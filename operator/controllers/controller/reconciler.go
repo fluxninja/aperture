@@ -313,7 +313,7 @@ func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log log
 	singletonInstance.Name = controllers.ControllerName
 
 	if !isCRNamedControllerPresent {
-		deployment, err := deploymentForController(singletonInstance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
+		deployment, err := deploymentForController(singletonInstance.DeepCopy(), log, r.Scheme)
 		if err != nil || deployment == nil {
 			log.Error(err, "Failed to create object for old Deployment during Migration")
 		} else {
@@ -459,19 +459,11 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	if r.tlsEnabled() {
-		// When controller TLS is enabled, force the TLS configuration
-		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-			CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
-			KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
-			Enabled:  true,
-		}
-	} else {
-		instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-			CertFile: "",
-			KeyFile:  "",
-			Enabled:  false,
-		}
+	// When controller TLS is enabled, force the TLS configuration
+	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
+		CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
+		KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
+		Enabled:  true,
 	}
 
 	if !r.MultipleControllers {
@@ -633,19 +625,10 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	return nil
 }
 
-func (r *ControllerReconciler) tlsEnabled() bool {
-	// FIXME: Manage per-controller tls certificates with cert-manager
-	if r.MultipleControllers {
-		return false
-	} else {
-		return true
-	}
-}
-
 // reconcileDeployment prepares the desired states for Controller Deployment and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	dep, err := deploymentForController(instance.DeepCopy(), r.tlsEnabled(), log, r.Scheme)
+	dep, err := deploymentForController(instance.DeepCopy(), log, r.Scheme)
 	if err != nil {
 		return err
 	}
