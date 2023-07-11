@@ -299,10 +299,10 @@ func (wsFactory *Factory) NewScheduler(
 	tokenManger scheduler.TokenManager,
 	schedulerMetrics *SchedulerMetrics,
 ) (*Scheduler, error) {
-	priorities := []uint64{proto.DefaultWorkloadParameters.Priority}
+	priorities := []uint64{uint64(proto.DefaultWorkloadParameters.Priority)}
 	// Loop through the workloads to find all priorities.
 	for _, workloadProto := range proto.Workloads {
-		priorities = append(priorities, workloadProto.Parameters.Priority)
+		priorities = append(priorities, uint64(workloadProto.Parameters.Priority))
 	}
 	// find least common multiple of all priorities
 	lcm := utils.LCMOfNums(priorities)
@@ -313,7 +313,7 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
-		invPriority := lcm / workloadProto.Parameters.Priority
+		invPriority := lcm / uint64(workloadProto.Parameters.Priority)
 		wm := &workloadMatcher{
 			workloadIndex: workloadIndex,
 			workload: &workload{
@@ -330,7 +330,7 @@ func (wsFactory *Factory) NewScheduler(
 	ws := &Scheduler{
 		proto: proto,
 		defaultWorkload: &workload{
-			invPriority: lcm / proto.DefaultWorkloadParameters.Priority,
+			invPriority: lcm / uint64(proto.DefaultWorkloadParameters.Priority),
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
 				Name:       metrics.DefaultWorkloadIndex,
@@ -398,15 +398,13 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	}
 
 	if matchedWorkloadParametersProto.Tokens != 0 {
-		tokens = matchedWorkloadParametersProto.Tokens
+		tokens = uint64(matchedWorkloadParametersProto.Tokens)
 	}
 
 	var matchedWorkloadTimeout time.Duration
+	hasWorkloadTimeout := false
 	if matchedWorkloadParametersProto.QueueTimeout != nil {
 		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
-	}
-	hasWorkloadTimeout := false
-	if matchedWorkloadTimeout > 0 {
 		hasWorkloadTimeout = true
 	}
 
@@ -420,8 +418,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	reqCtx := ctx
 
-	clientDeadline, hasDeadline := ctx.Deadline()
-	if hasDeadline || hasWorkloadTimeout {
+	clientDeadline, hasClientDeadline := ctx.Deadline()
+	if hasClientDeadline {
 		// The clientDeadline is calculated based on client's timeout, passed
 		// as grpc-timeout. Our goal is for the response to be received by the
 		// client before its deadline passes (otherwise we risk fail-open on
@@ -442,6 +440,11 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		}
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+		reqCtx = timeoutCtx
+	} else if hasWorkloadTimeout {
+		// If there is no client deadline but there is a workload timeout, we create a new context with the workload timeout.
+		timeoutCtx, cancel := context.WithTimeout(ctx, matchedWorkloadTimeout)
 		defer cancel()
 		reqCtx = timeoutCtx
 	}

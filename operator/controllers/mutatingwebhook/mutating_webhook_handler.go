@@ -33,7 +33,7 @@ import (
 // ApertureInjector injects the sidecar container of Aperture Agent in Pods.
 type ApertureInjector struct {
 	Client   client.Client
-	decoder  *admission.Decoder
+	Decoder  *admission.Decoder
 	Instance *agentv1alpha1.Agent
 }
 
@@ -41,7 +41,7 @@ type ApertureInjector struct {
 func (apertureInjector *ApertureInjector) Handle(ctx context.Context, req admission.Request) admission.Response {
 	pod := &corev1.Pod{}
 
-	err := apertureInjector.decoder.Decode(req, pod)
+	err := apertureInjector.Decoder.Decode(req, pod)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
@@ -77,10 +77,4 @@ func (apertureInjector *ApertureInjector) Handle(ctx context.Context, req admiss
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
-}
-
-// InjectDecoder injects the decoder.
-func (apertureInjector *ApertureInjector) InjectDecoder(d *admission.Decoder) error {
-	apertureInjector.decoder = d
-	return nil
 }

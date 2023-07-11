@@ -2,9 +2,14 @@
 package extconfig
 
 import (
+	"context"
+	"time"
+
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
 )
@@ -28,8 +33,10 @@ type FluxNinjaExtensionConfig struct {
 	ClientConfig ClientConfig `json:"client"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to configure local Prometheus OTel pipeline for metrics
+	// Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
 	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
+	// Whether to enable cloud controller. Overrides etcd and TLS configurations.
+	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 	// Controller ID.
 	ControllerID string `json:"controller_id,omitempty"`
 }
@@ -48,6 +55,7 @@ type ClientConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideConfig),
+		fx.Provide(provideEtcdConfigOverride),
 	)
 }
 
@@ -58,4 +66,37 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 		return nil, err
 	}
 	return &extensionConfig, nil
+}
+
+func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
+	if extensionConfig.EnableCloudController {
+		return &etcdclient.ConfigOverride{
+			EtcdConfig: etcd.EtcdConfig{
+				Namespace: "",
+				Endpoints: []string{extensionConfig.Endpoint},
+				LeaseTTL:  config.MakeDuration(60 * time.Second),
+			},
+			PerRPCCredentials: perRPCHeaders{
+				headers: map[string]string{
+					"apiKey": extensionConfig.APIKey,
+				},
+			},
+		}
+	} else {
+		return nil
+	}
+}
+
+type perRPCHeaders struct {
+	headers map[string]string
+}
+
+// GetRequestMetadata returns the request headers to be used with the RPC.
+func (p perRPCHeaders) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return p.headers, nil
+}
+
+// RequireTransportSecurity always returns true for this implementation.
+func (p perRPCHeaders) RequireTransportSecurity() bool {
+	return true
 }

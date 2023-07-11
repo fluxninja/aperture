@@ -29,9 +29,7 @@ import (
 )
 
 // ControllerHooks injects the default spec of Aperture Controller in CR.
-type ControllerHooks struct {
-	decoder *admission.Decoder
-}
+type ControllerHooks struct{}
 
 // Handle receives incoming requests from MutatingWebhook for newly created Controllers, set defaults and validates them.
 func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
@@ -61,10 +59,4 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, updatedController)
-}
-
-// InjectDecoder injects the decoder.
-func (controllerHooks *ControllerHooks) InjectDecoder(d *admission.Decoder) error {
-	controllerHooks.decoder = d
-	return nil
 }

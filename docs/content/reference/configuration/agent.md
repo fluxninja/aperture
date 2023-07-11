@@ -1538,7 +1538,20 @@ Controller ID.
 
 <!-- vale on -->
 
-Whether to configure local Prometheus OTel pipeline for metrics
+Whether to configure local Prometheus OTel pipeline for metrics. Implied to be
+true by EnableCloudController.
+
+</dd>
+<dt>enable_cloud_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to enable cloud controller. Overrides etcd and TLS configurations.
 
 </dd>
 <dt>endpoint</dt>

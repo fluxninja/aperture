@@ -81,8 +81,8 @@ control decisions.
 
 Aperture can automatically estimate the tokens for each workload based on
 historical latency measurements. See the `workload_latency_based_tokens`
-[configuration](/reference/configuration/spec.md#load-scheduler) for more
-details. The latency based token calculation is aligned with
+[configuration](/reference/configuration/spec.md#load-scheduler-parameters) for
+more details. The latency based token calculation is aligned with
 [Little's Law](https://en.wikipedia.org/wiki/Little%27s_law), which relates
 response times, arrival rate, and the system concurrency (number of in-flight
 requests).
