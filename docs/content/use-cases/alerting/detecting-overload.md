@@ -8,6 +8,8 @@ sidebar_position: 2
 ---
 
 ```mdx-code-block
+import {apertureVersion} from '../../apertureVersion.js';
+import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
@@ -81,6 +83,37 @@ based on the long-term EMA), the service is considered overloaded.
 ```
 
 </Zoom>
+
+## Installation
+
+Apply this custom policy to the `aperture-controller` namespace using
+`aperturectl` or `kubectl`. The
+[policy](/reference/aperturectl/apply/policy/policy.md) section within
+`aperturectl` documentation provides additional information and examples related
+the application of policies.
+
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
+
+```bash
+aperturectl apply policy --file=policy.yaml --kube
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
+
+```bash
+kubectl apply -f policy.yaml -n aperture-controller
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
 ## Policy in Action
 

@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/controllers"
@@ -188,7 +189,8 @@ func main() {
 		}
 
 		apertureInjector := &mutatingwebhook.ApertureInjector{
-			Client: mgr.GetClient(),
+			Client:  mgr.GetClient(),
+			Decoder: admission.NewDecoder(mgr.GetScheme()),
 		}
 		reconciler.ApertureInjector = apertureInjector
 
