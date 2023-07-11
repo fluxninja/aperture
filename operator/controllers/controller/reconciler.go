@@ -459,10 +459,19 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	// When controller TLS is enabled, force the TLS configuration
+	certFilePath := instance.Spec.ConfigSpec.Server.TLS.CertFile
+	if certFilePath == "" {
+		certFilePath = path.Join(controllers.ControllerCertPath, controllers.ControllerCertName)
+	}
+
+	keyFilePath := instance.Spec.ConfigSpec.Server.TLS.KeyFile
+	if keyFilePath == "" {
+		keyFilePath = path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName)
+	}
+
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
-		KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
+		CertFile: certFilePath,
+		KeyFile:  keyFilePath,
 		Enabled:  true,
 	}
 
