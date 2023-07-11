@@ -360,15 +360,6 @@ func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log log
 		certBytes = controllerClientCert.Bytes()
 	}
 
-	ccs, err := secretForControllerCert(instance.DeepCopy(), r.Scheme, bytes.NewBuffer(certBytes), bytes.NewBuffer(certBytes))
-	if err != nil {
-		return err
-	}
-	ccs.Name = fmt.Sprintf("%s-controller-cert", singletonInstance.GetName())
-	if err := r.Delete(ctx, ccs); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "Failed to delete old Controller Certificate Secret during Migration")
-	}
-
 	vwc := validatingWebhookConfiguration(singletonInstance.DeepCopy(), certBytes)
 	vwc.Name = controllers.ControllerServiceName
 	if err := r.Delete(ctx, vwc); err != nil && !errors.IsNotFound(err) {

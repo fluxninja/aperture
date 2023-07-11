@@ -387,7 +387,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					DefaultMode: pointer.Int32(420),
-					SecretName:  fmt.Sprintf("%s-cert", ControllerResourcesName(instance)),
+					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 				},
 			},
 		},
@@ -721,7 +721,7 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 
 // GetOrGenerateCertificate returns the TLS/SSL certificates of the Controller.
 func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1.Controller) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
-	secretName := fmt.Sprintf("%s-cert", ControllerResourcesName(instance))
+	secretName := fmt.Sprintf("%s-controller-cert", instance.GetName())
 
 	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
 		// generate certificates
