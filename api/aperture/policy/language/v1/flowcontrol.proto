@@ -225,7 +225,7 @@ message Scheduler {
       // virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
       // $$
       //
-      uint64 priority = 1; // @gotags: validate:"gt=0" default:"1"
+      int64 priority = 1; // @gotags: validate:"gt=0" default:"1"
 
       // Tokens determines the cost of admitting a single flow in the workload,
       // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -233,7 +233,7 @@ message Scheduler {
       // number of flows (3rd party rate limiters).
       // This override is applicable only if tokens for the flow aren't specified
       // in the flow labels.
-      uint64 tokens = 2;
+      int64 tokens = 2; // @gotags: validate:"gte=0"
 
       // Timeout for the flow in the workload.
       // If timeout is provided on the Check call as well, we pick the minimum of the two.

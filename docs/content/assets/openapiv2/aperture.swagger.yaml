@@ -3706,7 +3706,7 @@ definitions:
                     virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
                     $$
 
-                format: uint64
+                format: int64
                 minLength: 1
                 title: |-
                     Describes priority level of the flows within the workload.
@@ -3725,15 +3725,18 @@ definitions:
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
             tokens:
-                description: |-
+                description: |+
                     Tokens determines the cost of admitting a single flow in the workload,
                     which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
                     simply equal to 1 if the resource being accessed is constrained by the
                     number of flows (3rd party rate limiters).
                     This override is applicable only if tokens for the flow aren't specified
                     in the flow labels.
-                format: uint64
+
+                format: int64
+                minLength: 0
                 type: string
+                x-go-tag-validate: gte=0
         type: object
     Selector:
         description: |-
