@@ -69,13 +69,13 @@ return function(control_point)
     local request_body_json = json.encode(request_body)
     request_headers["Content-Type"] = "application/json"
     request_headers["Accept"] = "application/json"
-    request_headers["content-length"] = string.len(request_body_json)
+    request_headers["content-length"] = tostring(string.len(request_body_json))
     request_headers["grpc-timeout"] = apertureCheckTimeout
 
     local context, span = otlp_tracer:start(otlp_trace_context_propagator:extract(otlp_context, request),
         "Aperture CheckHTTP", {
             kind = otlp_span_kind.server,
-            attributes = {otlp_attr.string("aperture.source", "lua")}
+            attributes = { otlp_attr.string("aperture.source", "lua") }
         })
     ngx.ctx.otlp_span = span
 
