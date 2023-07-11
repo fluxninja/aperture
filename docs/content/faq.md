@@ -94,15 +94,23 @@ Aperture Agent is a binary that can be run on the
 The installation steps are available
 [here](/get-started/installation/agent/bare_metal.md).
 
-### What are the Aperture Agent's performance numbers?
+### What are Aperture Agent's performance numbers?
 
 The Aperture Agent is designed to be lightweight and performant.
 
-Comparing Aperture Agent’s CPU usage with the application it protects is unfair
-because the application’s CPU usage depends heavily on its workload type.
+With the following setup:
 
-With that being said, we have collected performance numbers at high RPS traffic
-constant arrival rate:
+- 1 node Kubernetes cluster
+- 1 Aperture Agent installed as a
+  [DaemonSet](/get-started/installation/agent/kubernetes/operator/daemonset.md)
+- Load-based rate limit escalation
+  [policy](/reference/blueprints/load-scheduling/average-latency.md) applied
+- 3 services in `demoapp` namespace instrumented using
+  [Istio Integration](/integrations/istio/istio.md)
+- 2500 RPS from 3 different user types (750 guests, 250 subscribers, 1500
+  crawlers identified from their headers) at constant arrival rate
+
+We have observed that:
 
 - On average, CPU utilization of Aperture Agent stays close to half of Istio
   Proxy’s
