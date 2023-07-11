@@ -94,21 +94,12 @@ Apply the policy using the `aperturectl` CLI or `kubectl`.
 <TabItem value="aperturectl" label="aperturectl">
 ```
 
-Pass the `--apply` flag with `aperturectl` to directly apply the generated
-policies on a Kubernetes cluster in the namespace where the Aperture Controller
-is installed.
+Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
+on a Kubernetes cluster in the namespace where the Aperture Controller is
+installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=quota-scheduling/base
---values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
-```
-
-Use the default configuration for the Kubernetes cluster under `~/.kube/config`,
-or opt for the `--kube-config` flag to indicate a different path.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=quota-scheduling/base
---values-file=values.yaml --kube-config=/path/to/config --apply --version={apertureVersion}</CodeBlock>
+<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/quota-scheduling.yaml --kube </CodeBlock>
 ```
 
 ```mdx-code-block

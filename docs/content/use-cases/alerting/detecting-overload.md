@@ -87,10 +87,10 @@ based on the long-term EMA), the service is considered overloaded.
 ## Installation
 
 Apply this custom policy to the `aperture-controller` namespace using
-`aperturectl` or `kubectl`. For more information and examples on how to apply
-[policies](/reference/aperturectl/apply/policy/policy.md) and
-[dynamic configurations](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
-using `aperturectl`, please consult the relevant sections.
+`aperturectl` or `kubectl`. The
+[policy](/reference/aperturectl/apply/policy/policy.md) section within
+`aperturectl` documentation provides additional information and examples related
+the application of policies.
 
 ```mdx-code-block
 <Tabs>
@@ -98,7 +98,7 @@ using `aperturectl`, please consult the relevant sections.
 ```
 
 ```bash
-aperturectl apply policy --file=policy.yaml
+aperturectl apply policy --file=policy.yaml --kube
 ```
 
 ```mdx-code-block
@@ -107,7 +107,7 @@ aperturectl apply policy --file=policy.yaml
 ```
 
 ```bash
- kubectl apply -f policy.yaml -n aperture-controller
+kubectl apply -f policy.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
