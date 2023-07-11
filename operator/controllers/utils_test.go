@@ -964,7 +964,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := ControllerVolumeMounts(true, instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1004,7 +1004,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 				},
 			}
 
-			result := ControllerVolumeMounts(true, instance.Spec.CommonSpec)
+			result := ControllerVolumeMounts(instance.Spec.CommonSpec)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1044,7 +1044,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := ControllerVolumes(true, instance.DeepCopy())
+			result := ControllerVolumes(instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -1099,7 +1099,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 				},
 			}
 
-			result := ControllerVolumes(true, instance.DeepCopy())
+			result := ControllerVolumes(instance.DeepCopy())
 			Expect(result).To(Equal(expected))
 		})
 	})
