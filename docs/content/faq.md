@@ -103,12 +103,10 @@ With the following setup:
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
   [DaemonSet](/get-started/installation/agent/kubernetes/operator/daemonset.md)
-- Load-based rate limit escalation
-  [policy](/reference/blueprints/load-scheduling/average-latency.md) applied
+- 1 policy with a rate limiter, a load scheduler and a flux meter
 - 3 services in `demoapp` namespace instrumented using
   [Istio Integration](/integrations/istio/istio.md)
-- 2500 RPS from 3 different user types (750 guests, 250 subscribers, 1500
-  crawlers identified from their headers) at constant arrival rate
+- 5000 RPS at constant arrival rate
 
 We have observed that:
 
