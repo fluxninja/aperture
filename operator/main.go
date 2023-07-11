@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/controllers"
@@ -124,6 +125,7 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+	decoder := admission.NewDecoder(mgr.GetScheme())
 
 	dynamicClient, err := dynamic.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
@@ -188,7 +190,8 @@ func main() {
 		}
 
 		apertureInjector := &mutatingwebhook.ApertureInjector{
-			Client: mgr.GetClient(),
+			Client:  mgr.GetClient(),
+			Decoder: decoder,
 		}
 		reconciler.ApertureInjector = apertureInjector
 
