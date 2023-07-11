@@ -107,14 +107,14 @@ With the following setup:
   scheduler][Load Scheduler] and a [flux meter][Flux Meter]
 - 3 services in `demoapp` namespace instrumented using
   [Istio Integration](/integrations/istio/istio.md)
-- 5000 RPS at constant arrival rate
+- 5000 RPS at constant arrival rate over 30 minutes
 
-We have observed the following mean performance numbers:
+We have observed the following performance numbers:
 
-|                | CPU (vCPU cores) | Memory (MB) |
-| -------------- | ---------------- | ----------- |
-| Aperture Agent | 0.783            | 13.7        |
-| Istio Proxy    | 1.81             | 12.5        |
+|                | CPU (vCPU cores)     | Memory (MB)         |
+| -------------- | -------------------- | ------------------- |
+| Aperture Agent | 0.783 mean, 1.02 max | 13.7 mean, 22.0 max |
+| Istio Proxy    | 1.81 mean, 2.11 max  | 12.5 mean, 20.8 max |
 
 [Rate Limiter]: /concepts/rate-limiter.md
 [Load Scheduler]: /concepts/scheduler/load-scheduler.md
