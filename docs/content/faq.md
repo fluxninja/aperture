@@ -109,11 +109,12 @@ With the following setup:
   [Istio Integration](/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate
 
-We have observed that:
+We have observed the following mean performance numbers:
 
-- On average, CPU utilization of Aperture Agent stays close to half of Istio
-  Proxy’s
-- On average, memory consumption of Aperture Agent remains around Istio Proxy’s
+|                | CPU (vCPU cores) | Memory (MB) |
+| -------------- | ---------------- | ----------- |
+| Aperture Agent | 0.783            | 13.7        |
+| Istio Proxy    | 1.81             | 12.5        |
 
 [Rate Limiter]: /concepts/rate-limiter.md
 [Load Scheduler]: /concepts/scheduler/load-scheduler.md
