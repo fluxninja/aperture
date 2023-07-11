@@ -1,6 +1,7 @@
 package inframeter
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"sort"
 	"strings"
@@ -13,6 +14,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"go.opentelemetry.io/collector/component"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
@@ -70,19 +73,82 @@ func addInfraMeter(
 		if err := id.UnmarshalText([]byte(origName)); err != nil {
 			return fmt.Errorf("invalid id %q: %w", origName, err)
 		}
-		id = component.NewIDWithName(id.Type(), normalizeComponentName(pipelineName, id.Name()))
+
+		sum := sha256.Sum256([]byte(receiverConfig.String()))
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", sum))
+		strID := id.String()
+
+		// If receiver is already present with given id and per-agent-group = false, skip adding receiver with per-agent-group = true.
+		if _, ok := config.Receivers[strID]; ok && infraMeter.PerAgentGroup {
+			receiverIDs[origName] = strID
+			continue
+		}
+
 		var cfg any
 		cfg = receiverConfig.AsMap()
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
-		receiverIDs[origName] = id.String()
-		config.AddReceiver(id.String(), cfg)
+		strID = id.String()
+
+		// Remove receiver for per-agent-group infra-meter if a receiver with the same config already exists without per-agent-group.
+		if !infraMeter.PerAgentGroup {
+			updatedID, _ := leaderonlyreceiver.WrapConfig(id, cfg)
+			if _, ok := config.Receivers[updatedID.String()]; ok {
+				delete(config.Receivers, updatedID.String())
+				for key, value := range receiverIDs {
+					if value == updatedID.String() {
+						receiverIDs[key] = id.String()
+					}
+				}
+
+				// Update pipelines to use the new receiver id.
+				for key, value := range config.Service.Pipelines {
+					if slices.Contains(value.Receivers, updatedID.String()) {
+						value.Receivers[slices.Index(value.Receivers, updatedID.String())] = id.String()
+						config.Service.Pipelines[key] = value
+					}
+				}
+			}
+		}
+		receiverIDs[origName] = strID
+		config.AddReceiver(strID, cfg)
 	}
 
 	for origName, processorConfig := range infraMeter.Processors {
-		id := normalizeComponentName(pipelineName, origName)
-		processorIDs[origName] = id
-		var cfg any = processorConfig.AsMap()
-		config.AddProcessor(id, cfg)
+		var id component.ID
+		if err := id.UnmarshalText([]byte(origName)); err != nil {
+			return fmt.Errorf("invalid id %q: %w", origName, err)
+		}
+
+		selectorsList := []interface{}{}
+		var selectors *structpb.Value
+		if id.Type() == otelconsts.ProcessorK8sAttributes {
+			var ok bool
+			selectors, ok = processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors]
+			if ok && selectors != nil {
+				selectorsList = selectors.GetListValue().AsSlice()
+				delete(processorConfig.Fields, otelconsts.ProcessorK8sAttributesSelectors)
+			}
+		}
+
+		sum := sha256.Sum256([]byte(processorConfig.String()))
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", sum))
+		strID := id.String()
+		if processor, ok := config.Processors[strID]; ok {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+				updateK8sAttributesProcessor(processor, selectorsList)
+				config.Processors[strID] = processor
+			}
+			processorIDs[origName] = strID
+			continue
+		} else {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+			}
+			processorIDs[origName] = strID
+			var cfg any = processorConfig.AsMap()
+			config.AddProcessor(strID, cfg)
+		}
 	}
 
 	if infraMeter.Pipeline == nil {
@@ -120,7 +186,6 @@ func addInfraMeter(
 		),
 		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
 	})
-
 	return nil
 }
 
@@ -143,13 +208,22 @@ func mapSlice(mapping map[string]string, xs []string) []string {
 	return ys
 }
 
-// normalizeComponentName normalizes user defines component name by adding
-// `user-defined-<pipeline_name>` suffix.
-// This ensures no builtin components are overwritten.
-func normalizeComponentName(pipelineName, componentName string) string {
-	suffix := fmt.Sprintf("user-defined-%s", pipelineName)
-	if componentName == "" {
-		return suffix
+func updateK8sAttributesProcessor(processor interface{}, selectorsList []interface{}) {
+	processorMap := processor.(map[string]interface{})
+	if processorMap != nil {
+		var existingSelectorsList []interface{}
+		existingSelectors, ok := processorMap[otelconsts.ProcessorK8sAttributesSelectors]
+		if !ok || existingSelectors == nil {
+			existingSelectorsList = []interface{}{}
+		} else {
+			existingSelectorsList = existingSelectors.([]interface{})
+			if existingSelectorsList == nil {
+				existingSelectorsList = []interface{}{}
+			}
+		}
+
+		if len(selectorsList) > 0 {
+			processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
+		}
 	}
-	return fmt.Sprintf("%s/%s", componentName, suffix)
 }

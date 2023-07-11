@@ -178,7 +178,9 @@ const (
 	// ProcessorFilterHighCardinalityMetrics filters out high cardinality Aperture platform metrics.
 	ProcessorFilterHighCardinalityMetrics = "filter/high_cardinality_metrics"
 	// ProcessorK8sAttributes enriches metrics with k8s metadata.
-	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
+	ProcessorK8sAttributes = "k8sattributes"
+	// ProcessorK8sAttributesSelectors is the key name of selectors field in k8sattributes processor.
+	ProcessorK8sAttributesSelectors = "selectors"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "logging"
