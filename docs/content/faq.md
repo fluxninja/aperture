@@ -111,7 +111,7 @@ With the following setup:
 
 We have observed the following performance numbers:
 
-|                | CPU (vCPU cores)     | Memory (MB)         |
+|                | CPU (vCPU core)      | Memory (MB)         |
 | -------------- | -------------------- | ------------------- |
 | Aperture Agent | 0.783 mean, 1.02 max | 13.7 mean, 22.0 max |
 | Istio Proxy    | 1.81 mean, 2.11 max  | 12.5 mean, 20.8 max |
