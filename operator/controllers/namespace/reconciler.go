@@ -151,7 +151,10 @@ func (r *NamespaceReconciler) reconcileControllerCertConfigMap(ctx context.Conte
 		instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
 	}
 
+	caFile := instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile
+	instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = ""
 	configMap := agent.CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, namespace)
+	instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = caFile
 
 	if configMap == nil {
 		return nil
