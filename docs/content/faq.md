@@ -103,7 +103,8 @@ With the following setup:
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
   [DaemonSet](/get-started/installation/agent/kubernetes/operator/daemonset.md)
-- 1 policy with a rate limiter, a load scheduler and a flux meter
+- 1 policy with a [rate limiter][Rate Limiter], a [load
+  scheduler][Load Scheduler] and a [flux meter][Flux Meter]
 - 3 services in `demoapp` namespace instrumented using
   [Istio Integration](/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate
@@ -116,6 +117,7 @@ We have observed that:
 
 [Rate Limiter]: /concepts/rate-limiter.md
 [Load Scheduler]: /concepts/scheduler/load-scheduler.md
+[Flux Meter]: /concepts/flux-meter.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
 [Aperture Controller]: /get-started/installation/controller/controller.md
