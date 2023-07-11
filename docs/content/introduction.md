@@ -63,7 +63,7 @@ Aperture provides a variety of advanced load management features:
   mitigating potential service disruptions and ensuring optimal performance
   under all load conditions.
 - 📊
-  [**Intelligent Quota Management**](./use-cases/managing-quotas/managing-quotas.md):
+  [**Global Quota Management**](./use-cases/managing-quotas/managing-quotas.md):
   Maintain compliance with external API quotas with a global token bucket and
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
@@ -92,8 +92,14 @@ Aperture provides a variety of advanced load management features:
   usage.
 - 🚀
   [**Percentage Rollouts**](./use-cases/percentage-rollouts/percentage-rollouts.md):
-  Aperture enables teams to gradually release new features to a subset of users,
-  without impacting the rest of the system, using dark launch.
+  Enable teams to gradually release new features to a subset of users, without
+  impacting the rest of the system. Aperture provides automated load ramping
+  functionality, allowing for a safe and controlled increment of load to new
+  features or API endpoints. This feature continuously monitors for potential
+  performance issues and includes an automatic response mechanism to dial back
+  load in case of a performance regression. This proactive approach minimizes
+  service disruptions and maintains consistent performance, even when rolling
+  out new features.
 
 ## 🛠️ How it works
 

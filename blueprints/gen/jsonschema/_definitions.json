@@ -2823,7 +2823,7 @@
         "priority": {
           "default": "1",
           "description": "$$\ninverted\\_priority = {\\frac {\\operatorname{lcm} \\left(priorities\\right)} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
-          "format": "uint64",
+          "format": "int64",
           "minLength": 1,
           "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
           "type": "string",
@@ -2835,9 +2835,11 @@
           "type": "string"
         },
         "tokens": {
-          "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.",
-          "format": "uint64",
-          "type": "string"
+          "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.\n\n",
+          "format": "int64",
+          "minLength": 0,
+          "type": "string",
+          "x-go-tag-validate": "gte=0"
         }
       },
       "type": "object",

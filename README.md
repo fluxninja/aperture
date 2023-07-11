@@ -70,12 +70,14 @@ Aperture provides a variety of advanced load management features:
   Aperture's high-performance, distributed rate limiter. This feature enforces
   per-key limits based on fine-grained labels, ensuring precise control and
   prevention of excessive usage.
-- **Automated load ramping:** Ensure a safe and gradual increment of load to new
-  features or API endpoints. Aperture continuously monitors for potential
-  performance issues, offering an automatic response mechanism to dial back load
-  in case of a performance regression. This proactive approach minimizes service
-  disruptions and maintains consistent performance, even when rolling out new
-  features.
+- **Percentage rollouts:** Enable teams to gradually release new features to a
+  subset of users, without impacting the rest of the system. Aperture provides
+  automated load ramping functionality, allowing for a safe and controlled
+  increment of load to new features or API endpoints. This feature continuously
+  monitors for potential performance issues and includes an automatic response
+  mechanism to dial back load in case of a performance regression. This
+  proactive approach minimizes service disruptions and maintains consistent
+  performance, even when rolling out new features.
 
 ## 🏗️ Architecture
 
