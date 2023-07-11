@@ -352,27 +352,24 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 }
 
 // ControllerVolumeMounts prepares volumeMounts for Controllers' container.
-func ControllerVolumeMounts(tlsEnabled bool, controllerSpec common.CommonSpec) []corev1.VolumeMount {
+func ControllerVolumeMounts(controllerSpec common.CommonSpec) []corev1.VolumeMount {
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "aperture-controller-config",
 			MountPath: "/etc/aperture/aperture-controller/config",
 		},
-	}
-
-	if tlsEnabled {
-		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+		{
 			Name:      "server-cert",
 			MountPath: "/etc/aperture/aperture-controller/certs",
 			ReadOnly:  true,
-		})
+		},
 	}
 
 	return MergeVolumeMounts(volumeMounts, controllerSpec.ExtraVolumeMounts)
 }
 
 // ControllerVolumes prepares volumes for Controller.
-func ControllerVolumes(tlsEnabled bool, instance *controllerv1alpha1.Controller) []corev1.Volume {
+func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume {
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-controller-config",
@@ -385,18 +382,15 @@ func ControllerVolumes(tlsEnabled bool, instance *controllerv1alpha1.Controller)
 				},
 			},
 		},
-	}
-
-	if tlsEnabled {
-		volumes = append(volumes, corev1.Volume{
+		{
 			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					DefaultMode: pointer.Int32(420),
-					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
+					SecretName:  fmt.Sprintf("%s-cert", ControllerResourcesName(instance)),
 				},
 			},
-		})
+		},
 	}
 
 	return MergeVolumes(volumes, instance.Spec.ExtraVolumes)
@@ -727,7 +721,7 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 
 // GetOrGenerateCertificate returns the TLS/SSL certificates of the Controller.
 func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1.Controller) (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
-	secretName := fmt.Sprintf("%s-controller-cert", instance.GetName())
+	secretName := fmt.Sprintf("%s-cert", ControllerResourcesName(instance))
 
 	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
 		// generate certificates
