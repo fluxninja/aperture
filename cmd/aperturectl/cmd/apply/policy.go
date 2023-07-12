@@ -23,17 +23,22 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var (
-	file string
-	dir  string
+	file      string
+	dir       string
+	force     bool
+	selectAll bool
 )
 
 func init() {
 	ApplyPolicyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
 	ApplyPolicyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
+	ApplyPolicyCmd.Flags().BoolVarP(&force, "force", "f", false, "Force apply policy even if it already exists")
+	ApplyPolicyCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all policies in the directory")
 }
 
 // ApplyPolicyCmd is the command to apply a policy to the cluster.
@@ -55,9 +60,15 @@ aperturectl apply policy --dir=policies`,
 			}
 
 			model := tui.InitialCheckboxModel(policies, "Which policies to apply?")
-			p := tea.NewProgram(model)
-			if _, err := p.Run(); err != nil {
-				return err
+			if !selectAll {
+				p := tea.NewProgram(model)
+				if _, err := p.Run(); err != nil {
+					return err
+				}
+			} else {
+				for i := range policies {
+					model.Selected[i] = struct{}{}
+				}
 			}
 
 			for policyIndex := range model.Selected {
@@ -100,10 +111,36 @@ func getPolicy(policyFile string) (*languagev1.Policy, error) {
 	}
 	_, policy, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 	if err != nil {
-		return nil, err
+		policyCR, err := getPolicyCR(policyFile)
+		if err != nil {
+			return nil, err
+		}
+
+		policy = &languagev1.Policy{}
+		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
+		if err != nil {
+			return nil, err
+		}
+
+		return policy, nil
 	}
 
 	return policy, nil
+}
+
+func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
+	policyBytes, err := os.ReadFile(policyFile)
+	if err != nil {
+		return nil, err
+	}
+
+	policyCR := &policyv1alpha1.Policy{}
+	err = config.UnmarshalYAML(policyBytes, policyCR)
+	if err != nil {
+		return nil, err
+	}
+
+	return policyCR, nil
 }
 
 // applyPolicy applies a policy to the cluster.
@@ -247,6 +284,10 @@ func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8scl
 
 // checkForUpdate checks if the user wants to update the policy.
 func checkForUpdate(name string) (bool, error) {
+	if force {
+		return true, nil
+	}
+
 	model := tui.InitialRadioButtonModel([]string{"Yes", "No"}, fmt.Sprintf("Policy '%s' already exists. Do you want to update it?", name))
 	p := tea.NewProgram(model)
 	if _, err := p.Run(); err != nil {
