@@ -101,7 +101,7 @@ func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecyc
 			var merr error
 			for _, configEtcdPath := range samplerSync.configEtcdPaths {
 				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.Session.Lease()))
 				if err != nil {
 					logger.Error().Err(err).Msg("failed to put sampler config")
 					merr = multierr.Append(merr, err)

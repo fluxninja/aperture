@@ -62,7 +62,7 @@ func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.O
 			case opt := <-ew.opChannel.Out():
 				opt.opts = append(opt.opts, opts...)
 				if ew.withLease && opt.opType == put {
-					opt.opts = append(opt.opts, clientv3.WithLease(ew.etcdClient.LeaseID))
+					opt.opts = append(opt.opts, clientv3.WithLease(ew.etcdClient.Session.Lease()))
 				}
 
 				var err error

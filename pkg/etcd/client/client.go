@@ -54,13 +54,11 @@ type ClientIn struct {
 }
 
 // Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
+//
+// Client.Client is nil before OnStart.
 type Client struct {
-	KV      clientv3.KV
-	Watcher clientv3.Watcher
-	Lease   clientv3.Lease
-	Client  *clientv3.Client
+	*clientv3.Client
 	Session *concurrencyv3.Session
-	LeaseID clientv3.LeaseID
 }
 
 // ProvideClient creates a new Etcd Client and provides it via Fx.
@@ -124,26 +122,24 @@ func ProvideClient(in ClientIn) (*Client, error) {
 					return err
 				}
 			}
+
+			if config.Namespace != "" {
+				// namespace the client
+				cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
+				cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
+				cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
+			}
+
 			etcdClient.Client = cli
 
-			// namespace the client
-			cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
-			etcdClient.Lease = cli.Lease
-			cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
-			etcdClient.KV = cli.KV
-			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
-			etcdClient.Watcher = cli.Watcher
-
 			// Create a new Session
-			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
+			session, err := concurrencyv3.NewSession(cli, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to create a new session")
 				cancel()
 				return err
 			}
 			etcdClient.Session = session
-			// save the lease id
-			etcdClient.LeaseID = session.Lease()
 			// A goroutine to check if the session is expired
 			panichandler.Go(func() {
 				// wait for the context to be done or session to be closed

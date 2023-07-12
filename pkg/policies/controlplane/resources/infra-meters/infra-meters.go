@@ -71,7 +71,7 @@ func (configSync *infraMeterConfigSync) doSync(etcdClient *etcdclient.Client, li
 			// Put the marshaled data in etcd using the provided etcdPath and LeaseID.
 			// It returns an error in case of any failure.
 			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.Session.Lease()))
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to put infra meter config")

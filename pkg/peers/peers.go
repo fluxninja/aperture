@@ -216,7 +216,7 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 		return err
 	}
 	_, err = pd.client.KV.Put(clientv3.WithRequireLeader(ctx),
-		pd.selfKey, string(b), clientv3.WithLease(pd.client.LeaseID))
+		pd.selfKey, string(b), clientv3.WithLease(pd.client.Session.Lease()))
 
 	return err
 }

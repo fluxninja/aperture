@@ -102,7 +102,7 @@ func (limiterSync *quotaSchedulerSync) setupSync(etcdClient *etcdclient.Client, 
 			var merr error
 			for _, configEtcdPath := range limiterSync.configEtcdPaths {
 				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.Session.Lease()))
 				if err != nil {
 					logger.Error().Err(err).Msg("failed to put rate limiter config")
 					merr = multierr.Append(merr, err)

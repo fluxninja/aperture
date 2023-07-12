@@ -70,7 +70,7 @@ func (configSync *loadSchedulerConfigSync) doSync(etcdClient *etcdclient.Client,
 				return err
 			}
 			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.Session.Lease()))
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to put flux meter config")
 				return err
