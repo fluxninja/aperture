@@ -14,6 +14,7 @@ import { RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
 import { useRequestToEndpoint, useTabChange } from '../hooks'
 import { AxiosError } from 'axios'
+import { GrafanaDashboard } from '../components/grafana-dashboard'
 
 const RATE_LIMIT_REQUEST: RequestSpec = {
   method: 'GET',
@@ -43,6 +44,8 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
     'User-Type': 'guest',
   },
 }
+
+const SIGNAL_AVERAGE_DASHBOARD_URL = `http://localhost:3000/d-solo/cf7b152fa1ba61b9b8c11a8fd3d03990df23535c/aperture-signals-workload-prioritization?orgId=1&refresh=5s&from=1689185655821&to=1689186555821&theme=dark&panelId=1`
 
 export const HomePage: FC = () => {
   const { handleChange, value } = useTabChange([
@@ -117,7 +120,7 @@ export const HomePage: FC = () => {
           isLoading={isLoadingGuest}
           error={workloadPriorityGuestError}
         />
-        <GrafanaDashboard src="http://localhost:3000/goto/3B9sI4CVg?orgId=1" />
+        <GrafanaDashboard src={SIGNAL_AVERAGE_DASHBOARD_URL} />
       </TabPanel>
     </TabContext>
   )
@@ -193,7 +196,3 @@ export const HomePageColumnBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   minHeight: 500,
 }))
-
-const GrafanaDashboard: FC<{ src: string }> = ({ src }) => (
-  <iframe style={{ width: '100%', height: '600px', border: 0 }} src={src} />
-);

@@ -1,7 +1,7 @@
-import {useGracefulRequest} from '@fluxninja-tools/graceful-js'
-import {useCallback, useEffect, useState} from 'react'
-import {api, RequestSpec} from '../api'
-import {RequestRecord} from '../components/monitor-request'
+import { useGracefulRequest } from '@fluxninja-tools/graceful-js'
+import { useCallback, useEffect, useState } from 'react'
+import { api, RequestSpec } from '../api'
+import { RequestRecord } from '../components/monitor-request'
 
 export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
