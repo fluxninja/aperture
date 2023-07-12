@@ -17,13 +17,13 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -92,8 +92,7 @@ func getPolicies(policyDir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		fileBase := info.Name()[:len(info.Name())-len(filepath.Ext(info.Name()))]
-		if filepath.Ext(info.Name()) == ".yaml" && !strings.HasSuffix(fileBase, "-cr") {
+		if filepath.Ext(info.Name()) == ".yaml" {
 			_, err := getPolicy(path)
 			if err != nil {
 				return err
@@ -117,7 +116,7 @@ func getPolicy(policyFile string) (*languagev1.Policy, error) {
 		}
 
 		policy = &languagev1.Policy{}
-		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
+		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +134,7 @@ func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
 	}
 
 	policyCR := &policyv1alpha1.Policy{}
-	err = config.UnmarshalYAML(policyBytes, policyCR)
+	err = yaml.Unmarshal(policyBytes, policyCR)
 	if err != nil {
 		return nil, err
 	}
