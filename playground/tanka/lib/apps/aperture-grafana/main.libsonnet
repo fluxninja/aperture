@@ -53,6 +53,7 @@ local grafanaMixin =
   + grafana.spec.withDashboardLabelSelector({ 'fluxninja.com/grafana-instance': 'aperture-grafana' })
   + grafana.spec.config.security.withAdmin_user('fluxninja')
   + grafana.spec.config.security.withAdmin_password('fluxninja')
+  + grafana.spec.config.security.withAllow_embedding(true)
   + grafana.spec.service.withName('aperture-grafana')
   + {
     spec+: {

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
-import { RequestSpec, api } from '../api'
-import { RequestRecord } from '../components/monitor-request'
-import { useGracefulRequest } from '@fluxninja-tools/graceful-js'
+import {useGracefulRequest} from '@fluxninja-tools/graceful-js'
+import {useCallback, useEffect, useState} from 'react'
+import {api, RequestSpec} from '../api'
+import {RequestRecord} from '../components/monitor-request'
 
 export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
@@ -33,7 +33,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
     const intervalId = setInterval(() => {
       setRequestCount((prevCount) => prevCount + 1)
       refetch()
-    }, 800)
+    }, 500)
 
     setIntervalId(intervalId)
 
@@ -52,7 +52,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       clearInterval(intervalId)
       return
     }
-    if (requestCount >= 60) {
+    if (requestCount >= 150) {
       clearInterval(intervalId)
       return
     }

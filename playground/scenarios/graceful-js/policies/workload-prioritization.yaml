@@ -34,7 +34,7 @@ policy:
                 match_labels:
                   user_type: "guest"
               parameters:
-                priority: "5"
+                priority: "50"
               name: "guest"
             - label_matcher:
                 match_labels:

@@ -117,6 +117,7 @@ export const HomePage: FC = () => {
           isLoading={isLoadingGuest}
           error={workloadPriorityGuestError}
         />
+        <GrafanaDashboard src="http://localhost:3000/goto/3B9sI4CVg?orgId=1" />
       </TabPanel>
     </TabContext>
   )
@@ -192,3 +193,7 @@ export const HomePageColumnBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   minHeight: 500,
 }))
+
+const GrafanaDashboard: FC<{ src: string }> = ({ src }) => (
+  <iframe style={{ width: '100%', height: '600px', border: 0 }} src={src} />
+);
