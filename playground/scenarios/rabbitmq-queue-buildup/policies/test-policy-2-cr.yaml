@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: service1-demoapp-rabbitmq-queue-buildup
+  name: test-policy-2
 spec:
   circuit:
     components:
@@ -13,7 +13,7 @@ spec:
           out_ports:
             output:
               signal_name: PROMQL_0
-          query_string: avg(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="service1-demo-app",k8s_namespace_name="demoapp",policy_name="service1-demoapp-rabbitmq-queue-buildup",infra_meter_name="kubeletstats"})
+          query_string: avg(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="service3-demo-app",k8s_namespace_name="demoapp",policy_name="test-policy-2",infra_meter_name="kubeletstats"})
     - decider:
         in_ports:
           lhs:
@@ -120,7 +120,7 @@ spec:
             selectors:
             - api_version: apps/v1
               kind: Deployment
-              name: service1-demo-app
+              name: service3-demo-app
               namespace: demoapp
         receivers:
           kubeletstats:

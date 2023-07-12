@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/promql/gen/definitions.json
 policy:
-  policy_name: "service1-demoapp-rabbitmq-queue-buildup"
+  policy_name: "test-policy-2"
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
   service_protection_core:
     dry_run: true
@@ -13,7 +13,7 @@ policy:
         agent_group: default
         api_version: apps/v1
         kind: Deployment
-        name: service1-demo-app
+        name: service3-demo-app
         namespace: demoapp
     adaptive_load_scheduler:
       load_scheduler:

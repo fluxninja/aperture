@@ -8,6 +8,12 @@
       "policy_name": "service1-demoapp-rabbitmq-queue-buildup",
       "values_file": "policies/rabbitmq-queue-buildup.yaml",
       "dashboard_mixin_dir": "dashboards/"
+    },
+    {
+      "blueprint_name": "load-scheduling/promql",
+      "policy_name": "test-policy-2",
+      "values_file": "policies/test-policy-2.yaml",
+      "dashboard_mixin_dir": "dashboards/"
     }
   ],
   "images": [
