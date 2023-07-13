@@ -95,7 +95,7 @@ function(cfg, params={}, metadata={}) {
 
   local policyDef =
     spec.v1.Policy.new()
-    + spec.v1.Policy.withResources(utils.resources(updatedConfig.policy.resources).updatedResources)
+    + spec.v1.Policy.withResources(updatedConfig.policy.resources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
       + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)

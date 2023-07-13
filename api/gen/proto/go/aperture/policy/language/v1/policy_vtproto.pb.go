@@ -652,18 +652,6 @@ func (m *Resources) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.TelemetryCollectors) > 0 {
-		for iNdEx := len(m.TelemetryCollectors) - 1; iNdEx >= 0; iNdEx-- {
-			size, err := m.TelemetryCollectors[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarint(dAtA, i, uint64(size))
-			i--
-			dAtA[i] = 0xa
-		}
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1587,12 +1575,6 @@ func (m *Resources) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.TelemetryCollectors) > 0 {
-		for _, e := range m.TelemetryCollectors {
-			l = e.SizeVT()
-			n += 1 + l + sov(uint64(l))
-		}
-	}
 	if len(m.InfraMeters) > 0 {
 		for k, v := range m.InfraMeters {
 			_ = k
@@ -3365,40 +3347,6 @@ func (m *Resources) UnmarshalVT(dAtA []byte) error {
 			return fmt.Errorf("proto: Resources: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TelemetryCollectors", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TelemetryCollectors = append(m.TelemetryCollectors, &TelemetryCollector{})
-			if err := m.TelemetryCollectors[len(m.TelemetryCollectors)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field InfraMeters", wireType)

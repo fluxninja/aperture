@@ -6411,19 +6411,6 @@ of the agent(s).
 :::
 
 </dd>
-<dt>telemetry_collectors</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]TelemetryCollector](#telemetry-collector))
-
-<!-- vale on -->
-
-TelemetryCollector configures OpenTelemetry collector integration. Deprecated:
-v2.8.0. Use `infra_meters` instead.
-
-</dd>
 </dl>
 
 ---
@@ -7559,78 +7546,6 @@ Outputs for the Switcher component.
 <!-- vale on -->
 
 Selected signal (`on_signal` or `off_signal`).
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### TelemetryCollector {#telemetry-collector}
-
-<!-- vale on -->
-
-TelemetryCollector defines the telemetry configuration to be synced with the
-agents. Deprecated: v2.8.0. Use `InfraMeter` instead. It consists of two parts:
-
-- Agent Group: Agent group to sync telemetry configuration with
-- Infra Meters: OTel compatible metrics pipelines
-
-<dl>
-<dt>agent_group</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, default: `"default"`)
-
-<!-- vale on -->
-
-</dd>
-<dt>infra_meters</dt>
-<dd>
-
-<!-- vale off -->
-
-(map of [InfraMeter](#infra-meter))
-
-<!-- vale on -->
-
-_Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which
-will receive and process telemetry at the agents and send metrics to the
-configured Prometheus. Key in this map refers to OTel pipeline name. Prefixing
-pipeline name with `metrics/` is optional, as all the components and pipeline
-names would be normalized.
-
-Example:
-
-```yaml
- telemetry_collectors:
-   - agent_group: default
-     infra_meters:
-	      rabbitmq:
-	        processors:
-	          batch:
-	            send_batch_size: 10
-	            timeout: 10s
-	        receivers:
-	          rabbitmq:
-	            collection_interval: 10s
-	            endpoint: http://<rabbitmq-svc-fqdn>:15672
-	            password: secretpassword
-	            username: admin
-	        per_agent_group: true
-
-```
-
-:::caution
-
-Validate the OTel configuration before applying it to the production cluster.
-Incorrect configuration will get rejected at the agents and might cause shutdown
-of the agent(s).
-
-:::
 
 </dd>
 </dl>

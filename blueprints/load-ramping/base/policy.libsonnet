@@ -341,7 +341,7 @@ function(cfg, metadata={}) {
   local policyDef =
     spec.v1.Policy.new()
     + spec.v1.Policy.withResources(
-      utils.resources(params.policy.resources).updatedResources +
+      params.policy.resources +
       spec.v1.Resources.new()
       + spec.v1.Resources.withFlowControl(
         spec.v1.FlowControlResources.new()

@@ -185,10 +185,6 @@ message Circuit {
 //
 // :::
 message Resources {
-  // TelemetryCollector configures OpenTelemetry collector integration.
-  // Deprecated: v2.8.0. Use `infra_meters` instead.
-  repeated TelemetryCollector telemetry_collectors = 1;
-
   // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
   // receive and process telemetry at the agents and send metrics to the configured Prometheus.
   // Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`

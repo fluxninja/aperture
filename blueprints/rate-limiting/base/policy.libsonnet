@@ -13,7 +13,7 @@ function(cfg, metadata={}) {
   local params = config + cfg,
   local policyDef =
     policy.new()
-    + policy.withResources(utils.resources(params.policy.resources).updatedResources)
+    + policy.withResources(params.policy.resources)
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')

@@ -148,7 +148,6 @@
   Switcher: import 'switcher.libsonnet',
   SwitcherIns: import 'switcherins.libsonnet',
   SwitcherOuts: import 'switcherouts.libsonnet',
-  TelemetryCollector: import 'telemetrycollector.libsonnet',
   UnaryOperator: import 'unaryoperator.libsonnet',
   UnaryOperatorIns: import 'unaryoperatorins.libsonnet',
   UnaryOperatorOuts: import 'unaryoperatorouts.libsonnet',

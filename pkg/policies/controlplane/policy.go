@@ -129,23 +129,6 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		}
 
 		infraMeters := resources.GetInfraMeters()
-
-		// Deprecated: v2.8.0.
-		telemetryCollectors := resources.GetTelemetryCollectors()
-		for _, tc := range telemetryCollectors {
-			if infraMeters == nil {
-				infraMeters = make(map[string]*policylangv1.InfraMeter)
-			}
-			for name, infraMeter := range tc.GetInfraMeters() {
-				if _, exists := infraMeters[name]; !exists {
-					infraMeter.AgentGroup = tc.GetAgentGroup()
-					infraMeters[name] = infraMeter
-				} else {
-					return nil, nil, nil, fmt.Errorf("duplicate infra meter name '%s' found in telemetry_collectors and infra_meters", name)
-				}
-			}
-		}
-
 		if infraMeters != nil {
 			tcOption, err := inframeters.NewInfraMetersOptions(infraMeters, policy)
 			if err != nil {
