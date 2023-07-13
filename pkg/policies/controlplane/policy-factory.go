@@ -210,9 +210,12 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 // GetPolicies returns all policies.
 func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	policyWrappers := factory.GetPolicyWrappers()
-	policies := make(map[string]*policylangv1.Policy)
+	policies := make(map[string]*policylangv1.GetPolicyResponse)
 	for _, v := range policyWrappers {
-		policies[v.GetCommonAttributes().GetPolicyName()] = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
+		policies[v.GetCommonAttributes().GetPolicyName()] = &policylangv1.GetPolicyResponse{
+			Policy: proto.Clone(v.GetPolicy()).(*policylangv1.Policy),
+			Status: policylangv1.GetPolicyResponse_VALID,
+		}
 	}
 	return &policylangv1.Policies{
 		Policies: policies,

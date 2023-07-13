@@ -1620,7 +1620,20 @@ definitions:
         properties:
             policy:
                 $ref: '#/definitions/Policy'
+            reason:
+                type: string
+            status:
+                $ref: '#/definitions/GetPolicyResponseStatus'
         type: object
+    GetPolicyResponseStatus:
+        default: VALID
+        description: |4-
+             - VALID: Policy is valid.
+             - INVALID: Policy is invalid.
+        enum:
+            - VALID
+            - INVALID
+        type: string
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -2895,7 +2908,7 @@ definitions:
         properties:
             policies:
                 additionalProperties:
-                    $ref: '#/definitions/Policy'
+                    $ref: '#/definitions/GetPolicyResponse'
                 type: object
         type: object
     Policy:
@@ -3406,7 +3419,7 @@ definitions:
             telemetry_collectors:
                 description: |-
                     TelemetryCollector configures OpenTelemetry collector integration.
-                    Deprecated: v2.8.0. Use `infra_meters` instead.
+                    Deprecated: v3.0.0. Use `infra_meters` instead.
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
@@ -4059,7 +4072,7 @@ definitions:
                 type: object
         title: |-
             TelemetryCollector defines the telemetry configuration to be synced with the agents.
-            Deprecated: v2.8.0. Use `InfraMeter` instead.
+            Deprecated: v3.0.0. Use `InfraMeter` instead.
             It consists of two parts:
             - Agent Group: Agent group to sync telemetry configuration with
             - Infra Meters: OTel compatible metrics pipelines
