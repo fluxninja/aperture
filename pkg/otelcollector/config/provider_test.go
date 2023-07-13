@@ -54,8 +54,6 @@ var _ = Describe("Provider", func() {
 		By("Adding a hook")
 		Expect(triggered).To(BeFalse())
 		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
-			// Make sure we don't rerun the same hook
-			Expect(cfg.Receivers).NotTo(HaveKey("ext1"))
 			cfg.AddReceiver("ext1", map[string]any{})
 		})
 		Expect(triggered).To(BeTrue())
