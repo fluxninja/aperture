@@ -41,21 +41,21 @@ func (p *Provider) Retrieve(
 	_ string,
 	watchFn confmap.WatcherFunc,
 ) (*confmap.Retrieved, error) {
-	c := p.getConfig()
+	c := p.GetConfig()
 	if c == nil {
 		log.Bug().Msg("Retrieve after Shutdown")
 		return nil, errors.New("already shut down")
 	}
 
-	p.setWatchFunc(watchFn)
+	p.SetWatchFunc(watchFn)
 	return confmap.NewRetrieved(p.config.AsMap())
 }
 
 // Shutdown implements confmap.Provider.
 func (p *Provider) Shutdown(ctx context.Context) error {
 	// Prevent UpdateConfig to run after Shutdown.
-	p.setWatchFunc(nil)
-	p.setConfig(nil)
+	p.SetWatchFunc(nil)
+	p.SetConfig(nil)
 	return nil
 }
 
@@ -77,8 +77,8 @@ func (p *Provider) UpdateConfig(config *Config) {
 		hook(config)
 	}
 
-	p.setConfigIfNotNil(config)
-	wf := p.getWatchFunc()
+	p.SetConfigIfNotNil(config)
+	wf := p.GetWatchFunc()
 	if wf != nil {
 		wf(&confmap.ChangeEvent{})
 	}
@@ -102,19 +102,22 @@ func (p *Provider) AddMutatingHook(hook func(*Config)) {
 	p.UpdateConfig(p.config)
 }
 
-func (p *Provider) getConfig() *Config {
+// GetConfig returns the current config.
+func (p *Provider) GetConfig() *Config {
 	p.configLock.RLock()
 	defer p.configLock.RUnlock()
 	return p.config
 }
 
-func (p *Provider) setConfig(config *Config) {
+// SetConfig sets the new config, replacing the old one.
+func (p *Provider) SetConfig(config *Config) {
 	p.configLock.Lock()
 	defer p.configLock.Unlock()
 	p.config = config
 }
 
-func (p *Provider) setConfigIfNotNil(config *Config) {
+// SetConfigIfNotNil sets the new config only if it nil.
+func (p *Provider) SetConfigIfNotNil(config *Config) {
 	p.configLock.Lock()
 	defer p.configLock.Unlock()
 	if p.config == nil {
@@ -124,13 +127,15 @@ func (p *Provider) setConfigIfNotNil(config *Config) {
 	p.config = config
 }
 
-func (p *Provider) getWatchFunc() confmap.WatcherFunc {
+// GetWatchFunc returns the current watch function.
+func (p *Provider) GetWatchFunc() confmap.WatcherFunc {
 	p.watchFuncLock.Lock()
 	defer p.watchFuncLock.Unlock()
 	return p.watchFunc
 }
 
-func (p *Provider) setWatchFunc(watchFunc confmap.WatcherFunc) {
+// SetWatchFunc sets the new watch function, replacing the old one.
+func (p *Provider) SetWatchFunc(watchFunc confmap.WatcherFunc) {
 	p.watchFuncLock.Lock()
 	defer p.watchFuncLock.Unlock()
 	p.watchFunc = watchFunc
