@@ -70,6 +70,7 @@ var _ = DescribeTable("FN Extension OTel", func(
 	Expect(err).NotTo(HaveOccurred())
 
 	c := configProvider.GetConfig()
+	Expect(c).ToNot(BeNil())
 	Expect(c.Receivers).To(Equal(expected.Receivers))
 	Expect(c.Processors).To(Equal(expected.Processors))
 	Expect(c.Exporters).To(Equal(expected.Exporters))
