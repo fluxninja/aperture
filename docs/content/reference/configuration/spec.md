@@ -6421,7 +6421,7 @@ of the agent(s).
 <!-- vale on -->
 
 TelemetryCollector configures OpenTelemetry collector integration. Deprecated:
-v2.8.0. Use `infra_meters` instead.
+v3.0.0. Use `infra_meters` instead.
 
 </dd>
 </dl>
@@ -7572,7 +7572,7 @@ Selected signal (`on_signal` or `off_signal`).
 <!-- vale on -->
 
 TelemetryCollector defines the telemetry configuration to be synced with the
-agents. Deprecated: v2.8.0. Use `InfraMeter` instead. It consists of two parts:
+agents. Deprecated: v3.0.0. Use `InfraMeter` instead. It consists of two parts:
 
 - Agent Group: Agent group to sync telemetry configuration with
 - Infra Meters: OTel compatible metrics pipelines
