@@ -130,7 +130,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 
 		infraMeters := resources.GetInfraMeters()
 
-		// Deprecated: v2.8.0.
+		// Deprecated: v3.0.0.
 		telemetryCollectors := resources.GetTelemetryCollectors()
 		for _, tc := range telemetryCollectors {
 			if infraMeters == nil {
