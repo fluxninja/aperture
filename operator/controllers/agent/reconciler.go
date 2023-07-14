@@ -120,7 +120,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			r.deleteResources(ctx, logger, instance.DeepCopy())
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
-			if err = r.updateAgent(ctx, instance); err != nil && !errors.IsNotFound(err) {
+			if err = r.UpdateAgent(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
 			}
 		}
@@ -200,7 +200,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		controllerutil.AddFinalizer(instance, controllers.FinalizerName)
 	}
 
-	if err := r.updateAgent(ctx, instance); err != nil {
+	if err := r.UpdateAgent(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -377,8 +377,8 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	}
 }
 
-// updateAgent updates the Agent resource in Kubernetes.
-func (r *AgentReconciler) updateAgent(ctx context.Context, instance *agentv1alpha1.Agent) error {
+// UpdateAgent updates the Agent resource in Kubernetes.
+func (r *AgentReconciler) UpdateAgent(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
