@@ -69,12 +69,10 @@ var _ = DescribeTable("FN Extension OTel", func(
 	err = app.Start(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
 
-	c := configProvider.GetConfig()
-	Expect(c).ToNot(BeNil())
-	Expect(c.Receivers).To(Equal(expected.Receivers))
-	Expect(c.Processors).To(Equal(expected.Processors))
-	Expect(c.Exporters).To(Equal(expected.Exporters))
-	Expect(c.Service.Pipelines).To(Equal(expected.Service.Pipelines))
+	Expect(configProvider.MustGetConfig().Receivers).To(Equal(expected.Receivers))
+	Expect(configProvider.MustGetConfig().Processors).To(Equal(expected.Processors))
+	Expect(configProvider.MustGetConfig().Exporters).To(Equal(expected.Exporters))
+	Expect(configProvider.MustGetConfig().Service.Pipelines).To(Equal(expected.Service.Pipelines))
 
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
