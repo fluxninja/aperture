@@ -82,7 +82,15 @@ message GetPolicyRequest {
 
 // GetPolicyResponse is a response containing the requested Policy.
 message GetPolicyResponse {
+  enum Status {
+    // Policy is valid.
+    VALID = 0;
+    // Policy is invalid.
+    INVALID = 1;
+  }
   Policy policy = 1;
+  Status status = 2;
+  string reason = 3;
 }
 
 // PostPolicyRequest is a request to create or update Policy.
@@ -121,7 +129,7 @@ message GetPoliciesResponse {
 
 // Policies is a collection of Policies.
 message Policies {
-  map<string, Policy> policies = 1;
+  map<string, GetPolicyResponse> policies = 1;
 }
 
 // Policy expresses observability-driven control logic.
@@ -186,7 +194,7 @@ message Circuit {
 // :::
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
-  // Deprecated: v2.8.0. Use `infra_meters` instead.
+  // Deprecated: v3.0.0. Use `infra_meters` instead.
   repeated TelemetryCollector telemetry_collectors = 1;
 
   // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will

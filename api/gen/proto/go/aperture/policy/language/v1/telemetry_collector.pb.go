@@ -22,7 +22,7 @@ const (
 )
 
 // TelemetryCollector defines the telemetry configuration to be synced with the agents.
-// Deprecated: v2.8.0. Use `InfraMeter` instead.
+// Deprecated: v3.0.0. Use `InfraMeter` instead.
 // It consists of two parts:
 // - Agent Group: Agent group to sync telemetry configuration with
 // - Infra Meters: OTel compatible metrics pipelines
