@@ -5,9 +5,8 @@ import (
 	"errors"
 	"sync"
 
-	"go.opentelemetry.io/collector/confmap"
-
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"go.opentelemetry.io/collector/confmap"
 )
 
 // comply with confmap.Provider interface.
@@ -17,12 +16,11 @@ var _ confmap.Provider = (*Provider)(nil)
 //
 // It allows updating the config and registering hooks.
 type Provider struct {
-	configLock    sync.RWMutex // protects config, watchFunc & hooks
-	watchFuncLock sync.Mutex   // protects watchFunc
-	config        *Config      // nil only after Shutdown.
-	watchFunc     confmap.WatcherFunc
-	hooks         []func(*Config)
-	scheme        string
+	lock      sync.Mutex // protects config, watchFunc & hooks
+	config    *Config    // nil only after Shutdown.
+	watchFunc confmap.WatcherFunc
+	hooks     []func(*Config)
+	scheme    string
 }
 
 // NewProvider creates a new OTelConfigProvider.
@@ -41,21 +39,25 @@ func (p *Provider) Retrieve(
 	_ string,
 	watchFn confmap.WatcherFunc,
 ) (*confmap.Retrieved, error) {
-	c := p.GetConfig()
-	if c == nil {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	if p.config == nil {
 		log.Bug().Msg("Retrieve after Shutdown")
 		return nil, errors.New("already shut down")
 	}
 
-	p.SetWatchFunc(watchFn)
+	p.watchFunc = watchFn
 	return confmap.NewRetrieved(p.config.AsMap())
 }
 
 // Shutdown implements confmap.Provider.
 func (p *Provider) Shutdown(ctx context.Context) error {
+	p.lock.Lock()
+	defer p.lock.Unlock()
 	// Prevent UpdateConfig to run after Shutdown.
-	p.SetWatchFunc(nil)
-	p.SetConfig(nil)
+	p.watchFunc = nil
+	p.config = nil
 	return nil
 }
 
@@ -73,14 +75,26 @@ func (p *Provider) UpdateConfig(config *Config) {
 		config = New()
 	}
 
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
 	for _, hook := range p.hooks {
 		hook(config)
 	}
 
-	p.SetConfigIfNotNil(config)
-	wf := p.GetWatchFunc()
-	if wf != nil {
-		wf(&confmap.ChangeEvent{})
+	p.setConfig(config)
+}
+
+// Set post-hooks config and trigger update, assuming p.lock locked.
+func (p *Provider) setConfig(config *Config) {
+	if p.config == nil {
+		log.Warn().Msg("OtelConfigProvider: tried to update config after Shutdown")
+		return
+	}
+
+	p.config = config
+	if p.watchFunc != nil {
+		p.watchFunc(&confmap.ChangeEvent{})
 	}
 }
 
@@ -89,9 +103,10 @@ func (p *Provider) UpdateConfig(config *Config) {
 // The hook should treat the given config as temporary.
 // The hook will also be executed immediately, to ensure that current config
 // was passed through all the added hooks.
-//
-// WARNING: This is supposed to be called only during initialization.
 func (p *Provider) AddMutatingHook(hook func(*Config)) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
 	if p.config == nil {
 		log.Warn().Msg("OtelConfigProvider.AddHook: already shut down")
 		return
@@ -99,44 +114,15 @@ func (p *Provider) AddMutatingHook(hook func(*Config)) {
 
 	p.hooks = append(p.hooks, hook)
 
-	p.UpdateConfig(p.config)
+	// Now the config provided to collector is outdated, run the newly-added hook.
+	hook(p.config)
+	p.setConfig(p.config)
 }
 
-// GetConfig returns the current config.
-func (p *Provider) GetConfig() *Config {
-	p.configLock.RLock()
-	defer p.configLock.RUnlock()
-	return p.config
-}
-
-// SetConfig sets the new config, replacing the old one.
-func (p *Provider) SetConfig(config *Config) {
-	p.configLock.Lock()
-	defer p.configLock.Unlock()
-	p.config = config
-}
-
-// SetConfigIfNotNil sets the new config only if it nil.
-func (p *Provider) SetConfigIfNotNil(config *Config) {
-	p.configLock.Lock()
-	defer p.configLock.Unlock()
-	if p.config == nil {
-		log.Warn().Msg("OtelConfigProvider: tried to update config after Shutdown")
-		return
-	}
-	p.config = config
-}
-
-// GetWatchFunc returns the current watch function.
-func (p *Provider) GetWatchFunc() confmap.WatcherFunc {
-	p.watchFuncLock.Lock()
-	defer p.watchFuncLock.Unlock()
-	return p.watchFunc
-}
-
-// SetWatchFunc sets the new watch function, replacing the old one.
-func (p *Provider) SetWatchFunc(watchFunc confmap.WatcherFunc) {
-	p.watchFuncLock.Lock()
-	defer p.watchFuncLock.Unlock()
-	p.watchFunc = watchFunc
+// MustGetConfig returns a snapshot of the current config.
+func (p *Provider) MustGetConfig() *Config {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	// Copying to avoid concurrent modification by hooks.
+	return p.config.MustCopy()
 }
