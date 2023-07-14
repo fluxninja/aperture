@@ -15,9 +15,6 @@
   <a href="https://goreportcard.com/report/github.com/fluxninja/aperture">
     <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/fluxninja/aperture?style=for-the-badge">
   </a>
-  <a href="https://codecov.io/gh/fluxninja/aperture/branch/main/">
-    <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/fluxninja/aperture?style=for-the-badge&logo=codecov">
-  </a>
   <a href="https://pkg.go.dev/github.com/fluxninja/aperture">
     <img alt="Godoc Reference" src="https://img.shields.io/badge/godoc-reference-brightgreen?style=for-the-badge&logo=go&logoColor=white">
   </a>
