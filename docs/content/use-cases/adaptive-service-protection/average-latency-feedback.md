@@ -148,10 +148,10 @@ limit (`1.1`) of historical latency.
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`default_config.dry_run` option to `true`. In the `Dry Run` mode, the policy
-does not throttle the request rate while still evaluating the decisions it would
-take in each cycle. This is useful for evaluating the policy without impacting
-the service.
+`policy.service_protection_core.dry_run` parameter to `true`. In the `Dry Run`
+mode, the policy does not throttle the request rate while still evaluating the
+decisions it would take in each cycle. This is useful for evaluating the policy
+without impacting the service.
 
 :::note
 

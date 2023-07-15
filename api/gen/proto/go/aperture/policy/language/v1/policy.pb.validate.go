@@ -188,6 +188,10 @@ func (m *GetPolicyResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Status
+
+	// no validation rules for Reason
+
 	if len(errors) > 0 {
 		return GetPolicyResponseMultiError(errors)
 	}

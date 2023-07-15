@@ -64,6 +64,44 @@ func RegisterPolicyService(
 // GetPolicies returns all the policies running in the system.
 func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
 	policies := s.policyFactory.GetPolicies()
+
+	// Fetching policies from etcd if they are not stored in factory due to invalid state.
+	response, err := s.etcdClient.Client.KV.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
+	if err != nil || len(response.Kvs) == 0 {
+		return &policylangv1.GetPoliciesResponse{
+			Policies: policies,
+		}, nil
+	}
+
+	for _, kv := range response.Kvs {
+		keySplit := strings.Split(string(kv.Key), fmt.Sprintf("%s/", paths.PoliciesAPIConfigPath))
+		var key string
+		if len(keySplit) == 2 {
+			key = keySplit[1]
+		} else {
+			continue
+		}
+
+		if policies.Policies[key] != nil {
+			continue
+		}
+
+		policy := &policylangv1.Policy{}
+		err = protojson.Unmarshal(kv.Value, policy)
+		if err != nil {
+			continue
+		}
+
+		_, _, err = ValidateAndCompile(ctx, key, kv.Value)
+		if err != nil {
+			policies.Policies[key] = &policylangv1.GetPolicyResponse{
+				Policy: policy,
+				Status: policylangv1.GetPolicyResponse_INVALID,
+				Reason: err.Error(),
+			}
+		}
+	}
+
 	return &policylangv1.GetPoliciesResponse{
 		Policies: policies,
 	}, nil
@@ -73,10 +111,35 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.GetPolicyRequest) (*policylangv1.GetPolicyResponse, error) {
 	policy := s.policyFactory.GetPolicy(request.Name)
 	if policy == nil {
-		return nil, status.Error(codes.NotFound, "policy not found")
+		response, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
+		if err != nil {
+			return nil, status.Error(codes.Internal, fmt.Sprintf("failted to fetch policy '%s'", request.Name))
+		}
+
+		if len(response.Kvs) == 0 {
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("policy '%s' not found", request.Name))
+		}
+
+		policy = &policylangv1.Policy{}
+		policyBytes := response.Kvs[0].Value
+		err = protojson.Unmarshal(policyBytes, policy)
+		if err != nil {
+			return nil, status.Error(codes.Internal, fmt.Sprintf("policy '%s' is invalid. Spec: '%s'", request.Name, string(policyBytes)))
+		}
+
+		_, _, err = ValidateAndCompile(ctx, request.Name, policyBytes)
+		if err != nil {
+			return &policylangv1.GetPolicyResponse{
+				Policy: policy,
+				Status: policylangv1.GetPolicyResponse_INVALID,
+				Reason: err.Error(),
+			}, nil
+		}
 	}
+
 	return &policylangv1.GetPolicyResponse{
 		Policy: policy,
+		Status: policylangv1.GetPolicyResponse_VALID,
 	}, nil
 }
 
@@ -89,7 +152,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	}
 
 	if policy != nil {
-		if !updateMask {
+		if !updateMask && policy.Status == policylangv1.GetPolicyResponse_VALID {
 			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use UpsertPolicy with PATCH call to update it.", req.PolicyName)
 		}
 

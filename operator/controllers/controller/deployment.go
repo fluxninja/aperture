@@ -36,7 +36,7 @@ import (
 )
 
 // deploymentForAPIService prepares the Deployment object for the Controller.
-func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled bool, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+func deploymentForController(instance *controllerv1alpha1.Controller, log logr.Logger, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	spec := instance.Spec
 
 	podLabels := controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.ControllerServiceName)
@@ -137,10 +137,10 @@ func deploymentForController(instance *controllerv1alpha1.Controller, tlsEnabled
 							LivenessProbe:            livenessProbe,
 							ReadinessProbe:           readinessProbe,
 							Lifecycle:                spec.LifecycleHooks,
-							VolumeMounts:             controllers.ControllerVolumeMounts(tlsEnabled, spec.CommonSpec),
+							VolumeMounts:             controllers.ControllerVolumeMounts(spec.CommonSpec),
 						},
 					},
-					Volumes: controllers.ControllerVolumes(tlsEnabled, instance),
+					Volumes: controllers.ControllerVolumes(instance),
 				},
 			},
 		},
