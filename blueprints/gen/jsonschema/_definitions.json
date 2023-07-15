@@ -2565,7 +2565,7 @@
           "type": "object"
         },
         "telemetry_collectors": {
-          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v2.8.0. Use `infra_meters` instead.",
+          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v3.0.0. Use `infra_meters` instead.",
           "items": {
             "$ref": "#/definitions/TelemetryCollector",
             "type": "object"
@@ -3024,7 +3024,7 @@
           "type": "object"
         }
       },
-      "title": "TelemetryCollector defines the telemetry configuration to be synced with the agents.\nDeprecated: v2.8.0. Use `InfraMeter` instead.\nIt consists of two parts:\n- Agent Group: Agent group to sync telemetry configuration with\n- Infra Meters: OTel compatible metrics pipelines",
+      "title": "TelemetryCollector defines the telemetry configuration to be synced with the agents.\nDeprecated: v3.0.0. Use `InfraMeter` instead.\nIt consists of two parts:\n- Agent Group: Agent group to sync telemetry configuration with\n- Infra Meters: OTel compatible metrics pipelines",
       "type": "object",
       "additionalProperties": false
     },

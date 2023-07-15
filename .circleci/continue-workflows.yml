@@ -71,6 +71,9 @@ parameters:
   updated-blueprints:
     type: boolean
     default: false
+  updated-playground-policies:
+    type: boolean
+    default: false
 
 jobs:
   build-push-add-tag:
@@ -1062,8 +1065,52 @@ jobs:
       - asdf_save_cache:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
+  upload-policy-to-latest:
+    parameters:
+      policy-name:
+        type: string
+        description: Name of the playground policy to apply
+      scenario-name:
+        type: string
+        description: Name of the playground scenario to apply
+      controller-endpoint:
+        type: string
+        description: The endpoint of the controller to which the policy should be applied
+    executor: go-cimg-executor
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-v1-upload-policies-go-cache
+      - run:
+          name: Apply Policy
+          working_directory: .
+          command: |
+            go run ./cmd/aperturectl/main.go apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
+            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
+      - save_cache:
+          name: Save go cache
+          key: aperture-v1-upload-policies-go-cache
+          paths:
+            - ../.cache/go-build
+            - ./blueprints/vendor
+          when: on_success
+
 workflows:
   version: 2
+
+  upload-policy-to-latest:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-playground-policies >>
+    jobs:
+      - upload-policy-to-latest:
+          name: upload-policy-to-latest
+          policy-name: service1-demo-app
+          scenario-name: service-protection-rl-escalation
+          controller-endpoint: fluxninja.latest.dev.fluxninja.com:443
 
   build-aperture-agent-bare-metal-package:
     when:

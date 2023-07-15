@@ -11,4 +11,6 @@ var (
 	noValidate     bool
 	overwrite      bool
 	graphDepth     int
+	force          bool
+	selectAll      bool
 )
