@@ -59,7 +59,7 @@ flow in the queue is computed based on its virtual finish time using the
 following formula:
 
 $$
-inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+inverted\_priority = {\frac {1} {priority}}
 $$
 
 $$

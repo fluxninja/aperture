@@ -98,7 +98,7 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 type flowTracker struct {
 	fairnessLabel string // what label it needs
 	tokens        uint64 // how many tokens it needs
-	priority      uint64
+	priority      float64
 	timeout       time.Duration
 	requestRate   uint64
 	// counters
@@ -110,7 +110,7 @@ func (flow *flowTracker) String() string {
 	return fmt.Sprintf("FlowTracker<"+
 		"Flow<FairnessLabel: %s "+
 		"| RequestTokens: %d "+
-		"| Priority: %d "+
+		"| Priority: %f "+
 		"| Timeout: %v "+
 		"| RequestRate: %d "+
 		"| TotalRequests: %d "+

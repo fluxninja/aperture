@@ -25,7 +25,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // Module provides the fx options for the workload scheduler.
@@ -299,26 +298,17 @@ func (wsFactory *Factory) NewScheduler(
 	tokenManger scheduler.TokenManager,
 	schedulerMetrics *SchedulerMetrics,
 ) (*Scheduler, error) {
-	priorities := []uint64{uint64(proto.DefaultWorkloadParameters.Priority)}
-	// Loop through the workloads to find all priorities.
-	for _, workloadProto := range proto.Workloads {
-		priorities = append(priorities, uint64(workloadProto.Parameters.Priority))
-	}
-	// find least common multiple of all priorities
-	lcm := utils.LCMOfNums(priorities)
-
 	mm := multimatcher.New[int, multiMatchResult]()
 	for workloadIndex, workloadProto := range proto.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
 		if err != nil {
 			return nil, err
 		}
-		invPriority := lcm / uint64(workloadProto.Parameters.Priority)
 		wm := &workloadMatcher{
 			workloadIndex: workloadIndex,
 			workload: &workload{
-				proto:       workloadProto,
-				invPriority: invPriority,
+				proto:    workloadProto,
+				priority: uint64(workloadProto.Parameters.Priority),
 			},
 		}
 		err = mm.AddEntry(workloadIndex, labelMatcher, wm.matchCallback)
@@ -330,7 +320,8 @@ func (wsFactory *Factory) NewScheduler(
 	ws := &Scheduler{
 		proto: proto,
 		defaultWorkload: &workload{
-			invPriority: lcm / uint64(proto.DefaultWorkloadParameters.Priority),
+			priority: uint64(proto.DefaultWorkloadParameters.Priority),
+			// invPriority: lcm / uint64(proto.DefaultWorkloadParameters.Priority),
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
 				Name:       metrics.DefaultWorkloadIndex,
@@ -354,11 +345,10 @@ func (wsFactory *Factory) NewScheduler(
 }
 
 // Decide processes a single flow by load scheduler in a blocking manner.
-//
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
 func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
-	var invPriority uint64
+	var invPriority float64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
 	mmr := s.workloadMultiMatcher.Match(labels)
@@ -372,7 +362,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
-		invPriority = matchedWorkload.invPriority
+		invPriority = float64(1 / matchedWorkload.priority)
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
 		if matchedWorkload.proto.GetName() != "" {
 			matchedWorkloadIndex = matchedWorkload.proto.GetName()
@@ -381,7 +371,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		}
 	} else {
 		// no match, return default workload
-		invPriority = s.defaultWorkload.invPriority
+		invPriority = float64(1 / s.defaultWorkload.priority)
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
 		matchedWorkloadIndex = s.defaultWorkload.proto.Name
 	}
@@ -412,6 +402,14 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
 			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
 				tokens = parsedTokens
+			}
+		}
+	}
+
+	if s.proto.PrioritiesLabelKey != "" {
+		if val, ok := labels.Get(s.proto.PrioritiesLabelKey); ok {
+			if parsedPriority, err := strconv.ParseUint(val, 10, 64); err == nil {
+				invPriority = float64(1 / parsedPriority)
 			}
 		}
 	}
@@ -523,8 +521,8 @@ type multiMatchResult struct {
 type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 
 type workload struct {
-	proto       *policylangv1.Scheduler_Workload
-	invPriority uint64
+	proto    *policylangv1.Scheduler_Workload
+	priority uint64
 }
 
 type workloadMatcher struct {

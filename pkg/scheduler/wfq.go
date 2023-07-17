@@ -5,6 +5,7 @@ import (
 	"container/list"
 	"context"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -17,8 +18,8 @@ type queuedRequest struct {
 	fInfo  *flowInfo
 	ready  chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
 	flowID string        // Flow ID
-	vft    uint64        // Virtual finish time
-	cost   uint64        // Cost of the request (invPriority * tokens)
+	vft    float64       // Virtual finish time
+	cost   float64       // Cost of the request (invPriority * tokens)
 	onHeap bool          // Whether the request is on the heap or not
 }
 
@@ -85,7 +86,7 @@ func (h *requestHeap) Pop() interface{} {
 
 type flowInfo struct {
 	queue         *list.List
-	vt            uint64
+	vt            float64
 	refCnt        int
 	requestOnHeap bool
 }
@@ -125,7 +126,7 @@ type WFQScheduler struct {
 	// flows
 	flows    map[string]*flowInfo
 	requests requestHeap
-	vt       uint64 // virtual time
+	vt       float64 // virtual time
 	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
 	generation uint64
 	lock       sync.Mutex
@@ -197,8 +198,8 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 }
 
 // Construct FlowID by appending RequestLabel and Priority.
-func (sched *WFQScheduler) flowID(fairnessLabel string, priority uint64, generation uint64) string {
-	return fmt.Sprintf("%s_%d_%d", fairnessLabel, priority, generation)
+func (sched *WFQScheduler) flowID(fairnessLabel string, priority float64, generation uint64) string {
+	return fmt.Sprintf("%s_%s_%d", fairnessLabel, strconv.FormatFloat(priority, 'f', -1, 64), generation)
 }
 
 // Attempt to queue this request.
@@ -229,7 +230,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 
 	qRequest.flowID = flowID
 
-	cost := request.Tokens * request.InvPriority
+	cost := float64(request.Tokens) * request.InvPriority
 
 	// Get FlowInfo
 	fInfo, ok := sched.flows[flowID]
