@@ -46,7 +46,7 @@ func RegisterPolicyService(
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			svc.etcdWriter = etcdwriter.NewWriter(etcdClient, false)
+			svc.etcdWriter = etcdwriter.NewWriter(&etcdClient.KVWrapper)
 			return nil
 		},
 		OnStop: func(context.Context) error {

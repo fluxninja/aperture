@@ -38,7 +38,7 @@ type ElectionIn struct {
 	fx.In
 	Lifecycle  fx.Lifecycle
 	Shutdowner fx.Shutdowner
-	Client     *etcd.Client
+	Session    *etcd.Session
 	AgentInfo  *agentinfo.AgentInfo
 	Trackers   notifiers.Trackers `name:"etcd_election"`
 }
@@ -54,7 +54,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			// Create an election for this client
-			election.Election = concurrencyv3.NewElection(in.Client.Session, "/election/"+in.AgentInfo.GetAgentGroup())
+			election.Election = concurrencyv3.NewElection(in.Session.Session, "/election/"+in.AgentInfo.GetAgentGroup())
 			// A goroutine to do leader election
 			panichandler.Go(func() {
 				defer close(election.doneChan)

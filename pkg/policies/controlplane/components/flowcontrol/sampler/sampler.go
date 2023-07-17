@@ -81,7 +81,7 @@ func NewSamplerAndOptions(
 	), nil
 }
 
-func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (samplerSync *samplerSync) setupSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
 	logger := samplerSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -100,14 +100,13 @@ func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecyc
 			}
 			var merr error
 			for _, configEtcdPath := range samplerSync.configEtcdPaths {
-				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-					configEtcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+				_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configEtcdPath, string(dat))
 				if err != nil {
 					logger.Error().Err(err).Msg("failed to put sampler config")
 					merr = multierr.Append(merr, err)
 				}
 			}
-			samplerSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
+			samplerSync.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return merr
 		},
 		OnStop: func(ctx context.Context) error {
@@ -115,7 +114,7 @@ func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecyc
 			deleteEtcdPath := func(paths []string) error {
 				var merr error
 				for _, path := range paths {
-					_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), path)
+					_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), path)
 					if err != nil {
 						logger.Error().Err(err).Msgf("failed to delete etcd path %s", path)
 						merr = multierr.Append(merr, err)

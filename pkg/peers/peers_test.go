@@ -17,7 +17,7 @@ var (
 
 var _ = Describe("Peers", func() {
 	BeforeEach(func() {
-		pd, err = NewPeerDiscovery("", nil, nil)
+		pd, err = NewPeerDiscovery("", nil, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		for _, peer := range hardCodedPeers.Peers {
 			pd.addPeer(peer)
