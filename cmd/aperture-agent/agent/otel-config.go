@@ -166,8 +166,13 @@ func addMetricsPipeline(
 	lis *listener.Listener,
 	promClient promapi.Client,
 ) {
+	pipeline := otelconfig.Pipeline{}
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
-	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+	if promClient != nil {
+		otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+		pipeline.Exporters = []string{otelconsts.ExporterPrometheusRemoteWrite}
+	}
+
 	processors := []string{
 		otelconsts.ProcessorAgentGroup,
 	}
@@ -176,11 +181,10 @@ func addMetricsPipeline(
 		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
 		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
 	}
-	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
-		Receivers:  []string{otelconsts.ReceiverPrometheus},
-		Processors: processors,
-		Exporters:  []string{otelconsts.ExporterPrometheusRemoteWrite},
-	})
+
+	pipeline.Processors = processors
+	pipeline.Receivers = []string{otelconsts.ReceiverPrometheus}
+	config.Service.AddPipeline("metrics/fast", pipeline)
 }
 
 func addPrometheusReceiver(

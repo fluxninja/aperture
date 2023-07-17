@@ -40,6 +40,14 @@ func (controllerHooks *ControllerHooks) Handle(ctx context.Context, req admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if len(controller.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+		return admission.Denied("At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
+	}
+
+	if controller.Spec.ConfigSpec.Prometheus.Address == "" {
+		return admission.Denied("The address for Prometheus must be provided under spec.config.prometheus.address.")
+	}
+
 	if (controller.Spec.Image.Digest == "" && controller.Spec.Image.Tag == "") || (controller.Spec.Image.Digest != "" && controller.Spec.Image.Tag != "") {
 		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
