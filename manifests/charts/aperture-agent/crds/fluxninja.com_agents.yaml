@@ -1299,8 +1299,8 @@ spec:
                           for metrics. Implied to be true by EnableCloudController.
                         type: boolean
                       enable_cloud_controller:
-                        description: Whether to enable ARC controller. Overrides etcd,
-                          prometheus writer and TLS configurations.
+                        description: Whether to enable ARC controller. Overrides etcd
+                          configuration and prometheus writer.
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in

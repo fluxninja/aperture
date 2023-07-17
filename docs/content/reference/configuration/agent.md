@@ -1551,8 +1551,8 @@ true by EnableCloudController.
 
 <!-- vale on -->
 
-Whether to enable ARC controller. Overrides etcd, prometheus writer and TLS
-configurations.
+Whether to enable ARC controller. Overrides etcd configuration and prometheus
+writer.
 
 </dd>
 <dt>endpoint</dt>
