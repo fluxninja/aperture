@@ -1,3 +1,5 @@
+# remove once https://github.com/yaml/pyyaml/issues/601 is fixed
+Cython<3
 flex==6.14.1
 Jinja2==3.1.2
 loguru==0.7.0
