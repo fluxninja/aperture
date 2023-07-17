@@ -17,7 +17,7 @@ var _ confmap.Provider = (*Provider)(nil)
 //
 // It allows updating the config and registering hooks.
 type Provider struct {
-	configLock    sync.RWMutex // protects config, watchFunc & hooks
+	configLock    sync.RWMutex // protects config
 	watchFuncLock sync.Mutex   // protects watchFunc
 	config        *Config      // nil only after Shutdown.
 	watchFunc     confmap.WatcherFunc
