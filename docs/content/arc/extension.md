@@ -59,11 +59,11 @@ export const CloudExtensionConfig = ({children, component}) => (
 ```
 
 If you are a FluxNinja ARC customer, you can enhance your Aperture experience by
-enabling FluxNinja extension. It enriches logs and traces collected by Aperture
-with additional dimensions and batches and rolls ups metrics to optimize
-bandwidth usage. In FluxNinja ARC, you can monitor your policies and analyze
-flows. FluxNinja extension also sends periodic heartbeats from Aperture Agents
-and Controllers to track their health and configuration.
+enabling the FluxNinja extension. It enriches logs and traces collected by
+Aperture with additional dimensions and batches and rolls ups metrics to
+optimize bandwidth usage. In FluxNinja ARC, you can monitor your policies and
+analyze flows. FluxNinja extension also sends periodic heartbeats from Aperture
+Agents and Controllers to track their health and configuration.
 
 ## Configuration
 

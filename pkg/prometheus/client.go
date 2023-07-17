@@ -58,11 +58,7 @@ type ClientIn struct {
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
 	var fluxNinjaConfig extconfig.FluxNinjaExtensionConfig
-	if err := in.Unmarshaller.UnmarshalKey(fluxninjaCOnfigKey, &fluxNinjaConfig); err != nil {
-		log.Error().Err(err).Msg("unable to deserialize")
-	}
-
-	if fluxNinjaConfig.EnableCloudController {
+	if err := in.Unmarshaller.UnmarshalKey(fluxninjaCOnfigKey, &fluxNinjaConfig); err == nil && fluxNinjaConfig.EnableCloudController {
 		return nil, nil, nil
 	}
 

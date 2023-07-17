@@ -1551,8 +1551,8 @@ true by EnableCloudController.
 
 <!-- vale on -->
 
-Whether to enable cloud controller. Overrides etcd and TLS configurations. See
-[FluxNinja ARC](/arc/arc.md) for more details.
+Whether to enable ARC controller. Overrides etcd, prometheus writer and TLS
+configurations.
 
 </dd>
 <dt>endpoint</dt>
