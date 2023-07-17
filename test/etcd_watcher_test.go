@@ -29,7 +29,7 @@ var _ = Describe("Etcd Watcher", func() {
 
 		BeforeEach(func() {
 			k := notifiers.Key(notifierKey)
-			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient, false)
+			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient)
 			Expect(err).NotTo(HaveOccurred())
 			etcdKeyNotifier.Start()
 			err := etcdWatcher.AddKeyNotifier(etcdKeyNotifier)
