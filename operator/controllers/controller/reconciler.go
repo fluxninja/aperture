@@ -156,7 +156,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
-			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
+			if err = r.UpdateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
 			}
 		}
@@ -242,7 +242,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	if err := r.updateController(ctx, instance); err != nil {
+	if err := r.UpdateController(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -255,8 +255,8 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	return ctrl.Result{}, nil
 }
 
-// updateController updates the Controller resource in Kubernetes.
-func (r *ControllerReconciler) updateController(ctx context.Context, instance *controllerv1alpha1.Controller) error {
+// UpdateController updates the Controller resource in Kubernetes.
+func (r *ControllerReconciler) UpdateController(ctx context.Context, instance *controllerv1alpha1.Controller) error {
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec

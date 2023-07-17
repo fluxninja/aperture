@@ -27,8 +27,8 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
+	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -173,16 +173,16 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	var reconciler *agent.AgentReconciler
+	var agentReconciler *agent.AgentReconciler
 	if agentManager {
-		reconciler = &agent.AgentReconciler{
+		agentReconciler = &agent.AgentReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
 			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
 		}
 
-		if err = reconciler.SetupWithManager(mgr); err != nil {
+		if err = agentReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Agent")
 			os.Exit(1)
 		}
@@ -198,21 +198,24 @@ func main() {
 			Client:  mgr.GetClient(),
 			Decoder: admission.NewDecoder(mgr.GetScheme()),
 		}
-		reconciler.ApertureInjector = apertureInjector
+		agentReconciler.ApertureInjector = apertureInjector
 
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
 		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
+	var controllerReconciler *controller.ControllerReconciler
 	if controllerManager {
-		if err = (&controller.ControllerReconciler{
+		controllerReconciler = &controller.ControllerReconciler{
 			Client:              mgr.GetClient(),
 			DynamicClient:       dynamicClient,
 			Scheme:              mgr.GetScheme(),
 			Recorder:            mgr.GetEventRecorderFor("aperture-controller"),
 			MultipleControllers: multipleControllersEnabled,
 			ResourcesDeleted:    map[string]bool{},
-		}).SetupWithManager(mgr); err != nil {
+		}
+
+		if err = controllerReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)
 		}
@@ -231,7 +234,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx := setupContext(reconciler)
+	ctx := setupContext(agentReconciler, controllerReconciler, agentManager)
 	setupLog.Info("starting webhook server")
 	go func() {
 		if err := server.Start(ctx); err != nil {
@@ -247,7 +250,7 @@ func main() {
 	}
 }
 
-func setupContext(reconciler *agent.AgentReconciler) context.Context {
+func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool) context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	c := make(chan os.Signal, 1)
@@ -255,29 +258,49 @@ func setupContext(reconciler *agent.AgentReconciler) context.Context {
 
 	go func() {
 		<-c
-		removeFinalizer(ctx, reconciler)
+		removeFinalizer(ctx, agentReconciler, controllerReconciler, agentManager)
 		cancel()
 	}()
 	return ctx
 }
 
-func removeFinalizer(ctx context.Context, reconciler *agent.AgentReconciler) {
-	// Remove the finalizer from the agent
-	agent := &agentv1alpha1.Agent{}
-	err := reconciler.Client.Get(ctx, types.NamespacedName{
-		Name:      os.Getenv("AGENT_CR_NAME"),
-		Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-	}, agent)
-	if err != nil {
-		fmt.Printf("Error while getting the agent: %s\n", err.Error())
-	}
+func removeFinalizer(ctx context.Context, agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool) {
+	if agentManager {
+		agentList := &agentv1alpha1.AgentList{}
+		err := agentReconciler.Client.List(ctx, agentList)
+		if err != nil {
+			setupLog.Error(err, "Error while getting the agent")
+		}
+		if agentList.Items != nil && len(agentList.Items) != 0 {
+			for _, agentCR := range agentList.Items {
+				agentCR := agentCR
+				if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
+					setupLog.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
+					controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
+					if err = agentReconciler.UpdateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
+						setupLog.Error(err, "Error while removing Finalizer from the agent")
+					}
+				}
+			}
+		}
+	} else {
+		controllerList := &controllerv1alpha1.ControllerList{}
 
-	setupLog.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
-	if controllerutil.ContainsFinalizer(agent, controllers.FinalizerName) {
-
-		controllerutil.RemoveFinalizer(agent, controllers.FinalizerName)
-		if err = reconciler.UpdateAgent(ctx, agent); err != nil && !errors.IsNotFound(err) {
-			fmt.Printf("Error while removing Finalizer from the agent: %s\n", err.Error())
+		err := controllerReconciler.Client.List(ctx, controllerList)
+		if err != nil {
+			setupLog.Error(err, "Error while getting the controller")
+		}
+		if controllerList.Items != nil && len(controllerList.Items) != 0 {
+			for _, controllerCR := range controllerList.Items {
+				controllerCR := controllerCR
+				if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
+					setupLog.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
+					controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
+					if err = controllerReconciler.UpdateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
+						setupLog.Error(err, "Error while removing Finalizer from the controller")
+					}
+				}
+			}
 		}
 	}
 }
