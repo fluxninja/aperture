@@ -1402,7 +1402,7 @@ EtcdConfig holds configuration for etcd client.
 
 <!-- vale off -->
 
-([]string, **required**)
+([]string)
 
 <!-- vale on -->
 
@@ -2678,7 +2678,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale off -->
 
-(string, format: `hostname_port | url | fqdn`, **required**)
+(string)
 
 <!-- vale on -->
 
