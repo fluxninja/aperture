@@ -37,7 +37,7 @@ var (
 )
 
 // FluxninjaCOnfigKey is the key used to store the FluxNinjaConfig in the config.
-var fluxninjaCOnfigKey = "fluxninja"
+var fluxninjaConfigKey = "fluxninja"
 
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
@@ -57,8 +57,9 @@ type ClientIn struct {
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
+	// Skipping creation of prometheus client if FluxNinja ARC controller is enabled for Aperture Agent
 	var fluxNinjaConfig extconfig.FluxNinjaExtensionConfig
-	if err := in.Unmarshaller.UnmarshalKey(fluxninjaCOnfigKey, &fluxNinjaConfig); err == nil && fluxNinjaConfig.EnableCloudController {
+	if err := in.Unmarshaller.UnmarshalKey(fluxninjaConfigKey, &fluxNinjaConfig); err == nil && fluxNinjaConfig.EnableCloudController {
 		return nil, nil, nil
 	}
 

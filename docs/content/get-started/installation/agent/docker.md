@@ -56,7 +56,7 @@ Below are the instructions to install the Aperture Agent on Docker.
    values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual
    values of etcd and Prometheus, which are also being used by the Aperture
    Controller you want these Agents to connect to. `CONTROLLER_ENDPOINT_HERE`
-   should point to Aperture Controller. If you skip it, some sub-commands
+   should point to the Aperture Controller. If you skip it, some sub-commands
    `aperturectl` commands won't work.
 
    If you have installed the

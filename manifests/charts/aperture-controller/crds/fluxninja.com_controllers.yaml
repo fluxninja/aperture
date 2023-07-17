@@ -1183,17 +1183,8 @@ spec:
                           for metrics. Implied to be true by EnableCloudController.
                         type: boolean
                       enable_cloud_controller:
-<<<<<<< HEAD
-                        description: Whether to enable cloud controller. Overrides
-                          etcd and TLS configurations. See [FluxNinja ARC](/arc/arc.md)
-                          for more details.
-||||||| parent of 4d21a3701 (CI fixes and review comment changes)
-                        description: Whether to enable cloud controller. Overrides
-                          etcd and TLS configurations.
-=======
                         description: Whether to enable ARC controller. Overrides etcd,
                           prometheus writer and TLS configurations.
->>>>>>> 4d21a3701 (CI fixes and review comment changes)
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
