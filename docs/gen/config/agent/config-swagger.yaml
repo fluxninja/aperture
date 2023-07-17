@@ -334,9 +334,13 @@ definitions:
                 $ref: '#/definitions/GRPCClientConfig'
                 description: gRPC client settings.
                 x-go-tag-json: grpc
-        title: ClientConfig is configuration for network clients used by agent-functions.
+            http:
+                $ref: '#/definitions/HTTPClientConfig'
+                description: HTTP client settings.
+                x-go-tag-json: http
+        title: ClientConfig is the client configuration.
         type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/agent-functions/config
+        x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -553,7 +557,7 @@ definitions:
                 x-go-tag-json: disable_local_otel_pipeline
             enable_cloud_controller:
                 default: false
-                description: Whether to enable ARC controller. Overrides etcd configuration and prometheus writer.
+                description: Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
                 type: boolean
                 x-go-name: EnableCloudController
                 x-go-tag-default: "false"

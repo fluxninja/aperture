@@ -22,9 +22,9 @@ To sign-up, [register here](https://app.fluxninja.com/sign-up).
 
 ### ARC Controller
 
-FluxNinja ARC Organization comes with an ARC Controller, which is a SaaS version
+FluxNinja ARC Organization includes an ARC Controller, which is a SaaS version
 of the Aperture Controller, This controller can be used instead of Aperture
-Controller deployed On-premise, and doesn't require local etcd and prometheus
+Controller deployed On-premise, and doesn't require local etcd and Prometheus
 services.
 
 Check the [FluxNinja extension configuration](extension.md#configuration), ARC

@@ -1184,7 +1184,7 @@ spec:
                         type: boolean
                       enable_cloud_controller:
                         description: Whether to enable ARC controller. Overrides etcd
-                          configuration and prometheus writer.
+                          configuration and Prometheus writer.
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
