@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -18,6 +19,8 @@ import (
 
 	"github.com/castai/promwrite"
 	backoff "github.com/cenkalti/backoff/v4"
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -54,6 +57,7 @@ type SimpleService struct {
 	// if it is injected.
 	envoyPort         int
 	rabbitMQURL       string
+	elasticsearch     elasticsearch.Config
 	concurrency       int           // Maximum number of concurrent clients
 	latency           time.Duration // Simulated latency for each request
 	rejectRatio       float64       // Ratio of requests to be rejected
@@ -71,6 +75,7 @@ func NewSimpleService(
 	port int,
 	envoyPort int,
 	rabbitMQURL string,
+	elasticsearchConfig elasticsearch.Config,
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
@@ -81,6 +86,7 @@ func NewSimpleService(
 		port:              port,
 		envoyPort:         envoyPort,
 		rabbitMQURL:       rabbitMQURL,
+		elasticsearch:     elasticsearchConfig,
 		concurrency:       concurrency,
 		latency:           latency,
 		rejectRatio:       rejectRatio,
@@ -155,6 +161,32 @@ func (ss SimpleService) Run() error {
 		}
 
 		go consumeFromQueue(q, cCh, handler)
+	}
+
+	if len(ss.elasticsearch.Addresses) > 0 {
+		es, err := elasticsearch.NewClient(ss.elasticsearch)
+		if err != nil {
+			log.Error().Msgf("Error creating the client: %s", err)
+			return err
+		}
+		handler.elasticsearch = es
+
+		attempts := 1
+		operation := func() error {
+			_, err = es.Indices.Create(handler.hostname, es.Indices.Create.WithWaitForActiveShards("1"))
+			if err != nil {
+				log.Error().Msgf("Error creating the index: %s - %d", err, attempts)
+				attempts += 1
+				return err
+			}
+
+			return nil
+		}
+
+		err = backoff.Retry(operation, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 10))
+		if err != nil {
+			return err
+		}
 	}
 
 	if ss.envoyPort == -1 {
@@ -403,6 +435,7 @@ type Subrequest struct {
 type RequestHandler struct {
 	httpClient        HTTPClient
 	rabbitMQChan      *amqp.Channel
+	elasticsearch     *elasticsearch.Client
 	limitClients      chan struct{}
 	hostname          string
 	concurrency       int
@@ -412,6 +445,93 @@ type RequestHandler struct {
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if h.elasticsearch != nil {
+		type document struct {
+			Count int `json:"count"`
+		}
+
+		i, _ := strconv.Atoi(r.Header.Get("User-Id"))
+		docID := fmt.Sprintf("doc-%d", i)
+		body := document{Count: 1}
+
+		getReq := esapi.GetRequest{
+			Index:      h.hostname,
+			DocumentID: docID,
+		}
+		res, err := getReq.Do(context.Background(), h.elasticsearch)
+		if err == nil && res != nil && res.StatusCode == http.StatusOK {
+			var doc map[string]interface{}
+			err = json.NewDecoder(res.Body).Decode(&doc)
+			if err == nil {
+				body.Count = int(doc["_source"].(map[string]interface{})["count"].(float64)) + 1
+				if body.Count > 500 {
+					body.Count = 1
+				}
+			}
+			res.Body.Close()
+		} else {
+			log.Error().Err(err).Msgf("Failed to get document. Res: %+v", res)
+		}
+
+		jsonBody, _ := json.Marshal(body)
+		res, err = h.elasticsearch.Update(h.hostname, docID, bytes.NewReader(jsonBody))
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to update document")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			res, err = h.elasticsearch.Index(h.hostname, bytes.NewReader(jsonBody), h.elasticsearch.Index.WithDocumentID(docID))
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed to Create document.")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			res.Body.Close()
+		}
+
+		wg := sync.WaitGroup{}
+		wg.Add(body.Count)
+		for i := 1; i <= body.Count; i++ {
+			go func(i int) {
+				defer wg.Done()
+				var buf bytes.Buffer
+				query := map[string]interface{}{
+					"query": map[string]interface{}{
+						"term": map[string]interface{}{
+							"count": i,
+						},
+					},
+				}
+				if err = json.NewEncoder(&buf).Encode(query); err != nil {
+					log.Error().Err(err).Msg("Failed to prepare for search")
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				res, err = h.elasticsearch.Search(
+					h.elasticsearch.Search.WithContext(context.Background()),
+					h.elasticsearch.Search.WithIndex(h.hostname),
+					h.elasticsearch.Search.WithBody(&buf),
+				)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed to search. Res: %+v", res)
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				res.Body.Close()
+			}(i)
+		}
+
+		wg.Wait()
+		w.WriteHeader(http.StatusAccepted)
+		return
+	}
+
 	var p Request
 
 	// Extract baggage and trace context from headers

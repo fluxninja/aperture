@@ -3,27 +3,41 @@ local elasticsearchApp = import 'apps/elasticsearch/main.libsonnet';
 local elasticsearchAppMixin =
   elasticsearchApp {
     values+: {
-      extraEnvVars: [
-        {
-          name: 'ELASTICSEARCH_USERNAME',
-          value: 'elasticsearch',
+      extraConfig+: {
+        network+: {
+          host: '0.0.0.0',
         },
-        {
-          name: 'ELASTICSEARCH_PASSWORD',
-          value: 'ThisIsASuperSecurePassword!',
+        discovery+: {
+          seed_hosts: '',
         },
-      ],
+        xpack+: {
+          monitoring+: {
+            collection+: {
+              enabled: true,
+            },
+          },
+        },
+      },
       master+: {
         extraRoles+: 'remote_cluster_client,ml',
+        replicaCount: 1,
+        masterOnly: false,
+        heapSize: '500m',
       },
       data+: {
-        extraRoles+: 'remote_cluster_client,ml',
+        // extraRoles+: 'remote_cluster_client,ml',
+        replicaCount: 0,
       },
       ingest+: {
-        extraRoles+: 'remote_cluster_client,ml',
+        // extraRoles+: 'remote_cluster_client,ml',
+        replicaCount: 0,
       },
       coordinating+: {
-        extraRoles+: 'remote_cluster_client,ml',
+        // extraRoles+: 'remote_cluster_client,ml',
+        replicaCount: 0,
+      },
+      security+: {
+        elasticPassword: 'ThisIsSuperSecuredPassword!',
       },
     },
   };

@@ -284,41 +284,42 @@ DEP_TREE = {
                     "resource_deps": ["cluster-bootstrap"],
                     "extra_objects": [
                         ("^elasticsearch-master", None),
+                        ("^elasticsearch$", "ConfigMap")
                     ],
                     "ignored_objects": [
                         ("^elasticsearch-master", "Service|StatefulSet")
                     ]
                 },
-                {
-                    "workload": "elasticsearch-coordinating",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^elasticsearch-coordinating", None),
-                    ],
-                    "ignored_objects": [
-                        ("^elasticsearch-coordinating", "Service|StatefulSet")
-                    ]
-                },
-                {
-                    "workload": "elasticsearch-data",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^elasticsearch-data", None),
-                    ],
-                    "ignored_objects": [
-                        ("^elasticsearch-data", "Service|StatefulSet")
-                    ]
-                },
-                {
-                    "workload": "elasticsearch-ingest",
-                    "resource_deps": ["cluster-bootstrap"],
-                    "extra_objects": [
-                        ("^elasticsearch-ingest", None),
-                    ],
-                    "ignored_objects": [
-                        ("^elasticsearch-ingest", "Service|StatefulSet")
-                    ]
-                },
+                # {
+                #     "workload": "elasticsearch-coordinating",
+                #     "resource_deps": ["cluster-bootstrap"],
+                #     "extra_objects": [
+                #         ("^elasticsearch-coordinating", None),
+                #     ],
+                #     "ignored_objects": [
+                #         ("^elasticsearch-coordinating", "Service|StatefulSet")
+                #     ]
+                # },
+                # {
+                #     "workload": "elasticsearch-data",
+                #     "resource_deps": ["cluster-bootstrap"],
+                #     "extra_objects": [
+                #         ("^elasticsearch-data", None),
+                #     ],
+                #     "ignored_objects": [
+                #         ("^elasticsearch-data", "Service|StatefulSet")
+                #     ]
+                # },
+                # {
+                #     "workload": "elasticsearch-ingest",
+                #     "resource_deps": ["cluster-bootstrap"],
+                #     "extra_objects": [
+                #         ("^elasticsearch-ingest", None),
+                #     ],
+                #     "ignored_objects": [
+                #         ("^elasticsearch-ingest", "Service|StatefulSet")
+                #     ]
+                # },
                 {
                     "workload": "elasticsearch-kibana",
                     "resource_deps": ["cluster-bootstrap"],
