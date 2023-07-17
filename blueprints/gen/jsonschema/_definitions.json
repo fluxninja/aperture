@@ -2827,13 +2827,13 @@
       "description": "Parameters such as priority and tokens that are applicable to flows within a workload.",
       "properties": {
         "priority": {
-          "default": "1",
+          "default": 1,
           "description": "$$\ninverted\\_priority = {\\frac {1} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
-          "format": "int64",
-          "minLength": 1,
-          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
-          "type": "string",
-          "x-go-tag-default": "1",
+          "exclusiveMinimum": 0,
+          "format": "double",
+          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive number.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
+          "type": "number",
+          "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gt=0"
         },
         "queue_timeout": {

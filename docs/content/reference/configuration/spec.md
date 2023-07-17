@@ -7074,12 +7074,12 @@ workload.
 
 <!-- vale off -->
 
-(string, default: `"1"`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 
 Describes priority level of the flows within the workload. Priority level is
-unbounded and can be any positive integer. Higher numbers means higher priority
+unbounded and can be any positive number. Higher numbers means higher priority
 level. The following formula is used to determine the position of a flow in the
 queue based on virtual finish time:
 

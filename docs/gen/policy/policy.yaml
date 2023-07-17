@@ -3011,7 +3011,7 @@ definitions:
         description: Parameters such as priority and tokens that are applicable to flows within a workload.
         properties:
             priority:
-                default: "1"
+                default: 1
                 description: |+
                     $$
                     inverted\_priority = {\frac {1} {priority}}
@@ -3021,15 +3021,16 @@ definitions:
                     virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
                     $$
 
-                format: int64
-                minLength: 1
+                exclusiveMinimum: true
+                format: double
+                minimum: 0
                 title: |-
                     Describes priority level of the flows within the workload.
-                    Priority level is unbounded and can be any positive integer.
+                    Priority level is unbounded and can be any positive number.
                     Higher numbers means higher priority level.
                     The following formula is used to determine the position of a flow in the queue based on virtual finish time:
-                type: string
-                x-go-tag-default: "1"
+                type: number
+                x-go-tag-default: "1.0"
                 x-go-tag-validate: gt=0
             queue_timeout:
                 description: |-

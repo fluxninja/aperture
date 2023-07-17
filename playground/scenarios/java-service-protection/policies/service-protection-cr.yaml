@@ -39,12 +39,12 @@ spec:
                     match_labels:
                       user_type: guest
                   parameters:
-                    priority: "50"
+                    priority: 50
                 - label_matcher:
                     match_labels:
                       user_type: subscriber
                   parameters:
-                    priority: "200"
+                    priority: 200
               selectors:
               - control_point: awesomeFeature
                 service: service1-demo-app.demoapp.svc.cluster.local

@@ -213,7 +213,7 @@ message Scheduler {
     // Parameters such as priority and tokens that are applicable to flows within a workload.
     message Parameters {
       // Describes priority level of the flows within the workload.
-      // Priority level is unbounded and can be any positive integer.
+      // Priority level is unbounded and can be any positive number.
       // Higher numbers means higher priority level.
       // The following formula is used to determine the position of a flow in the queue based on virtual finish time:
       //
@@ -225,7 +225,7 @@ message Scheduler {
       // virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
       // $$
       //
-      int64 priority = 1; // @gotags: validate:"gt=0" default:"1"
+      double priority = 1; // @gotags: validate:"gt=0" default:"1.0"
 
       // Tokens determines the cost of admitting a single flow in the workload,
       // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or

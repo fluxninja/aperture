@@ -45,8 +45,9 @@ spec:
                         - label_matches:
                             label: aperture.destination_fqdns
                             regex: service3-demo-app.demoapp.svc.cluster.local
+                  name: service1
                   parameters:
-                    priority: "200"
+                    priority: 200
                 - label_matcher:
                     expression:
                       all:
@@ -57,8 +58,9 @@ spec:
                         - label_matches:
                             label: aperture.destination_fqdns
                             regex: service3-demo-app.demoapp.svc.cluster.local
+                  name: service2
                   parameters:
-                    priority: "50"
+                    priority: 50
               selectors:
               - control_point: egress
                 service: service1-demo-app.demoapp.svc.cluster.local

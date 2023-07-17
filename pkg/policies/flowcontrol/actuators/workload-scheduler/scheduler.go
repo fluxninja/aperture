@@ -308,7 +308,7 @@ func (wsFactory *Factory) NewScheduler(
 			workloadIndex: workloadIndex,
 			workload: &workload{
 				proto:    workloadProto,
-				priority: uint64(workloadProto.Parameters.Priority),
+				priority: workloadProto.Parameters.Priority,
 			},
 		}
 		err = mm.AddEntry(workloadIndex, labelMatcher, wm.matchCallback)
@@ -320,7 +320,7 @@ func (wsFactory *Factory) NewScheduler(
 	ws := &Scheduler{
 		proto: proto,
 		defaultWorkload: &workload{
-			priority: uint64(proto.DefaultWorkloadParameters.Priority),
+			priority: proto.DefaultWorkloadParameters.Priority,
 			// invPriority: lcm / uint64(proto.DefaultWorkloadParameters.Priority),
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
@@ -362,7 +362,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
-		invPriority = float64(1 / matchedWorkload.priority)
+		invPriority = 1 / matchedWorkload.priority
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
 		if matchedWorkload.proto.GetName() != "" {
 			matchedWorkloadIndex = matchedWorkload.proto.GetName()
@@ -371,7 +371,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		}
 	} else {
 		// no match, return default workload
-		invPriority = float64(1 / s.defaultWorkload.priority)
+		invPriority = 1 / s.defaultWorkload.priority
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
 		matchedWorkloadIndex = s.defaultWorkload.proto.Name
 	}
@@ -408,8 +408,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	if s.proto.PrioritiesLabelKey != "" {
 		if val, ok := labels.Get(s.proto.PrioritiesLabelKey); ok {
-			if parsedPriority, err := strconv.ParseUint(val, 10, 64); err == nil {
-				invPriority = float64(1 / parsedPriority)
+			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
+				invPriority = 1 / parsedPriority
 			}
 		}
 	}
@@ -522,7 +522,7 @@ type multiMatcher = multimatcher.MultiMatcher[int, multiMatchResult]
 
 type workload struct {
 	proto    *policylangv1.Scheduler_Workload
-	priority uint64
+	priority float64
 }
 
 type workloadMatcher struct {
