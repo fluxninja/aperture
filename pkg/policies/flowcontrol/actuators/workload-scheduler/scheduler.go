@@ -321,7 +321,6 @@ func (wsFactory *Factory) NewScheduler(
 		proto: proto,
 		defaultWorkload: &workload{
 			priority: proto.DefaultWorkloadParameters.Priority,
-			// invPriority: lcm / uint64(proto.DefaultWorkloadParameters.Priority),
 			proto: &policylangv1.Scheduler_Workload{
 				Parameters: proto.DefaultWorkloadParameters,
 				Name:       metrics.DefaultWorkloadIndex,
