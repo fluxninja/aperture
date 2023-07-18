@@ -20,14 +20,6 @@ export const ExtensionConfig = ({children, component}) => (
   config:
     fluxninja:
       endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
-      client:
-        grpc:
-          insecure: false
-          tls:
-            insecure_skip_verify: true
-        http:
-          tls:
-            insecure_skip_verify: true
   secrets:
     fluxNinjaExtension:
       create: true
@@ -71,6 +63,13 @@ Configure the following parameters in the `values.yaml` file generated during
 installation of the Aperture Controller or Agent:
 
 <Tabs>
+  <TabItem value="ARC Controller">
+    <Tabs>
+      <TabItem value="Agent">
+        <CloudExtensionConfig />
+      </TabItem>
+    </Tabs>
+  </TabItem>
   <TabItem value="On-premise Controller">
     <Tabs>
       <TabItem value="Controller">
@@ -81,13 +80,6 @@ installation of the Aperture Controller or Agent:
       </TabItem>
     </Tabs>
   </TabItem>
-  <TabItem value="ARC Controller">
-    <Tabs>
-      <TabItem value="Agent">
-        <CloudExtensionConfig />
-      </TabItem>
-    </Tabs>
-  </TabItem>
 </Tabs>
 
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
@@ -95,8 +87,8 @@ of the organization on FluxNinja ARC and API Key generated on it.
 
 Configuration parameters for the FluxNinja ARC Extension are as follows:
 
-- [Aperture Controller](/reference/configuration/controller.md/#flux-ninja)
-- [Aperture Agent](/reference/configuration/agent.md#flux-ninja)
+- [Aperture Agent](/reference/configuration/agent.md#flux-ninja-extension-config)
+- [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-extension-config)
 
 ## See also
 

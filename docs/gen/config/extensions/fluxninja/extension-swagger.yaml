@@ -99,20 +99,27 @@ definitions:
                 description: Client configuration.
                 x-go-tag-json: client
             controller_id:
-                description: Controller ID.
+                description: |-
+                    Overrides Controller ID for Aperture Controller. If not set, random id will be generated and persisted in etcd.
+
+                    Note: This option doesn't affect Aperture Agent.
                 type: string
                 x-go-name: ControllerID
                 x-go-tag-json: controller_id,omitempty
             disable_local_otel_pipeline:
                 default: false
-                description: Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
+                description: Disables local Prometheus OTel pipelines for metrics. Implied by EnableCloudController.
                 type: boolean
                 x-go-name: DisableLocalOTelPipeline
                 x-go-tag-default: "false"
                 x-go-tag-json: disable_local_otel_pipeline
             enable_cloud_controller:
                 default: false
-                description: Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
+                description: |-
+                    Whether to connect to ARC controller.
+
+                    Overrides etcd configuration and disables local Prometheus OTel pipelines.
+                    See [FluxNinja ARC](/arc/arc.md) for more details.
                 type: boolean
                 x-go-name: EnableCloudController
                 x-go-tag-default: "false"

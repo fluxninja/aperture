@@ -22,21 +22,27 @@ const (
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
-	// Interval between each heartbeat.
-	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
 	// Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
-	// Client configuration.
-	ClientConfig ClientConfig `json:"client"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
-	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
-	// Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
+	// Whether to connect to ARC controller.
+	//
+	// Overrides etcd configuration and disables local Prometheus OTel pipelines.
+	// See [FluxNinja ARC](/arc/arc.md) for more details.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
-	// Controller ID.
+
+	// Interval between each heartbeat.
+	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
+	// Client configuration.
+	ClientConfig ClientConfig `json:"client"`
+	// Disables local Prometheus OTel pipelines for metrics. Implied by EnableCloudController.
+	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
+	// Overrides Controller ID for Aperture Controller. If not set, random id will be generated and persisted in etcd.
+	//
+	// Note: This option doesn't affect Aperture Agent.
 	ControllerID string `json:"controller_id,omitempty"`
 }
 
