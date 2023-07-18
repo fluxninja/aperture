@@ -1327,6 +1327,8 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for TokensLabelKey
 
+	// no validation rules for PrioritiesLabelKey
+
 	if len(errors) > 0 {
 		return SchedulerMultiError(errors)
 	}

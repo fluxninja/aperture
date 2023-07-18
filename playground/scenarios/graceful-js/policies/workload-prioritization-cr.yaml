@@ -40,13 +40,13 @@ spec:
                       user_type: guest
                   name: guest
                   parameters:
-                    priority: "5"
+                    priority: 5
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
                   name: subscriber
                   parameters:
-                    priority: "250"
+                    priority: 250
               selectors:
               - control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local

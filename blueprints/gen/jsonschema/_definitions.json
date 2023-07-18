@@ -2777,6 +2777,12 @@
           "$ref": "#/definitions/SchedulerWorkloadParameters",
           "description": "Parameters to be used if none of workloads specified in `workloads` match."
         },
+        "priorities_label_key": {
+          "default": "priorities",
+          "description": "* Key for a flow label that can be used to override the default priority for this flow.\n* The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.\n* If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.\n\n",
+          "type": "string",
+          "x-go-tag-default": "priorities"
+        },
         "tokens_label_key": {
           "default": "tokens",
           "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.\n\n",
@@ -2821,13 +2827,13 @@
       "description": "Parameters such as priority and tokens that are applicable to flows within a workload.",
       "properties": {
         "priority": {
-          "default": "1",
-          "description": "$$\ninverted\\_priority = {\\frac {\\operatorname{lcm} \\left(priorities\\right)} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
-          "format": "int64",
-          "minLength": 1,
-          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive integer.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
-          "type": "string",
-          "x-go-tag-default": "1",
+          "default": 1,
+          "description": "$$\ninverted\\_priority = {\\frac {1} {priority}}\n$$\n\n$$\nvirtual\\_finish\\_time = virtual\\_time + \\left(tokens \\cdot inverted\\_priority\\right)\n$$\n\n",
+          "exclusiveMinimum": 0,
+          "format": "double",
+          "title": "Describes priority level of the flows within the workload.\nPriority level is unbounded and can be any positive number.\nHigher numbers means higher priority level.\nThe following formula is used to determine the position of a flow in the queue based on virtual finish time:",
+          "type": "number",
+          "x-go-tag-default": "1.0",
           "x-go-tag-validate": "gt=0"
         },
         "queue_timeout": {

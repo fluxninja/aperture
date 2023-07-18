@@ -213,19 +213,19 @@ message Scheduler {
     // Parameters such as priority and tokens that are applicable to flows within a workload.
     message Parameters {
       // Describes priority level of the flows within the workload.
-      // Priority level is unbounded and can be any positive integer.
+      // Priority level is unbounded and can be any positive number.
       // Higher numbers means higher priority level.
       // The following formula is used to determine the position of a flow in the queue based on virtual finish time:
       //
       // $$
-      // inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+      // inverted\_priority = {\frac {1} {priority}}
       // $$
       //
       // $$
       // virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
       // $$
       //
-      int64 priority = 1; // @gotags: validate:"gt=0" default:"1"
+      double priority = 1; // @gotags: validate:"gt=0" default:"1.0"
 
       // Tokens determines the cost of admitting a single flow in the workload,
       // which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -299,6 +299,11 @@ message Scheduler {
   // * The value associated with this key must be a valid uint64 number.
   // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
   string tokens_label_key = 7; // @gotags: default:"tokens"
+
+  // * Key for a flow label that can be used to override the default priority for this flow.
+  // * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
+  // * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
+  string priorities_label_key = 8; // @gotags: default:"priorities"
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.

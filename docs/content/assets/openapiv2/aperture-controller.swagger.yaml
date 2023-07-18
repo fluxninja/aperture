@@ -3014,6 +3014,15 @@ definitions:
             default_workload_parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.
+            priorities_label_key:
+                default: priorities
+                description: |+
+                    * Key for a flow label that can be used to override the default priority for this flow.
+                    * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
+                    * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
+
+                type: string
+                x-go-tag-default: priorities
             tokens_label_key:
                 default: tokens
                 description: |+
@@ -3075,25 +3084,26 @@ definitions:
         description: Parameters such as priority and tokens that are applicable to flows within a workload.
         properties:
             priority:
-                default: "1"
+                default: 1
                 description: |+
                     $$
-                    inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+                    inverted\_priority = {\frac {1} {priority}}
                     $$
 
                     $$
                     virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
                     $$
 
-                format: int64
-                minLength: 1
+                exclusiveMinimum: true
+                format: double
+                minimum: 0
                 title: |-
                     Describes priority level of the flows within the workload.
-                    Priority level is unbounded and can be any positive integer.
+                    Priority level is unbounded and can be any positive number.
                     Higher numbers means higher priority level.
                     The following formula is used to determine the position of a flow in the queue based on virtual finish time:
-                type: string
-                x-go-tag-default: "1"
+                type: number
+                x-go-tag-default: "1.0"
                 x-go-tag-validate: gt=0
             queue_timeout:
                 description: |-

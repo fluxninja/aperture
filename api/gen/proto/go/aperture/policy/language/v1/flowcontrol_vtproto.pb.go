@@ -929,9 +929,10 @@ func (m *Scheduler_Workload_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int
 		dAtA[i] = 0x10
 	}
 	if m.Priority != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.Priority))
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Priority))))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0x9
 	}
 	return len(dAtA) - i, nil
 }
@@ -1025,6 +1026,13 @@ func (m *Scheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.PrioritiesLabelKey) > 0 {
+		i -= len(m.PrioritiesLabelKey)
+		copy(dAtA[i:], m.PrioritiesLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.PrioritiesLabelKey)))
+		i--
+		dAtA[i] = 0x42
 	}
 	if len(m.TokensLabelKey) > 0 {
 		i -= len(m.TokensLabelKey)
@@ -3165,7 +3173,7 @@ func (m *Scheduler_Workload_Parameters) SizeVT() (n int) {
 	var l int
 	_ = l
 	if m.Priority != 0 {
-		n += 1 + sov(uint64(m.Priority))
+		n += 9
 	}
 	if m.Tokens != 0 {
 		n += 1 + sov(uint64(m.Tokens))
@@ -3233,6 +3241,10 @@ func (m *Scheduler) SizeVT() (n int) {
 		n += 1 + l + sov(uint64(l))
 	}
 	l = len(m.TokensLabelKey)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	l = len(m.PrioritiesLabelKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -5911,24 +5923,16 @@ func (m *Scheduler_Workload_Parameters) UnmarshalVT(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
 			}
-			m.Priority = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Priority |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
 			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Priority = float64(math.Float64frombits(v))
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
@@ -6343,6 +6347,38 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.TokensLabelKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PrioritiesLabelKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PrioritiesLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

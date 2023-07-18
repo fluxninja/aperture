@@ -29,7 +29,8 @@ policy:
                           label: aperture.destination_fqdns
                           regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
-                priority: "200"
+                priority: 200.0
+              name: "service1"
             - label_matcher:
                 expression:
                   all:
@@ -41,7 +42,8 @@ policy:
                           label: aperture.destination_fqdns
                           regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
-                priority: "50"
+                priority: 50.0
+              name: "service2"
   latency_baseliner:
     latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.

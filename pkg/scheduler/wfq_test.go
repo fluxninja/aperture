@@ -16,7 +16,6 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -98,7 +97,7 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 type flowTracker struct {
 	fairnessLabel string // what label it needs
 	tokens        uint64 // how many tokens it needs
-	priority      uint64
+	priority      float64
 	timeout       time.Duration
 	requestRate   uint64
 	// counters
@@ -110,7 +109,7 @@ func (flow *flowTracker) String() string {
 	return fmt.Sprintf("FlowTracker<"+
 		"Flow<FairnessLabel: %s "+
 		"| RequestTokens: %d "+
-		"| Priority: %d "+
+		"| Priority: %f "+
 		"| Timeout: %v "+
 		"| RequestRate: %d "+
 		"| TotalRequests: %d "+
@@ -366,10 +365,9 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		// }
 		priorities = append(priorities, uint64(flow.priority))
 	}
-	lcm := utils.LCMOfNums(priorities)
-	adjustedPriority := make([]uint16, len(flows))
+	adjustedPriority := make([]float64, len(flows))
 	for i, flow := range flows {
-		adjustedPriority[i] = uint16(lcm / uint64(flow.priority))
+		adjustedPriority[i] = 1 / flow.priority
 		sumPriority += float64(adjustedPriority[i])
 	}
 
