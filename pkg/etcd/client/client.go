@@ -2,6 +2,7 @@ package etcd
 
 import (
 	"context"
+	"fmt"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
@@ -101,6 +102,10 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
 			log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
 			return nil, err
+		}
+
+		if len(config.Endpoints) == 0 {
+			return nil, fmt.Errorf("no etcd endpoints provided")
 		}
 	}
 

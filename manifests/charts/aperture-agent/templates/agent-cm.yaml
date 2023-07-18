@@ -34,6 +34,13 @@ data:
       {{- end }}
       kubernetes:
         enabled: false
+    {{- if and .Values.agent.config .Values.agent.config.fluxninja .Values.agent.config.fluxninja.enable_cloud_controller }}
+    fluxninja:
+      {{- if (omit .Values.agent.config.fluxninja "endpoint")}}
+      {{- omit .Values.agent.config.fluxninja "endpoint" | toYaml | nindent 6 }}
+      {{- end }}
+      endpoint: {{ include "agent.fluxninja.endpoint" (dict "fluxninja" .Values.agent.config.fluxninja "context" . $) }}
+    {{- else }}
     etcd:
       {{- if (omit .Values.agent.config.etcd "endpoints")}}
       {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
@@ -41,6 +48,7 @@ data:
       endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
     prometheus:
       address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
+    {{- end }}
     {{- if and .Values.agent.config.agent_functions .Values.agent.controllerCert .Values.agent.controllerCert.cmName }}
     agent_functions:
       {{- if (omit .Values.agent.config.agent_functions "client")}}

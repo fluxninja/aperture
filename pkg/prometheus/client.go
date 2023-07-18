@@ -10,6 +10,7 @@ import (
 	"go.uber.org/fx"
 	"golang.org/x/oauth2"
 
+	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
@@ -35,6 +36,9 @@ var (
 	httpConfigKey = strings.Join([]string{prometheusConfigKey, "http_client"}, ".")
 )
 
+// FluxninjaCOnfigKey is the key used to store the FluxNinjaConfig in the config.
+var fluxninjaConfigKey = "fluxninja"
+
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
 	return fx.Options(
@@ -53,6 +57,12 @@ type ClientIn struct {
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
+	// Skipping creation of prometheus client if FluxNinja ARC controller is enabled for Aperture Agent
+	var fluxNinjaConfig extconfig.FluxNinjaExtensionConfig
+	if err := in.Unmarshaller.UnmarshalKey(fluxninjaConfigKey, &fluxNinjaConfig); err == nil && fluxNinjaConfig.EnableCloudController {
+		return nil, nil, nil
+	}
+
 	var config promconfig.PrometheusConfig
 	if err := in.Unmarshaller.UnmarshalKey(prometheusConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("unable to deserialize")

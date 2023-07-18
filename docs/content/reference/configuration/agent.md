@@ -1402,7 +1402,7 @@ EtcdConfig holds configuration for etcd client.
 
 <!-- vale off -->
 
-([]string, **required**)
+([]string)
 
 <!-- vale on -->
 
@@ -1551,7 +1551,8 @@ true by EnableCloudController.
 
 <!-- vale on -->
 
-Whether to enable cloud controller. Overrides etcd and TLS configurations.
+Whether to enable ARC controller. Overrides etcd configuration and Prometheus
+writer.
 
 </dd>
 <dt>endpoint</dt>
@@ -2678,7 +2679,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale off -->
 
-(string, format: `hostname_port | url | fqdn`, **required**)
+(string, format: `empty | hostname_port | url | fqdn`)
 
 <!-- vale on -->
 
