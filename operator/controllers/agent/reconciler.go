@@ -765,17 +765,29 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		return nil
 	}
 
-	nsList := &corev1.NamespaceList{}
-	err := r.List(ctx, nsList)
-	if err != nil {
-		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
-	}
-
 	var createControllerClientCm bool
 	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
 		createControllerClientCm = true
+	}
+
+	if createControllerClientCm {
+		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		}
+		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+	}
+
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+		instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+	}
+
+	nsList := &corev1.NamespaceList{}
+	err := r.List(ctx, nsList)
+	if err != nil {
+		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
 	}
 
 	for index := range nsList.Items {
@@ -799,24 +811,16 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		}
 
 		if createControllerClientCm {
-			if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
-				instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
-			}
 			configMap := CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, ns.GetName())
 			if configMap != nil {
 				configMap.Namespace = ns.GetName()
 				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
 				if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 					return err
 				}
 			}
 		}
 
-		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
-			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
-			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
-		}
 		configMap := CreateAgentConfigMapInNamespace(ctx, r.Client, instance.DeepCopy(), ns.GetName())
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
