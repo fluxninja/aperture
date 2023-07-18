@@ -39,12 +39,12 @@ spec:
                     match_labels:
                       http.request.header.user_type: guest
                   parameters:
-                    priority: "50"
+                    priority: 50
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
                   parameters:
-                    priority: "200"
+                    priority: 200
               selectors:
               - control_point: ingress
                 service: cart-service.prod.svc.cluster.local

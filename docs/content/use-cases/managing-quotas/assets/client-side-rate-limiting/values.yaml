@@ -21,9 +21,9 @@ policy:
             match_labels:
               call_type: background
           parameters:
-            priority: "50"
+            priority: 50.0
         - label_matcher:
             match_labels:
               call_type: interactive
           parameters:
-            priority: "200"
+            priority: 200.0
