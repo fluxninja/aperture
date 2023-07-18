@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"golang.org/x/oauth2"
 
-	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	commonhttp "github.com/fluxninja/aperture/v2/pkg/net/http"
@@ -36,9 +35,6 @@ var (
 	httpConfigKey = strings.Join([]string{prometheusConfigKey, "http_client"}, ".")
 )
 
-// FluxninjaCOnfigKey is the key used to store the FluxNinjaConfig in the config.
-var fluxninjaConfigKey = "fluxninja"
-
 // Module provides a singleton pointer to prometheusv1.API via FX.
 func Module() fx.Option {
 	return fx.Options(
@@ -48,18 +44,23 @@ func Module() fx.Option {
 	)
 }
 
+// ConfigOverride can be provided by an extension to control client creation behavior.
+type ConfigOverride struct {
+	SkipClientCreation bool
+}
+
 // ClientIn holds fields, parameters, to provide Prometheus Client.
 type ClientIn struct {
 	fx.In
-	HTTPClient   *http.Client       `name:"prometheus.http-client"`
-	TokenSource  oauth2.TokenSource `optional:"true"`
-	Unmarshaller config.Unmarshaller
+	HTTPClient     *http.Client       `name:"prometheus.http-client"`
+	TokenSource    oauth2.TokenSource `optional:"true"`
+	Unmarshaller   config.Unmarshaller
+	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
 	// Skipping creation of prometheus client if FluxNinja ARC controller is enabled for Aperture Agent
-	var fluxNinjaConfig extconfig.FluxNinjaExtensionConfig
-	if err := in.Unmarshaller.UnmarshalKey(fluxninjaConfigKey, &fluxNinjaConfig); err == nil && fluxNinjaConfig.EnableCloudController {
+	if in.ConfigOverride != nil && in.ConfigOverride.SkipClientCreation {
 		return nil, nil, nil
 	}
 

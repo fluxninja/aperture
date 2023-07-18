@@ -170,19 +170,6 @@ definitions:
         title: CRWatcherConfig holds fields to configure the Kubernetes watcher for Aperture Policy custom resource.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher
-    ClientConfig:
-        properties:
-            grpc:
-                $ref: '#/definitions/GRPCClientConfig'
-                description: gRPC client settings.
-                x-go-tag-json: grpc
-            http:
-                $ref: '#/definitions/HTTPClientConfig'
-                description: HTTP client settings.
-                x-go-tag-json: http
-        title: ClientConfig is the client configuration.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     ClientTLSConfig:
         properties:
             ca_file:
@@ -315,69 +302,6 @@ definitions:
         title: EtcdConfig holds configuration for etcd client.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/etcd
-    FluxNinjaExtensionConfig:
-        properties:
-            api_key:
-                description: API Key for this agent. If this key is not set, the extension won't be enabled.
-                type: string
-                x-go-name: APIKey
-                x-go-tag-json: api_key
-            client:
-                $ref: '#/definitions/ClientConfig'
-                description: Client configuration.
-                x-go-tag-json: client
-            controller_id:
-                description: Controller ID.
-                type: string
-                x-go-name: ControllerID
-                x-go-tag-json: controller_id,omitempty
-            disable_local_otel_pipeline:
-                default: false
-                description: Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
-                type: boolean
-                x-go-name: DisableLocalOTelPipeline
-                x-go-tag-default: "false"
-                x-go-tag-json: disable_local_otel_pipeline
-            enable_cloud_controller:
-                default: false
-                description: Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
-                type: boolean
-                x-go-name: EnableCloudController
-                x-go-tag-default: "false"
-                x-go-tag-json: enable_cloud_controller
-            endpoint:
-                description: Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
-                pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
-                type: string
-                x-go-name: Endpoint
-                x-go-tag-json: endpoint
-                x-go-tag-validate: omitempty,hostname_port|url|fqdn
-                x-pattern-rules: empty | hostname_port | url | fqdn
-            heartbeat_interval:
-                default: 5s
-                description: Interval between each heartbeat.
-                format: string
-                type: string
-                x-go-name: HeartbeatInterval
-                x-go-tag-default: 5s
-                x-go-tag-json: heartbeat_interval
-                x-go-tag-validate: gte=0s
-            installation_mode:
-                default: LINUX_BARE_METAL
-                description: Installation mode describes on which underlying platform the Agent or the Controller is being run.
-                enum:
-                    - KUBERNETES_SIDECAR
-                    - KUBERNETES_DAEMONSET
-                    - LINUX_BARE_METAL
-                type: string
-                x-go-name: InstallationMode
-                x-go-tag-default: LINUX_BARE_METAL
-                x-go-tag-json: installation_mode
-                x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL
-                x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
-        title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     GRPCClientConfig:
         properties:
             backoff:

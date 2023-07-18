@@ -12,6 +12,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/prometheus"
 )
 
 const (
@@ -56,6 +57,7 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideConfig),
 		fx.Provide(provideEtcdConfigOverride),
+		fx.Provide(providePrometheusConfigOverride),
 	)
 }
 
@@ -81,6 +83,16 @@ func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdc
 					"apiKey": extensionConfig.APIKey,
 				},
 			},
+		}
+	} else {
+		return nil
+	}
+}
+
+func providePrometheusConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *prometheus.ConfigOverride {
+	if extensionConfig.EnableCloudController {
+		return &prometheus.ConfigOverride{
+			SkipClientCreation: true,
 		}
 	} else {
 		return nil
