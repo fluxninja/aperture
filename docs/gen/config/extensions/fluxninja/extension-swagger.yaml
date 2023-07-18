@@ -112,7 +112,7 @@ definitions:
                 x-go-tag-json: disable_local_otel_pipeline
             enable_cloud_controller:
                 default: false
-                description: Whether to enable cloud controller. Overrides etcd and TLS configurations.
+                description: Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
                 type: boolean
                 x-go-name: EnableCloudController
                 x-go-tag-default: "false"

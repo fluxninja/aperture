@@ -44,15 +44,26 @@ func Module() fx.Option {
 	)
 }
 
+// ConfigOverride can be provided by an extension to control client creation behavior.
+type ConfigOverride struct {
+	SkipClientCreation bool
+}
+
 // ClientIn holds fields, parameters, to provide Prometheus Client.
 type ClientIn struct {
 	fx.In
-	HTTPClient   *http.Client       `name:"prometheus.http-client"`
-	TokenSource  oauth2.TokenSource `optional:"true"`
-	Unmarshaller config.Unmarshaller
+	HTTPClient     *http.Client       `name:"prometheus.http-client"`
+	TokenSource    oauth2.TokenSource `optional:"true"`
+	Unmarshaller   config.Unmarshaller
+	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
+	// Skipping creation of prometheus client if FluxNinja ARC controller is enabled for Aperture Agent
+	if in.ConfigOverride != nil && in.ConfigOverride.SkipClientCreation {
+		return nil, nil, nil
+	}
+
 	var config promconfig.PrometheusConfig
 	if err := in.Unmarshaller.UnmarshalKey(prometheusConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("unable to deserialize")

@@ -177,15 +177,19 @@ func addInfraMeter(
 		}
 	}
 
-	config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
+	pipeline := otelconfig.Pipeline{
 		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
 			processorName,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
-		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
-	})
+	}
+	if config.Exporters[otelconsts.ExporterPrometheusRemoteWrite] != nil {
+		pipeline.Exporters = []string{otelconsts.ExporterPrometheusRemoteWrite}
+	}
+
+	config.Service.AddPipeline(normalizePipelineName(pipelineName), pipeline)
 	return nil
 }
 

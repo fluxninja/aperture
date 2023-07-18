@@ -41,6 +41,18 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	if !newAgent.Spec.ConfigSpec.FluxNinja.EnableCloudController {
+		if len(newAgent.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+			return admission.Denied("At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
+		}
+
+		if newAgent.Spec.ConfigSpec.Prometheus.Address == "" {
+			return admission.Denied("The address for Prometheus must be provided under spec.config.prometheus.address.")
+		}
+	} else if newAgent.Spec.ConfigSpec.FluxNinja.Endpoint == "" {
+		return admission.Denied("The endpoint for Flux Ninja must be provided under spec.config.fluxNinja.endpoint.")
+	}
+
 	if (newAgent.Spec.Image.Digest == "" && newAgent.Spec.Image.Tag == "") || (newAgent.Spec.Image.Digest != "" && newAgent.Spec.Image.Tag != "") {
 		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}

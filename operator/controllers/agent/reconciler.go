@@ -408,37 +408,29 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *agentv1alph
 
 // checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
 func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
-	if err != nil {
+	updateStatus := func(instance *agentv1alpha1.Agent, reason, message string) error {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, reason, message)
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
 		}
 		return nil
+	}
+
+	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		return updateStatus(instance, "FailedToFetch", fmt.Sprintf("Failed to fetch Resource. Error: '%s'", err.Error()))
 	}
 
 	resourceBytes, err := resource.MarshalJSON()
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "FailedToMarshal", fmt.Sprintf("Failed to marshal Resource. Error: '%s'", err.Error()))
 	}
 
 	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "ValidationFailed", fmt.Sprintf("Failed to set defaults. Error: '%s'", err.Error()))
 	}
 
 	if instance.Spec.Sidecar.Enabled {
@@ -447,24 +439,24 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
 	}
 
-	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
+	if !instance.Spec.ConfigSpec.FluxNinja.EnableCloudController {
+		if len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+			return updateStatus(instance, "ValidationFailed", "At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
 		}
-		return nil
+
+		if instance.Spec.ConfigSpec.Prometheus.Address == "" {
+			return updateStatus(instance, "ValidationFailed", "The address for Prometheus must be provided under spec.config.prometheus.address.")
+		}
+	} else if instance.Spec.ConfigSpec.FluxNinja.Endpoint == "" {
+		return updateStatus(instance, "ValidationFailed", "The endpoint for Flux Ninja must be provided under spec.config.fluxNinja.endpoint.")
+	}
+
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
+		return updateStatus(instance, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 	}
 
 	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
 
 	if instance.Status.Resources == controllers.FailedStatus {

@@ -3,15 +3,14 @@ package extconfig
 
 import (
 	"context"
-	"time"
 
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
-	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/prometheus"
 )
 
 const (
@@ -35,7 +34,7 @@ type FluxNinjaExtensionConfig struct {
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
 	// Whether to configure local Prometheus OTel pipeline for metrics. Implied to be true by EnableCloudController.
 	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
-	// Whether to enable cloud controller. Overrides etcd and TLS configurations.
+	// Whether to enable ARC controller. Overrides etcd configuration and Prometheus writer.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 	// Controller ID.
 	ControllerID string `json:"controller_id,omitempty"`
@@ -56,6 +55,7 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideConfig),
 		fx.Provide(provideEtcdConfigOverride),
+		fx.Provide(providePrometheusConfigOverride),
 	)
 }
 
@@ -71,16 +71,24 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
 	if extensionConfig.EnableCloudController {
 		return &etcdclient.ConfigOverride{
-			EtcdConfig: etcd.EtcdConfig{
-				Namespace: "",
-				Endpoints: []string{extensionConfig.Endpoint},
-				LeaseTTL:  config.MakeDuration(60 * time.Second),
-			},
+			Namespace: "",
+			Endpoints: []string{extensionConfig.Endpoint},
 			PerRPCCredentials: perRPCHeaders{
 				headers: map[string]string{
 					"apiKey": extensionConfig.APIKey,
 				},
 			},
+			OverriderName: "fluxninja extension",
+		}
+	} else {
+		return nil
+	}
+}
+
+func providePrometheusConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *prometheus.ConfigOverride {
+	if extensionConfig.EnableCloudController {
+		return &prometheus.ConfigOverride{
+			SkipClientCreation: true,
 		}
 	} else {
 		return nil
