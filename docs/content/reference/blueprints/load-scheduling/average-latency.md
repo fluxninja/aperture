@@ -5,36 +5,33 @@ title: Load Scheduling with Average Latency Feedback
 ## Introduction
 
 This policy detects traffic overloads and cascading failure build-up by
-comparing the real-time latency with its exponential moving average. A gradient
-controller calculates a proportional response to limit accepted concurrency. The
-concurrency is reduced by a multiplicative factor when the service is
+comparing the real-time latency with a historical average. A gradient controller
+calculates a proportional response to limit the accepted token (or request)
+rate. The token rate is reduced by a multiplicative factor when the service is
 overloaded, and increased by an additive factor while the service is no longer
 overloaded.
 
 At a high level, this policy works as follows:
 
-- Latency EMA-based overload detection: A Flux Meter is used to gather latency
-  metrics from a [service control point](/concepts/selector.md). The latency
-  signal gets fed into an Exponential Moving Average (EMA) component to
-  establish a long-term trend that can be compared to the current latency to
-  detect overloads.
+- Latency trend-based overload detection: A Flux Meter is used to gather latency
+  metrics from a [service control point](/concepts/selector.md). The historical
+  latency over a large time window (30 minutes by default) is used to establish
+  a long-term trend that can be compared to the current latency to detect
+  overloads.
 - Gradient Controller: Set point latency and current latency signals are fed to
   the gradient controller that calculates the proportional response to adjust
-  the accepted concurrency (Control Variable).
+  the accepted token rate (Control Variable).
 - Integral Optimizer: When the service is detected to be in the normal state, an
-  integral optimizer is used to additively increase the concurrency of the
-  service in each execution cycle of the circuit. This design allows warming-up
-  a service from an initial inactive state. This also protects applications from
-  sudden spikes in traffic, as it sets an upper bound to the concurrency allowed
-  on a service in each execution cycle of the circuit based on the observed
-  incoming concurrency.
-- Load Scheduler and Actuator: The Accepted Concurrency at the service is
-  throttled by a
+  integral optimizer is used to additively increase the accepted token rate of
+  the service in each execution cycle of the circuit. This measured approach
+  prevents accepting all the traffic at once after an overload, which can again
+  lead to an overload.
+- Load Scheduler: The accepted token rate at the service is throttled by a
   [weighted-fair queuing scheduler](/concepts/scheduler/scheduler.md). The
-  output of the adjustments to accepted concurrency made by gradient controller
+  output of the adjustments to accepted token rate made by gradient controller
   and optimizer logic are translated to a load multiplier that is synchronized
   with Aperture Agents through etcd. The load multiplier adjusts (increases or
-  decreases) the token bucket fill rates based on the incoming concurrency
+  decreases) the token bucket fill rates based on the incoming token rate
   observed at each agent.
 
 :::info
