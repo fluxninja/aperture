@@ -32,6 +32,14 @@ process variables and maintain their values within the optimal range.
 
 ## Installation
 
+:::tip
+
+Instead of installing On-Premise Aperture Controller, you can start with
+[ARC Controller](/arc/arc.md#arc-controller) by creating your own organization
+on [FluxNinja ARC](https://www.fluxninja.com/product)
+
+:::
+
 The Aperture Controller can be installed using the below options:
 
 1. [**Kubernetes**](kubernetes/kubernetes.md)

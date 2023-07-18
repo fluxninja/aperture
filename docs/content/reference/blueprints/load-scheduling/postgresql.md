@@ -24,8 +24,8 @@ overload confirmation, the
 [list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/postgresqlreceiver/metadata.yaml)
 can be used to configure the policy.
 
-A gradient controller calculates a proportional response to limit accepted
-concurrency. The concurrency is reduced by a multiplicative factor when the
+A gradient controller calculates a proportional response to limit the accepted
+token rate. The token rate is reduced by a multiplicative factor when the
 service is overloaded, and increased by an additive factor while the service is
 no longer overloaded.
 
