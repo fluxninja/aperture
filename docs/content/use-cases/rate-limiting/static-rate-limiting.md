@@ -105,7 +105,7 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/rate-limiting.yaml --kube </CodeBlock>
+<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/static-rate-limiting.yaml --kube </CodeBlock>
 ```
 
 ```mdx-code-block
@@ -117,7 +117,7 @@ Apply the policy YAML generated (Kubernetes Custom Resource) using the above
 example with `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/configuration/static-rate-limiting-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
