@@ -304,7 +304,7 @@ func setupOutputDir(outputDir string) (string, error) {
 	// ask for user confirmation if the output directory already exists
 	if !overwrite {
 		if _, err := os.Stat(outputDir); err == nil {
-			fmt.Printf("The output directory '%s' already exists. Do you want to overwrite it? [y/N]: ", outputDir)
+			fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
 			var response string
 			fmt.Scanln(&response)
 			if response != "y" {
