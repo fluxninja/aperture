@@ -140,7 +140,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.generation = 0
 	sched.clk = clk
 	sched.lastAccessTime = sched.clk.Now()
-	sched.vt = 1.7976931348623157e+100
+	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
 

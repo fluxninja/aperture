@@ -16,7 +16,6 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -366,10 +365,9 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		// }
 		priorities = append(priorities, uint64(flow.priority))
 	}
-	lcm := utils.LCMOfNums(priorities)
-	adjustedPriority := make([]uint16, len(flows))
+	adjustedPriority := make([]float64, len(flows))
 	for i, flow := range flows {
-		adjustedPriority[i] = uint16(lcm / uint64(flow.priority))
+		adjustedPriority[i] = 1 / flow.priority
 		sumPriority += float64(adjustedPriority[i])
 	}
 
