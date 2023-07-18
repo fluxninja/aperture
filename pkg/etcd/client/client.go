@@ -28,10 +28,12 @@ func Module() fx.Option {
 	)
 }
 
-// ConfigOverride can be provided by an extension to provide etcd client config directly.
+// ConfigOverride can be provided by an extension to provide parts of etcd client config directly.
 type ConfigOverride struct {
-	etcd.EtcdConfig
+	Namespace         string                        // required
+	Endpoints         []string                      // required
 	PerRPCCredentials credentials.PerRPCCredentials // optional
+	OverriderName     string                        // who is providing the override, for logs
 }
 
 const (
@@ -93,20 +95,27 @@ type SessionScopedKV struct {
 func ProvideClient(in ClientIn) (*Client, error) {
 	var config etcd.EtcdConfig
 
-	if in.ConfigOverride != nil {
-		log.Info().Msg("Skipping etcd config deserialization, etcd config already provided")
-		config.Namespace = in.ConfigOverride.Namespace
-		config.Endpoints = in.ConfigOverride.Endpoints
-		config.LeaseTTL = in.ConfigOverride.LeaseTTL
-	} else {
-		if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
-			log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
-			return nil, err
-		}
+	if err := in.Unmarshaller.UnmarshalKey(defaultClientConfigKey, &config); err != nil {
+		log.Error().Err(err).Msg("Unable to deserialize etcd client configuration!")
+		return nil, err
+	}
 
-		if len(config.Endpoints) == 0 {
-			return nil, fmt.Errorf("no etcd endpoints provided")
+	if in.ConfigOverride != nil {
+		if config.Namespace != "aperture" {
+			log.Warn().Msg("ignoring etcd.namespace")
 		}
+		config.Namespace = in.ConfigOverride.Namespace
+
+		if len(config.Endpoints) != 0 {
+			log.Warn().Msg("ignoring etcd.endpoints")
+		}
+		config.Endpoints = in.ConfigOverride.Endpoints
+
+		log.Info().Msgf("etcd endpoints and namespace set by %s", in.ConfigOverride.OverriderName)
+	}
+
+	if len(config.Endpoints) == 0 {
+		return nil, fmt.Errorf("no etcd endpoints provided")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

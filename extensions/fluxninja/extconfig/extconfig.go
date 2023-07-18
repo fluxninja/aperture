@@ -3,12 +3,10 @@ package extconfig
 
 import (
 	"context"
-	"time"
 
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
-	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
@@ -71,16 +69,14 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
 	if extensionConfig.EnableCloudController {
 		return &etcdclient.ConfigOverride{
-			EtcdConfig: etcd.EtcdConfig{
-				Namespace: "",
-				Endpoints: []string{extensionConfig.Endpoint},
-				LeaseTTL:  config.MakeDuration(60 * time.Second),
-			},
+			Namespace: "",
+			Endpoints: []string{extensionConfig.Endpoint},
 			PerRPCCredentials: perRPCHeaders{
 				headers: map[string]string{
 					"apiKey": extensionConfig.APIKey,
 				},
 			},
+			OverriderName: "fluxninja extension",
 		}
 	} else {
 		return nil
