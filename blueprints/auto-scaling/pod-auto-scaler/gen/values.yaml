@@ -3,69 +3,12 @@
 # https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler
 
 policy:
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
-  components: []
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  # Additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers: []
-  # Dry run mode ensures that no scaling is invoked by this auto scaler.
-  # Type: bool
-  dry_run: false
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
-  # List of scale in controllers.
-  # Type: []promql_scale_in_controller
-  promql_scale_in_controllers: []
-  # List of scale out controllers.
-  # Type: []promql_scale_out_controller
-  promql_scale_out_controllers: []
   # Scaling backend for the policy.
   # Type: aperture.spec.v1.AutoScalerScalingBackend
   # Required: True
   scaling_backend:
     kubernetes_replicas: __REQUIRED_FIELD__
-  # Parameters that define the scaling behavior.
-  # Type: aperture.spec.v1.AutoScalerScalingParameters
-  scaling_parameters:
-    scale_in_alerter:
-      alert_name: "Auto-scaler is scaling in"
-    scale_out_alerter:
-      alert_name: "Auto-scaler is scaling out"
-  # Driver to do scaling of the resource based on the CPU usage.
-  # Type: scaling_driver
-  pod_cpu: {}
-  # Driver to do scaling of the resource based on the Memory usage.
-  # Type: scaling_driver
-  pod_memory: {}
-
-dashboard:
-  # Additional filters to pass to each query to Grafana datasource.
-  # Type: map[string]string
-  extra_filters: {}
-  # Refresh interval for dashboard panels.
-  # Type: string
-  refresh_interval: "15s"
-  # From time of dashboard.
-  # Type: string
-  time_from: "now-15m"
-  # To time of dashboard.
-  # Type: string
-  time_to: "now"
-  # Name of the main dashboard.
-  # Type: string
-  title: "Aperture Auto-scale"
-  datasource:
-    # Datasource filter regex.
-    # Type: string
-    filter_regex: ""
-    # Datasource name.
-    # Type: string
-    name: "$datasource"
