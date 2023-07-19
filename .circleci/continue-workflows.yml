@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.5
+      - image: cimg/go:1.20.6
         user: root
   python-cimg-executor:
     docker:
@@ -69,6 +69,9 @@ parameters:
     type: boolean
     default: false
   updated-blueprints:
+    type: boolean
+    default: false
+  updated-playground-policies:
     type: boolean
     default: false
 
@@ -313,7 +316,7 @@ jobs:
       - restore_cache:
           name: Restore daily cache
           keys:
-            - aperture-v8-daily-cache-{{ checksum "~/day" }}
+            - aperture-v9-daily-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -394,7 +397,7 @@ jobs:
             fi
       - save_cache:
           name: Save daily cache
-          key: aperture-v8-daily-cache-{{ checksum "~/day" }}
+          key: aperture-v9-daily-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/go-build
             - ../.cache/golangci-lint
@@ -1062,8 +1065,52 @@ jobs:
       - asdf_save_cache:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
+  upload-policy-to-latest:
+    parameters:
+      policy-name:
+        type: string
+        description: Name of the playground policy to apply
+      scenario-name:
+        type: string
+        description: Name of the playground scenario to apply
+      controller-endpoint:
+        type: string
+        description: The endpoint of the controller to which the policy should be applied
+    executor: go-cimg-executor
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-v2-go-cache-upload-policies
+      - run:
+          name: Apply Policy
+          working_directory: .
+          command: |
+            go run ./cmd/aperturectl/main.go apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
+            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
+      - save_cache:
+          name: Save go cache
+          key: aperture-v2-go-cache-upload-policies
+          paths:
+            - ../.cache/go-build
+            - ./blueprints/vendor
+          when: on_success
+
 workflows:
   version: 2
+
+  upload-policy-to-latest:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-playground-policies >>
+    jobs:
+      - upload-policy-to-latest:
+          name: upload-policy-to-latest
+          policy-name: service1-demo-app
+          scenario-name: service-protection-rl-escalation
+          controller-endpoint: fluxninja.latest.dev.fluxninja.com:443
 
   build-aperture-agent-bare-metal-package:
     when:
@@ -1444,10 +1491,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Copy tool-versions in HOME dir
@@ -1469,7 +1516,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:

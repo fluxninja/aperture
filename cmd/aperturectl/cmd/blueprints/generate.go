@@ -31,6 +31,8 @@ func init() {
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
 	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
+	generateCmd.Flags().BoolVarP(&force, "force", "f", false, "Force apply policy even if it already exists")
+	generateCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all the generated Policies")
 }
 
 type metadata struct {
@@ -302,7 +304,7 @@ func setupOutputDir(outputDir string) (string, error) {
 	// ask for user confirmation if the output directory already exists
 	if !overwrite {
 		if _, err := os.Stat(outputDir); err == nil {
-			fmt.Printf("The output directory '%s' already exists. Do you want to overwrite it? [y/N]: ", outputDir)
+			fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
 			var response string
 			fmt.Scanln(&response)
 			if response != "y" {

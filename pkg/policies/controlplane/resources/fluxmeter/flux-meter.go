@@ -53,9 +53,7 @@ func NewFluxMeterOptions(
 }
 
 // doSync is a method of fluxMeterConfigSync struct that syncs the flux meter configuration to etcd.
-// It takes an etcdClient of type etcdclient.Client and a lifecycle of type fx.Lifecycle as input parameters.
-// It returns an error in case of any failure during the sync process.
-func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (configSync *fluxMeterConfigSync) doSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) {
 	// Get the logger instance from the status registry.
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 
@@ -80,8 +78,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 
 			// Put the marshaled data in etcd using the provided etcdPath and LeaseID.
 			// It returns an error in case of any failure.
-			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx),
-				configSync.etcdPath, string(dat), clientv3.WithLease(etcdClient.LeaseID))
+			_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to put flux meter config")
@@ -96,7 +93,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 		OnStop: func(ctx context.Context) error {
 			// Delete the data from etcd using the provided etcdPath.
 			// It returns an error in case of any failure.
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
+			_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to delete flux meter config")
@@ -107,7 +104,4 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 			return nil
 		},
 	})
-
-	// Return nil to indicate success.
-	return nil
 }

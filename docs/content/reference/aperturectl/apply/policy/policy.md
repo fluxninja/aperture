@@ -33,7 +33,9 @@ aperturectl apply policy --dir=policies
 ```
       --dir string    Path to directory containing Aperture Policy files
       --file string   Path to Aperture Policy file
+  -f, --force         Force apply policy even if it already exists
   -h, --help          help for policy
+  -s, --select-all    Apply all policies in the directory
 ```
 
 ### Options inherited from parent commands

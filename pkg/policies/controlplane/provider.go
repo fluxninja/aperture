@@ -113,7 +113,7 @@ func setupPoliciesNotifier(
 	policyDynamicConfigTrackers notifiers.Trackers,
 	policyAPIWatcher notifiers.Watcher,
 	policyAPIDynamicConfigWatcher notifiers.Watcher,
-	etcdClient *etcdclient.Client,
+	scopedKV *etcdclient.SessionScopedKV,
 	lifecycle fx.Lifecycle,
 ) {
 	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
@@ -152,11 +152,11 @@ func setupPoliciesNotifier(
 		return key, dat, nil
 	}
 
-	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
+	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
 	// content transform callback to wrap policy in config properties wrapper
 	policyEtcdNotifier.SetTransformFunc(wrapPolicy)
 
-	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, true)
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, &scopedKV.KVWrapper)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

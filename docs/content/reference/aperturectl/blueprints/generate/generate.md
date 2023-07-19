@@ -35,6 +35,7 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
       --apply                  Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
+  -f, --force                  Force apply policy even if it already exists
       --graph-depth int        Max depth of the graph when generating DOT and Mermaid files (default 1)
   -h, --help                   help for generate
       --insecure               Allow connection to controller running without TLS
@@ -45,6 +46,7 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
       --no-yaml-modeline       Do not add YAML language server modeline to generated YAML files
       --output-dir string      Directory path where the generated Policy resources will be stored. If not provided, will use current directory
       --overwrite              Overwrite existing output directory
+  -s, --select-all             Apply all the generated Policies
       --skip-verify            Skip TLS certificate verification while connecting to controller
       --values-file string     Path to the values file for Blueprint's input
 ```

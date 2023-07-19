@@ -103,7 +103,7 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/load-scheduling.yaml --kube </CodeBlock>
+<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/workload-prioritization.yaml --kube </CodeBlock>
 ```
 
 ```mdx-code-block
@@ -115,7 +115,7 @@ Apply the policy YAML generated (Kubernetes Custom Resource) using the above
 example with `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/configuration/load-scheduling-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/configuration/workload-prioritization-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block

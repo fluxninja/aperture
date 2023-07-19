@@ -6421,7 +6421,7 @@ of the agent(s).
 <!-- vale on -->
 
 TelemetryCollector configures OpenTelemetry collector integration. Deprecated:
-v2.8.0. Use `infra_meters` instead.
+v3.0.0. Use `infra_meters` instead.
 
 </dd>
 </dl>
@@ -6937,6 +6937,23 @@ a value of "10s" would signify a duration of 10 seconds.
 Parameters to be used if none of workloads specified in `workloads` match.
 
 </dd>
+<dt>priorities_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"priorities"`)
+
+<!-- vale on -->
+
+- Key for a flow label that can be used to override the default priority for
+  this flow.
+- The value associated with this key must be a valid uint64 number. Higher
+  numbers means higher priority.
+- If this parameter is not provided, the priority for the flow will be
+  determined by the matched workload's priority.
+
+</dd>
 <dt>tokens_label_key</dt>
 <dd>
 
@@ -7057,17 +7074,17 @@ workload.
 
 <!-- vale off -->
 
-(string, default: `"1"`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 
 Describes priority level of the flows within the workload. Priority level is
-unbounded and can be any positive integer. Higher numbers means higher priority
+unbounded and can be any positive number. Higher numbers means higher priority
 level. The following formula is used to determine the position of a flow in the
 queue based on virtual finish time:
 
 $$
-inverted\_priority = {\frac {\operatorname{lcm} \left(priorities\right)} {priority}}
+inverted\_priority = {\frac {1} {priority}}
 $$
 
 $$
@@ -7572,7 +7589,7 @@ Selected signal (`on_signal` or `off_signal`).
 <!-- vale on -->
 
 TelemetryCollector defines the telemetry configuration to be synced with the
-agents. Deprecated: v2.8.0. Use `InfraMeter` instead. It consists of two parts:
+agents. Deprecated: v3.0.0. Use `InfraMeter` instead. It consists of two parts:
 
 - Agent Group: Agent group to sync telemetry configuration with
 - Infra Meters: OTel compatible metrics pipelines

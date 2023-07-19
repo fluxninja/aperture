@@ -40,14 +40,14 @@ spec:
                       user_type: guest
                   name: guest
                   parameters:
-                    priority: "50"
+                    priority: 50
                     queue_timeout: 1s
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
                   name: subscriber
                   parameters:
-                    priority: "200"
+                    priority: 200
                     queue_timeout: 2s
               selectors:
               - control_point: ingress

@@ -28,12 +28,12 @@ spec:
                 match_labels:
                   call_type: background
               parameters:
-                priority: "50"
+                priority: 50
             - label_matcher:
                 match_labels:
                   call_type: interactive
               parameters:
-                priority: "200"
+                priority: 200
           selectors:
           - control_point: some-external-api
     evaluation_interval: 1s

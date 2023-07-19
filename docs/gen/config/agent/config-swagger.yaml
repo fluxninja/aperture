@@ -480,11 +480,10 @@ definitions:
                 description: List of etcd server endpoints
                 items:
                     type: string
-                minItems: 1
                 type: array
                 x-go-name: Endpoints
-                x-go-tag-json: endpoints
-                x-go-tag-validate: required,gt=0,dive,hostname_port|url|fqdn
+                x-go-tag-json: endpoints,omitempty
+                x-go-tag-validate: dive,hostname_port|url|fqdn
             lease_ttl:
                 default: 60s
                 description: Lease time-to-live
@@ -514,8 +513,6 @@ definitions:
                 type: string
                 x-go-name: Username
                 x-go-tag-json: username
-        required:
-            - endpoints
         title: EtcdConfig holds configuration for etcd client.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/etcd
@@ -1289,12 +1286,12 @@ definitions:
         properties:
             address:
                 description: Address of the Prometheus server
-                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
+                pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Address
                 x-go-tag-json: address
-                x-go-tag-validate: required,hostname_port|url|fqdn
-                x-pattern-rules: hostname_port | url | fqdn
+                x-go-tag-validate: omitempty,hostname_port|url|fqdn
+                x-pattern-rules: empty | hostname_port | url | fqdn
             labels:
                 description: A list of labels to be attached to every query
                 items:
@@ -1302,8 +1299,6 @@ definitions:
                 type: array
                 x-go-name: Labels
                 x-go-tag-json: labels,omitempty
-        required:
-            - address
         title: PrometheusConfig holds configuration for Prometheus Server.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config

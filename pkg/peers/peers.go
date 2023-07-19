@@ -69,13 +69,14 @@ type PeerDiscoveryPrefix string
 // PeerDiscoveryIn holds parameters for newPeerDiscovery.
 type PeerDiscoveryIn struct {
 	fx.In
-	Lifecycle      fx.Lifecycle
-	Unmarshaller   config.Unmarshaller
-	Client         *etcdclient.Client
-	Listener       *listener.Listener
-	StatusRegistry status.Registry
-	Prefix         PeerDiscoveryPrefix
-	Watchers       PeerWatchers `group:"peer-watchers"`
+	Lifecycle       fx.Lifecycle
+	Unmarshaller    config.Unmarshaller
+	Client          *etcdclient.Client
+	SessionScopedKV *etcdclient.SessionScopedKV
+	Listener        *listener.Listener
+	StatusRegistry  status.Registry
+	Prefix          PeerDiscoveryPrefix
+	Watchers        PeerWatchers `group:"peer-watchers"`
 }
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
@@ -91,7 +92,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		return nil, err
 	}
 
-	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.Watchers)
+	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.SessionScopedKV, in.Watchers)
 	if err != nil {
 		return nil, err
 	}
@@ -143,18 +144,24 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	lock         sync.RWMutex
-	peers        *peersv1.Peers
-	client       *etcdclient.Client
-	etcdWatcher  notifiers.Watcher
-	selfKey      string
-	etcdPath     string
-	peerNotifier notifiers.PrefixNotifier
-	watchers     PeerWatchers
+	lock            sync.RWMutex
+	peers           *peersv1.Peers
+	client          *etcdclient.Client
+	sessionScopedKV *etcdclient.SessionScopedKV
+	etcdWatcher     notifiers.Watcher
+	selfKey         string
+	etcdPath        string
+	peerNotifier    notifiers.PrefixNotifier
+	watchers        PeerWatchers
 }
 
 // NewPeerDiscovery creates a new PeerDiscovery.
-func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWatchers) (*PeerDiscovery, error) {
+func NewPeerDiscovery(
+	prefix string,
+	client *etcdclient.Client,
+	sessionScopedKV *etcdclient.SessionScopedKV,
+	watchers PeerWatchers,
+) (*PeerDiscovery, error) {
 	var err error
 	pd := &PeerDiscovery{
 		peers: &peersv1.Peers{
@@ -163,9 +170,10 @@ func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWat
 			},
 			Peers: make(map[string]*peersv1.Peer),
 		},
-		watchers: watchers,
-		etcdPath: path.Join(etcdPath, prefix),
-		client:   client,
+		watchers:        watchers,
+		etcdPath:        path.Join(etcdPath, prefix),
+		client:          client,
+		sessionScopedKV: sessionScopedKV,
 	}
 
 	// create and start etcdwatcher to track peers and sync them to disk
@@ -215,8 +223,7 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 		log.Error().Err(err).Msg("failed to convert json to yaml")
 		return err
 	}
-	_, err = pd.client.KV.Put(clientv3.WithRequireLeader(ctx),
-		pd.selfKey, string(b), clientv3.WithLease(pd.client.LeaseID))
+	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(b))
 
 	return err
 }

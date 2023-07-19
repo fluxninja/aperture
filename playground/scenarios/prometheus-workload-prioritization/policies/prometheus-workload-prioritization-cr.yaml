@@ -39,12 +39,12 @@ spec:
                     match_labels:
                       is_demo_app_requests_total: "true"
                   parameters:
-                    priority: "50"
+                    priority: 50
                 - label_matcher:
                     match_labels:
                       is_demo_app_request_duration_micro_seconds: "true"
                   parameters:
-                    priority: "200"
+                    priority: 200
               selectors:
               - control_point: ingress
                 label_matcher:

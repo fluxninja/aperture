@@ -63,11 +63,16 @@ your cluster.
          endpoints: ["CONTROLLER_ENDPOINT_HERE"]
    ```
 
-   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of etcd and Prometheus, which are also being used by the
-   Aperture Controller you want these Agents to connect to.
-   `CONTROLLER_ENDPOINT_HERE` should point to Aperture Controller. If you skip
-   it, some sub-commands `aperturectl` commands won't work.
+   If you are using [ARC Controller](/arc/arc.md#arc-controller), refer to the
+   [Configuration](/arc/extension.md#configuration) section to get the
+   configuration for the Aperture Agent.
+
+   If you are using an Aperture Controller deployed On-Premise, replace the
+   values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual
+   values of etcd and Prometheus, which are also being used by the Aperture
+   Controller you want these Agents to connect to. `CONTROLLER_ENDPOINT_HERE`
+   should point to the Aperture Controller. If you skip it, some sub-commands
+   `aperturectl` commands won't work.
 
    If you have installed the
    [Aperture Controller](/get-started/installation/controller/controller.md) on

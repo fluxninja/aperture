@@ -13,32 +13,30 @@ import (
 )
 
 const (
-	put = 0
-	del = 1
+	put       = 0
+	del       = 1
+	delPrefix = 2
 )
 
-type op struct {
+type operation struct {
 	key    string
 	value  []byte
-	opts   []clientv3.OpOption
 	opType int
 }
 
 // Writer holds fields for etcd writer.
 type Writer struct {
-	context    context.Context
-	etcdClient *etcdclient.Client
-	opChannel  infchan.Channel[op]
-	cancel     context.CancelFunc
-	withLease  bool
+	context   context.Context
+	kv        *etcdclient.KVWrapper
+	opChannel infchan.Channel[operation]
+	cancel    context.CancelFunc
 }
 
 // NewWriter returns a new etcd writer.
-func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.OpOption) *Writer {
+func NewWriter(kv *etcdclient.KVWrapper, opts ...clientv3.OpOption) *Writer {
 	ew := &Writer{
-		etcdClient: etcdClient,
-		withLease:  withLease,
-		opChannel:  infchan.NewChannel[op](),
+		kv:        kv,
+		opChannel: infchan.NewChannel[operation](),
 	}
 	// Set finalizer to automatically close channel
 	runtime.SetFinalizer(ew, func(ew *Writer) {
@@ -59,18 +57,17 @@ func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.O
 		// start processing ops
 		for {
 			select {
-			case opt := <-ew.opChannel.Out():
-				opt.opts = append(opt.opts, opts...)
-				if ew.withLease && opt.opType == put {
-					opt.opts = append(opt.opts, clientv3.WithLease(ew.etcdClient.LeaseID))
-				}
-
+			case op := <-ew.opChannel.Out():
 				var err error
-				switch opt.opType {
+				switch op.opType {
 				case put:
-					_, err = ew.etcdClient.KV.Put(clientv3.WithRequireLeader(ew.context), opt.key, string(opt.value), opt.opts...)
+					_, err = ew.kv.Put(clientv3.WithRequireLeader(ew.context), op.key, string(op.value), opts...)
 				case del:
-					_, err = ew.etcdClient.KV.Delete(clientv3.WithRequireLeader(ew.context), opt.key, opt.opts...)
+					_, err = ew.kv.Delete(clientv3.WithRequireLeader(ew.context), op.key, opts...)
+				case delPrefix:
+					opOpts := []clientv3.OpOption{clientv3.WithPrefix()}
+					opOpts = append(opOpts, opts...)
+					_, err = ew.kv.Delete(clientv3.WithRequireLeader(ew.context), op.key, opOpts...)
 				}
 				if err != nil {
 					log.Error().Err(err).Msg("failed to write to etcd")
@@ -85,13 +82,18 @@ func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.O
 }
 
 // Write writes a key value pair to etcd with options.
-func (ew *Writer) Write(key string, value []byte, opts ...clientv3.OpOption) {
-	ew.opChannel.In() <- op{opType: put, key: key, value: value, opts: opts}
+func (ew *Writer) Write(key string, value []byte) {
+	ew.opChannel.In() <- operation{opType: put, key: key, value: value}
 }
 
 // Delete deletes a key from etcd.
-func (ew *Writer) Delete(key string, opts ...clientv3.OpOption) {
-	ew.opChannel.In() <- op{opType: del, key: key, opts: opts}
+func (ew *Writer) Delete(key string) {
+	ew.opChannel.In() <- operation{opType: del, key: key}
+}
+
+// DeletePrefix deletes a whole prefix from etcd.
+func (ew *Writer) DeletePrefix(key string) {
+	ew.opChannel.In() <- operation{opType: delPrefix, key: key}
 }
 
 // Close closes the etcd writer.

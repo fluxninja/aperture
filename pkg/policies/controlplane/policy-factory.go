@@ -63,6 +63,7 @@ type PolicyFactory struct {
 	lock                             sync.RWMutex
 	circuitJobGroup                  *jobs.JobGroup
 	etcdClient                       *etcdclient.Client
+	sessionScopedKV                  *etcdclient.SessionScopedKV
 	prometheusEnforcer               *prom.PrometheusEnforcer
 	alerterIface                     alerts.Alerter
 	registry                         status.Registry
@@ -77,6 +78,7 @@ func providePolicyFactory(
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
+	sessionScopedKV *etcdclient.SessionScopedKV,
 	enforcer *prom.PrometheusEnforcer,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
@@ -95,6 +97,7 @@ func providePolicyFactory(
 		registry:                         policiesStatusRegistry,
 		circuitJobGroup:                  circuitJobGroup,
 		etcdClient:                       etcdClient,
+		sessionScopedKV:                  sessionScopedKV,
 		prometheusEnforcer:               enforcer,
 		alerterIface:                     alerterIface,
 		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
@@ -169,6 +172,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
+			factory.sessionScopedKV,
 			factory.prometheusEnforcer,
 			factory.alerterIface,
 			&wrapperMessage,
@@ -210,9 +214,12 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 // GetPolicies returns all policies.
 func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	policyWrappers := factory.GetPolicyWrappers()
-	policies := make(map[string]*policylangv1.Policy)
+	policies := make(map[string]*policylangv1.GetPolicyResponse)
 	for _, v := range policyWrappers {
-		policies[v.GetCommonAttributes().GetPolicyName()] = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
+		policies[v.GetCommonAttributes().GetPolicyName()] = &policylangv1.GetPolicyResponse{
+			Policy: proto.Clone(v.GetPolicy()).(*policylangv1.Policy),
+			Status: policylangv1.GetPolicyResponse_VALID,
+		}
 	}
 	return &policylangv1.Policies{
 		Policies: policies,

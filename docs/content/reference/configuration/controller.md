@@ -848,7 +848,7 @@ EtcdConfig holds configuration for etcd client.
 
 <!-- vale off -->
 
-([]string, **required**)
+([]string)
 
 <!-- vale on -->
 
@@ -947,7 +947,10 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Controller ID.
+Overrides Controller ID for Aperture Controller. If not set, random id will be
+generated and persisted in etcd.
+
+Note: This option doesn't affect Aperture Agent.
 
 </dd>
 <dt>disable_local_otel_pipeline</dt>
@@ -959,8 +962,8 @@ Controller ID.
 
 <!-- vale on -->
 
-Whether to configure local Prometheus OTel pipeline for metrics. Implied to be
-true by EnableCloudController.
+Disables local Prometheus OTel pipelines for metrics. Implied by
+EnableCloudController.
 
 </dd>
 <dt>enable_cloud_controller</dt>
@@ -972,7 +975,10 @@ true by EnableCloudController.
 
 <!-- vale on -->
 
-Whether to enable cloud controller. Overrides etcd and TLS configurations.
+Whether to connect to ARC controller.
+
+Overrides etcd configuration and disables local Prometheus OTel pipelines. See
+[FluxNinja ARC](/arc/arc.md) for more details.
 
 </dd>
 <dt>endpoint</dt>
@@ -2050,7 +2056,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale off -->
 
-(string, format: `hostname_port | url | fqdn`, **required**)
+(string, format: `empty | hostname_port | url | fqdn`)
 
 <!-- vale on -->
 

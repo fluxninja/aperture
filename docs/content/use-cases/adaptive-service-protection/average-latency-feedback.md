@@ -108,7 +108,7 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/load-scheduling.yaml --kube </CodeBlock>
+<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/basic-service-protection.yaml --kube </CodeBlock>
 ```
 
 ```mdx-code-block
@@ -120,7 +120,7 @@ Apply the policy YAML generated (Kubernetes Custom Resource) using the above
 example with `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/configuration/load-scheduling-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/configuration/basic-service-protection-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
@@ -148,10 +148,10 @@ limit (`1.1`) of historical latency.
 ### Dry Run Mode
 
 You can run this policy in the `Dry Run` mode by setting the
-`default_config.dry_run` option to `true`. In the `Dry Run` mode, the policy
-does not throttle the request rate while still evaluating the decisions it would
-take in each cycle. This is useful for evaluating the policy without impacting
-the service.
+`policy.service_protection_core.dry_run` parameter to `true`. In the `Dry Run`
+mode, the policy does not throttle the request rate while still evaluating the
+decisions it would take in each cycle. This is useful for evaluating the policy
+without impacting the service.
 
 :::note
 
