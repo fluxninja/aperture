@@ -45,7 +45,7 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
   },
 }
 
-const SIGNAL_AVERAGE_DASHBOARD_URL = `http://localhost:3000/d-solo/cf7b152fa1ba61b9b8c11a8fd3d03990df23535c/aperture-signals-workload-prioritization?orgId=1&refresh=5s&from=1689185655821&to=1689186555821&theme=dark&panelId=1`
+const SIGNAL_AVERAGE_DASHBOARD_URL = `http://localhost:3000/d-solo/cf7b152fa1ba61b9b8c11a8fd3d03990df23535c/aperture-signals-workload-prioritization?orgId=1&refresh=5s&theme=dark&panelId=1`
 
 export const HomePage: FC = () => {
   const { handleChange, value } = useTabChange([
