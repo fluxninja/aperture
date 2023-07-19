@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.5
+      - image: cimg/go:1.20.6
         user: root
   python-cimg-executor:
     docker:
@@ -316,7 +316,7 @@ jobs:
       - restore_cache:
           name: Restore daily cache
           keys:
-            - aperture-v8-daily-cache-{{ checksum "~/day" }}
+            - aperture-v9-daily-cache-{{ checksum "~/day" }}
       - run: &install_opsninja
           name: Install opsninja and its dependencies
           command: |
@@ -397,7 +397,7 @@ jobs:
             fi
       - save_cache:
           name: Save daily cache
-          key: aperture-v8-daily-cache-{{ checksum "~/day" }}
+          key: aperture-v9-daily-cache-{{ checksum "~/day" }}
           paths:
             - ../.cache/go-build
             - ../.cache/golangci-lint
@@ -1082,7 +1082,7 @@ jobs:
       - restore_cache:
           name: Restore go cache
           keys:
-            - aperture-v1-upload-policies-go-cache
+            - aperture-v2-go-cache-upload-policies
       - run:
           name: Apply Policy
           working_directory: .
@@ -1091,7 +1091,7 @@ jobs:
             --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
       - save_cache:
           name: Save go cache
-          key: aperture-v1-upload-policies-go-cache
+          key: aperture-v2-go-cache-upload-policies
           paths:
             - ../.cache/go-build
             - ./blueprints/vendor
@@ -1491,10 +1491,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "tools/go/go.mod" }}
-            - aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Copy tool-versions in HOME dir
@@ -1516,7 +1516,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v10-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
