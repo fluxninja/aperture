@@ -847,21 +847,24 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 }
 
 // RemoveFinalizerFromAgentCR removes the finalizer from the Agent CR when the operator is getting deleted.
-func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context) {
-	logger := log.FromContext(ctx)
+func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupLog logr.Logger) {
 	agentList := &agentv1alpha1.AgentList{}
 	err := r.Client.List(ctx, agentList)
 	if err != nil {
-		logger.Error(err, "Error while getting the agent")
+		setupLog.Error(err, "Error while getting the agent")
 	}
 	if agentList.Items != nil && len(agentList.Items) != 0 {
 		for _, agentCR := range agentList.Items {
 			agentCR := agentCR
 			if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
-				logger.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
+				setupLog.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
 				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
 				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
-					logger.Error(err, "Error while removing Finalizer from the agent")
+					if err.Error() == "Unauthorized" {
+						setupLog.Error(err, "Unauthorized to remove Finalizer from the agent serviceaccount might be deleted")
+					} else {
+						setupLog.Error(err, "Error while removing Finalizer from the agent")
+					}
 				}
 			}
 		}

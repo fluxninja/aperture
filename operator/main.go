@@ -47,6 +47,7 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/controllers/controller"
 	"github.com/fluxninja/aperture/v2/operator/controllers/mutatingwebhook"
 	"github.com/fluxninja/aperture/v2/operator/controllers/namespace"
+	"github.com/go-logr/logr"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -231,7 +232,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx := setupContext(agentReconciler, controllerReconciler, agentManager)
+	ctx := setupContext(agentReconciler, controllerReconciler, agentManager, setupLog)
 	setupLog.Info("starting webhook server")
 	go func() {
 		if err := server.Start(ctx); err != nil {
@@ -247,7 +248,7 @@ func main() {
 	}
 }
 
-func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool) context.Context {
+func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool, setupLog logr.Logger) context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	c := make(chan os.Signal, 1)
@@ -256,9 +257,9 @@ func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *
 	go func() {
 		<-c
 		if agentManager {
-			agentReconciler.RemoveFinalizerFromAgentCR(ctx)
+			agentReconciler.RemoveFinalizerFromAgentCR(ctx, setupLog)
 		} else {
-			controllerReconciler.RemoveFinalizerFromControllerCR(ctx)
+			controllerReconciler.RemoveFinalizerFromControllerCR(ctx, setupLog)
 		}
 		cancel()
 	}()

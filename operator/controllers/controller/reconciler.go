@@ -735,22 +735,25 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 }
 
 // RemoveFinalizerFromControllerCR removes the finalizer from the controller CR when the operator is getting deleted.
-func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Context) {
-	logger := log.FromContext(ctx)
+func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Context, setupLog logr.Logger) {
 	controllerList := &controllerv1alpha1.ControllerList{}
 
 	err := r.Client.List(ctx, controllerList)
 	if err != nil {
-		logger.Error(err, "Error while getting the controller")
+		setupLog.Error(err, "Error while getting the controller")
 	}
 	if controllerList.Items != nil && len(controllerList.Items) != 0 {
 		for _, controllerCR := range controllerList.Items {
 			controllerCR := controllerCR
 			if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
-				logger.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
+				setupLog.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
 				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
 				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
-					logger.Error(err, "Error while removing Finalizer from the controller")
+					if err.Error() == "Unauthorized" {
+						setupLog.Error(err, "Unauthorized to remove Finalizer from the controller serviceaccount might be deleted")
+					} else {
+						setupLog.Error(err, "Error while removing Finalizer from the controller")
+					}
 				}
 			}
 		}
