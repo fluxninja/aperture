@@ -156,7 +156,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
-			if err = r.UpdateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
+			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
 			}
 		}
@@ -242,7 +242,7 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	if err := r.UpdateController(ctx, instance); err != nil {
+	if err := r.updateController(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -255,8 +255,8 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	return ctrl.Result{}, nil
 }
 
-// UpdateController updates the Controller resource in Kubernetes.
-func (r *ControllerReconciler) UpdateController(ctx context.Context, instance *controllerv1alpha1.Controller) error {
+// updateController updates the Controller resource in Kubernetes.
+func (r *ControllerReconciler) updateController(ctx context.Context, instance *controllerv1alpha1.Controller) error {
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
@@ -732,6 +732,29 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 
 	return nil
+}
+
+// RemoveFinalizerFromControllerCR removes the finalizer from the controller CR when the operator is getting deleted.
+func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Context) {
+	logger := log.FromContext(ctx)
+	controllerList := &controllerv1alpha1.ControllerList{}
+
+	err := r.Client.List(ctx, controllerList)
+	if err != nil {
+		logger.Error(err, "Error while getting the controller")
+	}
+	if controllerList.Items != nil && len(controllerList.Items) != 0 {
+		for _, controllerCR := range controllerList.Items {
+			controllerCR := controllerCR
+			if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
+				logger.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
+				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
+				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
+					logger.Error(err, "Error while removing Finalizer from the controller")
+				}
+			}
+		}
+	}
 }
 
 // eventFiltersForController sets up a Predicate filter for the received events.

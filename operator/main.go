@@ -26,9 +26,7 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
-	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
-	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
-	"k8s.io/apimachinery/pkg/api/errors"
+
 	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -38,7 +36,6 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -258,49 +255,12 @@ func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *
 
 	go func() {
 		<-c
-		removeFinalizer(ctx, agentReconciler, controllerReconciler, agentManager)
+		if agentManager {
+			agentReconciler.RemoveFinalizerFromAgentCR(ctx)
+		} else {
+			controllerReconciler.RemoveFinalizerFromControllerCR(ctx)
+		}
 		cancel()
 	}()
 	return ctx
-}
-
-func removeFinalizer(ctx context.Context, agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool) {
-	if agentManager {
-		agentList := &agentv1alpha1.AgentList{}
-		err := agentReconciler.Client.List(ctx, agentList)
-		if err != nil {
-			setupLog.Error(err, "Error while getting the agent")
-		}
-		if agentList.Items != nil && len(agentList.Items) != 0 {
-			for _, agentCR := range agentList.Items {
-				agentCR := agentCR
-				if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
-					setupLog.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
-					controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
-					if err = agentReconciler.UpdateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
-						setupLog.Error(err, "Error while removing Finalizer from the agent")
-					}
-				}
-			}
-		}
-	} else {
-		controllerList := &controllerv1alpha1.ControllerList{}
-
-		err := controllerReconciler.Client.List(ctx, controllerList)
-		if err != nil {
-			setupLog.Error(err, "Error while getting the controller")
-		}
-		if controllerList.Items != nil && len(controllerList.Items) != 0 {
-			for _, controllerCR := range controllerList.Items {
-				controllerCR := controllerCR
-				if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
-					setupLog.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
-					controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
-					if err = controllerReconciler.UpdateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
-						setupLog.Error(err, "Error while removing Finalizer from the controller")
-					}
-				}
-			}
-		}
-	}
 }

@@ -120,7 +120,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			r.deleteResources(ctx, logger, instance.DeepCopy())
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
-			if err = r.UpdateAgent(ctx, instance); err != nil && !errors.IsNotFound(err) {
+			if err = r.updateAgent(ctx, instance); err != nil && !errors.IsNotFound(err) {
 				return ctrl.Result{}, err
 			}
 		}
@@ -200,7 +200,7 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		controllerutil.AddFinalizer(instance, controllers.FinalizerName)
 	}
 
-	if err := r.UpdateAgent(ctx, instance); err != nil {
+	if err := r.updateAgent(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -377,8 +377,8 @@ func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, 
 	}
 }
 
-// UpdateAgent updates the Agent resource in Kubernetes.
-func (r *AgentReconciler) UpdateAgent(ctx context.Context, instance *agentv1alpha1.Agent) error {
+// updateAgent updates the Agent resource in Kubernetes.
+func (r *AgentReconciler) updateAgent(ctx context.Context, instance *agentv1alpha1.Agent) error {
 	attempt := 5
 	finalizers := instance.DeepCopy().Finalizers
 	spec := instance.DeepCopy().Spec
@@ -844,6 +844,28 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 	}
 
 	return nil
+}
+
+// RemoveFinalizerFromAgentCR removes the finalizer from the Agent CR when the operator is getting deleted.
+func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context) {
+	logger := log.FromContext(ctx)
+	agentList := &agentv1alpha1.AgentList{}
+	err := r.Client.List(ctx, agentList)
+	if err != nil {
+		logger.Error(err, "Error while getting the agent")
+	}
+	if agentList.Items != nil && len(agentList.Items) != 0 {
+		for _, agentCR := range agentList.Items {
+			agentCR := agentCR
+			if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
+				logger.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
+				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
+				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
+					logger.Error(err, "Error while removing Finalizer from the agent")
+				}
+			}
+		}
+	}
 }
 
 // eventFilters sets up a Predicate filter for the received events.
