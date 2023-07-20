@@ -157,7 +157,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
-			c.config = ""
+			return fmt.Errorf("failed to resolve config file '%s' path: %w", c.config, err)
 		}
 
 		config := &Config{}
