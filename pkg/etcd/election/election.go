@@ -101,7 +101,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 					log.Error().Err(err).Msg("Unable to resign from the election")
 				}
 			}
-			return nil
+			return err
 		},
 	})
 
