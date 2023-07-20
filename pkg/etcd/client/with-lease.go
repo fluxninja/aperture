@@ -4,16 +4,18 @@ import (
 	"context"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// kvWithLease implements KV by attaching Lease to every Put it makes.
+// kvWithLease implements KV by attaching session's Lease to every Put it makes.
 //
 // This makes all the keys it creates scoped to the session.
 type kvWithLease struct {
-	lease clientv3.LeaseID
-	rawKV clientv3.KV
+	session *Session
+	rawKV   clientv3.KV
 }
 
 // Get implements clientv3.KV.
@@ -31,7 +33,19 @@ func (c kvWithLease) Put(
 	key, val string,
 	opts ...clientv3.OpOption,
 ) (*clientv3.PutResponse, error) {
-	return c.rawKV.Put(ctx, key, val, append(opts, clientv3.WithLease(c.lease))...)
+	session, err := c.session.WaitSession(ctx)
+	if err != nil {
+		if err == errNoSessionFailed {
+			return nil, status.Error(codes.Unavailable, err.Error())
+		} else {
+			return nil, status.Error(
+				codes.DeadlineExceeded,
+				"etcd session haven't established before deadline",
+			)
+		}
+	}
+
+	return c.rawKV.Put(ctx, key, val, append(opts, clientv3.WithLease(session.Lease()))...)
 }
 
 // Delete implements clientv3.KV.
