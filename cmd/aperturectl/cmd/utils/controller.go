@@ -9,8 +9,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
+	toml "github.com/pelletier/go-toml"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -43,6 +46,7 @@ type ControllerConn struct {
 	kubeConfigPath string
 	kubeConfig     *rest.Config
 	apiKey         string
+	config         string
 
 	forwarderStopChan chan struct{}
 	conn              *grpc.ClientConn
@@ -92,13 +96,39 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"",
 		"FluxNinja ARC API Key to be used when using Cloud Controller",
 	)
+	flags.StringVar(
+		&c.config,
+		"config",
+		"",
+		"Path to the Aperture config file",
+	)
 }
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	if c.controllerAddr == "" && !c.kube {
-		log.Info().Msg("Neither --controller nor --kube flag is set. Assuming --kube=true.")
+	env := os.Getenv(configEnv)
+	if env == "" {
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			env = filepath.Join(homeDir, ".aperturectl", "config")
+			if _, err := os.Stat(env); err != nil {
+				env = ""
+			}
+		}
+	}
+
+	updatedConfig := c.config
+	if updatedConfig == "" {
+		updatedConfig = env
+	}
+
+	if c.controllerAddr == "" && !c.kube && updatedConfig == "" {
+		log.Info().Msg("Neither --controller nor --kube nor --config flag is set. Assuming --kube=true.")
 		c.kube = true
+	}
+
+	if c.config != "" && c.apiKey != "" {
+		return errors.New("--api-key cannot be used with --config")
 	}
 
 	if c.controllerAddr != "" && c.kube {
@@ -115,6 +145,43 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
+	} else if c.apiKey == "" && !c.kube {
+		config, err := toml.LoadFile(updatedConfig)
+		if err != nil {
+			return fmt.Errorf("failed to read config file '%s': %w", updatedConfig, err)
+		}
+
+		if config == nil {
+			return fmt.Errorf("invalid config file '%s'", updatedConfig)
+		}
+
+		controller, ok := config.Get("controller").(*toml.Tree)
+		if !ok {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller'", updatedConfig)
+		}
+
+		organizationURL := controller.Get("url")
+		organizationURLStr := ""
+		if organizationURL == nil {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", updatedConfig)
+		} else if organizationURLStr, ok = organizationURL.(string); !ok {
+			return fmt.Errorf("invalid config file '%s'. Key 'controller.url' must be a string", updatedConfig)
+		}
+
+		apiKey := controller.Get("api_key")
+		apiKeyStr := ""
+		if apiKey == nil {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", updatedConfig)
+		} else if apiKeyStr, ok = apiKey.(string); !ok {
+			return fmt.Errorf("invalid config file '%s'. Key 'controller.api_key' must be a string", updatedConfig)
+		}
+
+		if organizationURLStr == "" || apiKey == "" {
+			return errors.New("controller.url and controller.api_key must be set in config file")
+		}
+
+		c.controllerAddr = organizationURLStr
+		c.apiKey = apiKeyStr
 	}
 
 	return nil
