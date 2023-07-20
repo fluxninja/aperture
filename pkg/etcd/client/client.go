@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
-	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -15,8 +14,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // Module is a fx module that provides etcd client.
@@ -68,13 +65,6 @@ type Client struct {
 	leaseTTL config.Duration
 }
 
-// Session wraps concurrencyv3.Session.
-//
-// Session.Session is nil before OnStart.
-type Session struct {
-	Session *concurrencyv3.Session
-}
-
 // KVWrapper wraps clientv3.KV, can be used when wanting to depend on clientv3.KV
 // already before OnStart.
 //
@@ -83,12 +73,6 @@ type Session struct {
 // Note: This is not named just KV not to break .KV field access.
 type KVWrapper struct {
 	clientv3.KV
-}
-
-// SessionScopedKV implements clientv3.KV by attaching the session's lease to
-// all Put requests, effectively scoping all created keys to the session.
-type SessionScopedKV struct {
-	KVWrapper
 }
 
 // ProvideClient creates a new Etcd Client and provides it via Fx.
@@ -125,7 +109,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	}
 
 	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
+		OnStart: func(startCtx context.Context) error {
 			tlsConfig, tlsErr := config.ClientTLSConfig.GetTLSConfig()
 			if tlsErr != nil {
 				log.Error().Err(tlsErr).Msg("Failed to get TLS config")
@@ -159,7 +143,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 			}
 
 			if cli.Username != "" && cli.Password != "" {
-				if _, err = cli.AuthEnable(ctx); err != nil {
+				if _, err = cli.AuthEnable(startCtx); err != nil {
 					log.Error().Err(err).Msg("Unable to enable auth of the etcd cluster")
 					cancel()
 					return err
@@ -185,57 +169,4 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		},
 	})
 	return &etcdClient, nil
-}
-
-// ProvideSession provides Session.
-//
-// When the session expires, app will be shut down.
-func ProvideSession(
-	client *Client,
-	lc fx.Lifecycle,
-	shutdowner fx.Shutdowner,
-) (*Session, error) {
-	var sessionWrapper Session
-	lc.Append(fx.StartHook(func() error {
-		// Create a new Session
-		session, err := concurrencyv3.NewSession(client.Client, concurrencyv3.WithTTL((int)(client.leaseTTL.AsDuration().Seconds())))
-		if err != nil {
-			log.Error().Err(err).Msg("Unable to create a new session")
-			return err
-		}
-		sessionWrapper.Session = session
-
-		// A goroutine to check if the session is expired
-		panichandler.Go(func() {
-			// wait for session to be closed
-			<-session.Done()
-
-			select {
-			case <-session.Client().Ctx().Done():
-				return
-			default:
-				// session close not caused by client shutdown
-				log.Error().Msg("Etcd session expired, request shutdown")
-				utils.Shutdown(shutdowner)
-			}
-		})
-
-		return nil
-	}))
-
-	return &sessionWrapper, nil
-}
-
-// ProvideSessionScopedKV provides SessionScopedKV.
-//
-// Note: This requires Session, so any usage of SessionScopedKV will cause app to shut down.
-func ProvideSessionScopedKV(session *Session, lc fx.Lifecycle) *SessionScopedKV {
-	var scopedKV SessionScopedKV
-	lc.Append(fx.StartHook(func() {
-		scopedKV.KV = kvWithLease{
-			rawKV: session.Session.Client().KV,
-			lease: session.Session.Lease(),
-		}
-	}))
-	return &scopedKV
 }

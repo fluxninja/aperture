@@ -53,16 +53,25 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			// Create an election for this client
-			election.Election = concurrencyv3.NewElection(in.Session.Session, "/election/"+in.AgentInfo.GetAgentGroup())
 			// A goroutine to do leader election
 			panichandler.Go(func() {
 				defer close(election.doneChan)
+
+				session, err := in.Session.WaitSession(ctx)
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to get etcd session for leader election")
+					utils.Shutdown(in.Shutdowner)
+					return
+				}
+
+				// Create an election for this client
+				election.election = concurrencyv3.NewElection(session, "/election/"+in.AgentInfo.GetAgentGroup())
 				// Campaign for leadership
-				err := election.Election.Campaign(ctx, info.GetHostInfo().Uuid)
+				err = election.election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to elect a leader")
 					utils.Shutdown(in.Shutdowner)
+					return
 				}
 				// Check if canceled
 				if ctx.Err() != nil {
@@ -84,7 +93,10 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 			// resign from the election if we are the leader
 			if election.IsLeader() {
 				election.isLeader.Store(false)
-				err = election.Election.Resign(stopCtx)
+				if election.election == nil {
+					return nil
+				}
+				err = election.election.Resign(stopCtx)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to resign from the election")
 				}
@@ -98,7 +110,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 
 // Election is a wrapper around etcd election.
 type Election struct {
-	Election *concurrencyv3.Election
+	election *concurrencyv3.Election
 	isLeader atomic.Bool
 
 	// When closed, leader election has stopped (either due to becoming the
