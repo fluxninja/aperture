@@ -38,6 +38,7 @@ aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.ya
 
 ```
       --api-key string         FluxNinja ARC API Key to be used when using Cloud Controller
+      --config string          Path to the Aperture config file
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS
