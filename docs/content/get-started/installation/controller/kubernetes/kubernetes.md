@@ -45,7 +45,7 @@ Install the tool of your choice using the following links:
 
 ## Configuring the packaged etcd and Prometheus
 
-If the Aperture Controller is going to be installed with the packaged etcd and
+If the Aperture Controller will be installed with the packaged etcd and
 Prometheus, the following steps can be used to customize the installation of
 them:
 
