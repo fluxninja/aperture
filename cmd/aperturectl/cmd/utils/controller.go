@@ -117,6 +117,10 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
+	if c.config != "" && c.apiKey != "" {
+		return errors.New("--api-key cannot be used with --config")
+	}
+
 	// Fetching config from environment variable
 	if c.config == "" {
 		c.config = os.Getenv(configEnv)
@@ -135,10 +139,6 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		c.kube = true
 	}
 
-	if c.config != "" && c.apiKey != "" {
-		return errors.New("--api-key cannot be used with --config")
-	}
-
 	if c.controllerAddr != "" && c.kube {
 		return errors.New("--controller cannot be used with --kube")
 	}
@@ -153,7 +153,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
-	} else if c.apiKey == "" && !c.kube {
+	} else if c.config != "" {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
