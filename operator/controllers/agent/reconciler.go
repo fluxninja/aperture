@@ -852,6 +852,7 @@ func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupL
 	err := r.Client.List(ctx, agentList)
 	if err != nil {
 		setupLog.Error(err, "Error while getting the agent")
+		return
 	}
 	if agentList.Items != nil && len(agentList.Items) != 0 {
 		for _, agentCR := range agentList.Items {
@@ -862,8 +863,10 @@ func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupL
 				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
 					if err.Error() == "Unauthorized" {
 						setupLog.Error(err, "Unauthorized to remove Finalizer from the agent serviceaccount might be deleted")
+						return
 					} else {
 						setupLog.Error(err, "Error while removing Finalizer from the agent")
+						return
 					}
 				}
 			}

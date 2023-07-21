@@ -741,6 +741,7 @@ func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Conte
 	err := r.Client.List(ctx, controllerList)
 	if err != nil {
 		setupLog.Error(err, "Error while getting the controller")
+		return
 	}
 	if controllerList.Items != nil && len(controllerList.Items) != 0 {
 		for _, controllerCR := range controllerList.Items {
@@ -751,8 +752,10 @@ func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Conte
 				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
 					if err.Error() == "Unauthorized" {
 						setupLog.Error(err, "Unauthorized to remove Finalizer from the controller serviceaccount might be deleted")
+						return
 					} else {
 						setupLog.Error(err, "Error while removing Finalizer from the controller")
+						return
 					}
 				}
 			}
