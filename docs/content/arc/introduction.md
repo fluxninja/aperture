@@ -11,25 +11,36 @@ keywords:
   - reliability center
 ---
 
-## Application Reliability Center (ARC)
+[FluxNinja ARC][] (Application Reliability Center) is a cloud reliability
+platform for your applications and infrastructure. It provides a hassle-free
+experience and offers a unified solution for managing all tasks related to
+reliability. Regardless of whether your applications are hosted on your own
+bare-metal servers or in the cloud, the only requirement is to install Agents
+and set up integrations. This allows you to start implementing policies to
+control your traffic.
 
-[FluxNinja ARC](https://www.fluxninja.com/product) is a cloud native application
-reliability center that extends open source Aperture installation with advanced
-analytics, monitoring and alerting capabilities.
+[Aperture][], the core component of FluxNinja ARC, empowers you to manage your
+load effectively by classifying, scheduling, and rate-limiting API traffic in
+cloud applications.
 
 :::info Sign-up
 
-To sign-up, [register here](https://app.fluxninja.com/sign-up).
+To sign-up, [click here][sign-up].
 
 :::
 
-### ARC Controller
+## FluxNinja ARC load management features
 
-FluxNinja ARC Organization includes an ARC Controller, which is a SaaS version
-of the Aperture Controller, This controller can be used instead of Aperture
-Controller deployed On-premise, and doesn't require local etcd and Prometheus
-services.
+FluxNinja ARC [load management capabilities][] are powered by [Aperture][]:
 
-Check the [FluxNinja extension configuration](extension.md#configuration), ARC
-Controller section, for how to configure Aperture Agents to talk to the ARC
-Controller.
+- **[Adaptive Service Protection](/use-cases/adaptive-service-protection/adaptive-service-protection.md)**
+- **[Global Quota Management](/use-cases/managing-quotas/managing-quotas.md)**
+- **[Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)**
+- **[Load-based Auto Scaling](/use-cases/auto-scaling/load-based-auto-scaling.md)**
+- **[Distributed Rate-Limiting](/use-cases/rate-limiting/rate-limiting.md)**
+- **[Percentage Rollouts](/use-cases/percentage-rollouts/percentage-rollouts.md)**
+
+[FluxNinja ARC]: https://www.fluxninja.com/product
+[sign-up]: https://app.fluxninja.com/sign-up
+[Aperture]: /introduction.md
+[load management capabilities]: /introduction.md#load-management-capabilities

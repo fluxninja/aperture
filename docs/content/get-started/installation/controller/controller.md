@@ -32,11 +32,18 @@ process variables and maintain their values within the optimal range.
 
 ## Installation
 
-:::tip
+:::tip ARC Controller
 
-Instead of installing On-Premise Aperture Controller, you can start with
-[ARC Controller](/arc/introduction.md#arc-controller) by creating your own
-organization on [FluxNinja ARC](https://www.fluxninja.com/product)
+Every [FluxNinja ARC][] Organization already includes an ARC Controller in the
+`default` project. Check the
+[FluxNinja extension configuration](/arc/extension.md#configuration), for how to
+configure Aperture Agents to talk to the ARC Controller.
+
+To start with ARC Controller, start by creating your own organization on
+[FluxNinja ARC](https://www.fluxninja.com/product) and start the free trial.
+
+This rest of this page describes installation of self-hosted Aperture Controller
+and can be skipped.
 
 :::
 
@@ -62,3 +69,5 @@ is to create and apply policies.
 step-by-step instructions on customizing, creating, and applying policies within
 Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
 as a valuable resource for tailoring policies to meet specific requirements.
+
+[Fluxninja ARC]: /arc/introduction.md
