@@ -747,7 +747,7 @@ func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Conte
 		for _, controllerCR := range controllerList.Items {
 			controllerCR := controllerCR
 			if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
-				setupLog.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Controller CR named %s.", controllerCR.Name))
 				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
 				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
 					if errors.IsUnauthorized(err) {

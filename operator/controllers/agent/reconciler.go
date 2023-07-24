@@ -858,7 +858,7 @@ func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupL
 		for _, agentCR := range agentList.Items {
 			agentCR := agentCR
 			if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
-				setupLog.Info("Operator is getting deleted. Removing finalizer from the Agent CR")
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Agent CR named %s.", agentCR.Name))
 				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
 				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
 					if errors.IsUnauthorized(err) {
