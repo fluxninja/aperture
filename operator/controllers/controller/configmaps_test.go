@@ -78,13 +78,13 @@ var _ = Describe("ConfigMap for Controller", func() {
 									},
 								},
 							},
-							Etcd: etcd.EtcdConfig{
-								Endpoints: []string{"http://agent-etcd:2379"},
-								LeaseTTL:  config.MakeDuration(60 * time.Second),
-							},
-							Prometheus: prometheus.PrometheusConfig{
-								Address: "http://aperture-prometheus-server:80",
-							},
+						},
+						Etcd: etcd.EtcdConfig{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  config.MakeDuration(60 * time.Second),
+						},
+						Prometheus: prometheus.PrometheusConfig{
+							Address: "http://aperture-prometheus-server:80",
 						},
 						OTel: controller.ControllerOTelConfig{
 							CommonOTelConfig: otelconfig.CommonOTelConfig{

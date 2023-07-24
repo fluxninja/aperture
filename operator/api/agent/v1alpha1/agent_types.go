@@ -27,10 +27,12 @@ import (
 	afconfig "github.com/fluxninja/aperture/v2/pkg/agent-functions/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
 	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
+	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
@@ -62,6 +64,14 @@ type AgentConfigSpec struct {
 	// CommonConfigSpec
 	//+kubebuilder:validation:Optional
 	common.CommonConfigSpec `json:",inline"`
+
+	// Etcd configuration.
+	//+kubebuilder:validation:Optional
+	Etcd etcd.EtcdConfig `json:"etcd"`
+
+	// Prometheus configuration.
+	//+kubebuilder:validation:Optional
+	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
 
 	// AgentInfo configuration.
 	//+kubebuilder:validation:Optional
