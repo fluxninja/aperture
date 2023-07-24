@@ -31,23 +31,16 @@ To sign-up, [click here][sign-up].
 
 ## FluxNinja ARC load management features
 
-FluxNinja ARC load management capabilities are powered by [Aperture][]:
+FluxNinja ARC [load management capabilities][] are powered by [Aperture][]:
 
-- **[Adaptive Service Protection][]**
-- **[Global Quota Management][]**
-- **[Workload Prioritization][]**
-- **[Load-based Auto Scaling][]**
-- **[Distributed Rate-Limiting][]**
-- **[Percentage Rollouts][]**
+- **[Adaptive Service Protection](/use-cases/adaptive-service-protection/adaptive-service-protection.md)**
+- **[Global Quota Management](/use-cases/managing-quotas/managing-quotas.md)**
+- **[Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)**
+- **[Load-based Auto Scaling](/use-cases/auto-scaling/load-based-auto-scaling.md)**
+- **[Distributed Rate-Limiting](/use-cases/rate-limiting/rate-limiting.md)**
+- **[Percentage Rollouts](/use-cases/percentage-rollouts/percentage-rollouts.md)**
 
-[Adaptive Service Protection]:
-  /use-cases/adaptive-service-protection/adaptive-service-protection.md
-[Global Quota Management]: /use-cases/managing-quotas/managing-quotas.md
-[Workload Prioritization]:
-  /use-cases/adaptive-service-protection/workload-prioritization.md
-[Load-based Auto Scaling]: /use-cases/auto-scaling/load-based-auto-scaling.md
-[Distributed Rate-Limiting]: /use-cases/rate-limiting/rate-limiting.md
-[Percentage Rollouts]: /use-cases/percentage-rollouts/percentage-rollouts.md
 [FluxNinja ARC]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [Aperture]: /introduction.md
+[load management capabilities]: /introduction.md#load-management-capabilities
