@@ -1,6 +1,9 @@
 ---
-title: FluxNinja ARC
-sidebar_position: 8
+title: Introduction – FluxNinja ARC
+slug: /
+sidebar_position: 1
+sidebar_label: Introduction
+sidebar_class_name: introduction
 keywords:
   - cloud
   - enterprise

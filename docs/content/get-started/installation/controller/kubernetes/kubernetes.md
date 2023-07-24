@@ -43,6 +43,62 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
+## Configuring the packaged etcd and Prometheus
+
+If the Aperture Controller will be installed with the packaged etcd and
+Prometheus, the following steps can be used to customize the installation of
+them:
+
+1. The packaged **etcd** is installed using the
+   [Bitnami Helm Chart](https://artifacthub.io/packages/helm/bitnami/etcd/8.9.0),
+   and it can be customized using all the available options in the chart.
+
+   All the available options can be found
+   [here](https://artifacthub.io/packages/helm/bitnami/etcd/8.9.0?modal=values),
+   and the values can be overridden by creating a `values.yaml` file under the
+   `etcd` key.
+
+   For example, to change the default image used for etcd, create a file named
+   `values.yaml` with the following content:
+
+   ```yaml
+   etcd:
+     image:
+       registry: YOUR_REGISTRY
+       repository: YOUR_REPOSITORY
+       tag: ETCD_IMAGE_TAG
+   ```
+
+2. The packaged **Prometheus** is installed using the
+   [Prometheus Community Helm Chart](https://artifacthub.io/packages/helm/prometheus-community/prometheus/15.18.0),
+   and it can be customized using all the available options in the chart.
+
+   All the available options can be found
+   [here](https://artifacthub.io/packages/helm/prometheus-community/prometheus/15.18.0?modal=values),
+   and the values can be overridden by creating a `values.yaml` file under the
+   `prometheus` key.
+
+   For example, to change the default images used for Prometheus server, create
+   a file named `values.yaml` with the following content:
+
+   ```yaml
+   prometheus:
+     server:
+       image:
+         registry: YOUR_REGISTRY
+         repository: YOUR_REPOSITORY
+         tag: PROMETHEUS_IMAGE_TAG
+     configmapReload:
+       prometheus:
+         image:
+           registry: YOUR_REGISTRY
+           repository: YOUR_REPOSITORY
+           tag: CONFIG_RELOAD_IMAGE_TAG
+   ```
+
+The `values.yaml` file created above can be used with the
+[Installation](#installation) steps below.
+
 ## Installation
 
 The Aperture Controller can be installed on Kubernetes using the below options:

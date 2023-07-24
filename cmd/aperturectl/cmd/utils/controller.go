@@ -9,8 +9,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
+	toml "github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -31,6 +34,17 @@ import (
 
 var controllerNs string
 
+// ControllerConfig is the config file structure for ARC Controller.
+type ControllerConfig struct {
+	URL    string `toml:"url"`
+	APIKey string `toml:"api_key"`
+}
+
+// Config is the config file structure for Aperture.
+type Config struct {
+	Controller *ControllerConfig `toml:"controller"`
+}
+
 // ControllerConn manages flags for connecting to controller – either via
 // address or kubeconfig.
 type ControllerConn struct {
@@ -43,6 +57,7 @@ type ControllerConn struct {
 	kubeConfigPath string
 	kubeConfig     *rest.Config
 	apiKey         string
+	config         string
 
 	forwarderStopChan chan struct{}
 	conn              *grpc.ClientConn
@@ -92,12 +107,35 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"",
 		"FluxNinja ARC API Key to be used when using Cloud Controller",
 	)
+	flags.StringVar(
+		&c.config,
+		"config",
+		"",
+		"Path to the Aperture config file",
+	)
 }
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	if c.controllerAddr == "" && !c.kube {
-		log.Info().Msg("Neither --controller nor --kube flag is set. Assuming --kube=true.")
+	if c.config != "" && c.apiKey != "" {
+		return errors.New("--api-key cannot be used with --config")
+	}
+
+	// Fetching config from environment variable
+	if c.config == "" {
+		c.config = os.Getenv(configEnv)
+	}
+
+	// Fetching config from default location
+	if c.config == "" {
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			c.config = filepath.Join(homeDir, ".aperturectl", "config")
+		}
+	}
+
+	if c.controllerAddr == "" && !c.kube && c.config == "" {
+		log.Info().Msg("Neither --controller nor --kube nor --config flag is set. Assuming --kube=true.")
 		c.kube = true
 	}
 
@@ -115,6 +153,33 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
+	} else if c.config != "" {
+		var err error
+		c.config, err = filepath.Abs(c.config)
+		if err != nil {
+			return fmt.Errorf("failed to resolve config file '%s' path: %w", c.config, err)
+		}
+
+		config := &Config{}
+		_, err = toml.DecodeFile(c.config, config)
+		if err != nil {
+			return fmt.Errorf("failed to read config file '%s': %w", c.config, err)
+		}
+
+		if config.Controller == nil {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller'", c.config)
+		}
+
+		if config.Controller.URL == "" {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", c.config)
+		}
+
+		if config.Controller.APIKey == "" {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
+		}
+
+		c.controllerAddr = config.Controller.URL
+		c.apiKey = config.Controller.APIKey
 	}
 
 	return nil

@@ -1,8 +1,7 @@
 ---
-title: Introduction
-slug: /
+title: Introduction – Aperture
+sidebar_label: Introduction
 sidebar_position: 1
-sidebar_class_name: introduction
 description:
   Introduction to FluxNinja Aperture, an intelligent load management platform
   for modern cloud applications.
