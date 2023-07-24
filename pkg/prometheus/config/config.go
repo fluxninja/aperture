@@ -15,5 +15,5 @@ type PrometheusConfig struct {
 	// A list of labels to be attached to every query
 	Labels []PrometheusLabel `json:"labels,omitempty"`
 	// Address of the Prometheus server
-	Address string `json:"address,omitempty" validate:"hostname_port|url|fqdn,omitempty"`
+	Address string `json:"address,omitempty" validate:"omitempty,hostname_port|url|fqdn,omitempty"`
 }
