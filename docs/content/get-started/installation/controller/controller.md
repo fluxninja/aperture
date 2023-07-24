@@ -35,8 +35,8 @@ process variables and maintain their values within the optimal range.
 :::tip
 
 Instead of installing On-Premise Aperture Controller, you can start with
-[ARC Controller](/arc/arc.md#arc-controller) by creating your own organization
-on [FluxNinja ARC](https://www.fluxninja.com/product)
+[ARC Controller](/arc/introduction.md#arc-controller) by creating your own
+organization on [FluxNinja ARC](https://www.fluxninja.com/product)
 
 :::
 
