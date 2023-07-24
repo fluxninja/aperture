@@ -862,10 +862,10 @@ func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupL
 				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
 				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
 					if errors.IsUnauthorized(err) {
-						setupLog.Error(err, "Unauthorized to remove Finalizer from the agent serviceaccount might be deleted")
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the agent CR named %s, serviceaccount might be deleted.", agentCR.Name))
 						return
 					} else {
-						setupLog.Error(err, "Error while removing Finalizer from the agent")
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the agent CR named %s.", agentCR.Name))
 						return
 					}
 				}

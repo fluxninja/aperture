@@ -751,10 +751,10 @@ func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Conte
 				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
 				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
 					if errors.IsUnauthorized(err) {
-						setupLog.Error(err, "Unauthorized to remove Finalizer from the controller serviceaccount might be deleted")
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the controller CR named %s serviceaccount might be deleted.", controllerCR.Name))
 						return
 					} else {
-						setupLog.Error(err, "Error while removing Finalizer from the controller")
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the controller CR named %s.", controllerCR.Name))
 						return
 					}
 				}
