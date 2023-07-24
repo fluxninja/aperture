@@ -1982,9 +1982,6 @@ spec:
                             type: object
                         type: object
                     type: object
-                required:
-                - etcd
-                - prometheus
                 type: object
               containerSecurityContext:
                 description: Configure Containers' Security Context
