@@ -58,10 +58,8 @@ func (w *watcher) Start() error {
 	if err != nil {
 		return err
 	}
-	w.bootstrap()
 
 	w.waitGroup.Add(1)
-
 	panichandler.Go(func() {
 		defer w.waitGroup.Done()
 		// start watch to accumulate events
@@ -70,33 +68,36 @@ func (w *watcher) Start() error {
 			w.etcdPath, clientv3.WithRev(w.revision+1), clientv3.WithPrefix())
 
 		for {
-			select {
-			case resp, ok := <-wCh:
-				if !ok {
-					return
-				}
-				if resp.Canceled {
-					log.Error().Err(resp.Err()).Msg("Etcd watch channel was canceled")
-					w.Trackers.Purge("")
-					w.bootstrap()
-					continue
-				}
-				for _, ev := range resp.Events {
-					key := getNotifierKey(ev.Kv.Key)
-					// Track only the children, skip etcdPath itself
-					if path.Clean(string(ev.Kv.Key)) == path.Clean(w.etcdPath) {
+			w.bootstrap()
+			for {
+				select {
+				case resp, ok := <-wCh:
+					if !ok {
 						continue
 					}
-
-					switch ev.Type {
-					case mvccpb.PUT:
-						w.WriteEvent(key, ev.Kv.Value)
-					case mvccpb.DELETE:
-						w.RemoveEvent(key)
+					if resp.Canceled {
+						log.Error().Err(resp.Err()).Msg("Etcd watch channel was canceled")
+						w.Trackers.Purge("")
+						w.bootstrap()
+						continue
 					}
+					for _, ev := range resp.Events {
+						key := getNotifierKey(ev.Kv.Key)
+						// Track only the children, skip etcdPath itself
+						if path.Clean(string(ev.Kv.Key)) == path.Clean(w.etcdPath) {
+							continue
+						}
+
+						switch ev.Type {
+						case mvccpb.PUT:
+							w.WriteEvent(key, ev.Kv.Value)
+						case mvccpb.DELETE:
+							w.RemoveEvent(key)
+						}
+					}
+				case <-w.ctx.Done():
+					return
 				}
-			case <-w.ctx.Done():
-				return
 			}
 		}
 	})
