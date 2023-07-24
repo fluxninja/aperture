@@ -42,8 +42,8 @@ configure Aperture Agents to talk to the ARC Controller.
 To start with ARC Controller, start by creating your own organization on
 [FluxNinja ARC](https://www.fluxninja.com/product) and start the free trial.
 
-This rest page describes installation of self-hosted ARC Controller and can be
-skipped.
+This rest page describes installation of self-hosted Aperture Controller and
+can be skipped.
 
 :::
 
