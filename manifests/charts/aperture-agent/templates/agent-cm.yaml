@@ -16,8 +16,8 @@ metadata:
   {{- end }}
 data:
   aperture-agent.yaml: |-
-    {{- if (omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel") }}
-    {{- omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel" | toYaml | nindent 4 }}
+    {{- if (omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel" "fluxninja") }}
+    {{- omit .Values.agent.config "etcd" "prometheus" "auto_scale" "service_discovery" "agent_functions" "otel" "fluxninja" | toYaml | nindent 4 }}
     {{- end }}
     otel:
       {{- if and .Values.agent.config.otel (omit .Values.agent.config.otel "disable_kubernetes_scraper" "disable_kubelet_scraper")}}
@@ -40,7 +40,19 @@ data:
       {{- omit .Values.agent.config.fluxninja "endpoint" | toYaml | nindent 6 }}
       {{- end }}
       endpoint: {{ include "agent.fluxninja.endpoint" (dict "fluxninja" .Values.agent.config.fluxninja "context" . $) }}
+    {{- if (omit .Values.agent.config.etcd "endpoints")}}
+    etcd:
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if (omit .Values.agent.config.prometheus "address")}}
+    prometheus:
+      {{- omit .Values.agent.config.prometheus "address" | toYaml | nindent 6 }}
+    {{- end }}
     {{- else }}
+    {{- if and .Values.agent.config .Values.agent.config.fluxninja }}
+    fluxninja:
+      {{- .Values.agent.config.fluxninja | toYaml | nindent 6 }}
+    {{- end }}
     etcd:
       {{- if (omit .Values.agent.config.etcd "endpoints")}}
       {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}

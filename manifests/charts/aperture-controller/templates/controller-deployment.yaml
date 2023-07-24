@@ -118,7 +118,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            {{- if or .Values.controller.secrets.fluxNinjaExtension.create .Values.controller.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+            {{- if or (and .Values.controller.secrets.fluxNinjaExtension .Values.controller.secrets.fluxNinjaExtension.create) (and .Values.controller.secrets.fluxNinjaExtension .Values.controller.secrets.fluxNinjaExtension.secretKeyRef .Values.controller.secrets.fluxNinjaExtension.secretKeyRef.name) }}
             - name: APERTURE_CONTROLLER_FLUXNINJA_API_KEY
               valueFrom:
                 secretKeyRef:

@@ -155,14 +155,22 @@ spec:
   {{- end }}
   config:
     {{- if and .Values.agent.config .Values.agent.config.fluxninja .Values.agent.config.fluxninja.enable_cloud_controller }}
-    {{- if (omit .Values.agent.config "fluxninja") }}
-    {{- omit .Values.agent.config "fluxninja" | toYaml | nindent 4 }}
+    {{- if (omit .Values.agent.config "fluxninja" "etcd" "prometheus") }}
+    {{- omit .Values.agent.config "fluxninja" "etcd" "prometheus" | toYaml | nindent 4 }}
     {{- end }}
     fluxninja:
       {{- if (omit .Values.agent.config.fluxninja "endpoint")}}
       {{- omit .Values.agent.config.fluxninja "endpoint" | toYaml | nindent 6 }}
       {{- end }}
       endpoint: {{ include "agent.fluxninja.endpoint" (dict "fluxninja" .Values.agent.config.fluxninja "context" . $) }}
+    {{- if (omit .Values.agent.config.etcd "endpoints")}}
+    etcd:
+      {{- omit .Values.agent.config.etcd "endpoints" | toYaml | nindent 6 }}
+    {{- end }}
+    {{- if (omit .Values.agent.config.prometheus "address")}}
+    prometheus:
+      {{- omit .Values.agent.config.prometheus "address" | toYaml | nindent 6 }}
+    {{- end }}
     {{- else }}
     {{- if (omit .Values.agent.config "etcd" "prometheus") }}
     {{- omit .Values.agent.config "etcd" "prometheus" | toYaml | nindent 4 }}
@@ -173,6 +181,9 @@ spec:
       {{- end }}
       endpoints: {{ include "agent.etcd.endpoints" (dict "etcd" .Values.agent.config.etcd "context" . $) }}
     prometheus:
+      {{- if (omit .Values.agent.config.prometheus "address")}}
+      {{- omit .Values.agent.config.prometheus "address" | toYaml | nindent 6 }}
+      {{- end }}
       address: {{ include "agent.prometheus.address" (dict "prometheus" .Values.agent.config.prometheus "context" . $) }}
     {{- end }}
 {{- end }}

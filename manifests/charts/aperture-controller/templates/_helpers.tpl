@@ -89,7 +89,7 @@ Fetch the Name of the API Key secret for Aperture Controller
 {{- if .controller.secrets.fluxNinjaExtension.secretKeyRef.name -}}
     {{ print .controller.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
-    {{ print "%s-controller-apikey" .context.Release.Name }}
+    {{ printf "%s-controller-apikey" .context.Release.Name }}
 {{- end -}}
 {{- end -}}
 
