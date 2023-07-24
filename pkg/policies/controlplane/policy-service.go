@@ -20,6 +20,7 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
@@ -68,6 +69,9 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 	// Fetching policies from etcd if they are not stored in factory due to invalid state.
 	response, err := s.etcdClient.Client.KV.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
 	if err != nil || len(response.Kvs) == 0 {
+		if err != nil {
+			log.Warn().Msgf("failed to fetch policies from etcd: '%s'", err.Error())
+		}
 		return &policylangv1.GetPoliciesResponse{
 			Policies: policies,
 		}, nil
@@ -79,6 +83,7 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 		if len(keySplit) == 2 {
 			key = keySplit[1]
 		} else {
+			log.Warn().Msgf("failed to parse policy name from key '%s'", string(kv.Key))
 			continue
 		}
 
@@ -89,6 +94,10 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 		policy := &policylangv1.Policy{}
 		err = protojson.Unmarshal(kv.Value, policy)
 		if err != nil {
+			policies.Policies[key] = &policylangv1.GetPolicyResponse{
+				Status: policylangv1.GetPolicyResponse_INVALID,
+				Reason: err.Error(),
+			}
 			continue
 		}
 
@@ -113,7 +122,7 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 	if policy == nil {
 		response, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
 		if err != nil {
-			return nil, status.Error(codes.Internal, fmt.Sprintf("failted to fetch policy '%s'", request.Name))
+			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policy '%s'", request.Name))
 		}
 
 		if len(response.Kvs) == 0 {
