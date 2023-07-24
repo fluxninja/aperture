@@ -2056,7 +2056,7 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale off -->
 
-(string, format: `empty | hostname_port | url | fqdn`)
+(string, format: `hostname_port | url | fqdn | empty`)
 
 <!-- vale on -->
 
