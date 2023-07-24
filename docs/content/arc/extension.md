@@ -1,17 +1,11 @@
 ---
-title: FluxNinja ARC Extension
-sidebar_label: Extension
+title: FluxNinja ARC Configuration
+sidebar_label: Configuration
 sidebar_position: 8
 keywords:
   - cloud
   - extension
 ---
-
-:::caution
-
-This page will be removed>
-
-:::
 
 ```mdx-code-block
 import Tabs from '@theme/Tabs';
