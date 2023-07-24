@@ -750,7 +750,7 @@ func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Conte
 				setupLog.Info("Operator is getting deleted. Removing finalizer from the Controller CR")
 				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
 				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
-					if err.Error() == "Unauthorized" {
+					if errors.IsUnauthorized(err) {
 						setupLog.Error(err, "Unauthorized to remove Finalizer from the controller serviceaccount might be deleted")
 						return
 					} else {
