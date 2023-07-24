@@ -34,7 +34,7 @@ var policiesCmd = &cobra.Command{
 
 		for name, body := range policies.GetPolicies().Policies {
 			fmt.Printf("%v:\n", name)
-			if body.GetStatus() == languagev1.GetPolicyResponse_INVALID {
+			if body.GetStatus() != languagev1.GetPolicyResponse_VALID {
 				fmt.Println("\tStatus: INVALID")
 				reason := strings.ReplaceAll(body.GetReason(), "\n", "\n\n\t\t")
 				reason = strings.ReplaceAll(reason, " Error", "\n\t\tError")
