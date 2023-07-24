@@ -20,5 +20,5 @@ type EtcdConfig struct {
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// List of etcd server endpoints
-	Endpoints []string `json:"endpoints,omitempty" validate:"dive,hostname_port|url|fqdn,omitempty"`
+	Endpoints []string `json:"endpoints,omitempty" validate:"omitempty,dive,hostname_port|url|fqdn,omitempty"`
 }
