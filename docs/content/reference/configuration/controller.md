@@ -978,7 +978,7 @@ EnableCloudController.
 Whether to connect to ARC controller.
 
 Overrides etcd configuration and disables local Prometheus OTel pipelines. See
-[FluxNinja ARC](/arc/arc.md) for more details.
+[FluxNinja ARC](/arc/introduction.md) for more details.
 
 </dd>
 <dt>endpoint</dt>

@@ -31,7 +31,7 @@ type FluxNinjaExtensionConfig struct {
 	// Whether to connect to ARC controller.
 	//
 	// Overrides etcd configuration and disables local Prometheus OTel pipelines.
-	// See [FluxNinja ARC](/arc/arc.md) for more details.
+	// See [FluxNinja ARC](/arc/introduction.md) for more details.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 
 	// Interval between each heartbeat.

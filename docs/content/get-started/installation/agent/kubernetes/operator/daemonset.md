@@ -79,8 +79,8 @@ Kubernetes Objects which will be created by following steps are listed
          endpoints: ["CONTROLLER_ENDPOINT_HERE"]
    ```
 
-   If you are using [ARC Controller](/arc/arc.md#arc-controller), refer to the
-   [Configuration](/arc/extension.md#configuration) section to get the
+   If you are using [ARC Controller](/arc/introduction.md#arc-controller), refer
+   to the [Configuration](/arc/extension.md#configuration) section to get the
    configuration for the Aperture Agent.
 
    If you are using an Aperture Controller deployed On-Premise, replace the

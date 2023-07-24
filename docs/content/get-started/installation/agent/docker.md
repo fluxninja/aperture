@@ -48,8 +48,8 @@ Below are the instructions to install the Aperture Agent on Docker.
        enabled: false
    ```
 
-   If you are using [ARC Controller](/arc/arc.md#arc-controller), refer to the
-   [Configuration](/arc/extension.md#configuration) section to get the
+   If you are using [ARC Controller](/arc/introduction.md#arc-controller), refer
+   to the [Configuration](/arc/extension.md#configuration) section to get the
    configuration for the Aperture Agent.
 
    If you are using an Aperture Controller deployed On-Premise, replace the
