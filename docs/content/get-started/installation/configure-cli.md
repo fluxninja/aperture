@@ -16,17 +16,17 @@ api_key = "API_KEY"
 
 :::tip
 
-You can create multiple config files and use `APERTURE_CONFIG` environment
-variable to switch between them.
+You can create multiple configuration files and use `APERTURE_CONFIG`
+environment variable to switch between them.
 
 :::
 
 :::note self-hosted controller
 
 With a [self-hosted][] controller, if the controller is at the cluster pointed
-at by `~/.kube/config` or `KUBECONFIG`, no config file nor flags are needed at
-all. Otherwise, you need the `--controller` flag. See [aperturectl][] reference
-for details.
+at by `~/.kube/config` or `KUBECONFIG`, no configuration file nor flags are
+needed at all. Otherwise, you need the `--controller` flag. See [aperturectl][]
+reference for details.
 
 :::
 
