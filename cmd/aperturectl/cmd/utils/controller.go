@@ -174,6 +174,10 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", c.config)
 		}
 
+		if config.Controller.APIKey == "" {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
+		}
+
 		c.controllerAddr = config.Controller.URL
 		c.apiKey = config.Controller.APIKey
 	}

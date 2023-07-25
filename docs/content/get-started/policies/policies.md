@@ -179,7 +179,6 @@ Run the following command to check if the policy was created.
 aperturectl policies
 ```
 
-
 ```mdx-code-block
 </TabItem>
 <TabItem value="kubectl" label="kubectl">
@@ -195,10 +194,9 @@ kubectl get policies.fluxninja.com -n aperture-controller
 ```
 
 The policy runtime can be visualized in [FluxNinja ARC][], Grafana or any other
-Prometheus compatible analytics tool. Refer to the Prometheus compatible
-metrics available from the [controller][controller-metrics] and
-[agent][agent-metrics]. Some policy [blueprints][blueprints] come with
-recommended Grafana dashboards.
+Prometheus compatible analytics tool. Refer to the Prometheus compatible metrics
+available from the [controller][controller-metrics] and [agent][agent-metrics].
+Some policy [blueprints][blueprints] come with recommended Grafana dashboards.
 
 ## Deleting Policies
 
