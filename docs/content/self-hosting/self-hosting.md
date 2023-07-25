@@ -6,8 +6,8 @@ keywords:
   - self-hosted
 ---
 
-Usually, Aperture Agents are the only required Aperture component to be
-installed. In such a setup, Agents are connecting to [FluxNinja ARC][].
+The easiest way to install Aperture is to install just Aperture Agents and point
+them to [FluxNinja ARC][], which also provides the Aperture Controller.
 
 If you want to have control over the infrastructure and data, it's also possible
 to self-host your own Aperture Controller. In such a setup, Agents and
