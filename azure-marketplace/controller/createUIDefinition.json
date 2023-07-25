@@ -243,7 +243,7 @@
       "createNewCluster": "[basics('createNewCluster')]",
       "clusterResourceName": "[if(basics('createNewCluster'), steps('clusterDetails').newClusterSection.newClusterResourceName, steps('clusterDetails').existingClusterSection.existingClusterResourceName)]",
       "kubernetesVersion": "[steps('clusterDetails').newClusterSection.kubernetesVersion]",
-      "extensionResourceName": "[steps('clusterDetails').extensionResourceName]",
+      "extensionResourceName": "[steps('controllerDetails').extensionResourceName]",
       "vmSize": "[steps('clusterDetails').newClusterSection.vmSize]",
       "vmEnableAutoScale": "[steps('clusterDetails').newClusterSection.enableAutoScaling]",
       "vmCount": "[steps('clusterDetails').newClusterSection.vmCount]",
