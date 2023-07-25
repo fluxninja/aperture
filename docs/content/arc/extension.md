@@ -70,7 +70,7 @@ installation of the Aperture Controller or Agent:
       </TabItem>
     </Tabs>
   </TabItem>
-  <TabItem value="On-premise Controller">
+  <TabItem value="Self-Hosted Controller">
     <Tabs>
       <TabItem value="Controller">
         <ExtensionConfig component="controller" />

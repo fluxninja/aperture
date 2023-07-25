@@ -67,7 +67,7 @@ your cluster.
    to the [Configuration](/arc/extension.md#configuration) section to get the
    configuration for the Aperture Agent.
 
-   If you are using an Aperture Controller deployed On-Premise, replace the
+   If you are using an Aperture Controller deployed Self-Hosted, replace the
    values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual
    values of etcd and Prometheus, which are also being used by the Aperture
    Controller you want these Agents to connect to. `CONTROLLER_ENDPOINT_HERE`
