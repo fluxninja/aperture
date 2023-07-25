@@ -14,7 +14,7 @@ to self-host your own Aperture Controller. In such a setup, Agents and
 Controller comprise a fully functional Aperture system.
 
 Note that [FluxNinja ARC][] can integrate with self-hosted controller too,
-providing a visual way to manage policies and view the infrastructure, along
-with tools for OLAP analysis of traffic.
+providing an easy way to manage policies and a holistic view of the
+infrastructure, along with tools for OLAP analysis of traffic.
 
 [FluxNinja ARC]: /arc/introduction.md
