@@ -115,13 +115,11 @@ var _ = BeforeSuite(func() {
 		},
 		Spec: agentv1alpha1.AgentSpec{
 			ConfigSpec: agentv1alpha1.AgentConfigSpec{
-				CommonConfigSpec: common.CommonConfigSpec{
-					Etcd: etcd.EtcdConfig{
-						Endpoints: []string{"10.10.10.10:1010"},
-					},
-					Prometheus: prometheus.PrometheusConfig{
-						Address: "20.20.20.20:2020",
-					},
+				Etcd: etcd.EtcdConfig{
+					Endpoints: []string{"10.10.10.10:1010"},
+				},
+				Prometheus: prometheus.PrometheusConfig{
+					Address: "20.20.20.20:2020",
 				},
 			},
 			CommonSpec: common.CommonSpec{

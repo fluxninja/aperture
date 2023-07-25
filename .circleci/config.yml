@@ -147,7 +147,7 @@ workflows:
             (cmd|pkg|extensions|api|test)/.* updated-aperture true
             packaging/agent/.* updated-aperture-agent-packaging true
             packaging/cli/.* updated-aperturectl-packaging true
-            operator/(api|config|controllers|hack)/.*|operator/main.go updated-aperture-operator true
+            operator/(api|config|controllers|hack)/.*|operator/main.go|pkg/.* updated-aperture-operator true
             (go.mod|go.sum) updated-aperture true
             docs/.*|.github/styles/Vocab/FluxNinja/.* updated-aperture-docs true
             manifests/charts/.* updated-aperture-charts true

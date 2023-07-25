@@ -57,6 +57,8 @@ func (in *Controller) DeepCopyObject() runtime.Object {
 func (in *ControllerConfigSpec) DeepCopyInto(out *ControllerConfigSpec) {
 	*out = *in
 	in.CommonConfigSpec.DeepCopyInto(&out.CommonConfigSpec)
+	in.Etcd.DeepCopyInto(&out.Etcd)
+	in.Prometheus.DeepCopyInto(&out.Prometheus)
 	out.Policies = in.Policies
 	in.OTel.DeepCopyInto(&out.OTel)
 }

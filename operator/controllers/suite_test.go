@@ -116,13 +116,11 @@ var _ = BeforeSuite(func() {
 		},
 		Spec: controllerv1alpha1.ControllerSpec{
 			ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
-				CommonConfigSpec: common.CommonConfigSpec{
-					Etcd: etcd.EtcdConfig{
-						Endpoints: []string{"10.10.10.10:1010"},
-					},
-					Prometheus: prometheusconfig.PrometheusConfig{
-						Address: "20.20.20.20:2020",
-					},
+				Etcd: etcd.EtcdConfig{
+					Endpoints: []string{"10.10.10.10:1010"},
+				},
+				Prometheus: prometheusconfig.PrometheusConfig{
+					Address: "20.20.20.20:2020",
 				},
 			},
 			CommonSpec: common.CommonSpec{
@@ -160,13 +158,11 @@ var _ = BeforeSuite(func() {
 		},
 		Spec: agentv1alpha1.AgentSpec{
 			ConfigSpec: agentv1alpha1.AgentConfigSpec{
-				CommonConfigSpec: common.CommonConfigSpec{
-					Etcd: etcd.EtcdConfig{
-						Endpoints: []string{"10.10.10.10:1010"},
-					},
-					Prometheus: prometheusconfig.PrometheusConfig{
-						Address: "20.20.20.20:2020",
-					},
+				Etcd: etcd.EtcdConfig{
+					Endpoints: []string{"10.10.10.10:1010"},
+				},
+				Prometheus: prometheusconfig.PrometheusConfig{
+					Address: "20.20.20.20:2020",
 				},
 			},
 			CommonSpec: common.CommonSpec{

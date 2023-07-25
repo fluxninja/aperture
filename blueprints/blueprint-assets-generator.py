@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import re
 import subprocess
 import sys
@@ -703,15 +704,34 @@ def render_sample_config_yaml(
     sample_config_path: Path,
     parameters: Blueprint,
 ):
+    # flatten_config removes the nodes which are not required
+    def flatten_config(node: ParameterNode) -> ParameterNode:
+        flattened = None
+        if node.parameter.param_type == "intermediate_node":
+            for child_name, child_node in node.children.items():
+                flattened_child = flatten_config(child_node)
+                if flattened_child:
+                    if not flattened:
+                        flattened = ParameterNode(node.parameter)
+                    flattened.children[child_name] = flattened_child
+
+        elif node.parameter.required:
+            flattened = node
+
+        return flattened
+
     """Render sample config YAML file from blocks"""
     sample_config_data = parameters.nested_parameters
+    if os.path.basename(sample_config_path) == "values.yaml":
+        sample_config_data = flatten_config(sample_config_data)
 
-    env = get_jinja2_environment()
-    template = env.get_template("values.yaml.j2")
-    rendered = template.render(
-        {"sample_config_data": sample_config_data, "blueprint_name": blueprint_name}
-    )
-    sample_config_path.write_text(rendered)
+    if sample_config_data:
+        env = get_jinja2_environment()
+        template = env.get_template("values.yaml.j2")
+        rendered = template.render(
+            {"sample_config_data": sample_config_data, "blueprint_name": blueprint_name}
+        )
+        sample_config_path.write_text(rendered)
 
 
 def render_json_schema(

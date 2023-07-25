@@ -1303,7 +1303,8 @@ spec:
                       enable_cloud_controller:
                         description: "Whether to connect to ARC controller. \n Overrides
                           etcd configuration and disables local Prometheus OTel pipelines.
-                          See [FluxNinja ARC](/arc/arc.md) for more details."
+                          See [ARC Controller](/get-started/installation/controller/controller.md#installation)
+                          for more details."
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
@@ -1982,9 +1983,6 @@ spec:
                             type: object
                         type: object
                     type: object
-                required:
-                - etcd
-                - prometheus
                 type: object
               containerSecurityContext:
                 description: Configure Containers' Security Context

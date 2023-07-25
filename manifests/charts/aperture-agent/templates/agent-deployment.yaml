@@ -43,7 +43,7 @@ spec:
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.agent.tolerations "context" . $ ) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.agent.serviceAccount.name | default (include "common.names.fullname" .) }}
-      {{- if .Values.agent.podSecurityContext.enabled }}
+      {{- if and .Values.agent.podSecurityContext .Values.agent.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.agent.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       {{- if .Values.agent.terminationGracePeriodSeconds }}
@@ -82,7 +82,7 @@ spec:
                   fieldPath: metadata.name
             - name: APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED
               value: "false"
-            {{- if or .Values.agent.secrets.fluxNinjaExtension.create .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
+            {{- if or (and .Values.agent.secrets.fluxNinjaExtension .Values.agent.secrets.fluxNinjaExtension.create) (and .Values.agent.secrets.fluxNinjaExtension .Values.agent.secrets.fluxNinjaExtension.secretKeyRef .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name) }}
             - name: APERTURE_AGENT_FLUXNINJA_API_KEY
               valueFrom:
                 secretKeyRef:

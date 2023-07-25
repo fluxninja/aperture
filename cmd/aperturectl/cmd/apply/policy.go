@@ -93,7 +93,7 @@ func getPolicies(policyDir string) ([]string, error) {
 			return err
 		}
 		if filepath.Ext(info.Name()) == ".yaml" {
-			_, err := getPolicy(path)
+			_, _, err := getPolicy(path)
 			if err != nil {
 				return err
 			}
@@ -103,28 +103,32 @@ func getPolicies(policyDir string) ([]string, error) {
 	})
 }
 
-func getPolicy(policyFile string) (*languagev1.Policy, error) {
+func getPolicy(policyFile string) (*languagev1.Policy, string, error) {
+	policyFileBase := filepath.Base(policyFile)
+	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
+
 	policyBytes, err := os.ReadFile(policyFile)
 	if err != nil {
-		return nil, err
+		return nil, policyName, err
 	}
 	_, policy, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
 	if err != nil {
 		policyCR, err := getPolicyCR(policyFile)
 		if err != nil {
-			return nil, err
+			return nil, policyName, err
 		}
 
 		policy = &languagev1.Policy{}
 		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
 		if err != nil {
-			return nil, err
+			return nil, policyName, err
 		}
 
-		return policy, nil
+		policyName = policyCR.Name
+		return policy, policyName, nil
 	}
 
-	return policy, nil
+	return policy, policyName, nil
 }
 
 func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
@@ -144,10 +148,7 @@ func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
 
 // applyPolicy applies a policy to the cluster.
 func applyPolicy(policyFile string) error {
-	policyFileBase := filepath.Base(policyFile)
-	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
-
-	policy, err := getPolicy(policyFile)
+	policy, policyName, err := getPolicy(policyFile)
 	if err != nil {
 		return err
 	}

@@ -24,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
 	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
-	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	googletoken "github.com/fluxninja/aperture/v2/pkg/google/config"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
@@ -34,7 +33,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 	"github.com/fluxninja/aperture/v2/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/v2/pkg/profilers"
-	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"
@@ -303,10 +301,6 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Client ClientConfigSpec `json:"client"`
 
-	// Etcd configuration.
-	//+kubebuilder:validation:Required
-	Etcd etcd.EtcdConfig `json:"etcd"`
-
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
 	Liveness ProbeConfigSpec `json:"liveness"`
@@ -326,10 +320,6 @@ type CommonConfigSpec struct {
 	// Profilers configuration.
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers"`
-
-	// Prometheus configuration.
-	//+kubebuilder:validation:Required
-	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
 
 	// Google Token Source configuration
 	//+kubebuilder:validation:Optional

@@ -93,7 +93,7 @@ Fetch the Name of the API Key secret for Aperture Agent
 {{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
     {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
-    {{ print "%s-agent-apikey" .context.Release.Name }}
+    {{ printf "%s-agent-apikey" .context.Release.Name }}
 {{- end -}}
 {{- end -}}
 

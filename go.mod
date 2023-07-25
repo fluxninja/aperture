@@ -3,6 +3,7 @@ module github.com/fluxninja/aperture/v2
 go 1.20
 
 require (
+	github.com/BurntSushi/toml v1.2.1
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
@@ -146,7 +147,6 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowsperfcountersreceiver v0.80.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.80.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver v0.80.0
-	github.com/pelletier/go-toml v1.9.5
 	github.com/prometheus/alertmanager v0.25.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/prometheus/common v0.44.0
@@ -225,7 +225,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0 // indirect
 	github.com/Azure/go-amqp v1.0.1 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.8.1 // indirect
-	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.46.0-rc.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.46.0-rc.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/trace v0.47.0-devel // indirect
