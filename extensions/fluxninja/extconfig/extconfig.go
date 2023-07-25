@@ -18,7 +18,7 @@ const (
 	ExtensionConfigKey = "fluxninja"
 )
 
-// FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+// FluxNinjaExtensionConfig is the configuration for [FluxNinja ARC](/arc/introduction.md) integration.
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
@@ -28,10 +28,13 @@ type FluxNinjaExtensionConfig struct {
 	APIKey string `json:"api_key"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to connect to ARC controller.
+	// Whether to connect to FluxNinja ARC controller.
 	//
-	// Overrides etcd configuration and disables local Prometheus OTel pipelines.
-	// See [ARC Controller](/get-started/installation/controller/controller.md#installation) for more details.
+	// Enabling this flag configures various agent components to point to the
+	// ARC Controller, for example configures remote etcd endpoint and disables
+	// local Prometheus OTel pipelines.
+	//
+	// Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md) controller.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 
 	// Interval between each heartbeat.
@@ -41,8 +44,6 @@ type FluxNinjaExtensionConfig struct {
 	// Disables local Prometheus OTel pipelines for metrics. Implied by EnableCloudController.
 	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
 	// Overrides Controller ID for Aperture Controller. If not set, random id will be generated and persisted in etcd.
-	//
-	// Note: This option doesn't affect Aperture Agent.
 	ControllerID string `json:"controller_id,omitempty"`
 }
 

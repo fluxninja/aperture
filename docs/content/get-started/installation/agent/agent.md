@@ -48,15 +48,15 @@ and can result in unpredictable behavior.
 
       - [**DaemonSet**](kubernetes/operator/daemonset.md)
 
-      The Aperture Agent can be installed as a
-      [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
-      where it will get deployed on all the nodes of the cluster.
+        The Aperture Agent can be installed as a
+        [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
+        where it will get deployed on all the nodes of the cluster.
 
       - [**Sidecar**](kubernetes/operator/sidecar.md)
 
-      The Aperture Agent can also be installed as a Sidecar. In this mode,
-      whenever a new pod is started with required labels and annotations, the
-      agent container will be attached with the pod.
+        The Aperture Agent can also be installed as a Sidecar. In this mode,
+        whenever a new pod is started with required labels and annotations, the
+        agent container will be attached with the pod.
 
    2. [**Namespace-Scoped Installation**](kubernetes/namespace-scoped/namespace-scoped.md)
 
@@ -71,3 +71,15 @@ and can result in unpredictable behavior.
 3. [**Docker**](docker.md)
 
    The Aperture Agent can also be installed on Docker as containers.
+
+## Applying Policies
+
+Once the
+[application is set up](/get-started/setting-up-application/setting-up-application.md)
+and both the Aperture Controller and Agents are installed, the next crucial step
+is to create and apply policies.
+
+[Your first policy](/get-started/policies/policies.md) section provides
+step-by-step instructions on customizing, creating, and applying policies within
+Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
+as a valuable resource for tailoring policies to meet specific requirements.

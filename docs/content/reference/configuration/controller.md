@@ -16,7 +16,7 @@ sidebar_label: Controller
 :::info
 
 See also
-[Aperture Controller installation](/get-started/installation/controller/controller.md).
+[Aperture Controller installation](/self-hosting/controller/controller.md).
 
 :::
 
@@ -923,7 +923,8 @@ Client TLS configuration
 
 <!-- vale on -->
 
-FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+FluxNinjaExtensionConfig is the configuration for
+[FluxNinja ARC](/arc/introduction.md) integration.
 
 <dl>
 <dt>api_key</dt>
@@ -950,8 +951,6 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 Overrides Controller ID for Aperture Controller. If not set, random id will be
 generated and persisted in etcd.
 
-Note: This option doesn't affect Aperture Agent.
-
 </dd>
 <dt>disable_local_otel_pipeline</dt>
 <dd>
@@ -975,11 +974,14 @@ EnableCloudController.
 
 <!-- vale on -->
 
-Whether to connect to ARC controller.
+Whether to connect to FluxNinja ARC controller.
 
-Overrides etcd configuration and disables local Prometheus OTel pipelines. See
-[ARC Controller](/get-started/installation/controller/controller.md#installation)
-for more details.
+Enabling this flag configures various agent components to point to the ARC
+Controller, for example configures remote etcd endpoint and disables local
+Prometheus OTel pipelines.
+
+Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md)
+controller.
 
 </dd>
 <dt>endpoint</dt>

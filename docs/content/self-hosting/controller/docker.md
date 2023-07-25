@@ -11,7 +11,7 @@ sidebar_position: 2
 
 ```mdx-code-block
 import CodeBlock from '@theme/CodeBlock';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
 
 Below are the instructions to install the Aperture Controller on Docker.

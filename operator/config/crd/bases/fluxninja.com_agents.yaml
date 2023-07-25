@@ -1292,19 +1292,21 @@ spec:
                             type: object
                         type: object
                       controller_id:
-                        description: "Overrides Controller ID for Aperture Controller.
+                        description: Overrides Controller ID for Aperture Controller.
                           If not set, random id will be generated and persisted in
-                          etcd. \n Note: This option doesn't affect Aperture Agent."
+                          etcd.
                         type: string
                       disable_local_otel_pipeline:
                         description: Disables local Prometheus OTel pipelines for
                           metrics. Implied by EnableCloudController.
                         type: boolean
                       enable_cloud_controller:
-                        description: "Whether to connect to ARC controller. \n Overrides
-                          etcd configuration and disables local Prometheus OTel pipelines.
-                          See [ARC Controller](/get-started/installation/controller/controller.md#installation)
-                          for more details."
+                        description: "Whether to connect to FluxNinja ARC controller.
+                          \n Enabling this flag configures various agent components
+                          to point to the ARC Controller, for example configures remote
+                          etcd endpoint and disables local Prometheus OTel pipelines.
+                          \n Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md)
+                          controller."
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in

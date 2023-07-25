@@ -122,4 +122,4 @@ We have observed the following performance numbers:
 [Flux Meter]: /concepts/flux-meter.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
-[Aperture Controller]: /get-started/installation/controller/controller.md
+[Aperture Controller]: /self-hosting/controller/controller.md

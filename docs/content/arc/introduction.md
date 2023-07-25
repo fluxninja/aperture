@@ -40,6 +40,12 @@ FluxNinja ARC [load management capabilities][] are powered by [Aperture][]:
 - **[Distributed Rate-Limiting](/use-cases/rate-limiting/rate-limiting.md)**
 - **[Percentage Rollouts](/use-cases/percentage-rollouts/percentage-rollouts.md)**
 
+## FluxNinja ARC observability features
+
+[FluxNinja ARC][] extends Aperture by providing an easy way to manage policies
+and a holistic view of the infrastructure, along with tools for OLAP analysis of
+traffic.
+
 [FluxNinja ARC]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [Aperture]: /introduction.md

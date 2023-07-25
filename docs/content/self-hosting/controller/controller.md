@@ -5,14 +5,14 @@ keywords:
   - install
   - setup
   - controller
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
 ```
 
 ## Overview
@@ -32,21 +32,6 @@ process variables and maintain their values within the optimal range.
 
 ## Installation
 
-:::tip ARC Controller
-
-Every [FluxNinja ARC][] Organization already includes an ARC Controller in the
-`default` project. Check the
-[FluxNinja extension configuration](/arc/extension.md#configuration), for how to
-configure Aperture Agents to talk to the ARC Controller.
-
-To start with ARC Controller, start by creating your own organization on
-[FluxNinja ARC](https://www.fluxninja.com/product) and start the free trial.
-
-This rest of this page describes installation of self-hosted Aperture Controller
-and can be skipped.
-
-:::
-
 The Aperture Controller can be installed using the below options:
 
 1. [**Kubernetes**](kubernetes/kubernetes.md)
@@ -57,17 +42,3 @@ The Aperture Controller can be installed using the below options:
 2. [**Docker**](docker.md)
 
    The Aperture Controller can also be installed on Docker as containers.
-
-## Applying Policies
-
-Once the
-[application is set up](/get-started/setting-up-application/setting-up-application.md)
-and both the Aperture Controller and Agents are installed, the next crucial step
-is to create and apply policies.
-
-[Your first policy](/get-started/policies/policies.md) section provides
-step-by-step instructions on customizing, creating, and applying policies within
-Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
-as a valuable resource for tailoring policies to meet specific requirements.
-
-[Fluxninja ARC]: /arc/introduction.md
