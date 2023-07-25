@@ -31,8 +31,8 @@ type FluxNinjaExtensionConfig struct {
 	// Whether to connect to FluxNinja ARC controller.
 	//
 	// Enabling this flag configures various agent components to point to the
-	// ARC Controller, e.g. configures remote etcd endpoint and disables local
-	// Prometheus OTel pipelines.
+	// ARC Controller, for example configures remote etcd endpoint and disables
+	// local Prometheus OTel pipelines.
 	//
 	// Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md) controller.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
