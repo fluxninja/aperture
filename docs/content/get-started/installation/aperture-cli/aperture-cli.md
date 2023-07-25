@@ -1,6 +1,6 @@
 ---
-title: Install CLI (apeturectl)
-description: Aperture CLI for interacting with Aperture Seamlessly.
+title: Install CLI (aperturectl)
+description: Aperture CLI for interacting with Aperture seamlessly.
 keywords:
   - cli
 sidebar_position: 1
@@ -151,4 +151,4 @@ sudo rpm -e aperturectl
 
 ---
 
-### [aperturectl](/reference/aperturectl/aperturectl.md)
+## [aperturectl](/reference/aperturectl/aperturectl.md)

@@ -138,18 +138,23 @@ Controller is installed.
 --values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
 ```
 
-It uses the default configuration for Kubernetes cluster under `~/.kube/config`.
-You can pass the `--kube-config` flag to pass any other path.
+:::info
 
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
---values-file=values.yaml --kube-config=/path/to/config --apply --version={apertureVersion}</CodeBlock>
-```
+See [aperturectl configuration](/get-started/installation/configure-cli.md) on
+how to configure what aperturectl should connect to.
+
+:::
 
 ```mdx-code-block
 </TabItem>
 <TabItem value="kubectl" label="kubectl">
 ```
+
+:::caution
+
+You can only apply policies with kubectl on [self-hosted][] controller.
+
+:::
 
 The policy YAML generated (Kubernetes Custom Resource) using the above example
 can also be applied using `kubectl`.
@@ -165,21 +170,59 @@ kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-cont
 
 Run the following command to check if the policy was created.
 
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
+
+```bash
+aperturectl policies
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
+
 ```bash
 kubectl get policies.fluxninja.com -n aperture-controller
 ```
 
-The policy runtime can be visualized in Grafana or any other Prometheus
-compatible analytics tool. Refer to the Prometheus compatible metrics available
-from the [controller][controller-metrics] and [agent][agent-metrics]. Some
-policy [blueprints][blueprints] come with recommended Grafana dashboards.
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+The policy runtime can be visualized in [FluxNinja ARC][], Grafana or any other
+Prometheus compatible analytics tool. Refer to the Prometheus compatible metrics
+available from the [controller][controller-metrics] and [agent][agent-metrics].
+Some policy [blueprints][blueprints] come with recommended Grafana dashboards.
 
 ## Deleting Policies
 
 Run the following command to delete the above policy:
 
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
+
+```bash
+aperturectl delete policy --policy=rate-limiting
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
+
 ```bash
 kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
@@ -187,3 +230,5 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [blueprints]: /reference/blueprints/blueprints.md
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
+[self-hosted]: /self-hosting/self-hosting.md
+[FluxNinja ARC]: /arc/introduction.md

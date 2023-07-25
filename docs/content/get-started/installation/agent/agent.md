@@ -1,6 +1,6 @@
 ---
-title: Aperture Agent
-description: Install Aperture Agent
+title: Install Agents
+description: Install Aperture Agents
 keywords:
   - install
   - setup
