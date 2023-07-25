@@ -4,7 +4,7 @@ keywords:
   - setting up application
   - getting started
 sidebar_position: 1
-sidebar_label: Setting up your Application
+sidebar_label: Set up your Application
 ---
 
 ```mdx-code-block
