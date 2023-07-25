@@ -1,6 +1,7 @@
 ---
 title: FAQ
 slug: faq
+sidebar_label: FAQ
 sidebar_position: 9
 description: Frequently asked questions about FluxNinja Aperture.
 image: /assets/img/aperture_logo.png
@@ -121,4 +122,4 @@ We have observed the following performance numbers:
 [Flux Meter]: /concepts/flux-meter.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
-[Aperture Controller]: /get-started/installation/controller/controller.md
+[Aperture Controller]: /self-hosting/controller/controller.md

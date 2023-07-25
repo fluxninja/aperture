@@ -50,7 +50,7 @@ service meshes, and application middlewares. Moreover, it offers SDKs for
 developers who need to establish control points around specific features or code
 sections inside applications.
 
-## ⚙️ Load management capabilities
+## ⚙️ Load management capabilities {#load-management-capabilities}
 
 Aperture provides a variety of advanced load management features:
 
@@ -100,7 +100,7 @@ Aperture provides a variety of advanced load management features:
   service disruptions and maintains consistent performance, even when rolling
   out new features.
 
-## 🛠️ How it works
+## 🛠️ How it works {#how-it-works}
 
 Load management, at its core, consists of a control loop that observes,
 analyzes, and actuates workloads to ensure the stability and reliability of
@@ -123,7 +123,7 @@ service-level objectives.
 ![Aperture Control Loop](assets/img/oaalight.png#gh-light-mode-only)
 ![Aperture Control Loop](assets/img/oaadark.png#gh-dark-mode-only)
 
-## ✨ Get started
+## ✨ Get started {#get-started}
 
 - [**Setting up your application**](/get-started/setting-up-application/setting-up-application.md)
 - [**Install Aperture**](/get-started/installation/installation.md)
@@ -134,7 +134,7 @@ For an in-depth understanding of how Aperture interacts with applications and
 its various integral components, explore the
 [Architecture](/architecture/architecture.md) section.
 
-## 📖 Learn
+## 📖 Learn {#learn}
 
 The [Concepts section](/concepts/concepts.md) provides detailed insights into
 essential elements of Aperture's system and policies, offering a comprehensive
