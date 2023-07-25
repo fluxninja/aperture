@@ -42,5 +42,3 @@ The Aperture Controller can be installed using the below options:
 2. [**Docker**](docker.md)
 
    The Aperture Controller can also be installed on Docker as containers.
-
-[Fluxninja ARC]: /arc/introduction.md
