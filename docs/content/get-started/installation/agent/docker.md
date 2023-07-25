@@ -60,9 +60,9 @@ Below are the instructions to install the Aperture Agent on Docker.
    commands won't work.
 
    If you have installed the
-   [Aperture Controller](/get-started/installation/controller/docker.md) on the
-   same Docker environment, with etcd and Prometheus, the values for the values
-   for `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
+   [Aperture Controller](/self-hosting/controller/docker.md) on the same Docker
+   environment, with etcd and Prometheus, the values for the values for
+   `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
    `CONTROLLER_ENDPOINT_HERE` would be as below:
 
    ```yaml
