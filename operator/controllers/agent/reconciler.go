@@ -846,6 +846,34 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 	return nil
 }
 
+// RemoveFinalizerFromAgentCR removes the finalizer from the Agent CR when the operator is getting deleted.
+func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupLog logr.Logger) {
+	agentList := &agentv1alpha1.AgentList{}
+	err := r.Client.List(ctx, agentList)
+	if err != nil {
+		setupLog.Error(err, "Error while getting the agent")
+		return
+	}
+	if agentList.Items != nil && len(agentList.Items) != 0 {
+		for _, agentCR := range agentList.Items {
+			agentCR := agentCR
+			if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Agent CR named %s.", agentCR.Name))
+				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
+				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
+					if errors.IsUnauthorized(err) {
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the agent CR named %s, serviceaccount might be deleted.", agentCR.Name))
+						return
+					} else {
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the agent CR named %s.", agentCR.Name))
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // eventFilters sets up a Predicate filter for the received events.
 func eventFiltersForAgent() predicate.Predicate {
 	return predicate.Funcs{

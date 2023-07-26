@@ -17,12 +17,16 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+
 	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -43,6 +47,7 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/controllers/controller"
 	"github.com/fluxninja/aperture/v2/operator/controllers/mutatingwebhook"
 	"github.com/fluxninja/aperture/v2/operator/controllers/namespace"
+	"github.com/go-logr/logr"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -166,20 +171,19 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
+	var agentReconciler *agent.AgentReconciler
 	if agentManager {
-		reconciler := &agent.AgentReconciler{
+		agentReconciler = &agent.AgentReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
 			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
 		}
 
-		if err = reconciler.SetupWithManager(mgr); err != nil {
+		if err = agentReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Agent")
 			os.Exit(1)
 		}
-
 		if err = (&namespace.NamespaceReconciler{
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
@@ -192,21 +196,24 @@ func main() {
 			Client:  mgr.GetClient(),
 			Decoder: admission.NewDecoder(mgr.GetScheme()),
 		}
-		reconciler.ApertureInjector = apertureInjector
+		agentReconciler.ApertureInjector = apertureInjector
 
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
 		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
+	var controllerReconciler *controller.ControllerReconciler
 	if controllerManager {
-		if err = (&controller.ControllerReconciler{
+		controllerReconciler = &controller.ControllerReconciler{
 			Client:              mgr.GetClient(),
 			DynamicClient:       dynamicClient,
 			Scheme:              mgr.GetScheme(),
 			Recorder:            mgr.GetEventRecorderFor("aperture-controller"),
 			MultipleControllers: multipleControllersEnabled,
 			ResourcesDeleted:    map[string]bool{},
-		}).SetupWithManager(mgr); err != nil {
+		}
+
+		if err = controllerReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)
 		}
@@ -225,7 +232,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx := ctrl.SetupSignalHandler()
+	ctx := setupContext(agentReconciler, controllerReconciler, agentManager, setupLog)
 	setupLog.Info("starting webhook server")
 	go func() {
 		if err := server.Start(ctx); err != nil {
@@ -239,4 +246,22 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool, setupLog logr.Logger) context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-c
+		if agentManager {
+			agentReconciler.RemoveFinalizerFromAgentCR(ctx, setupLog)
+		} else {
+			controllerReconciler.RemoveFinalizerFromControllerCR(ctx, setupLog)
+		}
+		cancel()
+	}()
+	return ctx
 }

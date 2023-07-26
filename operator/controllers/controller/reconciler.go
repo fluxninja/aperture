@@ -734,6 +734,35 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 	return nil
 }
 
+// RemoveFinalizerFromControllerCR removes the finalizer from the controller CR when the operator is getting deleted.
+func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Context, setupLog logr.Logger) {
+	controllerList := &controllerv1alpha1.ControllerList{}
+
+	err := r.Client.List(ctx, controllerList)
+	if err != nil {
+		setupLog.Error(err, "Error while getting the controller")
+		return
+	}
+	if controllerList.Items != nil && len(controllerList.Items) != 0 {
+		for _, controllerCR := range controllerList.Items {
+			controllerCR := controllerCR
+			if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Controller CR named %s.", controllerCR.Name))
+				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
+				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
+					if errors.IsUnauthorized(err) {
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the controller CR named %s serviceaccount might be deleted.", controllerCR.Name))
+						return
+					} else {
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the controller CR named %s.", controllerCR.Name))
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
 // eventFiltersForController sets up a Predicate filter for the received events.
 func eventFiltersForController() predicate.Predicate {
 	return predicate.Funcs{
