@@ -172,7 +172,9 @@
             "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml",
             "defaultValue": "",
             "constraints": {
-              "required": true
+              "required": true,
+              "regex": "^(https?://([^:/\\s]+)(:\\d+)?)",
+              "validationMessage": "The given url is not correct."
             }
           },
           {
@@ -182,7 +184,9 @@
             "toolTip": "This will replace the agent.config.prometheus.address value inside your values.yaml",
             "defaultValue": "",
             "constraints": {
-              "required": true
+              "required": true,
+              "regex": "^(https?://([^:/\\s]+)(:\\d+)?)",
+              "validationMessage": "The given url is not correct."
             }
           },
           {
@@ -226,8 +230,11 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Name",
+                        "toolTip": "Enter the label name.",
                         "constraints": {
-                          "required": true
+                          "required": true,
+                          "regex": "^[a-zA-Z0-9-.]",
+                          "validationMessage": "key is not correct"
                         }
                       }
                     },
@@ -237,8 +244,11 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Value",
+                        "toolTip": "Enter the Value for the label.",
                         "constraints": {
-                          "required": true
+                          "required": true,
+                          "regex": "^[a-zA-Z0-9-.]",
+                          "validationMessage": "value is not correct"
                         }
                       }
                     }
