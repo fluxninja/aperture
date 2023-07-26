@@ -191,7 +191,7 @@
                 }
               },
               {
-                "name": "inputs",
+                "name": "dynamicSettings",
                 "type": "Microsoft.Common.EditableGrid",
                 "label": "Additional labels",
                 "toolTip": "Labels",
@@ -206,11 +206,9 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Name",
-                        "toolTip": "Only alphanumeric characters and hyphen are allowed, and the value must be 1-30 characters long.",
+                        "toolTip": "Enter the label name.",
                         "constraints": {
-                          "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
-                          "validationMessage": "Only alphanumeric characters and hyphen are allowed, and the value must be 1-30 characters long."
+                          "required": true
                         }
                       }
                     },
@@ -220,11 +218,9 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Value",
-                        "toolTip": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long.",
+                        "toolTip": "Enter the Value for the label.",
                         "constraints": {
-                          "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
-                          "validationMessage": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long."
+                          "required": true
                         }
                       }
                     }
@@ -247,7 +243,7 @@
       "vmSize": "[steps('clusterDetails').newClusterSection.vmSize]",
       "vmEnableAutoScale": "[steps('clusterDetails').newClusterSection.enableAutoScaling]",
       "vmCount": "[steps('clusterDetails').newClusterSection.vmCount]",
-      "inputs": "[steps('controllerDetails').dynamicSettingsSection.inputs]"
+      "dynamicSettings": "[steps('controllerDetails').dynamicSettingsSection.dynamicSettings]"
     }
   }
 }

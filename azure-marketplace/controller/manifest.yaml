@@ -5,7 +5,7 @@ version: 1.0.3 #Must be in the format of #.#.#
 helmChart: "../../manifests/charts/aperture-controller/"
 clusterArmTemplate: "./mainTemplate.json"
 uiDefinition: "./createUIDefinition.json"
-registryServer: "fluxninja.azurecr.io"
+registryServer: "fluxninjarc.azurecr.io"
 extensionRegistrationParameters:
   defaultScope: "cluster" # cluster or namespace
   namespace: "aperture-controller"

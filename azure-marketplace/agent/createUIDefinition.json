@@ -172,9 +172,7 @@
             "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml",
             "defaultValue": "",
             "constraints": {
-              "required": true,
-              "regex": "^[a-z0-9A-Z ]{1,30}$",
-              "validationMessage": "Only alphanumeric characters are allowed, and the value must be 6-30 characters long."
+              "required": true
             }
           },
           {
@@ -184,9 +182,7 @@
             "toolTip": "This will replace the agent.config.prometheus.address value inside your values.yaml",
             "defaultValue": "",
             "constraints": {
-              "required": true,
-              "regex": "^[a-z0-9A-Z ]{1,30}$",
-              "validationMessage": "Only alphanumeric characters are allowed, and the value must be 6-30 characters long."
+              "required": true
             }
           },
           {
@@ -230,11 +226,8 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Name",
-                        "toolTip": "Only alphanumeric characters and hyphen are allowed, and the value must be 1-30 characters long.",
                         "constraints": {
-                          "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
-                          "validationMessage": "Only alphanumeric characters and hyphen are allowed, and the value must be 1-30 characters long."
+                          "required": true
                         }
                       }
                     },
@@ -244,11 +237,8 @@
                       "element": {
                         "type": "Microsoft.Common.TextBox",
                         "placeholder": "Label Value",
-                        "toolTip": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long.",
                         "constraints": {
-                          "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
-                          "validationMessage": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long."
+                          "required": true
                         }
                       }
                     }

@@ -34,11 +34,17 @@
         "description": "The location of AKS resource."
       }
     },
-    "inputs": {
-      "defaultValue": [],
+    "dynamicSettings": {
       "type": "Array",
       "metadata": {
         "description": "Parameters for configuring the extension."
+      }
+    },
+    "logLevel": {
+      "type": "String",
+      "defaultValue": "info",
+      "metadata": {
+        "description": "The log level for the extension."
       }
     },
     "vmSize": {
@@ -138,17 +144,25 @@
 
     "copy": [
       {
-        "count": "[length(parameters('inputs'))]",
-        "input": "[createObject(concat('labels.', parameters('inputs')[copyIndex('inputs_array')].labelName), union(createObject('value', ''), parameters('inputs')[copyIndex('inputs_array')]).labelValue)]",
-        "name": "inputs_array"
+        "count": "[length(parameters('dynamicSettings'))]",
+        "input": "[createObject(concat('labels.', parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName), union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
+        "name": "dynamicSettings_array"
       }
     ],
-    "inputs": "[if(empty(parameters('inputs')), createObject(), json(variables('inputs_t3')))]",
+    "dynamicSettings_string": "[concat(string(variables('dynamicSettings_array')), '_END_')]",
+    "dynamicSettings_trim1": "[replace(variables('dynamicSettings_string'), '[{\"', '{\"')]",
+    "dynamicSettings_trim2": "[replace(variables('dynamicSettings_trim1'), '}]_END_', '}')]",
+    "dynamicSettings_trim3": "[replace(variables('dynamicSettings_trim2'), '},{\"', ',\"')]",
+    "dynamicSettings_json": "[json(variables('dynamicSettings_trim3'))]",
 
-    "inputs_string": "[concat(string(variables('inputs_array')), '_END_')]",
-    "inputs_t1": "[replace(variables('inputs_string'), '[{\"', '{\"')]",
-    "inputs_t2": "[replace(variables('inputs_t1'), '}]_END_', '}')]",
-    "inputs_t3": "[replace(variables('inputs_t2'), '},{\"', ',\"')]"
+    "is_dynamicSettings_empty": "[or(variables('is_dynamicSettings_defaultState'), empty(parameters('dynamicSettings')))]",
+    "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
+
+    "mandatory_setting_inputs": {
+      "controller.config.log.level": "[parameters('logLevel')]"
+    },
+
+    "configurationSettings": "[if(variables('is_dynamicSettings_empty'), variables('mandatory_setting_inputs'), union(variables('mandatory_setting_inputs'), variables('dynamicSettings_json') ))]"
   },
   "resources": [
     {
@@ -217,7 +231,7 @@
         "extensionType": "[variables('clusterExtensionTypeName')]",
         "autoUpgradeMinorVersion": "[parameters('autoUpgradeMinorVersion')]",
         "releaseTrain": "[variables('releaseTrain')]",
-        "configurationSettings": "[variables('inputs')]",
+        "configurationSettings": "[variables('configurationSettings')]",
         "configurationProtectedSettings": {}
       },
       "plan": {

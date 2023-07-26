@@ -35,7 +35,7 @@
       }
     },
     "etcdEndpoint": {
-      "type": "String"
+      "type": "array"
     },
     "prometheusAddress": {
       "type": "String"
