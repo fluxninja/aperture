@@ -228,7 +228,7 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
-   {`helm install agent aperture/aperture-agent -f values.yaml --namespacen aperture-agent --create-namespace`}
+   {`helm install agent aperture/aperture-agent -f values.yaml --namespace aperture-agent --create-namespace`}
    </CodeBlock>
    </TabItem>
    </Tabs>
