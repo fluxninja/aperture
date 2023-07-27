@@ -95,7 +95,7 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_NestedSignalEgress:
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	case *policylangv1.Component_NestedCircuit:
-		return ParseNestedCircuit(componentID, config.NestedCircuit, policyReadAPI)
+		return NewNestedCircuitAndOptions(config.NestedCircuit, componentID, policyReadAPI)
 	case *policylangv1.Component_Query:
 		query := componentProto.GetQuery()
 		switch queryConfig := query.Component.(type) {

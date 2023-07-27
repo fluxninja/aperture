@@ -16,10 +16,10 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
-// ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
-func ParseNestedCircuit(
-	nestedCircuitID runtime.ComponentID,
+// NewNestedCircuitAndOptions parses a nested circuit and returns the parent, leaf components, and options.
+func NewNestedCircuitAndOptions(
 	nestedCircuit *policylangv1.NestedCircuit,
+	nestedCircuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
@@ -130,11 +130,21 @@ func ParseNestedCircuit(
 		}
 	}
 
+	// The config for this component, used only for observability
+	var config any
+	if nestedCircuitProto.Config != nil {
+		// use the config set inside the nested circuit
+		config = nestedCircuitProto.Config
+	} else {
+		// fallback to the nested circuit spec
+		config = nestedCircuitProto
+	}
+
 	nestedCircConfComp, err := prepareComponent(
 		runtime.NewDummyComponent(nestedCircuitProto.Name,
 			nestedCircuitProto.ShortDescription,
 			runtime.ComponentTypeSignalProcessor),
-		nestedCircuitProto,
+		config,
 		nestedCircuitID,
 		false,
 	)

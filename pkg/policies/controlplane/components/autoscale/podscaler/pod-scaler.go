@@ -90,11 +90,18 @@ func ParsePodScaler(
 		kos.GetName(),
 	)
 
+	config, err := anypb.New(podScaler)
+	if err != nil {
+		return nil, err
+	}
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "PodScaler",
 		ShortDescription: sd,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		// provide podScaler as any pb as config
+		Config:      config,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_BoolVariable{

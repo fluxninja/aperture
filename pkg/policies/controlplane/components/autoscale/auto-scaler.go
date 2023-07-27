@@ -5,6 +5,7 @@ import (
 	"math"
 	"time"
 
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -1097,10 +1098,16 @@ func ParseAutoScaler(
 	components = append(components, componentsScaler...)
 	components = append(components, componentsAlerters...)
 
+	config, err := anypb.New(autoscaler)
+	if err != nil {
+		return nil, err
+	}
+
 	// Construct nested circuit.
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AutoScaler",
 		ShortDescription: shortDescription,
+		Config:           config,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components:       components,

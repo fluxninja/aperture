@@ -60,7 +60,7 @@ func newFlowControlNestedAndOptions(
 			return retErr(err)
 		}
 
-		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		tree, configuredComponents, nestedOptions, err := NewNestedCircuitAndOptions(nestedCircuit, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
@@ -73,14 +73,14 @@ func newFlowControlNestedAndOptions(
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return NewNestedCircuitAndOptions(nestedCircuit, componentID, policyReadAPI)
 	} else if isLoadRamp {
 		nestedCircuit, err := sampler.ParseLoadRamp(loadRampProto)
 		if err != nil {
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return NewNestedCircuitAndOptions(nestedCircuit, componentID, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }

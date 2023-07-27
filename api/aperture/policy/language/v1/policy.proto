@@ -9,6 +9,7 @@ import "aperture/policy/language/v1/query.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "aperture/policy/language/v1/telemetry_collector.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -357,4 +358,6 @@ message NestedCircuit {
   string name = 4;
   // Short description of the nested circuit component. This description is displayed by graph visualization tools.
   string short_description = 5;
+  // Arbitrary configuration for the nested circuit component. This configuration is displayed by graph visualization tools.
+  google.protobuf.Any config = 6;
 }

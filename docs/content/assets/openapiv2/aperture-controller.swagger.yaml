@@ -2198,6 +2198,9 @@ definitions:
                     type: object
                 type: array
                 x-go-tag-validate: dive
+            config:
+                $ref: '#/definitions/googleprotobufAny'
+                description: Arbitrary configuration for the nested circuit component. This configuration is displayed by graph visualization tools.
             in_ports_map:
                 additionalProperties:
                     $ref: '#/definitions/InPort'

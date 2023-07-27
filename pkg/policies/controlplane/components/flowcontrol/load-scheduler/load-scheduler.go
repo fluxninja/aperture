@@ -84,9 +84,15 @@ func ParseLoadScheduler(
 		return nil, err
 	}
 
+	config, err := anypb.New(loadScheduler)
+	if err != nil {
+		return nil, err
+	}
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "LoadScheduler",
 		ShortDescription: iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
+		Config:           config,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{

@@ -4,6 +4,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 const (
@@ -64,9 +65,15 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 		})
 	}
 
+	config, err := anypb.New(loadRamp)
+	if err != nil {
+		return nil, err
+	}
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "LoadRamp",
 		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.Sampler.GetSelectors()),
+		Config:           config,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{

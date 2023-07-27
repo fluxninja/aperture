@@ -6,6 +6,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -69,9 +70,15 @@ func ParseAdaptiveLoadScheduler(
 	alerterLabels["type"] = "load_scheduler"
 	adaptiveLoadScheduler.Parameters.Alerter.Labels = alerterLabels
 
+	config, err := anypb.New(adaptiveLoadScheduler)
+	if err != nil {
+		return nil, err
+	}
+
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Name:             "AdaptiveLoadScheduler",
 		ShortDescription: iface.GetSelectorsShortDescription(adaptiveLoadScheduler.Parameters.LoadScheduler.GetSelectors()),
+		Config:           config,
 		InPortsMap:       nestedInPortsMap,
 		OutPortsMap:      nestedOutPortsMap,
 		Components: []*policylangv1.Component{
