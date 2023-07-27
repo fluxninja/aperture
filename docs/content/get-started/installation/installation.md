@@ -8,7 +8,7 @@ sidebar_label: Install Aperture
 
 To deploy Aperture with FluxNinja, it's enough to install Aperture Agents.
 
-We also recommend to install aperturectl CLI. It can help with installation of
+We also recommend installing aperturectl CLI. It can help with installation of
 agents, and also will be needed to manage the policies.
 
 :::note

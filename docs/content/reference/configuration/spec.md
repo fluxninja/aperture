@@ -6328,8 +6328,8 @@ setting.
 
 :::caution
 
-When using [FluxNinja extension](/arc/extension.md), telemetry enabled labels
-are sent to FluxNinja for observability. Telemetry should be disabled for
+When using [FluxNinja extension](/fluxninja/extension.md), telemetry enabled
+labels are sent to FluxNinja for observability. Telemetry should be disabled for
 sensitive labels.
 
 :::
