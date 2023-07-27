@@ -1,7 +1,7 @@
 //go:generate swagger generate spec --scan-models --include="github.com/fluxninja/aperture/v2/extensions/fluxninja/*" --include-tag=extension-configuration -o ../../docs/gen/config/extensions/fluxninja/extension-swagger.yaml
 //go:generate go run ../../docs/tools/swagger/process-go-tags.go ../../docs/gen/config/extensions/fluxninja/extension-swagger.yaml
 
-// FluxNinja ARC Extension
+// FluxNinja Extension
 //   BasePath: /aperture-controller
 // swagger:meta
 

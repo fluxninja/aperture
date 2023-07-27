@@ -1,5 +1,5 @@
 ---
-title: FluxNinja ARC Configuration
+title: FluxNinja Configuration
 sidebar_label: Configuration
 sidebar_position: 8
 keywords:
@@ -50,10 +50,10 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-If you are a FluxNinja ARC customer, you can enhance your Aperture experience by
+If you are a FluxNinja customer, you can enhance your Aperture experience by
 enabling the FluxNinja extension. It enriches logs and traces collected by
 Aperture with additional dimensions and batches and rolls ups metrics to
-optimize bandwidth usage. In FluxNinja ARC, you can monitor your policies and
+optimize bandwidth usage. In FluxNinja, you can monitor your policies and
 analyze flows. The FluxNinja extension also sends periodic heartbeats from
 Aperture Agents and Controllers to track their health and configuration.
 
@@ -63,7 +63,7 @@ Configure the following parameters in the `values.yaml` file generated during
 installation of the Aperture Controller or Agent:
 
 <Tabs>
-  <TabItem value="ARC Controller">
+  <TabItem value="FluxNinja Cloud Controller">
     <Tabs>
       <TabItem value="Agent">
         <CloudExtensionConfig />
@@ -83,9 +83,9 @@ installation of the Aperture Controller or Agent:
 </Tabs>
 
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
-of the organization on FluxNinja ARC and API Key generated on it.
+of the organization on FluxNinja and API Key generated on it.
 
-Configuration parameters for the FluxNinja ARC Extension are as follows:
+Configuration parameters for the FluxNinja Extension are as follows:
 
 - [Aperture Agent](/reference/configuration/agent.md#flux-ninja-extension-config)
 - [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-extension-config)

@@ -508,7 +508,7 @@ agent:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## Agent API secret for FluxNinja ARC connection
+  ## Agent API secret for FluxNinja connection
   ## @param agent.secrets.fluxNinjaExtension.create Whether to create Kubernetes Secret with provided Agent API Key.
   ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.name specifies a name of the Secret for Agent API Key to be used. This defaults to {{ .Release.Name }}-agent-apikey
   ## @param agent.secrets.fluxNinjaExtension.secretKeyRef.key specifies which key from the Secret for Agent API Key to use

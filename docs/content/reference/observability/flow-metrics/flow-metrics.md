@@ -12,7 +12,7 @@ comprehensive view of individual requests or features within services. This
 stream contains high-cardinality attributes that represent key attributes of the
 requests and features, allowing for a detailed analysis of system performance
 and behavior. The stream can be stored and visualized in
-[FluxNinja ARC](/arc/introduction.md), or ingested into popular OLAP databases such as
+[FluxNinja](/fluxninja/introduction.md), or ingested into popular OLAP databases such as
 [Apache Druid](https://druid.apache.org/).
 
 ## Dimension Columns

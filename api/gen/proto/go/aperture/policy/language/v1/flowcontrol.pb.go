@@ -1168,8 +1168,8 @@ type Rule struct {
 	//
 	// :::caution
 	//
-	// When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
-	// labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+	// When using [FluxNinja extension](/fluxninja/extension.md), telemetry enabled
+	// labels are sent to FluxNinja for observability. Telemetry should be disabled for
 	// sensitive labels.
 	//
 	// :::
@@ -3311,8 +3311,8 @@ type Rego_LabelProperties struct {
 	//
 	// :::caution
 	//
-	// When using [FluxNinja ARC extension](/arc/extension.md), telemetry enabled
-	// labels are sent to FluxNinja ARC for observability. Telemetry should be disabled for
+	// When using [FluxNinja extension](/fluxninja/extension.md), telemetry enabled
+	// labels are sent to FluxNinja for observability. Telemetry should be disabled for
 	// sensitive labels.
 	//
 	// :::

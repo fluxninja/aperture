@@ -74,9 +74,9 @@ All the configuration parameters for the Aperture Agent are available
 
 :::info
 
-The default configuration disables the FluxNinja ARC Extension for the Aperture
+The default configuration disables the FluxNinja Extension for the Aperture
 Agent. If you want to keep it enabled, add parameters provided
-[here](/arc/extension.md#configuration).
+[here](/fluxninja/extension.md#configuration).
 
 :::
 

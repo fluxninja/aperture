@@ -48,9 +48,10 @@ Below are the instructions to install the Aperture Agent on Docker.
        enabled: false
    ```
 
-   If you are using [ARC Controller](/arc/introduction.md#arc-controller), refer
-   to the [Configuration](/arc/extension.md#configuration) section to get the
-   configuration for the Aperture Agent.
+   If you are using
+   [FluxNinja Cloud Controller](/fluxninja/introduction.md#arc-controller),
+   refer to the [Configuration](/fluxninja/extension.md#configuration) section
+   to get the configuration for the Aperture Agent.
 
    If you are using a self-hosted Aperture Controller, replace the values of
    `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of
