@@ -76,8 +76,7 @@ and can result in unpredictable behavior.
 
 Once the
 [application is set up](/get-started/setting-up-application/setting-up-application.md)
-and both the Aperture Controller and Agents are installed, the next crucial step
-is to create and apply policies.
+and Agents are installed, you can start creating and applying policies.
 
 [Your first policy](/get-started/policies/policies.md) section provides
 step-by-step instructions on customizing, creating, and applying policies within

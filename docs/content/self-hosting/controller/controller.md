@@ -6,6 +6,7 @@ keywords:
   - setup
   - controller
 sidebar_position: 1
+sidebar_label: Controller
 ---
 
 ```mdx-code-block
