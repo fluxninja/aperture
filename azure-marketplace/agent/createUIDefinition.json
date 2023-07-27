@@ -169,11 +169,11 @@
             "name": "etcdEndpoint",
             "type": "Microsoft.Common.TextBox",
             "label": "Etcd Endpoint",
-            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml",
+            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.It must be form of array using double quote Eg: []",
             "defaultValue": "",
             "constraints": {
               "required": true,
-              "regex": "^(https?://([^:/\\s]+)(:\\d+)?)",
+              "regex": "^(\\[\\s*(\"(?:https?://)?(?:[\\w-]+(?:\\.[\\w-]+)*(?::\\d+)?)\"\\s*,\\s*)*\"(?:https?://)?(?:[\\w-]+(?:\\.[\\w-]+)*(?::\\d+)?)\"\\s*\\])$",
               "validationMessage": "The given url is not correct."
             }
           },
