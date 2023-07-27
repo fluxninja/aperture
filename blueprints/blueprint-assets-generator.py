@@ -77,7 +77,7 @@ class Blueprint:
         if param.startswith("aperture.spec"):
             component = param.split(".")[-1]
             component_slug = camel_to_kebab_case(component)
-            docs_link = f"{policies_relative_path}/spec#{component_slug}"
+            docs_link = f"{policies_relative_path}/configuration/spec#{component_slug}"
             json_schema_link = f"{blueprints_root_relative_path}/gen/jsonschema/_definitions.json#/definitions/{component}"
             return (docs_link, json_schema_link, True)
         elif param.count(":") > 0:

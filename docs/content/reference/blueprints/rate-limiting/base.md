@@ -44,7 +44,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     name='policy.components'
     description='List of additional circuit components.'
     type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../spec#component'
+    reference='../../configuration/spec#component'
     value='[]'
 />
 
@@ -72,7 +72,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     name='policy.resources'
     description='Additional resources.'
     type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
+    reference='../../configuration/spec#resources'
     value='{"flow_control": {"classifiers": []}}'
 />
 
@@ -120,7 +120,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     name='policy.rate_limiter.parameters'
     description='Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
-    reference='../../spec#rate-limiter-parameters'
+    reference='../../configuration/spec#rate-limiter-parameters'
     value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'
 />
 
@@ -134,7 +134,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     name='policy.rate_limiter.selectors'
     description='Flow selectors to match requests against'
     type='Array of Object (aperture.spec.v1.Selector)'
-    reference='../../spec#selector'
+    reference='../../configuration/spec#selector'
     value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
 />
 
