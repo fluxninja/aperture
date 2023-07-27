@@ -1,6 +1,7 @@
 package loadscheduler
 
 import (
+	"fmt"
 	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -72,7 +73,7 @@ func ParseAdaptiveLoadScheduler(
 
 	config, err := anypb.New(adaptiveLoadScheduler)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.AdaptiveLoadScheduler: %w", err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{

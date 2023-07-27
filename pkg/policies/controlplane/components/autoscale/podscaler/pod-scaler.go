@@ -92,7 +92,7 @@ func ParsePodScaler(
 
 	config, err := anypb.New(podScaler)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.PodScaler: %w", err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{

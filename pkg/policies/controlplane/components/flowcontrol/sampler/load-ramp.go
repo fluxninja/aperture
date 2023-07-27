@@ -1,6 +1,8 @@
 package sampler
 
 import (
+	"fmt"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -67,7 +69,7 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 
 	config, err := anypb.New(loadRamp)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.LoadRamp: %w", err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{

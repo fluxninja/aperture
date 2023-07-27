@@ -86,7 +86,7 @@ func ParseLoadScheduler(
 
 	config, err := anypb.New(loadScheduler)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.LoadScheduler: %w", err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{

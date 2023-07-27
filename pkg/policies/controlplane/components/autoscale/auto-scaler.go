@@ -1100,7 +1100,7 @@ func ParseAutoScaler(
 
 	config, err := anypb.New(autoscaler)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.AutoScaler: %w", err)
 	}
 
 	// Construct nested circuit.
