@@ -385,7 +385,7 @@ type ClientConfigSpec struct {
 
 // BundledExtensionsSpec defines configuration for bundled extensions.
 type BundledExtensionsSpec struct {
-	// FluxNinja ARC extension configuration.
+	// FluxNinja extension configuration.
 	//+kubebuilder:validation:Optional
 	FluxNinja extconfig.FluxNinjaExtensionConfig `json:"fluxninja"`
 

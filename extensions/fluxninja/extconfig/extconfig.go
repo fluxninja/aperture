@@ -18,7 +18,7 @@ const (
 	ExtensionConfigKey = "fluxninja"
 )
 
-// FluxNinjaExtensionConfig is the configuration for [FluxNinja ARC](/arc/introduction.md) integration.
+// FluxNinjaExtensionConfig is the configuration for [FluxNinja](/fluxninja/introduction.md) integration.
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
@@ -28,10 +28,10 @@ type FluxNinjaExtensionConfig struct {
 	APIKey string `json:"api_key"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to connect to FluxNinja ARC controller.
+	// Whether to connect to FluxNinja Cloud Controller.
 	//
 	// Enabling this flag configures various agent components to point to the
-	// ARC Controller, for example configures remote etcd endpoint and disables
+	// FluxNinja Cloud Controller, for example configures remote etcd endpoint and disables
 	// local Prometheus OTel pipelines.
 	//
 	// Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md) controller.

@@ -23,7 +23,7 @@ which represent the Kubernetes Resources that can be scaled. This would include
 Deployments, StatefulSets and any Custom Resources which are scalable.
 
 The discovered control points can be viewed in the
-[FluxNinja ARC](/arc/introduction.md) UI. Navigate to the **Control Points**
+[FluxNinja](/fluxninja/introduction.md) UI. Navigate to the **Control Points**
 page and select the **Kubernetes** tab. You should see a list of discovered
 control points. Alternatively, you can use the
 [introspection API](/reference/api/agent/auto-scale-kubernetes-control-points-service-get-control-points.api.mdx)

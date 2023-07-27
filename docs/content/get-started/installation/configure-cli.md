@@ -5,8 +5,8 @@ keywords:
 sidebar_position: 2
 ---
 
-Configure aperturectl to point to your FluxNinja ARC endpoint: Save the
-following as `~/.aperturectl/config`:
+Configure aperturectl to point to your FluxNinja endpoint: Save the following as
+`~/.aperturectl/config`:
 
 ```toml
 [controller]

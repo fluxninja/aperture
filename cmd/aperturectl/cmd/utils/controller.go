@@ -34,7 +34,7 @@ import (
 
 var controllerNs string
 
-// ControllerConfig is the config file structure for ARC Controller.
+// ControllerConfig is the config file structure for FluxNinja Cloud Controller.
 type ControllerConfig struct {
 	URL    string `toml:"url"`
 	APIKey string `toml:"api_key"`
@@ -105,7 +105,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.apiKey,
 		"api-key",
 		"",
-		"FluxNinja ARC API Key to be used when using Cloud Controller",
+		"FluxNinja API Key to be used when using Cloud Controller",
 	)
 	flags.StringVar(
 		&c.config,

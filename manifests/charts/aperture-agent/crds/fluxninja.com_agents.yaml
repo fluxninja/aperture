@@ -1158,7 +1158,7 @@ spec:
                         type: object
                     type: object
                   fluxninja:
-                    description: FluxNinja ARC extension configuration.
+                    description: FluxNinja extension configuration.
                     properties:
                       api_key:
                         description: API Key for this agent. If this key is not set,
@@ -1301,11 +1301,11 @@ spec:
                           metrics. Implied by EnableCloudController.
                         type: boolean
                       enable_cloud_controller:
-                        description: "Whether to connect to FluxNinja ARC controller.
+                        description: "Whether to connect to FluxNinja Cloud Controller.
                           \n Enabling this flag configures various agent components
-                          to point to the ARC Controller, for example configures remote
-                          etcd endpoint and disables local Prometheus OTel pipelines.
-                          \n Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md)
+                          to point to the FluxNinja Cloud Controller, for example
+                          configures remote etcd endpoint and disables local Prometheus
+                          OTel pipelines. \n Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md)
                           controller."
                         type: boolean
                       endpoint:

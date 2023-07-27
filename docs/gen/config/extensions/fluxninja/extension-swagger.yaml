@@ -113,10 +113,10 @@ definitions:
             enable_cloud_controller:
                 default: false
                 description: |-
-                    Whether to connect to FluxNinja ARC controller.
+                    Whether to connect to FluxNinja Cloud Controller.
 
                     Enabling this flag configures various agent components to point to the
-                    ARC Controller, for example configures remote etcd endpoint and disables
+                    FluxNinja Cloud Controller, for example configures remote etcd endpoint and disables
                     local Prometheus OTel pipelines.
 
                     Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md) controller.
@@ -154,7 +154,7 @@ definitions:
                 x-go-tag-json: installation_mode
                 x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL
                 x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
-        title: FluxNinjaExtensionConfig is the configuration for [FluxNinja ARC](/arc/introduction.md) integration.
+        title: FluxNinjaExtensionConfig is the configuration for [FluxNinja](/fluxninja/introduction.md) integration.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     GRPCClientConfig:

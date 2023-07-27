@@ -60,8 +60,8 @@ Any _Flow Labels_ created through the _Classifier_ become available in
 subsequent stages of [flow processing](./flow-lifecycle.md). Additionally, the
 _Flow Label_ is injected as baggage, so it will be available as a flow label in
 downstream flows too (assuming you have [baggage propagation][baggage]
-configured in your system). If [FluxNinja ARC extension][arc] plugin is enabled,
-all flow labels including the ones created through classifier are available in
+configured in your system). If [FluxNinja extension][arc] plugin is enabled, all
+flow labels including the ones created through classifier are available in
 traffic analytics.
 
 :::note
@@ -298,7 +298,7 @@ rego:
 [rule]: /reference/configuration/spec.md#rule
 [extractor]: /reference/configuration/spec.md#extractor
 [rego-rule]: /reference/configuration/spec.md#rule-rego
-[arc]: /arc/extension.md
+[arc]: /fluxninja/extension.md
 [selector]: ./selector.md
 [policies]: /concepts/advanced/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/

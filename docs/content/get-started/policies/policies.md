@@ -193,7 +193,7 @@ kubectl get policies.fluxninja.com -n aperture-controller
 </Tabs>
 ```
 
-The policy runtime can be visualized in [FluxNinja ARC][], Grafana or any other
+The policy runtime can be visualized in [FluxNinja][], Grafana or any other
 Prometheus compatible analytics tool. Refer to the Prometheus compatible metrics
 available from the [controller][controller-metrics] and [agent][agent-metrics].
 Some policy [blueprints][blueprints] come with recommended Grafana dashboards.
@@ -231,4 +231,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
 [self-hosted]: /self-hosting/self-hosting.md
-[FluxNinja ARC]: /arc/introduction.md
+[FluxNinja]: /fluxninja/introduction.md

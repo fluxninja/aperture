@@ -1503,7 +1503,7 @@ Enables the flow preview service.
 <!-- vale on -->
 
 FluxNinjaExtensionConfig is the configuration for
-[FluxNinja ARC](/arc/introduction.md) integration.
+[FluxNinja](/fluxninja/introduction.md) integration.
 
 <dl>
 <dt>api_key</dt>
@@ -1553,10 +1553,10 @@ EnableCloudController.
 
 <!-- vale on -->
 
-Whether to connect to FluxNinja ARC controller.
+Whether to connect to FluxNinja Cloud Controller.
 
-Enabling this flag configures various agent components to point to the ARC
-Controller, for example configures remote etcd endpoint and disables local
+Enabling this flag configures various agent components to point to the FluxNinja
+Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
 Disable this flag only if using [self-hosted](/self-hosting/self-hosting.md)
