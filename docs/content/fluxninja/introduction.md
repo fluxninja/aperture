@@ -135,4 +135,3 @@ beneficial.
 [fluxninja]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [aperture]: /introduction.md
-[load management capabilities]: /introduction.md#load-management-capabilities
