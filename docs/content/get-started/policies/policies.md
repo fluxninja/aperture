@@ -152,7 +152,8 @@ how to configure what aperturectl should connect to.
 
 :::caution
 
-You can only apply policies with kubectl on [self-hosted][] controller.
+You can only apply policies with kubectl on [Self-Hosted][self-hosted] Aperture
+Controller.
 
 :::
 

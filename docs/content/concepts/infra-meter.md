@@ -39,7 +39,7 @@ The _Infra Meter_ resource consists of the following key parameters:
 
 ### Agent Group
 
-The pipeline defined in the _Infra Meter_ is applied to all agents in the
+The pipeline defined in the _Infra Meter_ is applied to all Agents in the
 specified agent group.
 
 ### Per Agent Group
@@ -88,7 +88,7 @@ are present by default on metrics collected by an _Infra Meter_:
 
 1. `infra_meter_name`: Name of the _Infra Meter_ in the resources section
 2. `policy_name`: Name of the policy that generated the metric
-3. Other common labels available at all agents, such as `instance`.
+3. Other common labels available at all Agents, such as `instance`.
 
 [reference]: /reference/configuration/spec.md#infra-meter
 [promql]: /reference/configuration/spec.md#prom-q-l

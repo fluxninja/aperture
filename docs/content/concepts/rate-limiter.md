@@ -49,7 +49,7 @@ For each configured [_Rate Limiter Component_][reference], every matching
 Aperture Agent instantiates a copy of the _Rate Limiter_. Although each agent
 has its own copy of the component, they all share counters through a distributed
 cache. This means that they work together as a single _Rate Limiter_, providing
-seamless coordination and control across agents. The agents within an [agent
+seamless coordination and control across Agents. The Agents within an [agent
 group][agent-group] constantly share state and detect failures using a gossip
 protocol.
 

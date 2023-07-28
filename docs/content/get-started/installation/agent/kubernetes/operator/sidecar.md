@@ -110,7 +110,7 @@ Kubernetes Objects which will be created by following steps are listed
 
    :::note
 
-   If you are using a self-hosted Aperture Controller, modify the above
+   If you are using a Self-Hosted Aperture Controller, modify the above
    configuration as explained in [Self-Hosting: Agent Configuration][].
 
    :::
@@ -280,7 +280,7 @@ Kubernetes Objects which will be created by following steps are listed
 
       :::note
 
-      If you are using a self-hosted Aperture Controller, modify the above
+      If you are using a Self-Hosted Aperture Controller, modify the above
       configuration as explained in [Self-Hosting: Agent Configuration][].
 
       :::

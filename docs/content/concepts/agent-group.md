@@ -9,10 +9,10 @@ keywords:
 
 ## Agent Group {#agent-group}
 
-The agent group is a versatile label that defines a collection of agents
-operating as peers. It serves as a means to organize and manage agents within
+The agent group is a versatile label that defines a collection of Agents
+operating as peers. It serves as a means to organize and manage Agents within
 Aperture. The agent group can be associated with different entities based on the
-deployment mode of the agents.
+deployment mode of the Agents.
 
 In sidecar mode, it is recommended to name the agent group based on the
 respective service. This approach establishes a unified agent group for all pods
@@ -20,12 +20,12 @@ within the service. For example, all pods within the 'Checkout' service can be
 defined under the same agent group.
 
 In DaemonSet mode, the agent group name is typically based on the Kubernetes
-cluster name. This ensures that all agents deployed on each node of the cluster
+cluster name. This ensures that all Agents deployed on each node of the cluster
 belong to the same agent group.
 
 :::note
 
-The agent group can be configured during agent installation. Refer to the
+The agent group can be configured during Agent installation. Refer to the
 [agent config](../reference/configuration/agent.md#agent-info-config) for more
 details.
 
@@ -38,7 +38,7 @@ details.
 <!-- vale on -->
 
 - **Efficient Management**: Agent groups facilitate the efficient management of
-  multiple agents within complex environments, such as
+  multiple Agents within complex environments, such as
   [sidecar](/get-started/installation/agent/kubernetes/operator/sidecar.md) or
   multi-cluster installations. They enable scaling of Aperture configuration to
   meet the demands of intricate setups.
@@ -48,7 +48,7 @@ details.
   synchronize fine-grained per label counters. These counters are crucial for
   [rate-limiting](./rate-limiter.md) and for implementing global token buckets
   used in [quota scheduling](./scheduler/quota-scheduler.md). Additionally, all
-  agents within an agent group instantiate the same set of flow control
+  Agents within an agent group instantiate the same set of flow control
   components as defined in the [policies](./advanced/policy.md) running at the
-  controller. This ensures consistent behavior and synchronization across the
+  Controller. This ensures consistent behavior and synchronization across the
   group.

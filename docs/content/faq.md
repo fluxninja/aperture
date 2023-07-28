@@ -22,7 +22,8 @@ keywords:
 ### Does the usage of Aperture entail extra overhead on requests? {#request-overhead}
 
 While Aperture does add some latency overhead, it's a minimal one. Thanks to
-colocating agents with services, it's a single RPC call within a single node.
+colocating Aperture Agents with services, it's a single RPC call within a single
+node.
 
 ### If we already have circuit breakers and rate limiting in EnvoyProxy, what are the benefits of using Aperture? {#envoy-rate-limit}
 
@@ -34,7 +35,7 @@ are still benefits of using Aperture:
 - The ability to configure global rate limiting without configuring any external
   components
   – [mesh of Agents is providing distributed counters](/concepts/rate-limiter.md#distributed-counters).
-- Rate-limiting decisions can be made locally on the agent if lazy sync is
+- Rate-limiting decisions can be made locally on the Agent if lazy sync is
   enabled.
 - In addition to Rate Limiter, Aperture also offers [Load
   Scheduler][Load Scheduler], which Envoy doesn't have an equivalent of.
