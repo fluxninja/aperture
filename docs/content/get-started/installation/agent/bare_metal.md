@@ -65,20 +65,15 @@ curl --fail --location --remote-name "\${url}"
   </TabItem>
 </Tabs>
 
-To point the Aperture Agent at etcd and Prometheus deployed by the Aperture
-Controller, edit the configuration file located at
-`/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+To point the Aperture Agent to the Aperture Controller, edit the configuration
+file located at `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+Follow the steps for
+[FluxNinja Cloud Controller](/fluxninja/extension.md#configuration) or
+[Self-Hosted Aperture Controller](/self-hosting/agent.md#configuration),
+depending on your setup.
 
 All the configuration parameters for the Aperture Agent are available
 [here](/reference/configuration/agent.md).
-
-:::info
-
-The default configuration disables the FluxNinja Extension for the Aperture
-Agent. If you want to keep it enabled, add parameters provided
-[here](/fluxninja/extension.md#configuration).
-
-:::
 
 After installing, you should enable the `aperture-agent` `systemd` service, and
 make it start after system boot:

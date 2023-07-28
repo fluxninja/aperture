@@ -93,44 +93,27 @@ Kubernetes Objects which will be created by following steps are listed
      sidecar:
        enabled: true
      config:
-       etcd:
-         endpoints: ["ETCD_ENDPOINT_HERE"]
-       prometheus:
-         address: "PROMETHEUS_ADDRESS_HERE"
-       agent_functions:
-         endpoints: ["CONTROLLER_ENDPOINT_HERE"]
+       fluxninja:
+         enable_cloud_controller: true
+         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+     secrets:
+       fluxNinjaExtension:
+         create: true
+         secretKeyRef:
+           name: aperture-agent-apikey
+           key: apiKey
+         value: API_KEY
    ```
 
-   If you are using
-   [FluxNinja Cloud Controller](/fluxninja/introduction.md#arc-controller),
-   refer to the [Configuration](/fluxninja/extension.md#configuration) section
-   to get the configuration for the Aperture Agent.
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+   organization name and api key created for your project.
 
-   If you are using a self-hosted Aperture Controller, replace the values of
-   `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of
-   etcd and Prometheus, which is also being used by the Aperture Controller you
-   want these Agents to connect to. `CONTROLLER_ENDPOINT_HERE` should point to
-   the Aperture Controller. If you skip it, some sub commands `aperturectl`
-   commands won't work.
+   :::note
 
-   If you have installed the
-   [Aperture Controller](/self-hosting/controller/controller.md) on the same
-   cluster in `default` namespace, with etcd and Prometheus using `controller`
-   as release name, the values for `ETCD_ENDPOINT_HERE`,
-   `PROMETHEUS_ADDRESS_HERE` and `CONTROLLER_ENDPOINT_HERE` would be as below:
+   If you are using a Self-Hosted Aperture Controller, modify the above
+   configuration as explained in [Self-Hosting: Agent Configuration][].
 
-   ```yaml
-   agent:
-     sidecar:
-       enabled: true
-     config:
-       etcd:
-         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-       prometheus:
-         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-       agent_functions:
-         endpoints: ["aperture-controller.default.svc.cluster.local:8080"]
-   ```
+   :::
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -157,10 +140,16 @@ Kubernetes Objects which will be created by following steps are listed
          - NAMESPACE1
          - NAMESPACE2
      config:
-       etcd:
-         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-       prometheus:
-         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       fluxninja:
+         enable_cloud_controller: true
+         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+     secrets:
+       fluxNinjaExtension:
+         create: true
+         secretKeyRef:
+           name: aperture-agent-apikey
+           key: apiKey
+         value: API_KEY
    ```
 
    Replace the `NAMESPACE1`, `NAMESPACE2` and other namespaces, with the actual
@@ -188,14 +177,20 @@ Kubernetes Objects which will be created by following steps are listed
      sidecar:
        enabled: true
      config:
-       etcd:
-         endpoints: ["ETCD_ENDPOINT_HERE"]
-       prometheus:
-         address: "PROMETHEUS_ADDRESS_HERE"
+       fluxninja:
+         enable_cloud_controller: true
+         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
        log:
          level: debug
          pretty_console: true
          non_blocking: false
+     secrets:
+       fluxNinjaExtension:
+         create: true
+         secretKeyRef:
+           name: aperture-agent-apikey
+           key: apiKey
+         value: API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
@@ -268,15 +263,27 @@ Kubernetes Objects which will be created by following steps are listed
         sidecar:
           enabled: true
         config:
-          etcd:
-            endpoints: ["ETCD_ENDPOINT_HERE"]
-          prometheus:
-            address: "PROMETHEUS_ADDRESS_HERE"
+          fluxninja:
+            enable_cloud_controller: true
+            endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+        secrets:
+          fluxNinjaExtension:
+            create: true
+            secretKeyRef:
+              name: aperture-agent-apikey
+              key: apiKey
+            value: API_KEY
       ```
 
-      Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`
-      with the actual values of etcd and Prometheus, which is also being used by
-      the Aperture Controller you want these Agents to connect to.
+      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+      organization name and api key created for your project.
+
+      :::note
+
+      If you are using a Self-Hosted Aperture Controller, modify the above
+      configuration as explained in [Self-Hosting: Agent Configuration][].
+
+      :::
 
       All the configuration parameters for the Agent Custom Resource are listed
       on the
@@ -532,3 +539,5 @@ following these steps:
    ```bash
    kubectl delete crd agents.fluxninja.com
    ```
+
+[Self-Hosting: Agent Configuration]: /self-hosting/agent.md#configuration

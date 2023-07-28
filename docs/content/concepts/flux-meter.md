@@ -48,7 +48,7 @@ In addition to the _Flux Meters_ shown in the diagram, the request might get
 processed by other matching flow control components before a decision is
 returned to the service. The service executes its logic based on the decision,
 and an OpenTelemetry span representing the flow gets generated and forwarded to
-the agent. The OTel pipeline in the agent processes the span(s) and reports the
+the Agent. The OTel pipeline in the Agent processes the span(s) and reports the
 generated metrics to Prometheus.
 
 ## Metric
@@ -87,7 +87,7 @@ following labels:
 3. `http_status_code`: HTTP status code of the flow. Relevant only for
    traffic-based _Control Points_.
 4. `flow_status`: Protocol independent status for the flow.
-5. Other common labels available at all agents, such as `instance`.
+5. Other common labels available at all Agents, such as `instance`.
 
 :::info
 

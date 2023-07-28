@@ -65,7 +65,7 @@ components for that stage.
     on health signals from a service. This scheduler type facilitates active
     service protection.
   - The [**Quota Scheduler**](./scheduler/quota-scheduler.md) uses a global
-    token bucket as a ledger, managing the token distribution across all agents.
+    token bucket as a ledger, managing the token distribution across all Agents.
     It proves especially effective in environments with strict global rate
     limits, as it allows for strategic prioritization of requests when reaching
     quota limits.

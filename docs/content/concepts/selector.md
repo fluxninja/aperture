@@ -109,7 +109,7 @@ these matching methods.
 
 ## Agent Group {#agent-group}
 
-The agent group parameter identifies the agents where the selector gets applied.
+The agent group parameter identifies the Agents where the selector gets applied.
 For more details, refer to the [agent group concept](agent-group.md).
 
 In the example below, the agent group is `prod-cluster`.

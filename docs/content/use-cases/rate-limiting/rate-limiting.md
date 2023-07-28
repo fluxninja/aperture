@@ -42,8 +42,8 @@ performance and resource allocation.
 
 </Zoom>
 
-The diagram depicts the distribution of tokens across agents through a global
-token bucket. Each incoming request prompts the agents to decrement tokens from
+The diagram depicts the distribution of tokens across Agents through a global
+token bucket. Each incoming request prompts the Agents to decrement tokens from
 the bucket. If the bucket has run out of tokens, indicating that the rate limit
 has been reached, the incoming request is rejected. Conversely, if tokens are
 available in the bucket, the request is accepted. The token bucket is

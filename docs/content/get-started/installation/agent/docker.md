@@ -26,13 +26,10 @@ Below are the instructions to install the Aperture Agent on Docker.
    configuration to the Aperture Agent:
 
    ```yaml
-   etcd:
-     endpoints:
-       - "ETCD_ENDPOINT_HERE"
-   prometheus:
-     address: "PROMETHEUS_ADDRESS_HERE"
-   agent_functions:
-     endpoints: ["CONTROLLER_ENDPOINT_HERE"]
+   fluxninja:
+     enable_cloud_controller: true
+     endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+     api_key: API_KEY
    log:
      level: info
      pretty_console: true
@@ -48,49 +45,15 @@ Below are the instructions to install the Aperture Agent on Docker.
        enabled: false
    ```
 
-   If you are using
-   [FluxNinja Cloud Controller](/fluxninja/introduction.md#arc-controller),
-   refer to the [Configuration](/fluxninja/extension.md#configuration) section
-   to get the configuration for the Aperture Agent.
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+   organization name and api key created for your project.
 
-   If you are using a self-hosted Aperture Controller, replace the values of
-   `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with the actual values of
-   etcd and Prometheus, which are also being used by the Aperture Controller you
-   want these Agents to connect to. `CONTROLLER_ENDPOINT_HERE` should point to
-   the Aperture Controller. If you skip it, some sub-commands `aperturectl`
-   commands won't work.
+   :::note
 
-   If you have installed the
-   [Aperture Controller](/self-hosting/controller/docker.md) on the same Docker
-   environment, with etcd and Prometheus, the values for the values for
-   `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
-   `CONTROLLER_ENDPOINT_HERE` would be as below:
+   If you are using a Self-Hosted Controller Aperture Controller, modify the
+   above configuration as explained in [Self-Hosting: Agent Configuration][].
 
-   ```yaml
-   etcd:
-     endpoints:
-       - "http://etcd:2379"
-   prometheus:
-     address: "http://prometheus:9090"
-   agent_functions:
-     endpoints: ["aperture-controller:8080"]
-     client:
-       grpc:
-         insecure: true
-   log:
-     level: info
-     pretty_console: true
-     non_blocking: false
-   otel:
-     disable_kubernetes_scraper: true
-     disable_kubelet_scraper: true
-   auto_scale:
-     kubernetes:
-       enabled: false
-   service_discovery:
-     kubernetes:
-       enabled: false
-   ```
+   :::
 
    All the configuration parameters for the Aperture Agent are available
    [here](/reference/configuration/agent.md).
@@ -124,3 +87,5 @@ Below are the instructions to install the Aperture Agent on Docker.
    ```bash
    docker rm -f aperture-agent
    ```
+
+[Self-Hosting: Agent Configuration]: /self-hosting/agent.md#configuration
