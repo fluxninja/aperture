@@ -25,9 +25,17 @@ type Tree struct {
 	Children []Tree
 }
 
+// NewTree creates a new Tree.
+func NewTree(Node *runtime.ConfiguredComponent, Children []Tree) Tree {
+	return Tree{
+		Node:     Node,
+		Children: Children,
+	}
+}
+
 // RootTree returns Tree to represent Circuit root.
 func RootTree(circuitProto *policylangv1.Circuit) (Tree, error) {
-	circuitComponent, err := prepareComponent(
+	circuitComponent, err := runtime.NewConfiguredComponent(
 		runtime.NewDummyComponent("Circuit", "The Circuit Root", runtime.ComponentTypeStandAlone),
 		circuitProto,
 		runtime.NewComponentID(runtime.RootComponentID),
@@ -47,35 +55,36 @@ func RootTree(circuitProto *policylangv1.Circuit) (Tree, error) {
 //
 // Note that number of returned components might be greater than number of
 // components in componentsProto, as some components may be composite multi-component stacks or nested circuits.
-func (tree *Tree) CreateComponents(
+func CreateComponents(
 	componentsProto []*policylangv1.Component,
 	circuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) ([]*runtime.ConfiguredComponent, fx.Option, error) {
+) ([]Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 	var (
 		leafComponents []*runtime.ConfiguredComponent
 		options        []fx.Option
+		trees          []Tree
 	)
 
 	for compIndex, componentProto := range componentsProto {
-		subTree, leafComps, compOption, err := NewComponentAndOptions(
+		tree, leafComps, compOption, err := NewComponentAndOptions(
 			componentProto,
 			circuitID.ChildID(strconv.Itoa(compIndex)),
 			policyReadAPI,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		options = append(options, compOption)
 
-		// Append subTree to tree.Children
-		tree.Children = append(tree.Children, subTree)
+		// Append tree to trees
+		trees = append(trees, tree)
 
 		// Add subComponents to configuredComponents
 		leafComponents = append(leafComponents, leafComps...)
 	}
 
-	return leafComponents, fx.Options(options...), nil
+	return trees, leafComponents, fx.Options(options...), nil
 }
 
 // TreeGraph walks the tree and gets graph representation of the links amongst the children of each node.

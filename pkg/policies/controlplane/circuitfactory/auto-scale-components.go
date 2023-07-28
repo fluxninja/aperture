@@ -38,12 +38,12 @@ func newAutoScaleNestedAndOptions(
 		}
 		options = append(options, podScalerOptions)
 
-		nestedCircuit, err := podscaler.ParsePodScaler(podScalerProto, componentID, policyReadAPI)
+		configuredComponent, nestedCircuit, err := podscaler.ParsePodScaler(podScalerProto, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
 
-		tree, configuredComponents, nestedOptions, err := NewNestedCircuitAndOptions(nestedCircuit, componentID, policyReadAPI)
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
@@ -51,12 +51,12 @@ func newAutoScaleNestedAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if autoScaler := autoScaleComponentProto.GetAutoScaler(); autoScaler != nil {
-		nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, policyReadAPI)
+		configuredComponent, nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
 
-		return NewNestedCircuitAndOptions(nestedCircuit, componentID, policyReadAPI)
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 	}
 
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))

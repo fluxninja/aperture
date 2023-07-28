@@ -1,12 +1,10 @@
 package sampler
 
 import (
-	"fmt"
-
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
-	"google.golang.org/protobuf/types/known/anypb"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 const (
@@ -19,7 +17,14 @@ const (
 )
 
 // ParseLoadRamp parses a LoadRamp from the given proto and returns its nested circuit representation.
-func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit, error) {
+func ParseLoadRamp(
+	loadRamp *policylangv1.LoadRamp,
+	componentID runtime.ComponentID,
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadRamp.InPorts
 	if inPorts != nil {
@@ -67,17 +72,9 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 		})
 	}
 
-	config, err := anypb.New(loadRamp)
-	if err != nil {
-		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.LoadRamp: %w", err)
-	}
-
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "LoadRamp",
-		ShortDescription: iface.GetSelectorsShortDescription(loadRamp.Parameters.Sampler.GetSelectors()),
-		Config:           config,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_SignalGenerator{
@@ -144,5 +141,17 @@ func ParseLoadRamp(loadRamp *policylangv1.LoadRamp) (*policylangv1.NestedCircuit
 	components.AddNestedEgress(nestedCircuit, loadRampAtStartPortName, "START_SIGNAL")
 	components.AddNestedEgress(nestedCircuit, loadRampAtEndPortName, "END_SIGNAL")
 
-	return nestedCircuit, nil
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("LoadScheduler",
+			iface.GetSelectorsShortDescription(loadRamp.Parameters.Sampler.GetSelectors()),
+			runtime.ComponentTypeSignalProcessor),
+		loadRamp,
+		componentID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+
+	return configuredComponent, nestedCircuit, nil
 }

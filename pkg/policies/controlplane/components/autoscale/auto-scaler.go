@@ -5,11 +5,11 @@ import (
 	"math"
 	"time"
 
-	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 const (
@@ -21,8 +21,13 @@ const (
 // ParseAutoScaler parses a AutoScaler and returns its nested circuit representation.
 func ParseAutoScaler(
 	autoscaler *policylangv1.AutoScaler,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (*policylangv1.NestedCircuit, error) {
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 
 	nestedOutPortsMap := make(map[string]*policylangv1.OutPort)
@@ -34,7 +39,7 @@ func ParseAutoScaler(
 	)
 	scalingBackend := autoscaler.ScalingBackend
 	if scalingBackend == nil {
-		return nil, fmt.Errorf("no scaling backend specified")
+		return retErr(fmt.Errorf("no scaling backend specified"))
 	}
 	if kubernetesReplicas := scalingBackend.GetKubernetesReplicas(); kubernetesReplicas != nil {
 		minScale = float64(kubernetesReplicas.MinReplicas)
@@ -129,7 +134,7 @@ func ParseAutoScaler(
 			},
 		}
 	} else {
-		return nil, fmt.Errorf("unsupported scaler type: %T", scalingBackend)
+		return retErr(fmt.Errorf("unsupported scaler type: %T", scalingBackend))
 	}
 
 	componentsAlerters := []*policylangv1.Component{
@@ -553,12 +558,12 @@ func ParseAutoScaler(
 
 		controller := scaleOutController.GetController()
 		if controller == nil {
-			return nil, fmt.Errorf("scale out controller is nil")
+			return retErr(fmt.Errorf("scale out controller is nil"))
 		}
 
 		alerter := scaleOutController.GetAlerter()
 		if alerter == nil {
-			return nil, fmt.Errorf("alerter is nil")
+			return retErr(fmt.Errorf("alerter is nil"))
 		}
 
 		switch controllerType := controller.Controller.(type) {
@@ -591,7 +596,7 @@ func ParseAutoScaler(
 
 			componentsScaleOut = append(componentsScaleOut, components...)
 		default:
-			return nil, fmt.Errorf("scale out controller is not defined or of unexpected type")
+			return retErr(fmt.Errorf("scale out controller is not defined or of unexpected type"))
 		}
 	}
 
@@ -609,12 +614,12 @@ func ParseAutoScaler(
 
 		controller := scaleInController.GetController()
 		if controller == nil {
-			return nil, fmt.Errorf("scale in controller is nil")
+			return retErr(fmt.Errorf("scale in controller is nil"))
 		}
 
 		alerter := scaleInController.GetAlerter()
 		if alerter == nil {
-			return nil, fmt.Errorf("alerter is nil")
+			return retErr(fmt.Errorf("alerter is nil"))
 		}
 
 		switch controllerType := controller.Controller.(type) {
@@ -653,7 +658,7 @@ func ParseAutoScaler(
 
 			componentsScaleIn = append(componentsScaleIn, components...)
 		default:
-			return nil, fmt.Errorf("scale in controller is not defined or of unexpected type")
+			return retErr(fmt.Errorf("scale in controller is not defined or of unexpected type"))
 		}
 	}
 
@@ -1098,22 +1103,26 @@ func ParseAutoScaler(
 	components = append(components, componentsScaler...)
 	components = append(components, componentsAlerters...)
 
-	config, err := anypb.New(autoscaler)
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("AutoScaler",
+			shortDescription,
+			runtime.ComponentTypeSignalProcessor),
+		autoscaler,
+		componentID,
+		false,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.AutoScaler: %w", err)
+		return retErr(err)
 	}
 
 	// Construct nested circuit.
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "AutoScaler",
-		ShortDescription: shortDescription,
-		Config:           config,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
-		Components:       components,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
+		Components:  components,
 	}
 
-	return nestedCircuit, nil
+	return configuredComponent, nestedCircuit, nil
 }
 
 func createGradientControllerComponents(

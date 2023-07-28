@@ -1,13 +1,12 @@
 package loadscheduler
 
 import (
-	"fmt"
 	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
-	"google.golang.org/protobuf/types/known/anypb"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -23,7 +22,12 @@ const (
 // ParseAdaptiveLoadScheduler parses and returns nested circuit representation of AdaptiveLoadScheduler.
 func ParseAdaptiveLoadScheduler(
 	adaptiveLoadScheduler *policylangv1.AdaptiveLoadScheduler,
-) (*policylangv1.NestedCircuit, error) {
+	componentID runtime.ComponentID,
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := adaptiveLoadScheduler.InPorts
 	if inPorts != nil {
@@ -71,17 +75,9 @@ func ParseAdaptiveLoadScheduler(
 	alerterLabels["type"] = "load_scheduler"
 	adaptiveLoadScheduler.Parameters.Alerter.Labels = alerterLabels
 
-	config, err := anypb.New(adaptiveLoadScheduler)
-	if err != nil {
-		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.AdaptiveLoadScheduler: %w", err)
-	}
-
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "AdaptiveLoadScheduler",
-		ShortDescription: iface.GetSelectorsShortDescription(adaptiveLoadScheduler.Parameters.LoadScheduler.GetSelectors()),
-		Config:           config,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_FirstValid{
@@ -439,5 +435,17 @@ func ParseAdaptiveLoadScheduler(
 	components.AddNestedEgress(nestedCircuit, alsDesiredLoadMultiplierPortName, "DESIRED_LOAD_MULTIPLIER")
 	components.AddNestedEgress(nestedCircuit, alsObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
 
-	return nestedCircuit, nil
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("AdaptiveLoadScheduler",
+			iface.GetSelectorsShortDescription(adaptiveLoadScheduler.Parameters.LoadScheduler.GetSelectors()),
+			runtime.ComponentTypeSignalProcessor),
+		adaptiveLoadScheduler,
+		componentID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+
+	return configuredComponent, nestedCircuit, nil
 }

@@ -24,7 +24,11 @@ func ParseLoadScheduler(
 	loadScheduler *policylangv1.LoadScheduler,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (*policylangv1.NestedCircuit, error) {
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadScheduler.GetInPorts()
 
@@ -81,20 +85,12 @@ func ParseLoadScheduler(
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})
 	if err != nil {
-		return nil, err
-	}
-
-	config, err := anypb.New(loadScheduler)
-	if err != nil {
-		return nil, fmt.Errorf("error creating *anypb.Any from *policylangv1.LoadScheduler: %w", err)
+		return retErr(err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "LoadScheduler",
-		ShortDescription: iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
-		Config:           config,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_BoolVariable{
@@ -214,5 +210,17 @@ func ParseLoadScheduler(
 	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER_INPUT")
 	components.AddNestedEgress(nestedCircuit, outputObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
 
-	return nestedCircuit, nil
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("LoadScheduler",
+			iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
+			runtime.ComponentTypeSignalProcessor),
+		loadScheduler,
+		componentID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+
+	return configuredComponent, nestedCircuit, nil
 }

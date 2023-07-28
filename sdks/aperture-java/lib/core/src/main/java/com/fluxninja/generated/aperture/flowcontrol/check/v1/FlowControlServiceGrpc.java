@@ -8,14 +8,14 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  * </pre>
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.56.1)",
+    value = "by gRPC proto compiler (version 1.57.0)",
     comments = "Source: aperture/flowcontrol/check/v1/check.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class FlowControlServiceGrpc {
 
   private FlowControlServiceGrpc() {}
 
-  public static final String SERVICE_NAME = "aperture.flowcontrol.check.v1.FlowControlService";
+  public static final java.lang.String SERVICE_NAME = "aperture.flowcontrol.check.v1.FlowControlService";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
@@ -291,9 +291,9 @@ public final class FlowControlServiceGrpc {
   private static final class FlowControlServiceMethodDescriptorSupplier
       extends FlowControlServiceBaseDescriptorSupplier
       implements io.grpc.protobuf.ProtoMethodDescriptorSupplier {
-    private final String methodName;
+    private final java.lang.String methodName;
 
-    FlowControlServiceMethodDescriptorSupplier(String methodName) {
+    FlowControlServiceMethodDescriptorSupplier(java.lang.String methodName) {
       this.methodName = methodName;
     }
 
