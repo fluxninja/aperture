@@ -46,7 +46,8 @@ spec:
                   parameters:
                     priority: 200
               selectors:
-              - control_point: awesomeFeature
+              - agent_group: default
+                control_point: awesomeFeature
                 service: service1-demo-app.demoapp.svc.cluster.local
             max_load_multiplier: 2
     - decider:
@@ -85,7 +86,8 @@ spec:
             interval: 1s
             label_key: user_id
           selectors:
-          - control_point: awesomeFeature
+          - agent_group: default
+            control_point: awesomeFeature
             label_matcher:
               match_labels:
                 user_type: crawler
@@ -128,11 +130,13 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: awesomeFeature
+        - agent_group: default
+          control_point: awesomeFeature
           service: service1-demo-app.demoapp.svc.cluster.local
       flux_meters:
         service-protection:
           selectors:
-          - control_point: awesomeFeature
+          - agent_group: default
+            control_point: awesomeFeature
             service: service3-demo-app.demoapp.svc.cluster.local
     infra_meters: {}

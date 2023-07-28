@@ -24,7 +24,8 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
   components:
     - auto_scale:

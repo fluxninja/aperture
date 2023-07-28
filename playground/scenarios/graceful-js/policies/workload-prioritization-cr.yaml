@@ -48,7 +48,8 @@ spec:
                   parameters:
                     priority: 250
               selectors:
-              - control_point: ingress
+              - agent_group: default
+                control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
             max_load_multiplier: 2
     - query:
@@ -89,11 +90,13 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
       flux_meters:
         workload-prioritization:
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
     infra_meters: {}

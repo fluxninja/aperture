@@ -43,7 +43,8 @@ policy:
             fill_amount:
               signal_name: RATE_LIMIT
           selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
               control_point: awesomeFeature
               label_matcher:
                 match_labels:
@@ -57,7 +58,8 @@ policy:
     flow_control:
       classifiers:
         - selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
               control_point: awesomeFeature
           rules:
             user_type:
@@ -71,7 +73,8 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - service: service1-demo-app.demoapp.svc.cluster.local
+          - agent_group: default
+            service: service1-demo-app.demoapp.svc.cluster.local
             control_point: awesomeFeature
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
@@ -98,5 +101,6 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - control_point: awesomeFeature
+        - agent_group: default
+          control_point: awesomeFeature
           service: service3-demo-app.demoapp.svc.cluster.local

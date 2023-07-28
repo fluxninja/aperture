@@ -48,7 +48,8 @@ spec:
                   parameters:
                     priority: 200
               selectors:
-              - control_point: service1-demo-app
+              - agent_group: default
+                control_point: service1-demo-app
                 label_matcher:
                   match_labels:
                     http.target: /service1
@@ -90,7 +91,8 @@ spec:
             interval: 1s
             label_key: http.request.header.user_id
           selectors:
-          - control_point: service1-demo-app
+          - agent_group: default
+            control_point: service1-demo-app
             label_matcher:
               match_labels:
                 http.request.header.user_type: crawler
@@ -132,7 +134,8 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: service1-demo-app
+        - agent_group: default
+          control_point: service1-demo-app
           label_matcher:
             match_labels:
               http.target: /service1
@@ -140,7 +143,8 @@ spec:
       flux_meters:
         service1-demo-app:
           selectors:
-          - control_point: service3-demo-app
+          - agent_group: default
+            control_point: service3-demo-app
             label_matcher:
               match_labels:
                 http.target: /service3
