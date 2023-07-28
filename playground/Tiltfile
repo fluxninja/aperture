@@ -1196,7 +1196,7 @@ config.define_string("scenario", usage="Demo scenario to execute")
 config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-extensions", usage="Skip extension building")
-config.define_bool("enable-cloud-extension",usage="Enable ARC API key authentication, which will send the data to the ARC cloud")
+config.define_bool("enable-cloud-extension",usage="Enable FluxNinja API key authentication, which will send the data to FluxNinja Cloud")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])

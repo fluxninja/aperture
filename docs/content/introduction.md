@@ -112,7 +112,7 @@ capacity. In auto-scaling scenarios, the control loop adjusts resource
 allocation in response to demand and performance fluctuations.
 
 During the observation phase, an in-built telemetry system continuously monitors
-service performance and request attributes, allowing the agent and controller to
+service performance and request attributes, allowing the Agent and Controller to
 make informed decisions about request handling and workload prioritization.
 
 The analysis and actuation phases use

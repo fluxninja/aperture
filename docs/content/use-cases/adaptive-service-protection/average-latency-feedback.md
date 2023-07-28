@@ -134,7 +134,7 @@ To see the policy in action, the traffic is generated such that it starts within
 the service's capacity and then goes beyond the capacity after some time. Such a
 traffic pattern is repeated periodically. The below dashboard demonstrates that
 when latency spikes due to high traffic at
-`cart-service.prod.svc.cluster.local`, the controller throttles the rate of
+`cart-service.prod.svc.cluster.local`, the Controller throttles the rate of
 requests admitted into the service. This approach helps protect the service from
 becoming unresponsive and maintains the current latency within the tolerance
 limit (`1.1`) of historical latency.

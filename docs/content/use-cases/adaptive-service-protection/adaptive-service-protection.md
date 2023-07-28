@@ -37,9 +37,9 @@ safeguard, ensuring that your system maintains optimal performance and uptime.
 </Zoom>
 
 The diagram illustrates the working of a load scheduling policy. The policy is
-evaluated at the controller, which analyzes health signals in real-time. Based
+evaluated at the Controller, which analyzes health signals in real-time. Based
 on these metrics, it calculates a load multiplier, which is relayed to the
-agents. The agents then adjust the rate of requests locally based on the load
+Agents. The Agents then adjust the rate of requests locally based on the load
 multiplier applied to the recent rate of requests.
 
 :::note

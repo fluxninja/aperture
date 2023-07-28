@@ -29,8 +29,8 @@ This diagram illustrates the working of a load scheduler.
 
 The _Load Scheduler_'s throttling behavior is controlled by the signal at its
 `load_multiplier` input port. As the policy circuit adjusts the signal at the
-load multiplier port, it gets translated to the token refill rate at the agents.
-At each agent, the adjusted token rate is determined by multiplying the past
+load multiplier port, it gets translated to the token refill rate at the Agents.
+At each Agent, the adjusted token rate is determined by multiplying the past
 token rate with the load multiplier. The past 30 seconds of data is used for
 finding the past token rate.
 

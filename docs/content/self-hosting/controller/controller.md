@@ -6,6 +6,7 @@ keywords:
   - setup
   - controller
 sidebar_position: 1
+sidebar_label: Controller
 ---
 
 ```mdx-code-block
@@ -18,10 +19,10 @@ import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js
 ## Overview
 
 The Aperture Controller functions as the brain of the Aperture system.
-Leveraging an advanced control loop, the controller routinely analyzes polled
+Leveraging an advanced control loop, the Controller routinely analyzes polled
 metrics and indicators to determine how traffic should be shaped as defined by
 set policies. Once determined, these decisions are then exported to all Aperture
-agents to effectively handle workloads.
+Agents to effectively handle workloads.
 
 The closed feedback loop functions primarily by monitoring the variables
 reflecting stability conditions (process variables) and compares them against

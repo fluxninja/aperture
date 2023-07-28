@@ -45,17 +45,17 @@ policies as needed.
 
 A policy represents a closed-loop control circuit that is executed periodically.
 The control circuit draws input signals from metrics aggregated across Aperture
-Agents, providing the controller with a holistic view of the application's
+Agents, providing the Controller with a holistic view of the application's
 health and performance. Service-level objectives (SLOs) are defined against
 these health and performance signals. The policies continuously track deviations
 from SLOs and calculate recovery or escalation actions that are translated as
-adjustments to the agents.
+adjustments to the Agents.
 
 After computing the adjustments, the Aperture Controller synchronizes them with
 the relevant Aperture Agents. These adjustments encompass load throttling,
 workload prioritization, and auto-scaling actions, among others. By
-disseminating the calculated adjustments to the agents, the controller ensures
-that the agents take localized actions in line with the global state of the
+disseminating the calculated adjustments to the Agents, the Controller ensures
+that the Agents take localized actions in line with the global state of the
 system.
 
 ## Aperture Agents
@@ -67,7 +67,7 @@ integrate with service meshes, gateways and HTTP middlewares. Alternately,
 developers can use SDKs to get flow control around specific features or code
 sections inside services.
 
-The agents monitor service and infrastructure health signals using an in-built
+The Agents monitor service and infrastructure health signals using an in-built
 telemetry system. In addition, a programmable, high-fidelity flow classifier is
 used to label requests based on attributes such as customer tier or request
 type. These metrics are then analyzed by the Aperture Controller.
@@ -79,7 +79,7 @@ a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
 Aperture Agents can be installed on a variety of infrastructure such as
-Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, agents
+Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, Agents
 work with auto-scaling APIs for platforms such as Kubernetes, to help scale
 infrastructure when needed.
 
@@ -89,9 +89,9 @@ Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
 Prometheus enables Aperture to monitor the system and detect deviations from the
 service-level objectives (SLOs) defined in the declarative policies. Aperture
-controller uses etcd (distributed key-value store) to persist the declarative
+Controller uses etcd (distributed key-value store) to persist the declarative
 policies that define the control circuits and their components, as well as the
-adjustments synchronized between the controller and agents.
+adjustments synchronized between the Controller and Agents.
 
 Users can optionally reuse their existing etcd and
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)

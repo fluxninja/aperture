@@ -37,7 +37,7 @@ cost overages.
 The diagram provides an overview of quota scheduling in action, including the
 operation of the token bucket and its role in managing request admission. The
 token bucket, specified by a given bucket size and fill rate, performs counting
-and distributes tokens across agents.
+and distributes tokens across Agents.
 
 Requests coming into the system are categorized into different workloads, each
 of which is defined by its priority and weight. This classification is crucial
