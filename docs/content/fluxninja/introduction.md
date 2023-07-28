@@ -21,6 +21,9 @@ to start implementing policies to control your traffic.
 effectively by classifying, scheduling, and rate-limiting API traffic in cloud
 applications.
 
+![FluxNinja Architecture](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
+![FluxNinja Architecture](../assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+
 :::info Sign-up
 
 To sign-up, [click here][sign-up].
