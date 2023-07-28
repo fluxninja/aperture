@@ -5,14 +5,14 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.56.1)",
+    value = "by gRPC proto compiler (version 1.57.0)",
     comments = "Source: aperture/flowcontrol/checkhttp/v1/checkhttp.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class FlowControlServiceHTTPGrpc {
 
   private FlowControlServiceHTTPGrpc() {}
 
-  public static final String SERVICE_NAME = "aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTP";
+  public static final java.lang.String SERVICE_NAME = "aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTP";
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest,
@@ -261,9 +261,9 @@ public final class FlowControlServiceHTTPGrpc {
   private static final class FlowControlServiceHTTPMethodDescriptorSupplier
       extends FlowControlServiceHTTPBaseDescriptorSupplier
       implements io.grpc.protobuf.ProtoMethodDescriptorSupplier {
-    private final String methodName;
+    private final java.lang.String methodName;
 
-    FlowControlServiceHTTPMethodDescriptorSupplier(String methodName) {
+    FlowControlServiceHTTPMethodDescriptorSupplier(java.lang.String methodName) {
       this.methodName = methodName;
     }
 
