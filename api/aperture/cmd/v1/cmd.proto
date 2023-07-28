@@ -8,6 +8,7 @@ import "aperture/discovery/entities/v1/entities.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "aperture/policy/language/v1/policy.proto";
+import "aperture/status/v1/status.proto";
 import "google/protobuf/empty.proto";
 
 // Controller describes APIs of the controller from the aperturectl POV
@@ -28,6 +29,7 @@ service Controller {
   rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
   rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
+  rpc GetStatus(aperture.status.v1.GroupStatusRequest) returns (aperture.status.v1.GroupStatus);
 }
 
 message ListServicesRequest {}
