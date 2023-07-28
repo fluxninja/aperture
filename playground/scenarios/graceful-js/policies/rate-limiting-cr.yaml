@@ -20,7 +20,8 @@ spec:
             interval: 60s
             label_key: http.request.header.user_id
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             label_matcher:
               match_labels:
                 http.path: /api/rate-limit

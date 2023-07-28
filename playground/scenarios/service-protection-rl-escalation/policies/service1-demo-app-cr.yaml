@@ -50,7 +50,8 @@ spec:
                     priority: 200
                     queue_timeout: 2s
               selectors:
-              - control_point: ingress
+              - agent_group: default
+                control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
             max_load_multiplier: 2
     - decider:
@@ -92,7 +93,8 @@ spec:
               enabled: true
               num_sync: 4
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             label_matcher:
               match_labels:
                 http.request.header.user_type: crawler
@@ -135,11 +137,13 @@ spec:
             extractor:
               from: request.http.headers.user-type
         selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
       flux_meters:
         service1-demo-app:
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service3-demo-app.demoapp.svc.cluster.local
     infra_meters: {}

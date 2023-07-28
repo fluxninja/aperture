@@ -46,7 +46,8 @@ spec:
                   parameters:
                     priority: 200
               selectors:
-              - control_point: ingress
+              - agent_group: default
+                control_point: ingress
                 label_matcher:
                   match_labels:
                     http.path: /api/v1/write
@@ -122,6 +123,7 @@ spec:
       flux_meters:
         prometheus-workload-prioritization:
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: controller-prometheus-server.aperture-controller.svc.cluster.local
     infra_meters: {}

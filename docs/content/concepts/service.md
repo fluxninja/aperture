@@ -21,7 +21,7 @@ database is local to each Aperture Agent.
 
 In the case of a Kubernetes DaemonSet installation, each Aperture Agent
 maintains a mapping of IP addresses to services for the pods running on its
-worker node. Changes in services and entities are actively watched by the agent
+worker node. Changes in services and entities are actively watched by the Agent
 to ensure that the discovery remains up to date. This allows for accurate and
 reliable identification of services during flow control decision-making.
 

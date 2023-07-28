@@ -38,7 +38,8 @@ policy:
     - flow_control:
         rate_limiter:
           selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
               control_point: ingress
               label_matcher:
                 match_labels:
@@ -60,7 +61,8 @@ policy:
     flow_control:
       classifiers:
         - selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
               control_point: ingress
           rules:
             user_type:
@@ -74,7 +76,8 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - service: service1-demo-app.demoapp.svc.cluster.local
+          - agent_group: default
+            service: service1-demo-app.demoapp.svc.cluster.local
             control_point: ingress
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
@@ -105,5 +108,6 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service3-demo-app.demoapp.svc.cluster.local

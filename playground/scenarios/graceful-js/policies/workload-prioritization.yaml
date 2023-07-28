@@ -13,7 +13,8 @@ policy:
     flow_control:
       classifiers:
         - selectors:
-            - service: service1-demo-app.demoapp.svc.cluster.local
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
               control_point: ingress
           rules:
             user_type:
@@ -26,7 +27,8 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
         scheduler:
           workloads:
@@ -49,5 +51,6 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local

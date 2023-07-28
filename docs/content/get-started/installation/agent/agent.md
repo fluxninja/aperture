@@ -15,8 +15,8 @@ sidebar_position: 3
 The Aperture Agent is the decision executor of the Aperture system. In addition
 to gathering data, the Aperture Agent functions as a gatekeeper, acting on
 traffic based on periodic adjustments made by the Aperture Controller.
-Specifically, depending on feedback from the controller, the agent will
-effectively allow or drop incoming requests. Further, supporting the controller,
+Specifically, depending on feedback from the Controller, the agent will
+effectively allow or drop incoming requests. Further, supporting the Controller,
 the agent works to inject information into traffic, including the specific
 traffic-shaping decisions made and classification labels which can later be used
 for observability and closed loop feedback.
@@ -76,8 +76,7 @@ and can result in unpredictable behavior.
 
 Once the
 [application is set up](/get-started/setting-up-application/setting-up-application.md)
-and both the Aperture Controller and Agents are installed, the next crucial step
-is to create and apply policies.
+and Agents are installed, you can start creating and applying policies.
 
 [Your first policy](/get-started/policies/policies.md) section provides
 step-by-step instructions on customizing, creating, and applying policies within

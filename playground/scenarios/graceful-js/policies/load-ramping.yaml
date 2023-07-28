@@ -15,7 +15,8 @@ policy:
   drivers:
     average_latency_drivers:
       - selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
             label_matcher:
               match_labels:
@@ -30,7 +31,8 @@ policy:
   load_ramp:
     sampler:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
           label_matcher:
             match_labels:

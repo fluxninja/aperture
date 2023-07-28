@@ -48,7 +48,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='policy.components'
     description='List of additional circuit components.'
     type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../spec#component'
+    reference='../../configuration/spec#component'
     value='[]'
 />
 
@@ -76,7 +76,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='policy.resources'
     description='Additional resources.'
     type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
+    reference='../../configuration/spec#resources'
     value='{"flow_control": {"classifiers": []}}'
 />
 
@@ -146,7 +146,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='policy.scaling_backend'
     description='Scaling backend for the policy.'
     type='Object (aperture.spec.v1.AutoScalerScalingBackend)'
-    reference='../../spec#auto-scaler-scaling-backend'
+    reference='../../configuration/spec#auto-scaler-scaling-backend'
     value='{"kubernetes_replicas": "__REQUIRED_FIELD__"}'
 />
 
@@ -160,7 +160,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='policy.scaling_parameters'
     description='Parameters that define the scaling behavior.'
     type='Object (aperture.spec.v1.AutoScalerScalingParameters)'
-    reference='../../spec#auto-scaler-scaling-parameters'
+    reference='../../configuration/spec#auto-scaler-scaling-parameters'
     value='{"scale_in_alerter": {"alert_name": "Auto-scaler is scaling in"}, "scale_out_alerter": {"alert_name": "Auto-scaler is scaling out"}}'
 />
 
@@ -324,7 +324,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='alerter'
     description='Alerter parameters for the controller.'
     type='Object (aperture.spec.v1.AlerterParameters)'
-    reference='../../spec#alerter-parameters'
+    reference='../../configuration/spec#alerter-parameters'
     value='"__REQUIRED_FIELD__"'
 />
 
@@ -338,7 +338,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='gradient'
     description='Gradient parameters for the controller.'
     type='Object (aperture.spec.v1.DecreasingGradientParameters)'
-    reference='../../spec#decreasing-gradient-parameters'
+    reference='../../configuration/spec#decreasing-gradient-parameters'
     value='"__REQUIRED_FIELD__"'
 />
 
@@ -388,7 +388,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='alerter'
     description='Alerter parameters for the controller.'
     type='Object (aperture.spec.v1.AlerterParameters)'
-    reference='../../spec#alerter-parameters'
+    reference='../../configuration/spec#alerter-parameters'
     value='"__REQUIRED_FIELD__"'
 />
 
@@ -402,7 +402,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     name='gradient'
     description='Gradient parameters for the controller.'
     type='Object (aperture.spec.v1.IncreasingGradientParameters)'
-    reference='../../spec#increasing-gradient-parameters'
+    reference='../../configuration/spec#increasing-gradient-parameters'
     value='"__REQUIRED_FIELD__"'
 />
 

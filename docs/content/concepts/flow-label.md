@@ -196,10 +196,10 @@ order:
 2. Baggage
 3. Default
 
-## Interaction with FluxNinja ARC Extension {#extension}
+## Interaction with FluxNinja Extension {#extension}
 
 All the flow Labels are used as labels of flow events. These events are rolled
-up and sent to the analytics database in the FluxNinja ARC. This allows:
+up and sent to the analytics database in the FluxNinja. This allows:
 
 - For the _Flow Labels_ to be used as filters or group-by
 - To see analytics for each _Flow Label_, for example: distribution of its

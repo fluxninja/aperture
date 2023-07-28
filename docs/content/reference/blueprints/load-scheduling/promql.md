@@ -38,7 +38,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     name='policy.components'
     description='List of additional circuit components.'
     type='Array of Object (aperture.spec.v1.Component)'
-    reference='../../spec#component'
+    reference='../../configuration/spec#component'
     value='[]'
 />
 
@@ -66,7 +66,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     name='policy.resources'
     description='Additional resources.'
     type='Object (aperture.spec.v1.Resources)'
-    reference='../../spec#resources'
+    reference='../../configuration/spec#resources'
     value='{"flow_control": {"classifiers": []}}'
 />
 
@@ -128,7 +128,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     name='policy.service_protection_core.adaptive_load_scheduler'
     description='Parameters for Adaptive Load Scheduler.'
     type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
-    reference='../../spec#adaptive-load-scheduler-parameters'
+    reference='../../configuration/spec#adaptive-load-scheduler-parameters'
     value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
 />
 
@@ -392,7 +392,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     name='infra_context'
     description='Kubernetes selector for scraping metrics.'
     type='Object (aperture.spec.v1.KubernetesObjectSelector)'
-    reference='../../spec#kubernetes-object-selector'
+    reference='../../configuration/spec#kubernetes-object-selector'
     value='"__REQUIRED_FIELD__"'
 />
 

@@ -41,10 +41,10 @@ ensuring optimal performance while minimizing infrastructure costs.
 
 Aperture Agents interface with cloud infrastructure APIs, such as Kubernetes
 API, to discover, monitor, and scale infrastructure resources. The Aperture
-Controller uses the information from the agents to make informed auto-scaling
-decisions that are then acted on by the agents.
+Controller uses the information from the Agents to make informed auto-scaling
+decisions that are then acted on by the Agents.
 
-In an agent group, the leader agent is responsible for interfacing with the
+In an agent group, the leader Agent is responsible for interfacing with the
 cloud infrastructure APIs. For example, by maintaining a watch on scalable
 Kubernetes resources, the agent group leader can monitor changes to the resource
 status, such as the number of replicas configured and currently deployed. The

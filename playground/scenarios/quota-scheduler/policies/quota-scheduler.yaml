@@ -8,7 +8,8 @@ policy:
     bucket_capacity: 500
     fill_amount: 25
     selectors:
-      - service: service1-demo-app.demoapp.svc.cluster.local
+      - agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
     rate_limiter:
       label_key: http.request.header.api_key

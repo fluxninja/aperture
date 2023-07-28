@@ -118,7 +118,20 @@ func (h *Heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 	return nil
 }
 
-func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client, controllerID string) error {
+func (h *Heartbeats) setupControllerInfo(
+	ctx context.Context,
+	etcdClient *etcdclient.Client,
+	extensionConfig *extconfig.FluxNinjaExtensionConfig,
+	controllerID string,
+) error {
+	if extensionConfig.EnableCloudController {
+		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
+		h.ControllerInfo = &heartbeatv1.ControllerInfo{
+			Id: "cloud",
+		}
+		return nil
+	}
+
 	etcdPath := "/fluxninja/controllerid"
 	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
 	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).

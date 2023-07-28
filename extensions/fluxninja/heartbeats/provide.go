@@ -90,7 +90,7 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, getControllerID(in.ExtensionConfig))
+			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.ExtensionConfig, getControllerID(in.ExtensionConfig))
 			if err != nil {
 				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
 				return err
