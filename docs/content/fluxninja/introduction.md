@@ -10,12 +10,13 @@ keywords:
   - platform
 ---
 
-[FluxNinja][] provides a load management solution, powered by our open source
-project **Aperture**, designed for classifying, scheduling, and rate-limiting
-API traffic in cloud applications. Built upon a foundation of observability and
-a global control plane, it offers a comprehensive suite of load management
-capabilities. These capabilities enhance the reliability and performance of
-cloud applications while also optimizing resource utilization.
+[FluxNinja][] is a load management platform powered by the open source project
+[**Aperture**](https://github.com/fluxninja/aperture). It's designed for
+classifying, scheduling, and rate-limiting API traffic in cloud applications.
+Built upon a foundation of observability and a global control plane, it offers a
+comprehensive suite of load management capabilities. These capabilities enhance
+the reliability and performance of cloud applications while also optimizing
+resource utilization.
 
 Aperture can seamlessly integrate with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
