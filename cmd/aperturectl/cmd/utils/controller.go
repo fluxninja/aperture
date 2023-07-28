@@ -117,10 +117,6 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	if c.config != "" && c.apiKey != "" {
-		return errors.New("--api-key cannot be used with --config")
-	}
-
 	// Fetching config from environment variable
 	if c.config == "" {
 		c.config = os.Getenv(configEnv)
@@ -131,6 +127,9 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		homeDir, err := os.UserHomeDir()
 		if err == nil {
 			c.config = filepath.Join(homeDir, ".aperturectl", "config")
+			if _, err := os.Stat(c.config); err != nil {
+				c.config = ""
+			}
 		}
 	}
 
@@ -153,13 +152,14 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
-	} else if c.config != "" {
+	} else if c.config != "" && (c.controllerAddr == "" || c.apiKey == "") {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
 			return fmt.Errorf("failed to resolve config file '%s' path: %w", c.config, err)
 		}
 
+		log.Info().Msgf("Using config file '%s'", c.config)
 		config := &Config{}
 		_, err = toml.DecodeFile(c.config, config)
 		if err != nil {
@@ -178,8 +178,13 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
 		}
 
-		c.controllerAddr = config.Controller.URL
-		c.apiKey = config.Controller.APIKey
+		if c.controllerAddr == "" {
+			c.controllerAddr = config.Controller.URL
+		}
+
+		if c.apiKey == "" {
+			c.apiKey = config.Controller.APIKey
+		}
 	}
 
 	return nil

@@ -50,7 +50,8 @@ policy:
       # Required: True
       load_scheduler:
         selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: controller-prometheus-server.aperture-controller.svc.cluster.local
             label_matcher:
               match_labels:
@@ -75,5 +76,6 @@ policy:
     # Required: True
     flux_meter:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: controller-prometheus-server.aperture-controller.svc.cluster.local

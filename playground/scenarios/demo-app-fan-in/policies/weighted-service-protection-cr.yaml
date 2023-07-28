@@ -62,9 +62,11 @@ spec:
                   parameters:
                     priority: 50
               selectors:
-              - control_point: egress
+              - agent_group: default
+                control_point: egress
                 service: service1-demo-app.demoapp.svc.cluster.local
-              - control_point: egress
+              - agent_group: default
+                control_point: egress
                 service: service2-demo-app.demoapp.svc.cluster.local
             max_load_multiplier: 2
     - query:
@@ -103,6 +105,7 @@ spec:
       flux_meters:
         weighted-service-protection:
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service3-demo-app.demoapp.svc.cluster.local
     infra_meters: {}

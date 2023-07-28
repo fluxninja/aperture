@@ -20,7 +20,8 @@ spec:
             interval: 1s
             label_key: http.request.header.user_id
           selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
     evaluation_interval: 1s
   resources:

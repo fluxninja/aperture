@@ -1,6 +1,10 @@
 local apertureControllerApp = import 'apps/aperture-controller/main.libsonnet';
 
-local extensionEnv = std.extVar('ENABLE_CLOUD_EXTENSION');
+local extensionEnvStr = std.extVar('CLOUD_EXTENSION');
+local extensionEnv = if extensionEnvStr != '' then std.parseYaml(extensionEnvStr) else {};
+local apiKey = if std.objectHas(extensionEnv, 'api_key') then extensionEnv.api_key else '';
+local endpoint = if std.objectHas(extensionEnv, 'endpoint') then extensionEnv.endpoint else '';
+local enabled = if std.objectHas(extensionEnv, 'enabled') then extensionEnv.enabled else false;
 local valuesStr = std.extVar('VALUES');
 local values = if valuesStr != '' then std.parseYaml(valuesStr) else {};
 local controllerValues = if std.objectHas(values, 'controller') then values.controller else {};
@@ -21,7 +25,7 @@ local apertureControllerMixin =
 
         config+: {
           fluxninja+: {
-            endpoint: 'aperture.latest.dev.fluxninja.com' + ':443',
+            endpoint: if enabled then endpoint else '',
             client+: {
               grpc+: {
                 insecure: false,
@@ -50,8 +54,8 @@ local apertureControllerMixin =
         },
         secrets+: {
           fluxNinjaExtension+: {
-            create: extensionEnv,
-            value: '2b97802cf7984791919758a537c05ad0',
+            create: enabled,
+            value: if enabled then apiKey else '',
           },
         },
         image: {

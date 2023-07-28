@@ -270,7 +270,6 @@ DEP_TREE = {
     APERTURE_ISTIO_NS: {
         "istio": {
             "labels": ["Istio"],
-            "needs": ["controller", "agent"],
             "tkenv": TANKA_ROOT + "/apps/istio",
             "child_resources": [
                 {
@@ -502,7 +501,7 @@ def wrapped_k8s_yaml(yaml, allow_duplicates=False):
     k8s_yaml(yaml, allow_duplicates)
 
 
-def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extension, values):
+def render_tanka(environment, env_vars, base_dir, namespace, cloud_extension, values):
     print(
         "Rendering tanka environment",
         environment,
@@ -525,15 +524,13 @@ def render_tanka(environment, env_vars, base_dir, namespace, enable_cloud_extens
         TANKA_DEPS_HANDLED.append(base_dir)
 
     trace("Rendering tanka with env: %s" % env_vars)
-
-    enable_cloud_extension = str(enable_cloud_extension)
     # Generate manifests with tanka
     rendered = local(
         quiet=True,
         command=[
             TANKA,
             "--ext-str=projectRoot=" + base_dir,
-            "--ext-str=ENABLE_CLOUD_EXTENSION=" + enable_cloud_extension,
+            "--ext-str=CLOUD_EXTENSION={}".format(str(encode_yaml(cloud_extension if cloud_extension.get('enabled') or cloud_extension.get('cloud_controller') else {}))),
             "--ext-str=VALUES=" + values,
             "show",
             # Allow dumping the templates to stdout,
@@ -568,7 +565,17 @@ def render_dashboards(policies):
     return dashboards
 
 
-def render_aperturectl(policies, namespace):
+def render_aperturectl(policies, namespace, cloud_extension):
+    api_key = ""
+    endpoint = ""
+    agent_group = ""
+    action = ""
+    if cloud_extension.get('cloud_controller'):
+        api_key = cloud_extension.get("api_key", "").lower()
+        endpoint = cloud_extension.get("endpoint", "").lower()
+        agent_group = cloud_extension.get("agent_group", "default").lower()
+        action = "apply" if config.tilt_subcommand == "up" else "delete"
+
     aperturectl_bin = str(local(command=["../scripts/build_aperturectl.sh"], quiet=True))
 
     blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
@@ -578,11 +585,12 @@ def render_aperturectl(policies, namespace):
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
         rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
-                                  blueprint_name, policy_name, values_file], quiet=True)
+                                  blueprint_name, policy_name, values_file, api_key, endpoint, agent_group, action], quiet=True)
 
-        if namespace:
-            rendered = namespace_inject(rendered, namespace)
-        wrapped_k8s_yaml(rendered)
+        if rendered:
+            if namespace:
+                rendered = namespace_inject(rendered, namespace)
+            wrapped_k8s_yaml(rendered)
 
 
 def print_available_resources(dep_tree):
@@ -626,7 +634,7 @@ def invert_dep_tree(dep_tree):
     return inverted
 
 
-def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
+def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree, cloud_controller):
     """
     Recursively convert list of NS and service names to set of required services
     If a given name is both a name of resource and namespace, it is assumed to be resource
@@ -639,7 +647,7 @@ def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
     for name in names:
         if name in inv_dep_tree:  # It's resource name
             resources.append(name)
-            if not run_only_listed:
+            if not run_only_listed or (cloud_controller and name != 'agent'):
                 # We could recursively resolve dependencies, but then we risk getting in a dependency loop
                 resource_info = inv_dep_tree[name]
                 dependencies = resource_info.get("needs", [])
@@ -651,7 +659,7 @@ def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree):
         elif name in dep_tree:  # It's a namespace
             resource_names = dep_tree[name].keys()
             resources.extend(
-                get_resource_list_to_deploy(resource_names, run_only_listed, dep_tree, inv_dep_tree)
+                get_resource_list_to_deploy(resource_names, run_only_listed, dep_tree, inv_dep_tree, cloud_controller)
             )
         else:
             fail("Unable to find " + name + " as neither resource nor namespace name")
@@ -922,14 +930,14 @@ def process_aperture_scenario(scenario_path):
         "namespace": APERTURE_DEMOAPP_NS,
         "labels": "TestScenarioApplication",
         "manifests_path": PLAYGROUND_ROOT + "/" + "resources/wavepool-generator",
-        "resource_deps": ["scenario-policies", "cluster-bootstrap"],
+        "resource_deps": ["agent", "cluster-bootstrap"],
         "env_vars": {
             "NINJA_WAVEPOOL_JS": wavepool_js
         },
         "child_resources": [
             {
                 "workload": "wavepool-generator",
-                "resource_deps": ["scenario-policies"] if aperture_policies else [],
+                "resource_deps": ["scenario-policies", "agent"] if aperture_policies else ["agent"],
                 "extra_objects": [
                     "wavepool-config:configmap"
                 ]
@@ -968,7 +976,7 @@ def get_agent_version():
     val = str(local("git tag -l --sort='-version:refname' v* | head -n 1")).strip().strip("v")
     return val
 
-def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_extension, scenario):
+def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, cloud_extension, scenario):
     """
     Declares resource-specific actions (images, ports, etc)
     Generating manifests with tanka is done separately, in order to speed up builds
@@ -1047,7 +1055,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
             namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
-                render_tanka(tkenv, env_vars, base_dir, namespace, enable_cloud_extension, values)
+                render_tanka(tkenv, env_vars, base_dir, namespace, cloud_extension, values)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)
             elif renderer == "jsonnet":
@@ -1057,7 +1065,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
             elif renderer == "aperturectl":
                 namespace = app_config.get("namespace", None)
                 policies = app_config.get("aperture_policies", None)
-                render_aperturectl(policies, namespace)
+                render_aperturectl(policies, namespace, cloud_extension)
             else:
                 fail("Tanka app is not found for %s." % app)
 
@@ -1101,6 +1109,8 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, enable_cloud_
 
             child["labels"] = resource_labels
             verbose("Registering child", child)
+            if cloud_extension.get('cloud_controller') and child.get('new_name') == 'scenario-policies':
+                continue
             k8s_resource(**child)
         for kind in resource_info.get("kinds", []):
             k8s_kind(**kind)
@@ -1196,7 +1206,10 @@ config.define_string("scenario", usage="Demo scenario to execute")
 config.define_string_list("dockerhub-image", usage="A list of images to pull directly from docker.io/fluxninja")
 config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-extensions", usage="Skip extension building")
-config.define_bool("enable-cloud-extension",usage="Enable FluxNinja API key authentication, which will send the data to FluxNinja Cloud")
+config.define_bool("enable-cloud-extension", usage="Enable FluxNinja API key authentication, which will send the data to FluxNinja Cloud")
+config.define_bool("cloud-controller", usage="Uses FluxNinja Controller instead of Self-Hosted Controller")
+config.define_bool("api-key", usage="FluxNinja API key")
+config.define_string("fluxninja-endpoint", usage="FluxNinja Endpoint")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
 config.set_enabled_resources([])
@@ -1209,10 +1222,23 @@ if cfg.get("list-resources", False):
 if cfg.get("manual", False):
     trigger_mode(TRIGGER_MODE_MANUAL)
 
+cloud_controller = cfg.get("cloud-controller", False)
+run_only_listed = cfg.get("only", cloud_controller)
 get_race = cfg.get("race",False)
-enable_cloud_extension = cfg.get("enable-cloud-extension",False)
+enable_cloud_extension = cfg.get("enable-cloud-extension", False)
+fluxninja_endpoint = ''
+api_key = ''
+if cloud_controller or enable_cloud_extension:
+    fluxninja_endpoint = cfg.get("fluxninja-endpoint", "aperture.latest.dev.fluxninja.com:443")
+    api_key = cfg.get("api-key", "2b97802cf7984791919758a537c05ad0")
 
-run_only_listed = cfg.get("only", False)
+cloud_extension = {
+    'enabled': enable_cloud_extension,
+    'endpoint': fluxninja_endpoint,
+    'api_key': api_key,
+    'agent_group': str(local('hostname')).strip(),
+    'cloud_controller': cloud_controller,
+}
 
 # Optionally, process a list of images that should be pulled from dockerhub instead of being
 # built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
@@ -1222,7 +1248,7 @@ if dockerhub_images:
 
 to_run = cfg.get("to-run", ["agent"])
 
-scenario = cfg.get("scenario", DEFAULT_TEST_SCENARIO if not run_only_listed else None)
+scenario = cfg.get("scenario", DEFAULT_TEST_SCENARIO if not run_only_listed or cloud_controller else None)
 if scenario:
     # If this is a relative path, it's relative to Tiltfile (PLAYGROUND_ROOT_PATH)
     if scenario[0] != "/":
@@ -1231,10 +1257,12 @@ if scenario:
     to_run += ["scenario-app", "scenario-wavepool"]
     # Not all scenarios have policies, so only load policies if they were generated based on the scenario.
     if "scenario-policies" in DEP_TREE[APERTURE_DEMOAPP_NS]:
-        to_run += ["scenario-policies", "aperture-grafana"]
+        to_run += ["scenario-policies"]
+        if not cloud_controller:
+            to_run += ["aperture-grafana"]
 
     for resource in DEP_TREE[APERTURE_CONTROLLER_NS]:
-        if "scenario-dashboard" in resource:
+        if "scenario-dashboard" in resource and not cloud_controller:
             to_run += [resource]
 
 cfg_trace = cfg.get("trace", os.getenv("NINJA_TILT_TRACE", "false"))
@@ -1248,7 +1276,7 @@ if cfg.get("skip-extensions", os.getenv("SKIP_EXTENSIONS", "false").lower() == "
     DEP_TREE[APERTURE_AGENT_NS]["agent"]["images"][0]["target"] = "agent-base"
 
 inverted_dep_tree = invert_dep_tree(DEP_TREE)
-resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree)
+resources = get_resource_list_to_deploy(to_run, run_only_listed, DEP_TREE, inverted_dep_tree, cloud_controller)
 
 print("Will deploy resources:", ", ".join(resources))
 
@@ -1315,4 +1343,4 @@ cmd_button('aperture-java-trigger',
         icon_name='ads_click',
         text='Trigger library example',
 )
-declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, enable_cloud_extension, scenario)
+declare_resources(resources, DEP_TREE, inverted_dep_tree,get_race, cloud_extension, scenario)

@@ -4,7 +4,7 @@
 apiVersion: ctlptl.dev/v1alpha1
 kind: Registry
 name: ctlptl-registry
-port: 5005
+port: 5001
 ---
 # Creates a cluster with 3 nodes.
 apiVersion: ctlptl.dev/v1alpha1
@@ -12,7 +12,7 @@ kind: Cluster
 product: kind
 registry: ctlptl-registry
 kindV1Alpha4Cluster:
-  name: aperture-playground
+  name: kind-kind
   nodes:
     - role: control-plane
     - role: worker
