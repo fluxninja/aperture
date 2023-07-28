@@ -16,10 +16,41 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
-// ParseNestedCircuit parses a nested circuit and returns the parent, leaf components, and options.
-func ParseNestedCircuit(
-	nestedCircuitID runtime.ComponentID,
+// NewNestedCircuitAndOptions parses a nested circuit and returns the parent, leaf components, and options.
+func NewNestedCircuitAndOptions(
 	nestedCircuit *policylangv1.NestedCircuit,
+	nestedCircuitID runtime.ComponentID,
+	policyReadAPI iface.Policy,
+) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
+		return Tree{}, nil, nil, err
+	}
+
+	nestedCircConfComp, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("NestedCircuit",
+			"Number of Components: "+fmt.Sprint(len(nestedCircuit.GetComponents())),
+			runtime.ComponentTypeSignalProcessor),
+		nestedCircuit,
+		nestedCircuitID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+
+	tree, leafComponents, options, err := ParseNestedCircuit(nestedCircConfComp, nestedCircuit, nestedCircuitID, policyReadAPI)
+	if err != nil {
+		return retErr(err)
+	}
+
+	return tree, leafComponents, options, err
+}
+
+// ParseNestedCircuit parses a nested circuit and returns the port mapping, children trees, leaf components, and options.
+func ParseNestedCircuit(
+	configuredComponent *runtime.ConfiguredComponent,
+	nestedCircuit *policylangv1.NestedCircuit,
+	nestedCircuitID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
 	retErr := func(err error) (Tree, []*runtime.ConfiguredComponent, fx.Option, error) {
@@ -61,9 +92,7 @@ func ParseNestedCircuit(
 	portMapping.Ins = ins
 	portMapping.Outs = outs
 
-	tree := Tree{}
-
-	leafComponents, options, err := tree.CreateComponents(
+	childrenTrees, leafComponents, options, err := CreateComponents(
 		nestedCircuitProto.GetComponents(),
 		nestedCircuitID,
 		policyReadAPI,
@@ -94,7 +123,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalIngress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := ingressPorts[portName]; ok {
-				return retErr(fmt.Errorf("duplicate ingress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
+				return retErr(fmt.Errorf("duplicate ingress port %s in nested circuit", portName))
 			}
 			ingressPorts[portName] = nil
 			signals, ok := portMapping.GetInPort(portName)
@@ -106,7 +135,7 @@ func ParseNestedCircuit(
 			portName := nestedSignalEgress.PortName()
 			// tracking the port names in the nested circuit
 			if _, ok := egressPorts[portName]; ok {
-				return retErr(fmt.Errorf("duplicate egress port %s in nested circuit %s", portName, nestedCircuitProto.Name))
+				return retErr(fmt.Errorf("duplicate egress port %s in nested circuit", portName))
 			}
 			egressPorts[portName] = nil
 			signals, ok := portMapping.GetOutPort(portName)
@@ -120,29 +149,22 @@ func ParseNestedCircuit(
 
 	for portName := range portMapping.Ins {
 		if _, ok := ingressPorts[portName]; !ok {
-			return retErr(fmt.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
+			return retErr(fmt.Errorf("port %s not found in nested circuit", portName))
 		}
 	}
 
 	for portName := range portMapping.Outs {
 		if _, ok := egressPorts[portName]; !ok {
-			return retErr(fmt.Errorf("port %s not found in nested circuit %s", portName, nestedCircuitProto.Name))
+			return retErr(fmt.Errorf("port %s not found in nested circuit", portName))
 		}
 	}
 
-	nestedCircConfComp, err := prepareComponent(
-		runtime.NewDummyComponent(nestedCircuitProto.Name,
-			nestedCircuitProto.ShortDescription,
-			runtime.ComponentTypeSignalProcessor),
-		nestedCircuitProto,
-		nestedCircuitID,
-		false,
-	)
-	if err != nil {
-		return retErr(err)
+	configuredComponent.PortMapping = portMapping
+
+	tree := Tree{
+		Children: childrenTrees,
+		Node:     configuredComponent,
 	}
-	nestedCircConfComp.PortMapping = portMapping
-	tree.Node = nestedCircConfComp
 
 	return tree, leafComponents, options, err
 }

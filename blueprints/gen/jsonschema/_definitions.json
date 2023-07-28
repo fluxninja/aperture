@@ -2071,20 +2071,12 @@
           "description": "Maps input port names to input ports.",
           "type": "object"
         },
-        "name": {
-          "description": "Name of the nested circuit component. This name is displayed by graph visualization tools.",
-          "type": "string"
-        },
         "out_ports_map": {
           "additionalProperties": {
             "$ref": "#/definitions/OutPort"
           },
           "description": "Maps output port names to output ports.",
           "type": "object"
-        },
-        "short_description": {
-          "description": "Short description of the nested circuit component. This description is displayed by graph visualization tools.",
-          "type": "string"
         }
       },
       "type": "object",

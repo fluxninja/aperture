@@ -55,12 +55,12 @@ func newFlowControlNestedAndOptions(
 		}
 		options = append(options, configSyncOptions)
 
-		nestedCircuit, err := loadscheduler.ParseLoadScheduler(loadSchedulerProto, componentID, policyReadAPI)
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseLoadScheduler(loadSchedulerProto, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
 
-		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
@@ -68,19 +68,19 @@ func newFlowControlNestedAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if isAdaptiveLoadScheduler {
-		nestedCircuit, err := loadscheduler.ParseAdaptiveLoadScheduler(adaptiveLoadSchedulerProto)
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAdaptiveLoadScheduler(adaptiveLoadSchedulerProto, componentID)
 		if err != nil {
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 	} else if isLoadRamp {
-		nestedCircuit, err := sampler.ParseLoadRamp(loadRampProto)
+		configuredComponent, nestedCircuit, err := sampler.ParseLoadRamp(loadRampProto, componentID)
 		if err != nil {
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 	}
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", flowControlComponentProto))
 }
