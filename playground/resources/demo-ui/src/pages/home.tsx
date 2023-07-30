@@ -6,14 +6,9 @@ import {
 import { Box, styled, Tab, CircularProgress } from '@mui/material'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
-import {
-  GracefulErrorByStatus,
-  RateLimitInfo,
-} from '@fluxninja-tools/graceful-js'
 import { RequestSpec } from '../api'
 import { SuccessIcon } from './success-icon'
 import { useRequestToEndpoint, useTabChange } from '../hooks'
-import { AxiosError } from 'axios'
 
 const RATE_LIMIT_REQUEST: RequestSpec = {
   method: 'GET',
@@ -44,35 +39,44 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
   },
 }
 
+// TODO: add a real waiting room endpoint request
+const WAITING_ROOM_REQUEST: RequestSpec = {
+  url: '/api/waiting-room',
+  method: 'POST',
+  data: {},
+}
+
 export const HomePage: FC = () => {
   const { handleChange, value } = useTabChange([
+    'Waiting Room',
     'Rate Limit',
     'Workload Prioritization',
   ])
 
   const {
     refetch,
-    isError,
     requestRecord,
     isLoading: isLoadingRequest,
-    error: rateLimitRequestError,
   } = useRequestToEndpoint(RATE_LIMIT_REQUEST)
 
   const {
     refetch: refetchUser,
-    isError: isErrorUser,
+
     requestRecord: userRequestRecord,
     isLoading: isLoadingUser,
-    error: workloadPrioritySubscriberError,
   } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_SUBSCRIBER_REQUEST)
 
   const {
     refetch: refetchGuest,
-    isError: isErrorGuest,
     requestRecord: guestRequestRecord,
     isLoading: isLoadingGuest,
-    error: workloadPriorityGuestError,
   } = useRequestToEndpoint(WORKLOAD_PRIORITIZATION_GUEST_REQUEST)
+
+  const {
+    refetch: refetchWaitingRoom,
+    requestRecord: waitingRoomRequestRecord,
+    isLoading: isLoadingWaitingRoom,
+  } = useRequestToEndpoint(WAITING_ROOM_REQUEST)
 
   return (
     <TabContext value={value}>
@@ -81,31 +85,40 @@ export const HomePage: FC = () => {
         aria-label="FluxNinja Scenarios"
         variant="fullWidth"
       >
-        <Tab label="Rate Limit" value="0" />
-        <Tab label="Workload Prioritization" value="1" />
+        <Tab label="Waiting Room" value="0" />
+        <Tab label="Rate Limit" value="1" />
+        <Tab label="Workload Prioritization" value="2" />
       </TabList>
+
       <TabPanel value="0">
         <RequestMonitorPanel
           monitorRequestProps={{
-            requestRecord: requestRecord,
+            requestRecord: waitingRoomRequestRecord,
+            userType: 'Waiting Room',
+            refetch: refetchWaitingRoom,
+          }}
+          isLoading={isLoadingWaitingRoom}
+        />
+      </TabPanel>
+
+      <TabPanel value="1">
+        <RequestMonitorPanel
+          monitorRequestProps={{
+            requestRecord,
             userType: 'Rate Limit',
             refetch,
           }}
-          isErrored={isError}
           isLoading={isLoadingRequest}
-          error={rateLimitRequestError}
         />
       </TabPanel>
-      <TabPanel value="1">
+      <TabPanel value="2">
         <RequestMonitorPanel
           monitorRequestProps={{
             requestRecord: userRequestRecord,
             refetch: refetchUser,
             userType: 'Subscriber',
           }}
-          isErrored={isErrorUser}
           isLoading={isLoadingUser}
-          error={workloadPrioritySubscriberError}
         />
         <RequestMonitorPanel
           monitorRequestProps={{
@@ -113,9 +126,7 @@ export const HomePage: FC = () => {
             refetch: refetchGuest,
             userType: 'Guest',
           }}
-          isErrored={isErrorGuest}
           isLoading={isLoadingGuest}
-          error={workloadPriorityGuestError}
         />
       </TabPanel>
     </TabContext>
@@ -124,31 +135,30 @@ export const HomePage: FC = () => {
 
 export interface RequestMonitorPanelProps {
   monitorRequestProps: MonitorRequestProps
-  isErrored: boolean
   isLoading: boolean
-  error: AxiosError<unknown, unknown> & {
-    rateLimitInfo?: RateLimitInfo
-  }
 }
 
 export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   monitorRequestProps,
-  isErrored,
   isLoading,
-  error,
 }) => {
+  const errorComponent =
+    monitorRequestProps.requestRecord?.[
+      monitorRequestProps.requestRecord.length - 1
+    ]?.errorComponent
+
   return (
     <HomePageWrapper>
       <HomePageColumnBox>
         <MonitorRequest {...monitorRequestProps} />
       </HomePageColumnBox>
       <HomePageColumnBox>
-        {isLoading ? (
+        {isLoading && !errorComponent ? (
           <FlexBox>
             <CircularProgress />
           </FlexBox>
-        ) : isErrored && !isLoading ? (
-          <GracefulErrorByStatus status={error.response?.status} />
+        ) : errorComponent ? (
+          errorComponent
         ) : (
           <FlexBox>
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />

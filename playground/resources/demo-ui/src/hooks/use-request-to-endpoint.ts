@@ -8,7 +8,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestCount, setRequestCount] = useState(0) // number of request count state
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
 
-  const { isError, refetch, error, data, isRetry, isLoading } =
+  const { isError, refetch, error, data, isRetry, isLoading, errorComponent } =
     useGracefulRequest<'Axios'>({
       typeOfRequest: 'Axios',
       requestFnc: () => api(reqSpec),
@@ -19,14 +19,20 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
 
   // update record state if request counter is not 0
   const updateRecord = useCallback(() => {
-    if (!requestCount) {
+    if (!requestCount || isLoading) {
       return
     }
     setRequestRecord((prevErrors) => [
       ...prevErrors,
-      { isError, rateLimitInfo: error?.rateLimitInfo || null, isRetry },
+      {
+        isError,
+        rateLimitInfo: error?.rateLimitInfo || null,
+        isRetry,
+        errorComponent,
+        error,
+      },
     ])
-  }, [isError, requestCount, error?.rateLimitInfo, isRetry])
+  }, [requestCount, isLoading, isError, error, isRetry, errorComponent])
 
   // start making request after 800ms
   const startFetch = useCallback(() => {
@@ -56,7 +62,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       clearInterval(intervalId)
       return
     }
-  }, [requestCount, intervalId, isError])
+  }, [requestCount, intervalId, isError, updateRecord])
 
-  return { isError, refetch: startFetch, requestRecord, isLoading, data, error }
+  return { isError, refetch: startFetch, requestRecord, isLoading, data }
 }
