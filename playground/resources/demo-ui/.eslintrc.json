@@ -6,8 +6,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:@typescript-eslint/recommended"
   ],
   "overrides": [],
   "parser": "@typescript-eslint/parser",
@@ -15,11 +14,9 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint"],
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
-  "rules": {}
+  "plugins": ["react", "@typescript-eslint", "react-hooks"],
+  "rules": {
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "warn"
+  }
 }
