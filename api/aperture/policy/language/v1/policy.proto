@@ -353,8 +353,4 @@ message NestedCircuit {
 
   // List of components in the nested circuit.
   repeated Component components = 3; // @gotags: validate:"dive"
-  // Name of the nested circuit component. This name is displayed by graph visualization tools.
-  string name = 4;
-  // Short description of the nested circuit component. This description is displayed by graph visualization tools.
-  string short_description = 5;
 }

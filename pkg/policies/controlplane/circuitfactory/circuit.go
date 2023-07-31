@@ -28,14 +28,15 @@ func CompileFromProto(
 	policyReadAPI iface.Policy,
 ) (*Circuit, fx.Option, error) {
 	componentsProto := policyProto.GetCircuit().Components
+	childrenTrees, leafComponents, option, err := CreateComponents(componentsProto, runtime.NewComponentID(runtime.RootComponentID), policyReadAPI)
+	if err != nil {
+		return nil, nil, err
+	}
 	tree, err := RootTree(policyProto.GetCircuit())
 	if err != nil {
 		return nil, nil, err
 	}
-	leafComponents, option, err := tree.CreateComponents(componentsProto, runtime.NewComponentID(runtime.RootComponentID), policyReadAPI)
-	if err != nil {
-		return nil, nil, err
-	}
+	tree.Children = childrenTrees
 
 	err = runtime.Compile(
 		leafComponents,

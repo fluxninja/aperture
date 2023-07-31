@@ -5152,19 +5152,6 @@ List of components in the nested circuit.
 Maps input port names to input ports.
 
 </dd>
-<dt>name</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Name of the nested circuit component. This name is displayed by graph
-visualization tools.
-
-</dd>
 <dt>out_ports_map</dt>
 <dd>
 
@@ -5175,19 +5162,6 @@ visualization tools.
 <!-- vale on -->
 
 Maps output port names to output ports.
-
-</dd>
-<dt>short_description</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Short description of the nested circuit component. This description is displayed
-by graph visualization tools.
 
 </dd>
 </dl>

@@ -3120,10 +3120,6 @@ func (m *NestedCircuit) validate(all bool) error {
 
 	}
 
-	// no validation rules for Name
-
-	// no validation rules for ShortDescription
-
 	if len(errors) > 0 {
 		return NestedCircuitMultiError(errors)
 	}

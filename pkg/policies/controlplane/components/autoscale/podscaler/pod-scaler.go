@@ -22,7 +22,11 @@ func ParsePodScaler(
 	podScaler *policylangv1.PodScaler,
 	componentID runtime.ComponentID,
 	_ iface.Policy,
-) (*policylangv1.NestedCircuit, error) {
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := podScaler.GetInPorts()
 
@@ -60,7 +64,7 @@ func ParsePodScaler(
 		},
 	)
 	if err != nil {
-		return nil, err
+		return retErr(err)
 	}
 
 	podScaleReporterAnyProto, err := anypb.New(
@@ -78,23 +82,12 @@ func ParsePodScaler(
 		},
 	)
 	if err != nil {
-		return nil, err
+		return retErr(err)
 	}
 
-	kos := podScaler.KubernetesObjectSelector
-	sd := fmt.Sprintf("%s/%s/%s/%s/%s",
-		kos.GetAgentGroup(),
-		kos.GetNamespace(),
-		kos.GetApiVersion(),
-		kos.GetKind(),
-		kos.GetName(),
-	)
-
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "PodScaler",
-		ShortDescription: sd,
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_BoolVariable{
@@ -167,5 +160,24 @@ func ParsePodScaler(
 	components.AddNestedEgress(nestedCircuit, outputActualReplicasPortName, "ACTUAL_REPLICAS")
 	components.AddNestedEgress(nestedCircuit, outputConfiguredReplicasPortName, "CONFIGURED_REPLICAS")
 
-	return nestedCircuit, nil
+	kos := podScaler.KubernetesObjectSelector
+	sd := fmt.Sprintf("%s/%s/%s/%s/%s",
+		kos.GetAgentGroup(),
+		kos.GetNamespace(),
+		kos.GetApiVersion(),
+		kos.GetKind(),
+		kos.GetName(),
+	)
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("PodScaler",
+			sd,
+			runtime.ComponentTypeSignalProcessor),
+		podScaler,
+		componentID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+	return configuredComponent, nestedCircuit, nil
 }
