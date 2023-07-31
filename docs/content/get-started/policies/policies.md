@@ -232,4 +232,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
 [self-hosted]: /self-hosting/self-hosting.md
-[FluxNinja]: /fluxninja/introduction.md
+[FluxNinja]: /introduction.md

@@ -22,10 +22,10 @@ Once the Aperture Agent is installed, it starts discovering control points,
 which represent the Kubernetes Resources that can be scaled. This would include
 Deployments, StatefulSets and any Custom Resources which are scalable.
 
-The discovered control points can be viewed in the
-[FluxNinja](/fluxninja/introduction.md) UI. Navigate to the **Control Points**
-page and select the **Kubernetes** tab. You should see a list of discovered
-control points. Alternatively, you can use the
+The discovered control points can be viewed in the [FluxNinja](/introduction.md)
+UI. Navigate to the **Control Points** page and select the **Kubernetes** tab.
+You should see a list of discovered control points. Alternatively, you can use
+the
 [introspection API](/reference/api/agent/auto-scale-kubernetes-control-points-service-get-control-points.api.mdx)
 or
 [aperturectl](/reference/aperturectl/auto-scale/control-points/control-points.md)

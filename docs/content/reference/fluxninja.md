@@ -113,5 +113,5 @@ How various components interact with the extension:
 - [Flow labels](/concepts/flow-label.md#extension)
 
 [Self-Hosting]: /self-hosting/self-hosting.md
-[FluxNinja Cloud]: /fluxninja/introduction.md
+[FluxNinja Cloud]: /introduction.md
 [Aperture Controller]: /self-hosting/controller/controller.md

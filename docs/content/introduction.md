@@ -1,5 +1,5 @@
 ---
-title: Introduction – FluxNinja
+title: Introduction
 slug: /
 sidebar_position: 1
 sidebar_label: Introduction
@@ -23,8 +23,8 @@ service meshes, and application middlewares. Moreover, it offers SDKs for
 developers who need to establish control points around specific features or code
 sections inside applications.
 
-![FluxNinja Architecture](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
-![FluxNinja Architecture](../assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+![FluxNinja Architecture](./assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
+![FluxNinja Architecture](./assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
 
 :::info Sign-up
 
@@ -37,20 +37,20 @@ To sign-up, [click here][sign-up].
 FluxNinja Aperture provides a variety of advanced load management features:
 
 - 🛡️
-  [**Adaptive Service Protection**](../use-cases/adaptive-service-protection/adaptive-service-protection.md):
+  [**Adaptive Service Protection**](/use-cases/adaptive-service-protection/adaptive-service-protection.md):
   Enhance resource utilization and safeguard against abrupt service overloads
   with an intelligent queue at the entry point of services. This queue
   dynamically adjusts the rate of requests based on live service health, thereby
   mitigating potential service disruptions and ensuring optimal performance
   under all load conditions.
 - 📊
-  [**Global Quota Management**](../use-cases/managing-quotas/managing-quotas.md):
+  [**Global Quota Management**](/use-cases/managing-quotas/managing-quotas.md):
   Maintain compliance with external API quotas with a global token bucket and
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs.
 - 🎯
-  [**Workload Prioritization**](../use-cases/adaptive-service-protection/workload-prioritization.md):
+  [**Workload Prioritization**](/use-cases/adaptive-service-protection/workload-prioritization.md):
   Safeguard crucial user experience pathways and ensure prioritized access to
   external APIs even during high-load conditions by strategically prioritizing
   workloads. This is achieved through the use of declarative policies that label
@@ -59,20 +59,19 @@ FluxNinja Aperture provides a variety of advanced load management features:
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
 - 🔀
-  [**Load-based Auto Scaling**](../use-cases/auto-scaling/load-based-auto-scaling.md):
+  [**Load-based Auto Scaling**](/use-cases/auto-scaling/load-based-auto-scaling.md):
   Eliminate the need for costly over-provisioning and enhance efficiency with
   Aperture's load-based auto-scaling. Aperture's policies are expressed as
   circuit graphs that continuously track deviations from service-level
   objectives and calculate recovery or escalation actions. Auto-scaling can be
   implemented as an escalation that triggers based on load throttling signal.
-- ⏱️
-  [**Distributed Rate-Limiting**](../use-cases/rate-limiting/rate-limiting.md):
+- ⏱️ [**Distributed Rate-Limiting**](/use-cases/rate-limiting/rate-limiting.md):
   Safeguard APIs from potential abuse with Aperture's high-performance,
   distributed rate limiter. This feature enforces per-key limits based on
   fine-grained labels, ensuring precise control and prevention of excessive
   usage.
 - 🚀
-  [**Percentage Rollouts**](../use-cases/percentage-rollouts/percentage-rollouts.md):
+  [**Percentage Rollouts**](/use-cases/percentage-rollouts/percentage-rollouts.md):
   Enable teams to gradually release new features to a subset of users, without
   impacting the rest of the system. Aperture provides automated load ramping
   functionality, allowing for a safe and controlled increment of load to new
@@ -98,27 +97,27 @@ service performance and request attributes, allowing the Agent and Controller to
 make informed decisions about request handling and workload prioritization.
 
 The analysis and actuation phases use
-[**Declarative policies**](../concepts/advanced/policy.md) that facilitate teams
-in defining responses to different situations, such as deviations from
+[**Declarative policies**](concepts/advanced/policy.md) that facilitate teams in
+defining responses to different situations, such as deviations from
 service-level objectives.
 
-![Aperture Control Loop](../assets/img/oaalight.png#gh-light-mode-only)
-![Aperture Control Loop](../assets/img/oaadark.png#gh-dark-mode-only)
+![Aperture Control Loop](./assets/img/oaalight.png#gh-light-mode-only)
+![Aperture Control Loop](./assets/img/oaadark.png#gh-dark-mode-only)
 
 ## ✨ Get started {#get-started}
 
-- [**Setting up your application**](../get-started/setting-up-application/setting-up-application.md)
-- [**Install Aperture**](../get-started/installation/installation.md)
-- [**Your first policy**](../get-started/policies/policies.md)
-- [**Use cases**](../use-cases/use-cases.md)
+- [**Setting up your application**](get-started/setting-up-application/setting-up-application.md)
+- [**Install Aperture**](get-started/installation/installation.md)
+- [**Your first policy**](get-started/policies/policies.md)
+- [**Use cases**](use-cases/use-cases.md)
 
 For an in-depth understanding of how Aperture interacts with applications and
 its various integral components, explore the
-[Architecture](../architecture/architecture.md) section.
+[Architecture](architecture/architecture.md) section.
 
 ## 📖 Learn {#learn}
 
-The [Concepts section](../concepts/concepts.md) provides detailed insights into
+The [Concepts section](concepts/concepts.md) provides detailed insights into
 essential elements of Aperture's system and policies, offering a comprehensive
 understanding of their key components.
 

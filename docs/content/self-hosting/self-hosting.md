@@ -1,6 +1,5 @@
 ---
 title: Self-Hosting Aperture
-sidebar_label: Self-Hosting
 sidebar_position: 6.5
 keywords:
   - self-hosted
@@ -18,6 +17,6 @@ Note that [FluxNinja can integrate][extension-config] with Self-Hosted
 Controller too, providing an easy way to manage policies and a holistic view of
 the infrastructure, along with tools for OLAP analysis of traffic.
 
-[FluxNinja]: /fluxninja/introduction.md
+[FluxNinja]: /introduction.md
 [Cloud Controller]: /reference/fluxninja.md#cloud-controller
 [extension-config]: /reference/fluxninja.md#configuration
