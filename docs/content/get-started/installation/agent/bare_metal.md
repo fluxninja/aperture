@@ -68,7 +68,7 @@ curl --fail --location --remote-name "\${url}"
 To point the Aperture Agent to the Aperture Controller, edit the configuration
 file located at `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 Follow the steps for
-[FluxNinja Cloud Controller](/fluxninja/extension.md#configuration) or
+[FluxNinja Cloud Controller](/reference/fluxninja.md#configuration) or
 [Self-Hosted Aperture Controller](/self-hosting/agent.md#configuration),
 depending on your setup.
 
