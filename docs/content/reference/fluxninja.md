@@ -1,6 +1,6 @@
 ---
-title: FluxNinja Configuration
-sidebar_label: Configuration
+title: FluxNinja Extension
+sidebar_label: FluxNinja Extension
 sidebar_position: 8
 keywords:
   - cloud
@@ -50,12 +50,25 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-If you are a FluxNinja customer, you can enhance your Aperture experience by
-enabling the FluxNinja extension. It enriches logs and traces collected by
-Aperture with additional dimensions and batches and rolls ups metrics to
-optimize bandwidth usage. In FluxNinja, you can monitor your policies and
-analyze flows. The FluxNinja extension also sends periodic heartbeats from
-Aperture Agents and Controllers to track their health and configuration.
+FluxNinja extension enables [FluxNinja Cloud][] integration for Aperture Agents
+(and [self-hosted][Self-Hosting] Controllers). It enriches logs and
+traces collected by Aperture and sends them to FluxNinja Cloud. This data is
+batched and rolled up to optimize bandwidth usage. The extension also sends
+periodic heartbeats to FluxNinja Cloud to track health and configuration.
+This allows you to monitor your policies and analyze flows in FluxNinja Cloud.
+
+FluxNinja extension also provides the possibility to use the FluxNinja Cloud
+Controller.
+
+## FluxNinja Cloud Controller {#cloud-controller}
+
+Without [Aperture Controller][], Aperture Agents won't be able to work.
+While it's possible to [self-host][Self-Hosting] Aperture Controller,
+FluxNinja Cloud Controller can be used instead.
+
+FluxNinja Cloud Controller is an [Aperture Controller] hosted by FluxNinja.
+The Cloud Controller is available for every FluxNinja Organization in the
+`default` project.
 
 ## Configuration
 
@@ -98,3 +111,7 @@ Configuration parameters for the FluxNinja Extension are as follows:
 How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
+
+[Self-Hosting]: /self-hosting/self-hosting.md
+[FluxNinja Cloud]: /fluxninja/introduction.md
+[Aperture Controller]: /self-hosting/controller/controller.md
