@@ -1,6 +1,6 @@
 ---
 title: Architecture
-sidebar_position: 5
+sidebar_position: 2
 description:
   Discover the core components of Aperture architecture and learn how they work
   together to provide powerful and efficient load management.

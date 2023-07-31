@@ -3300,7 +3300,7 @@ definitions:
 
                     :::caution
 
-                    When using [FluxNinja extension](/fluxninja/extension.md), telemetry enabled
+                    When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
                     labels are sent to FluxNinja for observability. Telemetry should be disabled for
                     sensitive labels.
 
@@ -3456,7 +3456,7 @@ definitions:
 
                     :::caution
 
-                    When using [FluxNinja extension](/fluxninja/extension.md), telemetry enabled
+                    When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
                     labels are sent to FluxNinja for observability. Telemetry should be disabled for
                     sensitive labels.
 
@@ -4975,13 +4975,13 @@ tags:
     - name: FlowControlPointsService
     - name: FlowPreviewService
     - name: PolicyService
+    - name: StatusService
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
-    - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
     - name: Coordinator

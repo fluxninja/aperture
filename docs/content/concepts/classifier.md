@@ -298,7 +298,7 @@ rego:
 [rule]: /reference/configuration/spec.md#rule
 [extractor]: /reference/configuration/spec.md#extractor
 [rego-rule]: /reference/configuration/spec.md#rule-rego
-[arc]: /fluxninja/extension.md
+[arc]: /reference/fluxninja.md
 [selector]: ./selector.md
 [policies]: /concepts/advanced/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/

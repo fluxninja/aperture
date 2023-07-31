@@ -96,5 +96,5 @@ commands (like `flow-control`) won't work.
 
 :::
 
-[FluxNinja]: /fluxninja/introduction.md
+[FluxNinja]: /introduction.md
 [install-agent]: /get-started/installation/agent/agent.md
