@@ -41,9 +41,12 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
 
 // TODO: add a real waiting room endpoint request
 const WAITING_ROOM_REQUEST: RequestSpec = {
-  url: '/api/waiting-room',
+  url: '/api/rate-limit',
   method: 'POST',
-  data: {},
+  data: {
+    'User-Id': 'DemoUI',
+    'User-Type': 'guest',
+  },
 }
 
 export const HomePage: FC = () => {
