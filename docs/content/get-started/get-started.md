@@ -12,15 +12,15 @@ you need to prepare your application to have Aperture integrated. Aperture can
 be integrated in multiple ways. You can choose the one that best suits your
 application.
 
-## [Setting up your Application: Pick your Integration](./setting-up-application/setting-up-application.md)
+## [Setting up your Application: Pick your Integration](./setting-up-your-service/setting-up-your-service.md)
 
-1. [**Manually setting feature control points**](./setting-up-application/manual-control-points.md)
+1. [**Manually setting feature control points**](./setting-up-your-service/manual-control-points.md)
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
    find the list of SDKs [here](../integrations/sdk/sdk.md).
 
-2. [**Middleware Insertions**](./setting-up-application/middleware-insertions.md)
+2. [**Middleware Insertions**](./setting-up-your-service/middleware-insertions.md)
 
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
@@ -28,7 +28,7 @@ application.
    of middleware, there isn't much code changes required in your application.
    Some middleware doesn't require any code change at all.
 
-3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-application/service-mesh-and-gateways.md)
+3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-your-service/service-mesh-and-gateways.md)
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
    find the list of service meshes [here](../integrations/istio/istio.md). With
