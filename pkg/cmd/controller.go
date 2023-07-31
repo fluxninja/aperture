@@ -12,10 +12,12 @@ import (
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
+	apertureStatus "github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 // Handler is a gRPC server for the controller service.
@@ -23,11 +25,20 @@ type Handler struct {
 	cmdv1.UnimplementedControllerServer
 	agents        agents.Agents
 	policyService *controlplane.PolicyService
+	statusService *apertureStatus.StatusService
 }
 
 // NewHandler creates a new Handler.
-func NewHandler(agents agents.Agents, policyService *controlplane.PolicyService) *Handler {
-	return &Handler{agents: agents, policyService: policyService}
+func NewHandler(
+	agents agents.Agents,
+	policyService *controlplane.PolicyService,
+	statusService *apertureStatus.StatusService,
+) *Handler {
+	return &Handler{
+		agents:        agents,
+		policyService: policyService,
+		statusService: statusService,
+	}
 }
 
 // ListAgents lists all agents.
@@ -374,4 +385,9 @@ func (h *Handler) GetDecisions(ctx context.Context, req *policylangv1.GetDecisio
 // ListPolicies returns all applied policies.
 func (h *Handler) ListPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
 	return h.policyService.GetPolicies(ctx, nil)
+}
+
+// GetStatus returns status of jobs in the system.
+func (h *Handler) GetStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
+	return h.statusService.GetGroupStatus(ctx, req)
 }

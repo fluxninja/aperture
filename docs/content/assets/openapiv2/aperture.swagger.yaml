@@ -4975,13 +4975,13 @@ tags:
     - name: FlowControlPointsService
     - name: FlowPreviewService
     - name: PolicyService
+    - name: StatusService
     - name: Controller
     - name: DistCacheService
     - name: FlowControlService
     - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
-    - name: StatusService
     - name: FluxNinjaService
     - name: ControllerInfoService
     - name: Coordinator

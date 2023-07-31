@@ -19,6 +19,7 @@ func Module() fx.Option {
 			),
 		),
 		grpcgateway.RegisterHandler{Handler: statusv1.RegisterStatusServiceHandlerFromEndpoint}.Annotate(),
+		fx.Provide(ProvideStatusService),
 		fx.Invoke(RegisterStatusService),
 	)
 }
