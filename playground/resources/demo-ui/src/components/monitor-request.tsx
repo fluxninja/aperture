@@ -241,10 +241,6 @@ export const MonitorRequestItem = styled(Box, {
   height: 50,
   width: 5,
   cursor: 'pointer',
-  backgroundColor: isError
-    ? theme.palette.error.main
-    : isRetry
-    ? theme.palette.warning.main
-    : theme.palette.success.main,
+  backgroundColor: isError ? theme.palette.error.main : isRetry ? theme.palette.warning.main : theme.palette.success.main,
   borderRadius: theme.spacing(1),
 }))
