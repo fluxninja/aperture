@@ -1,7 +1,7 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
-  "needs": ["istio"],
+  "needs": ["istio", "demo-ui"],
   "aperture_policies": [
     {
       "blueprint_name": "rate-limiting/base",
