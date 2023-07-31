@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RequestSpec, api } from '../api'
 import { RequestRecord } from '../components/monitor-request'
 import { useGracefulRequest } from '@fluxninja-tools/graceful-js'
@@ -7,6 +7,9 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   const [requestRecord, setRequestRecord] = useState<RequestRecord[]>([]) // record state for each request
   const [requestCount, setRequestCount] = useState(0) // number of request count state
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null) // interval id state, used to clear interval
+
+  const startFetchRef = useRef(false)
+  const lastCounter = useRef(0)
 
   const { isError, refetch, error, data, isRetry, isLoading, errorComponent } =
     useGracefulRequest<'Axios'>({
@@ -17,11 +20,20 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       },
     })
 
-  // update record state if request counter is not 0
-  const updateRecord = useCallback(() => {
-    if (!requestCount || isLoading) {
+  /**
+   * Push to the array of request record after every request we make by interval
+   * Or if a retry happens after an error
+   */
+  useEffect(() => {
+    if (
+      !requestCount ||
+      isLoading ||
+      (lastCounter.current === requestCount && !isRetry)
+    ) {
       return
     }
+
+    lastCounter.current = requestCount
     setRequestRecord((prevErrors) => [
       ...prevErrors,
       {
@@ -32,10 +44,17 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
         error,
       },
     ])
-  }, [requestCount, isLoading, isError, error, isRetry, errorComponent])
+  }, [error, errorComponent, isError, isLoading, isRetry, requestCount])
 
-  // start making request after 800ms
+  /**
+   * Start making request after every 800ms. We are using ref to make it sure that
+   * we don't start multiple intervals.
+   */
   const startFetch = useCallback(() => {
+    if (startFetchRef.current) {
+      return
+    }
+
     const intervalId = setInterval(() => {
       setRequestCount((prevCount) => prevCount + 1)
       refetch()
@@ -43,26 +62,44 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
 
     setIntervalId(intervalId)
 
+    startFetchRef.current = true
+
     return () => {
       clearInterval(intervalId)
     }
   }, [refetch])
 
-  // stop making request if isError is true or requestCount is greater than 50
+  /**
+   * We stop making request if we get error or request count is greater than 60
+   */
   useEffect(() => {
-    updateRecord()
     if (!intervalId) {
       return
     }
+
     if (isError) {
       clearInterval(intervalId)
       return
     }
+
     if (requestCount >= 60) {
       clearInterval(intervalId)
       return
     }
-  }, [requestCount, intervalId, isError, updateRecord])
+  }, [intervalId, isError, requestCount])
+
+  /**
+   * After error we will stop the request, but if request get resolved after the graceful retry
+   * We start requesting again until we get error or request count is greater than 60
+   */
+  useEffect(() => {
+    if (isRetry && !isError && requestCount < 60 && startFetchRef.current) {
+      clearInterval(intervalId)
+      startFetchRef.current = false
+      startFetch()
+      return
+    }
+  }, [isError, isRetry])
 
   return { isError, refetch: startFetch, requestRecord, isLoading, data }
 }
