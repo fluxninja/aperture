@@ -200,12 +200,11 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 		Message: "Request accepted",
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
 		log.Autosample().Error().Err(err).Msg("Error encoding JSON")
 		span.SetStatus(codes.Error, "rejected")
-
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 	}
 
@@ -213,9 +212,6 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(r.Header))
 
 	span.SetStatus(codes.Ok, "accepted")
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {

@@ -41,7 +41,7 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
 
 // TODO: add a real waiting room endpoint request
 const WAITING_ROOM_REQUEST: RequestSpec = {
-  url: '/api/rate-limit',
+  url: '/request',
   method: 'POST',
   data: {
     'User-Id': 'DemoUI',
@@ -162,7 +162,8 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
           </FlexBox>
         ) : errorComponent ? (
           errorComponent
-        ) : (
+        ) : null}
+        {!isLoading && !errorComponent && (
           <FlexBox>
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
           </FlexBox>
