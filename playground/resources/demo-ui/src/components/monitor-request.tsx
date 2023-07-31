@@ -45,7 +45,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
       {requestRecord.map((record, index) => (
         <Tooltip
           key={index}
-          title={record.error?.response?.status}
+          title={record.error?.response?.status || 200}
           placement="top"
           arrow
         >
@@ -74,6 +74,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
             color="primary"
             sx={{ alignSelf: 'center' }}
             onClick={refetch}
+            disabled={requestRecord.length < 60 && requestRecord.length > 0}
           >
             Start
           </Button>
@@ -241,6 +242,10 @@ export const MonitorRequestItem = styled(Box, {
   height: 50,
   width: 5,
   cursor: 'pointer',
-  backgroundColor: isError ? theme.palette.error.main : isRetry ? theme.palette.warning.main : theme.palette.success.main,
+  backgroundColor: isError
+    ? theme.palette.error.main
+    : isRetry
+    ? theme.palette.warning.main
+    : theme.palette.success.main,
   borderRadius: theme.spacing(1),
 }))

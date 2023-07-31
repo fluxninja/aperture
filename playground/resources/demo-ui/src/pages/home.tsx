@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useMemo } from 'react'
 import {
   MonitorRequest,
   MonitorRequestProps,
@@ -39,7 +39,6 @@ const WORKLOAD_PRIORITIZATION_GUEST_REQUEST: RequestSpec = {
   },
 }
 
-// TODO: add a real waiting room endpoint request
 const WAITING_ROOM_REQUEST: RequestSpec = {
   url: '/request',
   method: 'POST',
@@ -145,10 +144,13 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
   monitorRequestProps,
   isLoading,
 }) => {
-  const errorComponent =
-    monitorRequestProps.requestRecord?.[
-      monitorRequestProps.requestRecord.length - 1
-    ]?.errorComponent
+  const { errorComponent, isError } = useMemo(
+    () =>
+      monitorRequestProps.requestRecord?.[
+        monitorRequestProps.requestRecord?.length - 1
+      ] || { errorComponent: null, isError: false },
+    [monitorRequestProps.requestRecord]
+  )
 
   return (
     <HomePageWrapper>
@@ -156,14 +158,13 @@ export const RequestMonitorPanel: FC<RequestMonitorPanelProps> = ({
         <MonitorRequest {...monitorRequestProps} />
       </HomePageColumnBox>
       <HomePageColumnBox>
-        {isLoading && !errorComponent ? (
+        {isLoading && !errorComponent && (
           <FlexBox>
             <CircularProgress />
           </FlexBox>
-        ) : errorComponent ? (
-          errorComponent
-        ) : null}
-        {!isLoading && !errorComponent && (
+        )}
+        {errorComponent}
+        {!isLoading && !isError && (
           <FlexBox>
             <SuccessIcon style={{ width: '15rem', height: '15rem' }} />
           </FlexBox>

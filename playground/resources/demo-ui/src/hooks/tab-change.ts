@@ -1,22 +1,23 @@
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 export const useTabChange = (tabs: string[]) => {
   const [value, setValue] = useState(0)
   const [search, setSearchParams] = useSearchParams()
-  const queryParams = new URLSearchParams(search)
+  const queryParams = useMemo(() => new URLSearchParams(search), [search])
   const tab = useMemo(() => queryParams.get('tab'), [queryParams])
+  const tabsRef = useRef(tabs)
 
   useEffect(() => {
     if (!tab) {
       setSearchParams({
-        tab: tabs[0],
+        tab: tabsRef.current[0],
       })
       return
     }
-    const index = tabs.indexOf(tab)
+    const index = tabsRef.current.indexOf(tab)
     const currentTab = index !== -1 ? index : 0
-    setSearchParams({ tab: tabs[currentTab] })
+    setSearchParams({ tab: tabsRef.current[currentTab] })
     setValue(currentTab)
   }, [tab, setSearchParams, setValue])
 
