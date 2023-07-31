@@ -1503,7 +1503,7 @@ Enables the flow preview service.
 <!-- vale on -->
 
 FluxNinjaExtensionConfig is the configuration for
-[FluxNinja](/fluxninja/introduction.md) integration.
+[FluxNinja integration](/reference/fluxninja.md).
 
 <dl>
 <dt>api_key</dt>
@@ -1553,7 +1553,7 @@ EnableCloudController.
 
 <!-- vale on -->
 
-Whether to connect to FluxNinja Cloud Controller.
+Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
 
 Enabling this flag configures various agent components to point to the FluxNinja
 Cloud Controller, for example configures remote etcd endpoint and disables local

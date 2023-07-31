@@ -15,6 +15,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/info"
@@ -43,6 +44,7 @@ func init() {
 	RootCmd.AddCommand(delete.DeleteCmd)
 	RootCmd.AddCommand(decisions.DecisionsCmd)
 	RootCmd.AddCommand(policiesCmd)
+	RootCmd.AddCommand(status.StatusCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

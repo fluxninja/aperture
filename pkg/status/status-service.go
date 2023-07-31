@@ -17,11 +17,16 @@ type StatusService struct {
 	registry Registry
 }
 
-// RegisterStatusService registers the StatusService implementation with the provided grpc server.
-func RegisterStatusService(server *grpc.Server, reg Registry) {
+// ProvideStatusService provides a StatusService implementation.
+func ProvideStatusService(server *grpc.Server, reg Registry) *StatusService {
 	svc := &StatusService{
 		registry: reg,
 	}
+	return svc
+}
+
+// RegisterStatusService registers the StatusService implementation with the provided grpc server.
+func RegisterStatusService(server *grpc.Server, svc *StatusService) {
 	statusv1.RegisterStatusServiceServer(server, svc)
 }
 
