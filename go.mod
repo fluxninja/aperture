@@ -48,7 +48,7 @@ require (
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.8
-	github.com/open-policy-agent/opa v0.54.0
+	github.com/open-policy-agent/opa v0.55.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.80.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.80.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.80.0
@@ -183,7 +183,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.42.1-0.20230612162650-64be7e574a17
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/proto/otlp v0.20.0
-	go.uber.org/automaxprocs v1.5.2
+	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/fx v1.20.0
 	go.uber.org/goleak v1.2.1
 	go.uber.org/multierr v1.11.0
@@ -284,7 +284,7 @@ require (
 	github.com/cloudfoundry-incubator/uaago v0.0.0-20190307164349-8136b7bbe76e // indirect
 	github.com/cncf/udpa/go v0.0.0-20220112060539-c52dc94e7fbe // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
-	github.com/containerd/ttrpc v1.1.0 // indirect
+	github.com/containerd/ttrpc v1.2.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
@@ -415,7 +415,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.80.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters v0.80.0 // indirect
 	github.com/opencontainers/runc v1.1.5 // indirect
-	github.com/opencontainers/selinux v1.10.1 // indirect
+	github.com/opencontainers/selinux v1.11.0 // indirect
 	github.com/openshift/api v3.9.0+incompatible // indirect
 	github.com/openshift/client-go v0.0.0-20230120202327-72f107311084 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
@@ -453,7 +453,7 @@ require (
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	github.com/vishvananda/netlink v1.1.1-0.20210330154013-f5de75959ad5 // indirect
+	github.com/vishvananda/netlink v1.2.1-beta.2 // indirect
 	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -603,8 +603,8 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheusremotewrite v0.80.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.80.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b // indirect
-	github.com/opencontainers/runtime-spec v1.0.3-0.20220909204839-494a5a6aca78 // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc4 // indirect
+	github.com/opencontainers/runtime-spec v1.1.0-rc.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20220216144756-c35f1ee13d7c // indirect
 	github.com/prometheus-community/prom-label-proxy v0.7.0
