@@ -1,5 +1,6 @@
 ---
 title: Agent Configuration
+sidebar_position: 3
 ---
 
 ```mdx-code-block

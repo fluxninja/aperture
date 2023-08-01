@@ -8,6 +8,8 @@ keywords:
   - cloud
   - enterprise
   - platform
+  - fluxninja
+  - aperture
 ---
 
 [FluxNinja][] is a load management platform powered by the open source project
@@ -22,6 +24,9 @@ Aperture can seamlessly integrate with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
 developers who need to establish control points around specific features or code
 sections inside applications.
+
+Here's a simplified diagram how FluxNinja Cloud interacts with your
+infrastructure. Visit [Architecture][] page for more details.
 
 ![FluxNinja Architecture](./assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
 ![FluxNinja Architecture](./assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
@@ -139,3 +144,4 @@ beneficial.
 
 [fluxninja]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
+[Architecture]: /architecture/architecture.md
