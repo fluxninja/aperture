@@ -44,7 +44,7 @@ require (
 	github.com/lithammer/dedent v1.1.0
 	github.com/looplab/tarjan v0.1.0
 	github.com/mitchellh/copystructure v1.2.0
-	github.com/mitchellh/mapstructure v1.5.0
+	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.8
@@ -162,11 +162,11 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.etcd.io/etcd/api/v3 v3.5.9
 	go.etcd.io/etcd/client/v3 v3.5.9
-	go.opentelemetry.io/collector v0.80.0
-	go.opentelemetry.io/collector/component v0.80.0
-	go.opentelemetry.io/collector/confmap v0.80.0
-	go.opentelemetry.io/collector/connector v0.80.0
-	go.opentelemetry.io/collector/consumer v0.80.0
+	go.opentelemetry.io/collector v0.82.0
+	go.opentelemetry.io/collector/component v0.82.0
+	go.opentelemetry.io/collector/confmap v0.82.0
+	go.opentelemetry.io/collector/connector v0.82.0
+	go.opentelemetry.io/collector/consumer v0.82.0
 	go.opentelemetry.io/collector/exporter v0.80.0
 	go.opentelemetry.io/collector/exporter/loggingexporter v0.80.0
 	go.opentelemetry.io/collector/exporter/otlpexporter v0.80.0
@@ -174,7 +174,7 @@ require (
 	go.opentelemetry.io/collector/extension v0.80.0
 	go.opentelemetry.io/collector/extension/ballastextension v0.80.0
 	go.opentelemetry.io/collector/extension/zpagesextension v0.80.0
-	go.opentelemetry.io/collector/pdata v1.0.0-rcv0013
+	go.opentelemetry.io/collector/pdata v1.0.0-rcv0014
 	go.opentelemetry.io/collector/processor v0.80.0
 	go.opentelemetry.io/collector/processor/batchprocessor v0.80.0
 	go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.80.0
@@ -474,11 +474,11 @@ require (
 	go.opentelemetry.io/collector/config/confighttp v0.80.0 // indirect
 	go.opentelemetry.io/collector/config/confignet v0.80.0 // indirect
 	go.opentelemetry.io/collector/config/configopaque v0.80.0 // indirect
-	go.opentelemetry.io/collector/config/configtelemetry v0.80.0 // indirect
+	go.opentelemetry.io/collector/config/configtelemetry v0.82.0 // indirect
 	go.opentelemetry.io/collector/config/configtls v0.80.0 // indirect
 	go.opentelemetry.io/collector/config/internal v0.80.0 // indirect
 	go.opentelemetry.io/collector/extension/auth v0.80.0 // indirect
-	go.opentelemetry.io/collector/featuregate v1.0.0-rcv0013 // indirect
+	go.opentelemetry.io/collector/featuregate v1.0.0-rcv0014 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.17.0 // indirect
 	go.opentelemetry.io/otel/bridge/opencensus v0.39.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
