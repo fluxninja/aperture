@@ -3,7 +3,7 @@ module github.com/fluxninja/aperture/v2
 go 1.20
 
 require (
-	github.com/BurntSushi/toml v1.2.1
+	github.com/BurntSushi/toml v1.3.2
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
