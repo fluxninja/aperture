@@ -319,6 +319,9 @@ operator:
 ## @skip controller.createUninstallHook
 ##
 controller:
+  ## @param controller.crName Specifies the name of the CR for Controller.
+  ##
+  crName: ""
   ## @param controller.namespaceScoped Specifies whether the Controller installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over controller.create.
   ##
   namespaceScoped: false
@@ -536,9 +539,12 @@ controller:
       lease_ttl: 60s
     ## Prometheus parameters for Controller
     ## @param controller.config.prometheus.address specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty when prometheus.enabled is set to false.
+    ## @param controller.config.prometheus.labels specifies the labels to attach to metrics.
     ##
     prometheus:
       address: ~
+      labels: []
+
 
 ## @section Ingress
 ##

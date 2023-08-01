@@ -2,7 +2,7 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "controller.cr.name" (dict "crName" .Values.controller.crName "context" . $) }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aperture-controller-manager
@@ -201,4 +201,7 @@ spec:
       endpoints: {{ include "controller.etcd.endpoints" (dict "etcd" .Values.controller.config.etcd "context" . $) }}
     prometheus:
       address: {{ include "controller.prometheus.address" (dict "prometheus" .Values.controller.config.prometheus "context" . $) }}
+      {{- if .Values.controller.config.prometheus.labels }}
+      labels: {{ .Values.controller.config.prometheus.labels | toYaml | nindent 6 }}
+      {{- end }}
 {{- end }}

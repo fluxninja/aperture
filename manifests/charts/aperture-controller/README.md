@@ -104,6 +104,7 @@
 
 | Name                                                         | Description                                                                                                                                                               | Value                 |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `controller.crName`                                          | Specifies the name of the CR for Controller.                                                                                                                              | `""`                  |
 | `controller.namespaceScoped`                                 | Specifies whether the Controller installation should be namespace-scoped, avoiding the creation of cluster-level resources. This takes precedence over controller.create. | `false`               |
 | `controller.serverCert.secretName`                           | Specifies the name of the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.                                  | `nil`                 |
 | `controller.serverCert.certFileName`                         | Specifies the key for Cert file in the secret containing the server certificate for Controller. Used when .Values.controller.namespaceScoped is true.                     | `crt.pem`             |
@@ -164,6 +165,7 @@
 | `controller.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty when etcd.enabled is set to false.                                                   | `[]`                  |
 | `controller.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                                                                                       | `60s`                 |
 | `controller.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty when prometheus.enabled is set to false.                   | `nil`                 |
+| `controller.config.prometheus.labels`                        | specifies the labels to attach to metrics.                                                                                                                                | `[]`                  |
 
 ### Ingress
 
