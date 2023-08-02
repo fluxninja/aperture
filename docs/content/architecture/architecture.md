@@ -16,8 +16,8 @@ keywords:
   # TODO
 ---
 
-The diagram below shows interaction between main components of
-[Aperture][]-powered [FluxNinja][] platform: FluxNinja Cloud, Aperture Agents
+The diagram below shows the interaction between the main components of
+[Aperture][]-powered [FluxNinja][] platform: FluxNinja Cloud, Aperture Agents,
 and various integrations.
 
 ![FluxNinja Architecture](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
@@ -28,30 +28,30 @@ evaluating policies. Policy evaluation is performed by Aperture Controller and
 results in high-level decisions, which are then sent down to Aperture Agents.
 
 Aperture Agents are part of the system that's much closer to the infrastructure
-– they're installed on every node. Agents are where actual execution of policies
-takes place. Note that while Agents by themselves are able to collect some
-metrics and perform limited actions like auto-scaling, they need
+– they're installed on every node. The Agents are where the actual execution of
+policies takes place. Note that while the Agents by themselves are able to
+collect some metrics and perform limited actions like auto-scaling, they need
 [integrations][] to actually control the traffic.
 
 Aperture provides [integrations][] for service meshes and gateways. It's also
 possible to instrument your application directly with [Aperture SDKs][]. When
-integration is enabled, it will ask the Agent on local node to make a decision
-for every request or flow. Note that this RPC call never leaves the node, so its
-overhead and impact on latency is minimized.
+integration is enabled, it will ask the Agent on the local node to make a
+decision for every request or flow. Note that this RPC call never leaves the
+node, so its overhead and impact on latency are minimized.
 
 ## FluxNinja Cloud
 
 FluxNinja Cloud is a centralized platform that provides tools for policy
 management and observability. There are two significant components of FluxNinja
-Cloud worth mentioning: The analytics database and Aperture Controller.
+Cloud worth mentioning: The analytics database and the Aperture Controller.
 
 ### Analytics database
 
 FluxNinja uses a real-time analytics database to support FluxNinja observability
 capabilities. All the logs and traces collected by Aperture Agents are batched
-and rolled up and sent to FluxNinja. Thanks to use of rollup, similar events are
-aggregated to reduce the traffic, but no data is lost (as it would with usage of
-sampling-based solutions).
+and rolled up and sent to FluxNinja. Thanks to the use of rollup, similar events
+are aggregated to reduce the traffic, but no data is lost (as it would with
+usage of sampling-based solutions).
 
 ### Aperture Controller
 
@@ -121,8 +121,8 @@ syntax.
 
 :::info
 
-For more details about interaction between Aperture Controller and Agents and
-the exact databases, see [Architecture of Self-Hosted Aperture][].
+For more details about the interaction between Aperture Controller and Agents
+and the exact databases, see [Architecture of Self-Hosted Aperture][].
 
 :::
 
