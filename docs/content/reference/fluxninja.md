@@ -114,4 +114,4 @@ How various components interact with the extension:
 
 [Self-Hosting]: /self-hosting/self-hosting.md
 [FluxNinja Cloud]: /introduction.md
-[Aperture Controller]: /self-hosting/controller/controller.md
+[Aperture Controller]: /architecture/architecture.md#aperture-controller

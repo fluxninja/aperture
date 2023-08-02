@@ -63,7 +63,7 @@ and can result in unpredictable behavior.
       The Aperture Agent can also be installed with only namespace-scoped
       resources.
 
-2. [**Bare Metal or VM**](bare_metal.md)
+2. [**Bare Metal or VM**](bare-metal.md)
 
    The Aperture Agent can be installed as a system service on any Linux system
    that is [supported](../supported-platforms.md).

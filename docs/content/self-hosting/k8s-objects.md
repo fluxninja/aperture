@@ -16,10 +16,11 @@ to manage policies using Kubernetes Objects (in addition to usual way via
 `aperturectl`). Aperture Controller installation includes the Policy Custom
 Resource Definition.
 
-Such Policy objects can be prepared from blueprints via
+Policy objects can be created by hand or prepared from blueprints via
 [`aperturectl blueprints generate`][generate] command ([Generating Policies and
 Dashboards][] contains an example how to run this command). [Take a look here,
 how a Policy object could look like][Example] (look for "Generated Policy").
+Such a Policy can be then applied with regular `kubectl apply`.
 
 [generate]: /reference/aperturectl/blueprints/generate/generate.md
 [Generating Policies and Dashboards]:

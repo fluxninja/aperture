@@ -13,10 +13,10 @@ keywords:
   - fluxninja
   - microservices
   - cloud
-  - TODO
+  # TODO
 ---
 
-The diagram belows shows interaction between main components of
+The diagram below shows interaction between main components of
 [Aperture][]-powered [FluxNinja][] platform: FluxNinja Cloud, Aperture Agents
 and various integrations.
 
@@ -79,6 +79,13 @@ disseminating the calculated adjustments to the Agents, the Controller ensures
 that the Agents take localized actions in line with the global state of the
 system.
 
+:::note
+
+Here the Aperture Controller is shown as part of FluxNinja Cloud Platform, but
+it's also possible to [self-host it][Self-Hosting].
+
+:::
+
 ## Aperture Agents
 
 Aperture Agents are the workhorses of the platform, providing powerful flow
@@ -99,10 +106,10 @@ example, a video streaming service might prioritize a request to play a movie by
 a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
-Aperture Agents can be installed on a variety of infrastructure such as
-Kubernetes, VMs, or bare-metal. In addition to flow control capabilities, Agents
-work with auto-scaling APIs for platforms such as Kubernetes, to help scale
-infrastructure when needed.
+Aperture Agents can be [installed on a variety of
+infrastructure][Install Agents] such as Kubernetes, VMs, or bare-metal. In
+addition to flow control capabilities, Agents work with auto-scaling APIs for
+platforms such as Kubernetes, to help scale infrastructure when needed.
 
 ### Metrics
 
@@ -128,3 +135,5 @@ the exact databases, see [Architecture of Self-Hosted Aperture][].
 [integrations]: /integrations/integrations.md
 [Aperture SDKs]: /integrations/sdk/sdk.md
 [Metrics]: /integrations/metrics/metrics.md
+[Install Agents]: /get-started/installation/agent/agent.md
+[Self-Hosting]: /self-hosting/self-hosting.md
