@@ -85,8 +85,9 @@ existing services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
-No, as for now, we only support deploying [Aperture
-Controller][Aperture Controller] on a Kubernetes cluster.
+No, as for now, we only support deploying [Aperture Controller][] on a
+Kubernetes cluster. Remember that it's also possible to use [FluxNinja Cloud
+Controller] instead of deploying your own.
 
 ### Can the Aperture Agent run in a non-containerized environment?
 
@@ -94,7 +95,7 @@ Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the
 [Supported Linux platforms](/get-started/installation/supported-platforms.md).
 The installation steps are available
-[here](/get-started/installation/agent/bare_metal.md).
+[here](/get-started/installation/agent/bare-metal.md).
 
 ### What are Aperture Agent's performance numbers?
 
@@ -123,4 +124,5 @@ We have observed the following performance numbers:
 [Flux Meter]: /concepts/flux-meter.md
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
-[Aperture Controller]: /self-hosting/controller/controller.md
+[Aperture Controller]: /architecture/architecture.md#aperture-controller
+[FluxNinja Cloud Controller]: /reference/fluxninja.md#cloud-controller

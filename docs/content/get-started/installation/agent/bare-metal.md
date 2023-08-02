@@ -20,7 +20,7 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion
 ```
 
 The Aperture Agent can be installed as a system service on any Linux system that
-is [supported](../supported-platforms.md)).
+is [supported](../supported-platforms.md).
 
 ## Download {#agent-download}
 
