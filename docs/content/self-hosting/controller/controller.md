@@ -1,5 +1,5 @@
 ---
-title: Aperture Controller
+title: Self-Hosted Aperture Controller
 description: Install Aperture Controller
 keywords:
   - install
