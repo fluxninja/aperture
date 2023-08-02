@@ -13,19 +13,20 @@ To avoid specifying `--controller` and `--api-key` in every `aperturectl` invoca
 aperturectl can use a configuration file located in `~/.aperturectl/config`.
 
 Location of this file can be overridden by `APERTURE_CONFIG` environment
-variable and `--config` option (with the commandline option having higher
+variable and `--config` option (with the command-line option having higher
 precedence).
 
-Config file is ignored when any explicit flag related to controller
-location (such as `--kube`, `--controller` or `--api-key`) is passed.
+When any explicit flag related to controller location (e.g., --kube,
+--controller, or --api-key) is used, the _entire_ configuration file is
+ignored.
 
 If the config file is not specified nor present at the default location,
-aperturectl will try to find the controller at the local kubernetes cluster (as
-if `--kube` flag was passed).
+aperturectl will try to find the controller at the local Kubernetes cluster (as
+if the `--kube` flag were passed).
 
 ## Format
 
-The aperturectl configuration file uses following [TOML][] syntax:
+The aperturectl configuration file uses the following [TOML][] syntax:
 
 ```toml
 [controller]
@@ -33,8 +34,9 @@ url = "controller hostname:port"
 api_key = "api key for the controller"
 ```
 
-All the fields are required. See [Configuring aperturectl][] for an example
-how to configure aperturectl with [FluxNinja Cloud Controller][].
+All the fields are required (although the file itself is not). See [Configuring
+aperturectl][] for an example on how to configure aperturectl with [FluxNinja
+Cloud Controller][].
 
 :::tip
 
