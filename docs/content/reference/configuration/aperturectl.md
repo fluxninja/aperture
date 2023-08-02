@@ -1,7 +1,7 @@
 ---
 title: aperturectl Configuration File Format Reference
 sidebar_position: 5
-sidebar_label: .aperturectl/config
+sidebar_label: ".aperturectl/config"
 ---
 
 <!-- If our config grows, would be nice to automatically generate it from
