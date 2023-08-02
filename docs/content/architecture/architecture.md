@@ -35,15 +35,15 @@ metrics and perform limited actions like auto-scaling, they need
 
 Aperture provides [integrations][] for service meshes and gateways. It's also
 possible to instrument your application directly with [Aperture SDKs][]. When
-integration is enabled, it will ask the Agent on local node to make a decisions
-for every request or flow. Note that this RPC call never leaves the node so its
+integration is enabled, it will ask the Agent on local node to make a decision
+for every request or flow. Note that this RPC call never leaves the node, so its
 overhead and impact on latency is minimized.
 
 ## FluxNinja Cloud
 
 FluxNinja Cloud is a centralized platform that provides tools for policy
-management and observability. There are two significants components of FluxNinja
-Cloud worth mentioning: The analycis database and Aperture Controller.
+management and observability. There are two significant components of FluxNinja
+Cloud worth mentioning: The analytics database and Aperture Controller.
 
 ### Analytics database
 
