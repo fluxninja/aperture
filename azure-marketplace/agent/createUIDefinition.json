@@ -173,7 +173,7 @@
             "defaultValue": "",
             "constraints": {
               "required": true,
-              "regex": "^(\\[\\s*(\"(?:https?://)?(?:[\\w-]+(?:\\.[\\w-]+)*(?::\\d+)?)\"\\s*,\\s*)*\"(?:https?://)?(?:[\\w-]+(?:\\.[\\w-]+)*(?::\\d+)?)\"\\s*\\])$",
+              "regex": "^\"https?://[^\\s,]+(,https?://[^\\s,]+)*\"$",
               "validationMessage": "The given url is not correct."
             }
           },
