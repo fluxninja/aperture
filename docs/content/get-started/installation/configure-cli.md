@@ -14,10 +14,12 @@ url = "ORGANIZATION_NAME.app.fluxninja.com:443"
 api_key = "API_KEY"
 ```
 
-:::tip
+Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja organization
+name and api key created for your project.
 
-You can create multiple configuration files and use `APERTURE_CONFIG`
-environment variable to switch between them.
+:::info
+
+See also [aperturectl configuration file format reference][].
 
 :::
 
@@ -26,9 +28,12 @@ environment variable to switch between them.
 With a [Self-Hosted][self-hosted] Aperture Controller, if the Controller is at
 the cluster pointed at by `~/.kube/config` or `KUBECONFIG`, no configuration
 file nor flags are needed at all. Otherwise, you need the `--controller` flag.
-See [aperturectl][] reference for details.
 
 :::
 
+<!-- prettier-ignore-start -->
+
 [self-hosted]: /self-hosting/self-hosting.md
-[aperturectl]: /reference/aperturectl/aperturectl.md
+[aperturectl configuration file format reference]: /reference/configuration/aperturectl.md
+
+<!-- prettier-ignore-end -->

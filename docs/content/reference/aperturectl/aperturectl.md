@@ -12,6 +12,12 @@ keywords:
 
 For installation instructions, see [installing aperturectl](/get-started/installation/aperture-cli/aperture-cli.md).
 
+:::
+
+:::info
+
+See also [aperturectl configuration file format reference](/reference/configuration/aperturectl.md).
+
 :::## aperturectl
 
 aperturectl - CLI tool to interact with Aperture
