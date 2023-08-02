@@ -36,12 +36,14 @@ var controllerNs string
 
 // ControllerConfig is the config file structure for FluxNinja Cloud Controller.
 type ControllerConfig struct {
+	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
 	URL    string `toml:"url"`
 	APIKey string `toml:"api_key"`
 }
 
 // Config is the config file structure for Aperture.
 type Config struct {
+	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
 	Controller *ControllerConfig `toml:"controller"`
 }
 
@@ -111,7 +113,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.config,
 		"config",
 		"",
-		"Path to the Aperture config file",
+		"Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG",
 	)
 }
 
