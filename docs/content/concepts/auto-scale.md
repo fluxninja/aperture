@@ -8,6 +8,10 @@ keywords:
   - Kubernetes
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 Auto-scaling is a crucial technique for effective load management of service
 traffic. It enables service operators to automatically adjust the number of
 instances or resources allocated to a service based on current or expected
