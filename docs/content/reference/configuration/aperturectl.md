@@ -21,8 +21,8 @@ When any explicit flag related to controller location (e.g., --kube,
 ignored.
 
 If the configuration file is not specified nor present at the default location,
-aperturectl will try to find the controller at the local Kubernetes cluster (as
-if the `--kube` flag were passed).
+aperturectl will try to find the controller in the Kubernetes cluster (pointed
+at by `~/.kube/config` or `KUBECONFIG` – as if the `--kube` flag were passed).
 
 ## Format
 
