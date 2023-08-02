@@ -116,8 +116,8 @@ platforms such as Kubernetes, to help scale infrastructure when needed.
 Aperture Agents use metrics to provide input signals to policies in the Aperture
 Controller. These metrics can either be defined based on existing traffic using
 [Flux Meters](/concepts/flux-meter.md) or using [any OpenTelemetry Collector
-receiver][Metrics]. These metrics can then be used in policies using PromQL
-syntax.
+receiver][Metrics]. These metrics can then be used in policies using [PromQL
+syntax][].
 
 :::info
 
@@ -137,3 +137,4 @@ and the exact databases, see [Architecture of Self-Hosted Aperture][].
 [Metrics]: /integrations/metrics/metrics.md
 [Install Agents]: /get-started/installation/agent/agent.md
 [Self-Hosting]: /self-hosting/self-hosting.md
+[PromQL syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/
