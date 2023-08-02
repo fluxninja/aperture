@@ -20,7 +20,7 @@ When any explicit flag related to controller location (e.g., --kube,
 --controller, or --api-key) is used, the _entire_ configuration file is
 ignored.
 
-If the config file is not specified nor present at the default location,
+If the configuration file is not specified nor present at the default location,
 aperturectl will try to find the controller at the local Kubernetes cluster (as
 if the `--kube` flag were passed).
 
