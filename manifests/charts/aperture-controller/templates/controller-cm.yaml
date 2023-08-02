@@ -33,5 +33,8 @@ data:
       {{- end }}
       endpoints: {{ include "controller.etcd.endpoints" (dict "etcd" .Values.controller.config.etcd "context" . $) }}
     prometheus:
+      {{- if (omit .Values.controller.config.prometheus "address")}}
+      {{- omit .Values.controller.config.prometheus "address" | toYaml | nindent 6 }}
+      {{- end }}
       address: {{ include "controller.prometheus.address" (dict "prometheus" .Values.controller.config.prometheus "context" . $) }}
 {{- end }}
