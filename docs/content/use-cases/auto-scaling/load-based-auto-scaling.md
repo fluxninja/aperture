@@ -158,8 +158,4 @@ throttling.
 After the scale-out cooldown period, the periodic scale-in function is
 triggered, which reduces the number of replicas in response to decreased load.
 
-<Zoom>
-
 ![Auto Scale](./assets/load-based-auto-scaling/dashboard.png)
-
-</Zoom>
