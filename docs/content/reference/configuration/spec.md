@@ -6303,8 +6303,8 @@ setting.
 :::caution
 
 When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-labels are sent to FluxNinja for observability. Telemetry should be disabled for
-sensitive labels.
+labels are sent to FluxNinja Cloud for observability. Telemetry should be
+disabled for sensitive labels.
 
 :::
 
@@ -6454,8 +6454,8 @@ setting.
 :::caution
 
 When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-labels are sent to FluxNinja for observability. Telemetry should be disabled for
-sensitive labels.
+labels are sent to FluxNinja Cloud for observability. Telemetry should be
+disabled for sensitive labels.
 
 :::
 

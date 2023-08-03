@@ -120,35 +120,19 @@ kubectl apply -f policy.yaml -n aperture-controller
 As the service processes traffic, various signal metrics collected from the
 execution of the policy can be visualized:
 
-<Zoom>
-
 ![LATENCY](./assets/detecting-overload/latency.png) `LATENCY`: Signal gathered
 from the periodic execution of PromQL query on _Flux Meter_ metrics.
 
-</Zoom>
-
-<Zoom>
-
 ![LATENCY_EMA](./assets/detecting-overload/latency_ema.png) `LATENCY_EMA`:
 Exponential Moving Average of `LATENCY` signal.
-
-</Zoom>
-
-<Zoom>
 
 ![LATENCY_SETPOINT](./assets/detecting-overload/latency_setpoint.png)
 `LATENCY_SETPOINT`: Latency above which the service is considered to be
 overloaded. This is calculated by multiplying the exponential moving average
 with a tolerance factor (`LATENCY_EMA` \* `1.1`).
 
-</Zoom>
-
-<Zoom>
-
 ![IS_OVERLOAD_SWITCH](./assets/detecting-overload/is_overload_switch.png)
 `IS_OVERLOAD_SWITCH` is a signal that represents whether the service is in an
 overloaded state. This signal is derived by comparing `LATENCY` with
 `LATENCY_SETPOINT`. A value of `0` indicates no overload, while a value of `1`
 signals an overload.
-
-</Zoom>

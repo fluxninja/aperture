@@ -188,9 +188,4 @@ policy.
 
 :::
 
-<Zoom>
-
 ![Load Ramping with Average Latency Feedback](./assets/average-latency-feedback/dashboard.png)
-
-</Zoom>
-````

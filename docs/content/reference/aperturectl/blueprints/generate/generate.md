@@ -31,7 +31,7 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 ### Options
 
 ```
-      --api-key string         FluxNinja API Key to be used when using Cloud Controller
+      --api-key string         FluxNinja Cloud API Key to be used when using Cloud Controller
       --apply                  Apply generated policies on the Kubernetes cluster in the namespace where Aperture Controller is installed
       --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Controller

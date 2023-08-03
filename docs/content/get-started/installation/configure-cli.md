@@ -5,8 +5,8 @@ keywords:
 sidebar_position: 2
 ---
 
-Configure aperturectl to point to your FluxNinja endpoint: Save the following as
-`~/.aperturectl/config`:
+Configure aperturectl to point to your FluxNinja Cloud endpoint: Save the
+following as `~/.aperturectl/config`:
 
 ```toml
 [controller]
@@ -14,8 +14,8 @@ url = "ORGANIZATION_NAME.app.fluxninja.com:443"
 api_key = "API_KEY"
 ```
 
-Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja organization
-name and api key created for your project.
+Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
+organization name and api key created for your project.
 
 :::info
 

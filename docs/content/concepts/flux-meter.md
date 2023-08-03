@@ -6,6 +6,10 @@ keywords:
   - histograms
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 :::info See also
 
 [_Flux Meter_ reference][reference]

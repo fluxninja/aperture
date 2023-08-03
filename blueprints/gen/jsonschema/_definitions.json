@@ -2533,7 +2533,7 @@
       "properties": {
         "telemetry": {
           "default": true,
-          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled\nlabels are sent to FluxNinja for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
+          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled\nlabels are sent to FluxNinja Cloud for observability. Telemetry should\nbe disabled for sensitive labels.\n\n:::\n\n",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/flow-label.md#baggage)",
           "type": "boolean",
           "x-go-tag-default": "true"
@@ -2578,7 +2578,7 @@
         },
         "telemetry": {
           "default": true,
-          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled\nlabels are sent to FluxNinja for observability. Telemetry should be disabled for\nsensitive labels.\n\n:::\n\n",
+          "description": ":::note\n\nThe flow label is always accessible in Aperture Policies regardless of this setting.\n\n:::\n\n:::caution\n\nWhen using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled\nlabels are sent to FluxNinja Cloud for observability. Telemetry should be\ndisabled for sensitive labels.\n\n:::\n\n",
           "title": "Decides if the created flow label should be available as an attribute in OLAP telemetry and\npropagated in [baggage](/concepts/flow-label.md#baggage)",
           "type": "boolean",
           "x-go-tag-default": "true"

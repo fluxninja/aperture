@@ -66,8 +66,8 @@ Without [Aperture Controller][], Aperture Agents won't be able to work.
 While it's possible to [self-host][Self-Hosting] Aperture Controller,
 FluxNinja Cloud Controller can be used instead.
 
-FluxNinja Cloud Controller is an [Aperture Controller] hosted by FluxNinja.
-The Cloud Controller is available for every FluxNinja Organization in the
+FluxNinja Cloud Controller is an [Aperture Controller] hosted by FluxNinja Cloud.
+The Cloud Controller is available for every FluxNinja Cloud Organization in the
 `default` project.
 
 ## Configuration
@@ -96,7 +96,7 @@ installation of the Aperture Controller or Agent:
 </Tabs>
 
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
-of the organization on FluxNinja and API Key generated on it.
+of the organization on FluxNinja Cloud and API Key generated on it.
 
 More specific details about particular agent installation modes could be found
 in [Get Started: Installation](/get-started/installation/agent/agent.md).
