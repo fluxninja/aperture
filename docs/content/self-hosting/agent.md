@@ -85,8 +85,8 @@ You may need to adjust the endpoints, depending on your exact setup.
 
 :::info
 
-If you're not using [FluxNinja][] at all, simply remove the `fluxninja` and
-`secrets` sections.
+If you're not using [FluxNinja Cloud][] at all, simply remove the `fluxninja`
+and `secrets` sections.
 
 :::
 
@@ -97,5 +97,5 @@ commands (like `flow-control`) won't work.
 
 :::
 
-[FluxNinja]: /introduction.md
+[FluxNinja Cloud]: /introduction.md
 [install-agent]: /get-started/installation/agent/agent.md
