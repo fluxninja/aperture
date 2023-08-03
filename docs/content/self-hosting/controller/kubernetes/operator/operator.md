@@ -6,7 +6,7 @@ keywords:
   - setup
   - controller
   - operator
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block
@@ -15,6 +15,17 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVersion.js';
 ```
+
+:::info
+
+This method requires access to create cluster level resources like ClusterRole,
+ClusterRoleBinding, CustomResourceDefinition and so on.
+
+Please use the
+[Namespace-scoped Installation](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md)
+if you do not want to assign the cluster level permissions.
+
+:::
 
 ## Controller Custom Resource Definition
 

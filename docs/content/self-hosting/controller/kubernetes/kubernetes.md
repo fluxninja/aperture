@@ -110,17 +110,25 @@ and can result in unpredictable behavior.
 
 :::
 
-1. [**Install with Operator**](operator/operator.md)
-
-   The Aperture Controller can be installed using the Kubernetes Operator
-   available for it. This method requires access to create cluster level
-   resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition and
-   so on.
-
-2. [**Namespace-scoped Installation**](namespace-scoped/namespace-scoped.md)
+1. [**Namespace-scoped Installation**][namespace-scoped-installation]
 
    The Aperture Controller can also be installed with only namespace-scoped
    resources.
+
+2. [**Install with Operator**](operator/operator.md)
+
+   The Aperture Controller can be installed using the Kubernetes Operator
+   available for it.
+
+   :::info
+
+   This method requires access to create cluster level resources like
+   ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
+
+   Please use the [Namespace-scoped Installation][namespace-scoped-installation]
+   if you do not want to assign the cluster level permissions.
+
+   :::
 
 <!-- vale off -->
 
@@ -217,3 +225,5 @@ of the Kubernetes cluster based on your infrastructure.
 8. Once the `ADDRESS` matches the External IP, the etcd will be accessible on
    `http://etcd.YOUR_DOMAIN_HERE:80` and the Prometheus will be accessible on
    `http://prometheus.YOUR_DOMAIN_HERE:80`.
+
+[namespace-scoped-installation]: namespace-scoped/namespace-scoped.md

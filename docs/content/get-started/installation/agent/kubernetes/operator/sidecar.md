@@ -16,6 +16,17 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../../../../apertureVersion.js';
 ```
 
+:::info
+
+This method requires access to create cluster level resources like ClusterRole,
+ClusterRoleBinding, CustomResourceDefinition and so on.
+
+Please use the
+[Namespace-scoped Installation](/get-started/installation/agent/kubernetes/namespace-scoped/namespace-scoped.md)
+if you do not want to assign the cluster level permissions.
+
+:::
+
 The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a
 new pod is started with required labels and annotations, the agent container
 will be attached with the pod.
