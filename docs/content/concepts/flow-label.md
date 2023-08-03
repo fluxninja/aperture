@@ -3,6 +3,10 @@ title: Flow Label
 sidebar_position: 4
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 A flow is the fundamental unit of work from the perspective of an Aperture
 agent. It could be an API call, a feature, or even a database query. A flow in
 Aperture is similar to [OpenTelemetry span][span]. Each flow is annotated with a

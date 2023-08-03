@@ -12,6 +12,11 @@ sidebar_position: 2
 sidebar_label: Managing Quotas
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import DocCardList from '@theme/DocCardList';
+```
+
 ## Overview
 
 Quota scheduling is a sophisticated technique that enables effective management
@@ -59,9 +64,5 @@ preventing any single client application from monopolizing the database service
 or exhausting the available quota. Additionally, with Aperture's quota
 scheduling, the system becomes spend-aware, ensuring it stays within quota
 limits and avoids cost overages.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

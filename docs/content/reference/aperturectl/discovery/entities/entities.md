@@ -41,7 +41,7 @@ aperturectl discovery entities --find-by=“ip=10.244.1.24”
 
 ```
       --api-key string         FluxNinja API Key to be used when using Cloud Controller
-      --config string          Path to the Aperture config file
+      --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS

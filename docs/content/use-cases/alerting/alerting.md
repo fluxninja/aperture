@@ -7,6 +7,11 @@ sidebar_position: 5
 sidebar_label: Alerting
 ---
 
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+import Zoom from 'react-medium-image-zoom';
+```
+
 ## Overview
 
 Aperture provides a versatile solution for defining complex alert criteria using
@@ -29,12 +34,12 @@ channels, ensuring prompt response to any potential issues.
 {@include: ./assets/alerting/alerting.mmd}
 ```
 
+</Zoom>
+
 The diagram depicts Agents collecting metrics into Prometheus (the metrics can
 be collected by any other mechanism). These metrics are queried by the
 Controller, processed in the circuit-based policies to compute Alert events
 which are relayed to the Alert Manager.
-
-</Zoom>
 
 ## Example Scenario
 
@@ -42,9 +47,5 @@ Examples of complex alerting scenarios include:
 
 1. Auto-learning the alerting threshold based on past trends.
 2. Threshold based alert conditions combining multiple metrics.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

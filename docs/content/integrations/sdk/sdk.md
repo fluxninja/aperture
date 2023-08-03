@@ -14,6 +14,7 @@ sidebar_label: SDKs
 ```mdx-code-block
 import {apertureVersion} from '../../apertureVersion.js';
 import DocCardList from '@theme/DocCardList';
+import Zoom from 'react-medium-image-zoom';
 ```
 
 For services to control flows with Aperture Agent, [Control
