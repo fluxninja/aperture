@@ -6,6 +6,11 @@ sidebar_position: 3
 sidebar_label: Rate Limiting
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import DocCardList from '@theme/DocCardList';
+```
+
 :::note
 
 The following policy is based on the
@@ -57,9 +62,5 @@ its APIs. Each user of the platform gets identified by a unique key and assigned
 a specific rate limit, controlled by the Aperture's distributed rate limiter.
 For instance, the platform might allow a user to make a certain number of
 requests per minute to post content, retrieve posts, or send messages.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

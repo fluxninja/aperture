@@ -132,11 +132,7 @@ guests.
 The below dashboard shows that, during overload periods, requests from
 `subscriber` users have a higher acceptance rate than those from `guest` users.
 
-<Zoom>
-
 ![Workload Prioritization](./assets/workload-prioritization/dashboard.png)
-
-</Zoom>
 
 ### Demo Video
 

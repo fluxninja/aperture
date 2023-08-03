@@ -13,6 +13,7 @@ import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
+import Zoom from 'react-medium-image-zoom';
 ```
 
 Integrating Aperture with Nginx using Lua modules.

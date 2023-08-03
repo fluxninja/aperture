@@ -6,6 +6,11 @@ sidebar_position: 1
 sidebar_label: Adaptive Service Protection
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import DocCardList from '@theme/DocCardList';
+```
+
 ## Overview
 
 Adaptive service protection leverages closed-loop feedback of service health
@@ -59,9 +64,5 @@ the service begins to deteriorate. This prevents service overloads, which reduce
 good throughput and lead to cascading failures. Load scheduling policy ensures
 smooth service operation and a consistent user experience for a successful sales
 event.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

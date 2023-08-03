@@ -139,11 +139,7 @@ requests admitted into the service. This approach helps protect the service from
 becoming unresponsive and maintains the current latency within the tolerance
 limit (`1.1`) of historical latency.
 
-<Zoom>
-
 ![Basic Service Protection](./assets/average-latency-feedback/dashboard.png)
-
-</Zoom>
 
 ### Dry Run Mode
 

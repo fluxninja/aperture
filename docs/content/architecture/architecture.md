@@ -16,6 +16,10 @@ keywords:
   # TODO
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 The diagram below shows the interaction between the main components of
 [Aperture][]-powered [FluxNinja][] platform: FluxNinja Cloud, Aperture Agents,
 and various integrations.
