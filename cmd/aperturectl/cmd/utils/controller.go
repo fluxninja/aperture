@@ -107,7 +107,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.apiKey,
 		"api-key",
 		"",
-		"FluxNinja API Key to be used when using Cloud Controller",
+		"FluxNinja Cloud API Key to be used when using Cloud Controller",
 	)
 	flags.StringVar(
 		&c.config,

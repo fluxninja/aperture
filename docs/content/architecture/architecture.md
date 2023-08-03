@@ -51,11 +51,11 @@ Cloud worth mentioning: The analytics database and the Aperture Controller.
 
 ### Analytics database
 
-FluxNinja uses a real-time analytics database to support FluxNinja observability
-capabilities. All the logs and traces collected by Aperture Agents are batched
-and rolled up and sent to FluxNinja. Thanks to the use of rollup, similar events
-are aggregated to reduce the traffic, but no data is lost (as it would with
-usage of sampling-based solutions).
+FluxNinja uses a real-time analytics database to support FluxNinja Cloud
+observability capabilities. All the logs and traces collected by Aperture Agents
+are batched and rolled up and sent to FluxNinja. Thanks to the use of rollup,
+similar events are aggregated to reduce the traffic, but no data is lost (as it
+would with usage of sampling-based solutions).
 
 ### Aperture Controller
 

@@ -1169,8 +1169,8 @@ type Rule struct {
 	// :::caution
 	//
 	// When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-	// labels are sent to FluxNinja for observability. Telemetry should be disabled for
-	// sensitive labels.
+	// labels are sent to FluxNinja Cloud for observability. Telemetry should be
+	// disabled for sensitive labels.
 	//
 	// :::
 	Telemetry bool `protobuf:"varint,3,opt,name=telemetry,proto3" json:"telemetry,omitempty" default:"true"` // @gotags: default:"true"
@@ -3312,8 +3312,8 @@ type Rego_LabelProperties struct {
 	// :::caution
 	//
 	// When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-	// labels are sent to FluxNinja for observability. Telemetry should be disabled for
-	// sensitive labels.
+	// labels are sent to FluxNinja Cloud for observability. Telemetry should
+	// be disabled for sensitive labels.
 	//
 	// :::
 	Telemetry bool `protobuf:"varint,1,opt,name=telemetry,proto3" json:"telemetry,omitempty" default:"true"` // @gotags: default:"true"

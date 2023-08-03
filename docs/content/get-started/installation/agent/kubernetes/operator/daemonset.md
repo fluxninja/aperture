@@ -94,7 +94,7 @@ Kubernetes Objects which will be created by following steps are listed
          value: API_KEY
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
    organization name and api key created for your project.
 
    :::note
@@ -220,7 +220,7 @@ Kubernetes Objects which will be created by following steps are listed
             value: API_KEY
       ```
 
-      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
       organization name and api key created for your project.
 
       :::note
