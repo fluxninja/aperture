@@ -124,12 +124,6 @@ DEP_TREE = {
                     "dockerfile": GIT_ROOT + "/cmd/aperture-controller/Dockerfile",
                     "ssh": "default",
                     "build_args":{},
-                },
-                {
-                    "ref": "aperture-operator",
-                    "context": GIT_ROOT,
-                    "dockerfile": GIT_ROOT + "/operator/Dockerfile",
-                    "ssh": "default",
                 }
             ],
             "port_forwards": {
@@ -206,6 +200,12 @@ DEP_TREE = {
                     "dockerfile": GIT_ROOT + "/cmd/aperture-agent/Dockerfile",
                     "ssh": "default",
                     "build_args":{},
+                },
+                {
+                    "ref": "aperture-operator",
+                    "context": GIT_ROOT,
+                    "dockerfile": GIT_ROOT + "/operator/Dockerfile",
+                    "ssh": "default",
                 }
             ],
             "port_forwards": {
@@ -1208,7 +1208,7 @@ config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-extensions", usage="Skip extension building")
 config.define_bool("enable-cloud-extension", usage="Enable FluxNinja API key authentication, which will send the data to FluxNinja Cloud")
 config.define_bool("cloud-controller", usage="Uses FluxNinja Controller instead of Self-Hosted Controller")
-config.define_bool("api-key", usage="FluxNinja API key")
+config.define_string("api-key", usage="FluxNinja API key")
 config.define_string("fluxninja-endpoint", usage="FluxNinja Endpoint")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
@@ -1236,7 +1236,7 @@ cloud_extension = {
     'enabled': enable_cloud_extension,
     'endpoint': fluxninja_endpoint,
     'api_key': api_key,
-    'agent_group': str(local('hostname')).strip(),
+    'agent_group': str(local('hostname')).strip().lower(),
     'cloud_controller': cloud_controller,
 }
 
