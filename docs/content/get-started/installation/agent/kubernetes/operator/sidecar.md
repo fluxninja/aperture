@@ -16,6 +16,17 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../../../../apertureVersion.js';
 ```
 
+:::info
+
+This method requires access to create cluster level resources like ClusterRole,
+ClusterRoleBinding, CustomResourceDefinition and so on.
+
+Please use the
+[Namespace-scoped Installation](/get-started/installation/agent/kubernetes/namespace-scoped/namespace-scoped.md)
+if you do not want to assign the cluster level permissions.
+
+:::
+
 The Aperture Agent can also be installed as a Sidecar. In this mode, whenever a
 new pod is started with required labels and annotations, the agent container
 will be attached with the pod.
@@ -105,7 +116,7 @@ Kubernetes Objects which will be created by following steps are listed
          value: API_KEY
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
    organization name and api key created for your project.
 
    :::note
@@ -275,7 +286,7 @@ Kubernetes Objects which will be created by following steps are listed
             value: API_KEY
       ```
 
-      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
       organization name and api key created for your project.
 
       :::note

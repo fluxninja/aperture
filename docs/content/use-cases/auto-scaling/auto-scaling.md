@@ -6,6 +6,11 @@ sidebar_position: 4
 sidebar_label: Auto Scaling
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import DocCardList from '@theme/DocCardList';
+```
+
 ## Overview
 
 Auto-scaling is a vital pillar of load management. It empowers service operators
@@ -44,9 +49,5 @@ costs effectively, the service can use load-based auto-scaling. This strategy
 ensures that service resources are dynamically adjusted in line with usage
 patterns, therefore optimizing both user experience and infrastructure
 expenditure.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

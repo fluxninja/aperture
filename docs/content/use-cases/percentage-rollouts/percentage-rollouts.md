@@ -7,6 +7,11 @@ sidebar_position: 3
 sidebar_label: Percentage Rollouts
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import DocCardList from '@theme/DocCardList';
+```
+
 ## Overview
 
 Percentage rollout is a systematic procedure of gradually introducing a new
@@ -46,9 +51,5 @@ releasing the new design to an increasingly larger user base, until it is
 eventually launched universally. Throughout this process, Aperture would ensure
 that the rollout doesn't impact the overall system performance, thereby
 minimizing operational risk.
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-```
 
 <DocCardList />

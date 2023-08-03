@@ -12,8 +12,12 @@ keywords:
   - aperture
 ---
 
-[FluxNinja][] is a load management platform powered by the open source project
-[**Aperture**](https://github.com/fluxninja/aperture). It's designed for
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
+[FluxNinja Cloud][] is a load management platform powered by the open source
+project [**Aperture**](https://github.com/fluxninja/aperture). It's designed for
 classifying, scheduling, and rate-limiting API traffic in cloud applications.
 Built upon a foundation of observability and a global control plane, it offers a
 comprehensive suite of load management capabilities. These capabilities enhance
@@ -142,6 +146,6 @@ beneficial.
 
 <!-- vale on -->
 
-[fluxninja]: https://www.fluxninja.com/product
+[FluxNinja Cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [Architecture]: /architecture/architecture.md

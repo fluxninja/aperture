@@ -40,14 +40,14 @@ into existing monitoring infrastructure.
 {@include: ../assets/diagrams/architecture/architecture_simple.mmd}
 ```
 
+</Zoom>
+
 :::info
 
 The roles of Aperture Agent and Aperture Controller are described on the
 [Architecture][] page.
 
 :::
-
-</Zoom>
 
 [Architecture]: /architecture/architecture.md
 [Prometheus]: https://prometheus.io

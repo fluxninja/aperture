@@ -39,12 +39,26 @@ and can result in unpredictable behavior.
 
 1. **Kubernetes**
 
-   1. [**Install with Operator**](kubernetes/operator/operator.md)
+   1. [**Namespace-scoped Installation**][namespace-scoped-installation]
+
+      The Aperture Agent can also be installed with only namespace-scoped
+      resources.
+
+   2. [**Install with Operator**](kubernetes/operator/operator.md)
 
       The Aperture Agent can be installed using the Kubernetes Operator
-      available for it. This method requires access to create cluster level
-      resources like ClusterRole, ClusterRoleBinding, CustomResourceDefinition
-      and so on.
+      available for it.
+
+      :::info
+
+      This method requires access to create cluster level resources like
+      ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
+
+      Please use the [Namespace-scoped
+      Installation][namespace-scoped-installation] if you do not want to assign
+      the cluster level permissions.
+
+      :::
 
       - [**DaemonSet**](kubernetes/operator/daemonset.md)
 
@@ -57,11 +71,6 @@ and can result in unpredictable behavior.
         The Aperture Agent can also be installed as a Sidecar. In this mode,
         whenever a new pod is started with required labels and annotations, the
         agent container will be attached with the pod.
-
-   2. [**Namespace-Scoped Installation**](kubernetes/namespace-scoped/namespace-scoped.md)
-
-      The Aperture Agent can also be installed with only namespace-scoped
-      resources.
 
 2. [**Bare Metal or VM**](bare-metal.md)
 
@@ -82,3 +91,5 @@ and Agents are installed, you can start creating and applying policies.
 step-by-step instructions on customizing, creating, and applying policies within
 Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
 as a valuable resource for tailoring policies to meet specific requirements.
+
+[namespace-scoped-installation]: kubernetes/namespace-scoped/namespace-scoped.md

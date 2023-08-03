@@ -3,6 +3,10 @@ title: Flow Label
 sidebar_position: 4
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 A flow is the fundamental unit of work from the perspective of an Aperture
 agent. It could be an API call, a feature, or even a database query. A flow in
 Aperture is similar to [OpenTelemetry span][span]. Each flow is annotated with a
@@ -199,7 +203,7 @@ order:
 ## Interaction with FluxNinja Extension {#extension}
 
 All the flow Labels are used as labels of flow events. These events are rolled
-up and sent to the analytics database in the FluxNinja. This allows:
+up and sent to the analytics database in the FluxNinja Cloud. This allows:
 
 - For the _Flow Labels_ to be used as filters or group-by
 - To see analytics for each _Flow Label_, for example: distribution of its

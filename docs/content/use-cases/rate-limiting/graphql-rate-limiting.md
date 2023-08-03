@@ -161,11 +161,7 @@ per second for 2-minutes. When loading the above policy in the playground, you
 can observe that it accepts no more than `2` requests per second at any given
 time, and rejects the rest of the requests.
 
-<Zoom>
-
 ![GraphQL Status Rate Limiting](./assets/graphql-rate-limiting/dashboard.png)
-
-</Zoom>
 
 [rego-rules]: /concepts/classifier.md#rego
 [flow-label]: /concepts/flow-label.md

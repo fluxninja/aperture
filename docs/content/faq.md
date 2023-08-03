@@ -3,7 +3,8 @@ title: FAQ
 slug: faq
 sidebar_label: FAQ
 sidebar_position: 9
-description: Frequently asked questions about FluxNinja Aperture.
+description:
+  Frequently asked questions about FluxNinja Aperture and FluxNinja Cloud.
 image: /assets/img/aperture_logo.png
 keywords:
   - reliability

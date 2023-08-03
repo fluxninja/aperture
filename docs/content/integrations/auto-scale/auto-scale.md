@@ -7,6 +7,10 @@ keywords:
   - Kubernetes
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 :::info See also
 
 [Auto-scaling use-case](../../use-cases/auto-scaling/auto-scaling.md)

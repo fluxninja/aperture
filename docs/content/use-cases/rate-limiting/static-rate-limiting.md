@@ -130,8 +130,4 @@ kubectl apply -f policy-gen/configuration/static-rate-limiting-cr.yaml -n apertu
 When the policy is applied at a service, no more than 2 requests per second
 period (after an initial burst of 40 requests) are accepted for a user.
 
-<Zoom>
-
 ![Static Rate Limiting](./assets/static-rate-limiting/dashboard.png)
-
-</Zoom>

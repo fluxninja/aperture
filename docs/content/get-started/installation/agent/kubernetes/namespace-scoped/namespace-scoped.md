@@ -6,7 +6,7 @@ keywords:
   - setup
   - agent
   - operator
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 ```mdx-code-block
@@ -74,7 +74,7 @@ your cluster.
          value: API_KEY
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
    organization name and api key created for your project.
 
    :::note

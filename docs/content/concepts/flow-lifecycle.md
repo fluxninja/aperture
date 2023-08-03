@@ -9,6 +9,10 @@ keywords:
   - labels
 ---
 
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+```
+
 ## Flow Lifecycle
 
 The lifecycle of a flow begins when a service initiates it, requesting a
