@@ -1018,6 +1018,10 @@ spec:
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
+                      log_level:
+                        description: LogLevel of logs coming from inside the etcd
+                          client
+                        type: string
                       namespace:
                         description: etcd namespace
                         type: string

@@ -1421,6 +1421,20 @@ List of etcd server endpoints
 Lease time-to-live
 
 </dd>
+<dt>log_level</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of:
+`debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL`,
+default: `"warn"`)
+
+<!-- vale on -->
+
+LogLevel of logs coming from inside the etcd client
+
+</dd>
 <dt>namespace</dt>
 <dd>
 
