@@ -40,6 +40,7 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
+  log_level: warn
 flow_control:
   preview_service:
     enabled: true
