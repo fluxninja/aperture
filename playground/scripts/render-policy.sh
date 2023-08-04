@@ -11,6 +11,10 @@ api_key=${7:-}
 endpoint=${8:-}
 agent_group=${9:-default}
 action=${10:-apply}
+skipverify=${11:-false}
+if [[ "$skipverify" == "true" ]]; then
+	skipverify="--skip-verify"
+fi
 
 SED="sed"
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -32,7 +36,8 @@ if [[ "$api_key" != '' && "$endpoint" != '' ]]; then
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" -f -s >&2
+		echo "${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "$skipverify" -f -s >&2
+		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "$skipverify" -f -s >&2
 	else
 		"${aperturectl}" delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" >&2
 	fi
