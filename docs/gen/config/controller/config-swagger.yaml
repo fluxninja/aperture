@@ -281,7 +281,7 @@ definitions:
                 x-go-tag-validate: gte=1s
             log_level:
                 default: warn
-                description: LogLevel of logs coming from inside the ETCD Client
+                description: LogLevel of logs coming from inside the etcd client
                 enum:
                     - debug
                     - DEBUG

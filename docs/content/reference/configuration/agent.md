@@ -1432,7 +1432,7 @@ default: `"warn"`)
 
 <!-- vale on -->
 
-LogLevel of logs coming from inside the ETCD Client
+LogLevel of logs coming from inside the etcd client
 
 </dd>
 <dt>namespace</dt>

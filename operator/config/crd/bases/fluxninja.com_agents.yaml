@@ -1124,8 +1124,8 @@ spec:
                         description: Lease time-to-live
                         type: string
                       log_level:
-                        description: LogLevel of logs coming from inside the ETCD
-                          Client
+                        description: LogLevel of logs coming from inside the etcd
+                          client
                         type: string
                       namespace:
                         description: etcd namespace
