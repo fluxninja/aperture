@@ -8,6 +8,7 @@ import (
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -102,6 +103,11 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		return nil, fmt.Errorf("no etcd endpoints provided")
 	}
 
+	zapLogLevel, err := zapcore.ParseLevel(config.LogLevel)
+	if err != nil {
+		return nil, fmt.Errorf("invalid etcd log level")
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	etcdClient := Client{
@@ -128,12 +134,15 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientv3.Config{
-				Endpoints:   config.Endpoints,
-				Context:     ctx,
-				TLS:         tlsConfig,
-				Username:    config.Username,
-				Password:    config.Password,
-				Logger:      zap.New(log.NewZapAdapter(in.Logger, "etcd-client"), zap.IncreaseLevel(zap.WarnLevel)),
+				Endpoints: config.Endpoints,
+				Context:   ctx,
+				TLS:       tlsConfig,
+				Username:  config.Username,
+				Password:  config.Password,
+				Logger: zap.New(
+					log.NewZapAdapter(in.Logger, "etcd-client"),
+					zap.IncreaseLevel(zapLogLevel),
+				),
 				DialOptions: dialOptions,
 			})
 			if err != nil {
