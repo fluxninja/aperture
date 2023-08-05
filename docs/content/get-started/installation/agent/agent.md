@@ -84,7 +84,7 @@ and can result in unpredictable behavior.
 ## Applying Policies
 
 Once the
-[application is set up](/get-started/setting-up-your-service/setting-up-your-service.md)
+[application is set up](/get-started/set-up-application/set-up-application.md)
 and Agents are installed, you can start creating and applying policies.
 
 [Your first policy](/get-started/policies/policies.md) section provides

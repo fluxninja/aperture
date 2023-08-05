@@ -27,15 +27,15 @@ application.
    recommend using `aperturectl` as it provides an easier and less cumbersome
    way to get started.
 
-## [Setup Application: Pick an integration](./setting-up-your-service/setting-up-your-service.md)
+## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
 
-1. [**Manually setting feature control points**](./setting-up-your-service/manual-control-points.md)
+1. [**Manually setting feature control points**](./set-up-application/manual-control-points.md)
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
    find the list of SDKs [here](../integrations/sdk/sdk.md).
 
-2. [**Middleware Insertions**](./setting-up-your-service/middleware-insertions.md)
+2. [**Middleware Insertions**](./set-up-application/middleware-insertions.md)
 
    To make it easier to integrate Aperture in your application, we have created
    middleware for popular frameworks like Spring Boot, Netty, Armeria
@@ -43,7 +43,7 @@ application.
    of middleware, there isn't much code changes required in your application.
    Some middleware doesn't require any code change at all.
 
-3. [**Service Meshes (Istio, Envoy) & API Gateways**](./setting-up-your-service/service-mesh-and-gateways.md)
+3. [**Service Meshes (Istio, Envoy) & API Gateways**](./set-up-application/service-mesh-and-gateways.md)
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
    find the list of supported service meshes
@@ -54,7 +54,7 @@ application.
    integrate Aperture with API gateways, checkout the supported
    [API Gateways](../integrations/gateway/gateway.md).
 
-## [Create First Policy](./policies/policies.md)
+## [Create Your First Policy](./policies/policies.md)
 
 For creating policies, `aperturectl` can be of assistance. Apart from that, it
 can help with listing policies, previewing live traffic, and many more things.
