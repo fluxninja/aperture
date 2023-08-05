@@ -2,7 +2,7 @@
 title: Install Aperture
 keywords:
   - install
-sidebar_position: 2
+sidebar_position: 1
 sidebar_label: Install Aperture
 ---
 
