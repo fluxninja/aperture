@@ -169,7 +169,7 @@
             "name": "etcdEndpoint",
             "type": "Microsoft.Common.TextBox",
             "label": "Etcd Endpoint",
-            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.provide url endpoint seperted by comma",
+            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.provide url endpoint separated by comma",
             "defaultValue": "",
             "constraints": {
               "required": true,
