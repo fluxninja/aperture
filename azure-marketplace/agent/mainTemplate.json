@@ -155,7 +155,7 @@
     "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
 
     "mandatory_setting_inputs": {
-      "agent.config.etcd.endpoints": "[json(split(parameters('etcdEndpoint'),','))]",
+      "agent.config.etcd.endpoints": "[split(parameters('etcdEndpoint'),',')]",
       "agent.config.prometheus.address": "[parameters('prometheusAddress')]"
     },
 

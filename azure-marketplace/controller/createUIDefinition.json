@@ -209,7 +209,7 @@
                         "toolTip": "Enter the label name.",
                         "constraints": {
                           "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
+                          "regex": ".*",
                           "validationMessage": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long."
                         }
                       }
@@ -223,7 +223,7 @@
                         "toolTip": "Enter the Value for the label.",
                         "constraints": {
                           "required": true,
-                          "regex": "^[a-zA-Z0-9-.]",
+                          "regex": ".*",
                           "validationMessage": "Only alphanumeric characters, dot and hyphen are allowed, and the value must be 1-30 characters long."
                         }
                       }
