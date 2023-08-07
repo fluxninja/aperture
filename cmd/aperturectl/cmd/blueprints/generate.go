@@ -322,7 +322,7 @@ func setupOutputDir(outputDir string) (string, bool, error) {
 				fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
 				var response string
 				fmt.Scanln(&response)
-				if response != "y" {
+				if strings.ToLower(response) != "y" {
 					return "", false, fmt.Errorf("output directory '%s' already exists", outputDir)
 				}
 			}
