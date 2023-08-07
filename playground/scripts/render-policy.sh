@@ -13,7 +13,7 @@ agent_group=${9:-default}
 action=${10:-apply}
 skipverify=${11:-false}
 
-if [[ "$skipverify" == "true" ]]; then
+if [[ "${skipverify}" == "true" ]]; then
 	skipverify="--skip-verify"
 else
 	skipverify=""
@@ -28,7 +28,7 @@ _GEN_DIR="${base_dir}/_gen"
 mkdir -p "${_GEN_DIR}"
 trap 'rm -rf -- "$_GEN_DIR"' EXIT
 
-if [[ "$api_key" != '' && "$endpoint" != '' ]]; then
+if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 	cp "${values_file}" "${_GEN_DIR}/values.yaml"
 	new_policy_name=${policy_name}-${agent_group}
 	$SED -i "s/\bagent_group: .*/agent_group: ${agent_group}/g" "${_GEN_DIR}/values.yaml"
