@@ -125,7 +125,10 @@ definitions:
                 x-go-tag-default: "false"
                 x-go-tag-json: enable_cloud_controller
             endpoint:
-                description: Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+                description: |-
+                    Address to gRPC or HTTP(s) server listening in agent service.
+                    For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+                    For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
                 pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Endpoint
