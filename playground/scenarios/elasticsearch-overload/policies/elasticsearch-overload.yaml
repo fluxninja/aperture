@@ -26,5 +26,5 @@ policy:
                 enabled: true
             endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
             username: elastic
-            password: ThisIsSuperSecuredPassword!
+            password: secretpassword
             collection_interval: 10s

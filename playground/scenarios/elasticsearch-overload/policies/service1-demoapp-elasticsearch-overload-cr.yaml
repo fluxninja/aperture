@@ -67,5 +67,5 @@ spec:
             metrics:
               jvm.memory.heap.utilization:
                 enabled: true
-            password: ThisIsSuperSecuredPassword!
+            password: secretpassword
             username: elastic

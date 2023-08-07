@@ -37,7 +37,7 @@ local elasticsearchAppMixin =
         replicaCount: 0,
       },
       security+: {
-        elasticPassword: 'ThisIsSuperSecuredPassword!',
+        elasticPassword: 'secretpassword',
       },
     },
   };
