@@ -98,6 +98,12 @@ installation of the Aperture Controller or Agent:
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
 of the organization on FluxNinja Cloud and API Key generated on it.
 
+:::note
+
+For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address. We are working on supporting `https` fallback.
+
+:::
+
 More specific details about particular agent installation modes could be found
 in [Get Started: Installation](/get-started/installation/agent/agent.md).
 
