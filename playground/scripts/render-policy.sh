@@ -11,6 +11,13 @@ api_key=${7:-}
 endpoint=${8:-}
 agent_group=${9:-default}
 action=${10:-apply}
+skipverify=${11:-false}
+
+if [[ "${skipverify}" == "true" ]]; then
+	skipverify="--skip-verify"
+else
+	skipverify=""
+fi
 
 SED="sed"
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -21,7 +28,7 @@ _GEN_DIR="${base_dir}/_gen"
 mkdir -p "${_GEN_DIR}"
 trap 'rm -rf -- "$_GEN_DIR"' EXIT
 
-if [[ "$api_key" != '' && "$endpoint" != '' ]]; then
+if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 	cp "${values_file}" "${_GEN_DIR}/values.yaml"
 	new_policy_name=${policy_name}-${agent_group}
 	$SED -i "s/\bagent_group: .*/agent_group: ${agent_group}/g" "${_GEN_DIR}/values.yaml"
@@ -32,9 +39,9 @@ if [[ "$api_key" != '' && "$endpoint" != '' ]]; then
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" -f -s >&2
+		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" -f -s >&2
 	else
-		"${aperturectl}" delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" >&2
+		"${aperturectl}" delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" >&2
 	fi
 else
 	"${aperturectl}" blueprints generate --name "${blueprint_name}" --uri "${blueprints_uri}" \
