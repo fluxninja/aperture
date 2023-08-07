@@ -100,11 +100,11 @@ of the organization on FluxNinja Cloud and API Key generated on it.
 
 :::note
 
-For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address. We are working on supporting `https` fallback.
+For connecting to FluxNinja Cloud Controller, the `endpoint` should be an `grpc/http2` address. We are working on supporting `https` fallback.
 
 :::
 
-More specific details about particular agent installation modes could be found
+More details about particular agent installation modes could be found
 in [Get Started: Installation](/get-started/installation/agent/agent.md).
 
 Configuration parameters for the FluxNinja Extension are as follows:
