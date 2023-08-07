@@ -1,5 +1,6 @@
 ---
-title: Your First Policy
+title: Create Your First Policy
+sidebar_label: Create Your First Policy
 description: How to generate and apply policies in Aperture
 keywords:
   - policy

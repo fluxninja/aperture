@@ -279,6 +279,30 @@ definitions:
                 x-go-tag-default: 60s
                 x-go-tag-json: lease_ttl
                 x-go-tag-validate: gte=1s
+            log_level:
+                default: warn
+                description: LogLevel of logs coming from inside the etcd client
+                enum:
+                    - debug
+                    - DEBUG
+                    - info
+                    - INFO
+                    - warn
+                    - WARN
+                    - error
+                    - ERROR
+                    - dpanic
+                    - DPANIC
+                    - panic
+                    - PANIC
+                    - fatal
+                    - FATAL
+                type: string
+                x-go-name: LogLevel
+                x-go-tag-default: warn
+                x-go-tag-json: log_level
+                x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL
+                x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL
             namespace:
                 default: aperture
                 description: etcd namespace

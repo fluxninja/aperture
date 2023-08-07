@@ -115,7 +115,7 @@ service-level objectives.
 
 ## ✨ Get started {#get-started}
 
-- [**Setting up your application**](get-started/setting-up-your-service/setting-up-your-service.md)
+- [**Setting up your application**](get-started/set-up-application/set-up-application.md)
 - [**Install Aperture**](get-started/installation/installation.md)
 - [**Your first policy**](get-started/policies/policies.md)
 - [**Use cases**](use-cases/use-cases.md)
