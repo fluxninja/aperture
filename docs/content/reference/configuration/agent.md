@@ -1588,7 +1588,7 @@ Aperture Controller.
 
 Address to gRPC or HTTP(s) server listening in agent service. For connecting to
 FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address. For
-self-hosted controller, the HTTP protocol address must start with `http(s)://`.
+self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
