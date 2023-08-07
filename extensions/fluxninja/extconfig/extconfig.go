@@ -22,7 +22,9 @@ const (
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
-	// Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+	// Address to gRPC or HTTP(s) server listening in agent service.
+	// For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+	// For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
@@ -36,7 +38,6 @@ type FluxNinjaExtensionConfig struct {
 	//
 	// Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
-
 	// Interval between each heartbeat.
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
 	// Client configuration.
