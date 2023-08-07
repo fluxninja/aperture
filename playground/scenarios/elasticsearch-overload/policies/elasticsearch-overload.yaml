@@ -22,6 +22,16 @@ policy:
         receivers:
           elasticsearch:
             metrics:
+              elasticsearch.node.operations.current:
+                enabled: true
+              elasticsearch.node.operations.completed:
+                enabled: true
+              elasticsearch.node.operations.time:
+                enabled: true
+              elasticsearch.node.operations.get.completed:
+                enabled: true
+              elasticsearch.node.operations.get.time:
+                enabled: true
               jvm.memory.heap.utilization:
                 enabled: true
             endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200

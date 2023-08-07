@@ -65,6 +65,16 @@ spec:
             collection_interval: 10s
             endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
             metrics:
+              elasticsearch.node.operations.completed:
+                enabled: true
+              elasticsearch.node.operations.current:
+                enabled: true
+              elasticsearch.node.operations.get.completed:
+                enabled: true
+              elasticsearch.node.operations.get.time:
+                enabled: true
+              elasticsearch.node.operations.time:
+                enabled: true
               jvm.memory.heap.utilization:
                 enabled: true
             password: secretpassword
