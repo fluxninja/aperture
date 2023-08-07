@@ -140,16 +140,3 @@ Prepare the Host for configuring in the Ingress
     {{- fail "Value of .Values.ingress.domain_name cannot be empty when .Values.ingress.enabled is set to true." -}}
 {{- end -}}
 {{- end -}}
-
-
-{{/*
-Prepare the CR name for cloud controller
-{{ include "controller.cr.name" (dict "crName" .Values.controller.crName "context" . $) }}
-*/}}
-{{- define "controller.cr.name" -}}
-{{- if empty .crName  -}}
-    {{ print .context.Release.Name }}
-{{- else -}}
-    {{ print .crName }}
-{{- end -}}
-{{- end -}}

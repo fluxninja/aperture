@@ -2,7 +2,7 @@
 apiVersion: fluxninja.com/v1alpha1
 kind: Controller
 metadata:
-  name: {{ include "controller.cr.name" (dict "crName" .Values.controller.crName "context" . $) }}
+  name: {{ .Release.Name }}
   namespace: {{ template "common.names.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aperture-controller-manager

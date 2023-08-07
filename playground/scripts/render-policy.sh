@@ -12,8 +12,11 @@ endpoint=${8:-}
 agent_group=${9:-default}
 action=${10:-apply}
 skipverify=${11:-false}
+
 if [[ "$skipverify" == "true" ]]; then
 	skipverify="--skip-verify"
+else
+	skipverify=""
 fi
 
 SED="sed"
@@ -36,10 +39,9 @@ if [[ "$api_key" != '' && "$endpoint" != '' ]]; then
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		echo "${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "$skipverify" -f -s >&2
-		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "$skipverify" -f -s >&2
+		"${aperturectl}" apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" -f -s >&2
 	else
-		"${aperturectl}" delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" >&2
+		"${aperturectl}" delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" >&2
 	fi
 else
 	"${aperturectl}" blueprints generate --name "${blueprint_name}" --uri "${blueprints_uri}" \
