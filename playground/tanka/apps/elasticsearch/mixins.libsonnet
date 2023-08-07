@@ -22,7 +22,6 @@ local elasticsearchAppMixin =
         extraRoles+: 'remote_cluster_client,ml',
         replicaCount: 1,
         masterOnly: false,
-        heapSize: '500m',
       },
       data+: {
         // extraRoles+: 'remote_cluster_client,ml',
