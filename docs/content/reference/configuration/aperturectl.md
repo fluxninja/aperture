@@ -1,7 +1,7 @@
 ---
 title: aperturectl Configuration File Format Reference
 sidebar_position: 5
-sidebar_label: ".aperturectl/config"
+sidebar_label: "Aperturectl"
 ---
 
 <!-- If our configuration file grows, would be nice to automatically generate
@@ -26,7 +26,7 @@ if the `--kube` flag were passed).
 
 ## Format
 
-The aperturectl configuration file uses the following [TOML][] syntax:
+The aperturectl configuration file uses the following [TOML][toml] syntax:
 
 ```toml
 [controller]
@@ -34,9 +34,7 @@ url = "controller hostname:port"
 api_key = "api key for the controller"
 ```
 
-All the fields are required (although the file itself is not). See [Configuring
-aperturectl][] for an example on how to configure aperturectl with [FluxNinja
-Cloud Controller][].
+All the fields are required (although the file itself is not). See [Configuring aperturectl][configure-aperturectl] for an example on how to configure aperturectl with [FluxNinja Cloud Controller][cloud-controller].
 
 :::tip
 
@@ -45,6 +43,6 @@ environment variable to switch between different projects and organizations.
 
 :::
 
-[TOML]: https://toml.io/
-[Configuring aperturectl]: /get-started/installation/configure-cli.md
-[FluxNinja Cloud Controller]: /reference/fluxninja.md#cloud-controller
+[toml]: https://toml.io/
+[configure-aperturectl]: /get-started/installation/configure-cli.md
+[cloud-controller]: /reference/fluxninja.md#cloud-controller
