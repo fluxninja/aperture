@@ -13,75 +13,28 @@ keywords:
   - fluxninja
   - microservices
   - cloud
-  # TODO
 ---
 
 ```mdx-code-block
 import Zoom from 'react-medium-image-zoom';
 ```
 
-The diagram below shows the interaction between the main components of the
-[Aperture platform][aperture]: Aperture Cloud, Aperture Agents, and various
-integrations.
+The diagram below shows the core components of Aperture architecture and how
+they integrate with an application.
 
 ![Aperture Architecture (dark)](../assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
 ![Aperture Architecture (light)](../assets/img/aperture-architecture-light.svg#gh-light-mode-only)
 
-Aperture Cloud is the brain of the system and its role is collecting data and
-evaluating policies. Policy evaluation is performed by Aperture Controller and
-results in high-level decisions, which are then sent down to Aperture Agents.
+Aperture Cloud is a highly available, fully managed load management platform
+offering:
 
-Aperture Agents are part of the system that's much closer to the infrastructure
-– they're installed on every node. The Agents are where the actual execution of
-policies takes place. Note that while the Agents by themselves can collect some
-metrics and perform limited actions like auto-scaling, they need
-[integrations][integrations] to actually control the traffic.
+1. Hosted **Aperture Controller**
+2. Consoles for managing Aperture policies, **Aperture Agents** and self-hosted
+   Aperture Controllers
+3. Traffic analytics dashboard
+4. Alerting system to notify about actions taken by Aperture Agents
 
-Aperture provides [integrations][integrations] for service meshes and gateways.
-It's also possible to instrument your application directly with [Aperture
-SDKs][sdks]. When integration is enabled, it will ask the Agent on the local
-node to decide for every request or flow. Note that this RPC call never leaves
-the node, so its overhead and impact on latency are minimized.
-
-## Aperture Cloud
-
-Aperture Cloud is a centralized platform that provides tools for policy
-management and observability. There are two significant components of Aperture
-Cloud worth mentioning: The analytics database and the Aperture Controller.
-
-### Analytics database
-
-FluxNinja uses a real-time analytics database to support Aperture Cloud
-observability capabilities. All the logs and traces collected by Aperture Agents
-are batched and rolled up and sent to FluxNinja. Thanks to the use of rollup,
-similar events are aggregated to reduce the traffic, but no data is lost (as it
-would with usage of sampling-based solutions).
-
-### Aperture Controller
-
-Aperture Cloud [provides a per-project Aperture
-Controller][aperture-cloud-controller] for every organization.
-
-The Aperture Controller is a centralized control system, equipped with a
-comprehensive global perspective. It is programmed using declarative policies.
-Policies can be applied by configuring a [pre-defined blueprint][use-cases].
-It's also possible to build a policy [from scratch from policy
-components][policy].
-
-A policy represents a closed-loop control circuit that is executed periodically.
-The control circuit draws input signals from [metrics](#metrics) aggregated
-across Aperture Agents, providing the Controller with a holistic view of the
-application's health and performance. Service-level objectives (SLOs) are
-defined against these health and performance signals. The policies continuously
-track deviations from SLOs and calculate recovery or escalation actions that are
-translated as adjustments to the Agents.
-
-After computing the adjustments, the Aperture Controller synchronizes them with
-the relevant Aperture Agents. These adjustments encompass load throttling,
-workload prioritization, and auto-scaling actions, among others. By
-disseminating the calculated adjustments to the Agents, the Controller ensures
-that the Agents take localized actions in line with the global state of the
-system.
+## Aperture Controller (hosted in Aperture Cloud)
 
 :::note
 
@@ -90,14 +43,27 @@ possible to [self-host it][self-hosting].
 
 :::
 
+The Aperture Controller is a centralized control system, equipped with a
+comprehensive global perspective. Its role is collecting data and evaluating
+policies. Policy evaluation results in high-level adjustments, which are then
+sent down to Aperture Agents.
+
+Aperture Cloud [provides a per-project Aperture
+Controller][aperture-cloud-controller]. It is programmed using declarative
+policies. Policies can be applied by configuring a [pre-defined
+blueprint][use-cases]. It's also possible to build a policy [from scratch from
+policy components][policy].
+
 ## Aperture Agents
 
-Aperture Agents are the workhorses of the platform, providing powerful flow
-control components such as a weighted fair queuing scheduler for workload
-prioritization and a distributed rate-limiter for abuse prevention. Agents
-integrate with service meshes, gateways and HTTP middlewares. Alternately,
-developers can use SDKs to get flow control around specific features or code
-sections inside services.
+Serving as the workhorses of the platform, Aperture Agents provide powerful flow
+control components. These include a weighted fair queuing scheduler for workload
+prioritization and a distributed rate-limiter for abuse prevention. These agents
+are deployed adjacent to services requiring load management and control traffic
+flows based on real-time adjustments from the Aperture Controller. They
+seamlessly [integrate][integrations] with service meshes, gateways, and HTTP
+middlewares. For more specific control, developers can use [SDKs][sdks] to
+manage specific features or code sections within services.
 
 The Agents monitor service and infrastructure health signals using an in-built
 telemetry system. In addition, a programmable, high-fidelity flow classifier is
@@ -131,7 +97,6 @@ Aperture][architecture-self-hosted].
 
 :::
 
-[aperture]: https://github.com/fluxninja/aperture
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
 [architecture-self-hosted]: /self-hosting/architecture.md
 [use-cases]: /use-cases/use-cases.md
