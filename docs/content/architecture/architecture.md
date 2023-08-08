@@ -34,7 +34,7 @@ offering:
 3. Traffic analytics dashboard
 4. Alerting system to notify about actions taken by Aperture Agents
 
-## Aperture Controller (hosted in Aperture Cloud)
+## Aperture Controller (hosted in Aperture Cloud) {#aperture-controller}
 
 :::note
 
