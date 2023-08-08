@@ -24,8 +24,8 @@ The diagram below shows the interaction between the main components of the
 [Aperture][] platform: Aperture Cloud, Aperture Agents, and various
 integrations.
 
-![Aperture Architecture (dark)](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
-![Aperture Architecture (light)](../assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+![Aperture Architecture (dark)](../assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
+![Aperture Architecture (light)](../assets/img/aperture-architecture-light.svg#gh-light-mode-only)
 
 Aperture Cloud is the brain of the system and its role is collecting data and
 evaluating policies. Policy evaluation is performed by Aperture Controller and
