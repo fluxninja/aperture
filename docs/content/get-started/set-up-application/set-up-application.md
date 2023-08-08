@@ -1,10 +1,10 @@
 ---
-title: Setting Up Your Service
+title: Set Up Your Application
 keywords:
   - setting up application
   - getting started
-sidebar_position: 1
-sidebar_label: Setting Up Your Service
+sidebar_position: 2
+sidebar_label: Set Up Your Application
 ---
 
 ```mdx-code-block

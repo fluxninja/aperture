@@ -16,24 +16,27 @@ keywords:
 import Zoom from 'react-medium-image-zoom';
 ```
 
-[FluxNinja Cloud][] is a load management platform powered by the open source
-project [**Aperture**](https://github.com/fluxninja/aperture). It's designed for
-classifying, scheduling, and rate-limiting API traffic in cloud applications.
-Built upon a foundation of observability and a global control plane, it offers a
-comprehensive suite of load management capabilities. These capabilities enhance
-the reliability and performance of cloud applications while also optimizing
-resource utilization.
+[Aperture](https://github.com/fluxninja/aperture) is an open source load
+management platform designed for classifying, prioritizing, scheduling, and
+rate-limiting API traffic in cloud applications. Built upon a foundation of
+observability and a global control plane, it offers a comprehensive suite of
+load management capabilities. These capabilities enhance the reliability and
+performance of cloud applications while also optimizing resource utilization.
 
 Aperture can seamlessly integrate with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
 developers who need to establish control points around specific features or code
 sections inside applications.
 
-Here's a simplified diagram how FluxNinja Cloud interacts with your
-infrastructure. Visit [Architecture][] page for more details.
+Aperture's control plane is available as a managed service, [Aperture
+Cloud][cloud], or can be [self-hosted][self-hosted] within your infrastructure.
 
-![FluxNinja Architecture](./assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
-![FluxNinja Architecture](./assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+Here's a simplified diagram of how Aperture Cloud (managed by FluxNinja)
+interacts with your infrastructure. Visit the [Architecture][architecture] page
+for more details.
+
+![Aperture Architecture (dark)](./assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
+![Aperture Architecture (light)](./assets/img/aperture-architecture-light.svg#gh-light-mode-only)
 
 :::info Sign-up
 
@@ -43,7 +46,7 @@ To sign-up, [click here][sign-up].
 
 ## ⚙️ Load management capabilities {#load-management-capabilities}
 
-FluxNinja Aperture provides a variety of advanced load management features:
+Aperture provides a variety of advanced load management features:
 
 - 🛡️
   [**Adaptive Service Protection**](/use-cases/adaptive-service-protection/adaptive-service-protection.md):
@@ -115,7 +118,7 @@ service-level objectives.
 
 ## ✨ Get started {#get-started}
 
-- [**Setting up your application**](get-started/setting-up-your-service/setting-up-your-service.md)
+- [**Setting up your application**](get-started/set-up-application/set-up-application.md)
 - [**Install Aperture**](get-started/installation/installation.md)
 - [**Your first policy**](get-started/policies/policies.md)
 - [**Use cases**](use-cases/use-cases.md)
@@ -146,6 +149,7 @@ beneficial.
 
 <!-- vale on -->
 
-[FluxNinja Cloud]: https://www.fluxninja.com/product
+[cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
-[Architecture]: /architecture/architecture.md
+[architecture]: /architecture/architecture.md
+[self-hosted]: /self-hosting

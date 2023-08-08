@@ -63,16 +63,10 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 			return fmt.Errorf("--values-file must be provided")
 		}
 
-		// if outputDir is not provided, default to current directory
-		if outputDir == "" {
-			if applyPolicy {
-				// use temp dir
-				outputDir = os.TempDir()
-				// defer remove temp dir
-				defer os.RemoveAll(outputDir)
-			} else {
-				return fmt.Errorf("--output-dir must be provided")
-			}
+		log.Info().Msgf("Generating Aperture Policy resources for blueprint: %s", blueprintName)
+		// if outputDir is not provided and applyPolicy is false, return error
+		if outputDir == "" && !applyPolicy {
+			return fmt.Errorf("--output-dir must be provided")
 		}
 
 		_, err = os.Stat(valuesFile)
@@ -154,13 +148,18 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 			return err
 		}
 
-		var updatedOutputDir string
+		var (
+			updatedOutputDir string
+			doRemove         bool
+		)
 
-		if outputDir != "" {
-			updatedOutputDir, err = setupOutputDir(outputDir)
-			if err != nil {
-				return err
-			}
+		updatedOutputDir, doRemove, err = setupOutputDir(outputDir)
+		if err != nil {
+			return err
+		}
+		if doRemove {
+			// defer remove temp dir
+			defer os.RemoveAll(updatedOutputDir)
 		}
 
 		if err = processJsonnetOutput(bundle, updatedOutputDir); err != nil {
@@ -300,33 +299,45 @@ func blueprintExists(name string) error {
 	return nil
 }
 
-func setupOutputDir(outputDir string) (string, error) {
-	// ask for user confirmation if the output directory already exists
-	if !overwrite {
-		if _, err := os.Stat(outputDir); err == nil {
-			fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
-			var response string
-			fmt.Scanln(&response)
-			if response != "y" {
-				return "", fmt.Errorf("output directory '%s' already exists", outputDir)
+func setupOutputDir(outputDir string) (string, bool, error) {
+	if outputDir == "" && !applyPolicy {
+		// shouldn't happen
+		return "", false, fmt.Errorf("output directory is empty")
+	}
+	if outputDir == "" {
+		// Apply policy scenario
+		var err error
+		// use temp dir
+		outputDir, err = os.MkdirTemp("", "aperturectl-generate")
+		if err != nil {
+			log.Error().Msgf("Error creating temp dir: %s", err)
+			return "", false, err
+		}
+		log.Info().Msgf("Using temp dir: %s", outputDir)
+		return outputDir, true, nil
+	} else {
+		// ask for user confirmation if the output directory already exists
+		if !overwrite {
+			if _, err := os.Stat(outputDir); err == nil {
+				fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
+				var response string
+				fmt.Scanln(&response)
+				if strings.ToLower(response) != "y" {
+					return "", false, fmt.Errorf("output directory '%s' already exists", outputDir)
+				}
 			}
 		}
-	}
 
-	err := os.MkdirAll(outputDir, os.ModePerm)
-	if err != nil {
-		return "", err
+		err := os.MkdirAll(outputDir, os.ModePerm)
+		if err != nil {
+			return "", false, err
+		}
+		absOutputDir, err := filepath.Abs(outputDir)
+		if err != nil {
+			return "", false, err
+		}
+		return absOutputDir, false, nil
 	}
-
-	err = os.MkdirAll(outputDir, os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-	outputDir, err = filepath.Abs(outputDir)
-	if err != nil {
-		return "", err
-	}
-	return outputDir, nil
 }
 
 func generateGraphs(content []byte, outputDir string, policyPath string, depth int) error {

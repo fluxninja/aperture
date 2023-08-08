@@ -88,7 +88,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "agent.apiSecret.name" (dict "agent" .Values.agent "context" . $ ) }}
                   key: {{ include "agent.apiSecret.key" (dict "agent" .Values.agent $ ) }}
-                  optional: "false"
+                  optional: false
             {{- end }}
             {{- if .Values.agent.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.agent.extraEnvVars "context" . $ ) | nindent 12 }}
