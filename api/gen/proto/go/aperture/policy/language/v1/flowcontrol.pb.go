@@ -1169,7 +1169,7 @@ type Rule struct {
 	// :::caution
 	//
 	// When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-	// labels are sent to FluxNinja Cloud for observability. Telemetry should be
+	// labels are sent to Aperture Cloud for observability. Telemetry should be
 	// disabled for sensitive labels.
 	//
 	// :::
@@ -3312,7 +3312,7 @@ type Rego_LabelProperties struct {
 	// :::caution
 	//
 	// When using [FluxNinja extension](/reference/fluxninja.md), telemetry enabled
-	// labels are sent to FluxNinja Cloud for observability. Telemetry should
+	// labels are sent to Aperture Cloud for observability. Telemetry should
 	// be disabled for sensitive labels.
 	//
 	// :::

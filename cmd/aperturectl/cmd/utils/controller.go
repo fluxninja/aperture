@@ -34,7 +34,7 @@ import (
 
 var controllerNs string
 
-// ControllerConfig is the config file structure for FluxNinja Cloud Controller.
+// ControllerConfig is the config file structure for Aperture Cloud Controller.
 type ControllerConfig struct {
 	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
 	URL    string `toml:"url"`
@@ -107,7 +107,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.apiKey,
 		"api-key",
 		"",
-		"FluxNinja Cloud API Key to be used when using Cloud Controller",
+		"Aperture Cloud API Key to be used when using Cloud Controller",
 	)
 	flags.StringVar(
 		&c.config,
