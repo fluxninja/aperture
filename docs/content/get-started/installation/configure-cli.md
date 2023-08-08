@@ -15,7 +15,7 @@ api_key = "API_KEY"
 ```
 
 Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-organization name and api key created for your project.
+organization name and API key created for your project.
 
 :::info
 
