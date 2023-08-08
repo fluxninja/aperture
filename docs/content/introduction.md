@@ -17,8 +17,8 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 [Aperture](https://github.com/fluxninja/aperture) is an open source load
-management platform. It's designed for classifying, prioritizing, scheduling,
-and rate-limiting API traffic in cloud applications. Built upon a foundation of
+management platform designed for classifying, prioritizing, scheduling, and
+rate-limiting API traffic in cloud applications. Built upon a foundation of
 observability and a global control plane, it offers a comprehensive suite of
 load management capabilities. These capabilities enhance the reliability and
 performance of cloud applications while also optimizing resource utilization.
