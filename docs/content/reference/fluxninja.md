@@ -51,20 +51,20 @@ export const CloudExtensionConfig = ({children, component}) => (
 ```
 
 FluxNinja extension enables [Aperture Cloud][] integration for Aperture Agents
-(and [self-hosted][Self-Hosting] Controllers). It enriches logs and
-traces collected by Aperture and sends them to Aperture Cloud. This data is
-batched and rolled up to optimize bandwidth usage. The extension also sends
-periodic heartbeats to Aperture Cloud to track health and configuration.
-This allows you to monitor your policies and analyze flows in Aperture Cloud.
+(and [self-hosted][self-hosting] Controllers). It enriches logs and traces
+collected by Aperture and sends them to Aperture Cloud. This data is batched and
+rolled up to optimize bandwidth usage. The extension also sends periodic
+heartbeats to Aperture Cloud to track health and configuration. This allows you
+to monitor your policies and analyze flows in Aperture Cloud.
 
 FluxNinja extension also provides the possibility to use the Aperture Cloud
 Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without [Aperture Controller][], Aperture Agents won't be able to work.
-While it's possible to [self-host][Self-Hosting] Aperture Controller,
-Aperture Cloud Controller can be used instead.
+Without the [Aperture Controller][], Aperture Agents won't be able to work.
+While it's possible to [self-host][self-hosting] Aperture Controller, Aperture
+Cloud Controller can be used instead.
 
 Aperture Cloud Controller is an [Aperture Controller] hosted by Aperture Cloud.
 The Cloud Controller is available for every Aperture Cloud Organization in the
@@ -100,12 +100,13 @@ of the organization on Aperture Cloud and API Key generated on it.
 
 :::note
 
-For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address. We are working on supporting `https` fallback.
+For connecting to Aperture Cloud-based controller, the `endpoint` should be a
+`grpc/http2` address. We are working on supporting `https` fallback.
 
 :::
 
-More details about particular agent installation modes could be found
-in [Get Started: Installation](/get-started/installation/agent/agent.md).
+More details about particular agent installation modes could be found in
+[Get Started: Installation](/get-started/installation/agent/agent.md).
 
 Configuration parameters for the FluxNinja Extension are as follows:
 
@@ -118,6 +119,6 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[Self-Hosting]: /self-hosting/self-hosting.md
-[Aperture Cloud]: /introduction.md
-[Aperture Controller]: /architecture/architecture.md#aperture-controller
+[self-hosting]: /self-hosting/self-hosting.md
+[aperture cloud]: /introduction.md
+[aperture controller]: /architecture/architecture.md#aperture-controller

@@ -35,8 +35,8 @@ Here's a simplified diagram of how Aperture Cloud (managed by FluxNinja)
 interacts with your infrastructure. Visit the [Architecture][architecture] page
 for more details.
 
-![Aperture Architecture (dark)](./assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
-![Aperture Architecture (light)](./assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+![Aperture Architecture (dark)](./assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
+![Aperture Architecture (light)](./assets/img/aperture-architecture-light.svg#gh-light-mode-only)
 
 :::info Sign-up
 

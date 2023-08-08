@@ -3,8 +3,7 @@ title: FAQ
 slug: faq
 sidebar_label: FAQ
 sidebar_position: 9
-description:
-  Frequently asked questions about FluxNinja Aperture and Aperture Cloud.
+description: Frequently asked questions about Aperture.
 image: /assets/img/aperture_logo.png
 keywords:
   - reliability
@@ -39,7 +38,7 @@ are still benefits of using Aperture:
 - Rate-limiting decisions can be made locally on the Agent if lazy sync is
   enabled.
 - In addition to Rate Limiter, Aperture also offers [Load
-  Scheduler][Load Scheduler], which Envoy doesn't have an equivalent of.
+  Scheduler][load scheduler], which Envoy doesn't have an equivalent of.
 
 ### Does Aperture reject requests immediately?
 
@@ -80,14 +79,14 @@ As Aperture observes the system, it can detect early sign of overload and can
 take necessary actions to prevent the system from becoming unhealthy. Therefore,
 the server gets enough time to reach a healthy state.
 
-It might happen that overload is happening too quickly for auto-scale to happen.
-In such case, the Load Scheduler will queue or drop excessive load to protect
-existing services.
+Overload might be happening too quickly for auto-scale to happen. In such case,
+the Load Scheduler will queue or drop excessive load to protect existing
+services.
 
 ### Can the Aperture Controller run in a non-containerized environment?
 
 No, as for now, we only support deploying [Aperture Controller][] on a
-Kubernetes cluster. Remember that it's also possible to use [Aperture Cloud
+Kubernetes cluster. Remember that it's also possible to use the [Aperture Cloud
 Controller] instead of deploying your own.
 
 ### Can the Aperture Agent run in a non-containerized environment?
@@ -107,8 +106,8 @@ With the following setup:
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
   [DaemonSet](/get-started/installation/agent/kubernetes/operator/daemonset.md)
-- 1 policy with a [rate limiter][Rate Limiter], a [load
-  scheduler][Load Scheduler] and a [flux meter][Flux Meter]
+- 1 policy with a [rate limiter][rate limiter], a [load
+  scheduler][load scheduler] and a [flux meter][flux meter]
 - 3 services in `demoapp` namespace instrumented using
   [Istio Integration](/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate over 30 minutes
@@ -120,10 +119,10 @@ We have observed the following performance numbers:
 | Aperture Agent | 0.783 mean, 1.02 max | 13.7 mean, 22.0 max |
 | Istio Proxy    | 1.81 mean, 2.11 max  | 12.5 mean, 20.8 max |
 
-[Rate Limiter]: /concepts/rate-limiter.md
-[Load Scheduler]: /concepts/scheduler/load-scheduler.md
-[Flux Meter]: /concepts/flux-meter.md
-[Classifier]: /concepts/classifier.md
-[Flow Label]: /concepts/flow-label.md
-[Aperture Controller]: /architecture/architecture.md#aperture-controller
-[Aperture Cloud Controller]: /reference/fluxninja.md#cloud-controller
+[rate limiter]: /concepts/rate-limiter.md
+[load scheduler]: /concepts/scheduler/load-scheduler.md
+[flux meter]: /concepts/flux-meter.md
+[classifier]: /concepts/classifier.md
+[flow label]: /concepts/flow-label.md
+[aperture controller]: /architecture/architecture.md#aperture-controller
+[aperture cloud controller]: /reference/fluxninja.md#cloud-controller

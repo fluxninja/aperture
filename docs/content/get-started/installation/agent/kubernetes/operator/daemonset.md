@@ -95,7 +95,7 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-   organization name and api key created for your project.
+   organization name and API key created for your project.
 
    :::note
 
@@ -221,7 +221,7 @@ Kubernetes Objects which will be created by following steps are listed
       ```
 
       Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-      organization name and api key created for your project.
+      organization name and API key created for your project.
 
       :::note
 
@@ -398,4 +398,4 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[Self-Hosting: Agent Configuration]: /self-hosting/agent.md#configuration
+[self-hosting: agent configuration]: /self-hosting/agent.md#configuration

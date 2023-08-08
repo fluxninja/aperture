@@ -15,11 +15,10 @@ import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Architecture of the self-hosted Aperture solution differs slightly from the
+The architecture of the self-hosted Aperture solution differs slightly from the
 regular [Aperture Cloud + Aperture combination](/architecture/architecture.md).
-The main difference is that the Aperture Controller is no longer part of
-Aperture Cloud and is deployed separately. Aperture Controller also needs its
-supporting databases.
+The main difference is that the Aperture Controller is deployed separately. The
+Aperture Controller also needs its supporting databases.
 
 Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus][] and [etcd][]. Prometheus enables Aperture to monitor
@@ -49,6 +48,6 @@ The roles of Aperture Agent and Aperture Controller are described on the
 
 :::
 
-[Architecture]: /architecture/architecture.md
-[Prometheus]: https://prometheus.io
+[architecture]: /architecture/architecture.md
+[prometheus]: https://prometheus.io
 [etcd]: https://etcd.io
