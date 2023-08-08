@@ -59,7 +59,7 @@ type ClientIn struct {
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
-	// Skipping creation of prometheus client if FluxNinja Cloud Controller is enabled for Aperture Agent
+	// Skipping creation of prometheus client if Aperture Cloud Controller is enabled for Aperture Agent
 	if in.ConfigOverride != nil && in.ConfigOverride.SkipClientCreation {
 		return nil, nil, nil
 	}

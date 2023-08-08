@@ -34,7 +34,7 @@ url = "controller hostname:port"
 api_key = "api key for the controller"
 ```
 
-All the fields are required (although the file itself is not). See [Configuring aperturectl][configure-aperturectl] for an example on how to configure aperturectl with [FluxNinja Cloud Controller][cloud-controller].
+All the fields are required (although the file itself is not). See [Configuring aperturectl][configure-aperturectl] for an example on how to configure aperturectl with [Aperture Cloud Controller][cloud-controller].
 
 :::tip
 

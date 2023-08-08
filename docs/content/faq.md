@@ -4,7 +4,7 @@ slug: faq
 sidebar_label: FAQ
 sidebar_position: 9
 description:
-  Frequently asked questions about FluxNinja Aperture and FluxNinja Cloud.
+  Frequently asked questions about FluxNinja Aperture and Aperture Cloud.
 image: /assets/img/aperture_logo.png
 keywords:
   - reliability
@@ -87,7 +87,7 @@ existing services.
 ### Can the Aperture Controller run in a non-containerized environment?
 
 No, as for now, we only support deploying [Aperture Controller][] on a
-Kubernetes cluster. Remember that it's also possible to use [FluxNinja Cloud
+Kubernetes cluster. Remember that it's also possible to use [Aperture Cloud
 Controller] instead of deploying your own.
 
 ### Can the Aperture Agent run in a non-containerized environment?
@@ -126,4 +126,4 @@ We have observed the following performance numbers:
 [Classifier]: /concepts/classifier.md
 [Flow Label]: /concepts/flow-label.md
 [Aperture Controller]: /architecture/architecture.md#aperture-controller
-[FluxNinja Cloud Controller]: /reference/fluxninja.md#cloud-controller
+[Aperture Cloud Controller]: /reference/fluxninja.md#cloud-controller

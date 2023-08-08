@@ -19,7 +19,7 @@ Controller.
 
 ## Configuration
 
-When using the Self-Hosted Aperture Controller instead of the FluxNinja Cloud
+When using the Self-Hosted Aperture Controller instead of the Aperture Cloud
 Controller, you need to turn off the `enable_cloud_controller` flag and
 configure Controller, etcd and Prometheus endpoints directly, for example:
 
@@ -85,8 +85,8 @@ You may need to adjust the endpoints, depending on your exact setup.
 
 :::info
 
-If you're not using [FluxNinja Cloud][] at all, simply remove the `fluxninja`
-and `secrets` sections.
+If you're not using [Aperture Cloud][] at all, simply remove the `fluxninja` and
+`secrets` sections.
 
 :::
 
@@ -97,5 +97,5 @@ commands (like `flow-control`) won't work.
 
 :::
 
-[FluxNinja Cloud]: /introduction.md
+[Aperture Cloud]: /introduction.md
 [install-agent]: /get-started/installation/agent/agent.md

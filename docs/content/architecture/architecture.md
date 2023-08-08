@@ -20,38 +20,38 @@ keywords:
 import Zoom from 'react-medium-image-zoom';
 ```
 
-The diagram below shows the interaction between the main components of
-[Aperture][]-powered [FluxNinja][] platform: FluxNinja Cloud, Aperture Agents,
-and various integrations.
+The diagram below shows the interaction between the main components of the
+[Aperture][] platform: Aperture Cloud, Aperture Agents, and various
+integrations.
 
-![FluxNinja Architecture](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
-![FluxNinja Architecture](../assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
+![Aperture Architecture (dark)](../assets/img/FluxNinja-arc-dark.svg#gh-dark-mode-only)
+![Aperture Architecture (light)](../assets/img/FluxNinja-arc-light.svg#gh-light-mode-only)
 
-FluxNinja Cloud is the brain of the system and its role is collecting data and
+Aperture Cloud is the brain of the system and its role is collecting data and
 evaluating policies. Policy evaluation is performed by Aperture Controller and
 results in high-level decisions, which are then sent down to Aperture Agents.
 
 Aperture Agents are part of the system that's much closer to the infrastructure
 – they're installed on every node. The Agents are where the actual execution of
-policies takes place. Note that while the Agents by themselves are able to
-collect some metrics and perform limited actions like auto-scaling, they need
+policies takes place. Note that while the Agents by themselves can collect some
+metrics and perform limited actions like auto-scaling, they need
 [integrations][] to actually control the traffic.
 
 Aperture provides [integrations][] for service meshes and gateways. It's also
 possible to instrument your application directly with [Aperture SDKs][]. When
-integration is enabled, it will ask the Agent on the local node to make a
-decision for every request or flow. Note that this RPC call never leaves the
-node, so its overhead and impact on latency are minimized.
+integration is enabled, it will ask the Agent on the local node to decide for
+every request or flow. Note that this RPC call never leaves the node, so its
+overhead and impact on latency are minimized.
 
-## FluxNinja Cloud
+## Aperture Cloud
 
-FluxNinja Cloud is a centralized platform that provides tools for policy
-management and observability. There are two significant components of FluxNinja
+Aperture Cloud is a centralized platform that provides tools for policy
+management and observability. There are two significant components of Aperture
 Cloud worth mentioning: The analytics database and the Aperture Controller.
 
 ### Analytics database
 
-FluxNinja uses a real-time analytics database to support FluxNinja Cloud
+FluxNinja uses a real-time analytics database to support Aperture Cloud
 observability capabilities. All the logs and traces collected by Aperture Agents
 are batched and rolled up and sent to FluxNinja. Thanks to the use of rollup,
 similar events are aggregated to reduce the traffic, but no data is lost (as it
@@ -59,14 +59,14 @@ would with usage of sampling-based solutions).
 
 ### Aperture Controller
 
-FluxNinja Cloud [provides a per-project Aperture
-Controller][FluxNinja Cloud Controller] for every organization.
+Aperture Cloud [provides a per-project Aperture
+Controller][aperture cloud controller] for every organization.
 
 The Aperture Controller is a centralized control system, equipped with a
 comprehensive global perspective. It is programmed using declarative policies.
-Policies can be applied by configuring a [pre-defined blueprint][Use Cases].
+Policies can be applied by configuring a [pre-defined blueprint][use cases].
 It's also possible to build a policy [from scratch from policy
-components][Policy].
+components][policy].
 
 A policy represents a closed-loop control circuit that is executed periodically.
 The control circuit draws input signals from [metrics](#metrics) aggregated
@@ -85,8 +85,8 @@ system.
 
 :::note
 
-Here the Aperture Controller is shown as part of FluxNinja Cloud Platform, but
-it's also possible to [self-host it][Self-Hosting].
+Here the Aperture Controller is shown as part of Aperture Cloud, but it's also
+possible to [self-host it][self-hosting].
 
 :::
 
@@ -111,7 +111,7 @@ a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
 Aperture Agents can be [installed on a variety of
-infrastructure][Install Agents] such as Kubernetes, VMs, or bare-metal. In
+infrastructure][install agents] such as Kubernetes, VMs, or bare-metal. In
 addition to flow control capabilities, Agents work with auto-scaling APIs for
 platforms such as Kubernetes, to help scale infrastructure when needed.
 
@@ -120,7 +120,7 @@ platforms such as Kubernetes, to help scale infrastructure when needed.
 Aperture Agents use metrics to provide input signals to policies in the Aperture
 Controller. These metrics can either be defined based on existing traffic using
 [Flux Meters](/concepts/flux-meter.md) or using [any OpenTelemetry Collector
-receiver][Metrics]. These metrics can then be used in policies using [PromQL
+receiver][metrics]. These metrics can then be used in policies using [PromQL
 syntax][].
 
 :::info
@@ -130,15 +130,14 @@ and the exact databases, see [Architecture of Self-Hosted Aperture][].
 
 :::
 
-[FluxNinja]: /introduction.md
-[Aperture]: https://github.com/fluxninja/aperture
-[FluxNinja Cloud Controller]: /reference/fluxninja.md#cloud-controller
-[Architecture of Self-Hosted Aperture]: /self-hosting/architecture.md
-[Use Cases]: /use-cases/use-cases.md
-[Policy]: /concepts/advanced/policy.md
+[aperture]: https://github.com/fluxninja/aperture
+[aperture cloud controller]: /reference/fluxninja.md#cloud-controller
+[architecture of self-hosted aperture]: /self-hosting/architecture.md
+[use cases]: /use-cases/use-cases.md
+[policy]: /concepts/advanced/policy.md
 [integrations]: /integrations/integrations.md
-[Aperture SDKs]: /integrations/sdk/sdk.md
-[Metrics]: /integrations/metrics/metrics.md
-[Install Agents]: /get-started/installation/agent/agent.md
-[Self-Hosting]: /self-hosting/self-hosting.md
-[PromQL syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/
+[aperture sdks]: /integrations/sdk/sdk.md
+[metrics]: /integrations/metrics/metrics.md
+[install agents]: /get-started/installation/agent/agent.md
+[self-hosting]: /self-hosting/self-hosting.md
+[promql syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/

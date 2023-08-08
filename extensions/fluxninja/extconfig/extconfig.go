@@ -23,17 +23,17 @@ const (
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
 	// Address to gRPC or HTTP(s) server listening in agent service.
-	// For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+	// For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
 	// For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
-	// Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
+	// Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 	//
 	// Enabling this flag configures various agent components to point to the
-	// FluxNinja Cloud Controller, for example configures remote etcd endpoint and disables
+	// Aperture Cloud Controller, for example configures remote etcd endpoint and disables
 	// local Prometheus OTel pipelines.
 	//
 	// Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.

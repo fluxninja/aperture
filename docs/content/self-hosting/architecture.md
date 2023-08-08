@@ -16,9 +16,9 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Architecture of the self-hosted Aperture solution differs slightly from the
-regular [FluxNinja Cloud + Aperture combination](/architecture/architecture.md).
+regular [Aperture Cloud + Aperture combination](/architecture/architecture.md).
 The main difference is that the Aperture Controller is no longer part of
-FluxNinja Cloud and is deployed separately. Aperture Controller also needs its
+Aperture Cloud and is deployed separately. Aperture Controller also needs its
 supporting databases.
 
 Aperture uses two databases to store configuration, telemetry, and flow control

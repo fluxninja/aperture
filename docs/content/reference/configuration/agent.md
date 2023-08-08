@@ -1567,9 +1567,9 @@ EnableCloudController.
 
 <!-- vale on -->
 
-Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
+Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 
-Enabling this flag configures various agent components to point to the FluxNinja
+Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
@@ -1587,7 +1587,7 @@ Aperture Controller.
 <!-- vale on -->
 
 Address to gRPC or HTTP(s) server listening in agent service. For connecting to
-FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address. For
+Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address. For
 self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 
 </dd>
