@@ -22,7 +22,7 @@ Below are the instructions to install the Aperture Agent on Docker.
 
 ## Installation
 
-1. Create a file named `agent.yaml` with below content for passing the
+1. Create a file named `agent.yaml` with the below content for passing the
    configuration to the Aperture Agent:
 
    ```yaml
@@ -45,13 +45,14 @@ Below are the instructions to install the Aperture Agent on Docker.
        enabled: false
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
-   organization name and api key created for your project.
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
+   organization name and API key created for your project.
 
    :::note
 
    If you are using a Self-Hosted Controller Aperture Controller, modify the
-   above configuration as explained in [Self-Hosting: Agent Configuration][].
+   above configuration as explained in [Self-Hosting Agent
+   Configuration][self-hosting-agent-configuration].
 
    :::
 
@@ -88,4 +89,4 @@ Below are the instructions to install the Aperture Agent on Docker.
    docker rm -f aperture-agent
    ```
 
-[Self-Hosting: Agent Configuration]: /self-hosting/agent.md#configuration
+[self-hosting-agent-configuration]: /self-hosting/agent.md#configuration

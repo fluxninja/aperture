@@ -113,10 +113,10 @@ definitions:
             enable_cloud_controller:
                 default: false
                 description: |-
-                    Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
+                    Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 
                     Enabling this flag configures various agent components to point to the
-                    FluxNinja Cloud Controller, for example configures remote etcd endpoint and disables
+                    Aperture Cloud Controller, for example configures remote etcd endpoint and disables
                     local Prometheus OTel pipelines.
 
                     Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
@@ -127,7 +127,7 @@ definitions:
             endpoint:
                 description: |-
                     Address to gRPC or HTTP(s) server listening in agent service.
-                    For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+                    For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
                     For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
                 pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string

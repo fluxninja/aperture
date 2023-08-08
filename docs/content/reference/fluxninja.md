@@ -50,24 +50,24 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-FluxNinja extension enables [FluxNinja Cloud][] integration for Aperture Agents
-(and [self-hosted][Self-Hosting] Controllers). It enriches logs and
-traces collected by Aperture and sends them to FluxNinja Cloud. This data is
+FluxNinja extension enables [Aperture Cloud][aperture-cloud] integration for
+Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
+and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
-periodic heartbeats to FluxNinja Cloud to track health and configuration.
-This allows you to monitor your policies and analyze flows in FluxNinja Cloud.
+periodic heartbeats to Aperture Cloud to track health and configuration. This
+allows you to monitor your policies and analyze flows in Aperture Cloud.
 
-FluxNinja extension also provides the possibility to use the FluxNinja Cloud
+FluxNinja extension also provides the possibility to use the Aperture Cloud
 Controller.
 
-## FluxNinja Cloud Controller {#cloud-controller}
+## Aperture Cloud Controller {#cloud-controller}
 
-Without [Aperture Controller][], Aperture Agents won't be able to work.
-While it's possible to [self-host][Self-Hosting] Aperture Controller,
-FluxNinja Cloud Controller can be used instead.
+Without the [Aperture Controller][aperture-controller], Aperture Agents won't be
+able to work. While it's possible to [self-host][self-hosting] Aperture
+Controller, Aperture Cloud Controller can be used instead.
 
-FluxNinja Cloud Controller is an [Aperture Controller] hosted by FluxNinja Cloud.
-The Cloud Controller is available for every FluxNinja Cloud Organization in the
+Aperture Cloud Controller is an [Aperture Controller] hosted by Aperture Cloud.
+The Cloud Controller is available for every Aperture Cloud Organization in the
 `default` project.
 
 ## Configuration
@@ -76,7 +76,7 @@ Configure the following parameters in the `values.yaml` file generated during
 installation of the Aperture Controller or Agent:
 
 <Tabs>
-  <TabItem value="FluxNinja Cloud Controller">
+  <TabItem value="Aperture Cloud Controller">
     <Tabs>
       <TabItem value="Agent">
         <CloudExtensionConfig />
@@ -96,16 +96,18 @@ installation of the Aperture Controller or Agent:
 </Tabs>
 
 Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
-of the organization on FluxNinja Cloud and API Key generated on it.
+of the organization on Aperture Cloud and API Key generated on it.
 
 :::note
 
-For connecting to FluxNinja Cloud Controller, the `endpoint` should be a `grpc/http2` address. We are working on supporting `https` fallback.
+For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
+`grpc/http2` address. We are still working on supporting the `https` fallback
+option.
 
 :::
 
-More details about particular agent installation modes could be found
-in [Get Started: Installation](/get-started/installation/agent/agent.md).
+More details about particular agent installation modes could be found in
+[Get Started: Installation](/get-started/installation/agent/agent.md).
 
 Configuration parameters for the FluxNinja Extension are as follows:
 
@@ -118,6 +120,6 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[Self-Hosting]: /self-hosting/self-hosting.md
-[FluxNinja Cloud]: /introduction.md
-[Aperture Controller]: /architecture/architecture.md#aperture-controller
+[self-hosting]: /self-hosting/self-hosting.md
+[aperture-cloud]: /introduction.md
+[aperture-controller]: /architecture/architecture.md#aperture-controller

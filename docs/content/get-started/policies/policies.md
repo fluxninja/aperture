@@ -97,7 +97,7 @@ You can then edit the `values.yaml` to provide the required fields
 </TabItem>
 </Tabs>
 
-## Generating Policies and Dashboards
+## Generating Policies and Dashboards {#generating-policies}
 
 Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
@@ -195,11 +195,11 @@ kubectl get policies.fluxninja.com -n aperture-controller
 </Tabs>
 ```
 
-The policy runtime can be visualized in [FluxNinja Cloud][], Grafana or any
-other Prometheus compatible analytics tool. Refer to the Prometheus compatible
-metrics available from the [controller][controller-metrics] and
-[agent][agent-metrics]. Some policy [blueprints][blueprints] come with
-recommended Grafana dashboards.
+The policy runtime can be visualized in [Aperture Cloud][aperture-cloud],
+Grafana or any other Prometheus compatible analytics tool. Refer to the
+Prometheus compatible metrics available from the
+[controller][controller-metrics] and [agent][agent-metrics]. Some policy
+[blueprints][blueprints] come with recommended Grafana dashboards.
 
 ## Deleting Policies
 
@@ -234,4 +234,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
 [self-hosted]: /self-hosting/self-hosting.md
-[FluxNinja Cloud]: /introduction.md
+[aperture-cloud]: /introduction.md

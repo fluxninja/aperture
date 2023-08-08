@@ -9,15 +9,16 @@ it from corresponding go structs from cmd/aperturectl/cmd/utils/controller.go --
 
 ## Location
 
-To avoid specifying `--controller` and `--api-key` in every `aperturectl` invocation,
-aperturectl can use a configuration file located in `~/.aperturectl/config`.
+To avoid specifying `--controller` and `--api-key` in every `aperturectl`
+invocation, aperturectl can use a configuration file located in
+`~/.aperturectl/config`.
 
-Location of this file can be overridden by `APERTURE_CONFIG` environment
+The location of this file can be overridden by the `APERTURE_CONFIG` environment
 variable and `--config` option (with the command-line option having higher
 precedence).
 
-When any explicit flag related to controller location (e.g., --kube,
---controller, or --api-key) is used, the _entire_ configuration file is
+When any explicit flag related to controller location (e.g., `--kube`,
+`--controller`, or `--api-key`) is used, the _entire_ configuration file is
 ignored.
 
 If the configuration file is not specified nor present at the default location,
@@ -34,7 +35,9 @@ url = "controller hostname:port"
 api_key = "api key for the controller"
 ```
 
-All the fields are required (although the file itself is not). See [Configuring aperturectl][configure-aperturectl] for an example on how to configure aperturectl with [FluxNinja Cloud Controller][cloud-controller].
+All the fields are required (although the file itself is not). See [Configuring
+aperturectl][configure-aperturectl] for an example on how to configure
+aperturectl with [Aperture Cloud Controller][cloud-controller].
 
 :::tip
 
