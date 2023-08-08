@@ -76,8 +76,9 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters of etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` and passing it with `install` command:
+1. Configure the below parameters of Aperture Cloud endpoint and API key for the
+   Agent Custom Resource by creating a `values.yaml` and passing it with
+   `install` command:
 
    ```yaml
    agent:
@@ -94,13 +95,14 @@ Kubernetes Objects which will be created by following steps are listed
          value: API_KEY
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
-   organization name and api key created for your project.
+   Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
+   organization name and API key created for your project.
 
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
-   configuration as explained in [Self-Hosting: Agent Configuration][].
+   configuration as explained in [Self-Hosting: Agent
+   Configuration][self-hosting-agent].
 
    :::
 
@@ -220,13 +222,14 @@ Kubernetes Objects which will be created by following steps are listed
             value: API_KEY
       ```
 
-      Replace the `ORGANIZATION_NAME` and `API_KEY` with your FluxNinja Cloud
-      organization name and api key created for your project.
+      Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
+      organization name and API key created for your project.
 
       :::note
 
       If you are using a Self-Hosted Aperture Controller, modify the above
-      configuration as explained in [Self-Hosting: Agent Configuration][].
+      configuration as explained in [Self-Hosting: Agent
+      Configuration][self-hosting-agent].
 
       :::
 
@@ -398,4 +401,4 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[Self-Hosting: Agent Configuration]: /self-hosting/agent.md#configuration
+[self-hosting-agent]: /self-hosting/agent.md#configuration

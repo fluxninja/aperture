@@ -867,6 +867,20 @@ List of etcd server endpoints
 Lease time-to-live
 
 </dd>
+<dt>log_level</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of:
+`debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL`,
+default: `"warn"`)
+
+<!-- vale on -->
+
+LogLevel of logs coming from inside the etcd client
+
+</dd>
 <dt>namespace</dt>
 <dd>
 
@@ -974,9 +988,9 @@ EnableCloudController.
 
 <!-- vale on -->
 
-Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
+Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 
-Enabling this flag configures various agent components to point to the FluxNinja
+Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
@@ -993,8 +1007,9 @@ Aperture Controller.
 
 <!-- vale on -->
 
-Address to gRPC or HTTP(s) server listening in agent service. To use HTTP
-protocol, the address must start with `http(s)://`.
+Address to gRPC or HTTP(s) server listening in agent service. For connecting to
+Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address. For
+self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>

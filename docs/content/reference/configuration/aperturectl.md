@@ -1,7 +1,7 @@
 ---
 title: aperturectl Configuration File Format Reference
 sidebar_position: 5
-sidebar_label: ".aperturectl/config"
+sidebar_label: "Aperturectl"
 ---
 
 <!-- If our configuration file grows, would be nice to automatically generate
@@ -9,15 +9,16 @@ it from corresponding go structs from cmd/aperturectl/cmd/utils/controller.go --
 
 ## Location
 
-To avoid specifying `--controller` and `--api-key` in every `aperturectl` invocation,
-aperturectl can use a configuration file located in `~/.aperturectl/config`.
+To avoid specifying `--controller` and `--api-key` in every `aperturectl`
+invocation, aperturectl can use a configuration file located in
+`~/.aperturectl/config`.
 
-Location of this file can be overridden by `APERTURE_CONFIG` environment
+The location of this file can be overridden by the `APERTURE_CONFIG` environment
 variable and `--config` option (with the command-line option having higher
 precedence).
 
-When any explicit flag related to controller location (e.g., --kube,
---controller, or --api-key) is used, the _entire_ configuration file is
+When any explicit flag related to controller location (e.g., `--kube`,
+`--controller`, or `--api-key`) is used, the _entire_ configuration file is
 ignored.
 
 If the configuration file is not specified nor present at the default location,
@@ -26,7 +27,7 @@ if the `--kube` flag were passed).
 
 ## Format
 
-The aperturectl configuration file uses the following [TOML][] syntax:
+The aperturectl configuration file uses the following [TOML][toml] syntax:
 
 ```toml
 [controller]
@@ -35,8 +36,8 @@ api_key = "api key for the controller"
 ```
 
 All the fields are required (although the file itself is not). See [Configuring
-aperturectl][] for an example on how to configure aperturectl with [FluxNinja
-Cloud Controller][].
+aperturectl][configure-aperturectl] for an example on how to configure
+aperturectl with [Aperture Cloud Controller][cloud-controller].
 
 :::tip
 
@@ -45,6 +46,6 @@ environment variable to switch between different projects and organizations.
 
 :::
 
-[TOML]: https://toml.io/
-[Configuring aperturectl]: /get-started/installation/configure-cli.md
-[FluxNinja Cloud Controller]: /reference/fluxninja.md#cloud-controller
+[toml]: https://toml.io/
+[configure-aperturectl]: /get-started/installation/configure-cli.md
+[cloud-controller]: /reference/fluxninja.md#cloud-controller

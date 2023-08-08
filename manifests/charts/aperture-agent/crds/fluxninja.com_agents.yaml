@@ -1123,6 +1123,10 @@ spec:
                       lease_ttl:
                         description: Lease time-to-live
                         type: string
+                      log_level:
+                        description: LogLevel of logs coming from inside the etcd
+                          client
+                        type: string
                       namespace:
                         description: etcd namespace
                         type: string
@@ -1301,17 +1305,18 @@ spec:
                           metrics. Implied by EnableCloudController.
                         type: boolean
                       enable_cloud_controller:
-                        description: "Whether to connect to [FluxNinja Cloud Controller](/reference/fluxninja.md).
+                        description: "Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
                           \n Enabling this flag configures various agent components
-                          to point to the FluxNinja Cloud Controller, for example
-                          configures remote etcd endpoint and disables local Prometheus
-                          OTel pipelines. \n Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
+                          to point to the Aperture Cloud Controller, for example configures
+                          remote etcd endpoint and disables local Prometheus OTel
+                          pipelines. \n Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
                           Aperture Controller."
                         type: boolean
                       endpoint:
                         description: Address to gRPC or HTTP(s) server listening in
-                          agent service. To use HTTP protocol, the address must start
-                          with `http(s)://`.
+                          agent service. For connecting to Aperture Cloud Controller,
+                          the `endpoint` should be a `grpc/http2` address. For self-hosted
+                          controller, the HTTP protocol address can start with `http(s)://`.
                         type: string
                       heartbeat_interval:
                         description: Interval between each heartbeat.

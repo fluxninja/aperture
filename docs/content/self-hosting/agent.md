@@ -10,16 +10,16 @@ import TabItem from '@theme/TabItem';
 
 ## Installation
 
-Installation process of Aperture Agent doesn't change when using the Self-Hosted
+Installation process of Aperture Agent doesn't change when using the self-hosted
 Aperture Controller, so follow the steps from the [Aperture Agent installation
 guide][install-agent].
 
-Below are the configuration options that are specific to Self-Hosted Aperture
-Controller.
+Below are the configuration options that are specific to the self-hosted
+Aperture Controller.
 
 ## Configuration
 
-When using the Self-Hosted Aperture Controller instead of the FluxNinja Cloud
+When using the self-hosted Aperture Controller instead of the Aperture Cloud
 Controller, you need to turn off the `enable_cloud_controller` flag and
 configure Controller, etcd and Prometheus endpoints directly, for example:
 
@@ -76,7 +76,7 @@ agent_functions:
   endpoints: ["aperture-controller:8080"]
 ```
 
-You may need to adjust the endpoints, depending on your exact setup.
+You might need to adjust the endpoints, depending on your exact setup.
 
 ```mdx-code-block
   </TabItem>
@@ -85,8 +85,8 @@ You may need to adjust the endpoints, depending on your exact setup.
 
 :::info
 
-If you're not using [FluxNinja Cloud][] at all, simply remove the `fluxninja`
-and `secrets` sections.
+If you're not using [Aperture Cloud][aperture-cloud], simply remove the
+`fluxninja` and `secrets` sections.
 
 :::
 
@@ -97,5 +97,5 @@ commands (like `flow-control`) won't work.
 
 :::
 
-[FluxNinja Cloud]: /introduction.md
+[aperture-cloud]: /introduction.md
 [install-agent]: /get-started/installation/agent/agent.md
