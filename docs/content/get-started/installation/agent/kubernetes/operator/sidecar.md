@@ -95,9 +95,9 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters of etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` with the following parameters and
-   passing it with `install` command:
+1. Configure the below parameters of Aperture Cloud endpoint and API key for the
+   Agent Custom Resource by creating a `values.yaml` with the following
+   parameters and passing it with `install` command:
 
    ```yaml
    agent:

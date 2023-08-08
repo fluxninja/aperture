@@ -55,8 +55,8 @@ agent:
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-1. Configure the below parameters of etcd and Prometheus for the Agent by
-   updating the `values.yaml` and passing it with `install` command:
+1. Configure the Aperture Cloud endpoint and API key parameters in the Agent.
+   Update the `values.yaml` file and pass it with the `install` command:
 
    ```yaml
    agent:
