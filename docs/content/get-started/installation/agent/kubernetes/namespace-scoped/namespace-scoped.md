@@ -80,7 +80,8 @@ your cluster.
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
-   configuration as explained in [Self-Hosting: Agent Configuration][].
+   configuration as explained in [Self-Hosting: Agent
+   Configuration][self-hosting-config].
 
    :::
 
@@ -265,4 +266,4 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[self-hosting: agent configuration]: /self-hosting/agent.md#configuration
+[self-hosting-config]: /self-hosting/agent.md#configuration

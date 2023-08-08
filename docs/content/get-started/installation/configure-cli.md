@@ -19,21 +19,17 @@ organization name and API key created for your project.
 
 :::info
 
-See also [aperturectl configuration file format reference][].
+See also [aperturectl configuration file format reference][aperturectl-config].
 
 :::
 
-:::note Self-Hosted Aperture Controller
+:::note Self-hosted Aperture Controller
 
-With a [Self-Hosted][self-hosted] Aperture Controller, if the Controller is at
+With a [self-hosted][self-hosted] Aperture Controller, if the Controller is at
 the cluster pointed at by `~/.kube/config` or `KUBECONFIG`, no configuration
 file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 :::
 
-<!-- prettier-ignore-start -->
-
 [self-hosted]: /self-hosting/self-hosting.md
-[aperturectl configuration file format reference]: /reference/configuration/aperturectl.md
-
-<!-- prettier-ignore-end -->
+[aperturectl-config]: /reference/configuration/aperturectl.md

@@ -100,7 +100,8 @@ Kubernetes Objects which will be created by following steps are listed
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
-   configuration as explained in [Self-Hosting: Agent Configuration][].
+   configuration as explained in [Self-Hosting: Agent
+   Configuration][self-hosting-agent].
 
    :::
 
@@ -226,7 +227,8 @@ Kubernetes Objects which will be created by following steps are listed
       :::note
 
       If you are using a Self-Hosted Aperture Controller, modify the above
-      configuration as explained in [Self-Hosting: Agent Configuration][].
+      configuration as explained in [Self-Hosting: Agent
+      Configuration][self-hosting-agent].
 
       :::
 
@@ -398,4 +400,4 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[self-hosting: agent configuration]: /self-hosting/agent.md#configuration
+[self-hosting-agent]: /self-hosting/agent.md#configuration

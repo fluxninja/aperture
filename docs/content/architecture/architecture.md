@@ -21,7 +21,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 The diagram below shows the interaction between the main components of the
-[Aperture][] platform: Aperture Cloud, Aperture Agents, and various
+[Aperture platform][aperture]: Aperture Cloud, Aperture Agents, and various
 integrations.
 
 ![Aperture Architecture (dark)](../assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
@@ -35,13 +35,13 @@ Aperture Agents are part of the system that's much closer to the infrastructure
 – they're installed on every node. The Agents are where the actual execution of
 policies takes place. Note that while the Agents by themselves can collect some
 metrics and perform limited actions like auto-scaling, they need
-[integrations][] to actually control the traffic.
+[integrations][integrations] to actually control the traffic.
 
-Aperture provides [integrations][] for service meshes and gateways. It's also
-possible to instrument your application directly with [Aperture SDKs][]. When
-integration is enabled, it will ask the Agent on the local node to decide for
-every request or flow. Note that this RPC call never leaves the node, so its
-overhead and impact on latency are minimized.
+Aperture provides [integrations][integrations] for service meshes and gateways.
+It's also possible to instrument your application directly with [Aperture
+SDKs][sdks]. When integration is enabled, it will ask the Agent on the local
+node to decide for every request or flow. Note that this RPC call never leaves
+the node, so its overhead and impact on latency are minimized.
 
 ## Aperture Cloud
 
@@ -60,11 +60,11 @@ would with usage of sampling-based solutions).
 ### Aperture Controller
 
 Aperture Cloud [provides a per-project Aperture
-Controller][aperture cloud controller] for every organization.
+Controller][aperture-cloud-controller] for every organization.
 
 The Aperture Controller is a centralized control system, equipped with a
 comprehensive global perspective. It is programmed using declarative policies.
-Policies can be applied by configuring a [pre-defined blueprint][use cases].
+Policies can be applied by configuring a [pre-defined blueprint][use-cases].
 It's also possible to build a policy [from scratch from policy
 components][policy].
 
@@ -111,7 +111,7 @@ a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
 Aperture Agents can be [installed on a variety of
-infrastructure][install agents] such as Kubernetes, VMs, or bare-metal. In
+infrastructure][install-agents] such as Kubernetes, VMs, or bare-metal. In
 addition to flow control capabilities, Agents work with auto-scaling APIs for
 platforms such as Kubernetes, to help scale infrastructure when needed.
 
@@ -121,23 +121,24 @@ Aperture Agents use metrics to provide input signals to policies in the Aperture
 Controller. These metrics can either be defined based on existing traffic using
 [Flux Meters](/concepts/flux-meter.md) or using [any OpenTelemetry Collector
 receiver][metrics]. These metrics can then be used in policies using [PromQL
-syntax][].
+syntax][promql-syntax].
 
 :::info
 
 For more details about the interaction between Aperture Controller and Agents
-and the exact databases, see [Architecture of Self-Hosted Aperture][].
+and the exact databases, see [Architecture of Self-Hosted
+Aperture][architecture-self-hosted].
 
 :::
 
 [aperture]: https://github.com/fluxninja/aperture
-[aperture cloud controller]: /reference/fluxninja.md#cloud-controller
-[architecture of self-hosted aperture]: /self-hosting/architecture.md
-[use cases]: /use-cases/use-cases.md
+[aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
+[architecture-self-hosted]: /self-hosting/architecture.md
+[use-cases]: /use-cases/use-cases.md
 [policy]: /concepts/advanced/policy.md
 [integrations]: /integrations/integrations.md
-[aperture sdks]: /integrations/sdk/sdk.md
+[sdks]: /integrations/sdk/sdk.md
 [metrics]: /integrations/metrics/metrics.md
-[install agents]: /get-started/installation/agent/agent.md
+[install-agents]: /get-started/installation/agent/agent.md
 [self-hosting]: /self-hosting/self-hosting.md
-[promql syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/
+[promql-syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/
