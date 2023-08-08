@@ -24,6 +24,5 @@ Dashboards][generating-policies] contains an example how to run this command).
 `kubectl apply`.
 
 [generate]: /reference/aperturectl/blueprints/generate/generate.md
-[generating-policies]:
-  /get-started/policies/policies.md#generating-policies-and-dashboards
+[generating-policies]: /get-started/policies/policies.md#generating-policies
 [example]: /use-cases/adaptive-service-protection/average-latency-feedback.md

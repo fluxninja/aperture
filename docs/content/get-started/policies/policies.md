@@ -97,7 +97,7 @@ You can then edit the `values.yaml` to provide the required fields
 </TabItem>
 </Tabs>
 
-## Generating Policies and Dashboards
+## Generating Policies and Dashboards {#generating-policies}
 
 Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
