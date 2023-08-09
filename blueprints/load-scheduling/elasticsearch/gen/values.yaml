@@ -1,0 +1,38 @@
+# Generated values file for load-scheduling/elasticsearch blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/elasticsearch
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  service_protection_core:
+    # Parameters for Adaptive Load Scheduler.
+    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Required: True
+    adaptive_load_scheduler:
+      alerter:
+        alert_name: "Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      load_multiplier_linear_increment: 0.025
+      load_scheduler:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
+            service: __REQUIRED_FIELD__
+      max_load_multiplier: 2
+  # Setpoint.
+  # Type: float64
+  # Required: True
+  setpoint: __REQUIRED_FIELD__
+  # Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
+  # Type: elasticsearch
+  # Required: True
+  elasticsearch:
+    agent_group: "default"
+    endpoint: __REQUIRED_FIELD__
+    password: __REQUIRED_FIELD__
+    username: __REQUIRED_FIELD__

@@ -1,41 +1,24 @@
 ---
-title: Load Scheduling for PostgreSQL
+title: Load Scheduling for Elasticsearch
 keywords:
   - blueprints
 sidebar_position: 4
-sidebar_label: Load Scheduling for PostgreSQL
+sidebar_label: Load Scheduling for Elasticsearch
 ---
 
 ## Introduction
 
-This policy detects traffic overloads and cascading failure build-up on
-PostgreSQL by checking the real-time percentage of PostgreSQL connections
-against the maximum number of connections.
+By default, this policy detects when the Elasticsearch service is overloaded
+using the `search` thread pool queue size metric. The policy is based on the
+[adaptive load scheduling](/reference/configuration/spec.md#adaptive-load-scheduler)
+component.
 
-It also uses the CPU utilization ratio of the PostgreSQL pod to confirm traffic
-overloads and cascading failure build-up. The CPU utilization ratio is the
-percentage of CPU used by the PostgreSQL pod divided by the total CPU available
-to the pod.
-
-All the PostgreSQL related metrics are collected by the
-[PostgreSQL OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/postgresqlreceiver)
+All the Elasticsearch related metrics are collected by the
+[Elasticsearch OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/elasticsearchreceiver)
 so if the system under observation requires using different metrics for the
 overload confirmation, the
-[list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/postgresqlreceiver/metadata.yaml)
+[list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/elasticsearchreceiver/metadata.yaml)
 can be used to configure the policy.
-
-A gradient controller calculates a proportional response to limit the accepted
-token rate. The token rate is reduced by a multiplicative factor when the
-service is overloaded, and increased by an additive factor while the service is
-no longer overloaded.
-
-:::info
-
-Please see reference for the
-[`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
-component that is used within this blueprint.
-
-:::
 
 <!-- Configuration Marker -->
 
@@ -49,7 +32,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/postgresql`}>load-scheduling/postgresql</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/elasticsearch`}>load-scheduling/elasticsearch</a>
 
 <!-- vale on -->
 
@@ -123,10 +106,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='policy.promql_query'
-    description='PromQL query to detect PostgreSQL overload.'
+    description='PromQL query to detect ElasticSearch overload.'
     type='string'
     reference=''
-    value='"(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100"'
+    value='"elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}"'
 />
 
 <!-- vale on -->
@@ -147,13 +130,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-postgresql"></a>
+<a id="policy-elasticsearch"></a>
 
 <ParameterDescription
-    name='policy.postgresql'
-    description='Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.'
-    type='Object (postgresql)'
-    reference='#postgresql'
+    name='policy.elasticsearch'
+    description='Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.'
+    type='Object (elasticsearch)'
+    reference='#elasticsearch'
     value='{"agent_group": "default", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
 />
 
@@ -294,7 +277,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Name of the main dashboard.'
     type='string'
     reference=''
-    value='"Aperture Service Protection for PostgreSQL"'
+    value='"Aperture Service Protection for Elasticsearch"'
 />
 
 <!-- vale on -->
@@ -497,13 +480,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-#### postgresql {#postgresql}
+#### elasticsearch {#elasticsearch}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="postgresql-agent-group"></a>
+<a id="elasticsearch-agent-group"></a>
 
 <ParameterDescription
     name='agent_group'
@@ -517,7 +500,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-collection-interval"></a>
+<a id="elasticsearch-collection-interval"></a>
 
 <ParameterDescription
     name='collection_interval'
@@ -531,25 +514,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-database"></a>
-
-<ParameterDescription
-    name='database'
-    description='The list of databases for which the receiver will attempt to collect statistics.'
-    type='Array of string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-endpoint"></a>
+<a id="elasticsearch-endpoint"></a>
 
 <ParameterDescription
     name='endpoint'
-    description='Endpoint of the PostgreSQL.'
+    description='Endpoint of the Elasticsearch.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -559,7 +528,21 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-initial-delay"></a>
+<a id="elasticsearch-indices"></a>
+
+<ParameterDescription
+    name='indices'
+    description='Index filters that define which indices are scraped for index-level metrics.'
+    type='Array of string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-initial-delay"></a>
 
 <ParameterDescription
     name='initial_delay'
@@ -573,11 +556,25 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-password"></a>
+<a id="elasticsearch-nodes"></a>
+
+<ParameterDescription
+    name='nodes'
+    description='Node filters that define which nodes are scraped for node-level and cluster-level metrics.'
+    type='Array of string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-password"></a>
 
 <ParameterDescription
     name='password'
-    description='Password of the PostgreSQL.'
+    description='Password of the Elasticsearch.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -587,12 +584,12 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-transport"></a>
+<a id="elasticsearch-skip-cluster-metrics"></a>
 
 <ParameterDescription
-    name='transport'
-    description='The transport protocol being used to connect to postgresql. Available options are tcp and unix.'
-    type='string'
+    name='skip_cluster_metrics'
+    description='If true, cluster-level metrics will not be scraped.'
+    type='Boolean'
     reference=''
     value='null'
 />
@@ -601,90 +598,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-username"></a>
+<a id="elasticsearch-username"></a>
 
 <ParameterDescription
     name='username'
-    description='Username of the PostgreSQL.'
+    description='Username of the Elasticsearch.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-##### tls {#postgresql-tls}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-ca-file"></a>
-
-<ParameterDescription
-    name='ca_file'
-    description='A set of certificate authorities used to validate the database server SSL certificate.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-cert-file"></a>
-
-<ParameterDescription
-    name='cert_file'
-    description='A cerficate used for client authentication, if necessary.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-insecure"></a>
-
-<ParameterDescription
-    name='insecure'
-    description='Whether to enable client transport security for the postgresql connection.'
-    type='Boolean'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-insecure-skip-verify"></a>
-
-<ParameterDescription
-    name='insecure_skip_verify'
-    description='Whether to validate server name and certificate if client transport security is enabled.'
-    type='Boolean'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-tls-key-file"></a>
-
-<ParameterDescription
-    name='key_file'
-    description='An SSL key used for client authentication, if necessary.'
-    type='string'
-    reference=''
-    value='null'
 />
 
 <!-- vale on -->

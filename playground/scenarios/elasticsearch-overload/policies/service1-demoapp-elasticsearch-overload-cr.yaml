@@ -1,0 +1,79 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: service1-demoapp-elasticsearch-overload
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              selectors:
+              - agent_group: default
+                control_point: ingress
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}
+    - variable:
+        constant_output:
+          value: 250
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 10s
+  resources:
+    flow_control:
+      classifiers: []
+    infra_meters:
+      elasticsearch:
+        agent_group: default
+        per_agent_group: false
+        receivers:
+          elasticsearch:
+            endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
+            metrics:
+              elasticsearch.node.operations.completed:
+                enabled: true
+              elasticsearch.node.operations.current:
+                enabled: true
+              elasticsearch.node.operations.get.completed:
+                enabled: true
+              elasticsearch.node.operations.get.time:
+                enabled: true
+              elasticsearch.node.operations.time:
+                enabled: true
+              jvm.memory.heap.utilization:
+                enabled: true
+            password: secretpassword
+            username: elastic
