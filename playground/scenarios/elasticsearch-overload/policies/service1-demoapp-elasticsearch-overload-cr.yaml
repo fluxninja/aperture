@@ -9,7 +9,7 @@ spec:
     components:
     - flow_control:
         adaptive_load_scheduler:
-          dry_run: true
+          dry_run: false
           dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
@@ -44,11 +44,10 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(jvm_memory_heap_utilization_ratio{elasticsearch_cluster_name="elastic"})
-            * 100
+          query_string: elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}
     - variable:
         constant_output:
-          value: 70
+          value: 250
         out_ports:
           output:
             signal_name: SETPOINT
