@@ -113,8 +113,8 @@ The analysis and actuation phases use
 defining responses to different situations, such as deviations from
 service-level objectives.
 
-![Aperture Control Loop](./assets/img/oaalight.png#gh-light-mode-only)
-![Aperture Control Loop](./assets/img/oaadark.png#gh-dark-mode-only)
+![Aperture Control Loop](./assets/img/oaalight.svg#gh-light-mode-only)
+![Aperture Control Loop](./assets/img/oaadark.svg#gh-dark-mode-only)
 
 ## ✨ Get started {#get-started}
 
