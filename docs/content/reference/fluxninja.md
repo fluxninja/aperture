@@ -52,7 +52,7 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-FluxNinja Aperture Cloud Extension enables [Aperture Cloud][aperture-cloud] integration for
+FluxNinja Aperture Cloud extension enables [Aperture Cloud][aperture-cloud] integration for
 Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
