@@ -42,11 +42,8 @@ local add_kubelet_overload_confirmations(c) = {
         local overloadConfirmations = if std.objectHas(c.policy.service_protection_core, 'overload_confirmations') then
           c.policy.service_protection_core.overload_confirmations
         else [],
-        overload_confirmations+: overloadConfirmations +
-                                 (if std.objectHas(pod_cpu_overload_confirmation, 'query_string') then
-                                    [pod_cpu_overload_confirmation]
-                                  else []) +
-                                 (if std.objectHas(pod_memory_overload_confirmation, 'query_string') then [pod_memory_overload_confirmation] else []),
+        overload_confirmations: overloadConfirmations + (if std.objectHas(pod_cpu_overload_confirmation, 'query_string') then [pod_cpu_overload_confirmation] else []) +
+                                (if std.objectHas(pod_memory_overload_confirmation, 'query_string') then [pod_memory_overload_confirmation] else []),
       },
       resources+: {
         infra_meters:

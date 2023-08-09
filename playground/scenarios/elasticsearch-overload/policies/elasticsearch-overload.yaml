@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/elasticsearch/gen/definitions.json
+policy:
+  policy_name: "service1-demoapp-elasticsearch-overload"
+  service_protection_core:
+    dry_run: false
+    adaptive_load_scheduler:
+      load_scheduler:
+        # The selectors determine the flows that are protected by this policy.
+        # Type: []aperture.spec.v1.Selector
+        # Required: True
+        selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+  setpoint: 250
+  elasticsearch:
+    agent_group: default
+    endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
+    username: elastic
+    password: secretpassword

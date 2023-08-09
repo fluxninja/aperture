@@ -1,0 +1,27 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/single-service-app",
+  "needs": ["istio", "elasticsearch"],
+  "aperture_policies": [
+    {
+      "blueprint_name": "load-scheduling/elasticsearch",
+      "policy_name": "service1-demoapp-elasticsearch-overload",
+      "values_file": "policies/elasticsearch-overload.yaml",
+      "dashboard_mixin_dir": "dashboards/"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod", "elasticsearch-master"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    }
+  ]
+}

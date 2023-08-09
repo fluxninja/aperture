@@ -4,5 +4,6 @@ base
 istiod
 gateway
 rabbitmq
+elasticsearch
 
 **/charts/

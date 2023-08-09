@@ -1,0 +1,3 @@
+blueprint: Service Protection Policy for Elasticsearch.
+sources:
+  policy: load-scheduling/elasticsearch/policy.libsonnet

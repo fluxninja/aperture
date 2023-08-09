@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -13,11 +14,14 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/fluxninja/aperture/playground/resources/demo-app/app"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 type rabbitMQEnvVar string
+
+type elasticsearchEnvVar string
 
 const (
 	rabbitMQEnabled        rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLED"
@@ -25,6 +29,12 @@ const (
 	rabbitMQPortEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PORT"
 	rabbitMQUsernameEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USERNAME"
 	rabbitMQPasswordEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PASSWORD"
+
+	elasticsearchEnabled  elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_ENABLED"
+	elasticsearchHost     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_HOST"
+	elasticsearchPort     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PORT"
+	elasticsearchUserName elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_USERNAME"
+	elasticsearchPassword elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PASSWORD"
 )
 
 func main() {
@@ -44,6 +54,31 @@ func main() {
 		rabbitMQUsername := rabbitMQFromEnv(rabbitMQUsernameEnvVar)
 		rabbitMQPassword := rabbitMQFromEnv(rabbitMQPasswordEnvVar)
 		rabbitMQURL = "amqp://" + rabbitMQUsername + ":" + rabbitMQPassword + "@" + rabbitMQHost + ":" + rabbitMQPort + "/"
+	}
+
+	// Elasticsearch related setup
+	elaticsearchConfig := elasticsearch.Config{}
+	if elasticsearchFromEnv(elasticsearchEnabled) == "true" {
+		elasticsearchHost := elasticsearchFromEnv(elasticsearchHost)
+		elasticsearchPort := elasticsearchFromEnv(elasticsearchPort)
+		elasticsearchUserName := elasticsearchFromEnv(elasticsearchUserName)
+		elasticsearchPassword := elasticsearchFromEnv(elasticsearchPassword)
+
+		elaticsearchConfig = elasticsearch.Config{
+			Addresses: []string{
+				"http://" + elasticsearchHost + ":" + elasticsearchPort,
+			},
+			Transport: &http.Transport{
+				MaxIdleConnsPerHost: 1,
+				MaxIdleConns:        1,
+				MaxConnsPerHost:     1000,
+				DisableKeepAlives:   true,
+			},
+			DiscoverNodesOnStart:  true,
+			DiscoverNodesInterval: 60 * time.Second,
+			Username:   elasticsearchUserName,
+			Password:   elasticsearchPassword,
+		}
 	}
 
 	// We do not necessarily need tracing providers (just propagators), but lets
@@ -68,7 +103,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, concurrency, latency, rejectRatio, cpuLoadPercentage)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, elaticsearchConfig, concurrency, latency, rejectRatio, cpuLoadPercentage)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -88,6 +123,27 @@ func rabbitMQFromEnv(envVar rabbitMQEnvVar) string {
 		case rabbitMQUsernameEnvVar:
 			return "user"
 		case rabbitMQPasswordEnvVar:
+			return ""
+		default:
+			return ""
+		}
+	}
+	return value
+}
+
+func elasticsearchFromEnv(envVar elasticsearchEnvVar) string {
+	value := os.Getenv(string(envVar))
+	if value == "" {
+		switch envVar {
+		case elasticsearchEnabled:
+			return "false"
+		case elasticsearchHost:
+			return "localhost"
+		case elasticsearchPort:
+			return "9200"
+		case elasticsearchUserName:
+			return "elastic"
+		case elasticsearchPassword:
 			return ""
 		default:
 			return ""

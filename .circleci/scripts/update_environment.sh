@@ -8,6 +8,10 @@ commit_author=$(git show --format="%aN <%aE>" --quiet)
 args=(
     --author "${commit_author}"
     --release-train "${RELEASE_TRAIN:-latest}"
+    --manifests-repo-url "${MANIFESTS_REPO}"
+    --manifests-base-branch "${MANIFESTS_BRANCH}"
+    --manifests-repo-ref "${MANIFESTS_BRANCH}"
+    --skip-pull-request
     --push
 )
 
