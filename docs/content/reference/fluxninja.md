@@ -1,10 +1,12 @@
 ---
-title: FluxNinja Extension
-sidebar_label: FluxNinja Extension
+title: FluxNinja Aperture Cloud Extension
+sidebar_label: FluxNinja Aperture Cloud Extension
 sidebar_position: 8
 keywords:
   - cloud
   - extension
+  - fluxninja
+  - aperture-cloud
 ---
 
 ```mdx-code-block
@@ -50,14 +52,14 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-FluxNinja extension enables [Aperture Cloud][] integration for
+FluxNinja Aperture Cloud extension enables [Aperture Cloud][] integration for
 Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
 periodic heartbeats to Aperture Cloud to track health and configuration. This
 allows you to monitor your policies and analyze flows in Aperture Cloud.
 
-FluxNinja extension also provides the possibility to use the Aperture Cloud
+FluxNinja Aperture Cloud extension also provides the possibility to use the Aperture Cloud
 Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
@@ -109,7 +111,7 @@ option.
 More details about particular agent installation modes could be found in
 [Get Started: Installation](/get-started/installation/agent/agent.md).
 
-Configuration parameters for the FluxNinja Extension are as follows:
+Configuration parameters for the FluxNinja Aperture Cloud extension are as follows:
 
 - [Aperture Agent](/reference/configuration/agent.md#flux-ninja-extension-config)
 - [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-extension-config)
