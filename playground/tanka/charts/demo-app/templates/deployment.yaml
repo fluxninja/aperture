@@ -45,6 +45,19 @@ spec:
           image: busybox
           command: ['sh', '-c', 'until wget http://{{.Values.rabbitmq.username}}:{{.Values.rabbitmq.password}}@{{.Values.rabbitmq.host}}:15672/api/aliveness-test/%2F; do echo waiting for rabbitmq; sleep 2; done;']
 {{- end }}
+{{- if and .Values.elasticsearch .Values.elasticsearch.enabled }}
+      initContainers:
+        - name: wait-for-elasticsearch
+          image: docker.io/linuxserver/yq:3.1.0
+          command:
+          - 'sh'
+          - '-c'
+          - >
+            while status="$(curl http://{{.Values.elasticsearch.host}}:{{.Values.elasticsearch.port}}/_cluster/health | jq -r .status)"; [[ "${status}" != "green" && "${status}" != "yellow" ]] ; do
+              echo "Waiting for Elasticsearch to be Ready"; sleep 2;
+            done;
+            echo "Elasticsearch is ready."
+{{- end }}
       containers:
         - name: simplesrv
           securityContext:
@@ -85,6 +98,18 @@ spec:
               value: "{{ .Values.rabbitmq.username }}"
             - name: SIMPLE_SERVICE_RABBITMQ_PASSWORD
               value: "{{ .Values.rabbitmq.password }}"
+            {{- if and .Values.elasticsearch .Values.elasticsearch.enabled }}
+            - name: SIMPLE_SERVICE_ELASTICSEARCH_ENABLED
+              value: "{{ .Values.elasticsearch.enabled }}"
+            - name: SIMPLE_SERVICE_ELASTICSEARCH_HOST
+              value: "{{ .Values.elasticsearch.host }}"
+            - name: SIMPLE_SERVICE_ELASTICSEARCH_PORT
+              value: "{{ .Values.elasticsearch.port }}"
+            - name: SIMPLE_SERVICE_ELASTICSEARCH_USERNAME
+              value: "{{ .Values.elasticsearch.username }}"
+            - name: SIMPLE_SERVICE_ELASTICSEARCH_PASSWORD
+              value: "{{ .Values.elasticsearch.password }}"
+            {{- end }}
             - name: SIMPLE_SERVICE_CPU_LOAD
               value: "{{ .Values.simplesrv.cpuLoadPercentage }}"
       {{- with .Values.nodeSelector }}

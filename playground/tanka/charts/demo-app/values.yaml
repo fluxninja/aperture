@@ -25,6 +25,13 @@ rabbitmq:
   username: ~
   password: ~
 
+elasticseach:
+  enabled: false
+  host: ~
+  port: 9200
+  username: ~
+  password: ~
+
 nginx:
   enabled: false
   resources: {}

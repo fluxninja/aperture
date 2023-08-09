@@ -108,6 +108,7 @@ function(cfg, params={}, metadata={}) {
         + updatedConfig.policy.components,
       ),
     ),
+
   local policyResource = {
     kind: 'Policy',
     apiVersion: 'fluxninja.com/v1alpha1',
@@ -119,6 +120,7 @@ function(cfg, params={}, metadata={}) {
     },
     spec: policyDef,
   },
+
   policyDef: policyDef,
   policyResource: policyResource,
 }

@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/castai/promwrite v0.5.0
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/elastic/go-elasticsearch/v8 v8.8.2
 	github.com/fluxninja/aperture/v2 v2.5.0
 	github.com/onsi/ginkgo/v2 v2.9.5
 	github.com/onsi/gomega v1.27.7
@@ -14,6 +15,7 @@ require (
 )
 
 require (
+	github.com/elastic/elastic-transport-go/v8 v8.3.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect

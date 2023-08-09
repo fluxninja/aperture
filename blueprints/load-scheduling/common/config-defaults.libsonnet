@@ -11,7 +11,7 @@ local driver_criteria_defaults = {
 
 /**
 * @schema (overload_confirmation_driver.pod_cpu: driver_criteria) The driver for using CPU usage as overload confirmation.
-* @schema (overload_confirmation_driver.pod_memory: driver_criteria) The driver for using CPU usage as overload confirmation.
+* @schema (overload_confirmation_driver.pod_memory: driver_criteria) The driver for using memory usage as overload confirmation.
 */
 local overload_confirmation_driver_defaults = {
   pod_cpu: {},
