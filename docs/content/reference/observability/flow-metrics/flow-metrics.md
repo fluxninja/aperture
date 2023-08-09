@@ -77,30 +77,30 @@ and behavior. The stream can be stored and visualized in
 
 <!-- vale off -->
 
-| Name                                         | Type                    | Unit  | Description                                           |
-| -------------------------------------------- | ----------------------- | ----- | ----------------------------------------------------- |
-| workload_duration_ms_sum                     | float                   | ms    | Sum of duration of the workload                       |
-| workload_duration_ms_min                     | float                   | ms    | Min of duration of the workload                       |
-| workload_duration_ms_max                     | float                   | ms    | Max of duration of the workload                       |
-| workload_duration_ms_sumOfSquares            | float                   | ms    | Sum of squares of duration of the workload            |
-| workload_duration_ms_datasketch              | [quantilesDoubleSketch] | ms    | Datasktech of Duration of the workload                |
-| flow_duration_ms_sum                         | float                   | ms    | Sum of duration of the flow                           |
-| flow_duration_ms_min                         | float                   | ms    | Min of duration of the flow                           |
-| flow_duration_ms_max                         | float                   | ms    | Max of duration of the flow                           |
-| flow_duration_ms_sumOfSquares                | float                   | ms    | Sum of squares of duration of the flow                |
-| flow_duration_ms_datasketch                  | [quantilesDoubleSketch] | ms    | Sum of Aperture's processing duration                 |
-| aperture_processing_duration_ms_min          | float                   | ms    | Min of Aperture's processing duration                 |
-| aperture_processing_duration_ms_max          | float                   | ms    | Max of Aperture's processing duration                 |
-| aperture_processing_duration_ms_sumOfSquares | float                   | ms    | Sum of squares of Aperture's processing duration      |
-| aperture_processing_duration_ms_datasketch   | [quantilesDoubleSketch] | ms    | Datasktech of Aperture's processing duration          |
-| http.request_content_length_sum              | int                     | bytes | Sum of length of the HTTP request content             |
-| http.request_content_length_min              | int                     | bytes | Min of length of the HTTP request content             |
-| http.request_content_length_max              | int                     | bytes | Max of length of the HTTP request content             |
-| http.request_content_length_sumOfSquares     | int                     | bytes | Sum of squares of length of the HTTP request content  |
-| http.response_content_length_sum             | int                     | bytes | Sum of length of the HTTP response content            |
-| http.response_content_length_min             | int                     | bytes | Min of length of the HTTP response content            |
-| http.response_content_length_max             | int                     | bytes | Max of length of the HTTP response content            |
-| http.response_content_length_sumOfSquares    | int                     | bytes | Sum of squares of length of the HTTP response content |
+| Name                                         | Type                      | Unit  | Description                                           |
+| -------------------------------------------- | ------------------------- | ----- | ----------------------------------------------------- |
+| workload_duration_ms_sum                     | float                     | ms    | Sum of duration of the workload                       |
+| workload_duration_ms_min                     | float                     | ms    | Min of duration of the workload                       |
+| workload_duration_ms_max                     | float                     | ms    | Max of duration of the workload                       |
+| workload_duration_ms_sumOfSquares            | float                     | ms    | Sum of squares of duration of the workload            |
+| workload_duration_ms_datasketch              | [quantilesDoubleSketch][] | ms    | Datasktech of Duration of the workload                |
+| flow_duration_ms_sum                         | float                     | ms    | Sum of duration of the flow                           |
+| flow_duration_ms_min                         | float                     | ms    | Min of duration of the flow                           |
+| flow_duration_ms_max                         | float                     | ms    | Max of duration of the flow                           |
+| flow_duration_ms_sumOfSquares                | float                     | ms    | Sum of squares of duration of the flow                |
+| flow_duration_ms_datasketch                  | [quantilesDoubleSketch][] | ms    | Sum of Aperture's processing duration                 |
+| aperture_processing_duration_ms_min          | float                     | ms    | Min of Aperture's processing duration                 |
+| aperture_processing_duration_ms_max          | float                     | ms    | Max of Aperture's processing duration                 |
+| aperture_processing_duration_ms_sumOfSquares | float                     | ms    | Sum of squares of Aperture's processing duration      |
+| aperture_processing_duration_ms_datasketch   | [quantilesDoubleSketch][] | ms    | Datasktech of Aperture's processing duration          |
+| http.request_content_length_sum              | int                       | bytes | Sum of length of the HTTP request content             |
+| http.request_content_length_min              | int                       | bytes | Min of length of the HTTP request content             |
+| http.request_content_length_max              | int                       | bytes | Max of length of the HTTP request content             |
+| http.request_content_length_sumOfSquares     | int                       | bytes | Sum of squares of length of the HTTP request content  |
+| http.response_content_length_sum             | int                       | bytes | Sum of length of the HTTP response content            |
+| http.response_content_length_min             | int                       | bytes | Min of length of the HTTP response content            |
+| http.response_content_length_max             | int                       | bytes | Max of length of the HTTP response content            |
+| http.response_content_length_sumOfSquares    | int                       | bytes | Sum of squares of length of the HTTP response content |
 
 <!-- vale on -->
 
