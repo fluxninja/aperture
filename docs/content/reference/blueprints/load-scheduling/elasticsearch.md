@@ -1,6 +1,5 @@
 ---
-title:
-  Load Scheduling for Elasticsearch Based on the Search Thread Pool Queue Size
+title: Load Scheduling for Elasticsearch
 keywords:
   - blueprints
 sidebar_position: 4
@@ -9,8 +8,8 @@ sidebar_label: Load Scheduling for Elasticsearch
 
 ## Introduction
 
-This policy detects when the Elasticsearch service is overloaded using the
-`search` thread pool queue size metric. The policy is based on the
+By default, this policy detects when the Elasticsearch service is overloaded
+using the `search` thread pool queue size metric. The policy is based on the
 [adaptive load scheduling](/reference/configuration/spec.md#adaptive-load-scheduler)
 component.
 
@@ -33,7 +32,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/elasticsearch-search`}>load-scheduling/elasticsearch-search</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/elasticsearch`}>load-scheduling/elasticsearch</a>
 
 <!-- vale on -->
 
@@ -125,6 +124,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-elasticsearch"></a>
+
+<ParameterDescription
+    name='policy.elasticsearch'
+    description='Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.'
+    type='Object (elasticsearch)'
+    reference='#elasticsearch'
+    value='{"agent_group": "default", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -459,6 +472,140 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Number (double)'
     reference=''
     value='null'
+/>
+
+<!-- vale on -->
+
+---
+
+<!-- vale off -->
+
+#### elasticsearch {#elasticsearch}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-agent-group"></a>
+
+<ParameterDescription
+    name='agent_group'
+    description='Name of the Aperture Agent group.'
+    type='string'
+    reference=''
+    value='"default"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-collection-interval"></a>
+
+<ParameterDescription
+    name='collection_interval'
+    description='This receiver collects metrics on an interval.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-endpoint"></a>
+
+<ParameterDescription
+    name='endpoint'
+    description='Endpoint of the Elasticsearch.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-indices"></a>
+
+<ParameterDescription
+    name='indices'
+    description='Index filters that define which indices are scraped for index-level metrics.'
+    type='Array of string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-initial-delay"></a>
+
+<ParameterDescription
+    name='initial_delay'
+    description='Defines how long this receiver waits before starting.'
+    type='string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-nodes"></a>
+
+<ParameterDescription
+    name='nodes'
+    description='Node filters that define which nodes are scraped for node-level and cluster-level metrics.'
+    type='Array of string'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-password"></a>
+
+<ParameterDescription
+    name='password'
+    description='Password of the Elasticsearch.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-skip-cluster-metrics"></a>
+
+<ParameterDescription
+    name='skip_cluster_metrics'
+    description='If true, cluster-level metrics will not be scraped.'
+    type='Boolean'
+    reference=''
+    value='null'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="elasticsearch-username"></a>
+
+<ParameterDescription
+    name='username'
+    description='Username of the Elasticsearch.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

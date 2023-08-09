@@ -1,3 +1,0 @@
-blueprint: Service Protection Policy for Elasticsearch Based on the Search Thread Pool Queue Size.
-sources:
-  policy: load-scheduling/elasticsearch-search/policy.libsonnet

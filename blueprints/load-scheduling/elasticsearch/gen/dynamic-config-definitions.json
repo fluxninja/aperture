@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "load-scheduling/elasticsearch-search blueprint",
+  "title": "load-scheduling/elasticsearch blueprint",
   "additionalProperties": false,
   "required": ["dry_run"],
   "properties": {

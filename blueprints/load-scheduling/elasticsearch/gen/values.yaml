@@ -1,6 +1,6 @@
-# Generated values file for load-scheduling/elasticsearch-search blueprint
+# Generated values file for load-scheduling/elasticsearch blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/load-scheduling/elasticsearch-search
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/elasticsearch
 
 policy:
   # Name of the policy.
@@ -28,3 +28,11 @@ policy:
   # Type: float64
   # Required: True
   setpoint: __REQUIRED_FIELD__
+  # Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
+  # Type: elasticsearch
+  # Required: True
+  elasticsearch:
+    agent_group: "default"
+    endpoint: __REQUIRED_FIELD__
+    password: __REQUIRED_FIELD__
+    username: __REQUIRED_FIELD__

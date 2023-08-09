@@ -1,7 +1,6 @@
-# yaml-language-server: $schema=../../../../blueprints/load-scheduling/elasticsearch-search/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/elasticsearch/gen/definitions.json
 policy:
   policy_name: "service1-demoapp-elasticsearch-overload"
-  promql_query: 'elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}'
   service_protection_core:
     dry_run: false
     adaptive_load_scheduler:
@@ -14,27 +13,8 @@ policy:
             control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
   setpoint: 250
-  resources:
-    infra_meters:
-      elasticsearch:
-        agent_group: default
-        per_agent_group: true
-        receivers:
-          elasticsearch:
-            metrics:
-              elasticsearch.node.operations.current:
-                enabled: true
-              elasticsearch.node.operations.completed:
-                enabled: true
-              elasticsearch.node.operations.time:
-                enabled: true
-              elasticsearch.node.operations.get.completed:
-                enabled: true
-              elasticsearch.node.operations.get.time:
-                enabled: true
-              jvm.memory.heap.utilization:
-                enabled: true
-            endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
-            username: elastic
-            password: secretpassword
-            collection_interval: 10s
+  elasticsearch:
+    agent_group: default
+    endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
+    username: elastic
+    password: secretpassword

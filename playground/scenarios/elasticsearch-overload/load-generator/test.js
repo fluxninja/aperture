@@ -7,14 +7,10 @@ import http from "k6/http";
 export let vuStages = [
     { duration: "0s", target: 50 },
     { duration: "1m", target: 50 },
-    { duration: "30s", target: 250 },
-    { duration: "2m", target: 250 },
-    { duration: "1m", target: 500 },
-    { duration: "6m", target: 500 },
     { duration: "1m", target: 250 },
-    { duration: "2m", target: 250 },
-    { duration: "30s", target: 50 },
+    { duration: "10m", target: 250 },
     { duration: "1m", target: 50 },
+    { duration: "1m", target: 0 },
 ];
 
 export let options = {
