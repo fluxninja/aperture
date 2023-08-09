@@ -50,7 +50,7 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-FluxNinja extension enables [Aperture Cloud][aperture-cloud] integration for
+FluxNinja extension enables [Aperture Cloud][] integration for
 Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
@@ -62,11 +62,11 @@ Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][aperture-controller], Aperture Agents won't be
+Without the [Aperture Controller][], Aperture Agents won't be
 able to work. While it's possible to [self-host][self-hosting] Aperture
 Controller, Aperture Cloud Controller can be used instead.
 
-Aperture Cloud Controller is an [Aperture Controller] hosted by Aperture Cloud.
+Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture Cloud.
 The Cloud Controller is available for every Aperture Cloud Organization in the
 `default` project.
 
@@ -121,5 +121,5 @@ How various components interact with the extension:
 - [Flow labels](/concepts/flow-label.md#extension)
 
 [self-hosting]: /self-hosting/self-hosting.md
-[aperture-cloud]: /introduction.md
-[aperture-controller]: /architecture/architecture.md#aperture-controller
+[aperture cloud]: /introduction.md
+[aperture controller]: /architecture/architecture.md#aperture-controller
