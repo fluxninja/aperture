@@ -35,7 +35,7 @@ agent:
   config:
     fluxninja:
       enable_cloud_controller: false
-      endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+      endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
     etcd:
       endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
     prometheus:
@@ -67,7 +67,7 @@ release name. If your setup is different, adjust these endpoints accordingly.
 ```yaml
 fluxninja:
   enable_cloud_controller: false
-  endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+  endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
 etcd:
   endpoints: ["http://etcd:2379"]
 prometheus:

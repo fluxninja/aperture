@@ -21,7 +21,7 @@ export const ExtensionConfig = ({children, component}) => (
 {`${component}:
   config:
     fluxninja:
-      endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+      endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
   secrets:
     fluxNinjaExtension:
       create: true
@@ -40,7 +40,7 @@ export const CloudExtensionConfig = ({children, component}) => (
   config:
     fluxninja:
       enable_cloud_controller: true
-      endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+      endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
   secrets:
     fluxNinjaExtension:
       create: true
