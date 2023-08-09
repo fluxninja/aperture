@@ -1,10 +1,12 @@
 ---
-title: FluxNinja Extension
-sidebar_label: FluxNinja Extension
+title: FluxNinja Aperture Cloud Extension
+sidebar_label: FluxNinja Aperture Cloud Extension
 sidebar_position: 8
 keywords:
   - cloud
   - extension
+  - fluxninja
+  - aperture-cloud
 ---
 
 ```mdx-code-block
@@ -50,7 +52,7 @@ export const CloudExtensionConfig = ({children, component}) => (
 );
 ```
 
-FluxNinja extension enables [Aperture Cloud][aperture-cloud] integration for
+FluxNinja Aperture Cloud Extension enables [Aperture Cloud][aperture-cloud] integration for
 Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
