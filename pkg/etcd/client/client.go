@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
@@ -132,6 +133,19 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				)
 			}
 
+			// Workaround for https://github.com/fluxninja/cloud/issues/10613
+			logger := in.Logger.Hook(zerolog.HookFunc(
+				func(e *zerolog.Event, level zerolog.Level, msg string) {
+					if msg == "lease keepalive response queue is full; dropping response send" {
+						// This log pollutes the logs, but is harmless otherwise. The
+						// queue isn't used in any meaningful way and this
+						// warning doesn't harm the lease itself. Just ignore
+						// it for now, until the root cause is fixed.
+						e.Discard()
+					}
+				},
+			))
+
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientv3.Config{
 				Endpoints: config.Endpoints,
@@ -140,7 +154,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				Username:  config.Username,
 				Password:  config.Password,
 				Logger: zap.New(
-					log.NewZapAdapter(in.Logger, "etcd-client"),
+					log.NewZapAdapter(logger, "etcd-client"),
 					zap.IncreaseLevel(zapLogLevel),
 				),
 				DialOptions: dialOptions,
