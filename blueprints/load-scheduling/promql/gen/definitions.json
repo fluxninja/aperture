@@ -188,7 +188,7 @@
           "$ref": "#/$defs/driver_criteria"
         },
         "pod_memory": {
-          "description": "The driver for using CPU usage as overload confirmation.",
+          "description": "The driver for using memory usage as overload confirmation.",
           "default": {},
           "type": "object",
           "$ref": "#/$defs/driver_criteria"

@@ -354,7 +354,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='pod_memory'
-    description='The driver for using CPU usage as overload confirmation.'
+    description='The driver for using memory usage as overload confirmation.'
     type='Object (driver_criteria)'
     reference='#driver-criteria'
     value='{}'
