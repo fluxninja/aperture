@@ -23,7 +23,7 @@ function(params, metadata={}) {
         infra_meters+: {
           elasticsearch: {
             agent_group: if std.objectHas(updated_cfg.policy.elasticsearch, 'agent_group') then updated_cfg.policy.elasticsearch.agent_group else 'default',
-            per_agent_group: true,
+            per_agent_group: false,
             receivers: {
               elasticsearch: std.prune(updated_cfg.policy.elasticsearch {
                 agent_group: null,

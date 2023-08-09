@@ -58,7 +58,7 @@ spec:
     infra_meters:
       elasticsearch:
         agent_group: default
-        per_agent_group: true
+        per_agent_group: false
         receivers:
           elasticsearch:
             endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
