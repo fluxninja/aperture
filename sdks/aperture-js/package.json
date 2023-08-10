@@ -1,7 +1,7 @@
 {
-  "name": "aperture-js",
-  "version": "2.4.0",
-  "description": "",
+  "name": "@fluxninja/aperture-js",
+  "version": "1.0.0",
+  "description": "aperture-js is an SDK to interact with Aperture Agent.",
   "exports": "./lib/example/example.js",
   "scripts": {
     "pre-build": "rm -rf ./lib",
@@ -11,9 +11,14 @@
     "example": "npm run build && node ./lib/example/example.js",
     "prepublishOnly": "npm run build"
   },
+  "homepage": "https://fluxninja.com/",
   "type": "module",
-  "author": "",
-  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fluxninja/aperture/issues",
+    "email": "support@fluxninja.com"
+  },
+  "author": "FluxNinja Inc <support@fluxninja.com> (https://fluxninja.com/)",
+  "license": "Apache-2.0",
   "files": [
     "lib/**/*",
     "@types/**/*",

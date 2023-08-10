@@ -85,7 +85,7 @@ Kubernetes Objects which will be created by following steps are listed
      config:
        fluxninja:
          enable_cloud_controller: true
-         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
      secrets:
        fluxNinjaExtension:
          create: true
@@ -128,7 +128,7 @@ Kubernetes Objects which will be created by following steps are listed
      config:
        fluxninja:
          enable_cloud_controller: true
-         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
        log:
          level: debug
          pretty_console: true
@@ -212,7 +212,7 @@ Kubernetes Objects which will be created by following steps are listed
         config:
           fluxninja:
             enable_cloud_controller: true
-            endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+            endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
         secrets:
           fluxNinjaExtension:
             create: true

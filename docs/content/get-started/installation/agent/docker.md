@@ -28,7 +28,7 @@ Below are the instructions to install the Aperture Agent on Docker.
    ```yaml
    fluxninja:
      enable_cloud_controller: true
-     endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+     endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
      api_key: API_KEY
    log:
      level: info

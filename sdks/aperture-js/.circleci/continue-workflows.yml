@@ -1,0 +1,80 @@
+version: 2.1
+
+jobs:
+  publish-release:
+    parameters:
+      dry-run:
+        type: boolean
+        default: false
+        description: Whether to push changes to the npm registry
+    docker:
+      - image: cimg/base:2022.07
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - asdf_install:
+          cache_name: publish-npm
+      - run:
+          name: Publish to npmjs
+          command: |
+            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+            npm config set scope fluxninja --global
+            npm ci
+            args=(--access public)
+            if [[ "<< parameters.dry-run >>" == "true" ]]; then
+               args+=( --dry-run )
+            fi
+            npm publish "${args[@]}"
+
+workflows:
+  version: 2
+
+  publish-release:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+    jobs:
+      - publish-release:
+          name: verify-publish-release
+          context: npmjs
+          dry-run: true
+
+commands:
+  asdf_install:
+    description: "Install tools using ASDF"
+    parameters:
+      tools:
+        type: string
+        description:
+          "Newline separated list of tools to install. If empty, will install
+          everything."
+        default: ""
+      cache_name:
+        type: string
+        description: "Name of asdf cache"
+        default: "default"
+    steps:
+      - run:
+          name: Install ASDF
+          command: |
+            git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
+            printf '\nsource "${HOME}/.asdf/asdf.sh"\n' >> "${BASH_ENV}"
+            date +%m > ~/month
+            date +%d > ~/day
+      # We need to restore ASDF cache after installing, otherwise we will try to clone it to non-empty dir
+      - restore_cache:
+          name: Restore ASDF cache
+          keys:
+            - aperture-js-asdf-cache-v11-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-{{ checksum ".tool-versions" }}
+            - aperture-js-asdf-cache-v11-{{ checksum "~/month" }}-<<
+              parameters.cache_name >>-
+      - run:
+          name: Copy tool-versions in HOME dir
+          command: |
+            cp .tool-versions ~/.tool-versions
+      - run:
+          name: Install ASDF tools
+          environment:
+            TOOLS: << parameters.tools >>
+          command: .circleci/scripts/asdf_install.sh
