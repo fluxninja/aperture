@@ -5,11 +5,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 var controller utils.ControllerConn
@@ -51,49 +50,14 @@ var StatusCmd = &cobra.Command{
 			return err
 		}
 
-		printLeafStatus("", statusResp)
-
+		result, err := status.ParseGroupStatus(make(map[string]string), "", statusResp)
+		if err != nil {
+			return err
+		}
+		for k, v := range result {
+			fmt.Printf("%s: %s\n", k, v)
+		}
 		return nil
 	},
 	PersistentPostRun: controller.PostRun,
-}
-
-func printLeafStatus(parent string, resp *statusv1.GroupStatus) {
-	if resp.Groups == nil && resp.GetStatus() != nil {
-		if respErr := resp.Status.GetError(); respErr != nil {
-			fmt.Printf("Error for %s: %s\n", parent, respErr.Message)
-		}
-		if respMsg := resp.Status.GetMessage(); respMsg != nil {
-			value := respMsg.String()
-
-			if respMsg.MessageIs(new(wrapperspb.StringValue)) {
-				stringVal := &wrapperspb.StringValue{}
-				err := respMsg.UnmarshalTo(stringVal)
-				if err != nil {
-					fmt.Printf("Error unmarshalling string value for key %s: %s\n", parent, err)
-					return
-				}
-				value = stringVal.Value
-			}
-			if respMsg.MessageIs(new(wrapperspb.DoubleValue)) {
-				doubleVal := &wrapperspb.DoubleValue{}
-				err := respMsg.UnmarshalTo(doubleVal)
-				if err != nil {
-					fmt.Printf("Error unmarshalling double value for key %s: %s\n", parent, err)
-					return
-				}
-				value = fmt.Sprintf("%v", doubleVal.Value)
-			}
-			if respMsg.MessageIs(new(emptypb.Empty)) {
-				value = ""
-			}
-
-			fmt.Printf("Status for %s: %s\n", parent, value)
-		}
-	}
-
-	for k, v := range resp.Groups {
-		newParent := fmt.Sprintf("%s/%s", parent, k)
-		printLeafStatus(newParent, v)
-	}
 }
