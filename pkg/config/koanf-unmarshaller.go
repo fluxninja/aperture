@@ -11,12 +11,12 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/knadh/koanf"
 	koanfjson "github.com/knadh/koanf/parsers/json"
 	koanfyaml "github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/providers/rawbytes"
+	"github.com/knadh/koanf/v2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
 
