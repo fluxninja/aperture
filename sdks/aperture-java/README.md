@@ -7,8 +7,8 @@
   <a href="https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g">
     <img alt="Slack Community" src="https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen?style=for-the-badge&logo=slack">
   </a>
-  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture-java/tree/main.svg?style=svg&circle-token=cf4312657fbc2f4833fee89328a3f27ab5f39c10">
-    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture-java/main?token=cf4312657fbc2f4833fee89328a3f27ab5f39c10&style=for-the-badge&logo=circleci">
+  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture-java/tree/main.svg?style=svg&circle-token=ac6adf980d003526f2514cd75ad6fe410cace243">
+    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture-java/main?token=ac6adf980d003526f2514cd75ad6fe410cace243&style=for-the-badge&logo=circleci">
   </a>
   <a href="https://maven-badges.herokuapp.com/maven-central/com.fluxninja.aperture/aperture-java-core/">
     <img alt="Maven Central" src="https://maven-badges.herokuapp.com/maven-central/com.fluxninja.aperture/aperture-java-core/badge.svg?style=for-the-badge">
