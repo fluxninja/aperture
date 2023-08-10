@@ -64,7 +64,7 @@ your cluster.
      config:
        fluxninja:
          enable_cloud_controller: true
-         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
      secrets:
        fluxNinjaExtension:
          create: true
@@ -108,7 +108,7 @@ your cluster.
      config:
        fluxninja:
          enable_cloud_controller: true
-         endpoint: ORGANIZATION_NAME.app.fluxninja.com:443
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
        log:
          level: debug
          pretty_console: true
