@@ -6,7 +6,7 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
 
 {
   environment:: {
-    namespace: 'aperture-controller',
+    namespace: 'default',
     includeCrds: true,
     name: 'controller',
   },

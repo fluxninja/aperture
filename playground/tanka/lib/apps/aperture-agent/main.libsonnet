@@ -6,7 +6,7 @@ local helm = tanka.helm.new(helpers.helmChartsRoot);
 
 {
   environment:: {
-    namespace: 'aperture-agent',
+    namespace: 'default',
     includeCrds: true,
     name: 'agent',
   },

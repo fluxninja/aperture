@@ -4,11 +4,11 @@ function(apiServer='API SERVER MISSING') {
   apiVersion: 'tanka.dev/v1alpha1',
   kind: 'Environment',
   metadata: {
-    name: 'apps/aperture-agent',
+    name: 'apps/aperture-controller',
   },
   spec: {
     apiServer: apiServer,
-    namespace: 'aperture-controller',
+    namespace: 'default',
     applyStrategy: 'server',
   },
   data: mixins,

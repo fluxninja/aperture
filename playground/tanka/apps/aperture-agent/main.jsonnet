@@ -8,7 +8,7 @@ function(apiServer='API SERVER MISSING') {
   },
   spec: {
     apiServer: apiServer,
-    namespace: 'aperture-agent',
+    namespace: 'default',
     applyStrategy: 'server',
   },
   data: mixins,

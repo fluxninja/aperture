@@ -17,7 +17,7 @@ local commonValues = if std.objectHas(demoappValues, 'common') then demoappValue
 
 local application = {
   environment:: {
-    namespace: 'demoapp',
+    namespace: 'default',
   },
   values:: commonValues + istioInjectLabels,
   service1:

@@ -7,7 +7,7 @@ envoyFilter:
   ## @param envoyFilter.name Name of service running `aperture-agent`
   name: aperture-agent
   ## @param envoyFilter.namespace Namespace where `aperture-agent` is running
-  namespace: aperture-agent
+  namespace: default
   ## @param envoyFilter.port Port serving external authorization API and for streaming access logs
   port: 8080
   ## @param envoyFilter.authzGrpcTimeout Timeout in seconds to authorization requests made to `aperture-agent`.

@@ -23,6 +23,12 @@ local apertureAgentMixin =
       },
       agent+: {
         createUninstallHook: false,
+        livenessProbe+: {
+          enabled: false,
+        },
+        readinessProbe+: {
+          enabled: false,
+        },
         config+: {
           agent_info+: {
             agent_group: if cloudController then agentGroup else 'default',
@@ -50,10 +56,10 @@ local apertureAgentMixin =
             level: 'info',
           },
           etcd+: if !cloudController then {
-            endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
+            endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
           } else {},
           prometheus+: if !cloudController then {
-            address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
+            address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
           } else {},
           flow_control+: {
             preview_service+: {
@@ -61,7 +67,7 @@ local apertureAgentMixin =
             },
           },
           agent_functions+: if !cloudController then {
-            endpoints: ['aperture-controller.aperture-controller.svc.cluster.local:8080'],
+            endpoints: ['aperture-controller.default.svc.cluster.local:8080'],
           } else {},
         },
         secrets+: {
@@ -77,6 +83,9 @@ local apertureAgentMixin =
         },
         sidecar+: {
           enabled: false,
+        },
+        podAnnotations+: {
+          'consul.hashicorp.com/connect-inject': 'true',
         },
       },
     }, agentValues),

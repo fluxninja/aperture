@@ -1,7 +1,6 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
-  "needs": ["istio"],
   "aperture_policies": [
     {
       "policy_name": "service1-demo-app",

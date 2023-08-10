@@ -33,13 +33,13 @@ APERTURE_GO_REPO_PATH = GIT_ROOT + "/sdks/aperture-go"
 APERTURE_JAVA_REPO_PATH = GIT_ROOT + "/sdks/aperture-java"
 APERTURE_JS_REPO_PATH = GIT_ROOT + "/sdks/aperture-js"
 APERTURE_PYTHON_REPO_PATH = GIT_ROOT + "/sdks/aperture-py"
-APERTURE_AGENT_NS = "aperture-agent"
-APERTURE_CONTROLLER_NS = "aperture-controller"
+APERTURE_AGENT_NS = "default"
+APERTURE_CONTROLLER_NS = "default"
 APERTURE_GO_EXAMPLE_NS = "aperture-go-example"
 APERTURE_JS_EXAMPLE_NS = "aperture-js-example"
 APERTURE_JAVA_EXAMPLE_NS = "aperture-java-example"
 APERTURE_PYTHON_EXAMPLE_NS = "aperture-python-example"
-APERTURE_DEMOAPP_NS = "demoapp"
+APERTURE_DEMOAPP_NS = "default"
 APERTURE_DEMO_UI_NS = "demoui"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ELASTICSEARCH_NS = "elasticsearch"
@@ -190,7 +190,7 @@ DEP_TREE = {
             ]
         }
     },
-    APERTURE_AGENT_NS: {
+    "agent": {
         "agent": {
             "labels": ["ApertureAgent"],
             "needs": ["controller"],
@@ -237,11 +237,11 @@ DEP_TREE = {
                     "workload": "agent-aperture-agent-manager",
                     "resource_deps": ["agent-operator-bootstrap"],
                     "extra_objects": [
-                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", APERTURE_AGENT_NS),
+                        ("^agent-aperture-agent", "Role|RoleBinding|ServiceAccount", "default"),
                         ("^agent-aperture-agent", "ClusterRole|ClusterRoleBinding"),
                     ],
                     "ignored_objects": [
-                        ("^agent-aperture-agent-manager", "Service|Deployment", APERTURE_AGENT_NS),
+                        ("^agent-aperture-agent-manager", "Service|Deployment", "default"),
                     ]
                 }
             ]
@@ -1359,9 +1359,9 @@ watch_file("./tanka/lib/")
 watch_file("./tanka/charts/")
 watch_file(GIT_ROOT + "/operator/config/crd")
 
-run_wavepool_graphql_generator = '''
-kubectl -n demoapp scale --replicas=1 deployment wavepool-generator
-'''.format(TANKA_ROOT)
+run_wavepool_graphql_generator =  '''
+kubectl -n {} scale --replicas=1 deployment wavepool-generator
+'''.format(APERTURE_DEMOAPP_NS)
 cmd_button('wavepool-start',
     resource='wavepool-generator',
     icon_name='content_paste_go',
@@ -1370,7 +1370,7 @@ cmd_button('wavepool-start',
 )
 
 delete_wavepool_graphql_generator = '''
-kubectl -n demoapp scale --replicas=0 deployment wavepool-generator
+kubectl -n {} scale --replicas=0 deployment wavepool-generator
 '''.format(APERTURE_DEMOAPP_NS)
 cmd_button('wavepool-stop',
     resource='wavepool-generator',

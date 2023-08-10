@@ -1,0 +1,4 @@
+demoapp:
+  common:
+    podAnnotations:
+      'consul.hashicorp.com/connect-inject': 'true'

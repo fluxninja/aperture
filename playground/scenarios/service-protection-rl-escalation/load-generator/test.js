@@ -36,7 +36,7 @@ export let options = {
 export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
-  const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
+  const url = "http://service1-demo-app.default.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
     Cookie:
@@ -48,13 +48,13 @@ export default function () {
     request: [
       [
         {
-          destination: "service1-demo-app.demoapp.svc.cluster.local/request",
+          destination: "service1-demo-app.default.svc.cluster.local/request",
         },
         {
-          destination: "service2-demo-app.demoapp.svc.cluster.local/request",
+          destination: "service2-demo-app.default.svc.cluster.local/request",
         },
         {
-          destination: "service3-demo-app.demoapp.svc.cluster.local/request",
+          destination: "service3-demo-app.default.svc.cluster.local/request",
         },
       ],
     ],
@@ -62,6 +62,8 @@ export default function () {
   let res = http.request("POST", url, JSON.stringify(body), {
     headers: headers,
   });
+  console.log(res.status)
+  console.log(res.body)
   const ret = check(res, {
     "http status was 200": res.status === 200,
   });

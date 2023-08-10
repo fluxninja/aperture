@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wavepool-generator
-  namespace: demoapp
+  namespace: default
+  annotations:
+    'consul.hashicorp.com/connect-inject': 'true'
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app.kubernetes.io/component: wavepool-generator
@@ -15,6 +17,7 @@ spec:
         sidecar.istio.io/inject: "false"
       annotations:
         prometheus.io/scrape: "false"
+        'consul.hashicorp.com/connect-inject': 'true'
     spec:
       containers:
         - args:
@@ -36,3 +39,20 @@ spec:
         - configMap:
             name: wavepool-config
           name: graphql-js-file
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: wavepool-generator
+  name: wavepool-generator
+  namespace: default
+spec:
+  ports:
+  - name: 80-8080
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/component: wavepool-generator
+  type: ClusterIP

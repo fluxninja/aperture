@@ -46,10 +46,10 @@ local apertureControllerMixin =
             level: 'info',
           },
           etcd+: {
-            endpoints: ['http://controller-etcd.aperture-controller.svc.cluster.local:2379'],
+            endpoints: ['http://controller-etcd.default.svc.cluster.local:2379'],
           },
           prometheus+: {
-            address: 'http://controller-prometheus-server.aperture-controller.svc.cluster.local:80',
+            address: 'http://controller-prometheus-server.default.svc.cluster.local:80',
           },
         },
         secrets+: {

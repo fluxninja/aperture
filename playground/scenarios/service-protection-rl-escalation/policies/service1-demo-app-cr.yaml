@@ -53,7 +53,7 @@ spec:
             label_matcher:
               match_labels:
                 http.request.header.user_type: crawler
-            service: service1-demo-app.demoapp.svc.cluster.local
+            service: service1-demo-app.default.svc.cluster.local
     - flow_control:
         aimd_load_scheduler:
           dry_run: false
@@ -100,7 +100,7 @@ spec:
               selectors:
               - agent_group: default
                 control_point: ingress
-                service: service1-demo-app.demoapp.svc.cluster.local
+                service: service1-demo-app.default.svc.cluster.local
               workload_latency_based_tokens: true
             max_load_multiplier: 2
     - query:
@@ -143,11 +143,11 @@ spec:
         selectors:
         - agent_group: default
           control_point: ingress
-          service: service1-demo-app.demoapp.svc.cluster.local
+          service: service1-demo-app.default.svc.cluster.local
       flux_meters:
         service1-demo-app:
           selectors:
           - agent_group: default
             control_point: ingress
-            service: service3-demo-app.demoapp.svc.cluster.local
+            service: service3-demo-app.default.svc.cluster.local
     infra_meters: {}

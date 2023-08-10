@@ -4,4 +4,4 @@ data:
 kind: ConfigMap
 metadata:
   name: wavepool-config
-  namespace: demoapp
+  namespace: default
