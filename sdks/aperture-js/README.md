@@ -7,7 +7,7 @@
   <a href="https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g">
     <img alt="Slack Community" src="https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen?style=for-the-badge&logo=slack">
   </a>
-  <a href="https://dl.circleci.com/status-badge/redirect/gh/fluxninja/aperture-js/tree/main&circle-token=3355ec6bf64c89b5592804fe48726a2d78d49c17">
+  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture-js/tree/main.svg?style=svg&circle-token=3355ec6bf64c89b5592804fe48726a2d78d49c17">
     <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture-js/main?token=3355ec6bf64c89b5592804fe48726a2d78d49c17&style=for-the-badge&logo=circleci">
   </a>
 </p>
