@@ -95,7 +95,7 @@ type apertureLogger struct {
 }
 
 func (al *apertureLogger) Write(p []byte) (n int, err error) {
-	al.logger.Error().Msg(string(p))
+	al.logger.Debug().Msg(string(p))
 	return len(p), nil
 }
 
@@ -155,7 +155,7 @@ func (constructor ServerConstructor) provideServer(
 
 	router := mux.NewRouter()
 
-	logger := stdlog.New(&apertureLogger{log.GetGlobalLogger()}, "httpserver", stdlog.Llongfile|stdlog.Ldate|stdlog.Ltime|stdlog.LUTC)
+	logger := stdlog.New(&apertureLogger{log.GetGlobalLogger()}, "", 0)
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
