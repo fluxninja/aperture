@@ -40,7 +40,12 @@ require (
 	github.com/jonboulle/clockwork v0.3.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jsonnet-bundler/jsonnet-bundler v0.5.1
-	github.com/knadh/koanf v1.5.0
+	github.com/knadh/koanf/parsers/json v0.1.0
+	github.com/knadh/koanf/parsers/yaml v0.1.0
+	github.com/knadh/koanf/providers/confmap v0.1.0
+	github.com/knadh/koanf/providers/posflag v0.1.0
+	github.com/knadh/koanf/providers/rawbytes v0.1.0
+	github.com/knadh/koanf/v2 v2.0.1
 	github.com/lithammer/dedent v1.1.0
 	github.com/looplab/tarjan v0.1.0
 	github.com/mitchellh/copystructure v1.2.0
@@ -358,7 +363,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/asmfmt v1.3.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
-	github.com/knadh/koanf/v2 v2.0.1 // indirect
+	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/leodido/ragel-machinery v0.0.0-20181214104525-299bdde78165 // indirect
 	github.com/leoluk/perflib_exporter v0.2.1 // indirect
