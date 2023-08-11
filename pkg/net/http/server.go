@@ -90,6 +90,15 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 	)
 }
 
+type apertureLogger struct {
+	logger *log.Logger
+}
+
+func (al *apertureLogger) Write(p []byte) (n int, err error) {
+	al.logger.Error().Msg(string(p))
+	return len(p), nil
+}
+
 // Server holds fields for custom HTTP server.
 type Server struct {
 	Server    *http.Server
@@ -146,7 +155,7 @@ func (constructor ServerConstructor) provideServer(
 
 	router := mux.NewRouter()
 
-	logger := stdlog.New(log.GetPrettyConsoleWriter(), "httpserver", stdlog.Llongfile|stdlog.Ldate|stdlog.Ltime|stdlog.LUTC)
+	logger := stdlog.New(&apertureLogger{log.GetGlobalLogger()}, "httpserver", stdlog.Llongfile|stdlog.Ldate|stdlog.Ltime|stdlog.LUTC)
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
