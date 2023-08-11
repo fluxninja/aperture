@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	stdlog "log"
 	"net/http"
 	"time"
 
@@ -145,6 +146,7 @@ func (constructor ServerConstructor) provideServer(
 
 	router := mux.NewRouter()
 
+	logger := stdlog.New(log.GetPrettyConsoleWriter(), "httpserver", stdlog.Llongfile|stdlog.Ldate|stdlog.Ltime|stdlog.LUTC)
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
@@ -153,6 +155,7 @@ func (constructor ServerConstructor) provideServer(
 		ReadTimeout:       config.ReadTimeout.AsDuration(),
 		WriteTimeout:      config.WriteTimeout.AsDuration(),
 		TLSConfig:         tlsConfig,
+		ErrorLog:          logger,
 	}
 
 	httpServer := &Server{
