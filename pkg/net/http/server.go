@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	stdlog "log"
 	"net/http"
 	"time"
 
@@ -89,6 +90,15 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 	)
 }
 
+type apertureLogger struct {
+	logger *log.Logger
+}
+
+func (al *apertureLogger) Write(p []byte) (n int, err error) {
+	al.logger.Debug().Msg(string(p))
+	return len(p), nil
+}
+
 // Server holds fields for custom HTTP server.
 type Server struct {
 	Server    *http.Server
@@ -145,6 +155,7 @@ func (constructor ServerConstructor) provideServer(
 
 	router := mux.NewRouter()
 
+	logger := stdlog.New(&apertureLogger{log.GetGlobalLogger()}, "", 0)
 	server := &http.Server{
 		Handler:           router,
 		MaxHeaderBytes:    config.MaxHeaderBytes,
@@ -153,6 +164,7 @@ func (constructor ServerConstructor) provideServer(
 		ReadTimeout:       config.ReadTimeout.AsDuration(),
 		WriteTimeout:      config.WriteTimeout.AsDuration(),
 		TLSConfig:         tlsConfig,
+		ErrorLog:          logger,
 	}
 
 	httpServer := &Server{
