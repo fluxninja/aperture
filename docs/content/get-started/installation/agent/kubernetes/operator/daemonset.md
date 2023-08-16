@@ -95,8 +95,10 @@ Kubernetes Objects which will be created by following steps are listed
          value: API_KEY
    ```
 
-   Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-   organization name and API key created for your project.
+   Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
+   `API_KEY` with the API key linked to the project. If an API key has not been
+   created, generate a new one through the Aperture Cloud UI. Refer to [API
+   Keys][api-keys] for additional information.
 
    :::note
 
@@ -222,8 +224,10 @@ Kubernetes Objects which will be created by following steps are listed
             value: API_KEY
       ```
 
-      Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-      organization name and API key created for your project.
+      Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
+      `API_KEY` with the API key linked to the project. If an API key has not
+      been created, generate a new one through the Aperture Cloud UI. Refer to
+      [API Keys][api-keys] for additional information.
 
       :::note
 
@@ -402,3 +406,4 @@ following these steps:
    ```
 
 [self-hosting-agent]: /self-hosting/agent.md#configuration
+[api-keys]: /get-started/aperture-cloud/api-keys.md
