@@ -25,8 +25,8 @@ a project.
    [Aperture Cloud](https://app.fluxninja.com/sign-up).
 2. There are two ways you can sign up --
 
-   - Using your Google account
-   - Using your email address. We recommend using your work email — it keeps
+   - using your Google account
+   - using your email address. We recommend using your work email — it keeps
      work and life separate.
 
    ![Sign up](./assets/sign-up.png)
