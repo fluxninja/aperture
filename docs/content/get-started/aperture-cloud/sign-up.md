@@ -25,8 +25,8 @@ a project.
    [Aperture Cloud](https://app.fluxninja.com/sign-up).
 2. There are two ways you can sign up --
 
-   - using your Google account
-   - using your email address. We recommend using your work email — it keeps
+   - Using your Google account
+   - Using your email address. We recommend using your work email — it keeps
      work and life separate.
 
    ![Sign up](./assets/sign-up.png)
@@ -42,30 +42,30 @@ a project.
    ![Select Plan](./assets/select-subscription.png)
 
    Credit card details are required for verification purposes. Please rest
-   assured that your information will be handled securely and no charges will be
-   applied during the trial period.
+   assured that your information will be handled securely, and no charges will
+   be applied during the trial period.
 
    ![Subscription Details](./assets/subscription-plan.png)
 
-5. After completing the subscription, you will be redirected to Get Started
+5. After completing the subscription, you will be redirected to the Get Started
    page. Read the instructions and click **Next**.
 
    ![Get Started](./assets/get-started.png)
 
-6. By default, Aperture Cloud create one project for you. You can create more
+6. By default, Aperture Cloud creates one project for you. You can create more
    later on. Enter your project name and description, click **Next**.
 
    ![Create Project](./assets/project-name.png)
 
 7. Each project has a user group associated with it. Only the users in the user
    group will have access to the project. You can add users to the user group by
-   entering their email address, in next step.
+   entering their email address, in the next step.
    ![Add Users](./assets/usergroups.png)
 
-8. You're by default added in that group, but you can invite more users by
-   entering their email address and assigning them a role. Once you have entered
-   all the email addresses, click **Send Invitations**. You can also skip this
-   step and add users later on.
+8. You are added by default to the user group created in the previous step, but
+   you can invite more users by entering their email addresses and assigning
+   them a role. Once you have entered all the email addresses, click **Send
+   Invitations**. You can also choose to skip this step and add users later on.
 
    ![Add Users](./assets/invite-members.png)
 
@@ -74,8 +74,8 @@ a project.
 
    ![Install Aperture](./assets/install-aperture.png)
 
-10. To start using Aperture Cloud. Click **Finish**. You be redirected to the
-    Aperture Cloud UI.
+10. To start using Aperture Cloud. Click **Finish**. You will be redirected to
+    the Aperture Cloud UI.
 
     ![Final Step](./assets/thats-all.png)
 
