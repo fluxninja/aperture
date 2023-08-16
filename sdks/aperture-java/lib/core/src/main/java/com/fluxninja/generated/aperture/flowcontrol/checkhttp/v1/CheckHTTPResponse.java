@@ -38,6 +38,7 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.class, com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.Builder.class);
   }
 
+  private int bitField0_;
   private int httpResponseCase_ = 0;
   @SuppressWarnings("serial")
   private java.lang.Object httpResponse_;
@@ -92,7 +93,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasStatus() {
-    return status_ != null;
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <pre>
@@ -217,7 +218,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasDynamicMetadata() {
-    return dynamicMetadata_ != null;
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
    * <pre>
@@ -259,7 +260,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (status_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getStatus());
     }
     if (httpResponseCase_ == 2) {
@@ -268,7 +269,7 @@ private static final long serialVersionUID = 0L;
     if (httpResponseCase_ == 3) {
       output.writeMessage(3, (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_);
     }
-    if (dynamicMetadata_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(4, getDynamicMetadata());
     }
     getUnknownFields().writeTo(output);
@@ -280,7 +281,7 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (status_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getStatus());
     }
@@ -292,7 +293,7 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_);
     }
-    if (dynamicMetadata_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, getDynamicMetadata());
     }
@@ -484,13 +485,20 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getStatusFieldBuilder();
+        getDynamicMetadataFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -548,16 +556,20 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.status_ = statusBuilder_ == null
             ? status_
             : statusBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
             ? dynamicMetadata_
             : dynamicMetadataBuilder_.build();
+        to_bitField0_ |= 0x00000002;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     private void buildPartialOneofs(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse result) {
@@ -808,8 +820,10 @@ private static final long serialVersionUID = 0L;
       } else {
         statusBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
-      onChanged();
+      if (status_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -1324,8 +1338,10 @@ private static final long serialVersionUID = 0L;
       } else {
         dynamicMetadataBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000008;
-      onChanged();
+      if (dynamicMetadata_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
       return this;
     }
     /**
