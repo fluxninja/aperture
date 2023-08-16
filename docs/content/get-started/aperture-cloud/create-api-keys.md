@@ -20,7 +20,7 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 
 ## Create API Keys
 
-1. In the Aperture Cloud UI, navigate to the your project. _API keys are project
+1. In the Aperture Cloud UI, navigate to your project. _API keys are project
    specific. You need to create a new API key for each project._
 2. Now, from the left sidebar, click **Aperture**.
 3. Click **API Keys** tab.

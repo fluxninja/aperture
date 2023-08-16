@@ -18,14 +18,16 @@ choose to continue using Aperture Cloud by subscribing to one of the [plans][].
 
 :::
 
-To begin using Aperture Cloud, you need to sign up and create a organization & a
-project.
+To begin using Aperture Cloud, you need to sign up and create an organization &
+a project.
 
 1. For sign up, head over to
    [Aperture Cloud](https://app.fluxninja.com/sign-up).
-2. There are two ways you can sign up A) Using your Google account B) Using your
-   email address. We recommend using your work email — it keeps work and life
-   separate.
+2. There are two ways you can sign up --
+
+   - Using your Google account
+   - Using your email address. We recommend using your work email — it keeps
+     work and life separate.
 
    ![Sign up](./assets/sign-up.png)
 
@@ -34,13 +36,14 @@ project.
 
    ![Create Organization](./assets/create-organization.png)
 
-4. After you have created your organization, you will be redirected to Select
-   Subscription page. Default plan is with trial period of 30 days.
+4. After you have created your organization, you will be redirected to the
+   Select Subscription page. The default plan is with a trial period of 30 days.
 
    ![Select Plan](./assets/select-subscription.png)
 
-   Credit Card details required for verification purposes. Rest assured, no
-   charges will be applied during trial period.
+   Credit card details are required for verification purposes. Please rest
+   assured that your information will be handled securely and no charges will be
+   applied during the trial period.
 
    ![Subscription Details](./assets/subscription-plan.png)
 
