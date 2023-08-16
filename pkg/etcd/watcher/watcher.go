@@ -79,9 +79,10 @@ func (w *watcher) Stop() error {
 	return w.Trackers.Stop()
 }
 
-// bootstrap iterates throughout all existing keys in etcd and updates trackers in the existing watcher.
+// doWatch iterates throughout all existing keys in etcd, updates trackers in
+// the existing watcher, and starts watching for updates.
 //
-// Errors when context is canceled or watch failed.
+// Errors when context is canceled or watching fails.
 func (w *watcher) doWatch() error {
 	// bootstrap
 
