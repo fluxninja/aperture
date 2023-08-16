@@ -50,6 +50,8 @@ set up an organization and kick off a project for you.
    validating your credit card details, your subscription will be started.
    ![Subscription Started](./assets/subscription-started.png)
 
+   In case of any issues, please reach out to us at <support@fluxninja.com>
+
 5. After completing the select subscription step, you will be redirected to the
    Get Started page. Read the instructions and click **Next**.
 
