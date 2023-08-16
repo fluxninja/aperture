@@ -91,3 +91,6 @@ Elon
 rollup
 ConfigMap
 EnvoyProxy
+[Vv]irality
+forecasted
+[Bb]ursty
