@@ -15,7 +15,9 @@ api_key = "API_KEY"
 ```
 
 Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-organization name and API key created for your project.
+organization name and API key associated with your project. If you don't know
+the API key, you can create one in the Aperture Cloud UI. See [API
+Keys][api-keys] for more details.
 
 :::info
 
@@ -33,3 +35,4 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 [self-hosted]: /self-hosting/self-hosting.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
+[api-keys]: /get-started/aperture-cloud/api-keys.md
