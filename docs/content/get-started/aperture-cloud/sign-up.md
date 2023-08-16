@@ -47,8 +47,12 @@ a project.
 
    ![Subscription Details](./assets/subscription-plan.png)
 
-5. After completing the subscription, you will be redirected to the Get Started
-   page. Read the instructions and click **Next**.
+   Once you have entered your credit card details, click **Subscribe**. After
+   validating your credit card details, your subscription will be started.
+   ![Subscription Started](./assets/subscription-started.png)
+
+5. After completing the select subscription step, you will be redirected to the
+   Get Started page. Read the instructions and click **Next**.
 
    ![Get Started](./assets/get-started.png)
 

@@ -27,7 +27,7 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 4. Click **Create API Key**.
 5. Copy the API key and save it in a secure location.
 
-![API Keys](../../assets/img/api-keys.gif "Creating API Keys for fluxninja-demo project")
+![API Keys](./assets/api-keys.gif "Creating API Keys for fluxninja-demo project")
 
 [configure aperturectl]: /get-started/installation/configure-cli.md
 [sign-up]: https://app.fluxninja.com/sign-up
