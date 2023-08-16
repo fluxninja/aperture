@@ -2036,6 +2036,7 @@ java.lang.String defaultValue) {
 
   }
 
+  private int bitField0_;
   public static final int SOURCE_FIELD_NUMBER = 1;
   private com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.SocketAddress source_;
   /**
@@ -2050,7 +2051,7 @@ java.lang.String defaultValue) {
    */
   @java.lang.Override
   public boolean hasSource() {
-    return source_ != null;
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <pre>
@@ -2094,7 +2095,7 @@ java.lang.String defaultValue) {
    */
   @java.lang.Override
   public boolean hasDestination() {
-    return destination_ != null;
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
    * <pre>
@@ -2136,7 +2137,7 @@ java.lang.String defaultValue) {
    */
   @java.lang.Override
   public boolean hasRequest() {
-    return request_ != null;
+    return ((bitField0_ & 0x00000004) != 0);
   }
   /**
    * <pre>
@@ -2225,13 +2226,13 @@ java.lang.String defaultValue) {
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (source_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getSource());
     }
-    if (destination_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(2, getDestination());
     }
-    if (request_ != null) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       output.writeMessage(3, getRequest());
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
@@ -2246,15 +2247,15 @@ java.lang.String defaultValue) {
     if (size != -1) return size;
 
     size = 0;
-    if (source_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getSource());
     }
-    if (destination_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getDestination());
     }
-    if (request_ != null) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, getRequest());
     }
@@ -2437,13 +2438,21 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getSourceFieldBuilder();
+        getDestinationFieldBuilder();
+        getRequestFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -2498,24 +2507,29 @@ java.lang.String defaultValue) {
 
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.source_ = sourceBuilder_ == null
             ? source_
             : sourceBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.destination_ = destinationBuilder_ == null
             ? destination_
             : destinationBuilder_.build();
+        to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.request_ = requestBuilder_ == null
             ? request_
             : requestBuilder_.build();
+        to_bitField0_ |= 0x00000004;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.controlPoint_ = controlPoint_;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -2741,8 +2755,10 @@ java.lang.String defaultValue) {
       } else {
         sourceBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
-      onChanged();
+      if (source_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -2914,8 +2930,10 @@ java.lang.String defaultValue) {
       } else {
         destinationBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000002;
-      onChanged();
+      if (destination_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -3077,8 +3095,10 @@ java.lang.String defaultValue) {
       } else {
         requestBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000004;
-      onChanged();
+      if (request_ != null) {
+        bitField0_ |= 0x00000004;
+        onChanged();
+      }
       return this;
     }
     /**
