@@ -30,5 +30,5 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 ![API Keys](./assets/api-keys.gif "Creating API Keys for sudhanshu-demo-docs project")
 
 [configure aperturectl]: /get-started/installation/configure-cli.md
-[sign-up]: https://app.fluxninja.com/sign-up
+[sign-up]: /get-started/aperture-cloud/sign-up.md
 [Agents]: /get-started/installation/agent/agent.md
