@@ -25,7 +25,6 @@ type watcher struct {
 	etcdClient *etcdclient.Client
 	cancel     context.CancelFunc
 	etcdPath   string
-	revision   int64
 }
 
 // Make sure Watcher implements notifiers.Watcher interface.
@@ -35,7 +34,7 @@ var _ notifiers.Watcher = (*watcher)(nil)
 func NewWatcher(etcdClient *etcdclient.Client, etcdPath string) (notifiers.Watcher, error) {
 	if etcdPath == "" {
 		err := errors.New("unable to create etcd watcher because etcdPath is empty")
-		log.Error().Err(err).Msg("")
+		log.Error().Err(err).Send()
 		return nil, err
 	}
 
@@ -58,46 +57,16 @@ func (w *watcher) Start() error {
 	if err != nil {
 		return err
 	}
-	w.bootstrap()
 
 	w.waitGroup.Add(1)
-
 	panichandler.Go(func() {
 		defer w.waitGroup.Done()
-		// start watch to accumulate events
-		// need to start all over again on non-recoverable error in watch response (refer https://pkg.go.dev/github.com/coreos/etcd/clientv3#Watcher)
-		wCh := w.etcdClient.Watcher.Watch(clientv3.WithRequireLeader(w.ctx),
-			w.etcdPath, clientv3.WithRev(w.revision+1), clientv3.WithPrefix())
-
 		for {
-			select {
-			case resp, ok := <-wCh:
-				if !ok {
-					return
-				}
-				if resp.Canceled {
-					log.Error().Err(resp.Err()).Msg("Etcd watch channel was canceled")
-					w.Trackers.Purge("")
-					w.bootstrap()
-					continue
-				}
-				for _, ev := range resp.Events {
-					key := getNotifierKey(ev.Kv.Key)
-					// Track only the children, skip etcdPath itself
-					if path.Clean(string(ev.Kv.Key)) == path.Clean(w.etcdPath) {
-						continue
-					}
-
-					switch ev.Type {
-					case mvccpb.PUT:
-						w.WriteEvent(key, ev.Kv.Value)
-					case mvccpb.DELETE:
-						w.RemoveEvent(key)
-					}
-				}
-			case <-w.ctx.Done():
+			err := w.doWatch()
+			if w.ctx.Err() != nil {
 				return
 			}
+			log.Error().Err(err).Msg("Etcd watch channel was canceled. Re-bootrapping")
 		}
 	})
 	return nil
@@ -111,13 +80,16 @@ func (w *watcher) Stop() error {
 }
 
 // bootstrap iterates throughout all existing keys in etcd and updates trackers in the existing watcher.
-func (w *watcher) bootstrap() {
-	var getResp *clientv3.GetResponse
-	var err error
+//
+// Errors when context is canceled or watch failed.
+func (w *watcher) doWatch() error {
+	// bootstrap
 
+	var getResp *clientv3.GetResponse
 	operation := func() error {
 		ctx, cancel := context.WithTimeout(w.ctx, 5*time.Second)
 		defer cancel()
+		var err error
 		getResp, err = w.etcdClient.KV.Get(ctx, w.etcdPath, clientv3.WithPrefix())
 		if err != nil {
 			log.Error().Err(err).Str("etcdPath", w.etcdPath).Msg("Failed to list keys")
@@ -130,24 +102,52 @@ func (w *watcher) bootstrap() {
 	boff.MaxElapsedTime = time.Duration(0) // never stop retrying
 	boff.MaxInterval = 10 * time.Second
 
-	err = backoff.Retry(operation, backoff.WithContext(boff, w.ctx))
+	err := backoff.Retry(operation, backoff.WithContext(boff, w.ctx))
 	if err != nil {
 		log.Info().Msg("Stopping bootstrap")
-		return
+		return err
 	}
 
-	w.revision = getResp.Header.Revision
+	// Remove all potentially stale keys from the Trackers, before writing new state.
+	w.Trackers.Purge("")
 
-	kvs := make([]*mvccpb.KeyValue, 0, len(getResp.Kvs))
-	kvs = append(kvs, getResp.Kvs...)
-
-	for _, kv := range kvs {
+	for _, kv := range getResp.Kvs {
 		if string(kv.Key) == w.etcdPath {
 			continue
 		}
 		key := getNotifierKey(kv.Key)
 		w.WriteEvent(key, kv.Value)
 	}
+
+	// start watch to accumulate events
+	wCh := w.etcdClient.Watcher.Watch(clientv3.WithRequireLeader(w.ctx),
+		w.etcdPath, clientv3.WithRev(getResp.Header.Revision+1), clientv3.WithPrefix())
+
+	for resp := range wCh {
+		if err := resp.Err(); err != nil {
+			// need to start all over again on non-recoverable error in watch
+			// response (refer https://pkg.go.dev/github.com/coreos/etcd/clientv3#Watcher)
+			return err
+		}
+		for _, ev := range resp.Events {
+			key := getNotifierKey(ev.Kv.Key)
+			// Track only the children, skip etcdPath itself
+			if path.Clean(string(ev.Kv.Key)) == path.Clean(w.etcdPath) {
+				continue
+			}
+
+			switch ev.Type {
+			case mvccpb.PUT:
+				w.WriteEvent(key, ev.Kv.Value)
+			case mvccpb.DELETE:
+				w.RemoveEvent(key)
+			}
+		}
+	}
+
+	// This probably should not happen, as watcher should send Err() != nil
+	// response response on the wCh before closing it.
+	return nil
 }
 
 func getNotifierKey(etcdKey []byte) notifiers.Key {
