@@ -74,8 +74,7 @@ set up an organization and kick off a project for you.
 
    ![Add Users](./assets/invite-members.png)
 
-9. Now, you can install Aperture using the instructions provided. You can also
-   skip this step and install Aperture later on.
+9. Now, you can install Aperture using the instructions provided.
 
    ![Install Aperture](./assets/install-aperture.png)
 
