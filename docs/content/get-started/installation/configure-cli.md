@@ -14,10 +14,10 @@ url = "ORGANIZATION_NAME.app.fluxninja.com:443"
 api_key = "API_KEY"
 ```
 
-Replace the `ORGANIZATION_NAME` and `API_KEY` with your Aperture Cloud
-organization name and API key associated with your project. If you don't know
-the API key, you can create one in the Aperture Cloud UI. See [API
-Keys][api-keys] for more details.
+Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
+`API_KEY` with the API key linked to the project. If an API key has not been
+created, generate a new one through the Aperture Cloud UI. Refer to [API
+Keys][api-keys] for additional information.
 
 :::info
 
