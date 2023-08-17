@@ -919,7 +919,7 @@ jobs:
         description: ArgoCD manifests repository to update
       manifests-branch:
         type: string
-        default: tests
+        default: environments/latest
         description: Branch to use when pushing deployment changes
       environment-path:
         type: string
