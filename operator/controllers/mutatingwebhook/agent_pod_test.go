@@ -247,7 +247,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "auto",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64(1001),
+					RunAsUser:  pointer.Int64(1000),
+					RunAsGroup: pointer.Int64(1000),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -276,7 +277,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser: pointer.Int64(1001),
+					RunAsUser:  pointer.Int64(1000),
+					RunAsGroup: pointer.Int64(1000),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -418,6 +420,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 						ContainerSecurityContext: common.ContainerSecurityContext{
 							Enabled:                true,
 							RunAsUser:              0,
+							RunAsGroup:             0,
 							RunAsNonRootUser:       false,
 							ReadOnlyRootFilesystem: false,
 						},
@@ -476,6 +479,7 @@ var _ = Describe("Sidecar container for Agent", func() {
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{
 					RunAsUser:              pointer.Int64(0),
+					RunAsGroup:             pointer.Int64(0),
 					RunAsNonRoot:           pointer.Bool(false),
 					ReadOnlyRootFilesystem: pointer.Bool(false),
 				},

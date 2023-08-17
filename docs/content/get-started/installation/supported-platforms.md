@@ -6,7 +6,7 @@ keywords:
   - kubernetes
   - istio
   - envoy
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 Below are the platforms supported for the Aperture Agent:

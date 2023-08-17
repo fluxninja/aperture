@@ -54,6 +54,7 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.class, com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.Builder.class);
   }
 
+  private int bitField0_;
   public static final int HEADERS_FIELD_NUMBER = 1;
   private static final class HeadersDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
@@ -157,7 +158,7 @@ java.lang.String defaultValue) {
    */
   @java.lang.Override
   public boolean hasDynamicMetadata() {
-    return dynamicMetadata_ != null;
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <code>.google.protobuf.Struct dynamic_metadata = 2 [json_name = "dynamicMetadata"];</code>
@@ -195,7 +196,7 @@ java.lang.String defaultValue) {
         internalGetHeaders(),
         HeadersDefaultEntryHolder.defaultEntry,
         1);
-    if (dynamicMetadata_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(2, getDynamicMetadata());
     }
     getUnknownFields().writeTo(output);
@@ -217,7 +218,7 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, headers__);
     }
-    if (dynamicMetadata_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getDynamicMetadata());
     }
@@ -407,13 +408,19 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getDynamicMetadataFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -462,11 +469,14 @@ java.lang.String defaultValue) {
         result.headers_ = internalGetHeaders();
         result.headers_.makeImmutable();
       }
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
             ? dynamicMetadata_
             : dynamicMetadataBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -799,8 +809,10 @@ java.lang.String defaultValue) {
       } else {
         dynamicMetadataBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000002;
-      onChanged();
+      if (dynamicMetadata_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
       return this;
     }
     /**
