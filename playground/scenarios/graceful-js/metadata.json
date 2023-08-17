@@ -1,7 +1,7 @@
 {
   "renderer": "tanka",
   "tkenv": "playground/tanka/apps/demo-app",
-  "needs": ["istio", "demo-ui"],
+  "needs": ["istio", "demo-ui", "postgresql"],
   "aperture_policies": [
     {
       "blueprint_name": "rate-limiting/base",
@@ -32,18 +32,8 @@
   "child_resources": [
     {
       "workload": "service1-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "resource_deps": ["cluster-bootstrap", "istiod", "postgresql"],
       "extra_objects": ["service1-demo-app:serviceaccount"]
-    },
-    {
-      "workload": "service2-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
-      "extra_objects": ["service2-demo-app:serviceaccount"]
-    },
-    {
-      "workload": "service3-demo-app",
-      "resource_deps": ["cluster-bootstrap", "istiod"],
-      "extra_objects": ["service3-demo-app:serviceaccount"]
     }
   ]
 }
