@@ -336,6 +336,7 @@ var _ = Describe("Agent DaemonSet", func() {
 						ContainerSecurityContext: common.ContainerSecurityContext{
 							Enabled:                true,
 							RunAsUser:              0,
+							RunAsGroup:             0,
 							RunAsNonRootUser:       false,
 							ReadOnlyRootFilesystem: false,
 						},
@@ -460,6 +461,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
 										RunAsUser:              pointer.Int64(0),
+										RunAsGroup:             pointer.Int64(0),
 										RunAsNonRoot:           pointer.Bool(false),
 										ReadOnlyRootFilesystem: pointer.Bool(false),
 									},
