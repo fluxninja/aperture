@@ -60,6 +60,7 @@ func ContainerSecurityContext(containerSecurityContext common.ContainerSecurityC
 			RunAsUser:              pointer.Int64(containerSecurityContext.RunAsUser),
 			RunAsNonRoot:           pointer.Bool(containerSecurityContext.RunAsNonRootUser),
 			ReadOnlyRootFilesystem: pointer.Bool(containerSecurityContext.ReadOnlyRootFilesystem),
+			RunAsGroup:             pointer.Int64(containerSecurityContext.RunAsGroup),
 		}
 	} else {
 		securityContext = &corev1.SecurityContext{}

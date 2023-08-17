@@ -114,7 +114,7 @@ type PodSecurityContext struct {
 
 	// fsGroup to define the Group ID for the Pod
 	//+kubebuilder:validation:Optional
-	FsGroup int64 `json:"fsGroup" default:"1001" validate:"gte=0"`
+	FsGroup int64 `json:"fsGroup" default:"1000" validate:"gte=0"`
 }
 
 // ContainerSecurityContext defines Enabled, RunAsUser, RunAsNonRootUser and ReadOnlyRootFilesystem for the containers' security context.
@@ -124,11 +124,15 @@ type ContainerSecurityContext struct {
 
 	// Set containers' Security Context runAsUser
 	//+kubebuilder:validation:Optional
-	RunAsUser int64 `json:"runAsUser" default:"1001" validate:"gte=0"`
+	RunAsUser int64 `json:"runAsUser" default:"1000" validate:"gte=0"`
+
+	// Set containers' Security Context runAsGroup
+	//+kubebuilder:validation:Optional
+	RunAsGroup int64 `json:"runAsGroup" default:"1000" validate:"gte=0"`
 
 	// Set containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	RunAsNonRootUser bool `json:"runAsNonRoot" default:"false"`
+	RunAsNonRootUser bool `json:"runAsNonRoot" default:"true"`
 
 	// Set agent containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional

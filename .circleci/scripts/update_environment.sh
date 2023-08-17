@@ -11,12 +11,15 @@ args=(
     --manifests-repo-url "${MANIFESTS_REPO}"
     --manifests-base-branch "${MANIFESTS_BRANCH}"
     --manifests-repo-ref "${MANIFESTS_BRANCH}"
-    --skip-pull-request
     --push
 )
 
 if [ -n "${COMPONENT:-}" ]; then
     args+=(--component "${COMPONENT}")
+fi
+
+if [ "${SKIP_PULL_REQUEST:-}" == "true" ]; then
+    args+=(--skip-pull-request)
 fi
 
 if [ -n "${SKIP_COMPONENT:-}" ]; then

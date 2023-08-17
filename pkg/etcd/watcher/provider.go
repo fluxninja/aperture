@@ -1,7 +1,6 @@
 package watcher
 
 import (
-	"context"
 	"io/fs"
 	"os"
 	"path"
@@ -52,19 +51,7 @@ func (c Constructor) provideWatcher(client *etcdclient.Client, unmarshaller conf
 		return nil, err
 	}
 
-	lifecycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			err := watcher.Start()
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to start etcd watcher")
-				return err
-			}
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			return watcher.Stop()
-		},
-	})
+	lifecycle.Append(fx.StartStopHook(watcher.Start, watcher.Stop))
 
 	return watcher, nil
 }

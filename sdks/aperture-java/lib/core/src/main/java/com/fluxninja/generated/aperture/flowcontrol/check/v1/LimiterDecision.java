@@ -2172,6 +2172,7 @@ private static final long serialVersionUID = 0L;
               com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo.Builder.class);
     }
 
+    private int bitField0_;
     public static final int LABEL_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile java.lang.Object label_ = "";
@@ -2219,7 +2220,7 @@ private static final long serialVersionUID = 0L;
      */
     @java.lang.Override
     public boolean hasSchedulerInfo() {
-      return schedulerInfo_ != null;
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo scheduler_info = 2 [json_name = "schedulerInfo"];</code>
@@ -2254,7 +2255,7 @@ private static final long serialVersionUID = 0L;
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, label_);
       }
-      if (schedulerInfo_ != null) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(2, getSchedulerInfo());
       }
       getUnknownFields().writeTo(output);
@@ -2269,7 +2270,7 @@ private static final long serialVersionUID = 0L;
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, label_);
       }
-      if (schedulerInfo_ != null) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getSchedulerInfo());
       }
@@ -2431,13 +2432,19 @@ private static final long serialVersionUID = 0L;
 
       // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo.newBuilder()
       private Builder() {
-
+        maybeForceBuilderInitialization();
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getSchedulerInfoFieldBuilder();
+        }
       }
       @java.lang.Override
       public Builder clear() {
@@ -2485,11 +2492,14 @@ private static final long serialVersionUID = 0L;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.label_ = label_;
         }
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.schedulerInfo_ = schedulerInfoBuilder_ == null
               ? schedulerInfo_
               : schedulerInfoBuilder_.build();
+          to_bitField0_ |= 0x00000001;
         }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -2737,8 +2747,10 @@ private static final long serialVersionUID = 0L;
         } else {
           schedulerInfoBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
-        onChanged();
+        if (schedulerInfo_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
         return this;
       }
       /**

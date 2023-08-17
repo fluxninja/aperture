@@ -35,4 +35,14 @@ RUN apt-get update \
 
 COPY --link --from=builder /aperture-agent /aperture-agent
 
+ARG USERNAME=aperture-agent
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && chown -R $USERNAME:$USERNAME /aperture-agent
+
+USER $USERNAME
+
 CMD ["/aperture-agent"]

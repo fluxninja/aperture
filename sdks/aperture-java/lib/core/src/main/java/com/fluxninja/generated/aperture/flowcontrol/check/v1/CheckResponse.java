@@ -306,6 +306,7 @@ private static final long serialVersionUID = 0L;
     // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CheckResponse.DecisionType)
   }
 
+  private int bitField0_;
   public static final int START_FIELD_NUMBER = 1;
   private com.google.protobuf.Timestamp start_;
   /**
@@ -318,7 +319,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasStart() {
-    return start_ != null;
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <pre>
@@ -356,7 +357,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasEnd() {
-    return end_ != null;
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
    * <pre>
@@ -878,7 +879,7 @@ java.lang.String defaultValue) {
    */
   @java.lang.Override
   public boolean hasWaitTime() {
-    return waitTime_ != null;
+    return ((bitField0_ & 0x00000004) != 0);
   }
   /**
    * <pre>
@@ -920,10 +921,10 @@ java.lang.String defaultValue) {
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (start_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getStart());
     }
-    if (end_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(2, getEnd());
     }
     for (int i = 0; i < services_.size(); i++) {
@@ -956,7 +957,7 @@ java.lang.String defaultValue) {
     for (int i = 0; i < limiterDecisions_.size(); i++) {
       output.writeMessage(12, limiterDecisions_.get(i));
     }
-    if (waitTime_ != null) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       output.writeMessage(13, getWaitTime());
     }
     getUnknownFields().writeTo(output);
@@ -968,11 +969,11 @@ java.lang.String defaultValue) {
     if (size != -1) return size;
 
     size = 0;
-    if (start_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getStart());
     }
-    if (end_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getEnd());
     }
@@ -1025,7 +1026,7 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(12, limiterDecisions_.get(i));
     }
-    if (waitTime_ != null) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(13, getWaitTime());
     }
@@ -1273,13 +1274,24 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getStartFieldBuilder();
+        getEndFieldBuilder();
+        getClassifierInfosFieldBuilder();
+        getFluxMeterInfosFieldBuilder();
+        getLimiterDecisionsFieldBuilder();
+        getWaitTimeFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -1393,15 +1405,18 @@ java.lang.String defaultValue) {
 
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.start_ = startBuilder_ == null
             ? start_
             : startBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.end_ = endBuilder_ == null
             ? end_
             : endBuilder_.build();
+        to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         services_.makeImmutable();
@@ -1428,7 +1443,9 @@ java.lang.String defaultValue) {
         result.waitTime_ = waitTimeBuilder_ == null
             ? waitTime_
             : waitTimeBuilder_.build();
+        to_bitField0_ |= 0x00000004;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -1821,8 +1838,10 @@ java.lang.String defaultValue) {
       } else {
         startBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
-      onChanged();
+      if (start_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -1976,8 +1995,10 @@ java.lang.String defaultValue) {
       } else {
         endBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000002;
-      onChanged();
+      if (end_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -3759,8 +3780,10 @@ java.lang.String defaultValue) {
       } else {
         waitTimeBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000800;
-      onChanged();
+      if (waitTime_ != null) {
+        bitField0_ |= 0x00000800;
+        onChanged();
+      }
       return this;
     }
     /**

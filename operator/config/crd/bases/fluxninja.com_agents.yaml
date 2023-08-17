@@ -2000,6 +2000,10 @@ spec:
                   readOnlyRootFilesystem:
                     description: Set agent containers' Security Context runAsNonRoot
                     type: boolean
+                  runAsGroup:
+                    description: Set containers' Security Context runAsGroup
+                    format: int64
+                    type: integer
                   runAsNonRoot:
                     description: Set containers' Security Context runAsNonRoot
                     type: boolean
