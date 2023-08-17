@@ -121,6 +121,7 @@ To install the Aperture system, please follow the
 
 ## 🎥 Videos
 
+- [SREcon 23 APAC - Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
 - [Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
 - [Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://www.youtube.com/watch?v=nm62d2gYqNk)
 - [How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
