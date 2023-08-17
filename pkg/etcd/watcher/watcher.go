@@ -51,7 +51,7 @@ func NewWatcher(etcdClient *etcdclient.Client, etcdPath string) (notifiers.Watch
 	return w, nil
 }
 
-// Start first starts trackers, bootstraps from existing keys in etcd and then starts watching etcd prefix w.etcdPath.
+// Start starts the etcd watcher.
 func (w *watcher) Start() error {
 	err := w.Trackers.Start()
 	if err != nil {
@@ -121,6 +121,9 @@ func (w *watcher) doWatch() error {
 	}
 
 	// start watch to accumulate events
+	// Note: Watching from "Get" revision + 1, because revision passed to
+	// WithRev is inclusive and we want to watch for all events occurring
+	// _after_ we retrieved the initial state.
 	wCh := w.etcdClient.Watcher.Watch(clientv3.WithRequireLeader(w.ctx),
 		w.etcdPath, clientv3.WithRev(getResp.Header.Revision+1), clientv3.WithPrefix())
 
