@@ -11,7 +11,6 @@ args=(
     --manifests-repo-url "${MANIFESTS_REPO}"
     --manifests-base-branch "${MANIFESTS_BRANCH}"
     --manifests-repo-ref "${MANIFESTS_BRANCH}"
-    --skip-pull-request
     --push
 )
 
