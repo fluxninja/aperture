@@ -953,6 +953,7 @@ jobs:
             MANIFESTS_REPO: << parameters.manifests-repo >>
             COMPONENT: << parameters.component >>
             ENVIRONMENT_PATH: << parameters.environment-path >>
+            SKIP_PULL_REQUEST: "true"
           command: .circleci/scripts/update_environment.sh
 
   package-binaries:
