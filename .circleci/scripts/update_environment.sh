@@ -18,6 +18,10 @@ if [ -n "${COMPONENT:-}" ]; then
     args+=(--component "${COMPONENT}")
 fi
 
+if [ "${SKIP_PULL_REQUEST:-}" == "true" ]; then
+    args+=(--skip-pull-request)
+fi
+
 if [ -n "${SKIP_COMPONENT:-}" ]; then
     args+=(--skip-component "${SKIP_COMPONENT}")
 fi
