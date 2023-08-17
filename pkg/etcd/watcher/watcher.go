@@ -64,9 +64,10 @@ func (w *watcher) Start() error {
 		for {
 			err := w.doWatch()
 			if w.ctx.Err() != nil {
+				log.Info().Err(w.ctx.Err()).Msg("Context canceled, stopping etcd watcher")
 				return
 			}
-			log.Error().Err(err).Msg("Etcd watch channel was canceled. Re-bootrapping")
+			log.Error().Err(err).Msg("etcd watch channel was canceled. Re-bootrapping")
 		}
 	})
 	return nil

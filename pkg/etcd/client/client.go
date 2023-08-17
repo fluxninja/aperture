@@ -77,7 +77,7 @@ type KVWrapper struct {
 	clientv3.KV
 }
 
-// ProvideClient creates a new Etcd Client and provides it via Fx.
+// ProvideClient creates a new etcd Client and provides it via Fx.
 func ProvideClient(in ClientIn) (*Client, error) {
 	var config etcd.EtcdConfig
 
