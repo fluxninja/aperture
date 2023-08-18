@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,6 +22,7 @@ import (
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -55,13 +57,14 @@ type SimpleService struct {
 	// If it is not set then value is -1 and we do not configure proxy.
 	// Istio proxy should handle requests without additional config
 	// if it is injected.
-	envoyPort         int
-	rabbitMQURL       string
-	elasticsearch     elasticsearch.Config
-	concurrency       int           // Maximum number of concurrent clients
-	latency           time.Duration // Simulated latency for each request
-	rejectRatio       float64       // Ratio of requests to be rejected
-	cpuLoadPercentage int           // Percentage of CPU to be loaded
+	envoyPort           int
+	rabbitMQURL         string
+	elasticsearchConfig elasticsearch.Config
+	pgsqlURL            string
+	concurrency         int           // Maximum number of concurrent clients
+	latency             time.Duration // Simulated latency for each request
+	rejectRatio         float64       // Ratio of requests to be rejected
+	cpuLoadPercentage   int           // Percentage of CPU to be loaded
 }
 
 // ResponseBody is a response body for returning a response to all requests made on api endpoints
@@ -76,21 +79,23 @@ func NewSimpleService(
 	envoyPort int,
 	rabbitMQURL string,
 	elasticsearchConfig elasticsearch.Config,
+	pgsqlURL string,
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
 	cpuLoadPercentage int,
 ) *SimpleService {
 	return &SimpleService{
-		hostname:          hostname,
-		port:              port,
-		envoyPort:         envoyPort,
-		rabbitMQURL:       rabbitMQURL,
-		elasticsearch:     elasticsearchConfig,
-		concurrency:       concurrency,
-		latency:           latency,
-		rejectRatio:       rejectRatio,
-		cpuLoadPercentage: cpuLoadPercentage,
+		hostname:            hostname,
+		port:                port,
+		envoyPort:           envoyPort,
+		rabbitMQURL:         rabbitMQURL,
+		elasticsearchConfig: elasticsearchConfig,
+		pgsqlURL:            pgsqlURL,
+		concurrency:         concurrency,
+		latency:             latency,
+		rejectRatio:         rejectRatio,
+		cpuLoadPercentage:   cpuLoadPercentage,
 	}
 }
 
@@ -103,6 +108,7 @@ func (ss SimpleService) Run() error {
 		concurrency:       ss.concurrency,
 		limitClients:      make(chan struct{}, ss.concurrency),
 		cpuLoadPercentage: ss.cpuLoadPercentage,
+		pgsqlDB:           nil,
 	}
 
 	if ss.rabbitMQURL != "" {
@@ -163,8 +169,8 @@ func (ss SimpleService) Run() error {
 		go consumeFromQueue(q, cCh, handler)
 	}
 
-	if len(ss.elasticsearch.Addresses) > 0 {
-		es, err := elasticsearch.NewClient(ss.elasticsearch)
+	if len(ss.elasticsearchConfig.Addresses) > 0 {
+		es, err := elasticsearch.NewClient(ss.elasticsearchConfig)
 		if err != nil {
 			log.Error().Msgf("Error creating the client: %s", err)
 			return err
@@ -189,6 +195,20 @@ func (ss SimpleService) Run() error {
 		}
 	}
 
+	if ss.pgsqlURL != "" {
+		pgsqlDB, err := sql.Open("postgres", ss.pgsqlURL)
+		if err != nil {
+			return err
+		}
+		defer pgsqlDB.Close()
+
+		err = pgsqlDB.Ping()
+		if err != nil {
+			return err
+		}
+		handler.pgsqlDB = pgsqlDB
+	}
+
 	if ss.envoyPort == -1 {
 		handler.httpClient = &http.Client{}
 	} else {
@@ -201,7 +221,6 @@ func (ss SimpleService) Run() error {
 
 	prometheusAddress := os.Getenv("PROMETHEUS_ADDRESS")
 	if prometheusAddress != "" {
-
 		if prometheusAddress[len(prometheusAddress)-1] == '/' {
 			prometheusAddress = prometheusAddress[:len(prometheusAddress)-1]
 		}
@@ -432,6 +451,7 @@ type RequestHandler struct {
 	httpClient        HTTPClient
 	rabbitMQChan      *amqp.Channel
 	elasticsearch     *elasticsearch.Client
+	pgsqlDB           *sql.DB
 	limitClients      chan struct{}
 	hostname          string
 	concurrency       int
@@ -528,6 +548,22 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	headers := r.Header.Clone()
+
+	if h.pgsqlDB != nil {
+		// Simulate a slow query
+		// nolint:gosec
+		sleepDuration := rand.Float64()
+
+		rows, err := h.pgsqlDB.Query("SELECT * FROM users WHERE type = $1 pg_sleep($2)", r.Header.Get("User-Type"), fmt.Sprintf("%.2f", sleepDuration))
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to query postgresql")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+	}
+
 	var p Request
 
 	// Extract baggage and trace context from headers
@@ -556,8 +592,6 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	headers := r.Header.Clone()
 
 	code := http.StatusOK
 	for _, chain := range p.Chains {
