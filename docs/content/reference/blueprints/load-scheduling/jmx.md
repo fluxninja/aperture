@@ -1,3 +1,11 @@
+---
+title: Load Scheduling Based on JMX Metrics
+keywords:
+  - blueprints
+sidebar_position: 3
+sidebar_label: Load Scheduling Based on JMX Metrics
+---
+
 <!-- Configuration Marker -->
 
 ```mdx-code-block
