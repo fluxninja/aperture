@@ -7,14 +7,75 @@ metadata:
 spec:
   circuit:
     components:
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: PROMQL_0
+          query_string: avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~"service3-demo-app-.*"})
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: PROMQL_0
+          rhs:
+            constant_signal:
+              value: "0.35"
+        operator: gt
+        out_ports:
+          output:
+            signal_name: CONFIRMATION_SIGNAL_0
+    - first_valid:
+        in_ports:
+          inputs:
+          - signal_name: CONFIRMATION_SIGNAL_0
+          - constant_signal:
+              value: 0
+        out_ports:
+          output:
+            signal_name: OVERLOAD_CONFIRMATION_0
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: PROMQL_1
+          query_string: avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: PROMQL_1
+          rhs:
+            constant_signal:
+              value: "30"
+        operator: gt
+        out_ports:
+          output:
+            signal_name: CONFIRMATION_SIGNAL_1
+    - first_valid:
+        in_ports:
+          inputs:
+          - signal_name: CONFIRMATION_SIGNAL_1
+          - constant_signal:
+              value: 0
+        out_ports:
+          output:
+            signal_name: OVERLOAD_CONFIRMATION_1
+    - and:
+        in_ports:
+          inputs:
+          - signal_name: OVERLOAD_CONFIRMATION_0
+          - signal_name: OVERLOAD_CONFIRMATION_1
+        out_ports:
+          output:
+            signal_name: OVERLOAD_CONFIRMATION
     - flow_control:
         adaptive_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
-              constant_signal:
-                value: 1
+              signal_name: OVERLOAD_CONFIRMATION
             setpoint:
               signal_name: SETPOINT
             signal:

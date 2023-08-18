@@ -143,7 +143,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
-    value='[]'
+    value='[{"operator": "gt", "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": "0.35"}, {"operator": "gt", "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": "30"}]'
 />
 
 <!-- vale on -->
@@ -449,7 +449,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
-    value='null'
+    value='"gt"'
 />
 
 <!-- vale on -->
@@ -463,7 +463,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='null'
+    value='"avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})"'
 />
 
 <!-- vale on -->
@@ -477,7 +477,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
-    value='null'
+    value='"0.35"'
 />
 
 <!-- vale on -->

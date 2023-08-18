@@ -86,7 +86,18 @@
             },
             "overload_confirmations": {
               "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [],
+              "default": [
+                {
+                  "operator": "gt",
+                  "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})",
+                  "threshold": "0.35"
+                },
+                {
+                  "operator": "gt",
+                  "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
+                  "threshold": "30"
+                }
+              ],
               "type": "array",
               "items": {
                 "type": "object",
@@ -244,14 +255,17 @@
       "properties": {
         "operator": {
           "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "default": "gt",
           "type": "string"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "default": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})",
           "type": "string"
         },
         "threshold": {
           "description": "The threshold for the overload confirmation criteria.",
+          "default": "0.35",
           "type": "number",
           "format": "double"
         }

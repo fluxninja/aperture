@@ -3,6 +3,20 @@ local serviceProtectionDefaults = import '../common/config-defaults.libsonnet';
 
 serviceProtectionDefaults {
   policy+: {
+    service_protection_core+: {
+      overload_confirmations+: [
+        {
+          query_string: 'avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~"service3-demo-app-.*"})',
+          threshold: '0.35',
+          operator: 'gt',
+        },
+        {
+          query_string: 'avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
+          threshold: '30',
+          operator: 'gt',
+        },
+      ],
+    },
     latency_baseliner: {
       /**
       * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter defines the scope of latency measurements.
