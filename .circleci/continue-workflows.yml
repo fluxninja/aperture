@@ -1006,9 +1006,14 @@ jobs:
             tag="$(head -n1 \<<<"${tags}")"
             commits="$(git rev-list "${tag}"..HEAD --count)"
             APERTURECTL_BUILD_VERSION="${tag##*/}-b.${commits}"
+            vless_version="${APERTURECTL_BUILD_VERSION##v}"
+            APERTURECTL_BUILD_VERSION=${vless_version}
+            APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
 
             export APERTURECTL_BUILD_VERSION
+            export APERTURE_PACKAGE_VERSION
             declare -p APERTURECTL_BUILD_VERSION >> "${BASH_ENV}"
+            declare -p APERTURE_PACKAGE_VERSION >> "${BASH_ENV}"
       - restore_cache:
           name: Restore go cache
           keys:
