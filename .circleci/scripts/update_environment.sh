@@ -10,7 +10,6 @@ args=(
     --release-train "${RELEASE_TRAIN:-latest}"
     --manifests-repo-url "${MANIFESTS_REPO}"
     --manifests-base-branch "${MANIFESTS_BRANCH}"
-    --manifests-repo-ref "${MANIFESTS_BRANCH}"
     --push
 )
 

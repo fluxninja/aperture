@@ -11,3 +11,15 @@ log:
   level: info
   non_blocking: false
   pretty_console: true
+
+otel:
+  disable_kubernetes_scraper: true
+  disable_kubelet_scraper: true
+
+auto_scale:
+  kubernetes:
+    enabled: false
+
+service_discovery:
+  kubernetes:
+    enabled: false

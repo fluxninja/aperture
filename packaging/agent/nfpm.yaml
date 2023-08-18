@@ -1,13 +1,13 @@
 # check https://nfpm.goreleaser.com/configuration for detailed usage
 name: "aperture-agent"
 arch: "${GOARCH}"
-version: "${APERTURECTL_BUILD_VERSION}"
+version: "${APERTURE_PACKAGE_VERSION}"
 section: "default"
 priority: "extra"
 provides: [aperture-agent]
 maintainer: "FluxNinja <info@fluxninja.com>"
 description: |
-  Intelligent load management for cloud-native applications
+  Observability-driven load management for cloud apps
 vendor: "FluxNinja"
 homepage: "https://www.fluxninja.com"
 license: "Apache-2.0"
