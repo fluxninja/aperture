@@ -72,6 +72,29 @@ Follow the steps for
 [Self-Hosted Aperture Controller](/self-hosting/agent.md#configuration),
 depending on your setup.
 
+:::caution
+
+It is mandatory to keep the below configuration block in the configuration file.
+
+```yaml
+otel:
+  disable_kubernetes_scraper: true
+  disable_kubelet_scraper: true
+
+auto_scale:
+  kubernetes:
+    enabled: false
+
+service_discovery:
+  kubernetes:
+    enabled: false
+```
+
+Please verify that the above configuration block is present in the configuration
+file `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+
+:::
+
 All the configuration parameters for the Aperture Agent are available
 [here](/reference/configuration/agent.md).
 

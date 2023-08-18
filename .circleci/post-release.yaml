@@ -103,6 +103,17 @@ jobs:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             golang
+      - run:
+          name: "Set version"
+          command: |
+            vless_version="${APERTURECTL_BUILD_VERSION##v}"
+            APERTURECTL_BUILD_VERSION=${vless_version}
+            APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
+
+            export APERTURECTL_BUILD_VERSION
+            export APERTURE_PACKAGE_VERSION
+            declare -p APERTURECTL_BUILD_VERSION >> "${BASH_ENV}"
+            declare -p APERTURE_PACKAGE_VERSION >> "${BASH_ENV}"
       - restore_cache:
           name: Restore go cache
           keys:
