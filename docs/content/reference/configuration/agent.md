@@ -1426,7 +1426,7 @@ Lease time-to-live
 
 <!-- vale off -->
 
-(string, one of:
+(string, format: `empty | empty`, one of:
 `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL`,
 default: `"warn"`)
 
@@ -2345,7 +2345,7 @@ negative, then keep-alive is disabled.
 
 <!-- vale off -->
 
-(string, one of: `tcp | tcp4 | tcp6`, default: `"tcp"`)
+(string, format: `empty | empty`, one of: `tcp | tcp4 | tcp6`, default: `"tcp"`)
 
 <!-- vale on -->
 
@@ -2370,7 +2370,7 @@ LogConfig holds configuration for a logger and log writers.
 
 <!-- vale off -->
 
-(string, one of:
+(string, format: `empty | empty`, one of:
 `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`,
 default: `"info"`)
 

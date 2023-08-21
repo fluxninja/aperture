@@ -297,12 +297,14 @@ definitions:
                     - PANIC
                     - fatal
                     - FATAL
+                pattern: (^$)|(^$)
                 type: string
                 x-go-name: LogLevel
                 x-go-tag-default: warn
-                x-go-tag-json: log_level
-                x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL
+                x-go-tag-json: log_level,omitempty
+                x-go-tag-validate: omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL,omitempty
                 x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL
+                x-pattern-rules: empty | empty
             namespace:
                 default: aperture
                 description: etcd namespace
@@ -808,12 +810,14 @@ definitions:
                     - tcp
                     - tcp4
                     - tcp6
+                pattern: (^$)|(^$)
                 type: string
                 x-go-name: Network
                 x-go-tag-default: tcp
-                x-go-tag-json: network
-                x-go-tag-validate: oneof=tcp tcp4 tcp6
+                x-go-tag-json: network,omitempty
+                x-go-tag-validate: omitempty,oneof=tcp tcp4 tcp6,omitempty
                 x-oneof: tcp | tcp4 | tcp6
+                x-pattern-rules: empty | empty
         title: ListenerConfig holds configuration for socket listeners.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/net/listener
@@ -839,12 +843,14 @@ definitions:
                     - TRACE
                     - disabled
                     - DISABLED
+                pattern: (^$)|(^$)
                 type: string
                 x-go-name: LogLevel
                 x-go-tag-default: info
-                x-go-tag-json: level
-                x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED
+                x-go-tag-json: level,omitempty
+                x-go-tag-validate: omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED,omitempty
                 x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED
+                x-pattern-rules: empty | empty
             non_blocking:
                 default: true
                 description: Use non-blocking log writer (can lose logs at high throughput)
