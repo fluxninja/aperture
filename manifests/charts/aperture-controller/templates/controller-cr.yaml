@@ -23,7 +23,7 @@ spec:
   serviceAccount:
     create: {{ .Values.controller.serviceAccount.create }}
     {{- if .Values.controller.serviceAccount.annotations }}
-    annotations: {{ .Values.controller.serviceAccount.annotations | toYaml | indent 6 }}
+    annotations: {{ .Values.controller.serviceAccount.annotations | toYaml | nindent 6 }}
     {{- end }}
     {{- if .Values.controller.serviceAccount.automountServiceAccountToken }}
     automountServiceAccountToken: {{ .Values.controller.serviceAccount.automountServiceAccountToken }}
