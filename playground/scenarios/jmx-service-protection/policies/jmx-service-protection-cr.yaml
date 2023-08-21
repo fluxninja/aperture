@@ -20,7 +20,7 @@ spec:
             signal_name: PROMQL_0
           rhs:
             constant_signal:
-              value: "0.35"
+              value: 0.6
         operator: gt
         out_ports:
           output:
@@ -47,7 +47,7 @@ spec:
             signal_name: PROMQL_1
           rhs:
             constant_signal:
-              value: "30"
+              value: 30
         operator: gt
         out_ports:
           output:

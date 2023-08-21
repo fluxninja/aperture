@@ -1,4 +1,7 @@
-function(agent_group='default') {
+function(config, agent_group='default') {
+  local jmx_regex = '(.*?:' + config.policy.jmx.jmx_metrics_port + ')',
+  local app_address_regex = '(.*?:' + config.policy.jmx.app_server_port + ')',
+
   prometheus: {
     agent_group: agent_group,
     per_agent_group: true,
@@ -18,7 +21,7 @@ function(agent_group='default') {
                 {
                   role: 'pod',
                   namespaces: {
-                    names: ['demoapp'],
+                    names: [config.policy.jmx.app_namespace],
                   },
                 },
               ],
@@ -31,7 +34,7 @@ function(agent_group='default') {
                 {
                   source_labels: ['__address__'],
                   action: 'keep',
-                  regex: '(.*?:8087)',
+                  regex: jmx_regex,
                 },
               ],
             },
@@ -45,7 +48,7 @@ function(agent_group='default') {
                     role: 'pod',
                     namespaces:
                       {
-                        names: ['demoapp'],
+                        names: [config.policy.jmx.app_namespace],
                       },
                   },
                 ],
@@ -59,7 +62,7 @@ function(agent_group='default') {
                   {
                     source_labels: ['__address__'],
                     action: 'keep',
-                    regex: '(.*?:8099)',
+                    regex: app_address_regex,
                   },
                 ],
             },

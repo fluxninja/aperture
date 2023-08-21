@@ -143,7 +143,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
-    value='[{"operator": "gt", "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": "0.35"}, {"operator": "gt", "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": "30"}]'
+    value='[{"operator": "gt", "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": 0.6}, {"operator": "gt", "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": 30}]'
 />
 
 <!-- vale on -->
@@ -477,7 +477,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
-    value='"0.35"'
+    value='0.6'
 />
 
 <!-- vale on -->

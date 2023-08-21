@@ -90,12 +90,12 @@
                 {
                   "operator": "gt",
                   "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})",
-                  "threshold": "0.35"
+                  "threshold": 0.6
                 },
                 {
                   "operator": "gt",
                   "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
-                  "threshold": "30"
+                  "threshold": 30
                 }
               ],
               "type": "array",
@@ -265,7 +265,7 @@
         },
         "threshold": {
           "description": "The threshold for the overload confirmation criteria.",
-          "default": "0.35",
+          "default": 0.6,
           "type": "number",
           "format": "double"
         }

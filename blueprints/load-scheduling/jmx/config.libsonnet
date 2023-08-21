@@ -7,12 +7,12 @@ serviceProtectionDefaults {
       overload_confirmations+: [
         {
           query_string: 'avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~"service3-demo-app-.*"})',
-          threshold: '0.35',
+          threshold: 0.6,
           operator: 'gt',
         },
         {
           query_string: 'avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
-          threshold: '30',
+          threshold: 30,
           operator: 'gt',
         },
       ],
@@ -32,6 +32,12 @@ serviceProtectionDefaults {
       long_term_query_interval: '1800s',
       long_term_query_periodic_interval: '30s',
       latency_tolerance_multiplier: 1.25,
+    },
+
+    jmx: {
+      jmx_metrics_port: 8087,
+      app_server_port: 8099,
+      app_namespace: 'demoapp',
     },
   },
 

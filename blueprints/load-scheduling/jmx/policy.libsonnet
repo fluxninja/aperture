@@ -11,7 +11,7 @@ function(cfg, params={}, metadata={}) {
 
   local policyDef = averageLatencyPolicy.policyDef {
     resources+: {
-      infra_meters+: jmxUtils(),
+      infra_meters+: jmxUtils(c),
     },
   },
 
