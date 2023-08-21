@@ -1428,7 +1428,7 @@ Lease time-to-live
 
 (string, format: `empty | empty`, one of:
 `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL`,
-default: `"warn"`)
+default: `"error"`)
 
 <!-- vale on -->
 
