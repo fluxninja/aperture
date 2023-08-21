@@ -22,5 +22,5 @@ type EtcdConfig struct {
 	// List of etcd server endpoints
 	Endpoints []string `json:"endpoints,omitempty" validate:"omitempty,dive,hostname_port|url|fqdn,omitempty"`
 	// LogLevel of logs coming from inside the etcd client
-	LogLevel string `json:"log_level,omitempty" validate:"omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL,omitempty" default:"warn"`
+	LogLevel string `json:"log_level,omitempty" validate:"omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL,omitempty" default:"error"`
 }
