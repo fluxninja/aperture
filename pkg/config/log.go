@@ -51,7 +51,7 @@ func LogModule() fx.Option {
 // +kubebuilder:object:generate=true
 type LogConfig struct {
 	// Log level
-	LogLevel string `json:"level" validate:"oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED" default:"info"`
+	LogLevel string `json:"level,omitempty" validate:"omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED,omitempty" default:"info"`
 
 	// Log writers
 	Writers []LogWriterConfig `json:"writers,omitempty" validate:"omitempty,dive,omitempty"`

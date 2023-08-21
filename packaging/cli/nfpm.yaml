@@ -2,7 +2,7 @@
 name: "aperturectl"
 arch: "${GOARCH}"
 platform: "${GOOS}"
-version: "${APERTURECTL_BUILD_VERSION}"
+version: "${APERTURE_PACKAGE_VERSION}"
 section: "default"
 priority: "extra"
 provides: [aperturectl]

@@ -15,7 +15,7 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
-  log_level: warn
+  log_level: error
 fluxninja:
   api_key: ""
   client:
