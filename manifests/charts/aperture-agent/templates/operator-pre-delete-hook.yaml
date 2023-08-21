@@ -32,7 +32,8 @@ spec:
       restartPolicy: Never
       containers:
       - name: pre-delete-job
-        image: "bitnami/kubectl"
+        image: {{ include "common.images.image" (dict "imageRoot" .Values.operator.hooks.kubectl.image "global" .Values.global) }}
+        imagePullPolicy: {{ .Values.operator.hooks.kubectl.image.pullPolicy }}
         command:
           - "/bin/bash"
           - "-xc"

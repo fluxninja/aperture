@@ -314,6 +314,24 @@ operator:
     ## @param operator.serviceAccount.automountServiceAccountToken Automount API credentials for a service account.
     ##
     automountServiceAccountToken: true
+  ## Hooks
+  hooks:
+    kubectl:
+      ## Image to use for kubectl in pre-delete and post-install hooks.
+      ## @param operator.hooks.kubectl.image.registry kubectl image registry
+      ## @param operator.hooks.kubectl.image.repository kubectl image repository
+      ## @param operator.hooks.kubectl.image.tag kubectl image tag (immutable tags are recommended)
+      ## @param operator.hooks.kubectl.image.pullPolicy kubectl image pull policy
+      ##
+      image:
+        registry: docker.io/bitnami
+        repository: kubectl
+        tag: latest
+        ## Specify a imagePullPolicy
+        ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+        ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+        ##
+        pullPolicy: Always
 
 ## @section Agent Custom Resource Parameters
 ## @skip agent.createUninstallHook
