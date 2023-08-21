@@ -99,6 +99,10 @@
 | `operator.serviceAccount.name`                               | The name of the service account to use. If not set and create is true, a name is generated using the fullname template | `""`                  |
 | `operator.serviceAccount.annotations`                        | Add annotations                                                                                                        | `{}`                  |
 | `operator.serviceAccount.automountServiceAccountToken`       | Automount API credentials for a service account.                                                                       | `true`                |
+| `operator.hooks.kubectl.image.registry`                      | kubectl image registry                                                                                                 | `docker.io/bitnami`   |
+| `operator.hooks.kubectl.image.repository`                    | kubectl image repository                                                                                               | `kubectl`             |
+| `operator.hooks.kubectl.image.tag`                           | kubectl image tag (immutable tags are recommended)                                                                     | `latest`              |
+| `operator.hooks.kubectl.image.pullPolicy`                    | kubectl image pull policy                                                                                              | `Always`              |
 
 ### Controller Custom Resource Parameters
 
