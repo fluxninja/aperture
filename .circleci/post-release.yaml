@@ -224,6 +224,7 @@ jobs:
             ENVIRONMENT_PATH: << parameters.environment-path >>
             SKIP_COMPONENT: << parameters.skip-component >>
             RELEASE_TRAIN: << parameters.release-train >>
+            SKIP_PULL_REQUEST: "true"
           command: .circleci/scripts/update_environment.sh
       - asdf_save_cache:
           cache_name: update-environment
