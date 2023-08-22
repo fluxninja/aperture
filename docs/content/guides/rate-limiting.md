@@ -12,7 +12,7 @@ keywords:
 ---
 
 This guide provides a fresh framework for implementing rate limiting in your
-service's using Aperture. It covers the following topics:
+services using Aperture. It covers the following topics:
 
 - [Introduction](#introduction)
 - [A Framework for Rate Limiting](#a-framework-for-rate-limiting)
