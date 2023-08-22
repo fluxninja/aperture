@@ -75,8 +75,6 @@ using algorithms such as:
   shifting time frame, providing more fluid control compared to the fixed window
   technique.
 
-<!-- vale off -->
-
 These algorithms can be implemented either locally (for instance, on an API
 Gateway) or globally, using a service like Redis to maintain state on a per-user
 basis. While the local implementations are lower latency, they don't scale for
@@ -86,8 +84,6 @@ are hard to implement because the underlying technologies such as Redis
 themselves become a bottleneck at high traffic rates. Sophisticated approaches
 for global rate limiting typically involve distributing the state across
 multiple instances by sharding the per-user rate limiting keys to handle scale.
-
-<!-- vale on -->
 
 Aperture offers an advanced and scalable approach to global rate limiting
 through the
