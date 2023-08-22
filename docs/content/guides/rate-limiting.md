@@ -27,7 +27,7 @@ service's using Aperture. It covers the following topics:
 ## Introduction {#introduction}
 
 Rate limiting is usually an effective technique to manage load at a service.
-However, it is often misunderstood and misapplied. Often Teams might apply a
+However, it is often, misunderstood and misapplied. Often Teams might apply a
 blanket rate limit per-user in hopes to protect against service overloads. While
 per-user rate limits provide a mechanism to prevent abuse, they do not safeguard
 against service overloads.
@@ -98,11 +98,11 @@ the speed limit on a highway – a set pace that everyone has to follow.
 
 ![Per-User Rate Limits](./assets/per-user-limits.svg)
 
-Most APIs provider implement static rate limits which are well-known and
+Most APIs providers implement static rate limits which are well-known and
 publicly shared, setting the basic expectations for the end-user in terms of
 fair use of the service. With the help of
 **[Rate Limiting Policy Blueprint](/reference/blueprints/rate-limiting/base.md)**
-per-user static limits can be implement easily.
+per-user static limits can be implemented easily.
 
 The use-cases of per-user static limits include:
 
@@ -149,7 +149,7 @@ a service.
 [Static limits are useful](/use-cases/managing-quotas/inter-service-rate-limiting.md)
 when enforcing an agreed-upon quota. With the help of
 **[Quota Scheduler blueprint](/reference/blueprints/quota-scheduling/base.md)**
-static service limits can be implement easily.
+static service limits can be implemented easily.
 
 Use-cases of static rate limits include:
 
@@ -170,7 +170,7 @@ regulate the overall load on a service based on service health signals such as
 database connections, queue sizes, response latency, error rates and so on to
 protect the service against overloads. With the help of
 **[Load Scheduling Blueprint](/reference/blueprints/load-scheduling/load-scheduling.md)**
-adaptive service limits can be implement easily.
+adaptive service limits can be implemented easily.
 
 ![Adaptive Service Limits](./assets/adaptive-service-limits.svg)
 
