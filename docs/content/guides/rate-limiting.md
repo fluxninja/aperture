@@ -27,10 +27,12 @@ services using Aperture. It covers the following topics:
 ## Introduction {#introduction}
 
 Rate limiting is usually an effective technique to manage load at a service.
-However, it is often, misunderstood and misapplied. Often Teams might apply a
-blanket rate limit per-user in hopes to protect against service overloads. While
+However, it is often, misunderstood and misapplied. Often teams apply a blanket
+rate limit per-user in hopes to protect against service overloads. While
 per-user rate limits provide a mechanism to prevent abuse, they do not safeguard
-against service overloads.
+against service overloads. This is where rate limiting framework comes in,
+helping you to understand the different types of rate limits and how to
+implement them using Aperture.
 
 ## A framework for rate limiting {#a-framework-for-rate-limiting}
 
