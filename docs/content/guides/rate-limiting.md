@@ -151,7 +151,7 @@ a service.
 
 [Static limits are useful](/use-cases/managing-quotas/inter-service-rate-limiting.md)
 when enforcing an agreed-upon quota. With the help of
-**[Quota Scheduler blueprint](/reference/blueprints/quota-scheduling/base.md)**
+**[Quota Scheduler Blueprint](/reference/blueprints/quota-scheduling/base.md)**
 static service limits can be implemented easily.
 
 Use-cases of static rate limits include:
@@ -208,5 +208,5 @@ Checkout Aperture implemented use cases of adaptive service limits
 ## Summary {#summary}
 
 Rate limiting is integral to maintaining system performance and fairness. By
-leveraging [Aperture's blueprints](/reference/blueprints/blueprints.md), you can
+leveraging [Aperture's Blueprints](/reference/blueprints/blueprints.md), you can
 efficiently implement a rate-limiting strategy tailored to your service's needs.
