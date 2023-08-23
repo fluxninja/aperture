@@ -45,7 +45,7 @@ cloud-foundry:
 
 collectd:
   metric_name: collectd
-  camel_case: CollectD `write_http` plugin JSON
+  camel_case: collectd `write_http` plugin JSON
   receiver_name: collectdreceiver
 
 couchdb:
