@@ -9,9 +9,21 @@ function(cfg, params={}, metadata={}) {
   local averageLatencyPolicy = averageLatencyFn(cfg, params, metadata),
   local c = std.mergePatch(config, cfg),
 
+  // add overload confirmations
   local policyDef = averageLatencyPolicy.policyDef {
-    resources+: {
-      infra_meters+: jmxUtils(c),
+    service_protection_core+: {
+      overload_confirmations+: [
+        {
+          query_string: c.policy.jmx.cpu_query,
+          threshold: c.policy.jmx.cpu_threshold,
+          operator: 'gt',
+        },
+        {
+          query_string: c.policy.jmx.gc_query,
+          threshold: c.policy.jmx.gc_threshold,
+          operator: 'gt',
+        },
+      ],
     },
   },
 

@@ -143,7 +143,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
-    value='[{"operator": "gt", "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": 0.6}, {"operator": "gt", "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})", "threshold": 30}]'
+    value='[]'
 />
 
 <!-- vale on -->
@@ -206,6 +206,110 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='string'
     reference=''
     value='"30s"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.jmx {#policy-jmx}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-app-namespace"></a>
+
+<ParameterDescription
+    name='policy.jmx.app_namespace'
+    description='Namespace of the application for which JMX metrics are scraped.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-app-server-port"></a>
+
+<ParameterDescription
+    name='policy.jmx.app_server_port'
+    description='Port number for scraping metrics provided by Java Micrometer.'
+    type='Integer (int32)'
+    reference=''
+    value='8099'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-cpu-query"></a>
+
+<ParameterDescription
+    name='policy.jmx.cpu_query'
+    description='Query for CPU utilization metric.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-cpu-threshold"></a>
+
+<ParameterDescription
+    name='policy.jmx.cpu_threshold'
+    description='Threshold for CPU utilization metric.'
+    type='Number (double)'
+    reference=''
+    value='0.6'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-gc-query"></a>
+
+<ParameterDescription
+    name='policy.jmx.gc_query'
+    description='Query for GC duration metric.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-gc-threshold"></a>
+
+<ParameterDescription
+    name='policy.jmx.gc_threshold'
+    description='Threshold for GC duration metric.'
+    type='Number (double)'
+    reference=''
+    value='10'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-jmx-metrics-port"></a>
+
+<ParameterDescription
+    name='policy.jmx.jmx_metrics_port'
+    description='Port number for scraping metrics provided by JMX Promtheus Java Agent.'
+    type='Integer (int32)'
+    reference=''
+    value='8087'
 />
 
 <!-- vale on -->
@@ -449,7 +553,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`'
     type='string'
     reference=''
-    value='"gt"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -463,7 +567,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The Prometheus query to be run. Must return a scalar or a vector with a single element.'
     type='string'
     reference=''
-    value='"avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})"'
+    value='null'
 />
 
 <!-- vale on -->
@@ -477,7 +581,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='The threshold for the overload confirmation criteria.'
     type='Number (double)'
     reference=''
-    value='0.6'
+    value='null'
 />
 
 <!-- vale on -->

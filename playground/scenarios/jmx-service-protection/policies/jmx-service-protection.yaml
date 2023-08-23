@@ -104,3 +104,8 @@ policy:
         - agent_group: default
           control_point: awesomeFeature
           service: service3-demo-app.demoapp.svc.cluster.local
+
+  jmx:
+    app_namespace: 'demoapp'
+    cpu_query: 'avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~"service3-demo-app-.*"})'
+    gc_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})'

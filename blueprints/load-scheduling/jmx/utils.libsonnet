@@ -2,7 +2,7 @@ function(config, agent_group='default') {
   local jmx_regex = '(.*?:' + config.policy.jmx.jmx_metrics_port + ')',
   local app_address_regex = '(.*?:' + config.policy.jmx.app_server_port + ')',
 
-  prometheus: {
+  jmx_inframeter: {
     agent_group: agent_group,
     per_agent_group: true,
     pipeline: {

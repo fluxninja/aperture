@@ -11,7 +11,8 @@
       "required": [
         "policy_name",
         "service_protection_core",
-        "latency_baseliner"
+        "latency_baseliner",
+        "jmx"
       ],
       "properties": {
         "components": {
@@ -86,18 +87,7 @@
             },
             "overload_confirmations": {
               "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [
-                {
-                  "operator": "gt",
-                  "query_string": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})",
-                  "threshold": 0.6
-                },
-                {
-                  "operator": "gt",
-                  "query_string": "avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
-                  "threshold": 30
-                }
-              ],
+              "default": [],
               "type": "array",
               "items": {
                 "type": "object",
@@ -139,6 +129,52 @@
               "description": "Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.",
               "default": "30s",
               "type": "string"
+            }
+          }
+        },
+        "jmx": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["app_namespace", "cpu_query", "gc_query"],
+          "properties": {
+            "app_namespace": {
+              "description": "Namespace of the application for which JMX metrics are scraped.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            },
+            "app_server_port": {
+              "description": "Port number for scraping metrics provided by Java Micrometer.",
+              "default": 8099,
+              "type": "integer",
+              "format": "int32"
+            },
+            "cpu_query": {
+              "description": "Query for CPU utilization metric.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            },
+            "cpu_threshold": {
+              "description": "Threshold for CPU utilization metric.",
+              "default": 0.6,
+              "type": "number",
+              "format": "double"
+            },
+            "gc_query": {
+              "description": "Query for GC duration metric.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            },
+            "gc_threshold": {
+              "description": "Threshold for GC duration metric.",
+              "default": 10,
+              "type": "number",
+              "format": "double"
+            },
+            "jmx_metrics_port": {
+              "description": "Port number for scraping metrics provided by JMX Promtheus Java Agent.",
+              "default": 8087,
+              "type": "integer",
+              "format": "int32"
             }
           }
         }
@@ -255,17 +291,14 @@
       "properties": {
         "operator": {
           "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
-          "default": "gt",
           "type": "string"
         },
         "query_string": {
           "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
-          "default": "avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~\"service3-demo-app-.*\"})",
           "type": "string"
         },
         "threshold": {
           "description": "The threshold for the overload confirmation criteria.",
-          "default": 0.6,
           "type": "number",
           "format": "double"
         }

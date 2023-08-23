@@ -3,20 +3,6 @@ local serviceProtectionDefaults = import '../common/config-defaults.libsonnet';
 
 serviceProtectionDefaults {
   policy+: {
-    service_protection_core+: {
-      overload_confirmations+: [
-        {
-          query_string: 'avg(java_lang_OperatingSystem_CpuLoad{k8s_pod_name=~"service3-demo-app-.*"})',
-          threshold: 0.6,
-          operator: 'gt',
-        },
-        {
-          query_string: 'avg(java_lang_Copy_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
-          threshold: 30,
-          operator: 'gt',
-        },
-      ],
-    },
     latency_baseliner: {
       /**
       * @param (policy.latency_baseliner.flux_meter: aperture.spec.v1.FluxMeter) Flux Meter defines the scope of latency measurements.
@@ -35,9 +21,22 @@ serviceProtectionDefaults {
     },
 
     jmx: {
+      /**
+      * @param (policy.jmx.jmx_metrics_port: int32) Port number for scraping metrics provided by JMX Promtheus Java Agent.
+      * @param (policy.jmx.app_server_port: int32) Port number for scraping metrics provided by Java Micrometer.
+      * @param (policy.jmx.app_namespace: string) Namespace of the application for which JMX metrics are scraped.
+      * @param (policy.jmx.cpu_query: string) Query for CPU utilization metric.
+      * @param (policy.jmx.gc_query: string) Query for GC duration metric.
+      * @param (policy.jmx.cpu_threshold: float64) Threshold for CPU utilization metric.
+      * @param (policy.jmx.gc_threshold: float64) Threshold for GC duration metric.
+      */
       jmx_metrics_port: 8087,
       app_server_port: 8099,
-      app_namespace: 'demoapp',
+      app_namespace: '__REQUIRED_FIELD__',
+      cpu_query: '__REQUIRED_FIELD__',
+      gc_query: '__REQUIRED_FIELD__',
+      cpu_threshold: 0.6,
+      gc_threshold: 10,
     },
   },
 
