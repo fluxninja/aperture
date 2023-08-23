@@ -1807,7 +1807,7 @@
       "properties": {
         "denied_response_status_code": {
           "$ref": "#/definitions/StatusCode",
-          "description": "This field allows to override the default `503 Service Unavailable` HTTP status code by default."
+          "description": "This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied."
         },
         "duration": {
           "description": "Duration for which the step is active.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
@@ -2462,7 +2462,7 @@
         },
         "denied_response_status_code": {
           "$ref": "#/definitions/StatusCode",
-          "description": "This field allows to override the default `429 Too Many Requests` HTTP status code by default."
+          "description": "This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied."
         },
         "interval": {
           "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
@@ -2694,7 +2694,7 @@
       "properties": {
         "denied_response_status_code": {
           "$ref": "#/definitions/StatusCode",
-          "description": "This field allows to override the default `503 Service Unavailable` HTTP status code by default."
+          "description": "This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied."
         },
         "label_key": {
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Sampler_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Sampler_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
@@ -2783,7 +2783,7 @@
         },
         "denied_response_status_code": {
           "$ref": "#/definitions/StatusCode",
-          "description": "This field allows to override the default `503 Service Unavailable` HTTP status code by default."
+          "description": "This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied."
         },
         "priorities_label_key": {
           "default": "priorities",
@@ -2979,7 +2979,7 @@
     },
     "StatusCode": {
       "default": "Empty",
-      "description": "- Empty: Empty - This code not part of the HTTP status code specification, but it is needed for proto\n`enum` type.",
+      "description": "- Empty: Empty - This code not part of the HTTP status code specification, but it is needed for protobuf\n`enum` type.",
       "enum": [
         "Empty",
         "Continue",

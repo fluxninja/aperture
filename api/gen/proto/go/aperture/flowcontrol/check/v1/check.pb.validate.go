@@ -17,8 +17,6 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
-
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // ensure the imports are used
@@ -35,8 +33,6 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
-
-	_ = languagev1.StatusCode(0)
 )
 
 // Validate checks the field values on CheckRequest with the rules defined in
@@ -372,7 +368,7 @@ func (m *CheckResponse) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := languagev1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := CheckResponseValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -461,7 +457,7 @@ var _ interface {
 	ErrorName() string
 } = CheckResponseValidationError{}
 
-var _CheckResponse_DeniedResponseStatusCode_NotInLookup = map[languagev1.StatusCode]struct{}{
+var _CheckResponse_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
 	0: {},
 }
 
@@ -616,7 +612,7 @@ func (m *LimiterDecision) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := languagev1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := LimiterDecisionValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -874,7 +870,7 @@ var _ interface {
 	ErrorName() string
 } = LimiterDecisionValidationError{}
 
-var _LimiterDecision_DeniedResponseStatusCode_NotInLookup = map[languagev1.StatusCode]struct{}{
+var _LimiterDecision_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
 	0: {},
 }
 

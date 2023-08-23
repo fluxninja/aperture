@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = checkv1.StatusCode(0)
 )
 
 // Validate checks the field values on FlowControlResources with the rules
@@ -1340,7 +1344,7 @@ func (m *Scheduler) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := SchedulerValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -1428,7 +1432,7 @@ var _ interface {
 	ErrorName() string
 } = SchedulerValidationError{}
 
-var _Scheduler_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
+var _Scheduler_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
 	0: {},
 }
 
@@ -3728,7 +3732,7 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := RateLimiter_ParametersValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -3819,7 +3823,7 @@ var _ interface {
 	ErrorName() string
 } = RateLimiter_ParametersValidationError{}
 
-var _RateLimiter_Parameters_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
+var _RateLimiter_Parameters_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
 	0: {},
 }
 
@@ -5487,7 +5491,7 @@ func (m *Sampler_Parameters) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := Sampler_ParametersValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -5578,7 +5582,7 @@ var _ interface {
 	ErrorName() string
 } = Sampler_ParametersValidationError{}
 
-var _Sampler_Parameters_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
+var _Sampler_Parameters_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
 	0: {},
 }
 
@@ -6312,7 +6316,7 @@ func (m *LoadRamp_Parameters_Step) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := LoadRamp_Parameters_StepValidationError{
 			field:  "DeniedResponseStatusCode",
 			reason: "value must be one of the defined enum values",
@@ -6403,7 +6407,7 @@ var _ interface {
 	ErrorName() string
 } = LoadRamp_Parameters_StepValidationError{}
 
-var _LoadRamp_Parameters_Step_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
+var _LoadRamp_Parameters_Step_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
 	0: {},
 }
 

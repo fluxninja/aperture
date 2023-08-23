@@ -7,6 +7,7 @@ package languagev1
 import (
 	binary "encoding/binary"
 	fmt "fmt"
+	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
@@ -5075,7 +5076,7 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -6445,7 +6446,7 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7291,7 +7292,7 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7690,7 +7691,7 @@ func (m *LoadRamp_Parameters_Step) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

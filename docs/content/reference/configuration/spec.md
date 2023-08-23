@@ -4555,8 +4555,8 @@ Parameters for the _Sampler_.
 
 <!-- vale on -->
 
-This field allows to override the default `503 Service Unavailable` HTTP status
-code by default.
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
 <dt>duration</dt>
@@ -6103,8 +6103,8 @@ continuously or only on discrete intervals.
 
 <!-- vale on -->
 
-This field allows to override the default `429 Too Many Requests` HTTP status
-code by default.
+This field allows you to override the default HTTP status code
+(`429 Too Many Requests`) that is returned when a request is denied.
 
 </dd>
 <dt>interval</dt>
@@ -6736,8 +6736,8 @@ The percentage of requests to accept.
 
 <!-- vale on -->
 
-This field allows to override the default `503 Service Unavailable` HTTP status
-code by default.
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
 <dt>label_key</dt>
@@ -6959,8 +6959,8 @@ Parameters to be used if none of workloads specified in `workloads` match.
 
 <!-- vale on -->
 
-This field allows to override the default `503 Service Unavailable` HTTP status
-code by default.
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
 <dt>priorities_label_key</dt>
@@ -7503,11 +7503,11 @@ HTTP response codes. For more details:
 https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
 - Empty: Empty - This code not part of the HTTP status code specification, but
-  it is needed for proto `enum` type.
+  it is needed for protobuf `enum` type.
 
-| Property     | Type   | Default            | Constraints | Description                                                                                           |
-| ------------ | ------ | ------------------ | ----------- | ----------------------------------------------------------------------------------------------------- |
-| `StatusCode` | string | Default: `"Empty"` |             | - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for proto |
+| Property     | Type   | Default            | Constraints | Description                                                                                              |
+| ------------ | ------ | ------------------ | ----------- | -------------------------------------------------------------------------------------------------------- |
+| `StatusCode` | string | Default: `"Empty"` |             | - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for protobuf |
 | `enum` type. |
 
 ---

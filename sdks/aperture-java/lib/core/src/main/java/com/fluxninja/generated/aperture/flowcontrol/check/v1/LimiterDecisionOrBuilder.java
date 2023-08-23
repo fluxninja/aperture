@@ -121,15 +121,15 @@ public interface LimiterDecisionOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfoOrBuilder getQuotaSchedulerInfoOrBuilder();
 
   /**
-   * <code>.aperture.policy.language.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
    * @return The enum numeric value on the wire for deniedResponseStatusCode.
    */
   int getDeniedResponseStatusCodeValue();
   /**
-   * <code>.aperture.policy.language.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
    * @return The deniedResponseStatusCode.
    */
-  com.fluxninja.generated.aperture.policy.language.v1.StatusCode getDeniedResponseStatusCode();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
 
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.DetailsCase getDetailsCase();
 }

@@ -1950,7 +1950,7 @@ definitions:
         properties:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             duration:
                 description: |+
                     Duration for which the step is active.
@@ -2597,7 +2597,7 @@ definitions:
                 x-go-tag-default: "true"
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows to override the default `429 Too Many Requests` HTTP status code by default.
+                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -2925,7 +2925,7 @@ definitions:
         properties:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             label_key:
                 description: |-
                     The flow label key for identifying sessions.
@@ -3019,7 +3019,7 @@ definitions:
                 description: Parameters to be used if none of workloads specified in `workloads` match.
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priorities_label_key:
                 default: priorities
                 description: |+
@@ -3313,7 +3313,7 @@ definitions:
     StatusCode:
         default: Empty
         description: |-
-            - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for proto
+            - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for protobuf
             `enum` type.
         enum:
             - Empty

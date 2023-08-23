@@ -7,7 +7,6 @@ package checkv1
 import (
 	binary "encoding/binary"
 	fmt "fmt"
-	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -1860,7 +1859,7 @@ func (m *CheckResponse) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2802,7 +2801,7 @@ func (m *LimiterDecision) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				m.DeniedResponseStatusCode |= StatusCode(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
