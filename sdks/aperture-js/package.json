@@ -2,17 +2,17 @@
   "name": "@fluxninja/aperture-js",
   "version": "1.0.1",
   "description": "aperture-js is an SDK to interact with Aperture Agent.",
-  "exports": "./lib/example/example.js",
+  "main": "./lib/sdk/index.js",
   "scripts": {
     "pre-build": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
     "post-build": "cp -r ./proto ./lib/proto",
     "grpc-client": "npm run build && node ./lib/sdk/client.js",
     "example": "npm run build && node ./lib/example/example.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "local:publish": "npx local-package-publisher -p"
   },
   "homepage": "https://fluxninja.com/",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/fluxninja/aperture/issues",
     "email": "support@fluxninja.com"
@@ -20,8 +20,8 @@
   "author": "FluxNinja Inc <support@fluxninja.com> (https://fluxninja.com/)",
   "license": "Apache-2.0",
   "files": [
-    "lib/sdk/*",
-    "@types/sdk/*",
+    "lib/**/*",
+    "@types/**/*",
     "proto/**/*"
   ],
   "types": "@types/sdk/index.d.ts",
@@ -44,5 +44,9 @@
   "devDependencies": {
     "@types/express": "4.17.17",
     "typescript": "4.9.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "scope": "@fluxninja"
   }
 }
