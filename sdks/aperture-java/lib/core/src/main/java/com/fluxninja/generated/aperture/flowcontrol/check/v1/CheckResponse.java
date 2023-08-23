@@ -916,7 +916,7 @@ java.lang.String defaultValue) {
    * decision_type is REJECTED. Optional.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
    * @return The enum numeric value on the wire for deniedResponseStatusCode.
    */
   @java.lang.Override public int getDeniedResponseStatusCodeValue() {
@@ -928,7 +928,7 @@ java.lang.String defaultValue) {
    * decision_type is REJECTED. Optional.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
    * @return The deniedResponseStatusCode.
    */
   @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
@@ -3913,7 +3913,7 @@ java.lang.String defaultValue) {
      * decision_type is REJECTED. Optional.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
      * @return The enum numeric value on the wire for deniedResponseStatusCode.
      */
     @java.lang.Override public int getDeniedResponseStatusCodeValue() {
@@ -3925,7 +3925,7 @@ java.lang.String defaultValue) {
      * decision_type is REJECTED. Optional.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
      * @param value The enum numeric value on the wire for deniedResponseStatusCode to set.
      * @return This builder for chaining.
      */
@@ -3941,7 +3941,7 @@ java.lang.String defaultValue) {
      * decision_type is REJECTED. Optional.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
      * @return The deniedResponseStatusCode.
      */
     @java.lang.Override
@@ -3955,7 +3955,7 @@ java.lang.String defaultValue) {
      * decision_type is REJECTED. Optional.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
      * @param value The deniedResponseStatusCode to set.
      * @return This builder for chaining.
      */
@@ -3974,7 +3974,7 @@ java.lang.String defaultValue) {
      * decision_type is REJECTED. Optional.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
      * @return This builder for chaining.
      */
     public Builder clearDeniedResponseStatusCode() {

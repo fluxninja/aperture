@@ -7503,12 +7503,11 @@ HTTP response codes. For more details:
 https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
 - Empty: Empty - This code not part of the HTTP status code specification, but
-  it is needed for protobuf `enum` type.
+  it is needed for `enum` type.
 
-| Property     | Type   | Default            | Constraints | Description                                                                                              |
-| ------------ | ------ | ------------------ | ----------- | -------------------------------------------------------------------------------------------------------- |
-| `StatusCode` | string | Default: `"Empty"` |             | - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for protobuf |
-| `enum` type. |
+| Property     | Type   | Default            | Constraints | Description                                                                                                  |
+| ------------ | ------ | ------------------ | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `StatusCode` | string | Default: `"Empty"` |             | - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type. |
 
 ---
 

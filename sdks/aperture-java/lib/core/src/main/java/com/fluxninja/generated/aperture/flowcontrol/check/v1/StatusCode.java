@@ -15,8 +15,7 @@ public enum StatusCode
     implements com.google.protobuf.ProtocolMessageEnum {
   /**
    * <pre>
-   * Empty - This code not part of the HTTP status code specification, but it is needed for protobuf
-   * `enum` type.
+   * Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.
    * </pre>
    *
    * <code>Empty = 0;</code>
@@ -251,8 +250,7 @@ public enum StatusCode
 
   /**
    * <pre>
-   * Empty - This code not part of the HTTP status code specification, but it is needed for protobuf
-   * `enum` type.
+   * Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.
    * </pre>
    *
    * <code>Empty = 0;</code>

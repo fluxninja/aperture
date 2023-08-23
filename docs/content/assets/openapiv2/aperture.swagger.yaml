@@ -4011,9 +4011,7 @@ definitions:
         type: object
     StatusCode:
         default: Empty
-        description: |-
-            - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for protobuf
-            `enum` type.
+        description: '- Empty: Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.'
         enum:
             - Empty
             - Continue

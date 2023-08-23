@@ -357,27 +357,7 @@ func (m *CheckResponse) validate(all bool) error {
 		}
 	}
 
-	if _, ok := _CheckResponse_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := CheckResponseValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := CheckResponseValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for DeniedResponseStatusCode
 
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
@@ -456,10 +436,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CheckResponseValidationError{}
-
-var _CheckResponse_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on ClassifierInfo with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -601,27 +577,7 @@ func (m *LimiterDecision) validate(all bool) error {
 
 	// no validation rules for Reason
 
-	if _, ok := _LimiterDecision_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := LimiterDecisionValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if _, ok := StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := LimiterDecisionValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for DeniedResponseStatusCode
 
 	switch v := m.Details.(type) {
 	case *LimiterDecision_RateLimiterInfo_:
@@ -869,10 +825,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LimiterDecisionValidationError{}
-
-var _LimiterDecision_DeniedResponseStatusCode_NotInLookup = map[StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on FluxMeterInfo with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

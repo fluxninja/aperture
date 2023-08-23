@@ -3185,14 +3185,14 @@ private static final long serialVersionUID = 0L;
   public static final int DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER = 10;
   private int deniedResponseStatusCode_ = 0;
   /**
-   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
    * @return The enum numeric value on the wire for deniedResponseStatusCode.
    */
   @java.lang.Override public int getDeniedResponseStatusCodeValue() {
     return deniedResponseStatusCode_;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
    * @return The deniedResponseStatusCode.
    */
   @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
@@ -4686,14 +4686,14 @@ private static final long serialVersionUID = 0L;
 
     private int deniedResponseStatusCode_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
      * @return The enum numeric value on the wire for deniedResponseStatusCode.
      */
     @java.lang.Override public int getDeniedResponseStatusCodeValue() {
       return deniedResponseStatusCode_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
      * @param value The enum numeric value on the wire for deniedResponseStatusCode to set.
      * @return This builder for chaining.
      */
@@ -4704,7 +4704,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
      * @return The deniedResponseStatusCode.
      */
     @java.lang.Override
@@ -4713,7 +4713,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
      * @param value The deniedResponseStatusCode to set.
      * @return This builder for chaining.
      */
@@ -4727,7 +4727,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode", (.validate.rules) = { ... }</code>
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
      * @return This builder for chaining.
      */
     public Builder clearDeniedResponseStatusCode() {

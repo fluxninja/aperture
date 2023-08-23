@@ -4,7 +4,6 @@ package aperture.flowcontrol.check.v1;
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "validate/validate.proto";
 
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
@@ -61,10 +60,7 @@ message CheckResponse {
   google.protobuf.Duration wait_time = 13;
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
-  StatusCode denied_response_status_code = 14 [(validate.rules).enum = {
-    defined_only: true
-    not_in: 0
-  }];
+  StatusCode denied_response_status_code = 14;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.
@@ -124,10 +120,7 @@ message LimiterDecision {
     SamplerInfo sampler_info = 8;
     QuotaSchedulerInfo quota_scheduler_info = 9;
   }
-  StatusCode denied_response_status_code = 10 [(validate.rules).enum = {
-    defined_only: true
-    not_in: 0
-  }];
+  StatusCode denied_response_status_code = 10;
 }
 
 // FluxMeterInfo describes detail for each FluxMeterInfo.
@@ -138,8 +131,7 @@ message FluxMeterInfo {
 // HTTP response codes.
 // For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 enum StatusCode {
-  // Empty - This code not part of the HTTP status code specification, but it is needed for protobuf
-  // `enum` type.
+  // Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.
   Empty = 0;
 
   Continue = 100;
