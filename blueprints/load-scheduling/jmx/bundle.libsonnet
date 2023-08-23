@@ -16,28 +16,9 @@ function(params, metadata={}) {
 
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
 
-  local overload_confirmation_config = updated_cfg {
-    policy+: {
-      service_protection_core+: {
-        overload_confirmations+: [
-          {
-            query_string: c.policy.jmx.cpu_query,
-            threshold: c.policy.jmx.cpu_threshold,
-            operator: 'gt',
-          },
-          {
-            query_string: c.policy.jmx.gc_query,
-            threshold: c.policy.jmx.gc_threshold,
-            operator: 'gt',
-          },
-        ],
-      },
-    },
-  },
-
   local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
   assert !std.objectHas(infraMeters, 'jmx_inframeter') : 'An infra meter with name jmx_inframeter already exists. Please choose a different name.',
-  local config_with_jmx_infra_meter = overload_confirmation_config {
+  local config_with_jmx_infra_meter = updated_cfg {
     policy+: {
       resources+: {
         infra_meters+: jmxUtils(c),

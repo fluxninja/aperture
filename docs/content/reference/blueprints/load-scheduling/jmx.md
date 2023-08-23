@@ -88,6 +88,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-promql-query"></a>
+
+<ParameterDescription
+    name='policy.promql_query'
+    description='PromQL query.'
+    type='string'
+    reference=''
+    value='"avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-setpoint"></a>
+
+<ParameterDescription
+    name='policy.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='20'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -150,68 +178,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-##### policy.latency_baseliner {#policy-latency-baseliner}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-flux-meter"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.flux_meter'
-    description='Flux Meter defines the scope of latency measurements.'
-    type='Object (aperture.spec.v1.FluxMeter)'
-    reference='../../configuration/spec#flux-meter'
-    value='{"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-latency-tolerance-multiplier"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.latency_tolerance_multiplier'
-    description='Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.'
-    type='Number (double)'
-    reference=''
-    value='1.25'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-long-term-query-interval"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.long_term_query_interval'
-    description='Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.'
-    type='string'
-    reference=''
-    value='"1800s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-latency-baseliner-long-term-query-periodic-interval"></a>
-
-<ParameterDescription
-    name='policy.latency_baseliner.long_term_query_periodic_interval'
-    description='Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.'
-    type='string'
-    reference=''
-    value='"30s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.jmx {#policy-jmx}
 
 <!-- vale on -->
@@ -240,62 +206,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Integer (int32)'
     reference=''
     value='8099'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-jmx-cpu-query"></a>
-
-<ParameterDescription
-    name='policy.jmx.cpu_query'
-    description='Query for CPU utilization metric.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-jmx-cpu-threshold"></a>
-
-<ParameterDescription
-    name='policy.jmx.cpu_threshold'
-    description='Threshold for CPU utilization metric.'
-    type='Number (double)'
-    reference=''
-    value='0.6'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-jmx-gc-query"></a>
-
-<ParameterDescription
-    name='policy.jmx.gc_query'
-    description='Query for GC duration metric.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-jmx-gc-threshold"></a>
-
-<ParameterDescription
-    name='policy.jmx.gc_threshold'
-    description='Threshold for GC duration metric.'
-    type='Number (double)'
-    reference=''
-    value='10'
 />
 
 <!-- vale on -->

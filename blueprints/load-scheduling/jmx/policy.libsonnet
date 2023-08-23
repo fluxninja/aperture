@@ -1,5 +1,5 @@
 local spec = import '../../spec.libsonnet';
-local averageLatencyFn = import '../average-latency/policy.libsonnet';
+local promqlFn = import '../promql/policy.libsonnet';
 local blueprint = import './jmx.libsonnet';
 local jmxUtils = import './utils.libsonnet';
 
@@ -7,10 +7,10 @@ local config = blueprint.config;
 
 function(cfg, params={}, metadata={}) {
   local c = std.mergePatch(config, cfg),
-  local averageLatencyPolicy = averageLatencyFn(c, params, metadata),
+  local promqlPolicy = promqlFn(c, params, metadata),
 
-  policyResource: averageLatencyPolicy.policyResource {
-    spec+: averageLatencyPolicy.policyDef,
+  policyResource: promqlPolicy.policyResource {
+    spec+: promqlPolicy.policyDef,
   },
-  policyDef: averageLatencyPolicy.policyDef,
+  policyDef: promqlPolicy.policyDef,
 }

@@ -8,12 +8,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "latency_baseliner",
-        "jmx"
-      ],
+      "required": ["policy_name", "service_protection_core", "jmx"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -96,46 +91,21 @@
             }
           }
         },
-        "latency_baseliner": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["flux_meter"],
-          "properties": {
-            "flux_meter": {
-              "description": "Flux Meter defines the scope of latency measurements.",
-              "default": {
-                "selectors": [
-                  {
-                    "control_point": "__REQUIRED_FIELD__",
-                    "service": "__REQUIRED_FIELD__"
-                  }
-                ]
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/FluxMeter"
-            },
-            "latency_tolerance_multiplier": {
-              "description": "Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.",
-              "default": 1.25,
-              "type": "number",
-              "format": "double"
-            },
-            "long_term_query_interval": {
-              "description": "Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.",
-              "default": "1800s",
-              "type": "string"
-            },
-            "long_term_query_periodic_interval": {
-              "description": "Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.",
-              "default": "30s",
-              "type": "string"
-            }
-          }
+        "promql_query": {
+          "description": "PromQL query.",
+          "default": "avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
+          "type": "string"
+        },
+        "setpoint": {
+          "description": "Setpoint.",
+          "default": 20,
+          "type": "number",
+          "format": "double"
         },
         "jmx": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["app_namespace", "cpu_query", "gc_query"],
+          "required": ["app_namespace"],
           "properties": {
             "app_namespace": {
               "description": "Namespace of the application for which JMX metrics are scraped.",
@@ -147,28 +117,6 @@
               "default": 8099,
               "type": "integer",
               "format": "int32"
-            },
-            "cpu_query": {
-              "description": "Query for CPU utilization metric.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
-            },
-            "cpu_threshold": {
-              "description": "Threshold for CPU utilization metric.",
-              "default": 0.6,
-              "type": "number",
-              "format": "double"
-            },
-            "gc_query": {
-              "description": "Query for GC duration metric.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
-            },
-            "gc_threshold": {
-              "description": "Threshold for GC duration metric.",
-              "default": 10,
-              "type": "number",
-              "format": "double"
             },
             "jmx_metrics_port": {
               "description": "Port number for scraping metrics provided by JMX Promtheus Java Agent.",
