@@ -7,6 +7,7 @@ package checkv1
 import (
 	binary "encoding/binary"
 	fmt "fmt"
+	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -112,6 +113,11 @@ func (m *CheckResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x70
 	}
 	if m.WaitTime != nil {
 		if vtmsg, ok := interface{}(m.WaitTime).(interface {
@@ -561,6 +567,11 @@ func (m *LimiterDecision) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		}
 		i -= size
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x50
+	}
 	if m.Reason != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.Reason))
 		i--
@@ -875,6 +886,9 @@ func (m *CheckResponse) SizeVT() (n int) {
 		}
 		n += 1 + l + sov(uint64(l))
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1001,6 +1015,9 @@ func (m *LimiterDecision) SizeVT() (n int) {
 	}
 	if vtmsg, ok := m.Details.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1829,6 +1846,25 @@ func (m *CheckResponse) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			iNdEx = postIndex
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -2752,6 +2788,25 @@ func (m *LimiterDecision) UnmarshalVT(dAtA []byte) error {
 				m.Details = &LimiterDecision_QuotaSchedulerInfo_{QuotaSchedulerInfo: v}
 			}
 			iNdEx = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

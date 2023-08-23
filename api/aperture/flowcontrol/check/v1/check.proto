@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package aperture.flowcontrol.check.v1;
 
+import "aperture/policy/language/v1/flowcontrol.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
@@ -58,6 +60,12 @@ message CheckResponse {
   // Recommended minimal amount of time to wait when retrying the request, if
   // decision_type is REJECTED. Optional.
   google.protobuf.Duration wait_time = 13;
+  // http_status contains the http status code to be returned to the client, if
+  // decision_type is REJECTED. Optional.
+  policy.language.v1.StatusCode denied_response_status_code = 14 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.
@@ -117,6 +125,10 @@ message LimiterDecision {
     SamplerInfo sampler_info = 8;
     QuotaSchedulerInfo quota_scheduler_info = 9;
   }
+  policy.language.v1.StatusCode denied_response_status_code = 10 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
 }
 
 // FluxMeterInfo describes detail for each FluxMeterInfo.

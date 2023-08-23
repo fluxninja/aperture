@@ -7,6 +7,7 @@ import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
+import "validate/validate.proto";
 
 // FlowControl Resources
 message FlowControlResources {
@@ -109,6 +110,12 @@ message RateLimiter {
 
     // Configuration of lazy-syncing behavior of rate limiter
     LazySync lazy_sync = 6;
+
+    // This field allows to override the default `429 Too Many Requests` HTTP status code by default.
+    StatusCode denied_response_status_code = 7 [(validate.rules).enum = {
+      defined_only: true
+      not_in: 0
+    }];
   }
 
   // Inputs for the RateLimiter component
@@ -304,6 +311,12 @@ message Scheduler {
   // * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
   // * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
   string priorities_label_key = 8; // @gotags: default:"priorities"
+
+  // This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+  StatusCode denied_response_status_code = 9 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
@@ -389,6 +402,12 @@ message Sampler {
 
     // Selectors for the component.
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+
+    // This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+    StatusCode denied_response_status_code = 4 [(validate.rules).enum = {
+      defined_only: true
+      not_in: 0
+    }];
   }
 
   message Ins {
@@ -431,6 +450,11 @@ message LoadRamp {
       // Duration for which the step is active.
       // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+      // This field allows to override the default `503 Service Unavailable` HTTP status code by default.
+      StatusCode denied_response_status_code = 3 [(validate.rules).enum = {
+        defined_only: true
+        not_in: 0
+      }];
     }
 
     // Parameters for the _Sampler_.
@@ -897,4 +921,124 @@ message Selector {
   // [Label Matcher](/concepts/selector.md#label-matcher)
   // can be used to match flows based on flow labels.
   LabelMatcher label_matcher = 4;
+}
+
+// HTTP response codes.
+// For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+enum StatusCode {
+  // Empty - This code not part of the HTTP status code specification, but it is needed for proto
+  // `enum` type.
+  Empty = 0;
+
+  Continue = 100;
+
+  OK = 200;
+
+  Created = 201;
+
+  Accepted = 202;
+
+  NonAuthoritativeInformation = 203;
+
+  NoContent = 204;
+
+  ResetContent = 205;
+
+  PartialContent = 206;
+
+  MultiStatus = 207;
+
+  AlreadyReported = 208;
+
+  IMUsed = 226;
+
+  MultipleChoices = 300;
+
+  MovedPermanently = 301;
+
+  Found = 302;
+
+  SeeOther = 303;
+
+  NotModified = 304;
+
+  UseProxy = 305;
+
+  TemporaryRedirect = 307;
+
+  PermanentRedirect = 308;
+
+  BadRequest = 400;
+
+  Unauthorized = 401;
+
+  PaymentRequired = 402;
+
+  Forbidden = 403;
+
+  NotFound = 404;
+
+  MethodNotAllowed = 405;
+
+  NotAcceptable = 406;
+
+  ProxyAuthenticationRequired = 407;
+
+  RequestTimeout = 408;
+
+  Conflict = 409;
+
+  Gone = 410;
+
+  LengthRequired = 411;
+
+  PreconditionFailed = 412;
+
+  PayloadTooLarge = 413;
+
+  URITooLong = 414;
+
+  UnsupportedMediaType = 415;
+
+  RangeNotSatisfiable = 416;
+
+  ExpectationFailed = 417;
+
+  MisdirectedRequest = 421;
+
+  UnprocessableEntity = 422;
+
+  Locked = 423;
+
+  FailedDependency = 424;
+
+  UpgradeRequired = 426;
+
+  PreconditionRequired = 428;
+
+  TooManyRequests = 429;
+
+  RequestHeaderFieldsTooLarge = 431;
+
+  InternalServerError = 500;
+
+  NotImplemented = 501;
+
+  BadGateway = 502;
+
+  ServiceUnavailable = 503;
+
+  GatewayTimeout = 504;
+
+  HTTPVersionNotSupported = 505;
+
+  VariantAlsoNegotiates = 506;
+
+  InsufficientStorage = 507;
+
+  LoopDetected = 508;
+
+  NotExtended = 510;
+
+  NetworkAuthenticationRequired = 511;
 }

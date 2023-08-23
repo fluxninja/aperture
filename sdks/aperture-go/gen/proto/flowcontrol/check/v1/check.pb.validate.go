@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = languagev1.StatusCode(0)
 )
 
 // Validate checks the field values on CheckRequest with the rules defined in
@@ -357,6 +361,28 @@ func (m *CheckResponse) validate(all bool) error {
 		}
 	}
 
+	if _, ok := _CheckResponse_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
+		err := CheckResponseValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must not be in list [Empty]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := languagev1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := CheckResponseValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
 	}
@@ -434,6 +460,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CheckResponseValidationError{}
+
+var _CheckResponse_DeniedResponseStatusCode_NotInLookup = map[languagev1.StatusCode]struct{}{
+	0: {},
+}
 
 // Validate checks the field values on ClassifierInfo with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -574,6 +604,28 @@ func (m *LimiterDecision) validate(all bool) error {
 	// no validation rules for Dropped
 
 	// no validation rules for Reason
+
+	if _, ok := _LimiterDecision_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
+		err := LimiterDecisionValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must not be in list [Empty]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := languagev1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := LimiterDecisionValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	switch v := m.Details.(type) {
 	case *LimiterDecision_RateLimiterInfo_:
@@ -821,6 +873,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LimiterDecisionValidationError{}
+
+var _LimiterDecision_DeniedResponseStatusCode_NotInLookup = map[languagev1.StatusCode]struct{}{
+	0: {},
+}
 
 // Validate checks the field values on FluxMeterInfo with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
