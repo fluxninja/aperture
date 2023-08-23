@@ -154,7 +154,11 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 			resourceOptions = append(resourceOptions, tcOption)
 		}
 	}
-	var compiledCircuit *circuitfactory.Circuit
+
+	compiledCircuit := &circuitfactory.Circuit{
+		LeafComponents: make([]*runtime.ConfiguredComponent, 0),
+	}
+
 	partialCircuitOption := fx.Options()
 	var err error
 
@@ -162,10 +166,7 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		// Read evaluation interval
 		policy.evaluationInterval = policyProto.GetCircuit().GetEvaluationInterval().AsDuration()
 
-		compiledCircuit, partialCircuitOption, err = circuitfactory.CompileFromProto(
-			policyProto,
-			policy,
-		)
+		compiledCircuit, partialCircuitOption, err = circuitfactory.CompileFromProto(policyProto, policy)
 		if err != nil {
 			return nil, nil, nil, err
 		}
