@@ -105,3 +105,4 @@ Thanos
 Lucene
 Kibana
 Elasticsearch
+[Tt]riages
