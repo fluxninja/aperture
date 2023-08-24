@@ -113,10 +113,7 @@ message RateLimiter {
     LazySync lazy_sync = 6;
 
     // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 7 [(validate.rules).enum = {
-      defined_only: true
-      not_in: 0
-    }];
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 7 [(validate.rules).enum = {defined_only: true}];
   }
 
   // Inputs for the RateLimiter component
@@ -314,10 +311,7 @@ message Scheduler {
   string priorities_label_key = 8; // @gotags: default:"priorities"
 
   // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-  flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {
-    defined_only: true
-    not_in: 0
-  }];
+  flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {defined_only: true}];
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
@@ -405,10 +399,7 @@ message Sampler {
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 
     // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 4 [(validate.rules).enum = {
-      defined_only: true
-      not_in: 0
-    }];
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 4 [(validate.rules).enum = {defined_only: true}];
   }
 
   message Ins {
@@ -452,10 +443,7 @@ message LoadRamp {
       // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
       // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-      flowcontrol.check.v1.StatusCode denied_response_status_code = 3 [(validate.rules).enum = {
-        defined_only: true
-        not_in: 0
-      }];
+      flowcontrol.check.v1.StatusCode denied_response_status_code = 3 [(validate.rules).enum = {defined_only: true}];
     }
 
     // Parameters for the _Sampler_.
