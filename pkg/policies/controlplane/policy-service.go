@@ -217,17 +217,17 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 
 // getPolicyBytes returns the policy bytes after checking validity of the policy.
 func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy) ([]byte, error) {
-	jsonPolicy, err := policy.MarshalJSON()
+	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal policy '%s': '%s'", name, err)
 	}
 
-	_, _, err = ValidateAndCompile(context.Background(), name, jsonPolicy)
+	_, _, err = ValidateAndCompile(context.Background(), name, policyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compile policy '%s': '%s'", name, err)
 	}
 
-	return jsonPolicy, nil
+	return policyBytes, nil
 }
 
 // GetDecisions returns the decisions.

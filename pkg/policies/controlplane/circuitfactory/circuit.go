@@ -1,12 +1,13 @@
 package circuitfactory
 
 import (
+	"go.uber.org/fx"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policymonitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"go.uber.org/fx"
 )
 
 // Circuit is a compiled Circuit
@@ -18,7 +19,9 @@ type Circuit struct {
 }
 
 // Components returns a list of CompiledComponents, ready to create runtime.Circuit.
-func (circuit *Circuit) Components() []*runtime.ConfiguredComponent { return circuit.LeafComponents }
+func (circuit *Circuit) Components() []*runtime.ConfiguredComponent {
+	return circuit.LeafComponents
+}
 
 // CompileFromProto compiles a protobuf circuit definition into a Circuit.
 //
