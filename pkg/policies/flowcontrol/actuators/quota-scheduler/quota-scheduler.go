@@ -370,11 +370,12 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) ifac
 	returnDecision := func() iface.LimiterDecision {
 		return iface.LimiterDecision{
 			LimiterDecision: &flowcontrolv1.LimiterDecision{
-				PolicyName:  qs.GetPolicyName(),
-				PolicyHash:  qs.GetPolicyHash(),
-				ComponentId: qs.GetComponentId(),
-				Dropped:     dropped,
-				Reason:      reason,
+				PolicyName:               qs.GetPolicyName(),
+				PolicyHash:               qs.GetPolicyHash(),
+				ComponentId:              qs.GetComponentId(),
+				Dropped:                  dropped,
+				DeniedResponseStatusCode: qs.proto.GetRateLimiter().GetDeniedResponseStatusCode(),
+				Reason:                   reason,
 				Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
 					QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
 						Label:         label,

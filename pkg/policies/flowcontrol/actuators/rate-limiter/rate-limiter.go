@@ -341,11 +341,12 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.L
 
 	return iface.LimiterDecision{
 		LimiterDecision: &flowcontrolv1.LimiterDecision{
-			PolicyName:  rl.GetPolicyName(),
-			PolicyHash:  rl.GetPolicyHash(),
-			ComponentId: rl.GetComponentId(),
-			Dropped:     !ok,
-			Reason:      reason,
+			PolicyName:               rl.GetPolicyName(),
+			PolicyHash:               rl.GetPolicyHash(),
+			ComponentId:              rl.GetComponentId(),
+			Dropped:                  !ok,
+			DeniedResponseStatusCode: rl.lbProto.GetParameters().GetDeniedResponseStatusCode(),
+			Reason:                   reason,
 			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
 					Label:          label,

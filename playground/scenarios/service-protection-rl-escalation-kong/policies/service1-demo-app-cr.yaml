@@ -34,6 +34,7 @@ spec:
             load_multiplier_linear_increment: 0.025
             load_scheduler:
               scheduler:
+                denied_response_status_code: BadRequest
                 workloads:
                 - label_matcher:
                     match_labels:
@@ -88,6 +89,7 @@ spec:
             fill_amount:
               signal_name: RATE_LIMIT
           parameters:
+            denied_response_status_code: BadRequest
             interval: 1s
             label_key: http.request.header.user_id
           selectors:

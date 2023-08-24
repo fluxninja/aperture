@@ -307,11 +307,12 @@ func (fr *sampler) Decide(ctx context.Context,
 
 	// Initialize LimiterDecision
 	limiterDecision := &flowcontrolv1.LimiterDecision{
-		PolicyName:  fr.GetPolicyName(),
-		PolicyHash:  fr.GetPolicyHash(),
-		ComponentId: fr.GetComponentId(),
-		Dropped:     false,
-		Reason:      flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED,
+		PolicyName:               fr.GetPolicyName(),
+		PolicyHash:               fr.GetPolicyHash(),
+		ComponentId:              fr.GetComponentId(),
+		Dropped:                  false,
+		DeniedResponseStatusCode: fr.proto.GetParameters().GetDeniedResponseStatusCode(),
+		Reason:                   flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED,
 		Details: &flowcontrolv1.LimiterDecision_SamplerInfo_{
 			SamplerInfo: &flowcontrolv1.LimiterDecision_SamplerInfo{
 				Label: labelKey + ":" + labelValue,

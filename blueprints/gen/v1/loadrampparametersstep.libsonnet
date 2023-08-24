@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withDeniedResponseStatusCode(denied_response_status_code):: {
+    denied_response_status_code: denied_response_status_code,
+  },
+  withDeniedResponseStatusCodeMixin(denied_response_status_code):: {
+    denied_response_status_code+: denied_response_status_code,
+  },
   withDuration(duration):: {
     duration: duration,
   },

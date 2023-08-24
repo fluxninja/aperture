@@ -570,6 +570,11 @@ definitions:
             decision_type:
                 $ref: '#/definitions/CheckResponseDecisionType'
                 description: decision_type contains what the decision was.
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: |-
+                    http_status contains the http status code to be returned to the client, if
+                    decision_type is REJECTED. Optional.
             end:
                 format: date-time
                 title: end timestamp
@@ -2220,6 +2225,8 @@ definitions:
         properties:
             component_id:
                 type: string
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
             dropped:
                 type: boolean
             load_scheduler_info:
@@ -2413,6 +2420,9 @@ definitions:
         type: object
     LoadRampParametersStep:
         properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             duration:
                 description: |+
                     Duration for which the step is active.
@@ -3165,6 +3175,9 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -3551,6 +3564,9 @@ definitions:
         type: object
     SamplerParameters:
         properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             label_key:
                 description: |-
                     The flow label key for identifying sessions.
@@ -3642,6 +3658,9 @@ definitions:
             default_workload_parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters to be used if none of workloads specified in `workloads` match.
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priorities_label_key:
                 default: priorities
                 description: |+
@@ -3990,6 +4009,71 @@ definitions:
                 format: date-time
                 type: string
         type: object
+    StatusCode:
+        default: Empty
+        description: '- Empty: Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.'
+        enum:
+            - Empty
+            - Continue
+            - OK
+            - Created
+            - Accepted
+            - NonAuthoritativeInformation
+            - NoContent
+            - ResetContent
+            - PartialContent
+            - MultiStatus
+            - AlreadyReported
+            - IMUsed
+            - MultipleChoices
+            - MovedPermanently
+            - Found
+            - SeeOther
+            - NotModified
+            - UseProxy
+            - TemporaryRedirect
+            - PermanentRedirect
+            - BadRequest
+            - Unauthorized
+            - PaymentRequired
+            - Forbidden
+            - NotFound
+            - MethodNotAllowed
+            - NotAcceptable
+            - ProxyAuthenticationRequired
+            - RequestTimeout
+            - Conflict
+            - Gone
+            - LengthRequired
+            - PreconditionFailed
+            - PayloadTooLarge
+            - URITooLong
+            - UnsupportedMediaType
+            - RangeNotSatisfiable
+            - ExpectationFailed
+            - MisdirectedRequest
+            - UnprocessableEntity
+            - Locked
+            - FailedDependency
+            - UpgradeRequired
+            - PreconditionRequired
+            - TooManyRequests
+            - RequestHeaderFieldsTooLarge
+            - InternalServerError
+            - NotImplemented
+            - BadGateway
+            - ServiceUnavailable
+            - GatewayTimeout
+            - HTTPVersionNotSupported
+            - VariantAlsoNegotiates
+            - InsufficientStorage
+            - LoopDetected
+            - NotExtended
+            - NetworkAuthenticationRequired
+        title: |-
+            HTTP response codes.
+            For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+        type: string
     StatusError:
         description: Error holds raw error message and its cause in a nested field.
         properties:
@@ -4974,11 +5058,11 @@ tags:
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
+    - name: FlowControlService
     - name: PolicyService
     - name: StatusService
     - name: Controller
     - name: DistCacheService
-    - name: FlowControlService
     - name: FlowControlServiceHTTP
     - name: InfoService
     - name: PeerDiscoveryService
