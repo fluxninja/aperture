@@ -1333,17 +1333,6 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for PrioritiesLabelKey
 
-	if _, ok := _Scheduler_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := SchedulerValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := SchedulerValidationError{
 			field:  "DeniedResponseStatusCode",
@@ -1431,10 +1420,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SchedulerValidationError{}
-
-var _Scheduler_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on AdaptiveLoadScheduler with the rules
 // defined in the proto definition for this message. If any rules are
@@ -3721,17 +3706,6 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
-	if _, ok := _RateLimiter_Parameters_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := RateLimiter_ParametersValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := RateLimiter_ParametersValidationError{
 			field:  "DeniedResponseStatusCode",
@@ -3822,10 +3796,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiter_ParametersValidationError{}
-
-var _RateLimiter_Parameters_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on RateLimiter_Ins with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -5480,17 +5450,6 @@ func (m *Sampler_Parameters) validate(all bool) error {
 
 	}
 
-	if _, ok := _Sampler_Parameters_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := Sampler_ParametersValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := Sampler_ParametersValidationError{
 			field:  "DeniedResponseStatusCode",
@@ -5581,10 +5540,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Sampler_ParametersValidationError{}
-
-var _Sampler_Parameters_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on Sampler_Ins with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -6305,17 +6260,6 @@ func (m *LoadRamp_Parameters_Step) validate(all bool) error {
 		}
 	}
 
-	if _, ok := _LoadRamp_Parameters_Step_DeniedResponseStatusCode_NotInLookup[m.GetDeniedResponseStatusCode()]; ok {
-		err := LoadRamp_Parameters_StepValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must not be in list [Empty]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := LoadRamp_Parameters_StepValidationError{
 			field:  "DeniedResponseStatusCode",
@@ -6406,10 +6350,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadRamp_Parameters_StepValidationError{}
-
-var _LoadRamp_Parameters_Step_DeniedResponseStatusCode_NotInLookup = map[checkv1.StatusCode]struct{}{
-	0: {},
-}
 
 // Validate checks the field values on FluxMeter_StaticBuckets with the rules
 // defined in the proto definition for this message. If any rules are
