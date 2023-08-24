@@ -23,12 +23,6 @@ local apertureAgentMixin =
       },
       agent+: {
         createUninstallHook: false,
-        livenessProbe+: {
-          enabled: false,
-        },
-        readinessProbe+: {
-          enabled: false,
-        },
         config+: {
           agent_info+: {
             agent_group: if cloudController then agentGroup else 'default',
