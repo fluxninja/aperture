@@ -2,11 +2,13 @@ syntax = "proto3";
 
 package aperture.policy.language.v1;
 
+import "aperture/flowcontrol/check/v1/check.proto";
 import "aperture/policy/language/v1/label_matcher.proto";
 import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
+import "validate/validate.proto";
 
 // FlowControl Resources
 message FlowControlResources {
@@ -109,6 +111,12 @@ message RateLimiter {
 
     // Configuration of lazy-syncing behavior of rate limiter
     LazySync lazy_sync = 6;
+
+    // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 7 [(validate.rules).enum = {
+      defined_only: true
+      not_in: 0
+    }];
   }
 
   // Inputs for the RateLimiter component
@@ -304,6 +312,12 @@ message Scheduler {
   // * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
   // * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
   string priorities_label_key = 8; // @gotags: default:"priorities"
+
+  // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+  flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {
+    defined_only: true
+    not_in: 0
+  }];
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
@@ -389,6 +403,12 @@ message Sampler {
 
     // Selectors for the component.
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+
+    // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 4 [(validate.rules).enum = {
+      defined_only: true
+      not_in: 0
+    }];
   }
 
   message Ins {
@@ -431,6 +451,11 @@ message LoadRamp {
       // Duration for which the step is active.
       // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
+      // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+      flowcontrol.check.v1.StatusCode denied_response_status_code = 3 [(validate.rules).enum = {
+        defined_only: true
+        not_in: 0
+      }];
     }
 
     // Parameters for the _Sampler_.

@@ -24,6 +24,7 @@ private static final long serialVersionUID = 0L;
     policyHash_ = "";
     componentId_ = "";
     reason_ = 0;
+    deniedResponseStatusCode_ = 0;
   }
 
   @java.lang.Override
@@ -3181,6 +3182,24 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo.getDefaultInstance();
   }
 
+  public static final int DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER = 10;
+  private int deniedResponseStatusCode_ = 0;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The enum numeric value on the wire for deniedResponseStatusCode.
+   */
+  @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+    return deniedResponseStatusCode_;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The deniedResponseStatusCode.
+   */
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -3221,6 +3240,9 @@ private static final long serialVersionUID = 0L;
     }
     if (detailsCase_ == 9) {
       output.writeMessage(9, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo) details_);
+    }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      output.writeEnum(10, deniedResponseStatusCode_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -3264,6 +3286,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(9, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo) details_);
     }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeEnumSize(10, deniedResponseStatusCode_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -3288,6 +3314,7 @@ private static final long serialVersionUID = 0L;
     if (getDropped()
         != other.getDropped()) return false;
     if (reason_ != other.reason_) return false;
+    if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
     if (!getDetailsCase().equals(other.getDetailsCase())) return false;
     switch (detailsCase_) {
       case 6:
@@ -3331,6 +3358,8 @@ private static final long serialVersionUID = 0L;
         getDropped());
     hash = (37 * hash) + REASON_FIELD_NUMBER;
     hash = (53 * hash) + reason_;
+    hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
+    hash = (53 * hash) + deniedResponseStatusCode_;
     switch (detailsCase_) {
       case 6:
         hash = (37 * hash) + RATE_LIMITER_INFO_FIELD_NUMBER;
@@ -3503,6 +3532,7 @@ private static final long serialVersionUID = 0L;
       if (quotaSchedulerInfoBuilder_ != null) {
         quotaSchedulerInfoBuilder_.clear();
       }
+      deniedResponseStatusCode_ = 0;
       detailsCase_ = 0;
       details_ = null;
       return this;
@@ -3553,6 +3583,9 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
         result.reason_ = reason_;
+      }
+      if (((from_bitField0_ & 0x00000200) != 0)) {
+        result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
       }
     }
 
@@ -3641,6 +3674,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.reason_ != 0) {
         setReasonValue(other.getReasonValue());
+      }
+      if (other.deniedResponseStatusCode_ != 0) {
+        setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
       }
       switch (other.getDetailsCase()) {
         case RATE_LIMITER_INFO: {
@@ -3742,6 +3778,11 @@ private static final long serialVersionUID = 0L;
               detailsCase_ = 9;
               break;
             } // case 74
+            case 80: {
+              deniedResponseStatusCode_ = input.readEnum();
+              bitField0_ |= 0x00000200;
+              break;
+            } // case 80
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -4641,6 +4682,59 @@ private static final long serialVersionUID = 0L;
       detailsCase_ = 9;
       onChanged();
       return quotaSchedulerInfoBuilder_;
+    }
+
+    private int deniedResponseStatusCode_ = 0;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The enum numeric value on the wire for deniedResponseStatusCode.
+     */
+    @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+      return deniedResponseStatusCode_;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The enum numeric value on the wire for deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCodeValue(int value) {
+      deniedResponseStatusCode_ = value;
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The deniedResponseStatusCode.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCode(com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      bitField0_ |= 0x00000200;
+      deniedResponseStatusCode_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDeniedResponseStatusCode() {
+      bitField0_ = (bitField0_ & ~0x00000200);
+      deniedResponseStatusCode_ = 0;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

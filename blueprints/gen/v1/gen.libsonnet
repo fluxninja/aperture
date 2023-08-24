@@ -145,6 +145,7 @@
   SignalGeneratorOuts: import 'signalgeneratorouts.libsonnet',
   SignalGeneratorParameters: import 'signalgeneratorparameters.libsonnet',
   SignalGeneratorParametersStep: import 'signalgeneratorparametersstep.libsonnet',
+  StatusCode: import 'statuscode.libsonnet',
   Switcher: import 'switcher.libsonnet',
   SwitcherIns: import 'switcherins.libsonnet',
   SwitcherOuts: import 'switcherouts.libsonnet',
