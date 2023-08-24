@@ -13,6 +13,7 @@
     "local:publish": "npx local-package-publisher -p"
   },
   "homepage": "https://fluxninja.com/",
+  "repository": "https://github.com/fluxninja/aperture-js",
   "bugs": {
     "url": "https://github.com/fluxninja/aperture/issues",
     "email": "support@fluxninja.com"
