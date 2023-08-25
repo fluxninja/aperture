@@ -103,6 +103,8 @@
 | `operator.hooks.kubectl.image.repository`                    | kubectl image repository                                                                                               | `kubectl`             |
 | `operator.hooks.kubectl.image.tag`                           | kubectl image tag (immutable tags are recommended)                                                                     | `latest`              |
 | `operator.hooks.kubectl.image.pullPolicy`                    | kubectl image pull policy                                                                                              | `Always`              |
+| `operator.hooks.kubectl.image.resources.limits`              | kubectl container resource limits                                                                                      | `{}`                  |
+| `operator.hooks.kubectl.image.resources.requests`            | kubectl container resource requests                                                                                    | `{}`                  |
 
 ### Controller Custom Resource Parameters
 
@@ -178,27 +180,31 @@
 
 ### etcd
 
-| Name                                  | Description                                                                               | Value                |
-| ------------------------------------- | ----------------------------------------------------------------------------------------- | -------------------- |
-| `etcd.enabled`                        | Whether to deploy a small etcd cluster as part of this chart                              | `true`               |
-| `etcd.auth.rbac.create`               | specifies whether to create the RBAC resources for Etcd                                   | `false`              |
-| `etcd.auth.token.type`                | specifies the type of token to use                                                        | `simple`             |
-| `etcd.autoCompactionMode`             | Auto compaction mode, by default periodic. Valid values: "periodic", "revision".          | `periodic`           |
-| `etcd.autoCompactionRetention`        | Auto compaction retention for mvcc key value store in hour, by default 0, means disabled. | `24`                 |
-| `etcd.initContainer.enabled`          | Create init container to check the health of Etcd before starting Aperture Controller.    | `true`               |
-| `etcd.initContainer.image.registry`   | Init container image registry.                                                            | `docker.io/bitnami`  |
-| `etcd.initContainer.image.repository` | Init container image repository.                                                          | `etcd`               |
-| `etcd.initContainer.image.tag`        | Init container image tag.                                                                 | `3.5.8-debian-11-r0` |
-| `etcd.initContainer.image.pullPolicy` | Init container image pull policy.                                                         | `IfNotPresent`       |
-| `etcd.pdb.create`                     | Whether to create a Pod Disruption Budget for Etcd                                        | `false`              |
+| Name                                    | Description                                                                               | Value                |
+| --------------------------------------- | ----------------------------------------------------------------------------------------- | -------------------- |
+| `etcd.enabled`                          | Whether to deploy a small etcd cluster as part of this chart                              | `true`               |
+| `etcd.auth.rbac.create`                 | specifies whether to create the RBAC resources for Etcd                                   | `false`              |
+| `etcd.auth.token.type`                  | specifies the type of token to use                                                        | `simple`             |
+| `etcd.autoCompactionMode`               | Auto compaction mode, by default periodic. Valid values: "periodic", "revision".          | `periodic`           |
+| `etcd.autoCompactionRetention`          | Auto compaction retention for mvcc key value store in hour, by default 0, means disabled. | `24`                 |
+| `etcd.initContainer.enabled`            | Create init container to check the health of Etcd before starting Aperture Controller.    | `true`               |
+| `etcd.initContainer.resources.limits`   | Resources limits for the init containers                                                  | `{}`                 |
+| `etcd.initContainer.resources.requests` | Resources requests for the init containers                                                | `{}`                 |
+| `etcd.initContainer.image.registry`     | Init container image registry.                                                            | `docker.io/bitnami`  |
+| `etcd.initContainer.image.repository`   | Init container image repository.                                                          | `etcd`               |
+| `etcd.initContainer.image.tag`          | Init container image tag.                                                                 | `3.5.8-debian-11-r0` |
+| `etcd.initContainer.image.pullPolicy`   | Init container image pull policy.                                                         | `IfNotPresent`       |
+| `etcd.pdb.create`                       | Whether to create a Pod Disruption Budget for Etcd                                        | `false`              |
 
 ### prometheus
 
-| Name                                        | Description                                                                                     | Value                   |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------- |
-| `prometheus.enabled`                        | specifies whether to deploy embedded prometheus                                                 | `true`                  |
-| `prometheus.initContainer.enabled`          | Create init container to check the readiness of Prometheus before starting Aperture Controller. | `true`                  |
-| `prometheus.initContainer.image.registry`   | Init container image registry.                                                                  | `docker.io/linuxserver` |
-| `prometheus.initContainer.image.repository` | Init container image repository.                                                                | `yq`                    |
-| `prometheus.initContainer.image.tag`        | Init container image tag.                                                                       | `3.1.0`                 |
-| `prometheus.initContainer.image.pullPolicy` | Init container image pull policy.                                                               | `IfNotPresent`          |
+| Name                                          | Description                                                                                     | Value                   |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------- |
+| `prometheus.enabled`                          | specifies whether to deploy embedded prometheus                                                 | `true`                  |
+| `prometheus.initContainer.enabled`            | Create init container to check the readiness of Prometheus before starting Aperture Controller. | `true`                  |
+| `prometheus.initContainer.resources.limits`   | Resources limits for the init containers                                                        | `{}`                    |
+| `prometheus.initContainer.resources.requests` | Resources requests for the init containers                                                      | `{}`                    |
+| `prometheus.initContainer.image.registry`     | Init container image registry.                                                                  | `docker.io/linuxserver` |
+| `prometheus.initContainer.image.repository`   | Init container image repository.                                                                | `yq`                    |
+| `prometheus.initContainer.image.tag`          | Init container image tag.                                                                       | `3.1.0`                 |
+| `prometheus.initContainer.image.pullPolicy`   | Init container image pull policy.                                                               | `IfNotPresent`          |

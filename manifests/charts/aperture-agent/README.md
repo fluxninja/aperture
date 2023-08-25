@@ -103,6 +103,8 @@
 | `operator.hooks.kubectl.image.repository`                    | kubectl image repository                                                                                               | `kubectl`             |
 | `operator.hooks.kubectl.image.tag`                           | kubectl image tag (immutable tags are recommended)                                                                     | `latest`              |
 | `operator.hooks.kubectl.image.pullPolicy`                    | kubectl image pull policy                                                                                              | `Always`              |
+| `operator.hooks.kubectl.image.resources.limits`              | kubectl container resource limits                                                                                      | `{}`                  |
+| `operator.hooks.kubectl.image.resources.requests`            | kubectl container resource requests                                                                                    | `{}`                  |
 
 ### Agent Custom Resource Parameters
 
