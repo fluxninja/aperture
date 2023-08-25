@@ -1,18 +1,19 @@
 {
   "name": "@fluxninja/aperture-js",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "aperture-js is an SDK to interact with Aperture Agent.",
-  "exports": "./lib/example/example.js",
+  "main": "./lib/index.js",
   "scripts": {
     "pre-build": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
     "post-build": "cp -r ./proto ./lib/proto",
-    "grpc-client": "npm run build && node ./lib/sdk/client.js",
-    "example": "npm run build && node ./lib/example/example.js",
-    "prepublishOnly": "npm run build"
+    "grpc-client": "npm run build && node ./lib/client.js",
+    "example": "npm run build && node ./example/dist/example.js",
+    "prepublishOnly": "npm run build",
+    "local:publish": "npx local-package-publisher -p"
   },
   "homepage": "https://fluxninja.com/",
-  "type": "module",
+  "repository": "https://github.com/fluxninja/aperture-js",
   "bugs": {
     "url": "https://github.com/fluxninja/aperture/issues",
     "email": "support@fluxninja.com"
@@ -24,24 +25,27 @@
     "@types/**/*",
     "proto/**/*"
   ],
+  "type": "module",
+  "types": "@types/index.d.ts",
   "dependencies": {
-    "@grpc/grpc-js": "1.7.1",
-    "@grpc/proto-loader": "0.7.3",
+    "@grpc/grpc-js": "^1.7.1",
+    "@grpc/proto-loader": "^0.7.3",
     "@opentelemetry/api": "1.2.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.33.0",
     "@opentelemetry/resources": "1.7.0",
     "@opentelemetry/sdk-trace-base": "1.7.0",
     "@opentelemetry/sdk-trace-node": "1.7.0",
-    "@opentelemetry/semantic-conventions": "1.7.0",
-    "express": "4.18.2",
-    "http-terminator": "3.2.0"
+    "@opentelemetry/semantic-conventions": "1.7.0"
   },
   "engines": {
     "node": "16.19.1",
     "npm": "8.19.3"
   },
   "devDependencies": {
-    "@types/express": "4.17.17",
     "typescript": "4.9.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "scope": "@fluxninja"
   }
 }

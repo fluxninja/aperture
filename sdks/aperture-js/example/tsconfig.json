@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Node 16",
   "compilerOptions": {
-    "baseUrl": ".",
     "module": "es2022",
     "target": "es2015",
     "strict": true,
@@ -11,9 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "declaration": true,
-    "outDir": "./lib",
-    "declarationDir": "./@types"
-  },
-  "include": ["sdk"],
-  "exclude": ["node_modules", "proto", "@types", "lib", "example"]
+    "outDir": "./dist"
+  }
 }
