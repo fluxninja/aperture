@@ -322,6 +322,8 @@ operator:
       ## @param operator.hooks.kubectl.image.repository kubectl image repository
       ## @param operator.hooks.kubectl.image.tag kubectl image tag (immutable tags are recommended)
       ## @param operator.hooks.kubectl.image.pullPolicy kubectl image pull policy
+      ## @param operator.hooks.kubectl.image.resources.limits kubectl container resource limits
+      ## @param operator.hooks.kubectl.image.resources.requests kubectl container resource requests
       ##
       image:
         registry: docker.io/bitnami
@@ -332,6 +334,9 @@ operator:
         ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
         ##
         pullPolicy: Always
+        resources:
+          limits: {}
+          requests: {}
 
 ## @section Controller Custom Resource Parameters
 ## @skip controller.createUninstallHook
@@ -573,6 +578,8 @@ ingress:
 ## @param etcd.autoCompactionMode Auto compaction mode, by default periodic. Valid values: "periodic", "revision".
 ## @param etcd.autoCompactionRetention Auto compaction retention for mvcc key value store in hour, by default 0, means disabled.
 ## @param etcd.initContainer.enabled Create init container to check the health of Etcd before starting Aperture Controller.
+## @param etcd.initContainer.resources.limits Resources limits for the init containers
+## @param etcd.initContainer.resources.requests Resources requests for the init containers
 ## @param etcd.initContainer.image.registry Init container image registry.
 ## @param etcd.initContainer.image.repository Init container image repository.
 ## @param etcd.initContainer.image.tag Init container image tag.
@@ -586,6 +593,9 @@ etcd:
   autoCompactionRetention: 24
   initContainer:
     enabled: true
+    resources:
+      limits: {}
+      requests: {}
     image:
       registry: docker.io/bitnami
       repository: etcd
@@ -602,6 +612,8 @@ etcd:
 ## @section prometheus
 ## @param prometheus.enabled specifies whether to deploy embedded prometheus
 ## @param prometheus.initContainer.enabled Create init container to check the readiness of Prometheus before starting Aperture Controller.
+## @param prometheus.initContainer.resources.limits Resources limits for the init containers
+## @param prometheus.initContainer.resources.requests Resources requests for the init containers
 ## @param prometheus.initContainer.image.registry Init container image registry.
 ## @param prometheus.initContainer.image.repository Init container image repository.
 ## @param prometheus.initContainer.image.tag Init container image tag.
@@ -618,6 +630,9 @@ prometheus:
   enabled: true
   initContainer:
     enabled: true
+    resources:
+      limits: {}
+      requests: {}
     image:
       registry: docker.io/linuxserver
       repository: yq

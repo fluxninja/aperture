@@ -131,6 +131,9 @@ spec:
     - name: wait-for-etcd
       image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
       imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
+      {{- if .Values.etcd.initContainer.resources }}
+      resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 8 }}
+      {{- end }}
       command:
         - 'sh'
         - '-c'
@@ -149,6 +152,9 @@ spec:
     - name: wait-for-prometheus
       image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
       imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
+      {{- if .Values.etcd.initContainer.resources }}
+      resources: {{- toYaml .Values.prometheus.initContainer.resources | nindent 8 }}
+      {{- end }}
       command:
         - 'sh'
         - '-c'
