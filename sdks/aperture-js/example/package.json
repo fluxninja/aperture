@@ -8,6 +8,7 @@
     "start": "tsx ./example.ts",
     "build": "rm -rf ./dist && tsc -p tsconfig.json"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
