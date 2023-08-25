@@ -400,7 +400,7 @@ def main(
         # iterate over all definitions
         for _, definition in aperture_swagger_yaml["definitions"].items():
             # iterate over all properties in definition
-            for _, property in definition["properties"].items():
+            for _, property in definition.get("properties", {}).items():
                 # if the property has exclusiveMinimum or exclusiveMaximum, set it to the value of minimum or maximum
                 if (
                     "exclusiveMinimum" in property

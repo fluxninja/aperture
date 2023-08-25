@@ -217,15 +217,19 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Code: int32(code.Code_UNAVAILABLE),
 		}
 		var statusCode typev3.StatusCode
-		switch checkResponse.RejectReason {
-		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			statusCode = typev3.StatusCode_TooManyRequests
-		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
-			statusCode = typev3.StatusCode_ServiceUnavailable
-		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
-			statusCode = typev3.StatusCode_Forbidden
-		default:
-			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+		if checkResponse.GetDeniedResponseStatusCode() != 0 {
+			statusCode = typev3.StatusCode(checkResponse.GetDeniedResponseStatusCode())
+		} else {
+			switch checkResponse.RejectReason {
+			case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
+				statusCode = typev3.StatusCode_TooManyRequests
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
+				statusCode = typev3.StatusCode_ServiceUnavailable
+			case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+				statusCode = typev3.StatusCode_Forbidden
+			default:
+				log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+			}
 		}
 		deniedHTTPResponse := &authv3.DeniedHttpResponse{
 			Status: &typev3.HttpStatus{
