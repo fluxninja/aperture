@@ -7,6 +7,8 @@
     "pre-build": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
     "post-build": "cp -r ./proto ./lib/proto",
+    "grpc-client": "npm run build && node ./lib/client.js",
+    "example": "npm run build && node ./example/dist/example.js",
     "prepublishOnly": "npm run build",
     "local:publish": "npx local-package-publisher -p"
   },
