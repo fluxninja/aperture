@@ -23,6 +23,7 @@
     "@types/**/*",
     "proto/**/*"
   ],
+  "type": "module",
   "types": "@types/index.d.ts",
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
