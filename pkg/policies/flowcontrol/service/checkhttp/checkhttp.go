@@ -198,15 +198,19 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 		}
 
 		var statusCode int32
-		switch checkResponse.RejectReason {
-		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			statusCode = http.StatusTooManyRequests
-		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
-			statusCode = http.StatusServiceUnavailable
-		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
-			statusCode = http.StatusForbidden
-		default:
-			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+		if checkResponse.GetDeniedResponseStatusCode() != 0 {
+			statusCode = int32(checkResponse.GetDeniedResponseStatusCode())
+		} else {
+			switch checkResponse.RejectReason {
+			case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
+				statusCode = http.StatusTooManyRequests
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
+				statusCode = http.StatusServiceUnavailable
+			case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+				statusCode = http.StatusForbidden
+			default:
+				log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+			}
 		}
 
 		deniedHTTPResponse := &flowcontrolhttpv1.DeniedHttpResponse{

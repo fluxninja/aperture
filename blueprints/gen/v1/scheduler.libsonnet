@@ -13,6 +13,12 @@
   withDefaultWorkloadParametersMixin(default_workload_parameters):: {
     default_workload_parameters+: default_workload_parameters,
   },
+  withDeniedResponseStatusCode(denied_response_status_code):: {
+    denied_response_status_code: denied_response_status_code,
+  },
+  withDeniedResponseStatusCodeMixin(denied_response_status_code):: {
+    denied_response_status_code+: denied_response_status_code,
+  },
   withPrioritiesLabelKey(priorities_label_key):: {
     priorities_label_key: priorities_label_key,
   },

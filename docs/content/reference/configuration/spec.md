@@ -4546,6 +4546,19 @@ Parameters for the _Sampler_.
 <!-- vale on -->
 
 <dl>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
+
+</dd>
 <dt>duration</dt>
 <dd>
 
@@ -6081,6 +6094,19 @@ Continuous fill determines whether the token bucket should be filled
 continuously or only on discrete intervals.
 
 </dd>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`429 Too Many Requests`) that is returned when a request is denied.
+
+</dd>
 <dt>interval</dt>
 <dd>
 
@@ -6701,6 +6727,19 @@ The percentage of requests to accept.
 <!-- vale on -->
 
 <dl>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
+
+</dd>
 <dt>label_key</dt>
 <dd>
 
@@ -6909,6 +6948,19 @@ a value of "10s" would signify a duration of 10 seconds.
 <!-- vale on -->
 
 Parameters to be used if none of workloads specified in `workloads` match.
+
+</dd>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
 <dt>priorities_label_key</dt>
@@ -7438,6 +7490,24 @@ The value of the step.
 
 </dd>
 </dl>
+
+---
+
+<!-- vale off -->
+
+### StatusCode {#status-code}
+
+<!-- vale on -->
+
+HTTP response codes. For more details:
+https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+
+- Empty: Empty - This code not part of the HTTP status code specification, but
+  it is needed for `enum` type.
+
+| Property     | Type   | Default            | Constraints | Description                                                                                                  |
+| ------------ | ------ | ------------------ | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `StatusCode` | string | Default: `"Empty"` |             | - Empty: Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type. |
 
 ---
 

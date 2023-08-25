@@ -30,6 +30,7 @@ private static final long serialVersionUID = 0L;
     classifierInfos_ = java.util.Collections.emptyList();
     fluxMeterInfos_ = java.util.Collections.emptyList();
     limiterDecisions_ = java.util.Collections.emptyList();
+    deniedResponseStatusCode_ = 0;
   }
 
   @java.lang.Override
@@ -907,6 +908,34 @@ java.lang.String defaultValue) {
     return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
   }
 
+  public static final int DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER = 14;
+  private int deniedResponseStatusCode_ = 0;
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The enum numeric value on the wire for deniedResponseStatusCode.
+   */
+  @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+    return deniedResponseStatusCode_;
+  }
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The deniedResponseStatusCode.
+   */
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -959,6 +988,9 @@ java.lang.String defaultValue) {
     }
     if (((bitField0_ & 0x00000004) != 0)) {
       output.writeMessage(13, getWaitTime());
+    }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      output.writeEnum(14, deniedResponseStatusCode_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -1030,6 +1062,10 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(13, getWaitTime());
     }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeEnumSize(14, deniedResponseStatusCode_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1076,6 +1112,7 @@ java.lang.String defaultValue) {
       if (!getWaitTime()
           .equals(other.getWaitTime())) return false;
     }
+    if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1129,6 +1166,8 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + WAIT_TIME_FIELD_NUMBER;
       hash = (53 * hash) + getWaitTime().hashCode();
     }
+    hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
+    hash = (53 * hash) + deniedResponseStatusCode_;
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -1341,6 +1380,7 @@ java.lang.String defaultValue) {
         waitTimeBuilder_.dispose();
         waitTimeBuilder_ = null;
       }
+      deniedResponseStatusCode_ = 0;
       return this;
     }
 
@@ -1444,6 +1484,9 @@ java.lang.String defaultValue) {
             ? waitTime_
             : waitTimeBuilder_.build();
         to_bitField0_ |= 0x00000004;
+      }
+      if (((from_bitField0_ & 0x00001000) != 0)) {
+        result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -1613,6 +1656,9 @@ java.lang.String defaultValue) {
       if (other.hasWaitTime()) {
         mergeWaitTime(other.getWaitTime());
       }
+      if (other.deniedResponseStatusCode_ != 0) {
+        setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1735,6 +1781,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000800;
               break;
             } // case 106
+            case 112: {
+              deniedResponseStatusCode_ = input.readEnum();
+              bitField0_ |= 0x00001000;
+              break;
+            } // case 112
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3853,6 +3904,84 @@ java.lang.String defaultValue) {
         waitTime_ = null;
       }
       return waitTimeBuilder_;
+    }
+
+    private int deniedResponseStatusCode_ = 0;
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The enum numeric value on the wire for deniedResponseStatusCode.
+     */
+    @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+      return deniedResponseStatusCode_;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The enum numeric value on the wire for deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCodeValue(int value) {
+      deniedResponseStatusCode_ = value;
+      bitField0_ |= 0x00001000;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The deniedResponseStatusCode.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCode(com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      bitField0_ |= 0x00001000;
+      deniedResponseStatusCode_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDeniedResponseStatusCode() {
+      bitField0_ = (bitField0_ & ~0x00001000);
+      deniedResponseStatusCode_ = 0;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

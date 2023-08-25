@@ -7,6 +7,7 @@ package languagev1
 import (
 	binary "encoding/binary"
 	fmt "fmt"
+	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
@@ -430,6 +431,11 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x38
 	}
 	if m.LazySync != nil {
 		size, err := m.LazySync.MarshalToSizedBufferVT(dAtA[:i])
@@ -1027,6 +1033,11 @@ func (m *Scheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x48
+	}
 	if len(m.PrioritiesLabelKey) > 0 {
 		i -= len(m.PrioritiesLabelKey)
 		copy(dAtA[i:], m.PrioritiesLabelKey)
@@ -1399,6 +1410,11 @@ func (m *Sampler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Selectors) > 0 {
 		for iNdEx := len(m.Selectors) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.Selectors[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
@@ -1562,6 +1578,11 @@ func (m *LoadRamp_Parameters_Step) MarshalToSizedBufferVT(dAtA []byte) (int, err
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DeniedResponseStatusCode != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
+		i--
+		dAtA[i] = 0x18
 	}
 	if m.Duration != nil {
 		if vtmsg, ok := interface{}(m.Duration).(interface {
@@ -3036,6 +3057,9 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 		l = m.LazySync.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -3248,6 +3272,9 @@ func (m *Scheduler) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -3369,6 +3396,9 @@ func (m *Sampler_Parameters) SizeVT() (n int) {
 			n += 1 + l + sov(uint64(l))
 		}
 	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -3433,6 +3463,9 @@ func (m *LoadRamp_Parameters_Step) SizeVT() (n int) {
 			l = proto.Size(m.Duration)
 		}
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.DeniedResponseStatusCode != 0 {
+		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -5029,6 +5062,25 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -6380,6 +6432,25 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 			}
 			m.PrioritiesLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -7207,6 +7278,25 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -7587,6 +7677,25 @@ func (m *LoadRamp_Parameters_Step) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeniedResponseStatusCode", wireType)
+			}
+			m.DeniedResponseStatusCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DeniedResponseStatusCode |= v1.StatusCode(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
