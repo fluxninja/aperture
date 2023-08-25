@@ -134,13 +134,6 @@ spec:
       {{- if .Values.etcd.initContainer.resources }}
       resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 8 }}
       {{- end }}
-      resources:
-        limits:
-          cpu: 100m
-          memory: 200Mi
-        requests:
-          cpu: 50m
-          memory: 100Mi
       command:
         - 'sh'
         - '-c'
