@@ -1,6 +1,7 @@
 package installation
 
 import (
+	"bytes"
 	"context"
 	"crypto/x509"
 	"encoding/pem"
@@ -45,6 +46,7 @@ var (
 	version        string
 	latestVersion  string
 	namespace      string
+	dryRun         bool
 	kubeClient     client.Client
 	timeout        int
 	generateCert   bool
@@ -297,17 +299,32 @@ func handleInstall(chartName, releaseName string) error {
 		return err
 	}
 
+	var dryRunManifests bytes.Buffer
+
 	errs := []error{}
 	for _, crd := range crds {
-		if err = applyManifest(string(crd.File.Data)); err != nil {
-			errs = append(errs, err)
+		if dryRun {
+			dryRunManifests.WriteString(fmt.Sprintf("---\n# Source: %s\n%s\n", crd.File.Name, string(crd.File.Data)))
+		} else {
+			if err = applyManifest(string(crd.File.Data)); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 
 	for _, manifest := range manifests {
-		if err = applyManifest(manifest.Content); err != nil {
-			errs = append(errs, err)
+		if dryRun {
+			dryRunManifests.WriteString(fmt.Sprintf("---\n# Source: %s\n%s\n", manifest.Name, manifest.Content))
+		} else {
+			if err = applyManifest(manifest.Content); err != nil {
+				errs = append(errs, err)
+			}
 		}
+	}
+
+	if dryRun {
+		fmt.Println(dryRunManifests.String())
+		return nil
 	}
 
 	for _, err := range errs {
