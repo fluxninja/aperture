@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = checkv1.StatusCode(0)
 )
 
 // Validate checks the field values on FlowControlResources with the rules
@@ -1328,6 +1332,17 @@ func (m *Scheduler) validate(all bool) error {
 	// no validation rules for TokensLabelKey
 
 	// no validation rules for PrioritiesLabelKey
+
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := SchedulerValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return SchedulerMultiError(errors)
@@ -3691,6 +3706,17 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := RateLimiter_ParametersValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return RateLimiter_ParametersMultiError(errors)
 	}
@@ -5424,6 +5450,17 @@ func (m *Sampler_Parameters) validate(all bool) error {
 
 	}
 
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := Sampler_ParametersValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return Sampler_ParametersMultiError(errors)
 	}
@@ -6221,6 +6258,17 @@ func (m *LoadRamp_Parameters_Step) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
+		err := LoadRamp_Parameters_StepValidationError{
+			field:  "DeniedResponseStatusCode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {

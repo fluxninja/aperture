@@ -357,6 +357,8 @@ func (m *CheckResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DeniedResponseStatusCode
+
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
 	}
@@ -574,6 +576,8 @@ func (m *LimiterDecision) validate(all bool) error {
 	// no validation rules for Dropped
 
 	// no validation rules for Reason
+
+	// no validation rules for DeniedResponseStatusCode
 
 	switch v := m.Details.(type) {
 	case *LimiterDecision_RateLimiterInfo_:

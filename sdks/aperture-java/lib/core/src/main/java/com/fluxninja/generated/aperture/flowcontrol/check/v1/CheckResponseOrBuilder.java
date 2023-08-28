@@ -416,4 +416,25 @@ java.lang.String defaultValue);
    * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
    */
   com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder();
+
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The enum numeric value on the wire for deniedResponseStatusCode.
+   */
+  int getDeniedResponseStatusCodeValue();
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The deniedResponseStatusCode.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
 }

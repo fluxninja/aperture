@@ -50,6 +50,7 @@ policy:
             fill_amount:
               signal_name: RATE_LIMIT
           parameters:
+            denied_response_status_code: BadRequest
             interval: "1s"
             label_key: http.request.header.user_id
             lazy_sync:
@@ -82,6 +83,7 @@ policy:
         # Scheduler parameters.
         # Type: aperture.spec.v1.SchedulerParameters
         scheduler:
+          denied_response_status_code: BadRequest
           workloads:
             - parameters:
                 queue_timeout: 1s

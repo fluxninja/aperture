@@ -13,6 +13,8 @@ Rego
 SLOs?\b
 VMs?\b
 SDKs?\b
+SREs?\b
+LLMs?\b
 etcd
 PromQL
 [Ss]tatefully
@@ -92,6 +94,16 @@ rollup
 ConfigMap
 EnvoyProxy
 [Vv]irality
-forecasted
+[Ff]orecasted
 [Bb]ursty
 sharding
+Datadog
+collectd
+Logstash
+Telegraf
+Chronosphere
+Thanos
+Lucene
+Kibana
+Elasticsearch
+[Tt]riages

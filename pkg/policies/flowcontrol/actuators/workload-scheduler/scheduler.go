@@ -457,10 +457,11 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	return iface.LimiterDecision{
 		LimiterDecision: &flowcontrolv1.LimiterDecision{
-			PolicyName:  s.component.GetPolicyName(),
-			PolicyHash:  s.component.GetPolicyHash(),
-			ComponentId: s.component.GetComponentId(),
-			Dropped:     !accepted,
+			PolicyName:               s.component.GetPolicyName(),
+			PolicyHash:               s.component.GetPolicyHash(),
+			ComponentId:              s.component.GetComponentId(),
+			Dropped:                  !accepted,
+			DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
 			Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 				LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
 					WorkloadIndex:  matchedWorkloadIndex,

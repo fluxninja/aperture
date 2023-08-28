@@ -12,9 +12,9 @@ keywords:
   - manual
 ---
 
-<a href={`https://www.npmjs.com/package/aperture-sdk`}>Aperture JavaScript
-SDK</a> can be used to manually set feature control points within a JavaScript
-service.
+<a href={`https://www.npmjs.com/package/@fluxninja/aperture-js`}>Aperture
+JavaScript SDK</a> can be used to manually set feature control points within a
+JavaScript service.
 
 To do so, first create an instance of ApertureClient. Agent host and port will
 be read from environment variables `FN_AGENT_HOST` and `FN_AGENT_PORT`,

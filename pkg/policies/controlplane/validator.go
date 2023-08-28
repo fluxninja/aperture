@@ -98,10 +98,10 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 
 	policy := &policiesv1.Policy{}
 	err = config.UnmarshalYAML(yamlSrc, policy)
-
 	if err != nil {
 		return nil, nil, err
 	}
+
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)

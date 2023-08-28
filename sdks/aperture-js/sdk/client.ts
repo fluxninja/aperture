@@ -22,6 +22,8 @@ import {
  */
 export type { FlowControlService, Flow };
 
+export { grpc };
+
 type ControlPoint = unknown;
 type Label = [string, string];
 
@@ -36,23 +38,26 @@ export class ApertureClient {
 
   public readonly timeout: number;
 
-  constructor(timeout = 200) {
-    this.fcsClient = new fcs.FlowControlService(
-      URL,
-      grpc.credentials.createInsecure(),
-    );
+  constructor({
+    timeout = 200,
+    channelCredentials = grpc.credentials.createInsecure(),
+  } = {}) {
+    this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
 
     this.exporter = new OTLPTraceExporter({
       url: URL,
-      credentials: grpc.credentials.createInsecure(),
+      credentials: channelCredentials,
     });
+
     let res = this.#newResource();
+
     this.tracerProvider = new NodeTracerProvider({
       resource: res,
     });
     this.tracerProvider.addSpanProcessor(new BatchSpanProcessor(this.exporter));
     this.tracerProvider.register();
     this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
+
     this.timeout = timeout;
   }
 
@@ -77,10 +82,9 @@ export class ApertureClient {
       span.setAttribute(SOURCE_LABEL, "sdk");
       let flow = new Flow(span);
 
-      let checkParams = { deadline: 0};
+      let checkParams = { deadline: 0 };
       if (this.timeout != null && this.timeout != 0) {
-        checkParams =
-        { deadline : Date.now() + this.timeout };
+        checkParams = { deadline: Date.now() + this.timeout };
       }
 
       this.fcsClient.Check(
@@ -93,16 +97,24 @@ export class ApertureClient {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 
           if (err) {
-            if (err.code === grpc.status.UNAVAILABLE) {
-              console.log(`Aperture server unavailable. Accepting request.`);
-              resolve(flow);
+            if (flow.failOpen) {
+              // Accept the request if failOpen is true even if we encounter an error
+              console.log(
+                `Aperture server unavailable due to ${JSON.stringify(
+                  err
+                )}. Accepting request.`
+              );
+              flow.checkResponse = null;
+            } else {
+              // Reject the request if failOpen is false if we encounter an error
+              reject(err);
             }
-            reject(err);
+          } else {
+            flow.checkResponse = response;
           }
 
-          flow.checkResponse = response;
           resolve(flow);
-        },
+        }
       );
     });
   }
