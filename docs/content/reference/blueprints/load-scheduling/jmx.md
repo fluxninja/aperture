@@ -198,20 +198,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-jmx-app-server-port"></a>
-
-<ParameterDescription
-    name='policy.jmx.app_server_port'
-    description='Port number for scraping metrics provided by Java Micrometer.'
-    type='Integer (int32)'
-    reference=''
-    value='8099'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-jmx-jmx-metrics-port"></a>
 
 <ParameterDescription

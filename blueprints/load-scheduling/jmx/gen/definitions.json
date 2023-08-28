@@ -112,12 +112,6 @@
               "default": "__REQUIRED_FIELD__",
               "type": "string"
             },
-            "app_server_port": {
-              "description": "Port number for scraping metrics provided by Java Micrometer.",
-              "default": 8099,
-              "type": "integer",
-              "format": "int32"
-            },
             "jmx_metrics_port": {
               "description": "Port number for scraping metrics provided by JMX Promtheus Java Agent.",
               "default": 8087,
