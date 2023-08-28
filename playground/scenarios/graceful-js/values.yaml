@@ -1,0 +1,9 @@
+demoapp:
+  common:
+    postgresql:
+      enabled: true
+      host: postgresql.postgresql.svc.cluster.local
+      port: 5672
+      user: postgres
+      password: secretpassword
+      db: users
