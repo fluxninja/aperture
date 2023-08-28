@@ -1,0 +1,146 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: jmx-service-protection
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      user_type: subscriber
+                  parameters:
+                    priority: 200
+              selectors:
+              - agent_group: default
+                control_point: awesomeFeature
+                service: service1-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: DESIRED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1
+        operator: lt
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        true_for: 30s
+    - switcher:
+        in_ports:
+          off_signal:
+            constant_signal:
+              value: 10
+          on_signal:
+            constant_signal:
+              value: 0
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          in_ports:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            fill_amount:
+              signal_name: RATE_LIMIT
+          parameters:
+            interval: 1s
+            label_key: user_id
+          selectors:
+          - agent_group: default
+            control_point: awesomeFeature
+            label_matcher:
+              match_labels:
+                user_type: crawler
+            service: service1-demo-app.demoapp.svc.cluster.local
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})
+    - variable:
+        constant_output:
+          value: 20
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 10s
+  resources:
+    flow_control:
+      classifiers:
+      - rules:
+          user_type:
+            extractor:
+              from: request.http.headers.user-type
+        selectors:
+        - agent_group: default
+          control_point: awesomeFeature
+          service: service1-demo-app.demoapp.svc.cluster.local
+    infra_meters:
+      jmx_inframeter:
+        agent_group: default
+        per_agent_group: true
+        pipeline:
+          receivers:
+          - prometheus
+        receivers:
+          prometheus:
+            config:
+              scrape_configs:
+              - job_name: java-demo-app-jmx
+                kubernetes_sd_configs:
+                - namespaces:
+                    names:
+                    - demoapp
+                  role: pod
+                relabel_configs:
+                - action: keep
+                  regex: true
+                  source_labels:
+                  - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+                - action: keep
+                  regex: (.*?:8087)
+                  source_labels:
+                  - __address__
+                scrape_interval: 10s

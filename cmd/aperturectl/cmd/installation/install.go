@@ -19,6 +19,7 @@ func init() {
 	InstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
 	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
 	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", defaultNS, "Namespace in which the component will be installed. Defaults to 'default' namespace")
+	InstallCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "If set to true, only the manifests will be generated and no installation will be performed")
 
 	InstallCmd.AddCommand(controllerInstallCmd)
 	InstallCmd.AddCommand(agentInstallCmd)
@@ -35,24 +36,28 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 
-		kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
-		if err != nil {
-			return err
-		}
+		if !dryRun {
+			kubeRestConfig, err = utils.GetKubeConfig(kubeConfig)
+			if err != nil {
+				return err
+			}
 
-		err = api.SchemeBuilder.AddToScheme(scheme.Scheme)
-		if err != nil {
-			return fmt.Errorf("failed to create Kubernetes client: %w", err)
-		}
-		kubeClient, err = client.New(kubeRestConfig, client.Options{
-			Scheme: scheme.Scheme,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to create Kubernetes client: %w", err)
-		}
+			err = api.SchemeBuilder.AddToScheme(scheme.Scheme)
+			if err != nil {
+				return fmt.Errorf("failed to create Kubernetes client: %w", err)
+			}
 
-		if err = manageNamespace(); err != nil {
-			return err
+			kubeClient, err = client.New(kubeRestConfig, client.Options{
+				Scheme: scheme.Scheme,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to create Kubernetes client: %w", err)
+			}
+
+			err = manageNamespace()
+			if err != nil {
+				return err
+			}
 		}
 
 		latestVersion, err = utils.ResolveLatestVersion()
@@ -63,6 +68,7 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 		if version == "" || version == apertureLatestVersion {
 			version = latestVersion
 		}
+
 		return nil
 	},
 }

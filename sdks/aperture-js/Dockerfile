@@ -15,9 +15,13 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
-RUN npm run build
+RUN npm run pre-build && npm run build && npm run post-build
+
+RUN npm link
+
+RUN cd example && npm ci && npm link @fluxninja/aperture-js && npm run build
 
 HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=5s \
-    CMD wget --no-verbose --tries=1 --spider 127.0.0.1:8080/health || exit 1
+   CMD wget --no-verbose --tries=1 --spider 127.0.0.1:8080/health || exit 1
 
-CMD [ "node", "./lib/example/example.js" ]
+CMD [ "node", "./example/dist/example.js" ]

@@ -332,6 +332,13 @@ operator:
         ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
         ##
         pullPolicy: Always
+      ## Resource configuration for kubectl container
+      ## @param operator.hooks.kubectl.resources.limits kubectl container resource limits
+      ## @param operator.hooks.kubectl.resources.requests kubectl container resource requests
+      ##
+      resources:
+        limits: {}
+        requests: {}
 
 ## @section Agent Custom Resource Parameters
 ## @skip agent.createUninstallHook

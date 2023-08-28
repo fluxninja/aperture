@@ -1,7 +1,6 @@
 import express from "express";
 
-import { ApertureClient } from "../../sdk/client.js";
-import { FlowStatus } from "../../sdk/flow.js";
+import { ApertureClient, FlowStatus } from "@fluxninja/aperture-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
