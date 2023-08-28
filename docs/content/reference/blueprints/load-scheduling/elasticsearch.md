@@ -109,7 +109,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='PromQL query to detect ElasticSearch overload.'
     type='string'
     reference=''
-    value='"elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}"'
+    value='"avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))"'
 />
 
 <!-- vale on -->
