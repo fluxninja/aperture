@@ -44,7 +44,7 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}
+          query_string: avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))
     - variable:
         constant_output:
           value: 250
