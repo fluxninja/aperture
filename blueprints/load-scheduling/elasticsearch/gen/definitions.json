@@ -98,7 +98,7 @@
         },
         "promql_query": {
           "description": "PromQL query to detect ElasticSearch overload.",
-          "default": "elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}",
+          "default": "avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))",
           "type": "string"
         },
         "setpoint": {
