@@ -35,8 +35,8 @@ spec:
       - name: pre-delete-job
         image: {{ include "common.images.image" (dict "imageRoot" .Values.operator.hooks.kubectl.image "global" .Values.global) }}
         imagePullPolicy: {{ .Values.operator.hooks.kubectl.image.pullPolicy }}
-        {{- if .Values.operator.hooks.kubectl.image.resources }}
-        resources: {{- toYaml .Values.operator.hooks.kubectl.image.resources | nindent 10 }}
+        {{- if .Values.operator.hooks.kubectl.resources }}
+        resources: {{- toYaml .Values.operator.hooks.kubectl.resources | nindent 10 }}
         {{- end }}
         command:
           - "/bin/sh"
