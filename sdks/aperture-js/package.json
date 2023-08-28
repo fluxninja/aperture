@@ -1,6 +1,6 @@
 {
   "name": "@fluxninja/aperture-js",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "aperture-js is an SDK to interact with Aperture Agent.",
   "main": "./lib/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "post-build": "cp -r ./proto ./lib/proto",
     "grpc-client": "npm run build && node ./lib/client.js",
-    "example": "npm run build && node ./example/dist/example.js",
+    "example": "cd example && npm run build && node ./dist/example.js",
     "prepublishOnly": "npm run build",
     "local:publish": "npx local-package-publisher -p"
   },
@@ -28,8 +28,8 @@
   "type": "module",
   "types": "@types/index.d.ts",
   "dependencies": {
-    "@grpc/grpc-js": "^1.7.1",
-    "@grpc/proto-loader": "^0.7.3",
+    "@grpc/grpc-js": "^1.9.1",
+    "@grpc/proto-loader": "^0.7.9",
     "@opentelemetry/api": "1.2.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.33.0",
     "@opentelemetry/resources": "1.7.0",
