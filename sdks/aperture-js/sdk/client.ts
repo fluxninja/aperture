@@ -97,14 +97,22 @@ export class ApertureClient {
           span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
 
           if (err) {
-            if (err.code === grpc.status.UNAVAILABLE) {
-              console.log(`Aperture server unavailable. Accepting request.`);
-              resolve(flow);
+            if (flow.failOpen) {
+              // Accept the request if failOpen is true even if we encounter an error
+              console.log(
+                `Aperture server unavailable due to ${JSON.stringify(
+                  err
+                )}. Accepting request.`
+              );
+              flow.checkResponse = null;
+            } else {
+              // Reject the request if failOpen is false if we encounter an error
+              reject(err);
             }
-            reject(err);
+          } else {
+            flow.checkResponse = response;
           }
 
-          flow.checkResponse = response;
           resolve(flow);
         }
       );
