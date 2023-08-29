@@ -107,3 +107,5 @@ Lucene
 Kibana
 Elasticsearch
 [Tt]riages
+CodeRabbit
+[Tt]iering

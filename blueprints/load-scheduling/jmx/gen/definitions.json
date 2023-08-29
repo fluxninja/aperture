@@ -1,19 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "load-scheduling/elasticsearch blueprint",
+  "title": "load-scheduling/jmx blueprint",
   "additionalProperties": false,
   "required": ["policy"],
   "properties": {
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "setpoint",
-        "elasticsearch"
-      ],
+      "required": ["policy_name", "service_protection_core", "jmx"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -97,26 +92,33 @@
           }
         },
         "promql_query": {
-          "description": "PromQL query to detect ElasticSearch overload.",
-          "default": "avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))",
+          "description": "PromQL query.",
+          "default": "avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
           "type": "string"
         },
         "setpoint": {
           "description": "Setpoint.",
-          "default": "__REQUIRED_FIELD__",
+          "default": 20,
           "type": "number",
           "format": "double"
         },
-        "elasticsearch": {
-          "description": "Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.",
-          "default": {
-            "agent_group": "default",
-            "endpoint": "__REQUIRED_FIELD__",
-            "password": "__REQUIRED_FIELD__",
-            "username": "__REQUIRED_FIELD__"
-          },
+        "jmx": {
           "type": "object",
-          "$ref": "#/$defs/elasticsearch"
+          "additionalProperties": false,
+          "required": ["app_namespace"],
+          "properties": {
+            "app_namespace": {
+              "description": "Namespace of the application for which JMX metrics are scraped.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            },
+            "jmx_metrics_port": {
+              "description": "Port number for scraping metrics provided by JMX Promtheus Java Agent.",
+              "default": 8087,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         }
       }
     },
@@ -147,7 +149,7 @@
         },
         "title": {
           "description": "Name of the main dashboard.",
-          "default": "Aperture Service Protection for Elasticsearch",
+          "default": "Aperture Service Protection",
           "type": "string"
         },
         "datasource": {
@@ -241,59 +243,6 @@
           "description": "The threshold for the overload confirmation criteria.",
           "type": "number",
           "format": "double"
-        }
-      }
-    },
-    "elasticsearch": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["endpoint", "password", "username"],
-      "properties": {
-        "agent_group": {
-          "description": "Name of the Aperture Agent group.",
-          "default": "default",
-          "type": "string"
-        },
-        "collection_interval": {
-          "description": "This receiver collects metrics on an interval.",
-          "type": "string"
-        },
-        "endpoint": {
-          "description": "Endpoint of the Elasticsearch.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "indices": {
-          "description": "Index filters that define which indices are scraped for index-level metrics.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "initial_delay": {
-          "description": "Defines how long this receiver waits before starting.",
-          "type": "string"
-        },
-        "nodes": {
-          "description": "Node filters that define which nodes are scraped for node-level and cluster-level metrics.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "password": {
-          "description": "Password of the Elasticsearch.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
-        },
-        "skip_cluster_metrics": {
-          "description": "If true, cluster-level metrics will not be scraped.",
-          "type": "boolean"
-        },
-        "username": {
-          "description": "Username of the Elasticsearch.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "string"
         }
       }
     }

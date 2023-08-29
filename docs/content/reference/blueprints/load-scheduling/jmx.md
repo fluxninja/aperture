@@ -1,24 +1,10 @@
 ---
-title: Load Scheduling for Elasticsearch
+title: Load Scheduling Based on JMX Metrics
 keywords:
   - blueprints
-sidebar_position: 4
-sidebar_label: Load Scheduling for Elasticsearch
+sidebar_position: 3
+sidebar_label: Load Scheduling Based on JMX Metrics
 ---
-
-## Introduction
-
-By default, this policy detects when the Elasticsearch service is overloaded
-using the `search` thread pool queue size metric. The policy is based on the
-[adaptive load scheduling](/reference/configuration/spec.md#adaptive-load-scheduler)
-component.
-
-All the Elasticsearch related metrics are collected by the
-[Elasticsearch OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/elasticsearchreceiver)
-so if the system under observation requires using different metrics for the
-overload confirmation, the
-[list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/elasticsearchreceiver/metadata.yaml)
-can be used to configure the policy.
 
 <!-- Configuration Marker -->
 
@@ -32,7 +18,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/elasticsearch`}>load-scheduling/elasticsearch</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/jmx`}>load-scheduling/jmx</a>
 
 <!-- vale on -->
 
@@ -106,10 +92,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <ParameterDescription
     name='policy.promql_query'
-    description='PromQL query to detect ElasticSearch overload.'
+    description='PromQL query.'
     type='string'
     reference=''
-    value='"avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))"'
+    value='"avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})"'
 />
 
 <!-- vale on -->
@@ -123,21 +109,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Setpoint.'
     type='Number (double)'
     reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-elasticsearch"></a>
-
-<ParameterDescription
-    name='policy.elasticsearch'
-    description='Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.'
-    type='Object (elasticsearch)'
-    reference='#elasticsearch'
-    value='{"agent_group": "default", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
+    value='20'
 />
 
 <!-- vale on -->
@@ -200,6 +172,40 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+##### policy.jmx {#policy-jmx}
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-app-namespace"></a>
+
+<ParameterDescription
+    name='policy.jmx.app_namespace'
+    description='Namespace of the application for which JMX metrics are scraped.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-jmx-metrics-port"></a>
+
+<ParameterDescription
+    name='policy.jmx.jmx_metrics_port'
+    description='Port number for scraping metrics provided by JMX Promtheus Java Agent.'
+    type='Integer (int32)'
+    reference=''
+    value='8087'
 />
 
 <!-- vale on -->
@@ -277,7 +283,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Name of the main dashboard.'
     type='string'
     reference=''
-    value='"Aperture Service Protection for Elasticsearch"'
+    value='"Aperture Service Protection"'
 />
 
 <!-- vale on -->
@@ -472,140 +478,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Number (double)'
     reference=''
     value='null'
-/>
-
-<!-- vale on -->
-
----
-
-<!-- vale off -->
-
-#### elasticsearch {#elasticsearch}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-agent-group"></a>
-
-<ParameterDescription
-    name='agent_group'
-    description='Name of the Aperture Agent group.'
-    type='string'
-    reference=''
-    value='"default"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-collection-interval"></a>
-
-<ParameterDescription
-    name='collection_interval'
-    description='This receiver collects metrics on an interval.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-endpoint"></a>
-
-<ParameterDescription
-    name='endpoint'
-    description='Endpoint of the Elasticsearch.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-indices"></a>
-
-<ParameterDescription
-    name='indices'
-    description='Index filters that define which indices are scraped for index-level metrics.'
-    type='Array of string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-initial-delay"></a>
-
-<ParameterDescription
-    name='initial_delay'
-    description='Defines how long this receiver waits before starting.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-nodes"></a>
-
-<ParameterDescription
-    name='nodes'
-    description='Node filters that define which nodes are scraped for node-level and cluster-level metrics.'
-    type='Array of string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-password"></a>
-
-<ParameterDescription
-    name='password'
-    description='Password of the Elasticsearch.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-skip-cluster-metrics"></a>
-
-<ParameterDescription
-    name='skip_cluster_metrics'
-    description='If true, cluster-level metrics will not be scraped.'
-    type='Boolean'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="elasticsearch-username"></a>
-
-<ParameterDescription
-    name='username'
-    description='Username of the Elasticsearch.'
-    type='string'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
