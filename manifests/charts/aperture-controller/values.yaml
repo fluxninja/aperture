@@ -458,7 +458,7 @@ controller:
   ## @param controller.containerSecurityContext.enabled Enabled Controller containers' Security Context. Defaults to false.
   ## @param controller.containerSecurityContext.runAsUser Set Controller containers' Security Context runAsUser. Defaults to 1000.
   ## @param controller.containerSecurityContext.runAsNonRoot Set Controller containers' Security Context runAsNonRoot. Defaults to true.
-  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context runAsNonRoot. Defaults to false.
+  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context readOnlyRootFilesystem. Defaults to false.
   containerSecurityContext:
     enabled: false
     runAsUser: 1000

@@ -455,7 +455,7 @@ agent:
   ## @param agent.containerSecurityContext.enabled Enabled Agent containers' Security Context. Defaults to false.
   ## @param agent.containerSecurityContext.runAsUser Set Agent containers' Security Context runAsUser. Defaults to 1000.
   ## @param agent.containerSecurityContext.runAsNonRoot Set Agent containers' Security Context runAsNonRoot. Defaults to true.
-  ## @param agent.containerSecurityContext.readOnlyRootFilesystem Set Agent containers' Security Context runAsNonRoot. Defaults to false.
+  ## @param agent.containerSecurityContext.readOnlyRootFilesystem Set Agent containers' Security Context readOnlyRootFilesystem. Defaults to false.
   containerSecurityContext:
     enabled: false
     runAsUser: 1000
