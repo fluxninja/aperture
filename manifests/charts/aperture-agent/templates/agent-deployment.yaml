@@ -43,8 +43,14 @@ spec:
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.agent.tolerations "context" . $ ) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.agent.serviceAccount.name | default (include "common.names.fullname" .) }}
-      {{- if and .Values.agent.podSecurityContext .Values.agent.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.agent.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if and .Values.agent.podSecurityContext.enabled (omit .Values.agent.podSecurityContext "enabled") }}
+      securityContext:
+        {{- if (omit .Values.agent.podSecurityContext "enabled" "fsGroup" )}}
+        {{- omit .Values.agent.podSecurityContext "enabled" "fsGroup" | toYaml | nindent 8 }}
+        {{- end }}
+        {{- if .Values.agent.podSecurityContext.fsGroup }}
+        fsGroup: {{ .Values.agent.podSecurityContext.fsGroup }}
+        {{- end }}
       {{- end }}
       {{- if .Values.agent.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.agent.terminationGracePeriodSeconds }}
@@ -58,9 +64,23 @@ spec:
       containers:
         - name: aperture-agent
           image: {{ include "agent-operator.image" (dict "image" .Values.agent.image "context" $ ) }}
+          {{- if .Values.agent.image.pullPolicy }}
           imagePullPolicy: {{ .Values.agent.image.pullPolicy }}
-          {{- if .Values.agent.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.agent.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if and .Values.agent.containerSecurityContext.enabled (omit .Values.agent.containerSecurityContext "enabled") }}
+          securityContext:
+            {{- if (omit .Values.agent.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" )}}
+            {{- omit .Values.agent.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" | toYaml | nindent 12 }}
+            {{- end }}
+            {{- if .Values.agent.containerSecurityContext.runAsUser }}
+            runAsUser: {{ .Values.agent.containerSecurityContext.runAsUser }}
+            {{- end }}
+            {{- if .Values.agent.containerSecurityContext.runAsNonRoot }}
+            runAsNonRoot: {{ .Values.agent.containerSecurityContext.runAsNonRoot }}
+            {{- end }}
+            {{- if .Values.agent.containerSecurityContext.readOnlyRootFilesystem }}
+            readOnlyRootFilesystem: {{ .Values.agent.containerSecurityContext.readOnlyRootFilesystem }}
+            {{- end }}
           {{- end }}
           {{- if .Values.agent.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.agent.command "context" . $ ) | nindent 12 }}
@@ -135,31 +155,11 @@ spec:
               path: /v1/status/system/liveness
               port: server
               scheme: HTTP
-            {{- if  .Values.agent.livenessProbe.initialDelaySeconds }}
-            initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds }}
-            {{- else }}
-            initialDelaySeconds: 15
-            {{- end }}
-            {{- if  .Values.agent.livenessProbe.periodSeconds }}
-            periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds }}
-            {{- else }}
-            periodSeconds: 15
-            {{- end }}
-            {{- if  .Values.agent.livenessProbe.timeoutSeconds }}
-            timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds }}
-            {{- else }}
-            timeoutSeconds: 5
-            {{- end }}
-            {{- if  .Values.agent.livenessProbe.failureThreshold }}
-            failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold }}
-            {{- else }}
-            failureThreshold: 6
-            {{- end }}
-            {{- if  .Values.agent.livenessProbe.successThreshold }}
-            successThreshold: {{ .Values.agent.livenessProbe.successThreshold }}
-            {{- else }}
-            successThreshold: 1
-            {{- end }}
+            initialDelaySeconds: {{ .Values.agent.livenessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.agent.livenessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.agent.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.agent.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.agent.livenessProbe.successThreshold | default 1 }}
           {{- else if .Values.agent.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agent.customLivenessProbe "context" . $ ) | nindent 12 }}
           {{- end }}
@@ -168,31 +168,11 @@ spec:
             httpGet:
               path: /v1/status/system/readiness
               port: server
-            {{- if  .Values.agent.readinessProbe.initialDelaySeconds }}
-            initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds }}
-            {{- else }}
-            initialDelaySeconds: 15
-            {{- end }}
-            {{- if  .Values.agent.readinessProbe.periodSeconds }}
-            periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds }}
-            {{- else }}
-            periodSeconds: 15
-            {{- end }}
-            {{- if  .Values.agent.readinessProbe.timeoutSeconds }}
-            timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds }}
-            {{- else }}
-            timeoutSeconds: 5
-            {{- end }}
-            {{- if  .Values.agent.readinessProbe.failureThreshold }}
-            failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold }}
-            {{- else }}
-            failureThreshold: 6
-            {{- end }}
-            {{- if  .Values.agent.readinessProbe.successThreshold }}
-            successThreshold: {{ .Values.agent.readinessProbe.successThreshold }}
-            {{- else }}
-            successThreshold: 1
-            {{- end }}
+            initialDelaySeconds: {{ .Values.agent.readinessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.agent.readinessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.agent.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.agent.readinessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.agent.readinessProbe.successThreshold | default 1 }}
           {{- else if .Values.agent.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agent.customReadinessProbe "context" . $ ) | nindent 12 }}
           {{- end }}

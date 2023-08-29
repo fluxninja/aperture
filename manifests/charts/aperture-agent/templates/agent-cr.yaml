@@ -14,8 +14,20 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
-  image: {{ omit .Values.agent.image "tag" | toYaml | nindent 4 }}
+  image:
+    {{- if .Values.agent.image.registry }}
+    registry: {{ .Values.agent.image.registry }}
+    {{- end }}
+    {{- if .Values.agent.image.repository }}
+    repository: {{ .Values.agent.image.repository }}
+    {{- end }}
     tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.agent.image.tag | quote }}
+    {{- if .Values.agent.image.pullPolicy }}
+    pullPolicy: {{ .Values.agent.image.pullPolicy }}
+    {{- end }}
+    {{- if .Values.agent.image.pullSecrets }}
+    pullSecrets: {{ .Values.agent.image.pullSecrets | toYaml | nindent 6 }}
+    {{- end }}
   {{- if .Values.agent.service.annotations }}
   service:
     annotations: {{ .Values.agent.service.annotations | toYaml | nindent 6 }}
@@ -72,10 +84,30 @@ spec:
   resources: {{ .Values.agent.resources | toYaml | nindent 4 }}
   {{- end }}
   {{- if .Values.agent.podSecurityContext.enabled }}
-  podSecurityContext: {{- .Values.agent.podSecurityContext | toYaml | nindent 4 }}
+  podSecurityContext:
+    {{- if (omit .Values.agent.podSecurityContext "enabled" "fsGroup" )}}
+    {{- omit .Values.agent.podSecurityContext "enabled" "fsGroup" | toYaml | nindent 4 }}
+    {{- end }}
+    enabled: {{ .Values.agent.podSecurityContext.enabled }}
+    {{- if .Values.agent.podSecurityContext.fsGroup }}
+    fsGroup: {{ .Values.agent.podSecurityContext.fsGroup }}
+    {{- end }}
   {{- end }}
-  {{- if .Values.agent.podSecurityContext.enabled }}
-  containerSecurityContext: {{- .Values.agent.containerSecurityContext | toYaml | nindent 4 }}
+  {{- if .Values.agent.containerSecurityContext.enabled }}
+  containerSecurityContext:
+    {{- if (omit .Values.agent.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" )}}
+    {{- omit .Values.agent.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" | toYaml | nindent 4 }}
+    {{- end }}
+    enabled: {{ .Values.agent.containerSecurityContext.enabled }}
+    {{- if .Values.agent.containerSecurityContext.runAsUser }}
+    runAsUser: {{ .Values.agent.containerSecurityContext.runAsUser }}
+    {{- end }}
+    {{- if .Values.agent.containerSecurityContext.runAsNonRoot }}
+    runAsNonRoot: {{ .Values.agent.containerSecurityContext.runAsNonRoot }}
+    {{- end }}
+    {{- if .Values.agent.containerSecurityContext.readOnlyRootFilesystem }}
+    readOnlyRootFilesystem: {{ .Values.agent.containerSecurityContext.readOnlyRootFilesystem }}
+    {{- end }}
   {{- end }}
   {{- if .Values.agent.command }}
   command: {{ .Values.agent.command | toYaml | nindent 4 }}
