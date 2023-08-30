@@ -35,10 +35,12 @@
       }
     },
     "etcdEndpoint": {
-      "type": "String"
+      "type": "String",
+      "defaultValue": ""
     },
     "prometheusAddress": {
-      "type": "String"
+      "type": "String",
+      "defaultValue": ""
     },
     "dynamicSettings": {
       "type": "array"
@@ -141,7 +143,7 @@
     "copy": [
       {
         "count": "[length(parameters('dynamicSettings'))]",
-        "input": "[createObject(concat('labels.', parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName), union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
+        "input": "[createObject(parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName, union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
         "name": "dynamicSettings_array"
       }
     ],
@@ -155,8 +157,8 @@
     "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
 
     "mandatory_setting_inputs": {
-      "agent.config.etcd.endpoints": "[split(parameters('etcdEndpoint'),',')]",
-      "agent.config.prometheus.address": "[parameters('prometheusAddress')]"
+      "agent.config.etcd.endpoints": "[if(empty(parameters('etcdEndpoint')), '', parameters('etcdEndpoint'))]",
+      "agent.config.prometheus.address": "[if(empty(parameters('prometheusAddress')), '', parameters('prometheusAddress'))]"
     },
 
     "configurationSettings": "[if(variables('is_dynamicSettings_empty'), variables('mandatory_setting_inputs'), union(variables('mandatory_setting_inputs'), variables('dynamicSettings_json') ))]"

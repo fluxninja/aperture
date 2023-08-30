@@ -166,13 +166,23 @@
             "visible": true
           },
           {
+            "name": "text1",
+            "type": "Microsoft.Common.InfoBox",
+            "visible": true,
+            "options": {
+              "icon": "Info",
+              "text": "If you are running cloud controller and just want to install the agent, please leave the below fields empty and pass other required fields like endpoint and apikey.",
+              "uri": "https://docs.fluxninja.com/reference/fluxninja#configuration"
+            }
+          },
+          {
             "name": "etcdEndpoint",
             "type": "Microsoft.Common.TextBox",
             "label": "Etcd Endpoint",
-            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.provide url endpoint separated by comma",
+            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.If you are running cloud controller no etcdendpoint is required",
             "defaultValue": "",
             "constraints": {
-              "required": true,
+              "required": false,
               "regex": ".*",
               "validationMessage": "The given url is not correct."
             }
@@ -181,10 +191,10 @@
             "name": "prometheusAddress",
             "type": "Microsoft.Common.TextBox",
             "label": "Prometheus Address",
-            "toolTip": "This will replace the agent.config.prometheus.address value inside your values.yaml",
+            "toolTip": "This will replace the agent.config.prometheus.address value inside your values.yaml.If you are running cloud controller no prometheusAddress is required",
             "defaultValue": "",
             "constraints": {
-              "required": true,
+              "required": false,
               "regex": ".*",
               "validationMessage": "The given url is not correct."
             }
@@ -210,7 +220,7 @@
                 "type": "Microsoft.Common.InfoBox",
                 "options": {
                   "icon": "Info",
-                  "text": "Below label name will be transformed to labels.yourlabelname once it is passed into the ARM Template so that helm chart can be consumed as override values. Click to learn more about helm values override.",
+                  "text": "Below label name will be transformed to yourlabelname and value once it is passed into the ARM Template so that helm chart can be consumed as override values.yaml file. Click to learn more about helm values override.",
                   "uri": "https://helm.sh/docs/chart_template_guide/values_files/"
                 }
               },

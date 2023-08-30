@@ -186,7 +186,7 @@
                 "type": "Microsoft.Common.InfoBox",
                 "options": {
                   "icon": "Info",
-                  "text": "Below label name will be transformed to labels.yourlabelname once it is passed into the ARM Template so that helm chart can be consumed as override values. Click to learn more about helm values override.",
+                  "text": "Below label name will be transformed to yourlabelname and value once it is passed into the ARM Template so that helm chart can be consumed as override values.yaml file. Click to learn more about helm values override.",
                   "uri": "https://helm.sh/docs/chart_template_guide/values_files/"
                 }
               },

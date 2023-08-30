@@ -145,7 +145,7 @@
     "copy": [
       {
         "count": "[length(parameters('dynamicSettings'))]",
-        "input": "[createObject(concat('labels.', parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName), union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
+        "input": "[createObject(parameters('dynamicSettings')[copyIndex('dynamicSettings_array')].labelName, union(createObject('value', ''), parameters('dynamicSettings')[copyIndex('dynamicSettings_array')]).labelValue)]",
         "name": "dynamicSettings_array"
       }
     ],
