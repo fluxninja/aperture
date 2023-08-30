@@ -201,7 +201,6 @@ func (ss SimpleService) Run() error {
 		if err != nil {
 			return err
 		}
-		defer pgsqlDB.Close()
 
 		err = pgsqlDB.Ping()
 		if err != nil {
@@ -253,12 +252,13 @@ func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
 		Message: "Request accepted",
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
 		log.Autosample().Error().Err(err).Msg("Error encoding JSON")
 		span.SetStatus(codes.Error, "rejected")
 		w.WriteHeader(http.StatusForbidden)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
 	}
 
 	r = r.WithContext(ctx)
@@ -555,12 +555,16 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h.pgsqlDB != nil {
 		// Simulate a slow query
 		// nolint:gosec
-		// sleepDuration := rand.Float64()
-		rows, err := h.pgsqlDB.Query("SELECT * from film, pg_sleep(2);")
+		sleepDuration := fmt.Sprintf("%.2f", rand.Float64())
+		// nolint:gosec
+		queryStr := fmt.Sprintf("SELECT * from film, pg_sleep(%s);", sleepDuration)
+		rows, err := h.pgsqlDB.Query(queryStr)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to query postgresql")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+		for rows.Next() {
 		}
 		defer rows.Close()
 		w.WriteHeader(http.StatusOK)
