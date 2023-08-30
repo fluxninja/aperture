@@ -63,12 +63,18 @@ Create the endpoint of the etcd for Aperture Agent
 {{ include "agent.etcd.endpoints" ( dict "etcd" .Values.path.to.the.etcd "context" $.context $) }}
 */}}
 {{- define "agent.etcd.endpoints" -}}
-{{- $endpoints := list -}}
-{{ $endpoints = without .etcd.endpoints "" }}
-{{- if empty $endpoints -}}
-    {{- fail "Value for etcd endpoints of Agent cannot be empty." -}}
+{{- $globalAzure := get .context.Values.global "azure" -}}
+    {{- if not (empty $globalAzure) -}}
+        {{  $endpoints := splitList "," .etcd.endpoints }}
+        {{ print $endpoints }}
+{{- else -}}
+    {{- $endpoints := list -}}
+    {{ $endpoints = without .etcd.endpoints "" }}
+    {{- if empty $endpoints -}}
+        {{- fail "Value for etcd endpoints of Agent cannot be empty." -}}
+    {{- end -}}
+    {{ print $endpoints }}
 {{- end -}}
-{{ print $endpoints }}
 {{- end -}}
 
 {{/*
