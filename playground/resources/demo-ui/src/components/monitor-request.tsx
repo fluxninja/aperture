@@ -5,25 +5,30 @@ import {
   Button,
   Divider,
   Paper,
+  Tooltip,
   Typography,
   styled,
 } from '@mui/material'
+import { AxiosError } from 'axios'
 import React, { useEffect, useState } from 'react'
 import { FC } from 'react'
 
 export declare type RequestRecord = {
   isError: boolean
+  errorComponent: JSX.Element | null
+  error: AxiosError & {
+    rateLimitInfo?: RateLimitInfo
+  }
   rateLimitInfo?: RateLimitInfo
   isRetry?: boolean
 }
 
 export interface MonitorRequestProps {
   requestRecord: RequestRecord[]
-  userType: 'Subscriber' | 'Guest' | 'Crawler' | 'User' | 'Rate Limit'
+  userType: string
   refetch: () => void
 }
 
-// fix where is showing NaN% when there is no request
 export const MonitorRequest: FC<MonitorRequestProps> = ({
   requestRecord,
   userType,
@@ -34,10 +39,18 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
       {userType}
     </Typography>
     <Divider />
+    <RequestMessagingInfo />
     <Typography>Request Info:</Typography>
     <Box display="flex" gap={0.3}>
       {requestRecord.map((record, index) => (
-        <MonitorRequestItem key={index} {...record} />
+        <Tooltip
+          key={index}
+          title={record.error?.response?.status || 200}
+          placement="top"
+          arrow
+        >
+          <MonitorRequestItem {...record} />
+        </Tooltip>
       ))}
     </Box>
     <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1}>
@@ -61,6 +74,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
             color="primary"
             sx={{ alignSelf: 'center' }}
             onClick={refetch}
+            disabled={requestRecord.length < 60 && requestRecord.length > 0}
           >
             Start
           </Button>
@@ -125,6 +139,23 @@ export const ErrorRate: FC<SuccessRateProps> = ({ requestRecord }) => {
   )
 }
 
+export const RequestMessagingInfo: FC = () => (
+  <RequestMessagingInfoWrapper>
+    <RowBox>
+      <RequestMessageInfoIndicator indicator="success" />
+      <Typography>Success</Typography>
+    </RowBox>
+    <RowBox>
+      <RequestMessageInfoIndicator indicator="error" />
+      <Typography>Error</Typography>
+    </RowBox>
+    <RowBox>
+      <RequestMessageInfoIndicator indicator="warning" />
+      <Typography>Retry</Typography>
+    </RowBox>
+  </RequestMessagingInfoWrapper>
+)
+
 const boxFlex: BoxProps = {
   display: 'flex',
   flexDirection: 'column',
@@ -132,6 +163,35 @@ const boxFlex: BoxProps = {
   justifyContent: 'center',
   minHeight: 100,
 }
+
+export const RequestMessagingInfoWrapper = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: theme.spacing(1),
+  [theme.breakpoints.down('md')]: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(1),
+  },
+}))
+
+export const RequestMessageInfoIndicator = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'indicator',
+})<{
+  indicator: 'success' | 'error' | 'warning'
+}>(({ theme, indicator }) => ({
+  backgroundColor: theme.palette[indicator].main,
+  borderRadius: theme.spacing(1),
+  height: 5,
+  width: 15,
+}))
+
+export const RowBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+}))
 
 export const ColumnBoxStyled = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -181,6 +241,7 @@ export const MonitorRequestItem = styled(Box, {
 })<RequestRecord>(({ theme, isError, isRetry }) => ({
   height: 50,
   width: 5,
+  cursor: 'pointer',
   backgroundColor: isError
     ? theme.palette.error.main
     : isRetry

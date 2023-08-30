@@ -39,14 +39,13 @@ spec:
                   matchLabels:
                     app.kubernetes.io/instance: {{ .Release.Name }}
                 topologyKey: kubernetes.io/hostname
-{{- if .Values.rabbitmq.enabled }}
       initContainers:
+{{- if .Values.rabbitmq.enabled }}
         - name: wait-for-rabbitmq
           image: busybox
           command: ['sh', '-c', 'until wget http://{{.Values.rabbitmq.username}}:{{.Values.rabbitmq.password}}@{{.Values.rabbitmq.host}}:15672/api/aliveness-test/%2F; do echo waiting for rabbitmq; sleep 2; done;']
 {{- end }}
 {{- if and .Values.elasticsearch .Values.elasticsearch.enabled }}
-      initContainers:
         - name: wait-for-elasticsearch
           image: docker.io/linuxserver/yq:3.1.0
           command:
@@ -57,6 +56,14 @@ spec:
               echo "Waiting for Elasticsearch to be Ready"; sleep 2;
             done;
             echo "Elasticsearch is ready."
+{{- end }}
+{{- if and .Values.postgresql .Values.postgresql.enabled }}
+        - name: seed-mock-data
+          image: ghcr.io/faisaltheparttimecoder/mock-data:latest
+          command:
+            - 'sh'
+            - '-c'
+            - 'mock database --create-db --full-database -d {{ .Values.postgresql.user }} -q -a {{ .Values.postgresql.host }} -p {{ .Values.postgresql.port }} -u {{ .Values.postgresql.user }} -w {{ .Values.postgresql.password }}'
 {{- end }}
       containers:
         - name: simplesrv
@@ -112,6 +119,18 @@ spec:
             {{- end }}
             - name: SIMPLE_SERVICE_CPU_LOAD
               value: "{{ .Values.simplesrv.cpuLoadPercentage }}"
+            {{- if and .Values.postgresql .Values.postgresql.enabled }}
+            - name: SIMPLE_SERVICE_PGSQL_ENABLED
+              value: "{{ .Values.postgresql.enabled }}"
+            - name: SIMPLE_SERVICE_PGSQL_HOST
+              value: "{{ .Values.postgresql.host }}"
+            - name: SIMPLE_SERVICE_PGSQL_PORT
+              value: "{{ .Values.postgresql.port }}"
+            - name: SIMPLE_SERVICE_PGSQL_USER
+              value: "{{ .Values.postgresql.user }}"
+            - name: SIMPLE_SERVICE_PGSQL_PASSWORD
+              value: "{{ .Values.postgresql.password }}"
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

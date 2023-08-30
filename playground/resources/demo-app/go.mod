@@ -7,6 +7,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/elastic/go-elasticsearch/v8 v8.8.2
 	github.com/fluxninja/aperture/v2 v2.5.0
+	github.com/lib/pq v1.10.9
 	github.com/onsi/ginkgo/v2 v2.9.5
 	github.com/onsi/gomega v1.27.7
 	github.com/rabbitmq/amqp091-go v1.8.0

@@ -13,7 +13,7 @@ promqlDefaults {
     * @schema (postgresql.password: string) Password of the PostgreSQL.
     * @schema (postgresql.endpoint: string) Endpoint of the PostgreSQL.
     * @schema (postgresql.transport: string) The transport protocol being used to connect to postgresql. Available options are tcp and unix.
-    * @schema (postgresql.database: []string) The list of databases for which the receiver will attempt to collect statistics.
+    * @schema (postgresql.databases: []string) The list of databases for which the receiver will attempt to collect statistics.
     * @schema (postgresql.collection_interval: string) This receiver collects metrics on an interval.
     * @schema (postgresql.initial_delay: string) Defines how long this receiver waits before starting.
     * @schema (postgresql.agent_group: string) Name of the Aperture Agent group.

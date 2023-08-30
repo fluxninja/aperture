@@ -16,8 +16,8 @@
           "subdir": "crdsonnet"
         }
       },
-      "version": "522d9546e44721fa8f1331d075295fc2feef966a",
-      "sum": "abzN6XHVHqSSjrrsQGpx/zBFaQn/fwbpH3XEzfct2Mw="
+      "version": "3dab27c8c9119eb14ecc19592240caf5f7330d23",
+      "sum": "Vh6Wo/7IIyIkmDE2XAJfWZDlTHClRrdMa9CCBPrcF1U="
     },
     {
       "source": {
@@ -66,7 +66,7 @@
           "subdir": "jsonnet/v9.4.0"
         }
       },
-      "version": "5ff7cfd1f478de867a25c62a7a0106ce27a72a97",
+      "version": "7a7f6b80de0ba5713a7ed45833acf5f641b08d4d",
       "sum": "b6KSW0/Z45K0W2dF+8ZPLV32uv0ApjIsShTjk/zHEbg="
     },
     {
@@ -76,8 +76,8 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
-      "sum": "RJjFQa1n8CDbB6m1fBQQzPye7jhOhGTUbma27Gil81I="
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
       "source": {
@@ -86,7 +86,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -96,7 +96,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -146,8 +146,8 @@
           "subdir": ""
         }
       },
-      "version": "d1929c3c1728274424a21a617f1b82095685d640",
-      "sum": "DHqlMNfQH/eCWHbHD2Ouc/bH00AwTkCS86z6cgzQ7UI="
+      "version": "59533c525e8bc6c54e86d7184c0ddf413a88c91c",
+      "sum": "8YJptN9ErbZFr7AGI6PiWM8A4f70JE5KSgt1cykieDU="
     },
     {
       "source": {
@@ -156,8 +156,8 @@
           "subdir": ""
         }
       },
-      "version": "003ba5eadfbd69817d1215952133d3ecf99fbd92",
-      "sum": "2ZvQR3ld4JuX0PC3IYMri/jbeW7ko3ni2Ukrz2QnG3M="
+      "version": "46fc905d5b2981642043088ac7902ea50db2903e",
+      "sum": "8FAie1MXww5Ip9F8hQWkU9Fio1Af+hO4weQuuexioIQ="
     }
   ],
   "legacyImports": false
