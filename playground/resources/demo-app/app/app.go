@@ -196,6 +196,7 @@ func (ss SimpleService) Run() error {
 	}
 
 	if ss.pgsqlURL != "" {
+		log.Info().Msg("PostgreSQL URL: " + ss.pgsqlURL)
 		pgsqlDB, err := sql.Open("postgres", ss.pgsqlURL)
 		if err != nil {
 			return err
@@ -206,6 +207,7 @@ func (ss SimpleService) Run() error {
 		if err != nil {
 			return err
 		}
+
 		handler.pgsqlDB = pgsqlDB
 	}
 
@@ -553,15 +555,16 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h.pgsqlDB != nil {
 		// Simulate a slow query
 		// nolint:gosec
-		sleepDuration := rand.Float64()
-
-		rows, err := h.pgsqlDB.Query("SELECT * FROM users WHERE type = $1 pg_sleep($2)", r.Header.Get("User-Type"), fmt.Sprintf("%.2f", sleepDuration))
+		// sleepDuration := rand.Float64()
+		rows, err := h.pgsqlDB.Query("SELECT * from film, pg_sleep(2);")
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to query postgresql")
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		defer rows.Close()
+		w.WriteHeader(http.StatusOK)
+		return
 	}
 
 	var p Request

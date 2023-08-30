@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/postgresql/gen/definitions.json
+
+policy:
+  policy_name: postgres-connections
+  setpoint: 20
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+  postgresql:
+    agent_group: default
+    endpoint: postgresql.postgresql.svc.cluster.local:5432
+    username: postgres
+    password: secretpassword
+    databases:
+      - "postgres"
+    collection_interval: 1s
+    tls:
+      insecure: true
+  service_protection_core:
+    dry_run: false
+    adaptive_load_scheduler:
+      load_scheduler:
+        selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  user_type: "guest"
+              parameters:
+                priority: 50.0
+              name: "guest"
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: "subscriber"
+              parameters:
+                priority: 250.0
+              name: "subscriber"

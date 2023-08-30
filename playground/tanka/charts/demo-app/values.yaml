@@ -36,9 +36,8 @@ postgresql:
   enabled: false
   host: ~
   port: 5432
-  username: ~
+  user: ~
   password: ~
-  db: ~
 
 nginx:
   enabled: false

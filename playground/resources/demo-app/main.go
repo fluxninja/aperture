@@ -44,7 +44,6 @@ const (
 	pgsqlPortEnvVar     pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_PORT"
 	pgsqlUserEnvVar     pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_USER"
 	pgsqlPasswordEnvVar pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_PASSWORD"
-	pgsqlDBEnvVar       pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_DB"
 )
 
 func main() {
@@ -98,8 +97,7 @@ func main() {
 		pgsqlPort := pgsqlFromEnv(pgsqlPortEnvVar)
 		pgsqlUser := pgsqlFromEnv(pgsqlUserEnvVar)
 		pgsqlPassword := pgsqlFromEnv(pgsqlPasswordEnvVar)
-		pgsqlDB := pgsqlFromEnv(pgsqlDBEnvVar)
-		pgsqlURL = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", pgsqlHost, pgsqlPort, pgsqlUser, pgsqlPassword, pgsqlDB)
+		pgsqlURL = fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", pgsqlUser, pgsqlPassword, pgsqlHost, pgsqlPort, pgsqlUser)
 	}
 
 	// We do not necessarily need tracing providers (just propagators), but lets
@@ -187,8 +185,6 @@ func pgsqlFromEnv(envVar pgsqlEnvVar) string {
 			return "postgres"
 		case pgsqlPasswordEnvVar:
 			return ""
-		case pgsqlDBEnvVar:
-			return "postgres"
 		default:
 			return ""
 		}

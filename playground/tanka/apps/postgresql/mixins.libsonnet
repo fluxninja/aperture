@@ -7,6 +7,10 @@ local postgresqlAppMixin =
         username: 'postgres',
         password: 'secretpassword',
       },
+      primary: {
+        hostNetwork: true,
+        hostIPC: true,
+      },
     },
   };
 

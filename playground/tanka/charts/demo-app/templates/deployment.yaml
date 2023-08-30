@@ -60,7 +60,10 @@ spec:
 {{- if and .Values.postgresql .Values.postgresql.enabled }}
         - name: seed-mock-data
           image: ghcr.io/faisaltheparttimecoder/mock-data:latest
-          command: ['sh', '-c', 'mock --help']
+          command:
+            - 'sh'
+            - '-c'
+            - 'mock database --create-db --full-database -d {{ .Values.postgresql.user }} -q -a {{ .Values.postgresql.host }} -p {{ .Values.postgresql.port }} -u {{ .Values.postgresql.user }} -w {{ .Values.postgresql.password }}'
 {{- end }}
       containers:
         - name: simplesrv
@@ -127,8 +130,6 @@ spec:
               value: "{{ .Values.postgresql.user }}"
             - name: SIMPLE_SERVICE_PGSQL_PASSWORD
               value: "{{ .Values.postgresql.password }}"
-            - name: SIMPLE_SERVICE_PGSQL_DB
-              value: "{{ .Values.postgresql.db }}"
             {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
