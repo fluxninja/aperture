@@ -14,8 +14,20 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" . $ ) | nindent 4 }}
   {{- end }}
 spec:
-  image: {{ omit .Values.controller.image "tag" | toYaml | nindent 4 }}
+  image:
+    {{- if .Values.controller.image.registry }}
+    registry: {{ .Values.controller.image.registry }}
+    {{- end }}
+    {{- if .Values.controller.image.repository }}
+    repository: {{ .Values.controller.image.repository }}
+    {{- end }}
     tag: {{ default (trimPrefix "v" .Chart.AppVersion) .Values.controller.image.tag | quote }}
+    {{- if .Values.controller.image.pullPolicy }}
+    pullPolicy: {{ .Values.controller.image.pullPolicy }}
+    {{- end }}
+    {{- if .Values.controller.image.pullSecrets }}
+    pullSecrets: {{ .Values.controller.image.pullSecrets | toYaml | nindent 6 }}
+    {{- end }}
   {{- if .Values.controller.service.annotations }}
   service:
     annotations: {{ .Values.controller.service.annotations | toYaml | nindent 6 }}
@@ -75,10 +87,30 @@ spec:
   resources: {{ .Values.controller.resources | toYaml | nindent 4 }}
   {{- end }}
   {{- if .Values.controller.podSecurityContext.enabled }}
-  podSecurityContext: {{- .Values.controller.podSecurityContext | toYaml | nindent 4 }}
+  podSecurityContext:
+    {{- if (omit .Values.controller.podSecurityContext "enabled" "fsGroup" )}}
+    {{- omit .Values.controller.podSecurityContext "enabled" "fsGroup" | toYaml | nindent 4 }}
+    {{- end }}
+    enabled: {{ .Values.controller.podSecurityContext.enabled }}
+    {{- if .Values.controller.podSecurityContext.fsGroup }}
+    fsGroup: {{ .Values.controller.podSecurityContext.fsGroup }}
+    {{- end }}
   {{- end }}
-  {{- if .Values.controller.podSecurityContext.enabled }}
-  containerSecurityContext: {{- .Values.controller.containerSecurityContext | toYaml | nindent 4 }}
+  {{- if .Values.controller.containerSecurityContext.enabled }}
+  containerSecurityContext:
+    {{- if (omit .Values.controller.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" )}}
+    {{- omit .Values.controller.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" | toYaml | nindent 4 }}
+    {{- end }}
+    enabled: {{ .Values.controller.containerSecurityContext.enabled }}
+    {{- if .Values.controller.containerSecurityContext.runAsUser }}
+    runAsUser: {{ .Values.controller.containerSecurityContext.runAsUser }}
+    {{- end }}
+    {{- if .Values.controller.containerSecurityContext.runAsNonRoot }}
+    runAsNonRoot: {{ .Values.controller.containerSecurityContext.runAsNonRoot }}
+    {{- end }}
+    {{- if .Values.controller.containerSecurityContext.readOnlyRootFilesystem }}
+    readOnlyRootFilesystem: {{ .Values.controller.containerSecurityContext.readOnlyRootFilesystem }}
+    {{- end }}
   {{- end }}
   {{- if .Values.controller.command }}
   command: {{ .Values.controller.command | toYaml | nindent 4 }}
@@ -130,7 +162,9 @@ spec:
     {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
     - name: wait-for-etcd
       image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+      {{- if .Values.etcd.initContainer.image.pullPolicy }}
       imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
+      {{- end }}
       {{- if .Values.etcd.initContainer.resources }}
       resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 8 }}
       {{- end }}
@@ -151,7 +185,9 @@ spec:
     {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
     - name: wait-for-prometheus
       image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+      {{- if .Values.prometheus.initContainer.image.pullPolicy }}
       imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
+      {{- end }}
       {{- if .Values.etcd.initContainer.resources }}
       resources: {{- toYaml .Values.prometheus.initContainer.resources | nindent 8 }}
       {{- end }}

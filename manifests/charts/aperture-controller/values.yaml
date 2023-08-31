@@ -449,20 +449,20 @@ controller:
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param controller.podSecurityContext.enabled Enabled Controller pods' Security Context
-  ## @param controller.podSecurityContext.fsGroup Set Controller pod's Security Context fsGroup. Defaults to 1001.
+  ## @param controller.podSecurityContext.fsGroup Set Controller pod's Security Context fsGroup. Defaults to 1000.
   podSecurityContext:
     enabled: false
-    fsGroup: ~
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param controller.containerSecurityContext.enabled Enabled Controller containers' Security Context. Defaults to false.
-  ## @param controller.containerSecurityContext.runAsUser Set Controller containers' Security Context runAsUser. Defaults to 1001.
-  ## @param controller.containerSecurityContext.runAsNonRoot Set Controller containers' Security Context runAsNonRoot. Defaults to false.
-  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context runAsNonRoot. Defaults to false.
+  ## @param controller.containerSecurityContext.runAsUser Set Controller containers' Security Context runAsUser. Defaults to 1000.
+  ## @param controller.containerSecurityContext.runAsNonRoot Set Controller containers' Security Context runAsNonRoot. Defaults to true.
+  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context readOnlyRootFilesystem. Defaults to false.
   containerSecurityContext:
     enabled: false
-    runAsUser: ~
-    runAsNonRoot: ~
+    runAsUser: 1000
+    runAsNonRoot: true
     readOnlyRootFilesystem: ~
   ## @param controller.command Override default container command (useful when using custom images)
   ##

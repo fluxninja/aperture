@@ -49,8 +49,14 @@ spec:
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.controller.tolerations "context" . $ ) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.controller.serviceAccount.name | default (include "common.names.fullname" .) }}
-      {{- if .Values.controller.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.controller.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- if and .Values.controller.podSecurityContext.enabled (omit .Values.controller.podSecurityContext "enabled") }}
+      securityContext:
+        {{- if (omit .Values.controller.podSecurityContext "enabled" "fsGroup" )}}
+        {{- omit .Values.controller.podSecurityContext "enabled" "fsGroup" | toYaml | nindent 8 }}
+        {{- end }}
+        {{- if .Values.controller.podSecurityContext.fsGroup }}
+        fsGroup: {{ .Values.controller.podSecurityContext.fsGroup }}
+        {{- end }}
       {{- end }}
       {{- if .Values.controller.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.controller.terminationGracePeriodSeconds }}
@@ -60,7 +66,9 @@ spec:
         {{- if and .Values.etcd.enabled .Values.etcd.initContainer.enabled }}
         - name: wait-for-etcd
           image: {{ include "common.images.image" (dict "imageRoot" .Values.etcd.initContainer.image "global" .Values.global) }}
+          {{- if .Values.etcd.initContainer.image.pullPolicy }}
           imagePullPolicy: {{ .Values.etcd.initContainer.image.pullPolicy }}
+          {{- end }}
           {{- if .Values.etcd.initContainer.resources }}
           resources: {{- toYaml .Values.etcd.initContainer.resources | nindent 12 }}
           {{- end }}
@@ -79,7 +87,9 @@ spec:
         {{- if and .Values.prometheus.enabled .Values.prometheus.initContainer.enabled }}
         - name: wait-for-prometheus
           image: {{ include "common.images.image" (dict "imageRoot" .Values.prometheus.initContainer.image "global" .Values.global) }}
+          {{- if .Values.prometheus.initContainer.image.pullPolicy }}
           imagePullPolicy: {{ .Values.prometheus.initContainer.image.pullPolicy }}
+          {{- end }}
           {{- if .Values.prometheus.initContainer.resources }}
           resources: {{- toYaml .Values.prometheus.initContainer.resources | nindent 12 }}
           {{- end }}
@@ -102,9 +112,23 @@ spec:
       containers:
         - name: aperture-controller
           image: {{ include "controller-operator.image" (dict "image" .Values.controller.image "context" $ ) }}
+          {{- if .Values.controller.image.pullPolicy }}
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
-          {{- if .Values.controller.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.controller.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if and .Values.controller.containerSecurityContext.enabled (omit .Values.controller.containerSecurityContext "enabled") }}
+          securityContext:
+            {{- if (omit .Values.controller.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" )}}
+            {{- omit .Values.controller.containerSecurityContext "enabled" "runAsUser" "runAsNonRoot" "readOnlyRootFilesystem" | toYaml | nindent 12 }}
+            {{- end }}
+            {{- if .Values.controller.containerSecurityContext.runAsUser }}
+            runAsUser: {{ .Values.controller.containerSecurityContext.runAsUser }}
+            {{- end }}
+            {{- if .Values.controller.containerSecurityContext.runAsNonRoot }}
+            runAsNonRoot: {{ .Values.controller.containerSecurityContext.runAsNonRoot }}
+            {{- end }}
+            {{- if .Values.controller.containerSecurityContext.readOnlyRootFilesystem }}
+            readOnlyRootFilesystem: {{ .Values.controller.containerSecurityContext.readOnlyRootFilesystem }}
+            {{- end }}
           {{- end }}
           {{- if .Values.controller.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.controller.command "context" . $ ) | nindent 12 }}
@@ -171,31 +195,11 @@ spec:
               path: /v1/status/system/liveness
               port: server
               scheme: HTTPS
-            {{- if  .Values.controller.livenessProbe.initialDelaySeconds }}
-            initialDelaySeconds: {{ .Values.controller.livenessProbe.initialDelaySeconds }}
-            {{- else }}
-            initialDelaySeconds: 15
-            {{- end }}
-            {{- if  .Values.controller.livenessProbe.periodSeconds }}
-            periodSeconds: {{ .Values.controller.livenessProbe.periodSeconds }}
-            {{- else }}
-            periodSeconds: 15
-            {{- end }}
-            {{- if  .Values.controller.livenessProbe.timeoutSeconds }}
-            timeoutSeconds: {{ .Values.controller.livenessProbe.timeoutSeconds }}
-            {{- else }}
-            timeoutSeconds: 5
-            {{- end }}
-            {{- if  .Values.controller.livenessProbe.failureThreshold }}
-            failureThreshold: {{ .Values.controller.livenessProbe.failureThreshold }}
-            {{- else }}
-            failureThreshold: 6
-            {{- end }}
-            {{- if  .Values.controller.livenessProbe.successThreshold }}
-            successThreshold: {{ .Values.controller.livenessProbe.successThreshold }}
-            {{- else }}
-            successThreshold: 1
-            {{- end }}
+            initialDelaySeconds: {{ .Values.controller.livenessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.controller.livenessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.controller.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.controller.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.controller.livenessProbe.successThreshold | default 1 }}
           {{- else if .Values.controller.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.controller.customLivenessProbe "context" . $ ) | nindent 12 }}
           {{- end }}
@@ -205,31 +209,11 @@ spec:
               path: /v1/status/system/readiness
               port: server
               scheme: HTTPS
-            {{- if  .Values.controller.readinessProbe.initialDelaySeconds }}
-            initialDelaySeconds: {{ .Values.controller.readinessProbe.initialDelaySeconds }}
-            {{- else }}
-            initialDelaySeconds: 15
-            {{- end }}
-            {{- if  .Values.controller.readinessProbe.periodSeconds }}
-            periodSeconds: {{ .Values.controller.readinessProbe.periodSeconds }}
-            {{- else }}
-            periodSeconds: 15
-            {{- end }}
-            {{- if  .Values.controller.readinessProbe.timeoutSeconds }}
-            timeoutSeconds: {{ .Values.controller.readinessProbe.timeoutSeconds }}
-            {{- else }}
-            timeoutSeconds: 5
-            {{- end }}
-            {{- if  .Values.controller.readinessProbe.failureThreshold }}
-            failureThreshold: {{ .Values.controller.readinessProbe.failureThreshold }}
-            {{- else }}
-            failureThreshold: 6
-            {{- end }}
-            {{- if  .Values.controller.readinessProbe.successThreshold }}
-            successThreshold: {{ .Values.controller.readinessProbe.successThreshold }}
-            {{- else }}
-            successThreshold: 1
-            {{- end }}
+            initialDelaySeconds: {{ .Values.controller.readinessProbe.initialDelaySeconds | default 15 }}
+            periodSeconds: {{ .Values.controller.readinessProbe.periodSeconds | default 15 }}
+            timeoutSeconds: {{ .Values.controller.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.controller.readinessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.controller.readinessProbe.successThreshold | default 1 }}
           {{- else if .Values.controller.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.controller.customReadinessProbe "context" . $ ) | nindent 12 }}
           {{- end }}

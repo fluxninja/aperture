@@ -446,20 +446,20 @@ agent:
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param agent.podSecurityContext.enabled Enabled Agent pods' Security Context
-  ## @param agent.podSecurityContext.fsGroup Set Agent pod's Security Context fsGroup. Defaults to 1001.
+  ## @param agent.podSecurityContext.fsGroup Set Agent pod's Security Context fsGroup. Defaults to 1000.
   podSecurityContext:
     enabled: false
-    fsGroup: ~
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param agent.containerSecurityContext.enabled Enabled Agent containers' Security Context. Defaults to false.
-  ## @param agent.containerSecurityContext.runAsUser Set Agent containers' Security Context runAsUser. Defaults to 1001.
-  ## @param agent.containerSecurityContext.runAsNonRoot Set Agent containers' Security Context runAsNonRoot. Defaults to false.
-  ## @param agent.containerSecurityContext.readOnlyRootFilesystem Set Agent containers' Security Context runAsNonRoot. Defaults to false.
+  ## @param agent.containerSecurityContext.runAsUser Set Agent containers' Security Context runAsUser. Defaults to 1000.
+  ## @param agent.containerSecurityContext.runAsNonRoot Set Agent containers' Security Context runAsNonRoot. Defaults to true.
+  ## @param agent.containerSecurityContext.readOnlyRootFilesystem Set Agent containers' Security Context readOnlyRootFilesystem. Defaults to false.
   containerSecurityContext:
     enabled: false
-    runAsUser: ~
-    runAsNonRoot: ~
+    runAsUser: 1000
+    runAsNonRoot: true
     readOnlyRootFilesystem: ~
   ## @param agent.command Override default container command (useful when using custom images)
   ##
