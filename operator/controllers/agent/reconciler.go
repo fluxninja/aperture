@@ -917,8 +917,8 @@ func (r *AgentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.ServiceAccount{}).
 		WithEventFilter(eventFiltersForAgent())
 
-	sidecarModeEnabled := os.Getenv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
-	if sidecarModeEnabled != "true" {
+	sidecarModeEnabled, ok := os.LookupEnv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+	if sidecarModeEnabled != "true" || !ok {
 		builder = builder.Owns(&appsv1.DaemonSet{}).
 			Owns(&corev1.Service{})
 	}

@@ -185,8 +185,8 @@ func main() {
 			os.Exit(1)
 		}
 
-		sidecarModeEnabled := os.Getenv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
-		if sidecarModeEnabled == "true" {
+		sidecarModeEnabled, ok := os.LookupEnv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+		if sidecarModeEnabled == "true" || !ok {
 			if err = (&namespace.NamespaceReconciler{
 				Client: mgr.GetClient(),
 				Scheme: mgr.GetScheme(),
