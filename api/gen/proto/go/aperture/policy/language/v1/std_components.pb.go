@@ -1720,7 +1720,7 @@ func (x *SignalGenerator) GetParameters() *SignalGenerator_Parameters {
 	return nil
 }
 
-// PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to computes proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+// PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
 // $$
 // error = setpoint - signal \\
 // integral_i = integral_{i-1} + k_i \cdot error \\
@@ -4531,10 +4531,10 @@ type PIDController_Parameters struct {
 	Ki float64 `protobuf:"fixed64,2,opt,name=ki,proto3" json:"ki,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
 	// The derivative gain of the PID controller.
 	Kd float64 `protobuf:"fixed64,3,opt,name=kd,proto3" json:"kd,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
-	// The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+	// The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	SamplePeriod *durationpb.Duration `protobuf:"bytes,4,opt,name=sample_period,json=samplePeriod,proto3" json:"sample_period,omitempty"`
-	// The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
+	// The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
 	ResetAfterInvalidSamples int32 `protobuf:"varint,5,opt,name=reset_after_invalid_samples,json=resetAfterInvalidSamples,proto3" json:"reset_after_invalid_samples,omitempty" validate:"gte=1" default:"4"` // @gotags: validate:"gte=1" default:"4"
 }
 

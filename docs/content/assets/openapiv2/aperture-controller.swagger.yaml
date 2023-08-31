@@ -2302,7 +2302,7 @@ definitions:
                 $ref: '#/definitions/PIDControllerParameters'
                 x-go-tag-validate: required
         title: |-
-            PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to computes proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+            PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
             $$
             error = setpoint - signal \\
             integral_i = integral_{i-1} + k_i \cdot error \\
@@ -2365,7 +2365,7 @@ definitions:
             reset_after_invalid_samples:
                 default: 4
                 description: |+
-                    The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
+                    The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
 
                 format: int32
                 minimum: 1
@@ -2374,7 +2374,7 @@ definitions:
                 x-go-tag-validate: gte=1
             sample_period:
                 description: |-
-                    The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+                    The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
         type: object

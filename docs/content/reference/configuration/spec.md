@@ -5442,10 +5442,10 @@ Name of the outgoing Signal on the OutPort.
 <!-- vale on -->
 
 PID Controller is a popular control mechanism for closed-loop feedback control.
-It takes a signal and a setpoint as inputs and uses the PID algorithm to
-computes proportional (proportional to the magnitude of error), integral
-(proportional to accumulation of error), and derivative (proportional to how
-fast the signal is changing) terms which are summed up to get a desired output.
+It takes a signal and a setpoint as inputs and uses the PID algorithm to compute
+proportional (proportional to the magnitude of error), integral (proportional to
+accumulation of error), and derivative (proportional to how fast the signal is
+changing) terms which are summed up to get a desired output.
 
 $$
 error = setpoint - signal \\
@@ -5622,8 +5622,8 @@ The proportional gain of the PID controller.
 
 <!-- vale on -->
 
-The integrator resets after the specified duration of time. Defaults to 4
-invalid samples.
+The integrator resets after the specified number of ticks if the signal or
+setpoint are continuously invalid. Defaults to 4 invalid samples.
 
 </dd>
 <dt>sample_period</dt>
@@ -5635,8 +5635,9 @@ invalid samples.
 
 <!-- vale on -->
 
-The sampling period of the PID controller. Defaults to the evaluation period of
-the circuit. This field employs the
+The sampling period of the PID controller. This determines how often the PID
+output is computed. Defaults to the evaluation period of the circuit. This field
+employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
 representation from Protocol Buffers. The format accommodates fractional seconds
 up to nine digits after the decimal point, offering nanosecond precision. Every
