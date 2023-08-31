@@ -258,7 +258,7 @@
           "description": "This receiver collects metrics on an interval.",
           "type": "string"
         },
-        "database": {
+        "databases": {
           "description": "The list of databases for which the receiver will attempt to collect statistics.",
           "type": "array",
           "items": {

@@ -17,4 +17,6 @@ requires:
     version: 11.12.0
   - chart: bitnami/elasticsearch
     version: 19.10.4
+  - chart: bitnami/postgresql
+    version: 12.8.2
 version: 1

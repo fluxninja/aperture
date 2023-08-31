@@ -96,6 +96,7 @@ EnvoyProxy
 [Vv]irality
 [Ff]orecasted
 [Bb]ursty
+sharding
 Datadog
 collectd
 Logstash

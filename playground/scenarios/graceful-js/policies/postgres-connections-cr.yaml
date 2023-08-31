@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: workload-prioritization
+  name: postgres-connections
 spec:
   circuit:
     components:
@@ -40,7 +40,7 @@ spec:
                       user_type: guest
                   name: guest
                   parameters:
-                    priority: 5
+                    priority: 50
                 - label_matcher:
                     match_labels:
                       http.request.header.user_type: subscriber
@@ -58,26 +58,11 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
-            policy_name="workload-prioritization"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[30s]))
-    - query:
-        promql:
-          evaluation_interval: 30s
-          out_ports:
-            output:
-              signal_name: SIGNAL_LONG_TERM
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
-            policy_name="workload-prioritization"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[1800s]))
-    - arithmetic_combinator:
-        in_ports:
-          lhs:
-            signal_name: SIGNAL_LONG_TERM
-          rhs:
-            constant_signal:
-              value: 1.1
-        operator: mul
+          query_string: (sum(postgresql_backends) / sum(postgresql_connection_max))
+            * 100
+    - variable:
+        constant_output:
+          value: 20
         out_ports:
           output:
             signal_name: SETPOINT
@@ -93,10 +78,17 @@ spec:
         - agent_group: default
           control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
-      flux_meters:
-        workload-prioritization:
-          selectors:
-          - agent_group: default
-            control_point: ingress
-            service: service1-demo-app.demoapp.svc.cluster.local
-    infra_meters: {}
+    infra_meters:
+      postgresql:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          postgresql:
+            collection_interval: 1s
+            databases:
+            - postgres
+            endpoint: postgresql.postgresql.svc.cluster.local:5432
+            password: secretpassword
+            tls:
+              insecure: true
+            username: postgres

@@ -43,6 +43,7 @@ APERTURE_DEMOAPP_NS = "demoapp"
 APERTURE_DEMO_UI_NS = "demoui"
 APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ELASTICSEARCH_NS = "elasticsearch"
+APERTURE_POSTGRESQL_NS = "postgresql"
 APERTURE_ISTIO_NS = "istio-system"
 DEFAULT_TEST_SCENARIO = "scenarios/java-service-protection"
 TANKA = "tk"
@@ -298,6 +299,24 @@ DEP_TREE = {
                     ],
                     "ignored_objects": [
                         ("^elasticsearch-kibana", "Service|Deployment")
+                    ]
+                }
+            ]
+        },
+    },
+    APERTURE_POSTGRESQL_NS: {
+        "postgresql": {
+            "labels": ["PostgreSQL"],
+            "tkenv": TANKA_ROOT + "/apps/postgresql",
+            "child_resources": [
+                {
+                    "workload": "postgresql",
+                    "resource_deps": ["cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^postgresql", None),
+                    ],
+                    "ignored_objects": [
+                        ("^postgresql", "Service|StatefulSet")
                     ]
                 }
             ]

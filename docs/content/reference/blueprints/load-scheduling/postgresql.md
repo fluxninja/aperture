@@ -531,10 +531,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-database"></a>
+<a id="postgresql-databases"></a>
 
 <ParameterDescription
-    name='database'
+    name='databases'
     description='The list of databases for which the receiver will attempt to collect statistics.'
     type='Array of string'
     reference=''
