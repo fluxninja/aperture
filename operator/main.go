@@ -184,12 +184,16 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "Agent")
 			os.Exit(1)
 		}
-		if err = (&namespace.NamespaceReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Namespace")
-			os.Exit(1)
+
+		sidecarModeEnabled := os.Getenv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+		if sidecarModeEnabled == "true" {
+			if err = (&namespace.NamespaceReconciler{
+				Client: mgr.GetClient(),
+				Scheme: mgr.GetScheme(),
+			}).SetupWithManager(mgr); err != nil {
+				setupLog.Error(err, "unable to create controller", "controller", "Namespace")
+				os.Exit(1)
+			}
 		}
 
 		apertureInjector := &mutatingwebhook.ApertureInjector{

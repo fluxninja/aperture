@@ -296,9 +296,11 @@ operator:
   ##
   extraVolumeMounts: []
   ## @param operator.rbac.create Create specifies whether to install and use RBAC rules
+  ## @param operator.rbac.featureBasedRoles Specifies whether to use Aperture Agent feature-based RBAC roles for the Aperture Operator. When this is enabled, switching the Aperture Agent installation mode won't be supported.
   ##
   rbac:
     create: true
+    featureBasedRoles: false
   ## ServiceAccount values
   ##
   serviceAccount:
