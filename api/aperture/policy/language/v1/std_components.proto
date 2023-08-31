@@ -845,6 +845,12 @@ message SignalGenerator {
   Parameters parameters = 3; // @gotags: validate:"required"
 }
 
+// PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to computes proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+// $$
+// error = setpoint - signal \\
+// integral_i = integral_{i-1} + k_i \cdot error \\
+// output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
+// $$
 message PIDController {
   message Parameters {
     // The proportional gain of the PID controller.
