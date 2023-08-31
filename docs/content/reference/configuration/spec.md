@@ -5447,11 +5447,15 @@ proportional (proportional to the magnitude of error), integral (proportional to
 accumulation of error), and derivative (proportional to how fast the signal is
 changing) terms which are summed up to get a desired output.
 
+<!-- vale off -->
+
 $$
 error = setpoint - signal \\
 integral_i = integral_{i-1} + k_i \cdot error \\
 output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
 $$
+
+<!-- vale on -->
 
 <dl>
 <dt>in_ports</dt>
