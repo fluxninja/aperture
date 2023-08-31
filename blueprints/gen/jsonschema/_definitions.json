@@ -2214,16 +2214,20 @@
     "PIDControllerIns": {
       "properties": {
         "max": {
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "title": "Maximum allowed output"
         },
         "min": {
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "title": "Minimum allowed output"
         },
         "setpoint": {
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "title": "The desired setpoint for the signal"
         },
         "signal": {
-          "$ref": "#/definitions/InPort"
+          "$ref": "#/definitions/InPort",
+          "title": "The signal to be controlled"
         }
       },
       "type": "object",
@@ -2232,7 +2236,8 @@
     "PIDControllerOuts": {
       "properties": {
         "output": {
-          "$ref": "#/definitions/OutPort"
+          "$ref": "#/definitions/OutPort",
+          "title": "Output of the PID controller"
         }
       },
       "type": "object",
@@ -2271,8 +2276,10 @@
           "default": 4,
           "description": "The integrator resets after the specified duration of time. Defaults to 4 invalid samples.\n\n",
           "format": "int32",
+          "minimum": 1,
           "type": "integer",
-          "x-go-tag-default": "4"
+          "x-go-tag-default": "4",
+          "x-go-tag-validate": "gte=1"
         },
         "sample_period": {
           "description": "The sampling period of the PID controller. Defaults to the evaluation period of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",

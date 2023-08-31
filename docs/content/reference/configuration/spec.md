@@ -5492,6 +5492,8 @@ Name of the outgoing Signal on the OutPort.
 
 <!-- vale on -->
 
+Maximum allowed output
+
 </dd>
 <dt>min</dt>
 <dd>
@@ -5501,6 +5503,8 @@ Name of the outgoing Signal on the OutPort.
 ([InPort](#in-port))
 
 <!-- vale on -->
+
+Minimum allowed output
 
 </dd>
 <dt>setpoint</dt>
@@ -5512,6 +5516,8 @@ Name of the outgoing Signal on the OutPort.
 
 <!-- vale on -->
 
+The desired setpoint for the signal
+
 </dd>
 <dt>signal</dt>
 <dd>
@@ -5521,6 +5527,8 @@ Name of the outgoing Signal on the OutPort.
 ([InPort](#in-port))
 
 <!-- vale on -->
+
+The signal to be controlled
 
 </dd>
 </dl>
@@ -5542,6 +5550,8 @@ Name of the outgoing Signal on the OutPort.
 ([OutPort](#out-port))
 
 <!-- vale on -->
+
+Output of the PID controller
 
 </dd>
 </dl>
@@ -5596,7 +5606,7 @@ The proportional gain of the PID controller.
 
 <!-- vale off -->
 
-(int32, default: `4`)
+(int32, minimum: `1`, default: `4`)
 
 <!-- vale on -->
 

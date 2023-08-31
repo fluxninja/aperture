@@ -4529,7 +4529,7 @@ type PIDController_Parameters struct {
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	SamplePeriod *durationpb.Duration `protobuf:"bytes,4,opt,name=sample_period,json=samplePeriod,proto3" json:"sample_period,omitempty"`
 	// The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
-	ResetAfterInvalidSamples int32 `protobuf:"varint,5,opt,name=reset_after_invalid_samples,json=resetAfterInvalidSamples,proto3" json:"reset_after_invalid_samples,omitempty" default:"4"` // @gotags: default:"4"
+	ResetAfterInvalidSamples int32 `protobuf:"varint,5,opt,name=reset_after_invalid_samples,json=resetAfterInvalidSamples,proto3" json:"reset_after_invalid_samples,omitempty" validate:"gte=1" default:"4"` // @gotags: validate:"gte=1" default:"4"
 }
 
 func (x *PIDController_Parameters) Reset() {
@@ -4604,10 +4604,14 @@ type PIDController_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Signal   *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
+	// The signal to be controlled
+	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
+	// The desired setpoint for the signal
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
-	Min      *InPort `protobuf:"bytes,3,opt,name=min,proto3" json:"min,omitempty"`
-	Max      *InPort `protobuf:"bytes,4,opt,name=max,proto3" json:"max,omitempty"`
+	// Minimum allowed output
+	Min *InPort `protobuf:"bytes,3,opt,name=min,proto3" json:"min,omitempty"`
+	// Maximum allowed output
+	Max *InPort `protobuf:"bytes,4,opt,name=max,proto3" json:"max,omitempty"`
 }
 
 func (x *PIDController_Ins) Reset() {
@@ -4675,6 +4679,7 @@ type PIDController_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Output of the PID controller
 	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
 }
 

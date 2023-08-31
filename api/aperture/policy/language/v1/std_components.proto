@@ -857,17 +857,22 @@ message PIDController {
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration sample_period = 4;
     // The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
-    int32 reset_after_invalid_samples = 5; // @gotags: default:"4"
+    int32 reset_after_invalid_samples = 5; // @gotags: validate:"gte=1" default:"4"
   }
 
   message Ins {
+    // The signal to be controlled
     InPort signal = 1;
+    // The desired setpoint for the signal
     InPort setpoint = 2;
+    // Minimum allowed output
     InPort min = 3;
+    // Maximum allowed output
     InPort max = 4;
   }
 
   message Outs {
+    // Output of the PID controller
     OutPort output = 1;
   }
 

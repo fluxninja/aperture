@@ -2800,17 +2800,22 @@ definitions:
         properties:
             max:
                 $ref: '#/definitions/InPort'
+                title: Maximum allowed output
             min:
                 $ref: '#/definitions/InPort'
+                title: Minimum allowed output
             setpoint:
                 $ref: '#/definitions/InPort'
+                title: The desired setpoint for the signal
             signal:
                 $ref: '#/definitions/InPort'
+                title: The signal to be controlled
         type: object
     PIDControllerOuts:
         properties:
             output:
                 $ref: '#/definitions/OutPort'
+                title: Output of the PID controller
         type: object
     PIDControllerParameters:
         properties:
@@ -2850,8 +2855,10 @@ definitions:
                     The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
 
                 format: int32
+                minimum: 1
                 type: integer
                 x-go-tag-default: "4"
+                x-go-tag-validate: gte=1
             sample_period:
                 description: |-
                     The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
