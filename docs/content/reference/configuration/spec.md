@@ -2294,7 +2294,7 @@ envelope.
 
 <!-- vale on -->
 
-Duration of EMA sampling window. This field employs the
+EMA window duration. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
 representation from Protocol Buffers. The format accommodates fractional seconds
 up to nine digits after the decimal point, offering nanosecond precision. Every
@@ -5560,7 +5560,7 @@ Name of the outgoing Signal on the OutPort.
 
 <!-- vale off -->
 
-(float64, **required**, default: `0`)
+(float64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -5572,7 +5572,7 @@ The derivative gain of the PID controller.
 
 <!-- vale off -->
 
-(float64, **required**, default: `0`)
+(float64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -5584,7 +5584,7 @@ The integral gain of the PID controller.
 
 <!-- vale off -->
 
-(float64, **required**, default: `0`)
+(float64, minimum: `0`, default: `0`)
 
 <!-- vale on -->
 
@@ -5614,7 +5614,12 @@ invalid samples.
 <!-- vale on -->
 
 The sampling period of the PID controller. Defaults to the evaluation period of
-the circuit.
+the circuit. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>

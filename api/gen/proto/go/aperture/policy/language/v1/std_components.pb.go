@@ -2161,7 +2161,7 @@ type EMA_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Duration of EMA sampling window.
+	// EMA window duration.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Duration of EMA warming up window.
@@ -4520,12 +4520,13 @@ type PIDController_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The proportional gain of the PID controller.
-	Kp float64 `protobuf:"fixed64,1,opt,name=kp,proto3" json:"kp,omitempty" validate:"required" default:"0"` // @gotags: validate:"required" default:"0"
+	Kp float64 `protobuf:"fixed64,1,opt,name=kp,proto3" json:"kp,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
 	// The integral gain of the PID controller.
-	Ki float64 `protobuf:"fixed64,2,opt,name=ki,proto3" json:"ki,omitempty" validate:"required" default:"0"` // @gotags: validate:"required" default:"0"
+	Ki float64 `protobuf:"fixed64,2,opt,name=ki,proto3" json:"ki,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
 	// The derivative gain of the PID controller.
-	Kd float64 `protobuf:"fixed64,3,opt,name=kd,proto3" json:"kd,omitempty" validate:"required" default:"0"` // @gotags: validate:"required" default:"0"
+	Kd float64 `protobuf:"fixed64,3,opt,name=kd,proto3" json:"kd,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
 	// The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	SamplePeriod *durationpb.Duration `protobuf:"bytes,4,opt,name=sample_period,json=samplePeriod,proto3" json:"sample_period,omitempty"`
 	// The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
 	ResetAfterInvalidSamples int32 `protobuf:"varint,5,opt,name=reset_after_invalid_samples,json=resetAfterInvalidSamples,proto3" json:"reset_after_invalid_samples,omitempty" default:"4"` // @gotags: default:"4"

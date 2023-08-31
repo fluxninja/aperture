@@ -183,7 +183,7 @@ message EMA {
 
   // Parameters for the EMA component.
   message Parameters {
-    // Duration of EMA sampling window.
+    // EMA window duration.
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration ema_window = 1; // @gotags: validate:"required"
 
@@ -848,12 +848,13 @@ message SignalGenerator {
 message PIDController {
   message Parameters {
     // The proportional gain of the PID controller.
-    double kp = 1; // @gotags: validate:"required" default:"0"
+    double kp = 1; // @gotags: validate:"gte=0" default:"0"
     // The integral gain of the PID controller.
-    double ki = 2; // @gotags: validate:"required" default:"0"
+    double ki = 2; // @gotags: validate:"gte=0" default:"0"
     // The derivative gain of the PID controller.
-    double kd = 3; // @gotags: validate:"required" default:"0"
+    double kd = 3; // @gotags: validate:"gte=0" default:"0"
     // The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration sample_period = 4;
     // The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
     int32 reset_after_invalid_samples = 5; // @gotags: default:"4"

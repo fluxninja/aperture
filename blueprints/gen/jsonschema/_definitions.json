@@ -894,7 +894,7 @@
           "x-go-tag-validate": "gte=1.0"
         },
         "ema_window": {
-          "description": "Duration of EMA sampling window.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
+          "description": "EMA window duration.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -2244,25 +2244,28 @@
           "default": 0,
           "description": "The derivative gain of the PID controller.\n\n",
           "format": "double",
+          "minimum": 0,
           "type": "number",
           "x-go-tag-default": "0",
-          "x-go-tag-validate": "required"
+          "x-go-tag-validate": "gte=0"
         },
         "ki": {
           "default": 0,
           "description": "The integral gain of the PID controller.\n\n",
           "format": "double",
+          "minimum": 0,
           "type": "number",
           "x-go-tag-default": "0",
-          "x-go-tag-validate": "required"
+          "x-go-tag-validate": "gte=0"
         },
         "kp": {
           "default": 0,
           "description": "The proportional gain of the PID controller.\n\n",
           "format": "double",
+          "minimum": 0,
           "type": "number",
           "x-go-tag-default": "0",
-          "x-go-tag-validate": "required"
+          "x-go-tag-validate": "gte=0"
         },
         "reset_after_invalid_samples": {
           "default": 4,
@@ -2272,11 +2275,10 @@
           "x-go-tag-default": "4"
         },
         "sample_period": {
-          "description": "The sampling period of the PID controller. Defaults to the evaluation period of the circuit.",
+          "description": "The sampling period of the PID controller. Defaults to the evaluation period of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",
           "type": "string"
         }
       },
-      "required": ["kd", "ki", "kp"],
       "type": "object",
       "additionalProperties": false
     },
