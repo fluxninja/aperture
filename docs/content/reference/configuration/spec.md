@@ -1575,6 +1575,18 @@ signal into a nested circuit.
 Logical OR.
 
 </dd>
+<dt>pid_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDController](#p-id-controller))
+
+<!-- vale on -->
+
+PID Controller is a proportional–integral–derivative controller.
+
+</dd>
 <dt>pulse_generator</dt>
 <dd>
 
@@ -5417,6 +5429,192 @@ Components produce output for other components through OutPorts
 <!-- vale on -->
 
 Name of the outgoing Signal on the OutPort.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDController {#p-id-controller}
+
+<!-- vale on -->
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerIns](#p-id-controller-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerOuts](#p-id-controller-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerParameters](#p-id-controller-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerIns {#p-id-controller-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>max</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>min</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerOuts {#p-id-controller-outs}
+
+<!-- vale on -->
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerParameters {#p-id-controller-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>kd</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, **required**, default: `0`)
+
+<!-- vale on -->
+
+The derivative gain of the PID controller.
+
+</dd>
+<dt>ki</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, **required**, default: `0`)
+
+<!-- vale on -->
+
+The integral gain of the PID controller.
+
+</dd>
+<dt>kp</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, **required**, default: `0`)
+
+<!-- vale on -->
+
+The proportional gain of the PID controller.
+
+</dd>
+<dt>reset_after_invalid_samples</dt>
+<dd>
+
+<!-- vale off -->
+
+(int32, default: `4`)
+
+<!-- vale on -->
+
+The integrator resets after the specified duration of time. Defaults to 4
+invalid samples.
+
+</dd>
+<dt>sample_period</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The sampling period of the PID controller. Defaults to the evaluation period of
+the circuit.
 
 </dd>
 </dl>

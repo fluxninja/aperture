@@ -127,6 +127,12 @@
   withOrMixin(or):: {
     or+: or,
   },
+  withPidController(pid_controller):: {
+    pid_controller: pid_controller,
+  },
+  withPidControllerMixin(pid_controller):: {
+    pid_controller+: pid_controller,
+  },
   withPulseGenerator(pulse_generator):: {
     pulse_generator: pulse_generator,
   },

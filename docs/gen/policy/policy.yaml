@@ -653,6 +653,9 @@ definitions:
             or:
                 $ref: '#/definitions/Or'
                 description: Logical OR.
+            pid_controller:
+                $ref: '#/definitions/PIDController'
+                description: PID Controller is a proportional–integral–derivative controller.
             pulse_generator:
                 $ref: '#/definitions/PulseGenerator'
                 description: Generates 0 and 1 in turns.
@@ -2235,6 +2238,77 @@ definitions:
                 description: Name of the outgoing Signal on the OutPort.
                 type: string
         title: Components produce output for other components through OutPorts
+        type: object
+    PIDController:
+        properties:
+            in_ports:
+                $ref: '#/definitions/PIDControllerIns'
+            out_ports:
+                $ref: '#/definitions/PIDControllerOuts'
+            parameters:
+                $ref: '#/definitions/PIDControllerParameters'
+                x-go-tag-validate: required
+        type: object
+    PIDControllerIns:
+        properties:
+            max:
+                $ref: '#/definitions/InPort'
+            min:
+                $ref: '#/definitions/InPort'
+            setpoint:
+                $ref: '#/definitions/InPort'
+            signal:
+                $ref: '#/definitions/InPort'
+        type: object
+    PIDControllerOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+        type: object
+    PIDControllerParameters:
+        properties:
+            kd:
+                default: 0
+                description: |+
+                    The derivative gain of the PID controller.
+
+                format: double
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: required
+            ki:
+                default: 0
+                description: |+
+                    The integral gain of the PID controller.
+
+                format: double
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: required
+            kp:
+                default: 0
+                description: |+
+                    The proportional gain of the PID controller.
+
+                format: double
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: required
+            reset_after_invalid_samples:
+                default: 4
+                description: |+
+                    The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
+
+                format: int32
+                type: integer
+                x-go-tag-default: "4"
+            sample_period:
+                description: The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+                type: string
+        required:
+            - kd
+            - ki
+            - kp
         type: object
     PathTemplateMatcher:
         description: |-

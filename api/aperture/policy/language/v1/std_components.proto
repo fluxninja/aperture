@@ -844,3 +844,33 @@ message SignalGenerator {
   // Parameters for the _Signal Generator_ component.
   Parameters parameters = 3; // @gotags: validate:"required"
 }
+
+message PIDController {
+  message Parameters {
+    // The proportional gain of the PID controller.
+    double kp = 1; // @gotags: validate:"required" default:"0"
+    // The integral gain of the PID controller.
+    double ki = 2; // @gotags: validate:"required" default:"0"
+    // The derivative gain of the PID controller.
+    double kd = 3; // @gotags: validate:"required" default:"0"
+    // The sampling period of the PID controller. Defaults to the evaluation period of the circuit.
+    google.protobuf.Duration sample_period = 4;
+    // The integrator resets after the specified duration of time. Defaults to 4 invalid samples.
+    int32 reset_after_invalid_samples = 5; // @gotags: default:"4"
+  }
+
+  message Ins {
+    InPort signal = 1;
+    InPort setpoint = 2;
+    InPort min = 3;
+    InPort max = 4;
+  }
+
+  message Outs {
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
