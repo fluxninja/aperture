@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/playground/resources/demo-app
 
-go 1.20
+go 1.21
 
 require (
 	github.com/castai/promwrite v0.5.0
