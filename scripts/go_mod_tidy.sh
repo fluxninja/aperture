@@ -16,6 +16,6 @@ pushd "$gitroot" >/dev/null || exit 1
 
 dirs=$($FIND . -name go.mod -not -path "*/vendor/*" -exec dirname {} \; | sort -u)
 
-parallel -j8 --no-notice --bar --eta "cd {} && go mod tidy -compat=1.21" ::: "$dirs"
+parallel -j8 --no-notice --bar --eta "cd {} && go mod tidy -compat=1.20" ::: "$dirs"
 
 popd >/dev/null || exit 1

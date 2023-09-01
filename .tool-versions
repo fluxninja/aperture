@@ -2,7 +2,7 @@ pre-commit 3.3.1
 bats 1.9.0
 python 3.11.4
 gcloud 429.0.0
-golang 1.21.0
+golang 1.20.7
 golangci-lint 1.54.1
 grpcurl 1.8.7
 mockery 2.26.1
