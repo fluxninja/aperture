@@ -47,6 +47,8 @@ func NewComponentAndOptions(
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
+	case *policylangv1.Component_PidController:
+		ctor = mkCtor(config.PidController, components.NewPIDControllerAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_Sma:

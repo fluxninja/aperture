@@ -116,16 +116,16 @@ To install the Aperture system, please follow the
 
 ### 🖥️ Slide Decks
 
-- [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs/edit?usp=sharing)
+- [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs)
   deck covers the overview and use-cases of Aperture.
 
 ## 🎥 Videos
 
-- [SREcon 23 APAC - Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
-- [Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
-- [Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://www.youtube.com/watch?v=nm62d2gYqNk)
-- [How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
-- [Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
+- [SREcon'23 APAC | Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
+- [Chaos Carnival 2023 | Graceful Degradation: Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
+- [Conf42 Chaos Engineering 2023 | Graceful Degradation: When All Goes Wrong](https://www.youtube.com/watch?v=nm62d2gYqNk)
+- [Demo | How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
+- [Explainer | Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 👷 Contributing
 
