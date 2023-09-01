@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  gcp-gcr: circleci/gcp-gcr@0.15.1
+  gcp-gcr: circleci/gcp-gcr@0.15.3
 
 executors:
   base-cimg-executor:
@@ -15,7 +15,7 @@ executors:
       - image: cimg/python:3.11
 
 jobs:
-  publish-protobuf-files:
+  publish-protobuf-files-job:
     parameters:
       tag:
         type: string
@@ -72,8 +72,7 @@ jobs:
     parameters:
       workspace-name:
         type: string
-        description:
-          the name of the workspace to which built packages should be added
+        description: the name of the workspace to which built packages should be added
         default: packages
       goarch:
         type: string
@@ -168,8 +167,7 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description:
-          The root folder of the job where all repositories will be cloned to
+        description: The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -184,18 +182,15 @@ jobs:
       component:
         type: string
         default: ""
-        description:
-          Application component to update image and deployment code for
+        description: Application component to update image and deployment code for
       skip-component:
         type: string
         default: ""
-        description:
-          Application component to skip to update image and deployment code for
+        description: Application component to skip to update image and deployment code for
       update:
         type: string
         default: everything
-        description:
-          Whether to update 'images', 'deployment-code' or 'everything'
+        description: Whether to update 'images', 'deployment-code' or 'everything'
       release-train:
         type: string
         default: latest
@@ -235,8 +230,7 @@ jobs:
         description: The release tag
       deployment-key:
         type: string
-        description:
-          Deployment key to use when interacting with remote repository
+        description: Deployment key to use when interacting with remote repository
     executor: python-cimg-executor
     environment:
       TAP_REPO: /home/circleci/taps
@@ -312,13 +306,11 @@ jobs:
             gh release upload "${VERSION}" "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
 workflows:
-  version: 2
-
   publish-protobuf-files:
     when:
       matches: { value: << pipeline.git.tag >>, pattern: ^v.*$ }
     jobs:
-      - publish-protobuf-files:
+      - publish-protobuf-files-job:
           filters: &release-filters
             branches:
               ignore: /.+/
@@ -343,8 +335,8 @@ workflows:
           component: cli
           matrix:
             parameters:
-              goos: ["linux","darwin"]
-              goarch: ["amd64","arm64"]
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
       - update-environment:
           filters:
@@ -410,10 +402,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Copy tool-versions in HOME dir
@@ -437,8 +429,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "go.mod" }}-{{ checksum "~/installed-tools" }}
           paths:

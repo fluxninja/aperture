@@ -21,7 +21,7 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVers
 This method requires access to create cluster level resources like ClusterRole,
 ClusterRoleBinding, CustomResourceDefinition and so on.
 
-Please use the
+Use the
 [Namespace-scoped Installation](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md)
 if you do not want to assign the cluster level permissions.
 
@@ -106,9 +106,9 @@ Kubernetes Objects which will be created by the following steps are listed
    [here](/reference/configuration/controller.md#etcd), and Prometheus are
    available [here](/reference/configuration/controller.md#prometheus).
 
-   **Note**: Please ensure that the flag `web.enable-remote-write-receiver` is
-   enabled on your existing Prometheus instance, as it is required by the
-   Aperture Controller.
+   **Note**: Ensure that the flag `web.enable-remote-write-receiver` is enabled
+   on your existing Prometheus instance, as it is required by the Aperture
+   Controller.
 
 3. If you want to modify the default parameters or the Aperture Controller
    configuration, for example `log`, you can create or update the `values.yaml`

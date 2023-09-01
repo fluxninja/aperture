@@ -10,9 +10,8 @@ PromQL queries for scale-in and scale-out.
 
 :::info
 
-Please see reference for the
-[`AutoScale`](/reference/configuration/spec.md#auto-scale) component that is
-used within this blueprint.
+See reference for the [`AutoScale`](/reference/configuration/spec.md#auto-scale)
+component that is used within this blueprint.
 
 :::
 

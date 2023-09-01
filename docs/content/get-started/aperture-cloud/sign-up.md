@@ -40,9 +40,9 @@ set up an organization and kick off a project for you.
 
    ![Select Plan](./assets/select-subscription.png)
 
-   Credit card details are required for verification purposes. Please rest
-   assured that your information will be handled securely, and no charges will
-   be applied during the trial period.
+   Credit card details are required for verification purposes. Your information
+   will be handled securely, and no charges will be applied during the trial
+   period.
 
    ![Subscription Details](./assets/subscription-plan.png)
 
@@ -50,7 +50,7 @@ set up an organization and kick off a project for you.
    validating your credit card details, your subscription will be started.
    ![Subscription Started](./assets/subscription-started.png)
 
-   In case of any issues, please reach out to us at <support@fluxninja.com>
+   In case of any issues, reach out to us at <support@fluxninja.com>
 
 5. After completing the select subscription step, you will be redirected to the
    Get Started page. Read the instructions and click **Next**.

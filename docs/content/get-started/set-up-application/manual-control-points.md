@@ -57,7 +57,7 @@ wherever you want in your code. For example, there is a function called
 executing the business logic, you want to create a feature control point so that
 you can control the execution flow of the API and can reject the request based
 on the policy defined in Aperture. You will see in the upcoming section how to
-define policy in Aperture. For now, remember, we added some labels in the code
+define policy in Aperture. For now, some labels have been added in the code
 snippet below. These labels will be used while defining a policy.
 
 Let's create a feature control point in the following code snippet.

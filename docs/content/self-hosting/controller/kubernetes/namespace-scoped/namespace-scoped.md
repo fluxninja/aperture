@@ -118,9 +118,9 @@ into your cluster.
    [here](/reference/configuration/controller.md#etcd) and Prometheus are
    available [here](/reference/configuration/controller.md#prometheus).
 
-   **Note**: Please ensure that the flag `web.enable-remote-write-receiver` is
-   enabled on your existing Prometheus instance, as it is required by the
-   Aperture Controller.
+   **Note**: Ensure that the flag `web.enable-remote-write-receiver` is enabled
+   on your existing Prometheus instance, as it is required by the Aperture
+   Controller.
 
 3. If you want to modify the default parameters or the Aperture Controller
    configuration, for example `log`, you can update the `values.yaml` file and

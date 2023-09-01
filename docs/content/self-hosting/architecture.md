@@ -30,8 +30,8 @@ synchronized between the Controller and Agents.
 
 Existing etcd and
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
-installations can be reused to minimize operational overhead and to integrate
-into existing monitoring infrastructure.
+installations can be reused to integrate into existing monitoring
+infrastructure.
 
 <Zoom>
 

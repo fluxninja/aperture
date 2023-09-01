@@ -95,7 +95,7 @@ following labels:
 
 :::info
 
-For more details, please
+For more details,
 [refer to metrics and labels](/reference/observability/prometheus-metrics/agent.md#flux-meter)
 collected by _Flux Meters_.
 

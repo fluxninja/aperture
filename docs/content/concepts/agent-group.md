@@ -14,10 +14,10 @@ operating as peers. It serves as a means to organize and manage Agents within
 Aperture. The agent group can be associated with different entities based on the
 deployment mode of the Agents.
 
-In sidecar mode, it is recommended to name the agent group based on the
-respective service. This approach establishes a unified agent group for all pods
-within the service. For example, all pods within the 'Checkout' service can be
-defined under the same agent group.
+In sidecar mode, it is recommended to name the agent group based on the service.
+This approach establishes a unified agent group for all pods within the service.
+For example, all pods within the 'Checkout' service can be defined under the
+same agent group.
 
 In DaemonSet mode, the agent group name is typically based on the Kubernetes
 cluster name. This ensures that all Agents deployed on each node of the cluster

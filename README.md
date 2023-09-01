@@ -106,7 +106,7 @@ To try Aperture in a local Kubernetes environment, refer to
 
 ### 🏎️ Installation
 
-To install the Aperture system, please follow the
+To install the Aperture system, follow the
 [Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Use Cases
@@ -130,11 +130,11 @@ To install the Aperture system, please follow the
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
-helps us improve Aperture to be more reliable and user-friendly. Please make
-sure to include all the required information to reproduce and understand the bug
-you are reporting. Follow helper questions in the bug report template to make it
-easier. If you see a way to improve Aperture, use the
+helps us improve Aperture to be more reliable and user-friendly. Include all the
+required information to reproduce and understand the bug you are reporting.
+Follow helper questions in the bug report template to make it easier. If you see
+a way to improve Aperture, use the
 [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=)
 template to create an issue.
 
-To contribute code, please read the [Contribution guide](CONTRIBUTING.md).
+To contribute code, read the [Contribution guide](CONTRIBUTING.md).

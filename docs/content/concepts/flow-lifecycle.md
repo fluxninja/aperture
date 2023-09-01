@@ -34,12 +34,11 @@ back to the service.
 
 </Zoom>
 
-Outlined below is the sequence of stages in detail, along with their respective
-roles:
+Outlined below is the sequence of stages in detail, along with their roles:
 
 :::note
 
-Remember, a flow may bypass certain or all stages if there are no matching
+Remember, a flow can bypass certain or all stages if there are no matching
 components for that stage.
 
 :::
