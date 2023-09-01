@@ -20,7 +20,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.11.1
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
-	github.com/getsentry/sentry-go v0.22.0
+	github.com/getsentry/sentry-go v0.23.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-git/go-git/v5 v5.8.1
 	github.com/go-logr/zerologr v1.2.3
