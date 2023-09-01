@@ -33,7 +33,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/memberlist v0.5.0
 	github.com/integralist/go-findroot v0.0.0-20160518114804-ac90681525dc
@@ -194,10 +194,10 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	golang.org/x/net v0.12.0
-	google.golang.org/genproto v0.0.0-20230717213848-3f92550aa753
-	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230726155614-23370e0ffb3e
+	golang.org/x/net v0.14.0
+	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5
+	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/fsnotify.v1 v1.4.7
@@ -211,10 +211,10 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.110.4 // indirect
+	cloud.google.com/go v0.110.6 // indirect
 	cloud.google.com/go/compute/metadata v0.2.4-0.20230617002413-005d2dfb6b68 // indirect
 	cloud.google.com/go/iam v1.1.1 // indirect
-	cloud.google.com/go/pubsub v1.32.0 // indirect
+	cloud.google.com/go/pubsub v1.33.0 // indirect
 	cloud.google.com/go/spanner v1.47.0 // indirect
 	code.cloudfoundry.org/go-diodes v0.0.0-20211115184647-b584dd5df32c // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible // indirect
@@ -510,7 +510,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute v1.22.0 // indirect
+	cloud.google.com/go/compute v1.23.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -654,13 +654,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.12.0
-	golang.org/x/oauth2 v0.10.0
+	golang.org/x/oauth2 v0.11.0
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/term v0.10.0 // indirect
-	golang.org/x/text v0.11.0
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/term v0.11.0 // indirect
+	golang.org/x/text v0.12.0
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/api v0.134.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
