@@ -26,7 +26,7 @@ require (
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-openapi/runtime v0.26.0
 	github.com/go-openapi/strfmt v0.21.7
-	github.com/go-playground/validator/v10 v10.14.1
+	github.com/go-playground/validator/v10 v10.15.3
 	github.com/gofrs/flock v0.8.1
 	github.com/golang/mock v1.6.0
 	github.com/google/go-jsonnet v0.20.0
