@@ -167,23 +167,23 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.etcd.io/etcd/api/v3 v3.5.9
 	go.etcd.io/etcd/client/v3 v3.5.9
-	go.opentelemetry.io/collector v0.82.0
-	go.opentelemetry.io/collector/component v0.82.0
-	go.opentelemetry.io/collector/confmap v0.82.0
+	go.opentelemetry.io/collector v0.84.0
+	go.opentelemetry.io/collector/component v0.84.0
+	go.opentelemetry.io/collector/confmap v0.84.0
 	go.opentelemetry.io/collector/connector v0.82.0
-	go.opentelemetry.io/collector/consumer v0.82.0
-	go.opentelemetry.io/collector/exporter v0.82.0
+	go.opentelemetry.io/collector/consumer v0.84.0
+	go.opentelemetry.io/collector/exporter v0.84.0
 	go.opentelemetry.io/collector/exporter/loggingexporter v0.82.0
 	go.opentelemetry.io/collector/exporter/otlpexporter v0.82.0
 	go.opentelemetry.io/collector/exporter/otlphttpexporter v0.82.0
-	go.opentelemetry.io/collector/extension v0.82.0
+	go.opentelemetry.io/collector/extension v0.84.0
 	go.opentelemetry.io/collector/extension/ballastextension v0.82.0
 	go.opentelemetry.io/collector/extension/zpagesextension v0.82.0
 	go.opentelemetry.io/collector/pdata v1.0.0-rcv0014
-	go.opentelemetry.io/collector/processor v0.82.0
+	go.opentelemetry.io/collector/processor v0.84.0
 	go.opentelemetry.io/collector/processor/batchprocessor v0.82.0
 	go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.82.0
-	go.opentelemetry.io/collector/receiver v0.82.0
+	go.opentelemetry.io/collector/receiver v0.84.0
 	go.opentelemetry.io/collector/receiver/otlpreceiver v0.82.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.42.1-0.20230612162650-64be7e574a17
 	go.opentelemetry.io/otel v1.16.0
@@ -192,9 +192,9 @@ require (
 	go.uber.org/fx v1.20.0
 	go.uber.org/goleak v1.2.1
 	go.uber.org/multierr v1.11.0
-	go.uber.org/zap v1.24.0
+	go.uber.org/zap v1.25.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	golang.org/x/net v0.12.0
+	golang.org/x/net v0.14.0
 	google.golang.org/genproto v0.0.0-20230717213848-3f92550aa753
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230726155614-23370e0ffb3e
@@ -481,7 +481,7 @@ require (
 	go.opentelemetry.io/collector/config/confighttp v0.82.0 // indirect
 	go.opentelemetry.io/collector/config/confignet v0.82.0 // indirect
 	go.opentelemetry.io/collector/config/configopaque v0.82.0 // indirect
-	go.opentelemetry.io/collector/config/configtelemetry v0.82.0 // indirect
+	go.opentelemetry.io/collector/config/configtelemetry v0.84.0 // indirect
 	go.opentelemetry.io/collector/config/configtls v0.82.0 // indirect
 	go.opentelemetry.io/collector/config/internal v0.82.0 // indirect
 	go.opentelemetry.io/collector/extension/auth v0.82.0 // indirect
@@ -654,13 +654,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.12.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/term v0.10.0 // indirect
-	golang.org/x/text v0.11.0
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/term v0.11.0 // indirect
+	golang.org/x/text v0.12.0
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/api v0.134.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
