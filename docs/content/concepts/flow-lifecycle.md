@@ -34,8 +34,7 @@ back to the service.
 
 </Zoom>
 
-Outlined below is the sequence of stages in detail, along with their respective
-roles:
+Outlined below is the sequence of stages in detail, along with their roles:
 
 :::note
 
