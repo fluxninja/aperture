@@ -31,7 +31,7 @@ no longer overloaded.
 
 :::info
 
-Please see reference for the
+See reference for the
 [`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
 component that is used within this blueprint.
 

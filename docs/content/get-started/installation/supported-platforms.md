@@ -23,4 +23,4 @@ Below are the platforms supported for the Aperture Agent:
 | Fedora     | 35 and above        |
 
 For information regarding other platforms where you want to see support for
-Aperture, please contact [FluxNinja support](mailto:support@fluxninja.com).
+Aperture, contact [FluxNinja support](mailto:support@fluxninja.com).

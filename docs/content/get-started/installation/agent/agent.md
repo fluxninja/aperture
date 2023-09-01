@@ -54,9 +54,8 @@ and can result in unpredictable behavior.
       This method requires access to create cluster level resources like
       ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
-      Please use the [Namespace-scoped
-      Installation][namespace-scoped-installation] if you do not want to assign
-      the cluster level permissions.
+      Use the [Namespace-scoped Installation][namespace-scoped-installation] if
+      you do not want to assign the cluster level permissions.
 
       :::
 

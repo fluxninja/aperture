@@ -15,9 +15,8 @@ healthy.
 
 :::info
 
-Please see reference for the
-[`LoadRamp`](/reference/configuration/spec.md#load-ramp) component that is used
-within this blueprint.
+See reference for the [`LoadRamp`](/reference/configuration/spec.md#load-ramp)
+component that is used within this blueprint.
 
 :::
 

@@ -21,7 +21,7 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../../apertureV
 This method requires access to create cluster level resources like ClusterRole,
 ClusterRoleBinding, CustomResourceDefinition and so on.
 
-Please use the
+Use the
 [Namespace-scoped Installation](/get-started/installation/agent/kubernetes/namespace-scoped/namespace-scoped.md)
 if you do not want to assign the cluster level permissions.
 
