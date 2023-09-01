@@ -372,7 +372,7 @@ github.com/containerd/cgroups v1.1.0/go.mod h1:6ppBcbh/NOOUU+dMKrykgaBnK9lCIBxHq
 github.com/containerd/console v1.0.3/go.mod h1:7LqA/THxQ86k76b8c/EMSiaJ3h1eZkMkXar0TQ1gf3U=
 github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 h1:q2hJAaP1k2wIvVRd/hEHD7lacgqrCPS+k8g1MndzfWY=
 github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81/go.mod h1:YynlIjWYF8myEu6sdkwKIvGQq+cOckRm6So2avqoYAk=
-github.com/containerd/containerd v1.7.2 h1:UF2gdONnxO8I6byZXDi5sXWiWvlW3D/sci7dTQimEJo=
+github.com/containerd/containerd v1.7.4 h1:Q5lwCrO44ahHhO65rXthXkfJUG5W78LXwK9gTt8XFfU=
 github.com/containerd/ttrpc v1.1.0/go.mod h1:XX4ZTnoOId4HklF4edwc4DcqskFZuvXB1Evzy5KFQpQ=
 github.com/containerd/ttrpc v1.2.2 h1:9vqZr0pxwOF5koz6N0N3kJ0zDHokrcPxIR/ZR2YFtOs=
 github.com/containerd/ttrpc v1.2.2/go.mod h1:sIT6l32Ph/H9cvnJsfXM5drIVzTr5A2flTf1G5tYZak=
@@ -1503,8 +1503,8 @@ github.com/onsi/gomega v1.27.3/go.mod h1:5vG284IBtfDAmDyrK+eGyZmUgUlmi+Wngqo557c
 github.com/onsi/gomega v1.27.4/go.mod h1:riYq/GJKh8hhoM01HN6Vmuy93AarCXCBGpvFDK3q3fQ=
 github.com/onsi/gomega v1.27.10 h1:naR28SdDFlqrG6kScpT8VWpu1xWY5nJRCF3XaYyBjhI=
 github.com/onsi/gomega v1.27.10/go.mod h1:RsS8tutOdbdgzbPtzzATp12yT7kM5I5aElG3evPbQ0M=
-github.com/open-policy-agent/opa v0.55.0 h1:s7Vm4ph6zDqqP/KzvUSw9fsKVsm9lhbTZhYGxxTK7mo=
-github.com/open-policy-agent/opa v0.55.0/go.mod h1:2Vh8fj/bXCqSwGMbBiHGrw+O8yrho6T/fdaHt5ROmaQ=
+github.com/open-policy-agent/opa v0.56.0 h1:FUSb6MyckjuffOMshEG8P+HGnckxkJ8ENZJHEzAddhk=
+github.com/open-policy-agent/opa v0.56.0/go.mod h1:un01L10fkolr00KJMDSqGb2FXCjVyVQOybLtHOfSEfY=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0 h1:YccZy2FGXswLjcZrAJuz2v4kA+rmRpMFa6O5wm9SnXM=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0/go.mod h1:xojeJD4/M8VAWSPzWYWAqCSpUifJZTOV1HeI4z9H/kg=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
