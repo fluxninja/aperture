@@ -19,13 +19,12 @@ keywords:
   - faq
 ---
 
-### Does the usage of Aperture entail extra overhead on requests? {#request-overhead}
+### Does Aperture add latency on requests? {#request-overhead}
 
-While Aperture does add some latency overhead, it's a minimal one. Thanks to
-colocating Aperture Agents with services, it's a single RPC call within a single
-node.
+While Aperture does add some latency, it is a minimal one. Thanks to colocating
+Aperture Agents with services, it's a single RPC call within a single node.
 
-### If we already have circuit breakers and rate limiting in EnvoyProxy, what are the benefits of using Aperture? {#envoy-rate-limit}
+### If are the benefits of using Aperture over circuit breakers and rate limiting in EnvoyProxy? {#envoy-rate-limit}
 
 While Envoy does have some local and non-local rate-limiting capabilities, there
 are still benefits of using Aperture:
@@ -62,7 +61,7 @@ to avoid, if such a case occurs an overload is already happening and Aperture is
 protecting your service from an unhealthy state (for example crashing) and
 therefore affecting even more users.
 
-### How can we define Flow Labels for workload prioritization or rate limiting? {#flow-labels}
+### How can Flow Labels be defined for workload prioritization or rate limiting? {#flow-labels}
 
 - In proxy- or web-framework-based Control Point insertion, most request
   metadata is already available as Flow Labels, for example
@@ -86,10 +85,9 @@ additional capacity is being added.
 
 ### Can the Aperture Controller run in a non-containerized environment? {#controller-bare-metal}
 
-No, as for now, we only support deploying [Aperture
-Controller][aperture-controller] on a Kubernetes cluster. Remember that it's
-also possible to use the [Aperture Cloud Controller][aperture-cloud-controller]
-instead of deploying your own.
+No, as for now, [Aperture Controller][aperture-controller] only runs on a
+Kubernetes cluster. Remember that it's also possible to use the [Aperture Cloud
+Controller][aperture-cloud-controller] instead of deploying your own.
 
 ### Can the Aperture Agent run in a non-containerized environment? {#agent-bare-metal}
 
@@ -114,7 +112,7 @@ With the following setup:
   [Istio Integration](/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate over 30 minutes
 
-We have observed the following performance numbers:
+The following results were observed:
 
 |                | CPU (vCPU core)      | Memory (MB)         |
 | -------------- | -------------------- | ------------------- |

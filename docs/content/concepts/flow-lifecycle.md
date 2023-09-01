@@ -39,7 +39,7 @@ roles:
 
 :::note
 
-Remember, a flow may bypass certain or all stages if there are no matching
+Remember, a flow can bypass certain or all stages if there are no matching
 components for that stage.
 
 :::

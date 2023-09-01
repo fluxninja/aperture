@@ -8,8 +8,8 @@ sidebar_label: Install Aperture
 
 To deploy Aperture with Aperture Cloud, it's enough to install Aperture Agents.
 
-We also recommend installing aperturectl CLI. It can help with installation of
-Agents, and also will be needed to manage the policies.
+It is recommended to install `aperturectl` CLI as it can help with installation
+of Agents and managing policies.
 
 :::note
 

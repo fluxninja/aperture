@@ -2418,9 +2418,9 @@ type Scheduler_Workload_Parameters struct {
 	// in the flow labels.
 	Tokens int64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
 	// Timeout for the flow in the workload.
-	// If timeout is provided on the Check call as well, we pick the minimum of the two.
+	// If timeout is provided on the Check call as well, the minimum of the two is picked.
 	// If this override is not provided, the timeout provided in the check call is used.
-	// 0 timeout value implies that the request will not wait in the queue and will be accepted/dropped immediately.
+	// 0 timeout value implies that the request will not wait in the queue and will be accepted or dropped immediately.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	QueueTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=queue_timeout,json=queueTimeout,proto3" json:"queue_timeout,omitempty"`
 }

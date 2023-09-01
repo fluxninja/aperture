@@ -32,9 +32,9 @@ Aperture. Check out the complete installation guide in
 
 <!-- vale on -->
 
-With the help of Aperture Lua modules and Aperture Plugin for Nginx and Kong
-respectively, it is easy to integrate Aperture with API Gateway. You can check
-out the complete installation guide in
+With the help of Aperture Lua modules in Nginx and Aperture Plugin in Kong, it
+is easy to integrate Aperture with API Gateway. You can check out the complete
+installation guide in
 [API Gateway Integration](/integrations/gateway/gateway.md).
 
 <!-- vale off -->

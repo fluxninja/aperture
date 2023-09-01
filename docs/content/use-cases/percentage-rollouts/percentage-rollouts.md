@@ -34,10 +34,10 @@ cause any performance regressions, thereby reducing operational risk.
 
 This graph portrays the role of the Controller in actuating the rollout policy.
 The rollout policy defines the 'forward' and 'reset' criteria, which dictate
-when to roll forward or reset the feature, respectively. Based on these
-criteria, the Controller sends the defined load ramp percentage to the Agent.
-Subsequently, the Agent redirects traffic based on this percentage to the new
-feature of the service.
+when to roll forward or reset the feature. Based on these criteria, the
+Controller sends the defined load ramp percentage to the Agent. Subsequently,
+the Agent redirects traffic based on this percentage to the new feature of the
+service.
 
 ## Example Scenario
 

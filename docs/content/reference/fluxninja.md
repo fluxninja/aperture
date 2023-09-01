@@ -103,8 +103,7 @@ of the organization on Aperture Cloud and API Key generated on it.
 :::note
 
 For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
-`grpc/http2` address. We are still working on supporting the `https` fallback
-option.
+`grpc/http2` address. Support for `https` fallback option is in the works.
 
 :::
 
