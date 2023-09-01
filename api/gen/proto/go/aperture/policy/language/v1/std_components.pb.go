@@ -1720,6 +1720,77 @@ func (x *SignalGenerator) GetParameters() *SignalGenerator_Parameters {
 	return nil
 }
 
+// PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+// <!-- vale off -->
+// $$
+// error = setpoint - signal \\
+// integral_i = integral_{i-1} + k_i \cdot error \\
+// output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
+// $$
+// <!-- vale on -->
+type PIDController struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	InPorts    *PIDController_Ins        `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
+	OutPorts   *PIDController_Outs       `protobuf:"bytes,2,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
+	Parameters *PIDController_Parameters `protobuf:"bytes,3,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
+}
+
+func (x *PIDController) Reset() {
+	*x = PIDController{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PIDController) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PIDController) ProtoMessage() {}
+
+func (x *PIDController) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PIDController.ProtoReflect.Descriptor instead.
+func (*PIDController) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_std_components_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *PIDController) GetInPorts() *PIDController_Ins {
+	if x != nil {
+		return x.InPorts
+	}
+	return nil
+}
+
+func (x *PIDController) GetOutPorts() *PIDController_Outs {
+	if x != nil {
+		return x.OutPorts
+	}
+	return nil
+}
+
+func (x *PIDController) GetParameters() *PIDController_Parameters {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
 // Gradient Parameters.
 type GradientController_Parameters struct {
 	state         protoimpl.MessageState
@@ -1778,7 +1849,7 @@ type GradientController_Parameters struct {
 func (x *GradientController_Parameters) Reset() {
 	*x = GradientController_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[24]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1791,7 +1862,7 @@ func (x *GradientController_Parameters) String() string {
 func (*GradientController_Parameters) ProtoMessage() {}
 
 func (x *GradientController_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[24]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1851,7 +1922,7 @@ type GradientController_Ins struct {
 func (x *GradientController_Ins) Reset() {
 	*x = GradientController_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[25]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1864,7 +1935,7 @@ func (x *GradientController_Ins) String() string {
 func (*GradientController_Ins) ProtoMessage() {}
 
 func (x *GradientController_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[25]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1928,7 +1999,7 @@ type GradientController_Outs struct {
 func (x *GradientController_Outs) Reset() {
 	*x = GradientController_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[26]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1941,7 +2012,7 @@ func (x *GradientController_Outs) String() string {
 func (*GradientController_Outs) ProtoMessage() {}
 
 func (x *GradientController_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[26]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1993,7 +2064,7 @@ type EMA_Ins struct {
 func (x *EMA_Ins) Reset() {
 	*x = EMA_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[27]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2006,7 +2077,7 @@ func (x *EMA_Ins) String() string {
 func (*EMA_Ins) ProtoMessage() {}
 
 func (x *EMA_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[27]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2056,7 +2127,7 @@ type EMA_Outs struct {
 func (x *EMA_Outs) Reset() {
 	*x = EMA_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[28]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2069,7 +2140,7 @@ func (x *EMA_Outs) String() string {
 func (*EMA_Outs) ProtoMessage() {}
 
 func (x *EMA_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[28]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2098,7 +2169,7 @@ type EMA_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Duration of EMA sampling window.
+	// EMA window duration.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	EmaWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=ema_window,json=emaWindow,proto3" json:"ema_window,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Duration of EMA warming up window.
@@ -2117,7 +2188,7 @@ type EMA_Parameters struct {
 func (x *EMA_Parameters) Reset() {
 	*x = EMA_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[29]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2130,7 +2201,7 @@ func (x *EMA_Parameters) String() string {
 func (*EMA_Parameters) ProtoMessage() {}
 
 func (x *EMA_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[29]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2193,7 +2264,7 @@ type SMA_Ins struct {
 func (x *SMA_Ins) Reset() {
 	*x = SMA_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[30]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2206,7 +2277,7 @@ func (x *SMA_Ins) String() string {
 func (*SMA_Ins) ProtoMessage() {}
 
 func (x *SMA_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[30]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2241,7 +2312,7 @@ type SMA_Outs struct {
 func (x *SMA_Outs) Reset() {
 	*x = SMA_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[31]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2254,7 +2325,7 @@ func (x *SMA_Outs) String() string {
 func (*SMA_Outs) ProtoMessage() {}
 
 func (x *SMA_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[31]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2292,7 +2363,7 @@ type SMA_Parameters struct {
 func (x *SMA_Parameters) Reset() {
 	*x = SMA_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[32]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2305,7 +2376,7 @@ func (x *SMA_Parameters) String() string {
 func (*SMA_Parameters) ProtoMessage() {}
 
 func (x *SMA_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[32]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2350,7 +2421,7 @@ type ArithmeticCombinator_Ins struct {
 func (x *ArithmeticCombinator_Ins) Reset() {
 	*x = ArithmeticCombinator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[33]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2363,7 +2434,7 @@ func (x *ArithmeticCombinator_Ins) String() string {
 func (*ArithmeticCombinator_Ins) ProtoMessage() {}
 
 func (x *ArithmeticCombinator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[33]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2406,7 +2477,7 @@ type ArithmeticCombinator_Outs struct {
 func (x *ArithmeticCombinator_Outs) Reset() {
 	*x = ArithmeticCombinator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[34]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2419,7 +2490,7 @@ func (x *ArithmeticCombinator_Outs) String() string {
 func (*ArithmeticCombinator_Outs) ProtoMessage() {}
 
 func (x *ArithmeticCombinator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[34]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2457,7 +2528,7 @@ type Decider_Ins struct {
 func (x *Decider_Ins) Reset() {
 	*x = Decider_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[35]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2470,7 +2541,7 @@ func (x *Decider_Ins) String() string {
 func (*Decider_Ins) ProtoMessage() {}
 
 func (x *Decider_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[35]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2513,7 +2584,7 @@ type Decider_Outs struct {
 func (x *Decider_Outs) Reset() {
 	*x = Decider_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[36]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2526,7 +2597,7 @@ func (x *Decider_Outs) String() string {
 func (*Decider_Outs) ProtoMessage() {}
 
 func (x *Decider_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[36]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2566,7 +2637,7 @@ type Switcher_Ins struct {
 func (x *Switcher_Ins) Reset() {
 	*x = Switcher_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[37]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2579,7 +2650,7 @@ func (x *Switcher_Ins) String() string {
 func (*Switcher_Ins) ProtoMessage() {}
 
 func (x *Switcher_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[37]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2629,7 +2700,7 @@ type Switcher_Outs struct {
 func (x *Switcher_Outs) Reset() {
 	*x = Switcher_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[38]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2642,7 +2713,7 @@ func (x *Switcher_Outs) String() string {
 func (*Switcher_Outs) ProtoMessage() {}
 
 func (x *Switcher_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[38]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2678,7 +2749,7 @@ type Variable_Outs struct {
 func (x *Variable_Outs) Reset() {
 	*x = Variable_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[39]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2691,7 +2762,7 @@ func (x *Variable_Outs) String() string {
 func (*Variable_Outs) ProtoMessage() {}
 
 func (x *Variable_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[39]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2727,7 +2798,7 @@ type BoolVariable_Outs struct {
 func (x *BoolVariable_Outs) Reset() {
 	*x = BoolVariable_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[40]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2740,7 +2811,7 @@ func (x *BoolVariable_Outs) String() string {
 func (*BoolVariable_Outs) ProtoMessage() {}
 
 func (x *BoolVariable_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[40]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2776,7 +2847,7 @@ type UnaryOperator_Ins struct {
 func (x *UnaryOperator_Ins) Reset() {
 	*x = UnaryOperator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[41]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2789,7 +2860,7 @@ func (x *UnaryOperator_Ins) String() string {
 func (*UnaryOperator_Ins) ProtoMessage() {}
 
 func (x *UnaryOperator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[41]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2825,7 +2896,7 @@ type UnaryOperator_Outs struct {
 func (x *UnaryOperator_Outs) Reset() {
 	*x = UnaryOperator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[42]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2838,7 +2909,7 @@ func (x *UnaryOperator_Outs) String() string {
 func (*UnaryOperator_Outs) ProtoMessage() {}
 
 func (x *UnaryOperator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[42]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2875,7 +2946,7 @@ type Extrapolator_Parameters struct {
 func (x *Extrapolator_Parameters) Reset() {
 	*x = Extrapolator_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[43]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2888,7 +2959,7 @@ func (x *Extrapolator_Parameters) String() string {
 func (*Extrapolator_Parameters) ProtoMessage() {}
 
 func (x *Extrapolator_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[43]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2924,7 +2995,7 @@ type Extrapolator_Ins struct {
 func (x *Extrapolator_Ins) Reset() {
 	*x = Extrapolator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[44]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2937,7 +3008,7 @@ func (x *Extrapolator_Ins) String() string {
 func (*Extrapolator_Ins) ProtoMessage() {}
 
 func (x *Extrapolator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[44]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2973,7 +3044,7 @@ type Extrapolator_Outs struct {
 func (x *Extrapolator_Outs) Reset() {
 	*x = Extrapolator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[45]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2986,7 +3057,7 @@ func (x *Extrapolator_Outs) String() string {
 func (*Extrapolator_Outs) ProtoMessage() {}
 
 func (x *Extrapolator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[45]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3022,7 +3093,7 @@ type Max_Ins struct {
 func (x *Max_Ins) Reset() {
 	*x = Max_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[46]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3035,7 +3106,7 @@ func (x *Max_Ins) String() string {
 func (*Max_Ins) ProtoMessage() {}
 
 func (x *Max_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[46]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3071,7 +3142,7 @@ type Max_Outs struct {
 func (x *Max_Outs) Reset() {
 	*x = Max_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[47]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3084,7 +3155,7 @@ func (x *Max_Outs) String() string {
 func (*Max_Outs) ProtoMessage() {}
 
 func (x *Max_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[47]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3120,7 +3191,7 @@ type Min_Ins struct {
 func (x *Min_Ins) Reset() {
 	*x = Min_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[48]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3133,7 +3204,7 @@ func (x *Min_Ins) String() string {
 func (*Min_Ins) ProtoMessage() {}
 
 func (x *Min_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[48]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3169,7 +3240,7 @@ type Min_Outs struct {
 func (x *Min_Outs) Reset() {
 	*x = Min_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[49]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3182,7 +3253,7 @@ func (x *Min_Outs) String() string {
 func (*Min_Outs) ProtoMessage() {}
 
 func (x *Min_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[49]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3218,7 +3289,7 @@ type And_Ins struct {
 func (x *And_Ins) Reset() {
 	*x = And_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[50]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3231,7 +3302,7 @@ func (x *And_Ins) String() string {
 func (*And_Ins) ProtoMessage() {}
 
 func (x *And_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[50]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3269,7 +3340,7 @@ type And_Outs struct {
 func (x *And_Outs) Reset() {
 	*x = And_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[51]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3282,7 +3353,7 @@ func (x *And_Outs) String() string {
 func (*And_Outs) ProtoMessage() {}
 
 func (x *And_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[51]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3318,7 +3389,7 @@ type Or_Ins struct {
 func (x *Or_Ins) Reset() {
 	*x = Or_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[52]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[53]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3331,7 +3402,7 @@ func (x *Or_Ins) String() string {
 func (*Or_Ins) ProtoMessage() {}
 
 func (x *Or_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[52]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[53]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3369,7 +3440,7 @@ type Or_Outs struct {
 func (x *Or_Outs) Reset() {
 	*x = Or_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[53]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3382,7 +3453,7 @@ func (x *Or_Outs) String() string {
 func (*Or_Outs) ProtoMessage() {}
 
 func (x *Or_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[53]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3418,7 +3489,7 @@ type Inverter_Ins struct {
 func (x *Inverter_Ins) Reset() {
 	*x = Inverter_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[54]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3431,7 +3502,7 @@ func (x *Inverter_Ins) String() string {
 func (*Inverter_Ins) ProtoMessage() {}
 
 func (x *Inverter_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[54]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3469,7 +3540,7 @@ type Inverter_Outs struct {
 func (x *Inverter_Outs) Reset() {
 	*x = Inverter_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[55]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[56]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3482,7 +3553,7 @@ func (x *Inverter_Outs) String() string {
 func (*Inverter_Outs) ProtoMessage() {}
 
 func (x *Inverter_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[55]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[56]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3518,7 +3589,7 @@ type FirstValid_Ins struct {
 func (x *FirstValid_Ins) Reset() {
 	*x = FirstValid_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[56]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[57]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3531,7 +3602,7 @@ func (x *FirstValid_Ins) String() string {
 func (*FirstValid_Ins) ProtoMessage() {}
 
 func (x *FirstValid_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[56]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[57]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3567,7 +3638,7 @@ type FirstValid_Outs struct {
 func (x *FirstValid_Outs) Reset() {
 	*x = FirstValid_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[57]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[58]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3580,7 +3651,7 @@ func (x *FirstValid_Outs) String() string {
 func (*FirstValid_Outs) ProtoMessage() {}
 
 func (x *FirstValid_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[57]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[58]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3625,7 +3696,7 @@ type Alerter_Parameters struct {
 func (x *Alerter_Parameters) Reset() {
 	*x = Alerter_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[58]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[59]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3638,7 +3709,7 @@ func (x *Alerter_Parameters) String() string {
 func (*Alerter_Parameters) ProtoMessage() {}
 
 func (x *Alerter_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[58]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[59]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3702,7 +3773,7 @@ type Alerter_Ins struct {
 func (x *Alerter_Ins) Reset() {
 	*x = Alerter_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[59]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[60]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3715,7 +3786,7 @@ func (x *Alerter_Ins) String() string {
 func (*Alerter_Ins) ProtoMessage() {}
 
 func (x *Alerter_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[59]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[60]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3757,7 +3828,7 @@ type Integrator_Ins struct {
 func (x *Integrator_Ins) Reset() {
 	*x = Integrator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[61]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[62]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3770,7 +3841,7 @@ func (x *Integrator_Ins) String() string {
 func (*Integrator_Ins) ProtoMessage() {}
 
 func (x *Integrator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[61]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[62]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3826,7 +3897,7 @@ type Integrator_Outs struct {
 func (x *Integrator_Outs) Reset() {
 	*x = Integrator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[62]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[63]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3839,7 +3910,7 @@ func (x *Integrator_Outs) String() string {
 func (*Integrator_Outs) ProtoMessage() {}
 
 func (x *Integrator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[62]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[63]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3874,7 +3945,7 @@ type Differentiator_Ins struct {
 func (x *Differentiator_Ins) Reset() {
 	*x = Differentiator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[63]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[64]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3887,7 +3958,7 @@ func (x *Differentiator_Ins) String() string {
 func (*Differentiator_Ins) ProtoMessage() {}
 
 func (x *Differentiator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[63]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[64]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3922,7 +3993,7 @@ type Differentiator_Outs struct {
 func (x *Differentiator_Outs) Reset() {
 	*x = Differentiator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[64]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[65]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3935,7 +4006,7 @@ func (x *Differentiator_Outs) String() string {
 func (*Differentiator_Outs) ProtoMessage() {}
 
 func (x *Differentiator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[64]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[65]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3970,7 +4041,7 @@ type PulseGenerator_Outs struct {
 func (x *PulseGenerator_Outs) Reset() {
 	*x = PulseGenerator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[65]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[66]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3983,7 +4054,7 @@ func (x *PulseGenerator_Outs) String() string {
 func (*PulseGenerator_Outs) ProtoMessage() {}
 
 func (x *PulseGenerator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[65]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[66]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4021,7 +4092,7 @@ type Holder_Ins struct {
 func (x *Holder_Ins) Reset() {
 	*x = Holder_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[66]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[67]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4034,7 +4105,7 @@ func (x *Holder_Ins) String() string {
 func (*Holder_Ins) ProtoMessage() {}
 
 func (x *Holder_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[66]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[67]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4077,7 +4148,7 @@ type Holder_Outs struct {
 func (x *Holder_Outs) Reset() {
 	*x = Holder_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[67]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[68]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4090,7 +4161,7 @@ func (x *Holder_Outs) String() string {
 func (*Holder_Outs) ProtoMessage() {}
 
 func (x *Holder_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[67]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[68]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4126,7 +4197,7 @@ type NestedSignalIngress_Outs struct {
 func (x *NestedSignalIngress_Outs) Reset() {
 	*x = NestedSignalIngress_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[68]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[69]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4139,7 +4210,7 @@ func (x *NestedSignalIngress_Outs) String() string {
 func (*NestedSignalIngress_Outs) ProtoMessage() {}
 
 func (x *NestedSignalIngress_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[68]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[69]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4175,7 +4246,7 @@ type NestedSignalEgress_Ins struct {
 func (x *NestedSignalEgress_Ins) Reset() {
 	*x = NestedSignalEgress_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[69]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[70]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4188,7 +4259,7 @@ func (x *NestedSignalEgress_Ins) String() string {
 func (*NestedSignalEgress_Ins) ProtoMessage() {}
 
 func (x *NestedSignalEgress_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[69]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[70]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4223,7 +4294,7 @@ type SignalGenerator_Parameters struct {
 func (x *SignalGenerator_Parameters) Reset() {
 	*x = SignalGenerator_Parameters{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[70]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[71]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4236,7 +4307,7 @@ func (x *SignalGenerator_Parameters) String() string {
 func (*SignalGenerator_Parameters) ProtoMessage() {}
 
 func (x *SignalGenerator_Parameters) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[70]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[71]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4276,7 +4347,7 @@ type SignalGenerator_Ins struct {
 func (x *SignalGenerator_Ins) Reset() {
 	*x = SignalGenerator_Ins{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[71]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[72]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4289,7 +4360,7 @@ func (x *SignalGenerator_Ins) String() string {
 func (*SignalGenerator_Ins) ProtoMessage() {}
 
 func (x *SignalGenerator_Ins) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[71]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[72]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4343,7 +4414,7 @@ type SignalGenerator_Outs struct {
 func (x *SignalGenerator_Outs) Reset() {
 	*x = SignalGenerator_Outs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[72]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[73]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4356,7 +4427,7 @@ func (x *SignalGenerator_Outs) String() string {
 func (*SignalGenerator_Outs) ProtoMessage() {}
 
 func (x *SignalGenerator_Outs) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[72]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[73]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4408,7 +4479,7 @@ type SignalGenerator_Parameters_Step struct {
 func (x *SignalGenerator_Parameters_Step) Reset() {
 	*x = SignalGenerator_Parameters_Step{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[73]
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[74]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4421,7 +4492,7 @@ func (x *SignalGenerator_Parameters_Step) String() string {
 func (*SignalGenerator_Parameters_Step) ProtoMessage() {}
 
 func (x *SignalGenerator_Parameters_Step) ProtoReflect() protoreflect.Message {
-	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[73]
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[74]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4447,6 +4518,214 @@ func (x *SignalGenerator_Parameters_Step) GetTargetOutput() *ConstantSignal {
 func (x *SignalGenerator_Parameters_Step) GetDuration() *durationpb.Duration {
 	if x != nil {
 		return x.Duration
+	}
+	return nil
+}
+
+type PIDController_Parameters struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The proportional gain of the PID controller.
+	Kp float64 `protobuf:"fixed64,1,opt,name=kp,proto3" json:"kp,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
+	// The integral gain of the PID controller.
+	Ki float64 `protobuf:"fixed64,2,opt,name=ki,proto3" json:"ki,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
+	// The derivative gain of the PID controller.
+	Kd float64 `protobuf:"fixed64,3,opt,name=kd,proto3" json:"kd,omitempty" validate:"gte=0" default:"0"` // @gotags: validate:"gte=0" default:"0"
+	// The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
+	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+	SamplePeriod *durationpb.Duration `protobuf:"bytes,4,opt,name=sample_period,json=samplePeriod,proto3" json:"sample_period,omitempty"`
+	// The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
+	ResetAfterInvalidSamples int32 `protobuf:"varint,5,opt,name=reset_after_invalid_samples,json=resetAfterInvalidSamples,proto3" json:"reset_after_invalid_samples,omitempty" validate:"gte=1" default:"4"` // @gotags: validate:"gte=1" default:"4"
+}
+
+func (x *PIDController_Parameters) Reset() {
+	*x = PIDController_Parameters{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[75]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PIDController_Parameters) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PIDController_Parameters) ProtoMessage() {}
+
+func (x *PIDController_Parameters) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[75]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PIDController_Parameters.ProtoReflect.Descriptor instead.
+func (*PIDController_Parameters) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_std_components_proto_rawDescGZIP(), []int{24, 0}
+}
+
+func (x *PIDController_Parameters) GetKp() float64 {
+	if x != nil {
+		return x.Kp
+	}
+	return 0
+}
+
+func (x *PIDController_Parameters) GetKi() float64 {
+	if x != nil {
+		return x.Ki
+	}
+	return 0
+}
+
+func (x *PIDController_Parameters) GetKd() float64 {
+	if x != nil {
+		return x.Kd
+	}
+	return 0
+}
+
+func (x *PIDController_Parameters) GetSamplePeriod() *durationpb.Duration {
+	if x != nil {
+		return x.SamplePeriod
+	}
+	return nil
+}
+
+func (x *PIDController_Parameters) GetResetAfterInvalidSamples() int32 {
+	if x != nil {
+		return x.ResetAfterInvalidSamples
+	}
+	return 0
+}
+
+type PIDController_Ins struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The signal to be controlled
+	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty"`
+	// The desired setpoint for the signal
+	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty"`
+	// Minimum allowed output
+	Min *InPort `protobuf:"bytes,3,opt,name=min,proto3" json:"min,omitempty"`
+	// Maximum allowed output
+	Max *InPort `protobuf:"bytes,4,opt,name=max,proto3" json:"max,omitempty"`
+}
+
+func (x *PIDController_Ins) Reset() {
+	*x = PIDController_Ins{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[76]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PIDController_Ins) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PIDController_Ins) ProtoMessage() {}
+
+func (x *PIDController_Ins) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[76]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PIDController_Ins.ProtoReflect.Descriptor instead.
+func (*PIDController_Ins) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_std_components_proto_rawDescGZIP(), []int{24, 1}
+}
+
+func (x *PIDController_Ins) GetSignal() *InPort {
+	if x != nil {
+		return x.Signal
+	}
+	return nil
+}
+
+func (x *PIDController_Ins) GetSetpoint() *InPort {
+	if x != nil {
+		return x.Setpoint
+	}
+	return nil
+}
+
+func (x *PIDController_Ins) GetMin() *InPort {
+	if x != nil {
+		return x.Min
+	}
+	return nil
+}
+
+func (x *PIDController_Ins) GetMax() *InPort {
+	if x != nil {
+		return x.Max
+	}
+	return nil
+}
+
+type PIDController_Outs struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Output of the PID controller
+	Output *OutPort `protobuf:"bytes,1,opt,name=output,proto3" json:"output,omitempty"`
+}
+
+func (x *PIDController_Outs) Reset() {
+	*x = PIDController_Outs{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[77]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PIDController_Outs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PIDController_Outs) ProtoMessage() {}
+
+func (x *PIDController_Outs) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[77]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PIDController_Outs.ProtoReflect.Descriptor instead.
+func (*PIDController_Outs) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_std_components_proto_rawDescGZIP(), []int{24, 2}
+}
+
+func (x *PIDController_Outs) GetOutput() *OutPort {
+	if x != nil {
+		return x.Output
 	}
 	return nil
 }
@@ -5086,27 +5365,75 @@ var file_aperture_policy_language_v1_std_components_proto_rawDesc = []byte{
 	0x3b, 0x0a, 0x06, 0x61, 0x74, 0x5f, 0x65, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63,
 	0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75,
-	0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x61, 0x74, 0x45, 0x6e, 0x64, 0x42, 0xb2, 0x02, 0x0a,
-	0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e, 0x67,
-	0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
+	0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x61, 0x74, 0x45, 0x6e, 0x64, 0x22, 0xf7, 0x05, 0x0a,
+	0x0d, 0x50, 0x49, 0x44, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x12, 0x49,
+	0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x2e, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50,
+	0x49, 0x44, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x49, 0x6e, 0x73,
+	0x52, 0x07, 0x69, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x4c, 0x0a, 0x09, 0x6f, 0x75, 0x74,
+	0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x61,
+	0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c,
+	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x49, 0x44, 0x43, 0x6f,
+	0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x4f, 0x75, 0x74, 0x73, 0x52, 0x08, 0x6f,
+	0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x12, 0x55, 0x0a, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d,
+	0x65, 0x74, 0x65, 0x72, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x35, 0x2e, 0x61, 0x70,
+	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61,
+	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x49, 0x44, 0x43, 0x6f, 0x6e,
+	0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65,
+	0x72, 0x73, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0xbb,
+	0x01, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x0e, 0x0a,
+	0x02, 0x6b, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x02, 0x6b, 0x70, 0x12, 0x0e, 0x0a,
+	0x02, 0x6b, 0x69, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x02, 0x6b, 0x69, 0x12, 0x0e, 0x0a,
+	0x02, 0x6b, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x02, 0x6b, 0x64, 0x12, 0x3e, 0x0a,
+	0x0d, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x0c, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x50, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x12, 0x3d, 0x0a,
+	0x1b, 0x72, 0x65, 0x73, 0x65, 0x74, 0x5f, 0x61, 0x66, 0x74, 0x65, 0x72, 0x5f, 0x69, 0x6e, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x5f, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x05, 0x52, 0x18, 0x72, 0x65, 0x73, 0x65, 0x74, 0x41, 0x66, 0x74, 0x65, 0x72, 0x49, 0x6e,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x53, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x73, 0x1a, 0xf1, 0x01, 0x0a,
+	0x03, 0x49, 0x6e, 0x73, 0x12, 0x3b, 0x0a, 0x06, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x73, 0x69, 0x67, 0x6e, 0x61,
+	0x6c, 0x12, 0x3f, 0x0a, 0x08, 0x73, 0x65, 0x74, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70,
+	0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76,
+	0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x08, 0x73, 0x65, 0x74, 0x70, 0x6f, 0x69,
+	0x6e, 0x74, 0x12, 0x35, 0x0a, 0x03, 0x6d, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63,
+	0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e,
+	0x50, 0x6f, 0x72, 0x74, 0x52, 0x03, 0x6d, 0x69, 0x6e, 0x12, 0x35, 0x0a, 0x03, 0x6d, 0x61, 0x78,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
 	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
-	0x65, 0x2e, 0x76, 0x31, 0x42, 0x12, 0x53, 0x74, 0x64, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65,
-	0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x58, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61,
-	0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x2f, 0x61, 0x70,
-	0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2f, 0x6c, 0x61,
-	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2f, 0x76, 0x31, 0x3b, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61,
-	0x67, 0x65, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x4c, 0xaa, 0x02, 0x1b, 0x41, 0x70, 0x65,
-	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x4c, 0x61, 0x6e,
-	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74,
-	0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75,
-	0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x27, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
-	0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
-	0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x1e, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x3a, 0x50, 0x6f, 0x6c,
-	0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x3a, 0x3a, 0x56,
-	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x03, 0x6d, 0x61, 0x78,
+	0x1a, 0x44, 0x0a, 0x04, 0x4f, 0x75, 0x74, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70,
+	0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75,
+	0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06,
+	0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x42, 0xb2, 0x02, 0x0a, 0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66,
+	0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x64, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x42, 0x12,
+	0x53, 0x74, 0x64, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x58, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
+	0x2f, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
+	0x2f, 0x76, 0x31, 0x3b, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x76, 0x31, 0xa2, 0x02,
+	0x03, 0x41, 0x50, 0x4c, 0xaa, 0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x56, 0x31, 0xca, 0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f,
+	0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31,
+	0xe2, 0x02, 0x27, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1e, 0x41, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x3a, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c,
+	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5121,7 +5448,7 @@ func file_aperture_policy_language_v1_std_components_proto_rawDescGZIP() []byte 
 	return file_aperture_policy_language_v1_std_components_proto_rawDescData
 }
 
-var file_aperture_policy_language_v1_std_components_proto_msgTypes = make([]protoimpl.MessageInfo, 74)
+var file_aperture_policy_language_v1_std_components_proto_msgTypes = make([]protoimpl.MessageInfo, 78)
 var file_aperture_policy_language_v1_std_components_proto_goTypes = []interface{}{
 	(*GradientController)(nil),              // 0: aperture.policy.language.v1.GradientController
 	(*EMA)(nil),                             // 1: aperture.policy.language.v1.EMA
@@ -5147,191 +5474,204 @@ var file_aperture_policy_language_v1_std_components_proto_goTypes = []interface{
 	(*NestedSignalIngress)(nil),             // 21: aperture.policy.language.v1.NestedSignalIngress
 	(*NestedSignalEgress)(nil),              // 22: aperture.policy.language.v1.NestedSignalEgress
 	(*SignalGenerator)(nil),                 // 23: aperture.policy.language.v1.SignalGenerator
-	(*GradientController_Parameters)(nil),   // 24: aperture.policy.language.v1.GradientController.Parameters
-	(*GradientController_Ins)(nil),          // 25: aperture.policy.language.v1.GradientController.Ins
-	(*GradientController_Outs)(nil),         // 26: aperture.policy.language.v1.GradientController.Outs
-	(*EMA_Ins)(nil),                         // 27: aperture.policy.language.v1.EMA.Ins
-	(*EMA_Outs)(nil),                        // 28: aperture.policy.language.v1.EMA.Outs
-	(*EMA_Parameters)(nil),                  // 29: aperture.policy.language.v1.EMA.Parameters
-	(*SMA_Ins)(nil),                         // 30: aperture.policy.language.v1.SMA.Ins
-	(*SMA_Outs)(nil),                        // 31: aperture.policy.language.v1.SMA.Outs
-	(*SMA_Parameters)(nil),                  // 32: aperture.policy.language.v1.SMA.Parameters
-	(*ArithmeticCombinator_Ins)(nil),        // 33: aperture.policy.language.v1.ArithmeticCombinator.Ins
-	(*ArithmeticCombinator_Outs)(nil),       // 34: aperture.policy.language.v1.ArithmeticCombinator.Outs
-	(*Decider_Ins)(nil),                     // 35: aperture.policy.language.v1.Decider.Ins
-	(*Decider_Outs)(nil),                    // 36: aperture.policy.language.v1.Decider.Outs
-	(*Switcher_Ins)(nil),                    // 37: aperture.policy.language.v1.Switcher.Ins
-	(*Switcher_Outs)(nil),                   // 38: aperture.policy.language.v1.Switcher.Outs
-	(*Variable_Outs)(nil),                   // 39: aperture.policy.language.v1.Variable.Outs
-	(*BoolVariable_Outs)(nil),               // 40: aperture.policy.language.v1.BoolVariable.Outs
-	(*UnaryOperator_Ins)(nil),               // 41: aperture.policy.language.v1.UnaryOperator.Ins
-	(*UnaryOperator_Outs)(nil),              // 42: aperture.policy.language.v1.UnaryOperator.Outs
-	(*Extrapolator_Parameters)(nil),         // 43: aperture.policy.language.v1.Extrapolator.Parameters
-	(*Extrapolator_Ins)(nil),                // 44: aperture.policy.language.v1.Extrapolator.Ins
-	(*Extrapolator_Outs)(nil),               // 45: aperture.policy.language.v1.Extrapolator.Outs
-	(*Max_Ins)(nil),                         // 46: aperture.policy.language.v1.Max.Ins
-	(*Max_Outs)(nil),                        // 47: aperture.policy.language.v1.Max.Outs
-	(*Min_Ins)(nil),                         // 48: aperture.policy.language.v1.Min.Ins
-	(*Min_Outs)(nil),                        // 49: aperture.policy.language.v1.Min.Outs
-	(*And_Ins)(nil),                         // 50: aperture.policy.language.v1.And.Ins
-	(*And_Outs)(nil),                        // 51: aperture.policy.language.v1.And.Outs
-	(*Or_Ins)(nil),                          // 52: aperture.policy.language.v1.Or.Ins
-	(*Or_Outs)(nil),                         // 53: aperture.policy.language.v1.Or.Outs
-	(*Inverter_Ins)(nil),                    // 54: aperture.policy.language.v1.Inverter.Ins
-	(*Inverter_Outs)(nil),                   // 55: aperture.policy.language.v1.Inverter.Outs
-	(*FirstValid_Ins)(nil),                  // 56: aperture.policy.language.v1.FirstValid.Ins
-	(*FirstValid_Outs)(nil),                 // 57: aperture.policy.language.v1.FirstValid.Outs
-	(*Alerter_Parameters)(nil),              // 58: aperture.policy.language.v1.Alerter.Parameters
-	(*Alerter_Ins)(nil),                     // 59: aperture.policy.language.v1.Alerter.Ins
-	nil,                                     // 60: aperture.policy.language.v1.Alerter.Parameters.LabelsEntry
-	(*Integrator_Ins)(nil),                  // 61: aperture.policy.language.v1.Integrator.Ins
-	(*Integrator_Outs)(nil),                 // 62: aperture.policy.language.v1.Integrator.Outs
-	(*Differentiator_Ins)(nil),              // 63: aperture.policy.language.v1.Differentiator.Ins
-	(*Differentiator_Outs)(nil),             // 64: aperture.policy.language.v1.Differentiator.Outs
-	(*PulseGenerator_Outs)(nil),             // 65: aperture.policy.language.v1.PulseGenerator.Outs
-	(*Holder_Ins)(nil),                      // 66: aperture.policy.language.v1.Holder.Ins
-	(*Holder_Outs)(nil),                     // 67: aperture.policy.language.v1.Holder.Outs
-	(*NestedSignalIngress_Outs)(nil),        // 68: aperture.policy.language.v1.NestedSignalIngress.Outs
-	(*NestedSignalEgress_Ins)(nil),          // 69: aperture.policy.language.v1.NestedSignalEgress.Ins
-	(*SignalGenerator_Parameters)(nil),      // 70: aperture.policy.language.v1.SignalGenerator.Parameters
-	(*SignalGenerator_Ins)(nil),             // 71: aperture.policy.language.v1.SignalGenerator.Ins
-	(*SignalGenerator_Outs)(nil),            // 72: aperture.policy.language.v1.SignalGenerator.Outs
-	(*SignalGenerator_Parameters_Step)(nil), // 73: aperture.policy.language.v1.SignalGenerator.Parameters.Step
-	(*durationpb.Duration)(nil),             // 74: google.protobuf.Duration
-	(*ConstantSignal)(nil),                  // 75: aperture.policy.language.v1.ConstantSignal
-	(*InPort)(nil),                          // 76: aperture.policy.language.v1.InPort
-	(*OutPort)(nil),                         // 77: aperture.policy.language.v1.OutPort
+	(*PIDController)(nil),                   // 24: aperture.policy.language.v1.PIDController
+	(*GradientController_Parameters)(nil),   // 25: aperture.policy.language.v1.GradientController.Parameters
+	(*GradientController_Ins)(nil),          // 26: aperture.policy.language.v1.GradientController.Ins
+	(*GradientController_Outs)(nil),         // 27: aperture.policy.language.v1.GradientController.Outs
+	(*EMA_Ins)(nil),                         // 28: aperture.policy.language.v1.EMA.Ins
+	(*EMA_Outs)(nil),                        // 29: aperture.policy.language.v1.EMA.Outs
+	(*EMA_Parameters)(nil),                  // 30: aperture.policy.language.v1.EMA.Parameters
+	(*SMA_Ins)(nil),                         // 31: aperture.policy.language.v1.SMA.Ins
+	(*SMA_Outs)(nil),                        // 32: aperture.policy.language.v1.SMA.Outs
+	(*SMA_Parameters)(nil),                  // 33: aperture.policy.language.v1.SMA.Parameters
+	(*ArithmeticCombinator_Ins)(nil),        // 34: aperture.policy.language.v1.ArithmeticCombinator.Ins
+	(*ArithmeticCombinator_Outs)(nil),       // 35: aperture.policy.language.v1.ArithmeticCombinator.Outs
+	(*Decider_Ins)(nil),                     // 36: aperture.policy.language.v1.Decider.Ins
+	(*Decider_Outs)(nil),                    // 37: aperture.policy.language.v1.Decider.Outs
+	(*Switcher_Ins)(nil),                    // 38: aperture.policy.language.v1.Switcher.Ins
+	(*Switcher_Outs)(nil),                   // 39: aperture.policy.language.v1.Switcher.Outs
+	(*Variable_Outs)(nil),                   // 40: aperture.policy.language.v1.Variable.Outs
+	(*BoolVariable_Outs)(nil),               // 41: aperture.policy.language.v1.BoolVariable.Outs
+	(*UnaryOperator_Ins)(nil),               // 42: aperture.policy.language.v1.UnaryOperator.Ins
+	(*UnaryOperator_Outs)(nil),              // 43: aperture.policy.language.v1.UnaryOperator.Outs
+	(*Extrapolator_Parameters)(nil),         // 44: aperture.policy.language.v1.Extrapolator.Parameters
+	(*Extrapolator_Ins)(nil),                // 45: aperture.policy.language.v1.Extrapolator.Ins
+	(*Extrapolator_Outs)(nil),               // 46: aperture.policy.language.v1.Extrapolator.Outs
+	(*Max_Ins)(nil),                         // 47: aperture.policy.language.v1.Max.Ins
+	(*Max_Outs)(nil),                        // 48: aperture.policy.language.v1.Max.Outs
+	(*Min_Ins)(nil),                         // 49: aperture.policy.language.v1.Min.Ins
+	(*Min_Outs)(nil),                        // 50: aperture.policy.language.v1.Min.Outs
+	(*And_Ins)(nil),                         // 51: aperture.policy.language.v1.And.Ins
+	(*And_Outs)(nil),                        // 52: aperture.policy.language.v1.And.Outs
+	(*Or_Ins)(nil),                          // 53: aperture.policy.language.v1.Or.Ins
+	(*Or_Outs)(nil),                         // 54: aperture.policy.language.v1.Or.Outs
+	(*Inverter_Ins)(nil),                    // 55: aperture.policy.language.v1.Inverter.Ins
+	(*Inverter_Outs)(nil),                   // 56: aperture.policy.language.v1.Inverter.Outs
+	(*FirstValid_Ins)(nil),                  // 57: aperture.policy.language.v1.FirstValid.Ins
+	(*FirstValid_Outs)(nil),                 // 58: aperture.policy.language.v1.FirstValid.Outs
+	(*Alerter_Parameters)(nil),              // 59: aperture.policy.language.v1.Alerter.Parameters
+	(*Alerter_Ins)(nil),                     // 60: aperture.policy.language.v1.Alerter.Ins
+	nil,                                     // 61: aperture.policy.language.v1.Alerter.Parameters.LabelsEntry
+	(*Integrator_Ins)(nil),                  // 62: aperture.policy.language.v1.Integrator.Ins
+	(*Integrator_Outs)(nil),                 // 63: aperture.policy.language.v1.Integrator.Outs
+	(*Differentiator_Ins)(nil),              // 64: aperture.policy.language.v1.Differentiator.Ins
+	(*Differentiator_Outs)(nil),             // 65: aperture.policy.language.v1.Differentiator.Outs
+	(*PulseGenerator_Outs)(nil),             // 66: aperture.policy.language.v1.PulseGenerator.Outs
+	(*Holder_Ins)(nil),                      // 67: aperture.policy.language.v1.Holder.Ins
+	(*Holder_Outs)(nil),                     // 68: aperture.policy.language.v1.Holder.Outs
+	(*NestedSignalIngress_Outs)(nil),        // 69: aperture.policy.language.v1.NestedSignalIngress.Outs
+	(*NestedSignalEgress_Ins)(nil),          // 70: aperture.policy.language.v1.NestedSignalEgress.Ins
+	(*SignalGenerator_Parameters)(nil),      // 71: aperture.policy.language.v1.SignalGenerator.Parameters
+	(*SignalGenerator_Ins)(nil),             // 72: aperture.policy.language.v1.SignalGenerator.Ins
+	(*SignalGenerator_Outs)(nil),            // 73: aperture.policy.language.v1.SignalGenerator.Outs
+	(*SignalGenerator_Parameters_Step)(nil), // 74: aperture.policy.language.v1.SignalGenerator.Parameters.Step
+	(*PIDController_Parameters)(nil),        // 75: aperture.policy.language.v1.PIDController.Parameters
+	(*PIDController_Ins)(nil),               // 76: aperture.policy.language.v1.PIDController.Ins
+	(*PIDController_Outs)(nil),              // 77: aperture.policy.language.v1.PIDController.Outs
+	(*durationpb.Duration)(nil),             // 78: google.protobuf.Duration
+	(*ConstantSignal)(nil),                  // 79: aperture.policy.language.v1.ConstantSignal
+	(*InPort)(nil),                          // 80: aperture.policy.language.v1.InPort
+	(*OutPort)(nil),                         // 81: aperture.policy.language.v1.OutPort
 }
 var file_aperture_policy_language_v1_std_components_proto_depIdxs = []int32{
-	25,  // 0: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
-	26,  // 1: aperture.policy.language.v1.GradientController.out_ports:type_name -> aperture.policy.language.v1.GradientController.Outs
-	24,  // 2: aperture.policy.language.v1.GradientController.parameters:type_name -> aperture.policy.language.v1.GradientController.Parameters
-	27,  // 3: aperture.policy.language.v1.EMA.in_ports:type_name -> aperture.policy.language.v1.EMA.Ins
-	28,  // 4: aperture.policy.language.v1.EMA.out_ports:type_name -> aperture.policy.language.v1.EMA.Outs
-	29,  // 5: aperture.policy.language.v1.EMA.parameters:type_name -> aperture.policy.language.v1.EMA.Parameters
-	30,  // 6: aperture.policy.language.v1.SMA.in_ports:type_name -> aperture.policy.language.v1.SMA.Ins
-	31,  // 7: aperture.policy.language.v1.SMA.out_ports:type_name -> aperture.policy.language.v1.SMA.Outs
-	32,  // 8: aperture.policy.language.v1.SMA.parameters:type_name -> aperture.policy.language.v1.SMA.Parameters
-	33,  // 9: aperture.policy.language.v1.ArithmeticCombinator.in_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Ins
-	34,  // 10: aperture.policy.language.v1.ArithmeticCombinator.out_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Outs
-	35,  // 11: aperture.policy.language.v1.Decider.in_ports:type_name -> aperture.policy.language.v1.Decider.Ins
-	36,  // 12: aperture.policy.language.v1.Decider.out_ports:type_name -> aperture.policy.language.v1.Decider.Outs
-	74,  // 13: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
-	74,  // 14: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
-	37,  // 15: aperture.policy.language.v1.Switcher.in_ports:type_name -> aperture.policy.language.v1.Switcher.Ins
-	38,  // 16: aperture.policy.language.v1.Switcher.out_ports:type_name -> aperture.policy.language.v1.Switcher.Outs
-	39,  // 17: aperture.policy.language.v1.Variable.out_ports:type_name -> aperture.policy.language.v1.Variable.Outs
-	75,  // 18: aperture.policy.language.v1.Variable.constant_output:type_name -> aperture.policy.language.v1.ConstantSignal
-	40,  // 19: aperture.policy.language.v1.BoolVariable.out_ports:type_name -> aperture.policy.language.v1.BoolVariable.Outs
-	41,  // 20: aperture.policy.language.v1.UnaryOperator.in_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Ins
-	42,  // 21: aperture.policy.language.v1.UnaryOperator.out_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Outs
-	44,  // 22: aperture.policy.language.v1.Extrapolator.in_ports:type_name -> aperture.policy.language.v1.Extrapolator.Ins
-	45,  // 23: aperture.policy.language.v1.Extrapolator.out_ports:type_name -> aperture.policy.language.v1.Extrapolator.Outs
-	43,  // 24: aperture.policy.language.v1.Extrapolator.parameters:type_name -> aperture.policy.language.v1.Extrapolator.Parameters
-	46,  // 25: aperture.policy.language.v1.Max.in_ports:type_name -> aperture.policy.language.v1.Max.Ins
-	47,  // 26: aperture.policy.language.v1.Max.out_ports:type_name -> aperture.policy.language.v1.Max.Outs
-	48,  // 27: aperture.policy.language.v1.Min.in_ports:type_name -> aperture.policy.language.v1.Min.Ins
-	49,  // 28: aperture.policy.language.v1.Min.out_ports:type_name -> aperture.policy.language.v1.Min.Outs
-	50,  // 29: aperture.policy.language.v1.And.in_ports:type_name -> aperture.policy.language.v1.And.Ins
-	51,  // 30: aperture.policy.language.v1.And.out_ports:type_name -> aperture.policy.language.v1.And.Outs
-	52,  // 31: aperture.policy.language.v1.Or.in_ports:type_name -> aperture.policy.language.v1.Or.Ins
-	53,  // 32: aperture.policy.language.v1.Or.out_ports:type_name -> aperture.policy.language.v1.Or.Outs
-	54,  // 33: aperture.policy.language.v1.Inverter.in_ports:type_name -> aperture.policy.language.v1.Inverter.Ins
-	55,  // 34: aperture.policy.language.v1.Inverter.out_ports:type_name -> aperture.policy.language.v1.Inverter.Outs
-	56,  // 35: aperture.policy.language.v1.FirstValid.in_ports:type_name -> aperture.policy.language.v1.FirstValid.Ins
-	57,  // 36: aperture.policy.language.v1.FirstValid.out_ports:type_name -> aperture.policy.language.v1.FirstValid.Outs
-	59,  // 37: aperture.policy.language.v1.Alerter.in_ports:type_name -> aperture.policy.language.v1.Alerter.Ins
-	58,  // 38: aperture.policy.language.v1.Alerter.parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
-	61,  // 39: aperture.policy.language.v1.Integrator.in_ports:type_name -> aperture.policy.language.v1.Integrator.Ins
-	62,  // 40: aperture.policy.language.v1.Integrator.out_ports:type_name -> aperture.policy.language.v1.Integrator.Outs
-	63,  // 41: aperture.policy.language.v1.Differentiator.in_ports:type_name -> aperture.policy.language.v1.Differentiator.Ins
-	64,  // 42: aperture.policy.language.v1.Differentiator.out_ports:type_name -> aperture.policy.language.v1.Differentiator.Outs
-	74,  // 43: aperture.policy.language.v1.Differentiator.window:type_name -> google.protobuf.Duration
-	65,  // 44: aperture.policy.language.v1.PulseGenerator.out_ports:type_name -> aperture.policy.language.v1.PulseGenerator.Outs
-	74,  // 45: aperture.policy.language.v1.PulseGenerator.true_for:type_name -> google.protobuf.Duration
-	74,  // 46: aperture.policy.language.v1.PulseGenerator.false_for:type_name -> google.protobuf.Duration
-	66,  // 47: aperture.policy.language.v1.Holder.in_ports:type_name -> aperture.policy.language.v1.Holder.Ins
-	67,  // 48: aperture.policy.language.v1.Holder.out_ports:type_name -> aperture.policy.language.v1.Holder.Outs
-	74,  // 49: aperture.policy.language.v1.Holder.hold_for:type_name -> google.protobuf.Duration
-	68,  // 50: aperture.policy.language.v1.NestedSignalIngress.out_ports:type_name -> aperture.policy.language.v1.NestedSignalIngress.Outs
-	69,  // 51: aperture.policy.language.v1.NestedSignalEgress.in_ports:type_name -> aperture.policy.language.v1.NestedSignalEgress.Ins
-	71,  // 52: aperture.policy.language.v1.SignalGenerator.in_ports:type_name -> aperture.policy.language.v1.SignalGenerator.Ins
-	72,  // 53: aperture.policy.language.v1.SignalGenerator.out_ports:type_name -> aperture.policy.language.v1.SignalGenerator.Outs
-	70,  // 54: aperture.policy.language.v1.SignalGenerator.parameters:type_name -> aperture.policy.language.v1.SignalGenerator.Parameters
-	76,  // 55: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	76,  // 56: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	76,  // 57: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.InPort
-	76,  // 58: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.InPort
-	76,  // 59: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.InPort
-	77,  // 60: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 61: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	76,  // 62: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.InPort
-	76,  // 63: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.InPort
-	77,  // 64: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	74,  // 65: aperture.policy.language.v1.EMA.Parameters.ema_window:type_name -> google.protobuf.Duration
-	74,  // 66: aperture.policy.language.v1.EMA.Parameters.warmup_window:type_name -> google.protobuf.Duration
-	76,  // 67: aperture.policy.language.v1.SMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	77,  // 68: aperture.policy.language.v1.SMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	74,  // 69: aperture.policy.language.v1.SMA.Parameters.sma_window:type_name -> google.protobuf.Duration
-	76,  // 70: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
-	76,  // 71: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 72: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 73: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
-	76,  // 74: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 75: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 76: aperture.policy.language.v1.Switcher.Ins.on_signal:type_name -> aperture.policy.language.v1.InPort
-	76,  // 77: aperture.policy.language.v1.Switcher.Ins.off_signal:type_name -> aperture.policy.language.v1.InPort
-	76,  // 78: aperture.policy.language.v1.Switcher.Ins.switch:type_name -> aperture.policy.language.v1.InPort
-	77,  // 79: aperture.policy.language.v1.Switcher.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 80: aperture.policy.language.v1.Variable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 81: aperture.policy.language.v1.BoolVariable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 82: aperture.policy.language.v1.UnaryOperator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	77,  // 83: aperture.policy.language.v1.UnaryOperator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	74,  // 84: aperture.policy.language.v1.Extrapolator.Parameters.max_extrapolation_interval:type_name -> google.protobuf.Duration
-	76,  // 85: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	77,  // 86: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 87: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 88: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 89: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 90: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 91: aperture.policy.language.v1.And.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 92: aperture.policy.language.v1.And.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 93: aperture.policy.language.v1.Or.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 94: aperture.policy.language.v1.Or.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 95: aperture.policy.language.v1.Inverter.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	77,  // 96: aperture.policy.language.v1.Inverter.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 97: aperture.policy.language.v1.FirstValid.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	77,  // 98: aperture.policy.language.v1.FirstValid.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	74,  // 99: aperture.policy.language.v1.Alerter.Parameters.resolve_timeout:type_name -> google.protobuf.Duration
-	60,  // 100: aperture.policy.language.v1.Alerter.Parameters.labels:type_name -> aperture.policy.language.v1.Alerter.Parameters.LabelsEntry
-	76,  // 101: aperture.policy.language.v1.Alerter.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	76,  // 102: aperture.policy.language.v1.Integrator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	76,  // 103: aperture.policy.language.v1.Integrator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	76,  // 104: aperture.policy.language.v1.Integrator.Ins.max:type_name -> aperture.policy.language.v1.InPort
-	76,  // 105: aperture.policy.language.v1.Integrator.Ins.min:type_name -> aperture.policy.language.v1.InPort
-	77,  // 106: aperture.policy.language.v1.Integrator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 107: aperture.policy.language.v1.Differentiator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	77,  // 108: aperture.policy.language.v1.Differentiator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 109: aperture.policy.language.v1.PulseGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 110: aperture.policy.language.v1.Holder.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	76,  // 111: aperture.policy.language.v1.Holder.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	77,  // 112: aperture.policy.language.v1.Holder.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 113: aperture.policy.language.v1.NestedSignalIngress.Outs.signal:type_name -> aperture.policy.language.v1.OutPort
-	76,  // 114: aperture.policy.language.v1.NestedSignalEgress.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	73,  // 115: aperture.policy.language.v1.SignalGenerator.Parameters.steps:type_name -> aperture.policy.language.v1.SignalGenerator.Parameters.Step
-	76,  // 116: aperture.policy.language.v1.SignalGenerator.Ins.forward:type_name -> aperture.policy.language.v1.InPort
-	76,  // 117: aperture.policy.language.v1.SignalGenerator.Ins.backward:type_name -> aperture.policy.language.v1.InPort
-	76,  // 118: aperture.policy.language.v1.SignalGenerator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	77,  // 119: aperture.policy.language.v1.SignalGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 120: aperture.policy.language.v1.SignalGenerator.Outs.at_start:type_name -> aperture.policy.language.v1.OutPort
-	77,  // 121: aperture.policy.language.v1.SignalGenerator.Outs.at_end:type_name -> aperture.policy.language.v1.OutPort
-	75,  // 122: aperture.policy.language.v1.SignalGenerator.Parameters.Step.target_output:type_name -> aperture.policy.language.v1.ConstantSignal
-	74,  // 123: aperture.policy.language.v1.SignalGenerator.Parameters.Step.duration:type_name -> google.protobuf.Duration
-	124, // [124:124] is the sub-list for method output_type
-	124, // [124:124] is the sub-list for method input_type
-	124, // [124:124] is the sub-list for extension type_name
-	124, // [124:124] is the sub-list for extension extendee
-	0,   // [0:124] is the sub-list for field type_name
+	26,  // 0: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
+	27,  // 1: aperture.policy.language.v1.GradientController.out_ports:type_name -> aperture.policy.language.v1.GradientController.Outs
+	25,  // 2: aperture.policy.language.v1.GradientController.parameters:type_name -> aperture.policy.language.v1.GradientController.Parameters
+	28,  // 3: aperture.policy.language.v1.EMA.in_ports:type_name -> aperture.policy.language.v1.EMA.Ins
+	29,  // 4: aperture.policy.language.v1.EMA.out_ports:type_name -> aperture.policy.language.v1.EMA.Outs
+	30,  // 5: aperture.policy.language.v1.EMA.parameters:type_name -> aperture.policy.language.v1.EMA.Parameters
+	31,  // 6: aperture.policy.language.v1.SMA.in_ports:type_name -> aperture.policy.language.v1.SMA.Ins
+	32,  // 7: aperture.policy.language.v1.SMA.out_ports:type_name -> aperture.policy.language.v1.SMA.Outs
+	33,  // 8: aperture.policy.language.v1.SMA.parameters:type_name -> aperture.policy.language.v1.SMA.Parameters
+	34,  // 9: aperture.policy.language.v1.ArithmeticCombinator.in_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Ins
+	35,  // 10: aperture.policy.language.v1.ArithmeticCombinator.out_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Outs
+	36,  // 11: aperture.policy.language.v1.Decider.in_ports:type_name -> aperture.policy.language.v1.Decider.Ins
+	37,  // 12: aperture.policy.language.v1.Decider.out_ports:type_name -> aperture.policy.language.v1.Decider.Outs
+	78,  // 13: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
+	78,  // 14: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
+	38,  // 15: aperture.policy.language.v1.Switcher.in_ports:type_name -> aperture.policy.language.v1.Switcher.Ins
+	39,  // 16: aperture.policy.language.v1.Switcher.out_ports:type_name -> aperture.policy.language.v1.Switcher.Outs
+	40,  // 17: aperture.policy.language.v1.Variable.out_ports:type_name -> aperture.policy.language.v1.Variable.Outs
+	79,  // 18: aperture.policy.language.v1.Variable.constant_output:type_name -> aperture.policy.language.v1.ConstantSignal
+	41,  // 19: aperture.policy.language.v1.BoolVariable.out_ports:type_name -> aperture.policy.language.v1.BoolVariable.Outs
+	42,  // 20: aperture.policy.language.v1.UnaryOperator.in_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Ins
+	43,  // 21: aperture.policy.language.v1.UnaryOperator.out_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Outs
+	45,  // 22: aperture.policy.language.v1.Extrapolator.in_ports:type_name -> aperture.policy.language.v1.Extrapolator.Ins
+	46,  // 23: aperture.policy.language.v1.Extrapolator.out_ports:type_name -> aperture.policy.language.v1.Extrapolator.Outs
+	44,  // 24: aperture.policy.language.v1.Extrapolator.parameters:type_name -> aperture.policy.language.v1.Extrapolator.Parameters
+	47,  // 25: aperture.policy.language.v1.Max.in_ports:type_name -> aperture.policy.language.v1.Max.Ins
+	48,  // 26: aperture.policy.language.v1.Max.out_ports:type_name -> aperture.policy.language.v1.Max.Outs
+	49,  // 27: aperture.policy.language.v1.Min.in_ports:type_name -> aperture.policy.language.v1.Min.Ins
+	50,  // 28: aperture.policy.language.v1.Min.out_ports:type_name -> aperture.policy.language.v1.Min.Outs
+	51,  // 29: aperture.policy.language.v1.And.in_ports:type_name -> aperture.policy.language.v1.And.Ins
+	52,  // 30: aperture.policy.language.v1.And.out_ports:type_name -> aperture.policy.language.v1.And.Outs
+	53,  // 31: aperture.policy.language.v1.Or.in_ports:type_name -> aperture.policy.language.v1.Or.Ins
+	54,  // 32: aperture.policy.language.v1.Or.out_ports:type_name -> aperture.policy.language.v1.Or.Outs
+	55,  // 33: aperture.policy.language.v1.Inverter.in_ports:type_name -> aperture.policy.language.v1.Inverter.Ins
+	56,  // 34: aperture.policy.language.v1.Inverter.out_ports:type_name -> aperture.policy.language.v1.Inverter.Outs
+	57,  // 35: aperture.policy.language.v1.FirstValid.in_ports:type_name -> aperture.policy.language.v1.FirstValid.Ins
+	58,  // 36: aperture.policy.language.v1.FirstValid.out_ports:type_name -> aperture.policy.language.v1.FirstValid.Outs
+	60,  // 37: aperture.policy.language.v1.Alerter.in_ports:type_name -> aperture.policy.language.v1.Alerter.Ins
+	59,  // 38: aperture.policy.language.v1.Alerter.parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
+	62,  // 39: aperture.policy.language.v1.Integrator.in_ports:type_name -> aperture.policy.language.v1.Integrator.Ins
+	63,  // 40: aperture.policy.language.v1.Integrator.out_ports:type_name -> aperture.policy.language.v1.Integrator.Outs
+	64,  // 41: aperture.policy.language.v1.Differentiator.in_ports:type_name -> aperture.policy.language.v1.Differentiator.Ins
+	65,  // 42: aperture.policy.language.v1.Differentiator.out_ports:type_name -> aperture.policy.language.v1.Differentiator.Outs
+	78,  // 43: aperture.policy.language.v1.Differentiator.window:type_name -> google.protobuf.Duration
+	66,  // 44: aperture.policy.language.v1.PulseGenerator.out_ports:type_name -> aperture.policy.language.v1.PulseGenerator.Outs
+	78,  // 45: aperture.policy.language.v1.PulseGenerator.true_for:type_name -> google.protobuf.Duration
+	78,  // 46: aperture.policy.language.v1.PulseGenerator.false_for:type_name -> google.protobuf.Duration
+	67,  // 47: aperture.policy.language.v1.Holder.in_ports:type_name -> aperture.policy.language.v1.Holder.Ins
+	68,  // 48: aperture.policy.language.v1.Holder.out_ports:type_name -> aperture.policy.language.v1.Holder.Outs
+	78,  // 49: aperture.policy.language.v1.Holder.hold_for:type_name -> google.protobuf.Duration
+	69,  // 50: aperture.policy.language.v1.NestedSignalIngress.out_ports:type_name -> aperture.policy.language.v1.NestedSignalIngress.Outs
+	70,  // 51: aperture.policy.language.v1.NestedSignalEgress.in_ports:type_name -> aperture.policy.language.v1.NestedSignalEgress.Ins
+	72,  // 52: aperture.policy.language.v1.SignalGenerator.in_ports:type_name -> aperture.policy.language.v1.SignalGenerator.Ins
+	73,  // 53: aperture.policy.language.v1.SignalGenerator.out_ports:type_name -> aperture.policy.language.v1.SignalGenerator.Outs
+	71,  // 54: aperture.policy.language.v1.SignalGenerator.parameters:type_name -> aperture.policy.language.v1.SignalGenerator.Parameters
+	76,  // 55: aperture.policy.language.v1.PIDController.in_ports:type_name -> aperture.policy.language.v1.PIDController.Ins
+	77,  // 56: aperture.policy.language.v1.PIDController.out_ports:type_name -> aperture.policy.language.v1.PIDController.Outs
+	75,  // 57: aperture.policy.language.v1.PIDController.parameters:type_name -> aperture.policy.language.v1.PIDController.Parameters
+	80,  // 58: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	80,  // 59: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	80,  // 60: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	80,  // 61: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	80,  // 62: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.InPort
+	81,  // 63: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 64: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	80,  // 65: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.InPort
+	80,  // 66: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.InPort
+	81,  // 67: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	78,  // 68: aperture.policy.language.v1.EMA.Parameters.ema_window:type_name -> google.protobuf.Duration
+	78,  // 69: aperture.policy.language.v1.EMA.Parameters.warmup_window:type_name -> google.protobuf.Duration
+	80,  // 70: aperture.policy.language.v1.SMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	81,  // 71: aperture.policy.language.v1.SMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	78,  // 72: aperture.policy.language.v1.SMA.Parameters.sma_window:type_name -> google.protobuf.Duration
+	80,  // 73: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
+	80,  // 74: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 75: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 76: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
+	80,  // 77: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 78: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 79: aperture.policy.language.v1.Switcher.Ins.on_signal:type_name -> aperture.policy.language.v1.InPort
+	80,  // 80: aperture.policy.language.v1.Switcher.Ins.off_signal:type_name -> aperture.policy.language.v1.InPort
+	80,  // 81: aperture.policy.language.v1.Switcher.Ins.switch:type_name -> aperture.policy.language.v1.InPort
+	81,  // 82: aperture.policy.language.v1.Switcher.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 83: aperture.policy.language.v1.Variable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 84: aperture.policy.language.v1.BoolVariable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 85: aperture.policy.language.v1.UnaryOperator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	81,  // 86: aperture.policy.language.v1.UnaryOperator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	78,  // 87: aperture.policy.language.v1.Extrapolator.Parameters.max_extrapolation_interval:type_name -> google.protobuf.Duration
+	80,  // 88: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	81,  // 89: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 90: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 91: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 92: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 93: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 94: aperture.policy.language.v1.And.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 95: aperture.policy.language.v1.And.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 96: aperture.policy.language.v1.Or.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 97: aperture.policy.language.v1.Or.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 98: aperture.policy.language.v1.Inverter.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	81,  // 99: aperture.policy.language.v1.Inverter.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 100: aperture.policy.language.v1.FirstValid.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	81,  // 101: aperture.policy.language.v1.FirstValid.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	78,  // 102: aperture.policy.language.v1.Alerter.Parameters.resolve_timeout:type_name -> google.protobuf.Duration
+	61,  // 103: aperture.policy.language.v1.Alerter.Parameters.labels:type_name -> aperture.policy.language.v1.Alerter.Parameters.LabelsEntry
+	80,  // 104: aperture.policy.language.v1.Alerter.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	80,  // 105: aperture.policy.language.v1.Integrator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	80,  // 106: aperture.policy.language.v1.Integrator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	80,  // 107: aperture.policy.language.v1.Integrator.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	80,  // 108: aperture.policy.language.v1.Integrator.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	81,  // 109: aperture.policy.language.v1.Integrator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 110: aperture.policy.language.v1.Differentiator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	81,  // 111: aperture.policy.language.v1.Differentiator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 112: aperture.policy.language.v1.PulseGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 113: aperture.policy.language.v1.Holder.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	80,  // 114: aperture.policy.language.v1.Holder.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	81,  // 115: aperture.policy.language.v1.Holder.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 116: aperture.policy.language.v1.NestedSignalIngress.Outs.signal:type_name -> aperture.policy.language.v1.OutPort
+	80,  // 117: aperture.policy.language.v1.NestedSignalEgress.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	74,  // 118: aperture.policy.language.v1.SignalGenerator.Parameters.steps:type_name -> aperture.policy.language.v1.SignalGenerator.Parameters.Step
+	80,  // 119: aperture.policy.language.v1.SignalGenerator.Ins.forward:type_name -> aperture.policy.language.v1.InPort
+	80,  // 120: aperture.policy.language.v1.SignalGenerator.Ins.backward:type_name -> aperture.policy.language.v1.InPort
+	80,  // 121: aperture.policy.language.v1.SignalGenerator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	81,  // 122: aperture.policy.language.v1.SignalGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 123: aperture.policy.language.v1.SignalGenerator.Outs.at_start:type_name -> aperture.policy.language.v1.OutPort
+	81,  // 124: aperture.policy.language.v1.SignalGenerator.Outs.at_end:type_name -> aperture.policy.language.v1.OutPort
+	79,  // 125: aperture.policy.language.v1.SignalGenerator.Parameters.Step.target_output:type_name -> aperture.policy.language.v1.ConstantSignal
+	78,  // 126: aperture.policy.language.v1.SignalGenerator.Parameters.Step.duration:type_name -> google.protobuf.Duration
+	78,  // 127: aperture.policy.language.v1.PIDController.Parameters.sample_period:type_name -> google.protobuf.Duration
+	80,  // 128: aperture.policy.language.v1.PIDController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	80,  // 129: aperture.policy.language.v1.PIDController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	80,  // 130: aperture.policy.language.v1.PIDController.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	80,  // 131: aperture.policy.language.v1.PIDController.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	81,  // 132: aperture.policy.language.v1.PIDController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	133, // [133:133] is the sub-list for method output_type
+	133, // [133:133] is the sub-list for method input_type
+	133, // [133:133] is the sub-list for extension type_name
+	133, // [133:133] is the sub-list for extension extendee
+	0,   // [0:133] is the sub-list for field type_name
 }
 
 func init() { file_aperture_policy_language_v1_std_components_proto_init() }
@@ -5630,7 +5970,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GradientController_Parameters); i {
+			switch v := v.(*PIDController); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5642,7 +5982,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GradientController_Ins); i {
+			switch v := v.(*GradientController_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5654,7 +5994,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GradientController_Outs); i {
+			switch v := v.(*GradientController_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5666,7 +6006,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EMA_Ins); i {
+			switch v := v.(*GradientController_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5678,7 +6018,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EMA_Outs); i {
+			switch v := v.(*EMA_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5690,7 +6030,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EMA_Parameters); i {
+			switch v := v.(*EMA_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5702,7 +6042,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SMA_Ins); i {
+			switch v := v.(*EMA_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5714,7 +6054,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SMA_Outs); i {
+			switch v := v.(*SMA_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5726,7 +6066,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SMA_Parameters); i {
+			switch v := v.(*SMA_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5738,7 +6078,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArithmeticCombinator_Ins); i {
+			switch v := v.(*SMA_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5750,7 +6090,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArithmeticCombinator_Outs); i {
+			switch v := v.(*ArithmeticCombinator_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5762,7 +6102,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Decider_Ins); i {
+			switch v := v.(*ArithmeticCombinator_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5774,7 +6114,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Decider_Outs); i {
+			switch v := v.(*Decider_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5786,7 +6126,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Switcher_Ins); i {
+			switch v := v.(*Decider_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5798,7 +6138,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Switcher_Outs); i {
+			switch v := v.(*Switcher_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5810,7 +6150,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Variable_Outs); i {
+			switch v := v.(*Switcher_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5822,7 +6162,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BoolVariable_Outs); i {
+			switch v := v.(*Variable_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5834,7 +6174,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UnaryOperator_Ins); i {
+			switch v := v.(*BoolVariable_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5846,7 +6186,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UnaryOperator_Outs); i {
+			switch v := v.(*UnaryOperator_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5858,7 +6198,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Extrapolator_Parameters); i {
+			switch v := v.(*UnaryOperator_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5870,7 +6210,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Extrapolator_Ins); i {
+			switch v := v.(*Extrapolator_Parameters); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5882,7 +6222,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Extrapolator_Outs); i {
+			switch v := v.(*Extrapolator_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5894,7 +6234,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Max_Ins); i {
+			switch v := v.(*Extrapolator_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5906,7 +6246,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Max_Outs); i {
+			switch v := v.(*Max_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5918,7 +6258,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Min_Ins); i {
+			switch v := v.(*Max_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5930,7 +6270,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Min_Outs); i {
+			switch v := v.(*Min_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5942,7 +6282,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*And_Ins); i {
+			switch v := v.(*Min_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5954,7 +6294,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*And_Outs); i {
+			switch v := v.(*And_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5966,7 +6306,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Or_Ins); i {
+			switch v := v.(*And_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5978,7 +6318,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Or_Outs); i {
+			switch v := v.(*Or_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5990,7 +6330,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Inverter_Ins); i {
+			switch v := v.(*Or_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6002,7 +6342,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Inverter_Outs); i {
+			switch v := v.(*Inverter_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6014,7 +6354,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FirstValid_Ins); i {
+			switch v := v.(*Inverter_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6026,7 +6366,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[57].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FirstValid_Outs); i {
+			switch v := v.(*FirstValid_Ins); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6038,7 +6378,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[58].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Alerter_Parameters); i {
+			switch v := v.(*FirstValid_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6050,6 +6390,18 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			}
 		}
 		file_aperture_policy_language_v1_std_components_proto_msgTypes[59].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Alerter_Parameters); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[60].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Alerter_Ins); i {
 			case 0:
 				return &v.state
@@ -6061,7 +6413,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[61].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[62].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Integrator_Ins); i {
 			case 0:
 				return &v.state
@@ -6073,7 +6425,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[62].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[63].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Integrator_Outs); i {
 			case 0:
 				return &v.state
@@ -6085,7 +6437,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[63].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[64].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Differentiator_Ins); i {
 			case 0:
 				return &v.state
@@ -6097,7 +6449,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[64].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[65].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Differentiator_Outs); i {
 			case 0:
 				return &v.state
@@ -6109,7 +6461,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[65].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[66].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PulseGenerator_Outs); i {
 			case 0:
 				return &v.state
@@ -6121,7 +6473,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[66].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[67].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Holder_Ins); i {
 			case 0:
 				return &v.state
@@ -6133,7 +6485,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[67].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[68].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Holder_Outs); i {
 			case 0:
 				return &v.state
@@ -6145,7 +6497,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[68].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[69].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NestedSignalIngress_Outs); i {
 			case 0:
 				return &v.state
@@ -6157,7 +6509,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[69].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[70].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NestedSignalEgress_Ins); i {
 			case 0:
 				return &v.state
@@ -6169,7 +6521,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[70].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[71].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignalGenerator_Parameters); i {
 			case 0:
 				return &v.state
@@ -6181,7 +6533,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[71].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[72].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignalGenerator_Ins); i {
 			case 0:
 				return &v.state
@@ -6193,7 +6545,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[72].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[73].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignalGenerator_Outs); i {
 			case 0:
 				return &v.state
@@ -6205,8 +6557,44 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
-		file_aperture_policy_language_v1_std_components_proto_msgTypes[73].Exporter = func(v interface{}, i int) interface{} {
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[74].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignalGenerator_Parameters_Step); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[75].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PIDController_Parameters); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[76].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PIDController_Ins); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[77].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PIDController_Outs); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6224,7 +6612,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_aperture_policy_language_v1_std_components_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   74,
+			NumMessages:   78,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

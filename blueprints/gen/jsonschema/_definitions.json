@@ -614,6 +614,10 @@
           "$ref": "#/definitions/Or",
           "description": "Logical OR."
         },
+        "pid_controller": {
+          "$ref": "#/definitions/PIDController",
+          "description": "PID Controller is a proportional\u2013integral\u2013derivative controller."
+        },
         "pulse_generator": {
           "$ref": "#/definitions/PulseGenerator",
           "description": "Generates 0 and 1 in turns."
@@ -890,7 +894,7 @@
           "x-go-tag-validate": "gte=1.0"
         },
         "ema_window": {
-          "description": "Duration of EMA sampling window.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
+          "description": "EMA window duration.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         },
@@ -2188,6 +2192,101 @@
         }
       },
       "title": "Components produce output for other components through OutPorts",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PIDController": {
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/PIDControllerIns"
+        },
+        "out_ports": {
+          "$ref": "#/definitions/PIDControllerOuts"
+        },
+        "parameters": {
+          "$ref": "#/definitions/PIDControllerParameters",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "title": "PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.\n<!-- vale off -->\n$$\nerror = setpoint - signal \\\\\nintegral_i = integral_{i-1} + k_i \\cdot error \\\\\noutput_i = k_p \\cdot error + k_d \\cdot (signal_i - signal_{i-1}) + integral_i\n$$\n<!-- vale on -->",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PIDControllerIns": {
+      "properties": {
+        "max": {
+          "$ref": "#/definitions/InPort",
+          "title": "Maximum allowed output"
+        },
+        "min": {
+          "$ref": "#/definitions/InPort",
+          "title": "Minimum allowed output"
+        },
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "title": "The desired setpoint for the signal"
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "title": "The signal to be controlled"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PIDControllerOuts": {
+      "properties": {
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "title": "Output of the PID controller"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PIDControllerParameters": {
+      "properties": {
+        "kd": {
+          "default": 0,
+          "description": "The derivative gain of the PID controller.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0"
+        },
+        "ki": {
+          "default": 0,
+          "description": "The integral gain of the PID controller.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0"
+        },
+        "kp": {
+          "default": 0,
+          "description": "The proportional gain of the PID controller.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0",
+          "x-go-tag-validate": "gte=0"
+        },
+        "reset_after_invalid_samples": {
+          "default": 4,
+          "description": "The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.\n\n",
+          "format": "int32",
+          "minimum": 1,
+          "type": "integer",
+          "x-go-tag-default": "4",
+          "x-go-tag-validate": "gte=1"
+        },
+        "sample_period": {
+          "description": "The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",
+          "type": "string"
+        }
+      },
       "type": "object",
       "additionalProperties": false
     },

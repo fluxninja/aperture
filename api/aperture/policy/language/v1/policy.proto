@@ -333,6 +333,9 @@ message Component {
     // BoolVariable emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
     BoolVariable bool_variable = 28;
 
+    // PID Controller is a proportional–integral–derivative controller.
+    PIDController pid_controller = 29;
+
     // Query components that are query databases such as Prometheus.
     Query query = 100;
 

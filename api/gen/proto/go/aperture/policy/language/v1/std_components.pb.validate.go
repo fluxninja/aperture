@@ -4035,6 +4035,193 @@ var _ interface {
 	ErrorName() string
 } = SignalGeneratorValidationError{}
 
+// Validate checks the field values on PIDController with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PIDController) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PIDController with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PIDControllerMultiError, or
+// nil if none found.
+func (m *PIDController) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PIDController) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDControllerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDControllerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDControllerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDControllerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PIDControllerMultiError(errors)
+	}
+
+	return nil
+}
+
+// PIDControllerMultiError is an error wrapping multiple validation errors
+// returned by PIDController.ValidateAll() if the designated constraints
+// aren't met.
+type PIDControllerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PIDControllerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PIDControllerMultiError) AllErrors() []error { return m }
+
+// PIDControllerValidationError is the validation error returned by
+// PIDController.Validate if the designated constraints aren't met.
+type PIDControllerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PIDControllerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PIDControllerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PIDControllerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PIDControllerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PIDControllerValidationError) ErrorName() string { return "PIDControllerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PIDControllerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPIDController.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PIDControllerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PIDControllerValidationError{}
+
 // Validate checks the field values on GradientController_Parameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -10972,3 +11159,491 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SignalGenerator_Parameters_StepValidationError{}
+
+// Validate checks the field values on PIDController_Parameters with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PIDController_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PIDController_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PIDController_ParametersMultiError, or nil if none found.
+func (m *PIDController_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PIDController_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Kp
+
+	// no validation rules for Ki
+
+	// no validation rules for Kd
+
+	if all {
+		switch v := interface{}(m.GetSamplePeriod()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_ParametersValidationError{
+					field:  "SamplePeriod",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_ParametersValidationError{
+					field:  "SamplePeriod",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSamplePeriod()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_ParametersValidationError{
+				field:  "SamplePeriod",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ResetAfterInvalidSamples
+
+	if len(errors) > 0 {
+		return PIDController_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// PIDController_ParametersMultiError is an error wrapping multiple validation
+// errors returned by PIDController_Parameters.ValidateAll() if the designated
+// constraints aren't met.
+type PIDController_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PIDController_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PIDController_ParametersMultiError) AllErrors() []error { return m }
+
+// PIDController_ParametersValidationError is the validation error returned by
+// PIDController_Parameters.Validate if the designated constraints aren't met.
+type PIDController_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PIDController_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PIDController_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PIDController_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PIDController_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PIDController_ParametersValidationError) ErrorName() string {
+	return "PIDController_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PIDController_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPIDController_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PIDController_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PIDController_ParametersValidationError{}
+
+// Validate checks the field values on PIDController_Ins with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *PIDController_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PIDController_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PIDController_InsMultiError, or nil if none found.
+func (m *PIDController_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PIDController_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSignal()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Signal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Signal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_InsValidationError{
+				field:  "Signal",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSetpoint()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_InsValidationError{
+				field:  "Setpoint",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetMin()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Min",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Min",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMin()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_InsValidationError{
+				field:  "Min",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetMax()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Max",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_InsValidationError{
+					field:  "Max",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMax()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_InsValidationError{
+				field:  "Max",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PIDController_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// PIDController_InsMultiError is an error wrapping multiple validation errors
+// returned by PIDController_Ins.ValidateAll() if the designated constraints
+// aren't met.
+type PIDController_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PIDController_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PIDController_InsMultiError) AllErrors() []error { return m }
+
+// PIDController_InsValidationError is the validation error returned by
+// PIDController_Ins.Validate if the designated constraints aren't met.
+type PIDController_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PIDController_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PIDController_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PIDController_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PIDController_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PIDController_InsValidationError) ErrorName() string {
+	return "PIDController_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PIDController_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPIDController_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PIDController_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PIDController_InsValidationError{}
+
+// Validate checks the field values on PIDController_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PIDController_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PIDController_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PIDController_OutsMultiError, or nil if none found.
+func (m *PIDController_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PIDController_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PIDController_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PIDController_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PIDController_OutsValidationError{
+				field:  "Output",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PIDController_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// PIDController_OutsMultiError is an error wrapping multiple validation errors
+// returned by PIDController_Outs.ValidateAll() if the designated constraints
+// aren't met.
+type PIDController_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PIDController_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PIDController_OutsMultiError) AllErrors() []error { return m }
+
+// PIDController_OutsValidationError is the validation error returned by
+// PIDController_Outs.Validate if the designated constraints aren't met.
+type PIDController_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PIDController_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PIDController_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PIDController_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PIDController_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PIDController_OutsValidationError) ErrorName() string {
+	return "PIDController_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PIDController_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPIDController_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PIDController_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PIDController_OutsValidationError{}

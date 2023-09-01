@@ -183,7 +183,7 @@ message EMA {
 
   // Parameters for the EMA component.
   message Parameters {
-    // Duration of EMA sampling window.
+    // EMA window duration.
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
     google.protobuf.Duration ema_window = 1; // @gotags: validate:"required"
 
@@ -842,5 +842,49 @@ message SignalGenerator {
   Outs out_ports = 2;
 
   // Parameters for the _Signal Generator_ component.
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
+
+// PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+// <!-- vale off -->
+// $$
+// error = setpoint - signal \\
+// integral_i = integral_{i-1} + k_i \cdot error \\
+// output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
+// $$
+// <!-- vale on -->
+message PIDController {
+  message Parameters {
+    // The proportional gain of the PID controller.
+    double kp = 1; // @gotags: validate:"gte=0" default:"0"
+    // The integral gain of the PID controller.
+    double ki = 2; // @gotags: validate:"gte=0" default:"0"
+    // The derivative gain of the PID controller.
+    double kd = 3; // @gotags: validate:"gte=0" default:"0"
+    // The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+    google.protobuf.Duration sample_period = 4;
+    // The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
+    int32 reset_after_invalid_samples = 5; // @gotags: validate:"gte=1" default:"4"
+  }
+
+  message Ins {
+    // The signal to be controlled
+    InPort signal = 1;
+    // The desired setpoint for the signal
+    InPort setpoint = 2;
+    // Minimum allowed output
+    InPort min = 3;
+    // Maximum allowed output
+    InPort max = 4;
+  }
+
+  message Outs {
+    // Output of the PID controller
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
   Parameters parameters = 3; // @gotags: validate:"required"
 }
