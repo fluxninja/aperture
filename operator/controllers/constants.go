@@ -41,6 +41,8 @@ const (
 	AppName = "aperture"
 	// OperatorName defines operator name.
 	OperatorName = AppName + "-operator"
+	// ControllerName defines controller name.
+	ControllerName = "controller"
 	// ControllerServiceName defines controller service name.
 	ControllerServiceName = AppName + "-controller"
 	// AgentServiceName defines agent service name.
@@ -128,6 +130,8 @@ var (
 	Test = "test"
 	// TestTwo string.
 	TestTwo = "test2"
+	// TestDigest string.
+	TestDigest = "sha256:1234567890"
 	// TestArray array.
 	TestArray = []string{Test}
 	// TestArrayTwo array.

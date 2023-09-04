@@ -24,7 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
 	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
-	"github.com/fluxninja/aperture/v2/pkg/etcd"
+	googletoken "github.com/fluxninja/aperture/v2/pkg/google/config"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
@@ -33,7 +33,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 	"github.com/fluxninja/aperture/v2/pkg/net/tlsconfig"
 	"github.com/fluxninja/aperture/v2/pkg/profilers"
-	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 	watchdogconfig "github.com/fluxninja/aperture/v2/pkg/watchdog/config"
 
 	corev1 "k8s.io/api/core/v1"
@@ -47,7 +46,11 @@ type Image struct {
 
 	// The tag (version) of the image
 	//+kubebuilder:validation:Optional
-	Tag string `json:"tag" default:"latest"`
+	Tag string `json:"tag"`
+
+	// The digest (sha) of the image
+	//+kubebuilder:validation:Optional
+	Digest string `json:"digest"`
 
 	// The ImagePullPolicy of the image
 	//+kubebuilder:validation:Optional
@@ -111,7 +114,7 @@ type PodSecurityContext struct {
 
 	// fsGroup to define the Group ID for the Pod
 	//+kubebuilder:validation:Optional
-	FsGroup int64 `json:"fsGroup" default:"1001" validate:"gte=0"`
+	FsGroup int64 `json:"fsGroup" default:"1000" validate:"gte=0"`
 }
 
 // ContainerSecurityContext defines Enabled, RunAsUser, RunAsNonRootUser and ReadOnlyRootFilesystem for the containers' security context.
@@ -121,11 +124,15 @@ type ContainerSecurityContext struct {
 
 	// Set containers' Security Context runAsUser
 	//+kubebuilder:validation:Optional
-	RunAsUser int64 `json:"runAsUser" default:"1001" validate:"gte=0"`
+	RunAsUser int64 `json:"runAsUser" default:"1000" validate:"gte=0"`
+
+	// Set containers' Security Context runAsGroup
+	//+kubebuilder:validation:Optional
+	RunAsGroup int64 `json:"runAsGroup" default:"1000" validate:"gte=0"`
 
 	// Set containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
-	RunAsNonRootUser bool `json:"runAsNonRoot" default:"false"`
+	RunAsNonRootUser bool `json:"runAsNonRoot" default:"true"`
 
 	// Set agent containers' Security Context runAsNonRoot
 	//+kubebuilder:validation:Optional
@@ -298,10 +305,6 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Client ClientConfigSpec `json:"client"`
 
-	// Etcd configuration.
-	//+kubebuilder:validation:Required
-	Etcd etcd.EtcdConfig `json:"etcd"`
-
 	// Liveness probe configuration.
 	//+kubebuilder:validation:Optional
 	Liveness ProbeConfigSpec `json:"liveness"`
@@ -322,9 +325,9 @@ type CommonConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	Profilers profilers.ProfilersConfig `json:"profilers"`
 
-	// Prometheus configuration.
-	//+kubebuilder:validation:Required
-	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+	// Google Token Source configuration
+	//+kubebuilder:validation:Optional
+	TokenSource googletoken.Config `json:"token_source"`
 
 	// Server configuration.
 	//+kubebuilder:validation:Optional
@@ -386,7 +389,7 @@ type ClientConfigSpec struct {
 
 // BundledExtensionsSpec defines configuration for bundled extensions.
 type BundledExtensionsSpec struct {
-	// FluxNinja ARC extension configuration.
+	// FluxNinja extension configuration.
 	//+kubebuilder:validation:Optional
 	FluxNinja extconfig.FluxNinjaExtensionConfig `json:"fluxninja"`
 
@@ -395,7 +398,7 @@ type BundledExtensionsSpec struct {
 	Sentry sentry.SentryConfig `json:"sentry"`
 }
 
-// ServiceDiscoverySpec defines configuration for Service discoveru.
+// ServiceDiscoverySpec defines configuration for Service discovery.
 type ServiceDiscoverySpec struct {
 	// KubernetesDiscoveryConfig for Kubernetes service discovery.
 	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`

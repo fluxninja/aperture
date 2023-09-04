@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -13,6 +14,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	googletoken "github.com/fluxninja/aperture/v2/pkg/google"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -51,6 +53,7 @@ func policyFactoryModule() fx.Option {
 			),
 		),
 		prom.Module(),
+		googletoken.Module(),
 		policyModule(),
 	)
 }
@@ -60,6 +63,8 @@ type PolicyFactory struct {
 	lock                             sync.RWMutex
 	circuitJobGroup                  *jobs.JobGroup
 	etcdClient                       *etcdclient.Client
+	sessionScopedKV                  *etcdclient.SessionScopedKV
+	prometheusEnforcer               *prom.PrometheusEnforcer
 	alerterIface                     alerts.Alerter
 	registry                         status.Registry
 	policiesDynamicConfigEtcdWatcher notifiers.Watcher
@@ -73,6 +78,8 @@ func providePolicyFactory(
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
+	sessionScopedKV *etcdclient.SessionScopedKV,
+	enforcer *prom.PrometheusEnforcer,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -90,6 +97,8 @@ func providePolicyFactory(
 		registry:                         policiesStatusRegistry,
 		circuitJobGroup:                  circuitJobGroup,
 		etcdClient:                       etcdClient,
+		sessionScopedKV:                  sessionScopedKV,
+		prometheusEnforcer:               enforcer,
 		alerterIface:                     alerterIface,
 		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
 		policyTracker:                    make(map[string]*policysyncv1.PolicyWrapper),
@@ -163,6 +172,8 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
+			factory.sessionScopedKV,
+			factory.prometheusEnforcer,
 			factory.alerterIface,
 			&wrapperMessage,
 		),
@@ -195,7 +206,7 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 	// deepcopy wrappers
 	policyWrappers := make(map[string]*policysyncv1.PolicyWrapper)
 	for k, v := range factory.policyTracker {
-		policyWrappers[k] = v.DeepCopy()
+		policyWrappers[k] = proto.Clone(v).(*policysyncv1.PolicyWrapper)
 	}
 	return policyWrappers
 }
@@ -203,9 +214,12 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 // GetPolicies returns all policies.
 func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
 	policyWrappers := factory.GetPolicyWrappers()
-	policies := make(map[string]*policylangv1.Policy)
+	policies := make(map[string]*policylangv1.GetPolicyResponse)
 	for _, v := range policyWrappers {
-		policies[v.GetCommonAttributes().GetPolicyName()] = v.GetPolicy().DeepCopy()
+		policies[v.GetCommonAttributes().GetPolicyName()] = &policylangv1.GetPolicyResponse{
+			Policy: proto.Clone(v.GetPolicy()).(*policylangv1.Policy),
+			Status: policylangv1.GetPolicyResponse_VALID,
+		}
 	}
 	return &policylangv1.Policies{
 		Policies: policies,
@@ -218,7 +232,7 @@ func (factory *PolicyFactory) GetPolicy(name string) *policylangv1.Policy {
 	var policy *policylangv1.Policy
 	for _, v := range policyWrappers {
 		if v.GetCommonAttributes().GetPolicyName() == name {
-			policy = v.GetPolicy().DeepCopy()
+			policy = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
 			break
 		}
 	}

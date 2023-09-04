@@ -48,27 +48,20 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
         Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             RpcResponse res;
             try {
                 res = unwrap().execute(ctx, req);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                return RpcResponse.ofFailure(e);
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
             return res;
         } else {

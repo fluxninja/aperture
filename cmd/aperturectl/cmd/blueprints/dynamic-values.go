@@ -7,14 +7,12 @@ import (
 )
 
 const (
-	dynamicConfigValuesFileName         = "dynamic-config-values.yaml"
-	requiredDynamicConfigValuesFileName = "dynamic-config-values-required.yaml"
+	dynamicConfigValuesFileName = "dynamic-config-values.yaml"
 )
 
 func init() {
 	dynamicValuesCmd.Flags().StringVar(&blueprintName, "name", "", "Name of the Aperture Blueprint to provide values file for")
 	dynamicValuesCmd.Flags().StringVar(&valuesFile, "output-file", "", "Path to the output values file")
-	dynamicValuesCmd.Flags().BoolVar(&onlyRequired, "only-required", false, "Show only required values")
 	dynamicValuesCmd.Flags().BoolVar(&noYAMLModeline, "no-yaml-modeline", false, "Do not add YAML language server modeline to generated YAML files")
 	dynamicValuesCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing values file")
 }
@@ -25,7 +23,7 @@ var dynamicValuesCmd = &cobra.Command{
 	Long: `
 Provides a dynamic values file for a given Aperture Blueprint that can be then used to generate policies after customization`,
 	SilenceErrors: true,
-	Example:       `aperturectl blueprints dynamic-values --name=policies/rate-limiting --output-file=values.yaml`,
+	Example:       `aperturectl blueprints dynamic-values --name=rate-limiting/base --output-file=values.yaml`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if blueprintName == "" {
 			return fmt.Errorf("--name must be provided")

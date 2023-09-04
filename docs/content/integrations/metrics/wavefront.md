@@ -32,18 +32,17 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          wavefront:
-            per_agent_group: true
-            receivers:
-              wavefront: [wavefrontreceiver configuration here]
+    infra_meters:
+      wavefront:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          wavefront: [wavefrontreceiver configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/wavefrontreceiver
-[opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
+[opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector
 [applying-policy]: /use-cases/use-cases.md
-[policy-resources]: /reference/policies/spec.md#resources
+[policy-resources]: /reference/configuration/spec.md#resources

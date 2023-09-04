@@ -8,12 +8,12 @@ import (
 	"path"
 	"runtime/pprof"
 
-	"github.com/fluxninja/lumberjack"
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/lumberjack"
 )
 
 const (
@@ -90,6 +90,8 @@ func (constructor Constructor) setupProfilers(unmarshaller config.Unmarshaller,
 		router.HandleFunc(path.Join(httpPathPrefix, "cmdline"), httppprof.Cmdline)
 		router.HandleFunc(path.Join(httpPathPrefix, "profile"), httppprof.Profile)
 		router.HandleFunc(path.Join(httpPathPrefix, "symbol"), httppprof.Symbol)
+		router.Handle(path.Join(httpPathPrefix, "heap"), httppprof.Handler("heap"))
+		router.Handle(path.Join(httpPathPrefix, "goroutine"), httppprof.Handler("goroutine"))
 	}
 
 	lc.Append(fx.Hook{

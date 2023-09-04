@@ -26,10 +26,12 @@ dist_cache:
   bind_addr: :3320
   memberlist_bind_addr: :3322
   replica_count: 1
+  sync_replication: false
 etcd:
   endpoints:
   - http://agent-etcd:2379
   lease_ttl: 60s
+  namespace: aperture
   password: ""
   tls:
     ca_file: ""
@@ -38,6 +40,7 @@ etcd:
     key_file: ""
     key_log_file: ""
   username: ""
+  log_level: error
 flow_control:
   preview_service:
     enabled: true
@@ -86,6 +89,8 @@ fluxninja:
       tls_handshake_timeout: 10s
       use_proxy: false
       write_buffer_size: 0
+  disable_local_otel_pipeline: false
+  enable_cloud_controller: false
   endpoint: ""
   heartbeat_interval: 5s
   installation_mode: LINUX_BARE_METAL
@@ -150,6 +155,7 @@ otel:
     timeout: 1s
   disable_kubernetes_scraper: false
   disable_kubelet_scraper: false
+  enable_high_cardinality_platform_metrics: false
   ports:
     debug_port: 8888
     health_check_port: 13133
@@ -218,6 +224,8 @@ service_discovery:
   kubernetes:
     enabled: true
   static: {}
+token_source:
+  enabled: false
 watchdog:
   cgroup:
     adaptive_policy:

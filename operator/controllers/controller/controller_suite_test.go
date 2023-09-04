@@ -56,6 +56,8 @@ var (
 	cancel  context.CancelFunc
 )
 
+var controllerName = "aperture-controller-aperture"
+
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
@@ -113,18 +115,16 @@ var _ = BeforeSuite(func() {
 
 	DefaultControllerInstance = &controllerv1alpha1.Controller{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      AppName,
+			Name:      ControllerName,
 			Namespace: AppName,
 		},
 		Spec: controllerv1alpha1.ControllerSpec{
 			ConfigSpec: controllerv1alpha1.ControllerConfigSpec{
-				CommonConfigSpec: common.CommonConfigSpec{
-					Etcd: etcd.EtcdConfig{
-						Endpoints: []string{"10.10.10.10:1010"},
-					},
-					Prometheus: prometheus.PrometheusConfig{
-						Address: "20.20.20.20:2020",
-					},
+				Etcd: etcd.EtcdConfig{
+					Endpoints: []string{"10.10.10.10:1010"},
+				},
+				Prometheus: prometheus.PrometheusConfig{
+					Address: "20.20.20.20:2020",
 				},
 			},
 			CommonSpec: common.CommonSpec{
@@ -151,6 +151,8 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+
+	MinimumKubernetesVersionBool = true
 
 	err = config.UnmarshalYAML([]byte{}, &DefaultControllerInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())

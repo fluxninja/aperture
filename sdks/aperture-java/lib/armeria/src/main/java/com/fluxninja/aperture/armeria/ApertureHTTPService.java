@@ -1,10 +1,8 @@
 package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.*;
-import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingHttpService;
@@ -47,17 +45,18 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
-        CheckHTTPRequest request = HttpUtils.checkRequestFromRequest(ctx, req, controlPointName);
-        TrafficFlow flow = this.apertureSDK.startTrafficFlow(req.path(), request);
+        TrafficFlowRequest request =
+                HttpUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName);
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {
             return unwrap().serve(ctx, req);
         }
 
-        FlowResult flowResult = flow.result();
+        FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
-                (flowResult == FlowResult.Accepted
-                        || (flowResult == FlowResult.Unreachable && this.failOpen));
+                (flowDecision == FlowDecision.Accepted
+                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
 
         if (flowAccepted) {
             HttpResponse res;
@@ -70,19 +69,11 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
                 ctx.updateRequest(newRequest);
 
                 res = unwrap().serve(ctx, newRequest);
-                flow.end(FlowStatus.OK);
-            } catch (ApertureSDKException e) {
-                // ending flow failed
-                e.printStackTrace();
-                return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
-                try {
-                    flow.end(FlowStatus.Error);
-                } catch (ApertureSDKException ae) {
-                    e.printStackTrace();
-                    ae.printStackTrace();
-                }
+                flow.setStatus(FlowStatus.Error);
                 throw e;
+            } finally {
+                flow.end();
             }
             return res;
         } else {

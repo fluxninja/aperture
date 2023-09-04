@@ -30,6 +30,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -59,6 +60,7 @@ func ContainerSecurityContext(containerSecurityContext common.ContainerSecurityC
 			RunAsUser:              pointer.Int64(containerSecurityContext.RunAsUser),
 			RunAsNonRoot:           pointer.Bool(containerSecurityContext.RunAsNonRootUser),
 			ReadOnlyRootFilesystem: pointer.Bool(containerSecurityContext.ReadOnlyRootFilesystem),
+			RunAsGroup:             pointer.Int64(containerSecurityContext.RunAsGroup),
 		}
 	} else {
 		securityContext = &corev1.SecurityContext{}
@@ -84,6 +86,14 @@ func PodSecurityContext(podSecurityContext common.PodSecurityContext) *corev1.Po
 // ImageString prepares image string from the provided Image struct.
 func ImageString(image common.Image, repository string) string {
 	var imageStr string
+	if image.Digest != "" {
+		if image.Registry != "" {
+			imageStr = fmt.Sprintf("%s/%s@%s", image.Registry, repository, image.Digest)
+			return imageStr
+		}
+		imageStr = fmt.Sprintf("%s@%s", repository, image.Digest)
+		return imageStr
+	}
 	if image.Registry != "" {
 		imageStr = fmt.Sprintf("%s/%s:%s", image.Registry, repository, image.Tag)
 	} else {
@@ -368,7 +378,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: ControllerServiceName,
+						Name: ControllerResourcesName(instance),
 					},
 				},
 			},
@@ -451,6 +461,24 @@ func SecretName(instance, component string, spec *common.APIKeySecret) string {
 	return fmt.Sprintf("%s-%s-apikey", instance, component)
 }
 
+// ControllerResourcesName generates a name for the controller related resources.
+func ControllerResourcesName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s", AppName, instance.GetName())
+}
+
+// ControllerResourcesNamespacedName generates a name for the controller related resources.
+func ControllerResourcesNamespacedName(instance *controllerv1alpha1.Controller) string {
+	return fmt.Sprintf("%s-%s-%s", AppName, instance.GetName(), instance.GetNamespace())
+}
+
+// ServiceAccountName generate a name for the controller service account.
+func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
+	if instance.Spec.ServiceAccountSpec.Create && instance.Spec.ServiceAccountSpec.Name == "" {
+		return ControllerResourcesName(instance)
+	}
+	return instance.Spec.ServiceAccountSpec.Name
+}
+
 // SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.
 func SecretDataKey(spec *common.SecretKeyRef) string {
 	key := spec.Key
@@ -485,6 +513,16 @@ func CheckCertificate() bool {
 		fmt.Sprintf("%s/%s", os.Getenv("APERTURE_OPERATOR_CERT_DIR"), os.Getenv("APERTURE_OPERATOR_KEY_NAME")))
 
 	return err == nil
+}
+
+// GetCertificateDNSNames generates DNS names for the certificate.
+func GetCertificateDNSNames(dnsPrefix, namespace string) []string {
+	return []string{
+		dnsPrefix,
+		fmt.Sprintf("%s.%s", dnsPrefix, namespace),
+		fmt.Sprintf("%s.%s.svc", dnsPrefix, namespace),
+		fmt.Sprintf("%s.%s.svc.cluster.local", dnsPrefix, namespace),
+	}
 }
 
 // GenerateCertificate generates certificate and stores it in the desired location.
@@ -523,12 +561,7 @@ func GenerateCertificate(dnsPrefix, namespace string) (*bytes.Buffer, *bytes.Buf
 		Bytes: caBytes,
 	})
 
-	dnsNames := []string{
-		dnsPrefix,
-		fmt.Sprintf("%s.%s", dnsPrefix, namespace),
-		fmt.Sprintf("%s.%s.svc", dnsPrefix, namespace),
-		fmt.Sprintf("%s.%s.svc.cluster.local", dnsPrefix, namespace),
-	}
+	dnsNames := GetCertificateDNSNames(dnsPrefix, namespace)
 
 	commonName := fmt.Sprintf("%s.%s.svc", dnsPrefix, namespace)
 
@@ -641,7 +674,7 @@ func CheckAndGenerateCertForOperator(config *rest.Config) error {
 			block, _ := pem.Decode(certBytes)
 			var cert *x509.Certificate
 			cert, err = x509.ParseCertificate(block.Bytes)
-			if err == nil && cert.NotAfter.After(time.Now()) {
+			if err == nil && cert.NotAfter.After(time.Now()) && reflect.DeepEqual(cert.DNSNames, GetCertificateDNSNames(serviceName, namespace)) {
 				serverCertPEM = bytes.NewBuffer(secret.Data[OperatorCertName])
 				serverPrivKeyPEM = bytes.NewBuffer(secret.Data[OperatorCertKeyName])
 				caPEM = bytes.NewBuffer(secret.Data[OperatorCAName])
@@ -693,7 +726,7 @@ func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1
 
 	generateCert := func() (*bytes.Buffer, *bytes.Buffer, *bytes.Buffer, error) {
 		// generate certificates
-		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(ControllerServiceName, instance.GetNamespace())
+		serverCertPEM, serverPrivKeyPEM, caPEM, err := GenerateCertificate(ControllerResourcesName(instance), instance.GetNamespace())
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -724,7 +757,7 @@ func GetOrGenerateCertificate(client client.Client, instance *controllerv1alpha1
 	}
 
 	// regenerate certificate if it is expired
-	if time.Now().After(cert.NotAfter) {
+	if time.Now().After(cert.NotAfter) || !reflect.DeepEqual(cert.DNSNames, GetCertificateDNSNames(ControllerResourcesName(instance), instance.GetNamespace())) {
 		return generateCert()
 	}
 

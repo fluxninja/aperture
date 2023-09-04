@@ -44,14 +44,13 @@ Now, press Space to open the Tilt UI in your default browser.
 The above command starts an Aperture Controller and an Aperture Agent on each
 worker node in the local Kubernetes cluster. Additionally, it starts a
 Java-based demo application with
-[Aperture Java SDK](/integrations/flow-control/sdk/java/java.md) configured to
-integrate with Aperture. There is an instance of Grafana running on the cluster
-as well for viewing metrics from experiments.
+[Aperture Java SDK](/integrations/sdk/java/java.md) configured to integrate with
+Aperture. There is an instance of Grafana running on the cluster as well for
+viewing metrics from experiments.
 
 The Playground's default scenario is demonstrating
 [Basic Service Protection](/applying-policies/service-protection/basic-service-protection.md)
-with a combination of
-[Rate-Limiting Actuator](/concepts/flow-control/components/rate-limiter.md) to
+with a combination of [Rate-Limiting Actuator](/concepts/rate-limiter.md) to
 dynamically rate-limit traffic from unwanted users, which protects the demo
 application against sudden surges in traffic load. You can verify it using the
 following command:
@@ -317,7 +316,7 @@ clicked.
 
 There are other playground scenarios under the `playground/scenarios/`
 directory, and they can be loaded during `Tilt` setup by passing a relative path
-to the scenario, e.g. `tilt up -- --scenario scenarios/feature-rollout`
+to the scenario, e.g. `tilt up -- --scenario scenarios/load-ramping`
 
 > 📍 You can skip building of aperture container images to speed up your work on
 > the scenario, by passing `-- --dockerhub-image` to the `tilt up` command. In

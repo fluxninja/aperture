@@ -1,39 +1,35 @@
 package inframeter
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"sort"
 	"strings"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/v2/pkg/log"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"go.opentelemetry.io/collector/component"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // AddInfraMeters adds infra metrics pipelines to the given OTelConfig.
 func AddInfraMeters(
 	config *otelconfig.Config,
-	infraMeters map[string]*policylangv1.InfraMeter,
+	infraMeters map[string]*policysyncv1.InfraMeterWrapper,
 ) error {
-	config.AddProcessor(otelconsts.ProcessorInfraMeter, map[string]any{
-		"attributes": []map[string]interface{}{
-			{
-				"key":    "service.name",
-				"action": "upsert",
-				"value":  "aperture-infra-meter",
-			},
-		},
-	})
 	if infraMeters == nil {
-		infraMeters = map[string]*policylangv1.InfraMeter{}
+		infraMeters = map[string]*policysyncv1.InfraMeterWrapper{}
 	}
-	for pipelineName, metricConfig := range infraMeters {
-		if err := addInfraMeter(config, pipelineName, metricConfig); err != nil {
+	for pipelineName, infraMeterWrapper := range infraMeters {
+		infraMeter := infraMeterWrapper.GetInfraMeter()
+		if err := addInfraMeter(
+			config, infraMeterWrapper.GetPolicyName(), pipelineName, infraMeterWrapper.GetInfraMeterName(), infraMeter); err != nil {
 			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
@@ -42,9 +38,31 @@ func AddInfraMeters(
 
 func addInfraMeter(
 	config *otelconfig.Config,
+	policyName string,
 	pipelineName string,
+	infraMeterName string,
 	infraMeter *policylangv1.InfraMeter,
 ) error {
+	processorName := fmt.Sprintf("%s-%s-%s", otelconsts.ProcessorInfraMeter, policyName, infraMeterName)
+	config.AddProcessor(processorName, map[string]any{
+		"attributes": []map[string]interface{}{
+			{
+				"key":    "service.name",
+				"action": "upsert",
+				"value":  "aperture-infra-meter",
+			},
+			{
+				"key":    metrics.InfraMeterNameLabel,
+				"action": "upsert",
+				"value":  infraMeterName,
+			},
+			{
+				"key":    metrics.PolicyNameLabel,
+				"action": "upsert",
+				"value":  policyName,
+			},
+		},
+	})
 	pipelineName = strings.TrimPrefix(pipelineName, "metrics/")
 
 	receiverIDs := map[string]string{}
@@ -55,19 +73,82 @@ func addInfraMeter(
 		if err := id.UnmarshalText([]byte(origName)); err != nil {
 			return fmt.Errorf("invalid id %q: %w", origName, err)
 		}
-		id = component.NewIDWithName(id.Type(), normalizeComponentName(pipelineName, id.Name()))
+
+		sum := sha256.Sum256([]byte(receiverConfig.String()))
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", sum))
+		strID := id.String()
+
+		// If receiver is already present with given id and per-agent-group = false, skip adding receiver with per-agent-group = true.
+		if _, ok := config.Receivers[strID]; ok && infraMeter.PerAgentGroup {
+			receiverIDs[origName] = strID
+			continue
+		}
+
 		var cfg any
 		cfg = receiverConfig.AsMap()
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
-		receiverIDs[origName] = id.String()
-		config.AddReceiver(id.String(), cfg)
+		strID = id.String()
+
+		// Remove receiver for per-agent-group infra-meter if a receiver with the same config already exists without per-agent-group.
+		if !infraMeter.PerAgentGroup {
+			updatedID, _ := leaderonlyreceiver.WrapConfig(id, cfg)
+			if _, ok := config.Receivers[updatedID.String()]; ok {
+				delete(config.Receivers, updatedID.String())
+				for key, value := range receiverIDs {
+					if value == updatedID.String() {
+						receiverIDs[key] = id.String()
+					}
+				}
+
+				// Update pipelines to use the new receiver id.
+				for key, value := range config.Service.Pipelines {
+					if slices.Contains(value.Receivers, updatedID.String()) {
+						value.Receivers[slices.Index(value.Receivers, updatedID.String())] = id.String()
+						config.Service.Pipelines[key] = value
+					}
+				}
+			}
+		}
+		receiverIDs[origName] = strID
+		config.AddReceiver(strID, cfg)
 	}
 
 	for origName, processorConfig := range infraMeter.Processors {
-		id := normalizeComponentName(pipelineName, origName)
-		processorIDs[origName] = id
-		var cfg any = processorConfig.AsMap()
-		config.AddProcessor(id, cfg)
+		var id component.ID
+		if err := id.UnmarshalText([]byte(origName)); err != nil {
+			return fmt.Errorf("invalid id %q: %w", origName, err)
+		}
+
+		selectorsList := []interface{}{}
+		var selectors *structpb.Value
+		if id.Type() == otelconsts.ProcessorK8sAttributes {
+			var ok bool
+			selectors, ok = processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors]
+			if ok && selectors != nil {
+				selectorsList = selectors.GetListValue().AsSlice()
+				delete(processorConfig.Fields, otelconsts.ProcessorK8sAttributesSelectors)
+			}
+		}
+
+		sum := sha256.Sum256([]byte(processorConfig.String()))
+		id = component.NewIDWithName(id.Type(), fmt.Sprintf("%x", sum))
+		strID := id.String()
+		if processor, ok := config.Processors[strID]; ok {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+				updateK8sAttributesProcessor(processor, selectorsList)
+				config.Processors[strID] = processor
+			}
+			processorIDs[origName] = strID
+			continue
+		} else {
+			if id.Type() == otelconsts.ProcessorK8sAttributes {
+				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
+			}
+			processorIDs[origName] = strID
+			var cfg any = processorConfig.AsMap()
+			config.AddProcessor(strID, cfg)
+		}
 	}
 
 	if infraMeter.Pipeline == nil {
@@ -96,16 +177,19 @@ func addInfraMeter(
 		}
 	}
 
-	config.Service.AddPipeline(normalizePipelineName(pipelineName), otelconfig.Pipeline{
+	pipeline := otelconfig.Pipeline{
 		Receivers: mapSlice(receiverIDs, infraMeter.Pipeline.Receivers),
 		Processors: append(
 			mapSlice(processorIDs, infraMeter.Pipeline.Processors),
-			otelconsts.ProcessorInfraMeter,
+			processorName,
 			otelconsts.ProcessorAgentResourceLabels,
 		),
-		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
-	})
+	}
+	if config.Exporters[otelconsts.ExporterPrometheusRemoteWrite] != nil {
+		pipeline.Exporters = []string{otelconsts.ExporterPrometheusRemoteWrite}
+	}
 
+	config.Service.AddPipeline(normalizePipelineName(pipelineName), pipeline)
 	return nil
 }
 
@@ -128,107 +212,22 @@ func mapSlice(mapping map[string]string, xs []string) []string {
 	return ys
 }
 
-// normalizeComponentName normalizes user defines component name by adding
-// `user-defined-<pipeline_name>` suffix.
-// This ensures no builtin components are overwritten.
-func normalizeComponentName(pipelineName, componentName string) string {
-	suffix := fmt.Sprintf("user-defined-%s", pipelineName)
-	if componentName == "" {
-		return suffix
-	}
-	return fmt.Sprintf("%s/%s", componentName, suffix)
-}
+func updateK8sAttributesProcessor(processor interface{}, selectorsList []interface{}) {
+	processorMap := processor.(map[string]interface{})
+	if processorMap != nil {
+		var existingSelectorsList []interface{}
+		existingSelectors, ok := processorMap[otelconsts.ProcessorK8sAttributesSelectors]
+		if !ok || existingSelectors == nil {
+			existingSelectorsList = []interface{}{}
+		} else {
+			existingSelectorsList = existingSelectors.([]interface{})
+			if existingSelectorsList == nil {
+				existingSelectorsList = []interface{}{}
+			}
+		}
 
-// InfraMeterForKubeletStats returns an InfraMeter for kubelet stats.
-func InfraMeterForKubeletStats() *policylangv1.InfraMeter {
-	kubeletStatsReceiver, err := structpb.NewStruct(map[string]any{
-		"collection_interval":  "10s",
-		"auth_type":            "serviceAccount",
-		"endpoint":             "https://${NODE_NAME}:10250",
-		"insecure_skip_verify": true,
-		"metric_groups": []any{
-			"pod",
-		},
-	})
-	if err != nil {
-		log.Panic().Err(err).Msg("failed to create kubelet stats config")
-	}
-
-	receivers := map[string]*structpb.Struct{
-		otelconsts.ReceiverKubeletStats: kubeletStatsReceiver,
-	}
-
-	kubeletStatsProcessor, err := structpb.NewStruct(map[string]any{
-		"metrics": map[string]any{
-			"include": map[string]any{
-				"match_type": "strict",
-				"metric_names": []any{
-					"k8s.pod.cpu.utilization",
-					"k8s.pod.memory.available",
-					"k8s.pod.memory.usage",
-					"k8s.pod.memory.working_set",
-				},
-			},
-		},
-	})
-	if err != nil {
-		log.Panic().Err(err).Msg("failed to create kubelet stats processor config")
-	}
-
-	k8sAttributesProcessor, err := structpb.NewStruct(map[string]any{
-		"auth_type":   "serviceAccount",
-		"passthrough": false,
-		"filter": map[string]any{
-			"node_from_env_var": "NODE_NAME",
-		},
-		"extract": map[string]any{
-			"metadata": []any{
-				"k8s.daemonset.name",
-				"k8s.cronjob.name",
-				"k8s.deployment.name",
-				"k8s.job.name",
-				"k8s.namespace.name",
-				"k8s.node.name",
-				"k8s.pod.name",
-				"k8s.pod.uid",
-				"k8s.replicaset.name",
-				"k8s.statefulset.name",
-			},
-			"labels": []any{
-				map[string]any{
-					"key_regex": "^app.kubernetes.io/.*",
-				},
-			},
-		},
-		"pod_association": []any{
-			map[string]any{
-				"sources": map[string]any{
-					"from": "resource_attribute",
-					"name": "k8s.pod.uid",
-				},
-			},
-		},
-	})
-	if err != nil {
-		log.Panic().Err(err).Msg("failed to create k8s attributes processor config")
-	}
-
-	processors := map[string]*structpb.Struct{
-		otelconsts.ProcessorFilterKubeletStats: kubeletStatsProcessor,
-		otelconsts.ProcessorK8sAttributes:      k8sAttributesProcessor,
-	}
-
-	return &policylangv1.InfraMeter{
-		Receivers:  receivers,
-		Processors: processors,
-		Pipeline: &policylangv1.InfraMeter_MetricsPipeline{
-			Receivers: []string{
-				otelconsts.ReceiverKubeletStats,
-			},
-			Processors: []string{
-				otelconsts.ProcessorFilterKubeletStats,
-				otelconsts.ProcessorK8sAttributes,
-			},
-		},
+		if len(selectorsList) > 0 {
+			processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
+		}
 	}
 }

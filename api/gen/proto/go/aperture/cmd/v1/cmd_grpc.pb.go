@@ -11,6 +11,7 @@ package cmdv1
 import (
 	context "context"
 	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	v11 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -29,11 +30,14 @@ const (
 	Controller_ListAutoScaleControlPoints_FullMethodName = "/aperture.cmd.v1.Controller/ListAutoScaleControlPoints"
 	Controller_ListDiscoveryEntities_FullMethodName      = "/aperture.cmd.v1.Controller/ListDiscoveryEntities"
 	Controller_ListDiscoveryEntity_FullMethodName        = "/aperture.cmd.v1.Controller/ListDiscoveryEntity"
+	Controller_ListPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/ListPolicies"
 	Controller_PreviewFlowLabels_FullMethodName          = "/aperture.cmd.v1.Controller/PreviewFlowLabels"
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
 	Controller_UpsertPolicy_FullMethodName               = "/aperture.cmd.v1.Controller/UpsertPolicy"
 	Controller_PostDynamicConfig_FullMethodName          = "/aperture.cmd.v1.Controller/PostDynamicConfig"
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
+	Controller_GetDecisions_FullMethodName               = "/aperture.cmd.v1.Controller/GetDecisions"
+	Controller_GetStatus_FullMethodName                  = "/aperture.cmd.v1.Controller/GetStatus"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -46,12 +50,15 @@ type ControllerClient interface {
 	ListAutoScaleControlPoints(ctx context.Context, in *ListAutoScaleControlPointsRequest, opts ...grpc.CallOption) (*ListAutoScaleControlPointsControllerResponse, error)
 	ListDiscoveryEntities(ctx context.Context, in *ListDiscoveryEntitiesRequest, opts ...grpc.CallOption) (*ListDiscoveryEntitiesControllerResponse, error)
 	ListDiscoveryEntity(ctx context.Context, in *ListDiscoveryEntityRequest, opts ...grpc.CallOption) (*ListDiscoveryEntityAgentResponse, error)
+	ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.GetPoliciesResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
 	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
+	GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error)
 }
 
 type controllerClient struct {
@@ -116,6 +123,15 @@ func (c *controllerClient) ListDiscoveryEntity(ctx context.Context, in *ListDisc
 	return out, nil
 }
 
+func (c *controllerClient) ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.GetPoliciesResponse, error) {
+	out := new(v1.GetPoliciesResponse)
+	err := c.cc.Invoke(ctx, Controller_ListPolicies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *controllerClient) PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error) {
 	out := new(PreviewFlowLabelsControllerResponse)
 	err := c.cc.Invoke(ctx, Controller_PreviewFlowLabels_FullMethodName, in, out, opts...)
@@ -161,6 +177,24 @@ func (c *controllerClient) DeletePolicy(ctx context.Context, in *v1.DeletePolicy
 	return out, nil
 }
 
+func (c *controllerClient) GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error) {
+	out := new(v1.GetDecisionsResponse)
+	err := c.cc.Invoke(ctx, Controller_GetDecisions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error) {
+	out := new(v11.GroupStatus)
+	err := c.cc.Invoke(ctx, Controller_GetStatus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
@@ -171,12 +205,15 @@ type ControllerServer interface {
 	ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error)
 	ListDiscoveryEntities(context.Context, *ListDiscoveryEntitiesRequest) (*ListDiscoveryEntitiesControllerResponse, error)
 	ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error)
+	ListPolicies(context.Context, *emptypb.Empty) (*v1.GetPoliciesResponse, error)
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
 	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
+	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
+	GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -201,6 +238,9 @@ func (UnimplementedControllerServer) ListDiscoveryEntities(context.Context, *Lis
 func (UnimplementedControllerServer) ListDiscoveryEntity(context.Context, *ListDiscoveryEntityRequest) (*ListDiscoveryEntityAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDiscoveryEntity not implemented")
 }
+func (UnimplementedControllerServer) ListPolicies(context.Context, *emptypb.Empty) (*v1.GetPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
 func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewFlowLabels not implemented")
 }
@@ -215,6 +255,12 @@ func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.Post
 }
 func (UnimplementedControllerServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (UnimplementedControllerServer) GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDecisions not implemented")
+}
+func (UnimplementedControllerServer) GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
 }
 
 // UnsafeControllerServer may be embedded to opt out of forward compatibility for this service.
@@ -336,6 +382,24 @@ func _Controller_ListDiscoveryEntity_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_ListPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).ListPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_ListPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).ListPolicies(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Controller_PreviewFlowLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PreviewFlowLabelsRequest)
 	if err := dec(in); err != nil {
@@ -426,6 +490,42 @@ func _Controller_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_GetDecisions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.GetDecisionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetDecisions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetDecisions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetDecisions(ctx, req.(*v1.GetDecisionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.GroupStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetStatus(ctx, req.(*v11.GroupStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +558,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Controller_ListDiscoveryEntity_Handler,
 		},
 		{
+			MethodName: "ListPolicies",
+			Handler:    _Controller_ListPolicies_Handler,
+		},
+		{
 			MethodName: "PreviewFlowLabels",
 			Handler:    _Controller_PreviewFlowLabels_Handler,
 		},
@@ -476,6 +580,14 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePolicy",
 			Handler:    _Controller_DeletePolicy_Handler,
+		},
+		{
+			MethodName: "GetDecisions",
+			Handler:    _Controller_GetDecisions_Handler,
+		},
+		{
+			MethodName: "GetStatus",
+			Handler:    _Controller_GetStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

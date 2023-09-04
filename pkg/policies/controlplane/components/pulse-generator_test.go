@@ -1,9 +1,10 @@
 package components_test
 
 import (
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/sim"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/sim"
 )
 
 var _ = Describe("PulseGenerator", func() {

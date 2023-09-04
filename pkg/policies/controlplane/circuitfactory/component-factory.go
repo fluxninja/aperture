@@ -16,11 +16,10 @@ import (
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/regulator"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/sampler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // FactoryModule for component factory run via the main app.
@@ -48,6 +47,8 @@ func NewComponentAndOptions(
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
+	case *policylangv1.Component_PidController:
+		ctor = mkCtor(config.PidController, components.NewPIDControllerAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_Sma:
@@ -95,7 +96,7 @@ func NewComponentAndOptions(
 	case *policylangv1.Component_NestedSignalEgress:
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	case *policylangv1.Component_NestedCircuit:
-		return ParseNestedCircuit(componentID, config.NestedCircuit, policyReadAPI)
+		return NewNestedCircuitAndOptions(config.NestedCircuit, componentID, policyReadAPI)
 	case *policylangv1.Component_Query:
 		query := componentProto.GetQuery()
 		switch queryConfig := query.Component.(type) {
@@ -109,8 +110,8 @@ func NewComponentAndOptions(
 			ctor = mkCtor(flowControlConfig.QuotaScheduler, quotascheduler.NewQuotaSchedulerAndOptions)
 		case *policylangv1.FlowControl_RateLimiter:
 			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
-		case *policylangv1.FlowControl_Regulator:
-			ctor = mkCtor(flowControlConfig.Regulator, regulator.NewRegulatorAndOptions)
+		case *policylangv1.FlowControl_Sampler:
+			ctor = mkCtor(flowControlConfig.Sampler, sampler.NewSamplerAndOptions)
 		case *policylangv1.FlowControl_Private:
 			switch flowControlConfig.Private.TypeUrl {
 			case "type.googleapis.com/aperture.policy.private.v1.LoadActuator":
@@ -163,7 +164,7 @@ func NewComponentAndOptions(
 		return Tree{}, nil, nil, err
 	}
 
-	configuredComponent, err := prepareComponent(component, config, componentID, true)
+	configuredComponent, err := runtime.NewConfiguredComponent(component, config, componentID, true)
 	if err != nil {
 		return Tree{}, nil, nil, err
 	}
@@ -184,46 +185,4 @@ func mkCtor[Config any, Comp runtime.Component](
 		comp, opt, err := origCtor(config, componentID, policy)
 		return comp, config, opt, err
 	}
-}
-
-func prepareComponent(
-	component runtime.Component,
-	config any,
-	componentID runtime.ComponentID,
-	doParsePortMapping bool,
-) (*runtime.ConfiguredComponent, error) {
-	subCircuitID, ok := componentID.ParentID()
-	if !ok {
-		return nil, fmt.Errorf("component %s is not in a circuit", componentID.String())
-	}
-
-	return prepareComponentInCircuit(component, config, componentID, subCircuitID, doParsePortMapping)
-}
-
-func prepareComponentInCircuit(
-	component runtime.Component,
-	config any,
-	componentID runtime.ComponentID,
-	subCircuitID runtime.ComponentID,
-	doParsePortMapping bool,
-) (*runtime.ConfiguredComponent, error) {
-	mapStruct, err := utils.ToMapStruct(config)
-	if err != nil {
-		return nil, err
-	}
-
-	ports := runtime.NewPortMapping()
-	if doParsePortMapping {
-		ports, err = runtime.PortsFromComponentConfig(mapStruct, subCircuitID.String())
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return &runtime.ConfiguredComponent{
-		Component:   component,
-		PortMapping: ports,
-		Config:      mapStruct,
-		ComponentID: componentID,
-	}, nil
 }

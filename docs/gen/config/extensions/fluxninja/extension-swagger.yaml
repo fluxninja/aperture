@@ -98,8 +98,37 @@ definitions:
                 $ref: '#/definitions/ClientConfig'
                 description: Client configuration.
                 x-go-tag-json: client
+            controller_id:
+                description: Overrides Controller ID for Aperture Controller. If not set, random id will be generated and persisted in etcd.
+                type: string
+                x-go-name: ControllerID
+                x-go-tag-json: controller_id,omitempty
+            disable_local_otel_pipeline:
+                default: false
+                description: Disables local Prometheus OTel pipelines for metrics. Implied by EnableCloudController.
+                type: boolean
+                x-go-name: DisableLocalOTelPipeline
+                x-go-tag-default: "false"
+                x-go-tag-json: disable_local_otel_pipeline
+            enable_cloud_controller:
+                default: false
+                description: |-
+                    Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
+
+                    Enabling this flag configures various agent components to point to the
+                    Aperture Cloud Controller, for example configures remote etcd endpoint and disables
+                    local Prometheus OTel pipelines.
+
+                    Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
+                type: boolean
+                x-go-name: EnableCloudController
+                x-go-tag-default: "false"
+                x-go-tag-json: enable_cloud_controller
             endpoint:
-                description: Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+                description: |-
+                    Address to gRPC or HTTP(s) server listening in agent service.
+                    For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+                    For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
                 pattern: (((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
                 type: string
                 x-go-name: Endpoint
@@ -128,7 +157,7 @@ definitions:
                 x-go-tag-json: installation_mode
                 x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL
                 x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
-        title: FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+        title: FluxNinjaExtensionConfig is the configuration for [FluxNinja integration](/reference/fluxninja.md).
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig
     GRPCClientConfig:

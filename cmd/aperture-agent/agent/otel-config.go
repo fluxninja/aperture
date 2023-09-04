@@ -4,13 +4,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"path"
+	"sync"
 
 	promapi "github.com/prometheus/client_golang/api"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -50,14 +51,6 @@ func provideAgent(
 	addTracesPipeline(otelCfg, lis)
 	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
 
-	customConfig := map[string]*policylangv1.InfraMeter{}
-	if !agentCfg.DisableKubeletScraper {
-		customConfig[otelconsts.ReceiverKubeletStats] = inframeter.InfraMeterForKubeletStats()
-	}
-
-	if err := inframeter.AddInfraMeters(otelCfg, customConfig); err != nil {
-		return nil, fmt.Errorf("adding builtin custom metrics pipelines: %w", err)
-	}
 	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
 	baseOtelCfg, err := otelCfg.Copy()
@@ -66,34 +59,30 @@ func provideAgent(
 	}
 	configProvider := otelconfig.NewProvider("service", otelCfg)
 
-	allInfraMeters := map[string]map[string]*policylangv1.InfraMeter{}
+	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
+	var allInfraMetersMutex sync.Mutex
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
-		tc := &policylangv1.TelemetryCollector{}
-		if err = unmarshaller.UnmarshalKey("", tc); err != nil {
-			log.Error().Err(err).Msg("unmarshalling telemetry collector")
+		im := &policysyncv1.InfraMeterWrapper{}
+		if err = unmarshaller.UnmarshalKey("", im); err != nil {
+			log.Error().Err(err).Msg("unmarshalling infra meter")
 			return
 		}
-		infraMeters := tc.GetInfraMeters()
 		key := string(event.Key)
 
+		allInfraMetersMutex.Lock()
+		defer allInfraMetersMutex.Unlock()
 		switch event.Type {
 		case notifiers.Write:
-			allInfraMeters[key] = infraMeters
+			allInfraMeters[key] = im
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
 
 		// We already checked that the config is copiable, so MustCopy shouldn't panic.
 		otelCfg := baseOtelCfg.MustCopy()
-		ims := map[string]*policylangv1.InfraMeter{}
-		for prefix, v := range allInfraMeters {
-			for k, v := range v {
-				ims[fmt.Sprintf("%s/%s", prefix, k)] = v
-			}
-		}
-		if err := inframeter.AddInfraMeters(otelCfg, ims); err != nil {
+		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(shutdowner)
 			return
@@ -106,7 +95,7 @@ func provideAgent(
 	// Get Agent Group from host info gatherer
 	agentGroupName := ai.GetAgentGroup()
 	// Scope the sync to the agent group.
-	etcdPath := path.Join(paths.TelemetryCollectorConfigPath,
+	etcdPath := path.Join(paths.InfraMeterConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
 	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
 	if err != nil {
@@ -177,15 +166,25 @@ func addMetricsPipeline(
 	lis *listener.Listener,
 	promClient promapi.Client,
 ) {
+	pipeline := otelconfig.Pipeline{}
 	addPrometheusReceiver(config, agentConfig, tlsConfig, lis)
-	otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
-	config.Service.AddPipeline("metrics/fast", otelconfig.Pipeline{
-		Receivers: []string{otelconsts.ReceiverPrometheus},
-		Processors: []string{
-			otelconsts.ProcessorAgentGroup,
-		},
-		Exporters: []string{otelconsts.ExporterPrometheusRemoteWrite},
-	})
+	if promClient != nil {
+		otelconfig.AddPrometheusRemoteWriteExporter(config, promClient)
+		pipeline.Exporters = []string{otelconsts.ExporterPrometheusRemoteWrite}
+	}
+
+	processors := []string{
+		otelconsts.ProcessorAgentGroup,
+	}
+	if !agentConfig.EnableHighCardinalityPlatformMetrics {
+		otelconfig.AddHighCardinalityMetricsFilterProcessor(config)
+		// Prepending processor so we drop metrics as soon as possible without any unnecessary operation on them.
+		processors = append([]string{otelconsts.ProcessorFilterHighCardinalityMetrics}, processors...)
+	}
+
+	pipeline.Processors = processors
+	pipeline.Receivers = []string{otelconsts.ReceiverPrometheus}
+	config.Service.AddPipeline("metrics/fast", pipeline)
 }
 
 func addPrometheusReceiver(
@@ -216,7 +215,7 @@ func addPrometheusReceiver(
 	config.AddReceiver(otelconsts.ReceiverPrometheus, map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval":     "1s",
+				"scrape_interval":     "10s",
 				"scrape_timeout":      "1s",
 				"evaluation_interval": "1m",
 			},

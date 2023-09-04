@@ -1,6 +1,6 @@
 ---
 title: Aperture Agent Configuration Reference
-sidebar_position: 11
+sidebar_position: 2
 sidebar_label: Agent
 ---
 
@@ -774,7 +774,7 @@ attributes.
 All agents within an agent group receive the same data-plane configuration (for
 example, Flux Meters, Rate Limiters and so on).
 
-[Read more about agent groups here](/concepts/flow-control/selector.md#agent-group).
+[Read more about agent groups here](/concepts/selector.md#agent-group).
 
 </dd>
 </dl>
@@ -800,6 +800,8 @@ AgentOTelConfig is the configuration for Agent's OTel collector.
 <!-- vale on -->
 
 DisableKubeletScraper disables the default metrics collection for kubelet.
+Deprecated: kubelet scraper is removed entirely, so this flag makes no
+difference.
 
 </dd>
 <dt>disable_kubernetes_scraper</dt>
@@ -813,6 +815,23 @@ DisableKubeletScraper disables the default metrics collection for kubelet.
 
 DisableKubernetesScraper disables the default metrics collection for Kubernetes
 resources.
+
+</dd>
+<dt>enable_high_cardinality_platform_metrics</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture
+platform metrics from being published to Prometheus. Filtered out metrics are:
+"grpc_server_handled_total._" "grpc_server_handling_seconds._"
+"grpc_server_handling_seconds_bucket._" "grpc_server_handling_seconds_count._"
+"grpc_server_handling_seconds_sum._" "grpc_server_msg_received_total._"
+"grpc_server_msg_sent_total._" "grpc_server_started_total._"
 
 </dd>
 <dt>batch_alerts</dt>
@@ -1267,6 +1286,19 @@ to.
 ReplicaCount is 1 by default.
 
 </dd>
+<dt>sync_replication</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+SyncReplication enables synchronous replication. By default the replication is
+asynchronous.
+
+</dd>
 </dl>
 
 ---
@@ -1370,7 +1402,7 @@ EtcdConfig holds configuration for etcd client.
 
 <!-- vale off -->
 
-([]string, **required**)
+([]string)
 
 <!-- vale on -->
 
@@ -1387,6 +1419,32 @@ List of etcd server endpoints
 <!-- vale on -->
 
 Lease time-to-live
+
+</dd>
+<dt>log_level</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, format: `empty | empty`, one of:
+`debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL`,
+default: `"error"`)
+
+<!-- vale on -->
+
+LogLevel of logs coming from inside the etcd client
+
+</dd>
+<dt>namespace</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"aperture"`)
+
+<!-- vale on -->
+
+etcd namespace
 
 </dd>
 <dt>password</dt>
@@ -1458,7 +1516,8 @@ Enables the flow preview service.
 
 <!-- vale on -->
 
-FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+FluxNinjaExtensionConfig is the configuration for
+[FluxNinja integration](/reference/fluxninja.md).
 
 <dl>
 <dt>api_key</dt>
@@ -1473,6 +1532,51 @@ FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
 API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
+<dt>controller_id</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Overrides Controller ID for Aperture Controller. If not set, random id will be
+generated and persisted in etcd.
+
+</dd>
+<dt>disable_local_otel_pipeline</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Disables local Prometheus OTel pipelines for metrics. Implied by
+EnableCloudController.
+
+</dd>
+<dt>enable_cloud_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
+
+Enabling this flag configures various agent components to point to the Aperture
+Cloud Controller, for example configures remote etcd endpoint and disables local
+Prometheus OTel pipelines.
+
+Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
+Aperture Controller.
+
+</dd>
 <dt>endpoint</dt>
 <dd>
 
@@ -1482,8 +1586,9 @@ API Key for this agent. If this key is not set, the extension won't be enabled.
 
 <!-- vale on -->
 
-Address to gRPC or HTTP(s) server listening in agent service. To use HTTP
-protocol, the address must start with `http(s)://`.
+Address to gRPC or HTTP(s) server listening in agent service. For connecting to
+Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address. For
+self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 
 </dd>
 <dt>heartbeat_interval</dt>
@@ -2240,7 +2345,7 @@ negative, then keep-alive is disabled.
 
 <!-- vale off -->
 
-(string, one of: `tcp | tcp4 | tcp6`, default: `"tcp"`)
+(string, format: `empty | empty`, one of: `tcp | tcp4 | tcp6`, default: `"tcp"`)
 
 <!-- vale on -->
 
@@ -2265,7 +2370,7 @@ LogConfig holds configuration for a logger and log writers.
 
 <!-- vale off -->
 
-(string, one of:
+(string, format: `empty | empty`, one of:
 `debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED`,
 default: `"info"`)
 
@@ -2597,11 +2702,57 @@ PrometheusConfig holds configuration for Prometheus Server.
 
 <!-- vale off -->
 
-(string, format: `hostname_port | url | fqdn`, **required**)
+(string, format: `empty | hostname_port | url | fqdn | empty`)
 
 <!-- vale on -->
 
 Address of the Prometheus server
+
+</dd>
+<dt>labels</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]PrometheusLabel](#prometheus-label))
+
+<!-- vale on -->
+
+A list of labels to be attached to every query
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PrometheusLabel {#prometheus-label}
+
+<!-- vale on -->
+
+PrometheusLabel holds Name->Value mapping for the label that will be attached to
+every PromQL query executed by the controller.
+
+<dl>
+<dt>name</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+</dd>
+<dt>value</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
 
 </dd>
 </dl>

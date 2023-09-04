@@ -12,12 +12,62 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/crdsonnet/crdsonnet.git",
+          "subdir": "crdsonnet"
+        }
+      },
+      "version": "3dab27c8c9119eb14ecc19592240caf5f7330d23",
+      "sum": "Vh6Wo/7IIyIkmDE2XAJfWZDlTHClRrdMa9CCBPrcF1U="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/crdsonnet/validate-libsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "a78ca15fbfece3110c4807d1f059132ece01d97b",
+      "sum": "qYLH56MqvmgxE4YMNeTbuJ1XSsCpl1sumHN5x8IQv2I="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/grafana/grafonnet-lib.git",
           "subdir": "grafonnet"
         }
       },
-      "version": "30280196507e0fe6fa978a3e0eaca3a62844f817",
+      "version": "a1d61cce1da59c71409b99b5c7568511fec661ea",
       "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-v9.4.0"
+        }
+      },
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
+      "sum": "Ju+Q5MP6YAQvK4pNOGRjHWgP4eLCxzLtjUOCqXyCbf4="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "grafonnet-base"
+        }
+      },
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
+      "sum": "5zmj5Vn/cKhKrD+jA5BfLliR4t74upkM4PfnuJC5t4M="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grok.git",
+          "subdir": "jsonnet/v9.4.0"
+        }
+      },
+      "version": "7a7f6b80de0ba5713a7ed45833acf5f641b08d4d",
+      "sum": "b6KSW0/Z45K0W2dF+8ZPLV32uv0ApjIsShTjk/zHEbg="
     },
     {
       "source": {
@@ -26,8 +76,8 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
-      "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
       "source": {
@@ -36,8 +86,8 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
-      "sum": "2++XoPslyz02LRgsxREWxjLgYgiCIqhAtXCyVSvYcoE="
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
       "source": {
@@ -46,7 +96,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "351bfae3eee23db305597f272ef29ec16f99ee49",
+      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -56,8 +106,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "be066653f33fcaa8467231f6334f6878b92fd8f9",
-      "sum": "fzESn29CRKzLap9jTpcUNSNBy7MzvzOxZo1LYWyIrGs="
+      "version": "7c865ec0606f2b68c0f6b2721f101e6a99cd2593",
+      "sum": "zjjufxN4yAIevldYEERiZEp27vK0BJKj1VvZcVtWiOo="
     },
     {
       "source": {
@@ -66,8 +116,8 @@
           "subdir": ""
         }
       },
-      "version": "90f2a60a37433d12cd913793b65479b5830b532f",
-      "sum": "53cZqeDhE5Oik8pxXUNT3tjMzUoRKf3uHJjk4F37gAI="
+      "version": "f6661c067c63d5f7472b0f4b1823ce7e08e1492f",
+      "sum": "YjBV4glGE30l4I0uY7nrVZmHWmrX2lqqy7YOTKDxch4="
     },
     {
       "source": {
@@ -76,8 +126,8 @@
           "subdir": "1.22"
         }
       },
-      "version": "610803705e9ec295ef2e4eeaa6b2f8fc1419e5b1",
-      "sum": "QKsc62wl5Wc+uxxP4NJCF1NidiPi9zjngbzIszFvesc="
+      "version": "44a9f3d21c089a01f62b22e25bdf553f488a74e8",
+      "sum": "+pMhSLOcwfOC74Snh1B2Dx32nmzx51PqsoEJBphmXqM="
     },
     {
       "source": {
@@ -86,8 +136,18 @@
           "subdir": "1.24"
         }
       },
-      "version": "2ff9e542231fce1ba6d880d1157c81724f176bc6",
-      "sum": "qJK1nFZIYKv/ttM1bZxqXJJ7AIp9UA7ytVZpC6yQYoA="
+      "version": "44a9f3d21c089a01f62b22e25bdf553f488a74e8",
+      "sum": "ecHj4f4rxFPcqcu6rSdypniF5xMVRG9A8k+HwD87BTg="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/jsonnet-libs/xtd.git",
+          "subdir": ""
+        }
+      },
+      "version": "59533c525e8bc6c54e86d7184c0ddf413a88c91c",
+      "sum": "8YJptN9ErbZFr7AGI6PiWM8A4f70JE5KSgt1cykieDU="
     },
     {
       "source": {
@@ -96,8 +156,8 @@
           "subdir": ""
         }
       },
-      "version": "5e44626d70c2bf2d35c37f3fee5a6261a5335cc6",
-      "sum": "F0lSJ5J+DUU7Y5u+j783bFLTHNd8Ir1IEkbXuK59RaA="
+      "version": "46fc905d5b2981642043088ac7902ea50db2903e",
+      "sum": "8FAie1MXww5Ip9F8hQWkU9Fio1Af+hO4weQuuexioIQ="
     }
   ],
   "legacyImports": false

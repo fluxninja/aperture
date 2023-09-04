@@ -19,6 +19,7 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 ### Options
 
 ```
+      --dry-run              If set to true, only the manifests will be generated and no installation will be performed
   -h, --help                 help for install
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace in which the component will be installed. Defaults to 'default' namespace (default "default")

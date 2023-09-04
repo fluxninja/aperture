@@ -59,12 +59,16 @@ const (
 	ApertureDroppingRateLimitersLabel = "aperture.dropping_rate_limiters"
 	// ApertureLoadSchedulersLabel describes load schedulers matched to the traffic.
 	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
+	// ApertureQuotaSchedulersLabel describes quota schedulers matched to the traffic.
+	ApertureQuotaSchedulersLabel = "aperture.quota_schedulers"
 	// ApertureDroppingLoadSchedulersLabel describes load schedulers dropping the traffic.
 	ApertureDroppingLoadSchedulersLabel = "aperture.dropping_load_schedulers"
-	// ApertureLoadRegulatorsLabel describes load regulators matched to the traffic.
-	ApertureLoadRegulatorsLabel = "aperture.load_regulators"
-	// ApertureDroppingLoadRegulatorsLabel describes load regulators dropping the traffic.
-	ApertureDroppingLoadRegulatorsLabel = "aperture.dropping_load_regulators"
+	// ApertureDroppingQuotaSchedulersLabel describes quota schedulers dropping the traffic.
+	ApertureDroppingQuotaSchedulersLabel = "aperture.dropping_quota_schedulers"
+	// ApertureSamplersLabel describes samplers matched to the traffic.
+	ApertureSamplersLabel = "aperture.samplers"
+	// ApertureDroppingSamplersLabel describes samplers dropping the traffic.
+	ApertureDroppingSamplersLabel = "aperture.dropping_samplers"
 	// ApertureWorkloadsLabel describes workloads matched to the traffic.
 	ApertureWorkloadsLabel = "aperture.workloads"
 	// ApertureDroppingWorkloadsLabel describes workloads dropping the traffic.
@@ -171,8 +175,12 @@ const (
 	ProcessorAlertsNamespace = "attributes/alerts"
 	// ProcessorFilterKubeletStats filters in only metrics of interest.
 	ProcessorFilterKubeletStats = "filter/kubeletstats"
+	// ProcessorFilterHighCardinalityMetrics filters out high cardinality Aperture platform metrics.
+	ProcessorFilterHighCardinalityMetrics = "filter/high_cardinality_metrics"
 	// ProcessorK8sAttributes enriches metrics with k8s metadata.
-	ProcessorK8sAttributes = "k8sattributes/kubeletstats"
+	ProcessorK8sAttributes = "k8sattributes"
+	// ProcessorK8sAttributesSelectors is the key name of selectors field in k8sattributes processor.
+	ProcessorK8sAttributesSelectors = "selectors"
 
 	// ExporterLogging exports telemetry using Aperture logger.
 	ExporterLogging = "logging"
@@ -203,7 +211,6 @@ const (
 // FX tags used to pass OTel Collector factories.
 var (
 	BaseFxTag               = config.NameTag("base")
-	TelemetryCollectorFxTag = config.NameTag("telemetry-collector")
 	ReceiverFactoriesFxTag  = config.GroupTag("otel-collector-receiver-factories")
 	ProcessorFactoriesFxTag = config.GroupTag("otel-collector-processor-factories")
 )

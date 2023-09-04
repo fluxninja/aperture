@@ -23,6 +23,7 @@ import (
 	"path"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 
@@ -51,11 +52,13 @@ import (
 // ControllerReconciler reconciles a Controller object.
 type ControllerReconciler struct {
 	client.Client
-	DynamicClient    dynamic.Interface
-	Scheme           *runtime.Scheme
-	Recorder         record.EventRecorder
-	resourcesDeleted bool
-	defaultsExecuted bool
+	DynamicClient       dynamic.Interface
+	Scheme              *runtime.Scheme
+	Recorder            record.EventRecorder
+	MultipleControllers bool
+	ResourcesDeleted    map[string]bool
+	defaultsExecuted    bool
+	mutex               sync.RWMutex
 }
 
 var (
@@ -63,6 +66,29 @@ var (
 	controllerKey        *bytes.Buffer
 	controllerClientCert *bytes.Buffer
 )
+
+func (r *ControllerReconciler) verifySingletonControllerExists(ctx context.Context, instance *controllerv1alpha1.Controller, instances *controllerv1alpha1.ControllerList) (bool, error) {
+	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
+	if instances.Items != nil && len(instances.Items) != 0 {
+		for _, ins := range instances.Items {
+			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
+				continue
+			}
+			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
+				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
+					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
+
+				instance.Status.Resources = "skipped"
+				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+					return false, err
+				}
+
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=validatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
@@ -97,7 +123,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	instance := &controllerv1alpha1.Controller{}
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil && errors.IsNotFound(err) {
-		if !r.resourcesDeleted {
+		r.mutex.RLock()
+		defer r.mutex.RUnlock()
+		if deleted, ok := r.ResourcesDeleted[req.NamespacedName.String()]; !ok || !deleted {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and do not requeue
@@ -110,11 +138,22 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
+	// Checking if the Minimum kubernetes version condition is satisfied.
+	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
+		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
+			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
+		instance.Status.Resources = "failed"
+		err = r.updateStatus(ctx, instance.DeepCopy())
+		return ctrl.Result{}, err
+	}
+
 	// Handing delete operation
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
 		if controllerutil.ContainsFinalizer(instance, controllers.FinalizerName) {
-			r.deleteResources(ctx, logger, instance.DeepCopy())
+			if !r.MultipleControllers {
+				r.deleteResources(ctx, logger, instance.DeepCopy())
+			}
 
 			controllerutil.RemoveFinalizer(instance, controllers.FinalizerName)
 			if err = r.updateController(ctx, instance); err != nil && !errors.IsNotFound(err) {
@@ -122,7 +161,9 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 		}
 
-		r.resourcesDeleted = true
+		r.mutex.Lock()
+		defer r.mutex.Unlock()
+		r.ResourcesDeleted[req.NamespacedName.String()] = true
 		return ctrl.Result{}, nil
 	}
 
@@ -133,24 +174,19 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
-	if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
-				continue
-			}
-			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
-				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Controller does not support multiple replicas.")
-
-				instance.Status.Resources = "skipped"
-				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-					return ctrl.Result{}, err
-				}
-
-				return ctrl.Result{}, nil
-			}
+	if !r.MultipleControllers {
+		passed, innerErr := r.verifySingletonControllerExists(ctx, instance, instances)
+		if innerErr != nil {
+			return ctrl.Result{}, innerErr
 		}
+		if !passed {
+			return ctrl.Result{}, nil
+		}
+	}
+
+	instance.Status.Resources = "creating"
+	if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" || !r.defaultsExecuted {
@@ -163,19 +199,10 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.defaultsExecuted = true
 	}
 
-	// Checking if the Minimum kubernetes version condition is satisfied.
-	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
-		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
-			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
-	}
-
-	instance.Status.Resources = "creating"
-	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-		return ctrl.Result{}, err
-	}
-	r.resourcesDeleted = false
-
-	if err := r.manageResources(ctx, logger, instance); err != nil {
+	r.mutex.Lock()
+	r.ResourcesDeleted[req.NamespacedName.String()] = false
+	r.mutex.Unlock()
+	if err = r.manageResources(ctx, logger, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -183,10 +210,43 @@ func (r *ControllerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		controllerutil.AddFinalizer(instance, controllers.FinalizerName)
 	}
 
+	if !instance.Status.IsMigrationCompleted {
+		// Reloading instances for the case when the migration is completed by another controller.
+		err = r.List(ctx, instances)
+		if err != nil {
+			logger.Error(err, "failed to list Controller")
+			return ctrl.Result{}, err
+		}
+
+		doMigration := true
+		isCRNamedControllerPresent := false
+		for _, ins := range instances.Items {
+			if ins.GetName() == controllers.ControllerName {
+				isCRNamedControllerPresent = true
+			}
+
+			if ins.GetUID() == instance.GetUID() {
+				continue
+			}
+
+			if ins.Status.IsMigrationCompleted {
+				doMigration = false
+				break
+			}
+		}
+
+		if doMigration {
+			if err := r.deleteOlderInstances(ctx, logger, instance, isCRNamedControllerPresent); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	}
+
 	if err := r.updateController(ctx, instance); err != nil {
 		return ctrl.Result{}, err
 	}
 
+	instance.Status.IsMigrationCompleted = true
 	instance.Status.Resources = "created"
 	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
 		return ctrl.Result{}, err
@@ -248,15 +308,81 @@ func (r *ControllerReconciler) updateStatus(ctx context.Context, instance *contr
 	return nil
 }
 
-// deleteResources deletes cluster-scoped resources for which owner-reference is not added.
-func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) {
-	// Deleting old ClusterRole
-	cr := clusterRoleForController(instance)
-	cr.Name = controllers.AppName
-	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "failed to delete object of ClusterRole")
+func (r *ControllerReconciler) deleteOlderInstances(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller, isCRNamedControllerPresent bool) error {
+	singletonInstance := instance.DeepCopy()
+	singletonInstance.Name = controllers.ControllerName
+
+	if !isCRNamedControllerPresent {
+		deployment, err := deploymentForController(singletonInstance.DeepCopy(), log, r.Scheme)
+		if err != nil || deployment == nil {
+			log.Error(err, "Failed to create object for old Deployment during Migration")
+		} else {
+			if err = r.Delete(ctx, deployment); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old Deployment during Migration")
+			}
+		}
+
+		if singletonInstance.Spec.ServiceAccountSpec.Create {
+			var serviceAccount *corev1.ServiceAccount
+			serviceAccount, err = serviceAccountForController(singletonInstance.DeepCopy(), r.Scheme)
+			if err != nil || serviceAccount == nil {
+				log.Error(err, "Failed to create object for old ServiceAccount during Migration")
+			} else {
+				if err = r.Delete(ctx, serviceAccount); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, "Failed to delete old ServiceAccount during Migration")
+				}
+			}
+		}
+
+		configMap, err := configMapForControllerConfig(singletonInstance.DeepCopy(), r.Scheme)
+		if err != nil || configMap == nil {
+			log.Error(err, "Failed to create object for old ConfigMap during Migration")
+		} else {
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old ConfigMap during Migration")
+			}
+		}
+
+		service, err := serviceForController(singletonInstance.DeepCopy(), log, r.Scheme)
+		if err != nil || service == nil {
+			log.Error(err, "Failed to create object for old Service during Migration")
+		} else {
+			if err = r.Delete(ctx, service); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "Failed to delete old Service during Migration")
+			}
+		}
 	}
 
+	var certBytes []byte
+	if controllerClientCert == nil {
+		certBytes = []byte{}
+	} else {
+		certBytes = controllerClientCert.Bytes()
+	}
+
+	vwc := validatingWebhookConfiguration(singletonInstance.DeepCopy(), certBytes)
+	vwc.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, vwc); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ValidatingWebhookConfiguration during Migration")
+	}
+
+	crb := clusterRoleBindingForController(singletonInstance.DeepCopy())
+	crb.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, crb); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ClusterRoleBinding during Migration")
+	}
+
+	cr := clusterRoleForController(singletonInstance.DeepCopy())
+	cr.Name = controllers.ControllerServiceName
+	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
+		log.Error(err, "Failed to delete old ClusterRole during Migration")
+	}
+
+	return nil
+}
+
+// deleteResources deletes cluster-scoped resources for which owner-reference is not added.
+func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) {
 	if err := r.Delete(ctx, clusterRoleForController(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRole")
 	}
@@ -272,47 +398,45 @@ func (r *ControllerReconciler) deleteResources(ctx context.Context, log logr.Log
 
 // checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
 func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *controllerv1alpha1.Controller) error {
-	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("controllers")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
-	if err != nil {
+	updateStatus := func(instance *controllerv1alpha1.Controller, reason, message string) error {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, reason, message)
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
 		}
 		return nil
+	}
+
+	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("controllers")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		return updateStatus(instance, "FailedToFetch", fmt.Sprintf("Failed to fetch Resource. Error: '%s'", err.Error()))
 	}
 
 	resourceBytes, err := resource.MarshalJSON()
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource into JSON. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "FailedToMarshal", fmt.Sprintf("Failed to marshal Resource into JSON. Error: '%s'", err.Error()))
 	}
 
 	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToSetDefaults", "Failed to set defaults. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "FailedToSetDefaults", fmt.Sprintf("Failed to set defaults. Error: '%s'", err.Error()))
+	}
+
+	if len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+		return updateStatus(instance, "ValidationFailed", "At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
+	}
+
+	if instance.Spec.ConfigSpec.Prometheus.Address == "" {
+		return updateStatus(instance, "ValidationFailed", "The address for Prometheus must be provided under spec.config.prometheus.address.")
 	}
 
 	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
+	}
+
+	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
+		return updateStatus(instance, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
 
 	if instance.Status.Resources == controllers.FailedStatus {
@@ -323,35 +447,46 @@ func (r *ControllerReconciler) checkDefaults(ctx context.Context, instance *cont
 
 // manageResources creates/updates required resources.
 func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
-	// Always enable TLS on the controller
+	certFilePath := instance.Spec.ConfigSpec.Server.TLS.CertFile
+	if certFilePath == "" {
+		certFilePath = path.Join(controllers.ControllerCertPath, controllers.ControllerCertName)
+	}
+
+	keyFilePath := instance.Spec.ConfigSpec.Server.TLS.KeyFile
+	if keyFilePath == "" {
+		keyFilePath = path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName)
+	}
+
 	instance.Spec.ConfigSpec.Server.TLS = tlsconfig.ServerTLSConfig{
-		CertFile: path.Join(controllers.ControllerCertPath, controllers.ControllerCertName),
-		KeyFile:  path.Join(controllers.ControllerCertPath, controllers.ControllerCertKeyName),
+		CertFile: certFilePath,
+		KeyFile:  keyFilePath,
 		Enabled:  true,
 	}
 
-	instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
-	if err := r.reconcileConfigMap(ctx, instance); err != nil {
-		return err
+	if !r.MultipleControllers {
+		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
+		if err := r.reconcileClusterRole(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
+			return err
+		}
+
+		if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
+			return err
+		}
 	}
 
 	if err := r.reconcileService(ctx, log, instance); err != nil {
 		return err
 	}
 
-	if err := r.reconcileClusterRole(ctx, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileClusterRoleBinding(ctx, instance); err != nil {
+	if err := r.reconcileConfigMap(ctx, instance); err != nil {
 		return err
 	}
 
 	if err := r.reconcileServiceAccount(ctx, log, instance); err != nil {
-		return err
-	}
-
-	if err := r.reconcileValidatingWebhookConfigurationAndCertSecret(ctx, instance); err != nil {
 		return err
 	}
 
@@ -371,6 +506,10 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 func (r *ControllerReconciler) reconcileConfigMap(ctx context.Context, instance *controllerv1alpha1.Controller) error {
 	configMap, err := configMapForControllerConfig(instance.DeepCopy(), r.Scheme)
 	if err != nil {
+		return err
+	}
+
+	if err = ctrl.SetControllerReference(instance, configMap, r.Scheme); err != nil {
 		return err
 	}
 
@@ -466,10 +605,16 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 	if !instance.Spec.ServiceAccountSpec.Create {
 		return nil
 	}
+
 	sa, err := serviceAccountForController(instance.DeepCopy(), r.Scheme)
 	if err != nil {
 		return err
 	}
+
+	if err = ctrl.SetControllerReference(instance, sa, r.Scheme); err != nil {
+		return err
+	}
+
 	if err = r.createServiceAccount(sa, ctx, instance); err != nil {
 		return err
 	}
@@ -482,6 +627,10 @@ func (r *ControllerReconciler) reconcileServiceAccount(ctx context.Context, log 
 func (r *ControllerReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *controllerv1alpha1.Controller) error {
 	dep, err := deploymentForController(instance.DeepCopy(), log, r.Scheme)
 	if err != nil {
+		return err
+	}
+
+	if err = ctrl.SetControllerReference(instance, dep, r.Scheme); err != nil {
 		return err
 	}
 
@@ -583,6 +732,35 @@ func (r *ControllerReconciler) reconcileSecret(ctx context.Context, instance *co
 		instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension)
 
 	return nil
+}
+
+// RemoveFinalizerFromControllerCR removes the finalizer from the controller CR when the operator is getting deleted.
+func (r *ControllerReconciler) RemoveFinalizerFromControllerCR(ctx context.Context, setupLog logr.Logger) {
+	controllerList := &controllerv1alpha1.ControllerList{}
+
+	err := r.Client.List(ctx, controllerList)
+	if err != nil {
+		setupLog.Error(err, "Error while getting the controller")
+		return
+	}
+	if controllerList.Items != nil && len(controllerList.Items) != 0 {
+		for _, controllerCR := range controllerList.Items {
+			controllerCR := controllerCR
+			if controllerutil.ContainsFinalizer(&controllerCR, controllers.FinalizerName) {
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Controller CR named %s.", controllerCR.Name))
+				controllerutil.RemoveFinalizer(&controllerCR, controllers.FinalizerName)
+				if err = r.updateController(ctx, &controllerCR); err != nil && !errors.IsNotFound(err) {
+					if errors.IsUnauthorized(err) {
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the controller CR named %s serviceaccount might be deleted.", controllerCR.Name))
+						return
+					} else {
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the controller CR named %s.", controllerCR.Name))
+						return
+					}
+				}
+			}
+		}
+	}
 }
 
 // eventFiltersForController sets up a Predicate filter for the received events.

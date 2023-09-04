@@ -13,29 +13,11 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 rules:
-- nonResourceURLs:
-  - /healthz
-  - /metrics
-  - /version
-  verbs:
-  - get
+# Permissions required to run the operator
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
   - mutatingwebhookconfigurations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
   verbs:
   - create
   - delete
@@ -76,7 +58,6 @@ rules:
   - configmaps
   - secrets
   - serviceaccounts
-  - services
   verbs:
   - create
   - delete
@@ -88,47 +69,11 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - nodes
-  - endpoints
-  - componentstatuses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes/metrics
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/proxy
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/spec
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - nodes/stats
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
   - pods
-  - namespaces
+  - nodes
   verbs:
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - ""
@@ -165,6 +110,87 @@ rules:
   - patch
   - update
   - watch
+{{- if or (not .Values.operator.rbac.featureBasedRoles) (and .Values.agent.sidecar (not .Values.agent.sidecar.enabled))}}
+# Aperture Agent in DaemonSet mode permissions
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- nonResourceURLs:
+  - /healthz
+  - /metrics
+  - /version
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - componentstatuses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/metrics
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes/proxy
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes/spec
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+{{- end }}
+{{- if or (not .Values.operator.rbac.featureBasedRoles) (and .Values.agent.sidecar .Values.agent.sidecar.enabled)}}
+# Aperture Agent in Sidecar mode permissions
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - namespaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+{{- end }}
+{{- if or (not .Values.operator.rbac.featureBasedRoles) (or (not .Values.agent.config) (not .Values.agent.config.auto_scale) (not .Values.agent.config.auto_scale.kubernetes) .Values.agent.config.auto_scale.kubernetes.enabled) }}
 # auto scale permissions
 - apiGroups: ["*"]
   resources: ["*"]
@@ -178,6 +204,7 @@ rules:
   - get
   - update
   - patch
+{{- end }}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

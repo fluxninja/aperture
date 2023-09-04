@@ -10,10 +10,12 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/info"
@@ -24,6 +26,8 @@ import (
 var (
 	Version = info.Version
 	verbose bool
+
+	controller utils.ControllerConn
 )
 
 func init() {
@@ -38,6 +42,9 @@ func init() {
 	RootCmd.AddCommand(build.BuildCmd)
 	RootCmd.AddCommand(agentsCmd)
 	RootCmd.AddCommand(delete.DeleteCmd)
+	RootCmd.AddCommand(decisions.DecisionsCmd)
+	RootCmd.AddCommand(policiesCmd)
+	RootCmd.AddCommand(status.StatusCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

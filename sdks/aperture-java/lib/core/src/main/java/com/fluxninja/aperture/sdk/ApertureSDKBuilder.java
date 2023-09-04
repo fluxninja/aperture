@@ -1,7 +1,6 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.DEFAULT_RPC_TIMEOUT;
-import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
+import static com.fluxninja.aperture.sdk.Constants.*;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
@@ -20,10 +19,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
-    private Duration timeout;
+    private Duration flowTimeout;
     private String host;
     private int port;
     private boolean useHttpsInOtlpExporter = false;
@@ -31,16 +32,34 @@ public final class ApertureSDKBuilder {
     private String certFile;
     private final List<String> ignoredPaths;
     private boolean ignoredPathsMatchRegex = false;
+    private TlsChannelCredentials.Builder tlsChannelCredentialsBuilder;
+    private byte[] caCertFileContents;
+
+    private static final Logger logger = LoggerFactory.getLogger(ApertureSDKBuilder.class);
 
     ApertureSDKBuilder() {
         ignoredPaths = new ArrayList<>();
+        tlsChannelCredentialsBuilder = TlsChannelCredentials.newBuilder();
+        caCertFileContents = null;
     }
 
+    /**
+     * Set hostname of Aperture Agent to connect to.
+     *
+     * @param host hostname of Aperture Agent to connect to.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setHost(String host) {
         this.host = host;
         return this;
     }
 
+    /**
+     * Set port number of Aperture Agent to connect to.
+     *
+     * @param port port number of Aperture Agent to connect to.
+     * @return the builder object.
+     */
     public ApertureSDKBuilder setPort(int port) {
         this.port = port;
         return this;
@@ -52,8 +71,8 @@ public final class ApertureSDKBuilder {
      * @param timeout timeout for connection to Aperture Agent.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setDuration(Duration timeout) {
-        this.timeout = timeout;
+    public ApertureSDKBuilder setFlowTimeout(Duration timeout) {
+        this.flowTimeout = timeout;
         return this;
     }
 
@@ -69,8 +88,20 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDKBuilder setRootCertificateFile(String filename) {
+    /**
+     * Sets custom root CA certificate to be used by SSL connection.
+     *
+     * @param filename path to file containing custom root CA certificate.
+     * @return the builder object.
+     * @throws IOException if custom root CA certificate file cannot be read.
+     */
+    public ApertureSDKBuilder setRootCertificateFile(String filename) throws IOException {
         this.certFile = filename;
+        if (filename != null && !filename.isEmpty()) {
+            this.tlsChannelCredentialsBuilder.trustManager(new File(this.certFile));
+            this.caCertFileContents =
+                    ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
+        }
         return this;
     }
 
@@ -159,15 +190,24 @@ public final class ApertureSDKBuilder {
         return this;
     }
 
-    public ApertureSDK build() throws ApertureSDKException {
+    /**
+     * Build an ApertureSDK object using the configured parameters.
+     *
+     * @return The constructed ApertureSDK object.
+     */
+    public ApertureSDK build() {
         String host = this.host;
         if (host == null) {
-            throw new ApertureSDKException("host needs to be set");
+            logger.warn(
+                    "Host not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_HOST);
+            host = DEFAULT_AGENT_HOST;
         }
 
         int port = this.port;
         if (port == 0) {
-            throw new ApertureSDKException("port needs to be set");
+            logger.warn(
+                    "Port not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_PORT);
+            port = DEFAULT_AGENT_PORT;
         }
 
         String OtlpSpanExporterProtocol = "http";
@@ -175,9 +215,9 @@ public final class ApertureSDKBuilder {
             OtlpSpanExporterProtocol = "https";
         }
 
-        Duration timeout = this.timeout;
-        if (timeout == null) {
-            timeout = DEFAULT_RPC_TIMEOUT;
+        Duration flowTimeout = this.flowTimeout;
+        if (flowTimeout == null) {
+            flowTimeout = DEFAULT_RPC_TIMEOUT;
         }
 
         ChannelCredentials creds;
@@ -188,17 +228,8 @@ public final class ApertureSDKBuilder {
             if (this.certFile == null || this.certFile.isEmpty()) {
                 creds = TlsChannelCredentials.create();
             } else {
-                try {
-                    creds =
-                            TlsChannelCredentials.newBuilder()
-                                    .trustManager(new File(this.certFile))
-                                    .build();
-                    caCertContents =
-                            ByteStreams.toByteArray(Files.newInputStream(Paths.get(this.certFile)));
-                } catch (IOException e) {
-                    // cert file not found
-                    throw new ApertureSDKException(e);
-                }
+                creds = this.tlsChannelCredentialsBuilder.build();
+                caCertContents = this.caCertFileContents;
             }
         }
 
@@ -230,7 +261,7 @@ public final class ApertureSDKBuilder {
                 flowControlClient,
                 httpFlowControlClient,
                 tracer,
-                timeout,
+                flowTimeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
     }

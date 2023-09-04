@@ -1,0 +1,8 @@
+demoapp:
+  common:
+    postgresql:
+      enabled: true
+      host: postgresql.postgresql.svc.cluster.local
+      port: 5432
+      user: postgres
+      password: secretpassword

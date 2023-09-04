@@ -6,7 +6,7 @@ keywords:
   - otel
   - opentelemetry
   - collector
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 Aperture enables feeding custom metrics to the Aperture Controller's Prometheus
@@ -24,17 +24,16 @@ below:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
+    infra_meters:
+      agent_group: default
+      rabbitmq:
+        per_agent_group: true
+        receivers:
           rabbitmq:
-            per_agent_group: true
-            receivers:
-              rabbitmq:
-                endpoint: ${RABBITMQ_ENDPOINT}
-                username: ${RABBITMQ_USERNAME}
-                password: ${RABBITMQ_PASSWORD}
-                collection_interval: 1s
+            endpoint: ${RABBITMQ_ENDPOINT}
+            username: ${RABBITMQ_USERNAME}
+            password: ${RABBITMQ_PASSWORD}
+            collection_interval: 1s
 ```
 
 If you are installing the Aperture Agent on Kubernetes, you can use a Secret and
@@ -77,5 +76,5 @@ import DocCardList from '@theme/DocCardList';
 
 <DocCardList />
 
-[config]: /reference/policies/spec.md#resources
+[config]: /reference/configuration/spec.md#resources
 [rabbitmq]: /integrations/metrics/rabbitmq.md

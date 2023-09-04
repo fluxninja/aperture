@@ -7,22 +7,7 @@ import (
 	"github.com/looplab/tarjan"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
-
-// ConfiguredComponent consists of a Component and its PortMapping.
-type ConfiguredComponent struct {
-	Component
-	// Which signals this component wants to have connected on its ports.
-	PortMapping PortMapping
-	// Mapstruct representation of proto config that was used to create this
-	// component.  This Config is used only for observability purposes.
-	//
-	// Note: PortMapping is also part of Config.
-	Config utils.MapStruct
-	// ComponentID is the unique ID of this component within the circuit.
-	ComponentID ComponentID
-}
 
 // Compile compiles list of configured components into a circuit and validates it.
 func Compile(

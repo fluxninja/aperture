@@ -1,9 +1,9 @@
 ---
 title: Architecture
-sidebar_position: 5
+sidebar_position: 2
 description:
-  Discover the core components of Aperture Architecture and learn how they work
-  together to provide powerful and efficient reliability automation.
+  Discover the core components of Aperture architecture and learn how they work
+  together to provide powerful and efficient load management.
 image: ../assets/img/aperture_logo.png
 keywords:
   - reliability
@@ -13,90 +13,97 @@ keywords:
   - fluxninja
   - microservices
   - cloud
-  - TODO
 ---
 
 ```mdx-code-block
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Aperture is built on a distributed architecture that provides a unified
-observability and controllability platform for cloud-native applications. The
-architecture is designed to ensure high availability, scalability, and
-reliability.
+The diagram below shows the core components of Aperture architecture and how
+they integrate with an application.
 
-<Zoom>
+![Aperture Architecture (dark)](../assets/img/aperture-architecture-dark.svg#gh-dark-mode-only)
+![Aperture Architecture (light)](../assets/img/aperture-architecture-light.svg#gh-light-mode-only)
 
-```mermaid
-{@include: ../assets/diagrams/architecture/architecture_simple.mmd}
-```
+Aperture Cloud is a highly available, fully managed load management platform
+offering:
 
-</Zoom>
+1. Hosted **Aperture Controller**
+2. Consoles for managing Aperture policies, **Aperture Agents** and self-hosted
+   Aperture Controllers
+3. Traffic analytics dashboard
+4. Alerting system to notify about actions taken by Aperture Agents
 
-### Aperture Controller
+## Aperture Controller (hosted in Aperture Cloud) {#aperture-controller}
 
-The Aperture Controller is the central component of the platform. The controller
-monitors the system using an in-built telemetry system and collects metrics on
-service performance and workloads, including information on customer tiers,
-request types, and other relevant attributes.
+:::note
 
-The controller uses declarative policies, expressed as a control circuit, to
-analyze the collected metrics and make decisions on load throttling, workload
-prioritization, and auto-scaling to ensure that the application operates within
-the specified SLOs. The controller's policies are based on the principles of
-Observability-driven closed-loop automation, which continuously track deviations
-from service-level objectives (SLOs) and calculate recovery or escalation
-actions.
+Here the Aperture Controller is shown as part of Aperture Cloud, but it's also
+possible to [self-host it][self-hosting].
 
-The controller's policies are stored in a policy database and are managed using
-the Kubernetes Custom Resource Definition (CRD) API, allowing users to configure
-and modify policies as needed. The controller interacts with Aperture Agents to
-enforce the policies and ensure the reliable operation of cloud-native
-applications.
+:::
 
-### Aperture Agents
+The Aperture Controller is a centralized control system, equipped with a
+comprehensive global perspective. Its role is collecting data and evaluating
+policies. Policy evaluation results in high-level adjustments, which are then
+sent down to Aperture Agents.
 
-Aperture Agents are the workhorses of the platform, providing powerful flow
-control components such as a weighted fair queuing scheduler for workload
-prioritization and a distributed rate-limiter for abuse prevention.
+Aperture Cloud [provides a per-project Aperture
+Controller][aperture-cloud-controller]. It is programmed using declarative
+policies. Policies can be applied by configuring a [pre-defined
+blueprint][use-cases]. It's also possible to build a policy [from scratch from
+policy components][policy].
 
-A flow is the fundamental unit of work from the perspective of an Aperture
-Agent. It could be an API call, a feature, or even a database query.
+## Aperture Agents
 
-The agents monitor service and infrastructure health signals using an in-built
+Serving as the workhorses of the platform, Aperture Agents provide powerful flow
+control components. These include a weighted fair queuing scheduler for workload
+prioritization and a distributed rate-limiter for abuse prevention. These agents
+are deployed adjacent to services requiring load management and control traffic
+flows based on real-time adjustments from the Aperture Controller. They
+seamlessly [integrate][integrations] with service meshes, gateways, and HTTP
+middlewares. For more specific control, developers can use [SDKs][sdks] to
+manage specific features or code sections within services.
+
+The Agents monitor service and infrastructure health signals using an in-built
 telemetry system. In addition, a programmable, high-fidelity flow classifier is
 used to label requests based on attributes such as customer tier or request
 type. These metrics are then analyzed by the Aperture Controller.
 
-Aperture Agents schedule workloads based on their priorities, helping maximize
-user experience or revenue even during overload scenarios. Similar to boarding
-an aircraft, first class passengers get priority over other passengers; every
-application has workloads with varying priorities. For example, a video
-streaming service might prioritize a request to play a movie by a customer over
-running an internal machine learning workload. A SaaS product might prioritize
-features used by paid users over those being used by free users. Graceful
-degradation of services is achieved by prioritizing critical application
-features over background workloads.
+Aperture Agents schedule workloads based on their priorities, helping prioritize
+critical features over less important workloads during overload scenarios. For
+example, a video streaming service might prioritize a request to play a movie by
+a customer over a recommended movies API. A SaaS product might prioritize
+features used by paid users over those being used by free users.
 
-Aperture Agents can be installed on a variety of infrastructure such as
-Kubernetes, VMs, or bare-metal. They integrate with Service Meshes or can be
-used with SDKs to provide [flow control](/concepts/flow-control/flow-control.md)
-capabilities. Additionally, agents work with auto-scaling APIs for platforms
-such as Kubernetes, to help scale infrastructure when needed.
+Aperture Agents can be [installed on a variety of
+infrastructure][install-agents] such as Kubernetes, VMs, or bare-metal. In
+addition to flow control capabilities, Agents work with auto-scaling APIs for
+platforms such as Kubernetes, to help scale infrastructure when needed.
 
-### Aperture Databases
+### Metrics
 
-Aperture uses two databases to store configuration, telemetry, and flow control
-information: [Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
-Prometheus enables Aperture to monitor the system and detect deviations from the
-service-level objectives (SLOs) defined in the declarative policies. Aperture
-Controller uses etcd (distributed key-value store) to persist the declarative
-policies that define the control circuits and their components, as well as the
-current system state.
+Aperture Agents use metrics to provide input signals to policies in the Aperture
+Controller. These metrics can either be defined based on existing traffic using
+[Flux Meters](/concepts/flux-meter.md) or using [any OpenTelemetry Collector
+receiver][metrics]. These metrics can then be used in policies using [PromQL
+syntax][promql-syntax].
 
-Users can optionally reuse their existing etcd or
-[scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
-installations to minimize operational overhead and use their existing monitoring
-infrastructure.
+:::info
+
+For more details about the interaction between Aperture Controller and Agents
+and the exact databases, see [Architecture of Self-Hosted
+Aperture][architecture-self-hosted].
+
+:::
+
+[aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
+[architecture-self-hosted]: /self-hosting/architecture.md
+[use-cases]: /use-cases/use-cases.md
+[policy]: /concepts/advanced/policy.md
+[integrations]: /integrations/integrations.md
+[sdks]: /integrations/sdk/sdk.md
+[metrics]: /integrations/metrics/metrics.md
+[install-agents]: /get-started/installation/agent/agent.md
+[self-hosting]: /self-hosting/self-hosting.md
+[promql-syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/

@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -18,6 +20,9 @@ import (
 
 	"github.com/castai/promwrite"
 	backoff "github.com/cenkalti/backoff/v4"
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
+	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -52,12 +57,19 @@ type SimpleService struct {
 	// If it is not set then value is -1 and we do not configure proxy.
 	// Istio proxy should handle requests without additional config
 	// if it is injected.
-	envoyPort         int
-	rabbitMQURL       string
-	concurrency       int           // Maximum number of concurrent clients
-	latency           time.Duration // Simulated latency for each request
-	rejectRatio       float64       // Ratio of requests to be rejected
-	cpuLoadPercentage int           // Percentage of CPU to be loaded
+	envoyPort           int
+	rabbitMQURL         string
+	elasticsearchConfig elasticsearch.Config
+	pgsqlURL            string
+	concurrency         int           // Maximum number of concurrent clients
+	latency             time.Duration // Simulated latency for each request
+	rejectRatio         float64       // Ratio of requests to be rejected
+	cpuLoadPercentage   int           // Percentage of CPU to be loaded
+}
+
+// ResponseBody is a response body for returning a response to all requests made on api endpoints
+type ResponseBody struct {
+	Message string `json:"message"`
 }
 
 // NewSimpleService creates a SimpleService instance.
@@ -66,20 +78,24 @@ func NewSimpleService(
 	port int,
 	envoyPort int,
 	rabbitMQURL string,
+	elasticsearchConfig elasticsearch.Config,
+	pgsqlURL string,
 	concurrency int,
 	latency time.Duration,
 	rejectRatio float64,
 	cpuLoadPercentage int,
 ) *SimpleService {
 	return &SimpleService{
-		hostname:          hostname,
-		port:              port,
-		envoyPort:         envoyPort,
-		rabbitMQURL:       rabbitMQURL,
-		concurrency:       concurrency,
-		latency:           latency,
-		rejectRatio:       rejectRatio,
-		cpuLoadPercentage: cpuLoadPercentage,
+		hostname:            hostname,
+		port:                port,
+		envoyPort:           envoyPort,
+		rabbitMQURL:         rabbitMQURL,
+		elasticsearchConfig: elasticsearchConfig,
+		pgsqlURL:            pgsqlURL,
+		concurrency:         concurrency,
+		latency:             latency,
+		rejectRatio:         rejectRatio,
+		cpuLoadPercentage:   cpuLoadPercentage,
 	}
 }
 
@@ -92,6 +108,7 @@ func (ss SimpleService) Run() error {
 		concurrency:       ss.concurrency,
 		limitClients:      make(chan struct{}, ss.concurrency),
 		cpuLoadPercentage: ss.cpuLoadPercentage,
+		pgsqlDB:           nil,
 	}
 
 	if ss.rabbitMQURL != "" {
@@ -152,6 +169,47 @@ func (ss SimpleService) Run() error {
 		go consumeFromQueue(q, cCh, handler)
 	}
 
+	if len(ss.elasticsearchConfig.Addresses) > 0 {
+		es, err := elasticsearch.NewClient(ss.elasticsearchConfig)
+		if err != nil {
+			log.Error().Msgf("Error creating the client: %s", err)
+			return err
+		}
+		handler.elasticsearch = es
+
+		attempts := 1
+		operation := func() error {
+			_, err = es.Indices.Create(handler.hostname, es.Indices.Create.WithWaitForActiveShards("1"))
+			if err != nil {
+				log.Error().Msgf("Error creating the index: %s - %d", err, attempts)
+				attempts += 1
+				return err
+			}
+
+			return nil
+		}
+
+		err = backoff.Retry(operation, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 10))
+		if err != nil {
+			return err
+		}
+	}
+
+	if ss.pgsqlURL != "" {
+		log.Info().Msg("PostgreSQL URL: " + ss.pgsqlURL)
+		pgsqlDB, err := sql.Open("postgres", ss.pgsqlURL)
+		if err != nil {
+			return err
+		}
+
+		err = pgsqlDB.Ping()
+		if err != nil {
+			return err
+		}
+
+		handler.pgsqlDB = pgsqlDB
+	}
+
 	if ss.envoyPort == -1 {
 		handler.httpClient = &http.Client{}
 	} else {
@@ -164,7 +222,6 @@ func (ss SimpleService) Run() error {
 
 	prometheusAddress := os.Getenv("PROMETHEUS_ADDRESS")
 	if prometheusAddress != "" {
-
 		if prometheusAddress[len(prometheusAddress)-1] == '/' {
 			prometheusAddress = prometheusAddress[:len(prometheusAddress)-1]
 		}
@@ -173,6 +230,8 @@ func (ss SimpleService) Run() error {
 		http.HandleFunc("/prometheus", prometheusHandler)
 	}
 
+	http.HandleFunc("/api/rate-limit", apiEndpointHandler)
+	http.HandleFunc("/api/load-ramp", apiEndpointHandler)
 	http.Handle("/request", handlerFunc(handler))
 
 	address := fmt.Sprintf(":%d", ss.port)
@@ -180,6 +239,32 @@ func (ss SimpleService) Run() error {
 	server := &http.Server{Addr: address}
 
 	return server.ListenAndServe()
+}
+
+func apiEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract baggage and trace context from headers
+	ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+	// Start a new span (not needed if we want "just passthrough")
+	ctx, span := otel.Tracer(libraryName).Start(ctx, "apiEndpointHandler")
+	defer span.End()
+
+	responseBody := ResponseBody{
+		Message: "Request accepted",
+	}
+
+	err := json.NewEncoder(w).Encode(responseBody)
+	if err != nil {
+		log.Autosample().Error().Err(err).Msg("Error encoding JSON")
+		span.SetStatus(codes.Error, "rejected")
+		w.WriteHeader(http.StatusForbidden)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+	}
+
+	r = r.WithContext(ctx)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(r.Header))
+
+	span.SetStatus(codes.Ok, "accepted")
 }
 
 func getOrCreateCounter(userID, userType string) *Counter {
@@ -367,6 +452,8 @@ type Subrequest struct {
 type RequestHandler struct {
 	httpClient        HTTPClient
 	rabbitMQChan      *amqp.Channel
+	elasticsearch     *elasticsearch.Client
+	pgsqlDB           *sql.DB
 	limitClients      chan struct{}
 	hostname          string
 	concurrency       int
@@ -376,6 +463,114 @@ type RequestHandler struct {
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if h.elasticsearch != nil {
+		type document struct {
+			Count int `json:"count"`
+		}
+
+		i, _ := strconv.Atoi(r.Header.Get("User-Id"))
+		docID := fmt.Sprintf("doc-%d", i)
+		body := document{Count: 1}
+
+		getReq := esapi.GetRequest{
+			Index:      h.hostname,
+			DocumentID: docID,
+		}
+		res, err := getReq.Do(context.Background(), h.elasticsearch)
+		if err == nil && res != nil && res.StatusCode == http.StatusOK {
+			var doc map[string]interface{}
+			err = json.NewDecoder(res.Body).Decode(&doc)
+			if err == nil {
+				body.Count = int(doc["_source"].(map[string]interface{})["count"].(float64)) + 1
+				if body.Count > 500 {
+					body.Count = 1
+				}
+			}
+			res.Body.Close()
+		} else {
+			log.Error().Err(err).Msgf("Failed to get document. Res: %+v", res)
+		}
+
+		jsonBody, _ := json.Marshal(body)
+		res, err = h.elasticsearch.Update(h.hostname, docID, bytes.NewReader(jsonBody))
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to update document")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			res, err = h.elasticsearch.Index(h.hostname, bytes.NewReader(jsonBody), h.elasticsearch.Index.WithDocumentID(docID))
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed to Create document.")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			res.Body.Close()
+		}
+
+		wg := sync.WaitGroup{}
+		wg.Add(body.Count)
+		for i := 1; i <= body.Count; i++ {
+			go func(i int) {
+				defer wg.Done()
+				var buf bytes.Buffer
+				query := map[string]interface{}{
+					"query": map[string]interface{}{
+						"term": map[string]interface{}{
+							"count": i,
+						},
+					},
+				}
+				if err = json.NewEncoder(&buf).Encode(query); err != nil {
+					log.Error().Err(err).Msg("Failed to prepare for search")
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				res, err = h.elasticsearch.Search(
+					h.elasticsearch.Search.WithContext(context.Background()),
+					h.elasticsearch.Search.WithIndex(h.hostname),
+					h.elasticsearch.Search.WithBody(&buf),
+				)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed to search. Res: %+v", res)
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				res.Body.Close()
+			}(i)
+		}
+
+		wg.Wait()
+		w.WriteHeader(http.StatusAccepted)
+		return
+	}
+
+	headers := r.Header.Clone()
+
+	if h.pgsqlDB != nil {
+		// Simulate a slow query
+		// nolint:gosec
+		sleepDuration := fmt.Sprintf("%.2f", rand.Float64())
+		// nolint:gosec
+		queryStr := fmt.Sprintf("SELECT * from film, pg_sleep(%s);", sleepDuration)
+		rows, err := h.pgsqlDB.Query(queryStr)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to query postgresql")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		for rows.Next() {
+		}
+		defer rows.Close()
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	var p Request
 
 	// Extract baggage and trace context from headers
@@ -404,8 +599,6 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	headers := r.Header.Clone()
 
 	code := http.StatusOK
 	for _, chain := range p.Chains {

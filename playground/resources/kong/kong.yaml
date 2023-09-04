@@ -1,9 +1,15 @@
 _format_version: "3.0"
 _transform: true
 
+upstreams:
+- name: service1-demo-app
+  targets:
+    - target: service1-demo-app.demoapp.svc.cluster.local:80
+      weight: 100
+
 services:
 - name: service1-demo-app
-  url: http://service1-demo-app.demoapp.svc.cluster.local:80/request
+  host: service1-demo-app
   retries: 3
   routes:
   - name: service1

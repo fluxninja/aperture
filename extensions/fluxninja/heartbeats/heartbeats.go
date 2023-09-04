@@ -3,13 +3,9 @@ package heartbeats
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
-	guuid "github.com/google/uuid"
-	"github.com/technosophos/moniker"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -122,13 +118,21 @@ func (h *Heartbeats) start(ctx context.Context, in *ConstructorIn) error {
 	return nil
 }
 
-func (h *Heartbeats) setupControllerInfo(ctx context.Context, etcdClient *etcdclient.Client) error {
-	etcdPath := "/fluxninja/controllerid"
-	newID := guuid.NewString()
-	parts := strings.Split(newID, "-")
-	moniker := strings.Replace(moniker.New().Name(), " ", "-", 1)
-	controllerID := fmt.Sprintf("%s-%s", moniker, parts[0])
+func (h *Heartbeats) setupControllerInfo(
+	ctx context.Context,
+	etcdClient *etcdclient.Client,
+	extensionConfig *extconfig.FluxNinjaExtensionConfig,
+	controllerID string,
+) error {
+	if extensionConfig.EnableCloudController {
+		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
+		h.ControllerInfo = &heartbeatv1.ControllerInfo{
+			Id: "cloud",
+		}
+		return nil
+	}
 
+	etcdPath := "/fluxninja/controllerid"
 	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
 	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
 		Then(clientv3.OpPut(etcdPath, controllerID)).

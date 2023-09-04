@@ -20,7 +20,7 @@ type ListenerConfig struct {
 	Addr string `json:"addr" validate:"hostname_port" default:":8080"`
 
 	// TCP networks - `tcp`, `tcp4` (IPv4-only), `tcp6` (IPv6-only)
-	Network string `json:"network" validate:"oneof=tcp tcp4 tcp6" default:"tcp"`
+	Network string `json:"network,omitempty" validate:"omitempty,oneof=tcp tcp4 tcp6,omitempty" default:"tcp"`
 }
 
 func newListener(config ListenerConfig) (net.Listener, error) {

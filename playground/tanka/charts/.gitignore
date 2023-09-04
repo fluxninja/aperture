@@ -4,5 +4,7 @@ base
 istiod
 gateway
 rabbitmq
+elasticsearch
+postgresql
 
 **/charts/

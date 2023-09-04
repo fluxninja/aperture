@@ -29,7 +29,7 @@ var _ = Describe("Etcd Watcher", func() {
 
 		BeforeEach(func() {
 			k := notifiers.Key(notifierKey)
-			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient, false)
+			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, &etcdClient.KVWrapper)
 			Expect(err).NotTo(HaveOccurred())
 			etcdKeyNotifier.Start()
 			err := etcdWatcher.AddKeyNotifier(etcdKeyNotifier)
@@ -153,7 +153,7 @@ var _ = Describe("Etcd Watcher", func() {
 			etcdClient.KV.Put(ctx, "foo/key1", "val1")
 			etcdClient.KV.Put(ctx, "foo/key2", "val2")
 			etcdClient.KV.Put(ctx, "foo/key3", "val3")
-			etcdNotifier = etcdnotifier.NewPrefixToEtcdNotifier("bar/", etcdClient, false)
+			etcdNotifier = etcdnotifier.NewPrefixToEtcdNotifier("bar/", &etcdClient.KVWrapper)
 			etcdNotifier.Start()
 			err := etcdWatcher.AddPrefixNotifier(etcdNotifier)
 			Expect(err).ToNot(HaveOccurred())

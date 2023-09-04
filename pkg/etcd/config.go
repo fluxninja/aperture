@@ -10,6 +10,8 @@ import (
 // swagger:model
 // +kubebuilder:object:generate=true
 type EtcdConfig struct {
+	// etcd namespace
+	Namespace string `json:"namespace" default:"aperture"`
 	// Lease time-to-live
 	LeaseTTL config.Duration `json:"lease_ttl" validate:"gte=1s" default:"60s"`
 	// Authentication
@@ -18,5 +20,7 @@ type EtcdConfig struct {
 	// Client TLS configuration
 	ClientTLSConfig tlsconfig.ClientTLSConfig `json:"tls"`
 	// List of etcd server endpoints
-	Endpoints []string `json:"endpoints" validate:"required,gt=0,dive,hostname_port|url|fqdn"`
+	Endpoints []string `json:"endpoints,omitempty" validate:"omitempty,dive,hostname_port|url|fqdn,omitempty"`
+	// LogLevel of logs coming from inside the etcd client
+	LogLevel string `json:"log_level,omitempty" validate:"omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL,omitempty" default:"error"`
 }

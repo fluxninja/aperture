@@ -3,14 +3,15 @@ package loadscheduler
 import (
 	"fmt"
 
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const (
@@ -23,7 +24,11 @@ func ParseLoadScheduler(
 	loadScheduler *policylangv1.LoadScheduler,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
-) (*policylangv1.NestedCircuit, error) {
+) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
+		return nil, nil, err
+	}
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadScheduler.GetInPorts()
 
@@ -44,7 +49,8 @@ func ParseLoadScheduler(
 	}
 
 	// Prepare parameters for prometheus queries
-	policyParams := fmt.Sprintf("%s=\"%s\",%s=\"%s\",%s=\"%s\"",
+	policyParams := fmt.Sprintf(
+		"%s=\"%s\",%s=\"%s\",%s=\"%s\"",
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.PolicyHashLabel,
@@ -53,13 +59,17 @@ func ParseLoadScheduler(
 		componentID,
 	)
 
-	acceptedTokensQuery := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+	acceptedTokensQuery := fmt.Sprintf(
+		"sum(rate(%s{%s}[30s]))",
 		metrics.AcceptedTokensMetricName,
-		policyParams)
+		policyParams,
+	)
 
-	incomingTokenRate := fmt.Sprintf("sum(rate(%s{%s}[10s]))",
+	incomingTokenRate := fmt.Sprintf(
+		"sum(rate(%s{%s}[30s]))",
 		metrics.IncomingTokensMetricName,
-		policyParams)
+		policyParams,
+	)
 
 	loadActuatorAnyProto, err := anypb.New(
 		&policyprivatev1.LoadActuator{
@@ -75,14 +85,12 @@ func ParseLoadScheduler(
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})
 	if err != nil {
-		return nil, err
+		return retErr(err)
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{
-		Name:             "LoadScheduler",
-		ShortDescription: iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
-		InPortsMap:       nestedInPortsMap,
-		OutPortsMap:      nestedOutPortsMap,
+		InPortsMap:  nestedInPortsMap,
+		OutPortsMap: nestedOutPortsMap,
 		Components: []*policylangv1.Component{
 			{
 				Component: &policylangv1.Component_BoolVariable{
@@ -202,5 +210,17 @@ func ParseLoadScheduler(
 	components.AddNestedIngress(nestedCircuit, inputLoadMultiplierPortName, "LOAD_MULTIPLIER_INPUT")
 	components.AddNestedEgress(nestedCircuit, outputObservedLoadMultiplierPortName, "OBSERVED_LOAD_MULTIPLIER")
 
-	return nestedCircuit, nil
+	configuredComponent, err := runtime.NewConfiguredComponent(
+		runtime.NewDummyComponent("LoadScheduler",
+			iface.GetSelectorsShortDescription(loadScheduler.Parameters.GetSelectors()),
+			runtime.ComponentTypeSignalProcessor),
+		loadScheduler,
+		componentID,
+		false,
+	)
+	if err != nil {
+		return retErr(err)
+	}
+
+	return configuredComponent, nestedCircuit, nil
 }

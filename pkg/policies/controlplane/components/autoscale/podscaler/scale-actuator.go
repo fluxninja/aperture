@@ -65,17 +65,17 @@ func NewScaleActuatorAndOptions(
 	), nil
 }
 
-func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (sa *ScaleActuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
 	logger := sa.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			sa.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
+			sa.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			sa.decisionWriter.Close()
-			_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), sa.decisionsEtcdPath)
+			_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), sa.decisionsEtcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete scale decisions")
 				merr = multierr.Append(merr, err)

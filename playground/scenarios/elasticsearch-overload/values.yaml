@@ -1,0 +1,8 @@
+demoapp:
+  common:
+    elasticsearch:
+      enabled: true
+      host: elasticsearch.elasticsearch.svc.cluster.local
+      port: 9200
+      username: elastic
+      password: secretpassword

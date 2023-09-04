@@ -1,7 +1,6 @@
 local grafanaOperator = import 'github.com/jsonnet-libs/grafana-operator-libsonnet/4.3/main.libsonnet';
 
-local aperture = import '../../../blueprints/main.libsonnet';
-local signalsDashboard = aperture.dashboards.Signals.dashboard;
+local signalsDashboard = import '../../../blueprints/grafana/signals_dashboard.libsonnet';
 
 local dashboard = grafanaOperator.integreatly.v1alpha1.grafanaDashboard;
 local policyName = std.extVar('POLICY_NAME');
@@ -17,6 +16,7 @@ function(dashboardMixin) {
           policy_name: policyName,
         },
         dashboard+: {
+          title: 'Aperture Signals - %s' % policyName,
           datasource+: {
             name: 'controller-prometheus',
           },
@@ -26,7 +26,6 @@ function(dashboardMixin) {
         inputName: 'datasource',
         datasourceName: 'controller-prometheus',
       }),
-
       dashboard.new('%s-dashboard' % policyName) +
       dashboard.metadata.withNamespace('aperture-controller') +
       dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +

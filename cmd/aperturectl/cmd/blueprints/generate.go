@@ -31,11 +31,12 @@ func init() {
 	generateCmd.Flags().BoolVar(&noValidate, "no-validation", false, "Do not validate values.yaml file")
 	generateCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing output directory")
 	generateCmd.Flags().IntVar(&graphDepth, "graph-depth", 1, "Max depth of the graph when generating DOT and Mermaid files")
+	generateCmd.Flags().BoolVarP(&force, "force", "f", false, "Force apply policy even if it already exists")
+	generateCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all the generated Policies")
 }
 
 type metadata struct {
 	BlueprintsURI string `json:"blueprints_uri"`
-	BlueprintName string `json:"blueprint_name"`
 }
 
 var generateCmd = &cobra.Command{
@@ -44,9 +45,9 @@ var generateCmd = &cobra.Command{
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml
+	Example: `aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate-limiting.yaml --apply`,
+aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := utils.ReaderLock(blueprintsURIRoot)
 		if err != nil {
@@ -62,16 +63,10 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 			return fmt.Errorf("--values-file must be provided")
 		}
 
-		// if outputDir is not provided, default to current directory
-		if outputDir == "" {
-			if applyPolicy {
-				// use temp dir
-				outputDir = os.TempDir()
-				// defer remove temp dir
-				defer os.RemoveAll(outputDir)
-			} else {
-				return fmt.Errorf("--output-dir must be provided")
-			}
+		log.Info().Msgf("Generating Aperture Policy resources for blueprint: %s", blueprintName)
+		// if outputDir is not provided and applyPolicy is false, return error
+		if outputDir == "" && !applyPolicy {
+			return fmt.Errorf("--output-dir must be provided")
 		}
 
 		_, err = os.Stat(valuesFile)
@@ -133,7 +128,6 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 		}
 		metadata, err := json.Marshal(metadata{
 			BlueprintsURI: blueprintsURIMetadata,
-			BlueprintName: blueprintName,
 		})
 		if err != nil {
 			return err
@@ -154,13 +148,18 @@ aperturectl blueprints generate --name=policies/rate-limiting --values-file=rate
 			return err
 		}
 
-		var updatedOutputDir string
+		var (
+			updatedOutputDir string
+			doRemove         bool
+		)
 
-		if outputDir != "" {
-			updatedOutputDir, err = setupOutputDir(outputDir)
-			if err != nil {
-				return err
-			}
+		updatedOutputDir, doRemove, err = setupOutputDir(outputDir)
+		if err != nil {
+			return err
+		}
+		if doRemove {
+			// defer remove temp dir
+			defer os.RemoveAll(updatedOutputDir)
 		}
 
 		if err = processJsonnetOutput(bundle, updatedOutputDir); err != nil {
@@ -300,33 +299,45 @@ func blueprintExists(name string) error {
 	return nil
 }
 
-func setupOutputDir(outputDir string) (string, error) {
-	// ask for user confirmation if the output directory already exists
-	if !overwrite {
-		if _, err := os.Stat(outputDir); err == nil {
-			fmt.Printf("The output directory '%s' already exists. Do you want to overwrite it? [y/N]: ", outputDir)
-			var response string
-			fmt.Scanln(&response)
-			if response != "y" {
-				return "", fmt.Errorf("output directory '%s' already exists", outputDir)
+func setupOutputDir(outputDir string) (string, bool, error) {
+	if outputDir == "" && !applyPolicy {
+		// shouldn't happen
+		return "", false, fmt.Errorf("output directory is empty")
+	}
+	if outputDir == "" {
+		// Apply policy scenario
+		var err error
+		// use temp dir
+		outputDir, err = os.MkdirTemp("", "aperturectl-generate")
+		if err != nil {
+			log.Error().Msgf("Error creating temp dir: %s", err)
+			return "", false, err
+		}
+		log.Info().Msgf("Using temp dir: %s", outputDir)
+		return outputDir, true, nil
+	} else {
+		// ask for user confirmation if the output directory already exists
+		if !overwrite {
+			if _, err := os.Stat(outputDir); err == nil {
+				fmt.Printf("The output directory '%s' already exists. Do you want to merge the generated policy artifacts into the existing directory? [y/N]: ", outputDir)
+				var response string
+				fmt.Scanln(&response)
+				if strings.ToLower(response) != "y" {
+					return "", false, fmt.Errorf("output directory '%s' already exists", outputDir)
+				}
 			}
 		}
-	}
 
-	err := os.MkdirAll(outputDir, os.ModePerm)
-	if err != nil {
-		return "", err
+		err := os.MkdirAll(outputDir, os.ModePerm)
+		if err != nil {
+			return "", false, err
+		}
+		absOutputDir, err := filepath.Abs(outputDir)
+		if err != nil {
+			return "", false, err
+		}
+		return absOutputDir, false, nil
 	}
-
-	err = os.MkdirAll(outputDir, os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-	outputDir, err = filepath.Abs(outputDir)
-	if err != nil {
-		return "", err
-	}
-	return outputDir, nil
 }
 
 func generateGraphs(content []byte, outputDir string, policyPath string, depth int) error {

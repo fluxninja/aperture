@@ -13,12 +13,6 @@
   withLoadRampMixin(load_ramp):: {
     load_ramp+: load_ramp,
   },
-  withLoadRampSeries(load_ramp_series):: {
-    load_ramp_series: load_ramp_series,
-  },
-  withLoadRampSeriesMixin(load_ramp_series):: {
-    load_ramp_series+: load_ramp_series,
-  },
   withLoadScheduler(load_scheduler):: {
     load_scheduler: load_scheduler,
   },
@@ -37,10 +31,10 @@
   withRateLimiterMixin(rate_limiter):: {
     rate_limiter+: rate_limiter,
   },
-  withRegulator(regulator):: {
-    regulator: regulator,
+  withSampler(sampler):: {
+    sampler: sampler,
   },
-  withRegulatorMixin(regulator):: {
-    regulator+: regulator,
+  withSamplerMixin(sampler):: {
+    sampler+: sampler,
   },
 }

@@ -68,6 +68,7 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 						ContainerSecurityContext: common.ContainerSecurityContext{
 							Enabled:                true,
 							RunAsUser:              0,
+							RunAsGroup:             0,
 							RunAsNonRootUser:       false,
 							ReadOnlyRootFilesystem: false,
 						},
@@ -77,6 +78,7 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 
 			expected := &corev1.SecurityContext{
 				RunAsUser:              pointer.Int64(0),
+				RunAsGroup:             pointer.Int64(0),
 				RunAsNonRoot:           pointer.Bool(false),
 				ReadOnlyRootFilesystem: pointer.Bool(false),
 			}
@@ -157,6 +159,51 @@ var _ = Describe("Tests for imageString", func() {
 
 			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
 			Expect(result).To(Equal("test/test:test"))
+		})
+	})
+
+	Context("When image digest is given with registry", func() {
+		It("returns correct image string", func() {
+			instance := &agentv1alpha1.Agent{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Registry: Test,
+							Digest:   TestDigest,
+						},
+						Repository: Test,
+					},
+				},
+			}
+
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			Expect(result).To(Equal("test/test@sha256:1234567890"))
+		})
+	})
+
+	Context("When image digest is given without registry", func() {
+		It("returns correct image string", func() {
+			instance := &agentv1alpha1.Agent{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      AppName,
+					Namespace: AppName,
+				},
+				Spec: agentv1alpha1.AgentSpec{
+					Image: common.AgentImage{
+						Image: common.Image{
+							Digest: TestDigest,
+						},
+						Repository: Test,
+					},
+				},
+			}
+
+			result := ImageString(instance.Spec.Image.Image, instance.Spec.Image.Repository)
+			Expect(result).To(Equal("test@sha256:1234567890"))
 		})
 	})
 
@@ -800,7 +847,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 		It("returns correct EnvVarSource", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -855,7 +902,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 		It("returns correct EnvVarSource", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -901,7 +948,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 		It("returns correct VolumeMount", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -928,7 +975,7 @@ var _ = Describe("Tests for controllerVolumeMounts", func() {
 		It("returns correct VolumeMount", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -970,7 +1017,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 		It("returns correct Volume", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -1008,7 +1055,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 		It("returns correct Volume", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -1065,7 +1112,7 @@ var _ = Describe("Tests for commonLabels", func() {
 		It("returns correct labels", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{},
@@ -1087,7 +1134,7 @@ var _ = Describe("Tests for commonLabels", func() {
 		It("returns correct labels", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{

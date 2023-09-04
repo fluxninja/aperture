@@ -1,14 +1,22 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/rate-limiting/gen/definitions.json
-# Generated values file for policies/rate-limiting blueprint
+# yaml-language-server: $schema=../../../../blueprints/rate-limiting/base/gen/definitions.json
+# Generated values file for rate-limiting/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/policies/bundled-blueprints/policies/rate-limiting
+# https://docs.fluxninja.com/reference/blueprints/rate-limiting
 policy:
   policy_name: rate-limiting
+  resources:
+    infra_meters:
+      aerospike:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          aerospike: {}
   rate_limiter:
     bucket_capacity: 40
     fill_amount: 2
     selectors:
-      - service: service1-demo-app.demoapp.svc.cluster.local
+      - agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
     parameters:
       label_key: http.request.header.user_id

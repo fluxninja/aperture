@@ -30,6 +30,7 @@ private static final long serialVersionUID = 0L;
     classifierInfos_ = java.util.Collections.emptyList();
     fluxMeterInfos_ = java.util.Collections.emptyList();
     limiterDecisions_ = java.util.Collections.emptyList();
+    deniedResponseStatusCode_ = 0;
   }
 
   @java.lang.Override
@@ -306,6 +307,7 @@ private static final long serialVersionUID = 0L;
     // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CheckResponse.DecisionType)
   }
 
+  private int bitField0_;
   public static final int START_FIELD_NUMBER = 1;
   private com.google.protobuf.Timestamp start_;
   /**
@@ -318,7 +320,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasStart() {
-    return start_ != null;
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
    * <pre>
@@ -356,7 +358,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasEnd() {
-    return end_ != null;
+    return ((bitField0_ & 0x00000002) != 0);
   }
   /**
    * <pre>
@@ -865,6 +867,75 @@ java.lang.String defaultValue) {
     return limiterDecisions_.get(index);
   }
 
+  public static final int WAIT_TIME_FIELD_NUMBER = 13;
+  private com.google.protobuf.Duration waitTime_;
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  @java.lang.Override
+  public boolean hasWaitTime() {
+    return ((bitField0_ & 0x00000004) != 0);
+  }
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  @java.lang.Override
+  public com.google.protobuf.Duration getWaitTime() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+  /**
+   * <pre>
+   * Recommended minimal amount of time to wait when retrying the request, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+   */
+  @java.lang.Override
+  public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+
+  public static final int DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER = 14;
+  private int deniedResponseStatusCode_ = 0;
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The enum numeric value on the wire for deniedResponseStatusCode.
+   */
+  @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+    return deniedResponseStatusCode_;
+  }
+  /**
+   * <pre>
+   * http_status contains the http status code to be returned to the client, if
+   * decision_type is REJECTED. Optional.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+   * @return The deniedResponseStatusCode.
+   */
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -879,10 +950,10 @@ java.lang.String defaultValue) {
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (start_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       output.writeMessage(1, getStart());
     }
-    if (end_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       output.writeMessage(2, getEnd());
     }
     for (int i = 0; i < services_.size(); i++) {
@@ -915,6 +986,12 @@ java.lang.String defaultValue) {
     for (int i = 0; i < limiterDecisions_.size(); i++) {
       output.writeMessage(12, limiterDecisions_.get(i));
     }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      output.writeMessage(13, getWaitTime());
+    }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      output.writeEnum(14, deniedResponseStatusCode_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -924,11 +1001,11 @@ java.lang.String defaultValue) {
     if (size != -1) return size;
 
     size = 0;
-    if (start_ != null) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(1, getStart());
     }
-    if (end_ != null) {
+    if (((bitField0_ & 0x00000002) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getEnd());
     }
@@ -981,6 +1058,14 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(12, limiterDecisions_.get(i));
     }
+    if (((bitField0_ & 0x00000004) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(13, getWaitTime());
+    }
+    if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeEnumSize(14, deniedResponseStatusCode_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1022,6 +1107,12 @@ java.lang.String defaultValue) {
         .equals(other.getFluxMeterInfosList())) return false;
     if (!getLimiterDecisionsList()
         .equals(other.getLimiterDecisionsList())) return false;
+    if (hasWaitTime() != other.hasWaitTime()) return false;
+    if (hasWaitTime()) {
+      if (!getWaitTime()
+          .equals(other.getWaitTime())) return false;
+    }
+    if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1071,6 +1162,12 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + LIMITER_DECISIONS_FIELD_NUMBER;
       hash = (53 * hash) + getLimiterDecisionsList().hashCode();
     }
+    if (hasWaitTime()) {
+      hash = (37 * hash) + WAIT_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + getWaitTime().hashCode();
+    }
+    hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
+    hash = (53 * hash) + deniedResponseStatusCode_;
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -1216,13 +1313,24 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getStartFieldBuilder();
+        getEndFieldBuilder();
+        getClassifierInfosFieldBuilder();
+        getFluxMeterInfosFieldBuilder();
+        getLimiterDecisionsFieldBuilder();
+        getWaitTimeFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -1267,6 +1375,12 @@ java.lang.String defaultValue) {
         limiterDecisionsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000400);
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
+      deniedResponseStatusCode_ = 0;
       return this;
     }
 
@@ -1331,15 +1445,18 @@ java.lang.String defaultValue) {
 
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
         result.start_ = startBuilder_ == null
             ? start_
             : startBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.end_ = endBuilder_ == null
             ? end_
             : endBuilder_.build();
+        to_bitField0_ |= 0x00000002;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         services_.makeImmutable();
@@ -1362,8 +1479,50 @@ java.lang.String defaultValue) {
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.rejectReason_ = rejectReason_;
       }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.waitTime_ = waitTimeBuilder_ == null
+            ? waitTime_
+            : waitTimeBuilder_.build();
+        to_bitField0_ |= 0x00000004;
+      }
+      if (((from_bitField0_ & 0x00001000) != 0)) {
+        result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
+    @java.lang.Override
+    public Builder clone() {
+      return super.clone();
+    }
+    @java.lang.Override
+    public Builder setField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.setField(field, value);
+    }
+    @java.lang.Override
+    public Builder clearField(
+        com.google.protobuf.Descriptors.FieldDescriptor field) {
+      return super.clearField(field);
+    }
+    @java.lang.Override
+    public Builder clearOneof(
+        com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+      return super.clearOneof(oneof);
+    }
+    @java.lang.Override
+    public Builder setRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        int index, java.lang.Object value) {
+      return super.setRepeatedField(field, index, value);
+    }
+    @java.lang.Override
+    public Builder addRepeatedField(
+        com.google.protobuf.Descriptors.FieldDescriptor field,
+        java.lang.Object value) {
+      return super.addRepeatedField(field, value);
+    }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse) {
@@ -1494,6 +1653,12 @@ java.lang.String defaultValue) {
           }
         }
       }
+      if (other.hasWaitTime()) {
+        mergeWaitTime(other.getWaitTime());
+      }
+      if (other.deniedResponseStatusCode_ != 0) {
+        setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1609,6 +1774,18 @@ java.lang.String defaultValue) {
               }
               break;
             } // case 98
+            case 106: {
+              input.readMessage(
+                  getWaitTimeFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 106
+            case 112: {
+              deniedResponseStatusCode_ = input.readEnum();
+              bitField0_ |= 0x00001000;
+              break;
+            } // case 112
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1712,8 +1889,10 @@ java.lang.String defaultValue) {
       } else {
         startBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
-      onChanged();
+      if (start_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -1867,8 +2046,10 @@ java.lang.String defaultValue) {
       } else {
         endBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000002;
-      onChanged();
+      if (end_ != null) {
+        bitField0_ |= 0x00000002;
+        onChanged();
+      }
       return this;
     }
     /**
@@ -3557,6 +3738,250 @@ java.lang.String defaultValue) {
         limiterDecisions_ = null;
       }
       return limiterDecisionsBuilder_;
+    }
+
+    private com.google.protobuf.Duration waitTime_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> waitTimeBuilder_;
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     * @return Whether the waitTime field is set.
+     */
+    public boolean hasWaitTime() {
+      return ((bitField0_ & 0x00000800) != 0);
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     * @return The waitTime.
+     */
+    public com.google.protobuf.Duration getWaitTime() {
+      if (waitTimeBuilder_ == null) {
+        return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      } else {
+        return waitTimeBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        waitTime_ = value;
+      } else {
+        waitTimeBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(
+        com.google.protobuf.Duration.Builder builderForValue) {
+      if (waitTimeBuilder_ == null) {
+        waitTime_ = builderForValue.build();
+      } else {
+        waitTimeBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder mergeWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (((bitField0_ & 0x00000800) != 0) &&
+          waitTime_ != null &&
+          waitTime_ != com.google.protobuf.Duration.getDefaultInstance()) {
+          getWaitTimeBuilder().mergeFrom(value);
+        } else {
+          waitTime_ = value;
+        }
+      } else {
+        waitTimeBuilder_.mergeFrom(value);
+      }
+      if (waitTime_ != null) {
+        bitField0_ |= 0x00000800;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public Builder clearWaitTime() {
+      bitField0_ = (bitField0_ & ~0x00000800);
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.Duration.Builder getWaitTimeBuilder() {
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return getWaitTimeFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+      if (waitTimeBuilder_ != null) {
+        return waitTimeBuilder_.getMessageOrBuilder();
+      } else {
+        return waitTime_ == null ?
+            com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      }
+    }
+    /**
+     * <pre>
+     * Recommended minimal amount of time to wait when retrying the request, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration wait_time = 13 [json_name = "waitTime"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+        getWaitTimeFieldBuilder() {
+      if (waitTimeBuilder_ == null) {
+        waitTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                getWaitTime(),
+                getParentForChildren(),
+                isClean());
+        waitTime_ = null;
+      }
+      return waitTimeBuilder_;
+    }
+
+    private int deniedResponseStatusCode_ = 0;
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The enum numeric value on the wire for deniedResponseStatusCode.
+     */
+    @java.lang.Override public int getDeniedResponseStatusCodeValue() {
+      return deniedResponseStatusCode_;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The enum numeric value on the wire for deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCodeValue(int value) {
+      deniedResponseStatusCode_ = value;
+      bitField0_ |= 0x00001000;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return The deniedResponseStatusCode.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.forNumber(deniedResponseStatusCode_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @param value The deniedResponseStatusCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setDeniedResponseStatusCode(com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      bitField0_ |= 0x00001000;
+      deniedResponseStatusCode_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * http_status contains the http status code to be returned to the client, if
+     * decision_type is REJECTED. Optional.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 14 [json_name = "deniedResponseStatusCode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearDeniedResponseStatusCode() {
+      bitField0_ = (bitField0_ & ~0x00001000);
+      deniedResponseStatusCode_ = 0;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

@@ -4,9 +4,9 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "policies/feature-rollout/average-latency",
-      "policy_name": "feature-rollout",
-      "values_file": "policies/feature-rollout.yaml",
+      "blueprint_name": "load-ramping/base",
+      "policy_name": "load-ramping",
+      "values_file": "policies/load-ramping.yaml",
       "dashboard_mixin_dir": "dashboards/"
     }
   ],

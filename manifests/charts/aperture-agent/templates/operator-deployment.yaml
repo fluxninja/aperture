@@ -108,6 +108,13 @@ spec:
                   fieldPath: metadata.namespace
             - name: APERTURE_OPERATOR_SERVICE_NAME
               value: {{ template "common.names.fullname" . }}-manager
+            {{- if or (not .Values.operator.rbac.featureBasedRoles) (and .Values.agent.sidecar .Values.agent.sidecar.enabled)}}
+            - name: APERTURE_AGENT_SIDECAR_MODE_ENABLED
+              value: "true"
+            {{- else }}
+            - name: APERTURE_AGENT_SIDECAR_MODE_ENABLED
+              value: "false"
+            {{- end }}
             {{- if .Values.operator.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.operator.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}

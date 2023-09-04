@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/telemetry_collector.proto";
+
+message TelemetryCollectorWrapper {
+  // Telemetry Collector.
+  policy.language.v1.TelemetryCollector telemetry_collector = 1;
+  // Name of Flux Meter metric.
+  int64 telemetry_collector_id = 4;
+  // Name of the Policy.
+  string policy_name = 5;
+}

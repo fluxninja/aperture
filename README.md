@@ -27,10 +27,21 @@
 
 # 🥷 FluxNinja Aperture
 
-Aperture is an observability-driven load management platform for modern cloud
-applications.
+Aperture is an observability-driven load management platform designed for
+classifying, scheduling, and rate-limiting API traffic in cloud applications.
+Built upon a foundation of observability and a global control plane, it offers a
+comprehensive suite of load management capabilities that enhance the reliability
+and performance of cloud applications while also optimizing resource
+utilization.
+
+Aperture seamlessly integrates with existing control points such as gateways,
+service meshes, and application middlewares. Moreover, it offers SDKs for
+developers to establish control points around specific features or code sections
+inside applications
 
 ## ⚙️ Features
+
+Aperture provides a variety of advanced load management features:
 
 - **Adaptive service protection:** Enhance resource utilization and safeguard
   against abrupt service overloads with an intelligent queue at the entry point
@@ -59,12 +70,14 @@ applications.
   Aperture's high-performance, distributed rate limiter. This feature enforces
   per-key limits based on fine-grained labels, ensuring precise control and
   prevention of excessive usage.
-- **Automated load ramping:** Ensure a safe and gradual increment of load to new
-  features or API endpoints. Aperture continuously monitors for potential
-  performance issues, offering an automatic response mechanism to dial back load
-  in case of a performance regression. This proactive approach minimizes service
-  disruptions and maintains consistent performance, even when rolling out new
-  features.
+- **Percentage rollouts:** Enable teams to gradually release new features to a
+  subset of users, without impacting the rest of the system. Aperture provides
+  automated load ramping functionality, allowing for a safe and controlled
+  increment of load to new features or API endpoints. This feature continuously
+  monitors for potential performance issues and includes an automatic response
+  mechanism to dial back load in case of a performance regression. This
+  proactive approach minimizes service disruptions and maintains consistent
+  performance, even when rolling out new features.
 
 ## 🏗️ Architecture
 
@@ -93,29 +106,35 @@ To try Aperture in a local Kubernetes environment, refer to
 
 ### 🏎️ Installation
 
-To install the Aperture system, please follow the
+To install the Aperture system, follow the
 [Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Use Cases
 
-Learn about various use cases of Apertures in the
-[Applying Policies](https://docs.fluxninja.com/applying-policies) section.
+- [Use Cases](https://docs.fluxninja.com/use-cases) section in Aperture
+  documentation.
+
+### 🖥️ Slide Decks
+
+- [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs)
+  deck covers the overview and use-cases of Aperture.
 
 ## 🎥 Videos
 
-- [Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
-- [Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://www.youtube.com/watch?v=nm62d2gYqNk)
-- [How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
-- [Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
+- [SREcon'23 APAC | Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
+- [Chaos Carnival 2023 | Graceful Degradation: Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
+- [Conf42 Chaos Engineering 2023 | Graceful Degradation: When All Goes Wrong](https://www.youtube.com/watch?v=nm62d2gYqNk)
+- [Demo | How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
+- [Explainer | Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
-helps us improve Aperture to be more reliable and user-friendly. Please make
-sure to include all the required information to reproduce and understand the bug
-you are reporting. Follow helper questions in the bug report template to make it
-easier. If you see a way to improve Aperture, use the
+helps us improve Aperture to be more reliable and user-friendly. Include all the
+required information to reproduce and understand the bug you are reporting.
+Follow helper questions in the bug report template to make it easier. If you see
+a way to improve Aperture, use the
 [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=)
 template to create an issue.
 
-To contribute code, please read the [Contribution guide](CONTRIBUTING.md).
+To contribute code, read the [Contribution guide](CONTRIBUTING.md).

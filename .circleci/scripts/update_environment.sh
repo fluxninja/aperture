@@ -8,11 +8,17 @@ commit_author=$(git show --format="%aN <%aE>" --quiet)
 args=(
     --author "${commit_author}"
     --release-train "${RELEASE_TRAIN:-latest}"
+    --manifests-repo-url "${MANIFESTS_REPO}"
+    --manifests-base-branch "${MANIFESTS_BRANCH}"
     --push
 )
 
 if [ -n "${COMPONENT:-}" ]; then
     args+=(--component "${COMPONENT}")
+fi
+
+if [ "${SKIP_PULL_REQUEST:-}" == "true" ]; then
+    args+=(--skip-pull-request)
 fi
 
 if [ -n "${SKIP_COMPONENT:-}" ]; then

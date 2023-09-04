@@ -6,6 +6,11 @@
     },
     {
       "type": "link",
+      "label": "Aperture @ GitHub",
+      "href": "https://github.com/fluxninja/aperture"
+    },
+    {
+      "type": "link",
       "label": "FluxNinja Blog",
       "href": "https://blog.fluxninja.com/"
     },
@@ -13,11 +18,6 @@
       "type": "link",
       "label": "Join Slack Community",
       "href": "https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1ewkfjfy9-~wF4EryoDyJ6kaPRTNZPyA"
-    },
-    {
-      "type": "link",
-      "label": "Aperture @ GitHub",
-      "href": "https://github.com/fluxninja/aperture"
     }
   ]
 }

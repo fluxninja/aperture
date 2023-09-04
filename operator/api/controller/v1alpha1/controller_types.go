@@ -22,8 +22,10 @@ import (
 	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
+	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
+	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -54,6 +56,14 @@ type ControllerConfigSpec struct {
 	//+kubebuilder:validation:Optional
 	common.CommonConfigSpec `json:",inline"`
 
+	// Etcd configuration.
+	//+kubebuilder:validation:Required
+	Etcd etcd.EtcdConfig `json:"etcd"`
+
+	// Prometheus configuration.
+	//+kubebuilder:validation:Required
+	Prometheus prometheus.PrometheusConfig `json:"prometheus"`
+
 	// Policies configuration.
 	//+kubebuilder:validation:Optional
 	Policies PoliciesConfig `json:"policies"`
@@ -75,7 +85,8 @@ type PoliciesConfig struct {
 
 // ControllerStatus defines the observed state of Controller.
 type ControllerStatus struct {
-	Resources string `json:"resources,omitempty"`
+	Resources            string `json:"resources,omitempty"`
+	IsMigrationCompleted bool   `json:"isMigrationCompleted,omitempty"`
 }
 
 //+kubebuilder:object:root=true

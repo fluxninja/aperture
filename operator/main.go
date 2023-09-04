@@ -17,12 +17,16 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
+
 	apimachineryversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
@@ -35,6 +39,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/fluxninja/aperture/v2/operator/api"
 	"github.com/fluxninja/aperture/v2/operator/controllers"
@@ -42,6 +47,7 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/controllers/controller"
 	"github.com/fluxninja/aperture/v2/operator/controllers/mutatingwebhook"
 	"github.com/fluxninja/aperture/v2/operator/controllers/namespace"
+	"github.com/go-logr/logr"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -63,6 +69,7 @@ func main() {
 	var agentManager bool
 	var controllerManager bool
 	var probeAddr string
+	var multipleControllersEnabled bool
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -74,6 +81,8 @@ func main() {
 	flag.BoolVar(&controllerManager, "controller", false,
 		"Enable manager for Aperture Controller. "+
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
+	flag.BoolVar(&multipleControllersEnabled, "experimental-multiple-controllers", false,
+		"Experimental support for deployment of multiple controllers.")
 
 	opts := zap.Options{
 		Development: true,
@@ -82,6 +91,10 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	if multipleControllersEnabled {
+		setupLog.Info("Experimental support for managing multiple controllers enabled.")
+	}
 
 	if !agentManager && !controllerManager {
 		setupLog.Info("One of the --agent or --controller flag is required.")
@@ -98,6 +111,12 @@ func main() {
 		leaderElectionID = "a4362587-controller.fluxninja.com"
 	}
 
+	server := webhook.NewServer(webhook.Options{
+		CertDir:  os.Getenv("APERTURE_OPERATOR_CERT_DIR"),
+		CertName: os.Getenv("APERTURE_OPERATOR_CERT_NAME"),
+		KeyName:  os.Getenv("APERTURE_OPERATOR_KEY_NAME"),
+	})
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -105,6 +124,7 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       leaderElectionID,
+		WebhookServer:          server,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -135,18 +155,11 @@ func main() {
 	// Checking if the minimum Kubernetes version is satisfied
 	controllers.MinimumKubernetesVersionBool = controllers.CurrentKubernetesVersion.AtLeast(apimachineryversion.MustParseSemantic(controllers.MinimumKubernetesVersion))
 
-	var server *webhook.Server
-
 	if agentManager || controllerManager {
 		if err = controllers.CheckAndGenerateCertForOperator(ctrl.GetConfigOrDie()); err != nil {
 			setupLog.Error(err, "unable to manage webhook certificates")
 			os.Exit(1)
 		}
-
-		server = mgr.GetWebhookServer()
-		server.CertDir = os.Getenv("APERTURE_OPERATOR_CERT_DIR")
-		server.CertName = os.Getenv("APERTURE_OPERATOR_CERT_NAME")
-		server.KeyName = os.Getenv("APERTURE_OPERATOR_KEY_NAME")
 
 		if err = (&mutatingwebhook.MutatingWebhookReconciler{
 			Client:            mgr.GetClient(),
@@ -158,44 +171,53 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
+	var agentReconciler *agent.AgentReconciler
 	if agentManager {
-		reconciler := &agent.AgentReconciler{
+		agentReconciler = &agent.AgentReconciler{
 			Client:        mgr.GetClient(),
 			DynamicClient: dynamicClient,
 			Scheme:        mgr.GetScheme(),
 			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
 		}
 
-		if err = reconciler.SetupWithManager(mgr); err != nil {
+		if err = agentReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Agent")
 			os.Exit(1)
 		}
 
-		if err = (&namespace.NamespaceReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-		}).SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "Namespace")
-			os.Exit(1)
+		sidecarModeEnabled, ok := os.LookupEnv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+		if sidecarModeEnabled == "true" || !ok {
+			if err = (&namespace.NamespaceReconciler{
+				Client: mgr.GetClient(),
+				Scheme: mgr.GetScheme(),
+			}).SetupWithManager(mgr); err != nil {
+				setupLog.Error(err, "unable to create controller", "controller", "Namespace")
+				os.Exit(1)
+			}
 		}
 
 		apertureInjector := &mutatingwebhook.ApertureInjector{
-			Client: mgr.GetClient(),
+			Client:  mgr.GetClient(),
+			Decoder: admission.NewDecoder(mgr.GetScheme()),
 		}
-		reconciler.ApertureInjector = apertureInjector
+		agentReconciler.ApertureInjector = apertureInjector
 
 		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
 		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
+	var controllerReconciler *controller.ControllerReconciler
 	if controllerManager {
-		if err = (&controller.ControllerReconciler{
-			Client:        mgr.GetClient(),
-			DynamicClient: dynamicClient,
-			Scheme:        mgr.GetScheme(),
-			Recorder:      mgr.GetEventRecorderFor("aperture-controller"),
-		}).SetupWithManager(mgr); err != nil {
+		controllerReconciler = &controller.ControllerReconciler{
+			Client:              mgr.GetClient(),
+			DynamicClient:       dynamicClient,
+			Scheme:              mgr.GetScheme(),
+			Recorder:            mgr.GetEventRecorderFor("aperture-controller"),
+			MultipleControllers: multipleControllersEnabled,
+			ResourcesDeleted:    map[string]bool{},
+		}
+
+		if err = controllerReconciler.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "Controller")
 			os.Exit(1)
 		}
@@ -214,9 +236,36 @@ func main() {
 		os.Exit(1)
 	}
 
+	ctx := setupContext(agentReconciler, controllerReconciler, agentManager, setupLog)
+	setupLog.Info("starting webhook server")
+	go func() {
+		if err := server.Start(ctx); err != nil {
+			setupLog.Error(err, "unable to run webhook server")
+			os.Exit(1)
+		}
+	}()
+
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func setupContext(agentReconciler *agent.AgentReconciler, controllerReconciler *controller.ControllerReconciler, agentManager bool, setupLog logr.Logger) context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-c
+		if agentManager {
+			agentReconciler.RemoveFinalizerFromAgentCR(ctx, setupLog)
+		} else {
+			controllerReconciler.RemoveFinalizerFromControllerCR(ctx, setupLog)
+		}
+		cancel()
+	}()
+	return ctx
 }

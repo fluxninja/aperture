@@ -314,6 +314,31 @@ operator:
     ## @param operator.serviceAccount.automountServiceAccountToken Automount API credentials for a service account.
     ##
     automountServiceAccountToken: true
+  ## Hooks
+  hooks:
+    kubectl:
+      ## Image to use for kubectl in pre-delete and post-install hooks.
+      ## @param operator.hooks.kubectl.image.registry kubectl image registry
+      ## @param operator.hooks.kubectl.image.repository kubectl image repository
+      ## @param operator.hooks.kubectl.image.tag kubectl image tag (immutable tags are recommended)
+      ## @param operator.hooks.kubectl.image.pullPolicy kubectl image pull policy
+      ##
+      image:
+        registry: docker.io/bitnami
+        repository: kubectl
+        tag: latest
+        ## Specify a imagePullPolicy
+        ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+        ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+        ##
+        pullPolicy: Always
+      ## Resource configuration for kubectl container
+      ## @param operator.hooks.kubectl.resources.limits kubectl container resource limits
+      ## @param operator.hooks.kubectl.resources.requests kubectl container resource requests
+      ##
+      resources:
+        limits: {}
+        requests: {}
 
 ## @section Controller Custom Resource Parameters
 ## @skip controller.createUninstallHook
@@ -350,7 +375,7 @@ controller:
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
     ##
-    pullPolicy: ~
+    pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -424,20 +449,20 @@ controller:
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param controller.podSecurityContext.enabled Enabled Controller pods' Security Context
-  ## @param controller.podSecurityContext.fsGroup Set Controller pod's Security Context fsGroup. Defaults to 1001.
+  ## @param controller.podSecurityContext.fsGroup Set Controller pod's Security Context fsGroup. Defaults to 1000.
   podSecurityContext:
     enabled: false
-    fsGroup: ~
+    fsGroup: 1000
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
   ## @param controller.containerSecurityContext.enabled Enabled Controller containers' Security Context. Defaults to false.
-  ## @param controller.containerSecurityContext.runAsUser Set Controller containers' Security Context runAsUser. Defaults to 1001.
-  ## @param controller.containerSecurityContext.runAsNonRoot Set Controller containers' Security Context runAsNonRoot. Defaults to false.
-  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context runAsNonRoot. Defaults to false.
+  ## @param controller.containerSecurityContext.runAsUser Set Controller containers' Security Context runAsUser. Defaults to 1000.
+  ## @param controller.containerSecurityContext.runAsNonRoot Set Controller containers' Security Context runAsNonRoot. Defaults to true.
+  ## @param controller.containerSecurityContext.readOnlyRootFilesystem Set Controller containers' Security Context readOnlyRootFilesystem. Defaults to false.
   containerSecurityContext:
     enabled: false
-    runAsUser: ~
-    runAsNonRoot: ~
+    runAsUser: 1000
+    runAsNonRoot: true
     readOnlyRootFilesystem: ~
   ## @param controller.command Override default container command (useful when using custom images)
   ##
@@ -511,7 +536,7 @@ controller:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## Controller API secret for FluxNinja ARC connection
+  ## Controller API secret for FluxNinja connection
   ## @param controller.secrets.fluxNinjaExtension.create Whether to create Kubernetes Secret with provided Controller API Key.
   ## @param controller.secrets.fluxNinjaExtension.secretKeyRef.name specifies a name of the Secret for Controller API Key to be used. This defaults to {{ .Release.Name }}-controller-apikey
   ## @param controller.secrets.fluxNinjaExtension.secretKeyRef.key specifies which key from the Secret for Controller API Key to use
@@ -555,6 +580,8 @@ ingress:
 ## @param etcd.autoCompactionMode Auto compaction mode, by default periodic. Valid values: "periodic", "revision".
 ## @param etcd.autoCompactionRetention Auto compaction retention for mvcc key value store in hour, by default 0, means disabled.
 ## @param etcd.initContainer.enabled Create init container to check the health of Etcd before starting Aperture Controller.
+## @param etcd.initContainer.resources.limits Resources limits for the init containers
+## @param etcd.initContainer.resources.requests Resources requests for the init containers
 ## @param etcd.initContainer.image.registry Init container image registry.
 ## @param etcd.initContainer.image.repository Init container image repository.
 ## @param etcd.initContainer.image.tag Init container image tag.
@@ -568,10 +595,13 @@ etcd:
   autoCompactionRetention: 24
   initContainer:
     enabled: true
+    resources:
+      limits: {}
+      requests: {}
     image:
       registry: docker.io/bitnami
       repository: etcd
-      tag: 3.5
+      tag: 3.5.8-debian-11-r0
       pullPolicy: IfNotPresent
   pdb:
     create: false
@@ -584,6 +614,8 @@ etcd:
 ## @section prometheus
 ## @param prometheus.enabled specifies whether to deploy embedded prometheus
 ## @param prometheus.initContainer.enabled Create init container to check the readiness of Prometheus before starting Aperture Controller.
+## @param prometheus.initContainer.resources.limits Resources limits for the init containers
+## @param prometheus.initContainer.resources.requests Resources requests for the init containers
 ## @param prometheus.initContainer.image.registry Init container image registry.
 ## @param prometheus.initContainer.image.repository Init container image repository.
 ## @param prometheus.initContainer.image.tag Init container image tag.
@@ -600,6 +632,9 @@ prometheus:
   enabled: true
   initContainer:
     enabled: true
+    resources:
+      limits: {}
+      requests: {}
     image:
       registry: docker.io/linuxserver
       repository: yq
@@ -611,7 +646,7 @@ prometheus:
     image:
       tag: v2.33.5
     extraFlags:
-    - web.enable-remote-write-receiver
+      - web.enable-remote-write-receiver
   alertmanager:
     enabled: false
   nodeExporter:

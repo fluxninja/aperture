@@ -5,16 +5,18 @@ import (
 	"context"
 	"encoding/base64"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	typev3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -91,7 +93,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		// Additional base64 encoding step is used, as there's no way to push
 		// binary data through dynamic metadata and envoy's access log
 		// formatter. Overhead of this base64 encoding is small though.
-		marshalledCheckResponse, err := proto.Marshal(checkResponse)
+		marshalledCheckResponse, err := checkResponse.MarshalVT()
 		if err != nil {
 			log.Bug().Err(err).Msg("bug: Failed to marshal check response")
 			return nil
@@ -163,7 +165,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
-	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels.ToPlainMap(), input)
+	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {
 		cleanValue := sanitizeBaggageHeaderValue(fl.Value)
@@ -182,19 +184,19 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	// Make the freshly created flow labels available to flowcontrol.
 	// Newly created flow labels can overwrite existing flow labels.
 	flowlabel.Merge(mergedFlowLabels, newFlowLabels)
-	flowLabels := mergedFlowLabels.ToPlainMap()
 
 	// Ask flow control service for Ok/Deny
-	checkResponse := h.fcHandler.CheckRequest(ctx,
+	checkResponse := h.fcHandler.CheckRequest(
+		ctx,
 		iface.RequestContext{
-			FlowLabels:   flowLabels,
+			FlowLabels:   mergedFlowLabels,
 			ControlPoint: ctrlPt,
 			Services:     svcs,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs
 	// Set telemetry_flow_labels in the CheckResponse
-	checkResponse.TelemetryFlowLabels = flowLabels
+	checkResponse.TelemetryFlowLabels = mergedFlowLabels.TelemetryLabels()
 	// add control point type
 	checkResponse.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.HTTPControlPoint
 
@@ -214,33 +216,38 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 		resp.Status = &status.Status{
 			Code: int32(code.Code_UNAVAILABLE),
 		}
-		switch checkResponse.RejectReason {
-		case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_TooManyRequests,
-					},
-				},
+		var statusCode typev3.StatusCode
+		if checkResponse.GetDeniedResponseStatusCode() != 0 {
+			statusCode = typev3.StatusCode(checkResponse.GetDeniedResponseStatusCode())
+		} else {
+			switch checkResponse.RejectReason {
+			case flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED:
+				statusCode = typev3.StatusCode_TooManyRequests
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
+				statusCode = typev3.StatusCode_ServiceUnavailable
+			case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+				statusCode = typev3.StatusCode_Forbidden
+			default:
+				log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
 			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_ServiceUnavailable,
-					},
-				},
-			}
-		case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
-			resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
-				DeniedResponse: &authv3.DeniedHttpResponse{
-					Status: &typev3.HttpStatus{
-						Code: typev3.StatusCode_Forbidden,
-					},
-				},
-			}
-		default:
-			log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")
+		}
+		deniedHTTPResponse := &authv3.DeniedHttpResponse{
+			Status: &typev3.HttpStatus{
+				Code: statusCode,
+			},
+		}
+		if checkResponse.WaitTime != nil {
+			deniedHTTPResponse.Headers = append(
+				deniedHTTPResponse.Headers,
+				waitTimeToRetryAfter(checkResponse.WaitTime),
+			)
+			// Clear to avoid redundancy, as we're translating it into header.
+			// Logs processor doesn't read it and Envoy doesn't peek into
+			// CheckResponse.
+			checkResponse.WaitTime = nil
+		}
+		resp.HttpResponse = &authv3.CheckResponse_DeniedResponse{
+			DeniedResponse: deniedHTTPResponse,
 		}
 	default:
 		return nil, grpc.Bug().Stringer("type", checkResponse.DecisionType).
@@ -248,6 +255,21 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	return resp, nil
+}
+
+func waitTimeToRetryAfter(waitTime *durationpb.Duration) *corev3.HeaderValueOption {
+	seconds := waitTime.Seconds
+	// Retry-after header doesn't have full second resolution, we need to round
+	// up to avoid clients retrying too early.
+	if waitTime.Nanos != 0 {
+		seconds += 1
+	}
+	return &corev3.HeaderValueOption{
+		Header: &corev3.HeaderValue{
+			Key:   "retry-after",
+			Value: strconv.FormatInt(seconds, 10),
+		},
+	}
 }
 
 func authzRequestToCheckHTTPRequest(

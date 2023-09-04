@@ -8,6 +8,7 @@ import "aperture/discovery/entities/v1/entities.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "aperture/policy/language/v1/policy.proto";
+import "aperture/status/v1/status.proto";
 import "google/protobuf/empty.proto";
 
 // Controller describes APIs of the controller from the aperturectl POV
@@ -18,6 +19,7 @@ service Controller {
   rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
   rpc ListDiscoveryEntities(ListDiscoveryEntitiesRequest) returns (ListDiscoveryEntitiesControllerResponse);
   rpc ListDiscoveryEntity(ListDiscoveryEntityRequest) returns (ListDiscoveryEntityAgentResponse);
+  rpc ListPolicies(google.protobuf.Empty) returns (aperture.policy.language.v1.GetPoliciesResponse);
 
   // duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
@@ -26,6 +28,8 @@ service Controller {
   rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
   rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
+  rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
+  rpc GetStatus(aperture.status.v1.GroupStatusRequest) returns (aperture.status.v1.GroupStatus);
 }
 
 message ListServicesRequest {}

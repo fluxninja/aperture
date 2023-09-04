@@ -52,7 +52,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 		It("returns correct ConfigMap", func() {
 			instance := &controllerv1alpha1.Controller{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      AppName,
+					Name:      ControllerName,
 					Namespace: AppName,
 				},
 				Spec: controllerv1alpha1.ControllerSpec{
@@ -78,13 +78,13 @@ var _ = Describe("ConfigMap for Controller", func() {
 									},
 								},
 							},
-							Etcd: etcd.EtcdConfig{
-								Endpoints: []string{"http://agent-etcd:2379"},
-								LeaseTTL:  config.MakeDuration(60 * time.Second),
-							},
-							Prometheus: prometheus.PrometheusConfig{
-								Address: "http://aperture-prometheus-server:80",
-							},
+						},
+						Etcd: etcd.EtcdConfig{
+							Endpoints: []string{"http://agent-etcd:2379"},
+							LeaseTTL:  config.MakeDuration(60 * time.Second),
+						},
+						Prometheus: prometheus.PrometheusConfig{
+							Address: "http://aperture-prometheus-server:80",
 						},
 						OTel: controller.ControllerOTelConfig{
 							CommonOTelConfig: otelconfig.CommonOTelConfig{
@@ -95,6 +95,7 @@ var _ = Describe("ConfigMap for Controller", func() {
 									ZpagesPort:      55679,
 								},
 							},
+							EnableHighCardinalityPlatformMetrics: false,
 						},
 					},
 				},
@@ -116,11 +117,10 @@ var _ = Describe("ConfigMap for Controller", func() {
 					Namespace: AppName,
 					Labels: map[string]string{
 						"app.kubernetes.io/name":       AppName,
-						"app.kubernetes.io/instance":   AppName,
+						"app.kubernetes.io/instance":   ControllerName,
 						"app.kubernetes.io/managed-by": OperatorName,
 						"app.kubernetes.io/component":  ControllerServiceName,
 					},
-					Annotations: nil,
 					OwnerReferences: []metav1.OwnerReference{
 						{
 							APIVersion:         "fluxninja.com/v1alpha1",

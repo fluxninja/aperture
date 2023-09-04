@@ -13,6 +13,7 @@ import (
 	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 )
@@ -27,6 +28,8 @@ var (
 	prometheusRegistry              *prometheus.Registry
 	wfqFlowsGauge                   prometheus.Gauge
 	wfqHeapRequestsGauge            prometheus.Gauge
+	wfqAcceptedTokensCounter        prometheus.Counter
+	wfqIncomingTokensCounter        prometheus.Counter
 	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
@@ -50,6 +53,18 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqHeapRequestsGauge)
+	wfqIncomingTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        metrics.IncomingTokensMetricName,
+		Help:        "A counter measuring work incoming into Scheduler",
+		ConstLabels: constLabels,
+	})
+	_ = prometheusRegistry.Register(wfqIncomingTokensCounter)
+	wfqAcceptedTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        metrics.AcceptedTokensMetricName,
+		Help:        "A counter measuring work admitted by Scheduler",
+		ConstLabels: constLabels,
+	})
+	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
 		Help: "A gauge that tracks the load multiplier",
@@ -82,7 +97,7 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 type flowTracker struct {
 	fairnessLabel string // what label it needs
 	tokens        uint64 // how many tokens it needs
-	priority      uint8
+	priority      float64
 	timeout       time.Duration
 	requestRate   uint64
 	// counters
@@ -94,7 +109,7 @@ func (flow *flowTracker) String() string {
 	return fmt.Sprintf("FlowTracker<"+
 		"Flow<FairnessLabel: %s "+
 		"| RequestTokens: %d "+
-		"| Priority: %d "+
+		"| Priority: %f "+
 		"| Timeout: %v "+
 		"| RequestRate: %d "+
 		"| TotalRequests: %d "+
@@ -175,12 +190,8 @@ func runRequest(sched Scheduler, wg *sync.WaitGroup, flow *flowTracker) {
 	}
 }
 
-func (flow *flowTracker) makeRequest() Request {
-	return Request{
-		FairnessLabel: flow.fairnessLabel,
-		Tokens:        flow.tokens,
-		Priority:      flow.priority,
-	}
+func (flow *flowTracker) makeRequest() *Request {
+	return NewRequest(flow.fairnessLabel, flow.tokens, flow.priority)
 }
 
 func printPrettyFlowTracker(t *testing.T, flows flowTrackers) {
@@ -217,11 +228,11 @@ func Time(duration string) {
 // ------------------------- Benchmark Testing -------------------------
 func BenchmarkBasicTokenBucket(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload2", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload3", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload4", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload5", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload1", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	_, metrics := getMetrics()
@@ -229,8 +240,10 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	manager := NewBasicTokenBucket(c, 0, metrics)
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -249,11 +262,11 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 
 func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload1", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload2", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload3", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload4", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
-		{fairnessLabel: "workload5", tokens: 1, priority: 0, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload1", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload2", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload3", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload4", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
+		{fairnessLabel: "workload5", tokens: 1, priority: 1, timeout: 5 * time.Millisecond},
 	}
 	c := clockwork.NewRealClock()
 	startTime := c.Now()
@@ -261,11 +274,15 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	lmGauge, metrics := getMetrics()
 	manager := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, metrics)
 	manager.SetContinuousTracking(true)
-	manager.SetLoadMultiplier(1.0)
+	manager.SetLoadDecisionValues(&policysyncv1.LoadDecision{
+		LoadMultiplier: 1.0,
+	})
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -324,8 +341,10 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	_, tbMetrics := getMetrics()
 	basicBucket := NewBasicTokenBucket(c, fillRate, tbMetrics)
 	metrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
@@ -336,21 +355,20 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	flowRunTime := time.Second * 10
 
 	sumPriority := float64(0)
-	minInvPrio := uint8(math.MaxUint8)
-	minPrio := uint8(math.MaxUint8)
+	priorities := []uint64{}
 	for _, flow := range flows {
-		if minInvPrio > (math.MaxUint8 - flow.priority) {
-			minInvPrio = math.MaxUint8 - flow.priority
-		}
-		if minPrio > flow.priority {
-			minPrio = flow.priority
-		}
+		// if minInvPrio > (math.MaxUint8 - flow.priority) {
+		// 	minInvPrio = math.MaxUint8 - flow.priority
+		// }
+		// if minPrio > flow.priority {
+		// 	minPrio = flow.priority
+		// }
+		priorities = append(priorities, uint64(flow.priority))
 	}
-	t.Logf("minPrio: %d, minInvPrio: %d\n", minPrio, minInvPrio)
-	adjustedPrio := make([]uint16, len(flows))
+	adjustedPriority := make([]float64, len(flows))
 	for i, flow := range flows {
-		adjustedPrio[i] = uint16(flow.priority-minPrio+minInvPrio) + 1
-		sumPriority += float64(adjustedPrio[i])
+		adjustedPriority[i] = 1 / flow.priority
+		sumPriority += float64(adjustedPriority[i])
 	}
 
 	// Estimate the tokens -- It's a rough approach but seems to work so far for variety of loads and priorities
@@ -358,11 +376,11 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	estimatedTokens := make([]uint64, len(flows))
 
 	for i := range flows {
-		estimatedTokens[i] = uint64(fillRate*float64(adjustedPrio[i])/sumPriority) * uint64(flowRunTime.Seconds())
+		estimatedTokens[i] = uint64(fillRate*float64(adjustedPriority[i])/sumPriority) * uint64(flowRunTime.Seconds())
 		totalEstimatedtokens += estimatedTokens[i]
 	}
 	t.Logf("Flows: %v", flows)
-	t.Logf("Adjusted Prios: %v\n", adjustedPrio)
+	t.Logf("Adjusted Prios: %v\n", adjustedPriority)
 	t.Logf("Estimated minimum tokens per flow before run are: %v\n", estimatedTokens)
 	t.Logf("Total estimated allocated tokens: %d\n", totalEstimatedtokens)
 
@@ -429,9 +447,9 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 
 func TestHighRpsFlows(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 100},
-		{fairnessLabel: "workload1", tokens: 5, priority: 0, requestRate: 100},
-		{fairnessLabel: "workload2", tokens: 5, priority: 0, requestRate: 100},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 100},
+		{fairnessLabel: "workload1", tokens: 5, priority: 1, requestRate: 100},
+		{fairnessLabel: "workload2", tokens: 5, priority: 1, requestRate: 100},
 		{fairnessLabel: "workload3", tokens: 5, priority: 50, requestRate: 100},
 	}
 	for _, flow := range flows {
@@ -494,7 +512,7 @@ func TestSingleLowRequest(t *testing.T) {
 
 func TestSingleLowRequestLowTimeout(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 1, priority: 0, requestRate: 1, timeout: time.Millisecond},
+		{fairnessLabel: "workload0", tokens: 1, priority: 1, requestRate: 1, timeout: time.Millisecond},
 		{fairnessLabel: "workload1", tokens: 8, priority: 75, requestRate: 100, timeout: 50 * time.Millisecond},
 		{fairnessLabel: "workload2", tokens: 8, priority: 100, requestRate: 100, timeout: 50 * time.Millisecond},
 		{fairnessLabel: "workload3", tokens: 8, priority: 125, requestRate: 100, timeout: 50 * time.Millisecond},
@@ -507,7 +525,7 @@ func TestSingleLowRequestLowTimeout(t *testing.T) {
 
 func TestIncreasingPriority(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 50},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload1", tokens: 5, priority: 50, requestRate: 50},
 		{fairnessLabel: "workload2", tokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", tokens: 5, priority: 150, requestRate: 50},
@@ -520,7 +538,7 @@ func TestIncreasingPriority(t *testing.T) {
 
 func Test0FillRate(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 0, priority: 0, requestRate: 50},
+		{fairnessLabel: "workload0", tokens: 0, priority: 1, requestRate: 50},
 		{fairnessLabel: "workload1", tokens: 5, priority: 50, requestRate: 50},
 		{fairnessLabel: "workload2", tokens: 5, priority: 100, requestRate: 50},
 		{fairnessLabel: "workload3", tokens: 5, priority: 200, requestRate: 50},
@@ -556,7 +574,7 @@ func TestFairnessWithinPriority(t *testing.T) {
 
 func TestTimeouts(t *testing.T) {
 	flows := flowTrackers{
-		{fairnessLabel: "workload0", tokens: 5, priority: 0, requestRate: 50, timeout: time.Millisecond * 5},
+		{fairnessLabel: "workload0", tokens: 5, priority: 1, requestRate: 50, timeout: time.Millisecond * 5},
 	}
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 }
@@ -575,8 +593,10 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		},
 	}
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:        wfqFlowsGauge,
-		HeapRequestsGauge: wfqHeapRequestsGauge,
+		FlowsGauge:            wfqFlowsGauge,
+		HeapRequestsGauge:     wfqHeapRequestsGauge,
+		IncomingTokensCounter: wfqIncomingTokensCounter,
+		AcceptedTokensCounter: wfqAcceptedTokensCounter,
 	}
 
 	c := clockwork.NewFakeClock()
@@ -590,7 +610,9 @@ func TestLoadMultiplierBucket(t *testing.T) {
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket
 		depleteRunTime := time.Second * 2
-		loadMultiplierBucket.SetLoadMultiplier(0.0)
+		loadMultiplierBucket.SetLoadDecisionValues(&policysyncv1.LoadDecision{
+			LoadMultiplier: 0.0,
+		})
 		loadMultiplierBucket.SetPassThrough(false)
 
 		runFlows(sched, &wg, flows, depleteRunTime, c)
@@ -599,7 +621,9 @@ func TestLoadMultiplierBucket(t *testing.T) {
 
 	runExperiment := func() {
 		// Running Actual Experiment
-		loadMultiplierBucket.SetLoadMultiplier(lm)
+		loadMultiplierBucket.SetLoadDecisionValues(&policysyncv1.LoadDecision{
+			LoadMultiplier: lm,
+		})
 		flowRunTime := time.Second * 10
 		runFlows(sched, &wg, flows, flowRunTime, c)
 		wg.Wait()
@@ -638,11 +662,15 @@ func TestPanic(t *testing.T) {
 	lmGauge, tbMetrics := getMetrics()
 	manager := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, tbMetrics)
 	manager.SetContinuousTracking(true)
-	manager.SetLoadMultiplier(0.5)
+	manager.SetLoadDecisionValues(&policysyncv1.LoadDecision{
+		LoadMultiplier: 0.5,
+	})
 	if manager.LoadMultiplier() != 0.5 {
 		t.Logf("LoadMultiplier is not 0.5\n")
 	}
-	manager.SetLoadMultiplier(-1.5)
+	manager.SetLoadDecisionValues(&policysyncv1.LoadDecision{
+		LoadMultiplier: -1.5,
+	})
 
 	// If the panic is not thrown, the test will fail.
 	t.Errorf("Expected panic has not been caught")

@@ -8,6 +8,7 @@ import (
 	promapi "github.com/prometheus/client_golang/api"
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"go.uber.org/fx"
+	"golang.org/x/oauth2"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -38,28 +39,52 @@ var (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(providePrometheusClient),
+		fx.Provide(providePrometheusEnforcer),
 		commonhttp.ClientConstructor{Name: "prometheus.http-client", ConfigKey: httpConfigKey}.Annotate(),
 	)
+}
+
+// ConfigOverride can be provided by an extension to control client creation behavior.
+type ConfigOverride struct {
+	SkipClientCreation bool
 }
 
 // ClientIn holds fields, parameters, to provide Prometheus Client.
 type ClientIn struct {
 	fx.In
-	HTTPClient   *http.Client `name:"prometheus.http-client"`
-	Unmarshaller config.Unmarshaller
+	HTTPClient     *http.Client       `name:"prometheus.http-client"`
+	TokenSource    oauth2.TokenSource `optional:"true"`
+	Unmarshaller   config.Unmarshaller
+	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
 func providePrometheusClient(in ClientIn) (prometheusv1.API, promapi.Client, error) {
+	// Skipping creation of prometheus client if Aperture Cloud Controller is enabled for Aperture Agent
+	if in.ConfigOverride != nil && in.ConfigOverride.SkipClientCreation {
+		return nil, nil, nil
+	}
+
 	var config promconfig.PrometheusConfig
 	if err := in.Unmarshaller.UnmarshalKey(prometheusConfigKey, &config); err != nil {
 		log.Error().Err(err).Msg("unable to deserialize")
 		return nil, nil, err
 	}
+
 	if config.Address == "" {
 		err := errors.New("prometheus address not specified")
 		log.Error().Err(err).Msg("")
 		return nil, nil, err
 	}
+
+	if in.TokenSource != nil {
+		log.Info().Msg("Using Google TokenSource for prometheus API queries")
+		oauth2Transport := &oauth2.Transport{
+			Source: in.TokenSource,
+			Base:   in.HTTPClient.Transport,
+		}
+		in.HTTPClient.Transport = oauth2Transport
+	}
+
 	client, err := promapi.NewClient(promapi.Config{
 		Address:      config.Address,
 		RoundTripper: in.HTTPClient.Transport,

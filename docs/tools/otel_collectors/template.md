@@ -31,18 +31,17 @@ policy][applying-policy]:
 ```yaml
 policy:
   resources:
-    telemetry_collectors:
-      - agent_group: default
-        infra_meters:
-          METRIC_NAME:
-            per_agent_group: true
-            receivers:
-              METRIC_NAME: [RECEIVER_NAME configuration here]
+    infra_meters:
+      METRIC_NAME:
+        agent_group: default
+        per_agent_group: true
+        receivers:
+          METRIC_NAME: [RECEIVER_NAME configuration here]
 ```
 
 [build]: /reference/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/RECEIVER_NAME
-[opentelemetry-collector]: /reference/policies/spec.md#telemetry-collector
+[opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector
 [applying-policy]: /use-cases/use-cases.md
-[policy-resources]: /reference/policies/spec.md#resources
+[policy-resources]: /reference/configuration/spec.md#resources

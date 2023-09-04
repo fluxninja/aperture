@@ -29,9 +29,7 @@ import (
 )
 
 // AgentHooks injects the default spec of Aperture Agent in CR.
-type AgentHooks struct {
-	decoder *admission.Decoder
-}
+type AgentHooks struct{}
 
 // Handle receives incoming requests from MutatingWebhook for newly created Agents, set defaults and validates them.
 func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request) admission.Response {
@@ -41,6 +39,22 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 	err := config.UnmarshalYAML([]byte(req.Object.Raw), newAgent)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
+	}
+
+	if !newAgent.Spec.ConfigSpec.FluxNinja.EnableCloudController {
+		if len(newAgent.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+			return admission.Denied("At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
+		}
+
+		if newAgent.Spec.ConfigSpec.Prometheus.Address == "" {
+			return admission.Denied("The address for Prometheus must be provided under spec.config.prometheus.address.")
+		}
+	} else if newAgent.Spec.ConfigSpec.FluxNinja.Endpoint == "" {
+		return admission.Denied("The endpoint for Flux Ninja must be provided under spec.config.fluxNinja.endpoint.")
+	}
+
+	if (newAgent.Spec.Image.Digest == "" && newAgent.Spec.Image.Tag == "") || (newAgent.Spec.Image.Digest != "" && newAgent.Spec.Image.Tag != "") {
+		return admission.Denied("Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
 
 	if newAgent.Spec.Secrets.FluxNinjaExtension.Create && newAgent.Spec.Secrets.FluxNinjaExtension.Value == "" {
@@ -76,10 +90,4 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 	}
 
 	return admission.PatchResponseFromRaw(req.Object.Raw, updatedAgent)
-}
-
-// InjectDecoder injects the decoder.
-func (agentHooks *AgentHooks) InjectDecoder(d *admission.Decoder) error {
-	agentHooks.decoder = d
-	return nil
 }

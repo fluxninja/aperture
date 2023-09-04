@@ -16,6 +16,17 @@ import TabItem from '@theme/TabItem';
 import {apertureVersion, apertureVersionWithOutV} from '../../../../../apertureVersion.js';
 ```
 
+:::info
+
+This method requires access to create cluster level resources like ClusterRole,
+ClusterRoleBinding, CustomResourceDefinition and so on.
+
+Use the
+[Namespace-scoped Installation](/get-started/installation/agent/kubernetes/namespace-scoped/namespace-scoped.md)
+if you do not want to assign the cluster level permissions.
+
+:::
+
 The Aperture Agent can be installed as a
 [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/),
 where it will get deployed on all the nodes of the cluster.
@@ -65,43 +76,37 @@ Kubernetes Objects which will be created by following steps are listed
 
 :::
 
-1. Configure the below parameters of etcd and Prometheus for the Agent Custom
-   Resource by creating a `values.yaml` and passing it with `install` command:
+1. Configure the below parameters of Aperture Cloud endpoint and API key for the
+   Agent Custom Resource by creating a `values.yaml` and passing it with
+   `install` command:
 
    ```yaml
    agent:
      config:
-       etcd:
-         endpoints: ["ETCD_ENDPOINT_HERE"]
-       prometheus:
-         address: "PROMETHEUS_ADDRESS_HERE"
-       agent_functions:
-         endpoints: ["CONTROLLER_ENDPOINT_HERE"]
+       fluxninja:
+         enable_cloud_controller: true
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
+     secrets:
+       fluxNinjaExtension:
+         create: true
+         secretKeyRef:
+           name: aperture-agent-apikey
+           key: apiKey
+         value: API_KEY
    ```
 
-   Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE` with
-   the actual values of etcd and Prometheus, which is also being used by the
-   Aperture Controller you want these Agents to connect to.
-   `CONTROLLER_ENDPOINT_HERE` should point to the Aperture Controller. If you
-   skip it, some sub commands `aperturectl` commands won't work.
+   Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
+   `API_KEY` with the API key linked to the project. If an API key has not been
+   created, generate a new one through the Aperture Cloud UI. Refer to [API
+   Keys][api-keys] for additional information.
 
-   If you have installed the
-   [Aperture Controller](/get-started/installation/controller/controller.md) on
-   the same cluster in `default` namespace, with etcd and Prometheus using
-   `controller` as release name, the values for the values for
-   `ETCD_ENDPOINT_HERE`, `PROMETHEUS_ADDRESS_HERE` and
-   `CONTROLLER_ENDPOINT_HERE` would be as below:
+   :::note
 
-   ```yaml
-   agent:
-     config:
-       etcd:
-         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-       prometheus:
-         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
-       agent_functions:
-         endpoints: ["aperture-controller.default.svc.cluster.local:8080"]
-   ```
+   If you are using a Self-Hosted Aperture Controller, modify the above
+   configuration as explained in [Self-Hosting: Agent
+   Configuration][self-hosting-agent].
+
+   :::
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">
@@ -123,14 +128,20 @@ Kubernetes Objects which will be created by following steps are listed
    ```yaml
    agent:
      config:
-       etcd:
-         endpoints: ["http://controller-etcd.default.svc.cluster.local:2379"]
-       prometheus:
-         address: "http://controller-prometheus-server.default.svc.cluster.local:80"
+       fluxninja:
+         enable_cloud_controller: true
+         endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
        log:
          level: debug
          pretty_console: true
          non_blocking: false
+     secrets:
+       fluxNinjaExtension:
+         create: true
+         secretKeyRef:
+           name: aperture-agent-apikey
+           key: apiKey
+         value: API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
@@ -163,7 +174,7 @@ Kubernetes Objects which will be created by following steps are listed
    </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
-   {`helm install agent aperture/aperture-agent -f values.yaml --namespacen aperture-agent --create-namespace`}
+   {`helm install agent aperture/aperture-agent -f values.yaml --namespace aperture-agent --create-namespace`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -201,15 +212,30 @@ Kubernetes Objects which will be created by following steps are listed
         name: Agent
       spec:
         config:
-          etcd:
-            endpoints: ["ETCD_ENDPOINT_HERE"]
-          prometheus:
-            address: "PROMETHEUS_ADDRESS_HERE"
+          fluxninja:
+            enable_cloud_controller: true
+            endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
+        secrets:
+          fluxNinjaExtension:
+            create: true
+            secretKeyRef:
+              name: aperture-agent-apikey
+              key: apiKey
+            value: API_KEY
       ```
 
-      Replace the values of `ETCD_ENDPOINT_HERE` and `PROMETHEUS_ADDRESS_HERE`
-      with the actual values of etcd and Prometheus, which is also being used by
-      the Aperture Controller you want these Agents to connect to.
+      Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
+      `API_KEY` with the API key linked to the project. If an API key has not
+      been created, generate a new one through the Aperture Cloud UI. Refer to
+      [API Keys][api-keys] for additional information.
+
+      :::note
+
+      If you are using a Self-Hosted Aperture Controller, modify the above
+      configuration as explained in [Self-Hosting: Agent
+      Configuration][self-hosting-agent].
+
+      :::
 
       All the configuration parameters for the Agent Custom Resource are listed
       on the
@@ -222,9 +248,8 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-5. Refer to steps on the
-   [Istio Configuration](/integrations/flow-control/envoy/istio.md) if you do
-   not have the
+5. Refer to steps on the [Istio Configuration](/integrations/istio/istio.md) if
+   you do not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
@@ -379,3 +404,6 @@ following these steps:
    ```bash
    kubectl delete crd agents.fluxninja.com
    ```
+
+[self-hosting-agent]: /self-hosting/agent.md#configuration
+[api-keys]: /get-started/aperture-cloud/api-keys.md

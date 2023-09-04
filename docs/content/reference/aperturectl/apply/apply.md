@@ -19,7 +19,9 @@ Use this command to apply the Aperture Policies.
 ### Options
 
 ```
-      --controller string      Address of Aperture controller
+      --api-key string         Aperture Cloud API Key to be used when using Cloud Controller
+      --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for apply
       --insecure               Allow connection to controller running without TLS

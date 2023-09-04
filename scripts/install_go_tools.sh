@@ -24,8 +24,10 @@ go mod download
 
 tools=$(grep _ tools.go | awk -F'"' '{print $2}')
 
-# use a parallel command to install go tools in parallel
-parallel -j8 --no-notice --bar --eta go install ::: "$tools"
+echo "$tools" | while IFS= read -r tool; do
+    go install "$tool"
+done
+
 
 popd >/dev/null
 

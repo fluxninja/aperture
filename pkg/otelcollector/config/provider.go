@@ -5,8 +5,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"go.opentelemetry.io/collector/confmap"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // comply with confmap.Provider interface.
@@ -95,7 +96,14 @@ func (p *Provider) setConfig(config *Config) {
 	p.config = config
 	if p.watchFunc != nil {
 		p.watchFunc(&confmap.ChangeEvent{})
+		// Prevent calling watchFunc another time before the next Retrieve
+		// (perhaps it's even illegal). We won't miss any update though, as
+		// explained below.
+		p.watchFunc = nil
 	}
+	// If watchFunc is nil, then:
+	// * either we have not any Retrieve yet, so there's no reason to notify, or
+	// * we already notified of the change, but didn't got Retrieve yet.
 }
 
 // AddMutatingHook adds a hook to be run before applying config.

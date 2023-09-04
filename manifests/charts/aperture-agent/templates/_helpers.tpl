@@ -58,6 +58,18 @@ Create the address of the Prometheus for Aperture Agent
 {{- end -}}
 
 {{/*
+Create the endpoint of the FluxNinja for Aperture Agent
+{{ include "agent.fluxninja.endpoint" ( dict "fluxninja" .Values.path.to.the.fluxninja "context" $.context $) }}
+*/}}
+{{- define "agent.fluxninja.endpoint" -}}
+{{- if .fluxninja.endpoint -}}
+    {{ print .fluxninja.endpoint }}
+{{- else -}}
+    {{- fail "Value for agent.config.fluxninja.endpoint cannot be empty when agent.config.fluxninja.enable_cloud_controller is set to true." -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Fetch the value of the API Key secret for Aperture Agent
 {{ include "agent.apiSecret.value" ( dict "agent" .Values.path.to.the.agent $) }}
 */}}
@@ -81,7 +93,7 @@ Fetch the Name of the API Key secret for Aperture Agent
 {{- if .agent.secrets.fluxNinjaExtension.secretKeyRef.name -}}
     {{ print .agent.secrets.fluxNinjaExtension.secretKeyRef.name }}
 {{- else -}}
-    {{ print "%s-agent-apikey" .context.Release.Name }}
+    {{ printf "%s-agent-apikey" .context.Release.Name }}
 {{- end -}}
 {{- end -}}
 

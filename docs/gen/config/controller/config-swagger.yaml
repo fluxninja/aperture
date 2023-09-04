@@ -208,12 +208,46 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
+    Config:
+        properties:
+            enabled:
+                default: false
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+            scopes:
+                items:
+                    type: string
+                type: array
+                x-go-name: Scopes
+                x-go-tag-json: scopes,omitempty
+        title: Config stores configuration for the Google Token Source.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/google/config
     ControllerOTelConfig:
         properties:
             batch_alerts:
                 $ref: '#/definitions/BatchAlertsConfig'
                 description: BatchAlerts configures batch alerts processor.
                 x-go-tag-json: batch_alerts
+            enable_high_cardinality_platform_metrics:
+                default: false
+                description: |-
+                    EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
+                    published to Prometheus. Filtered out metrics are:
+                    "grpc_server_handled_total.*"
+                    "grpc_server_handling_seconds.*"
+                    "grpc_server_handling_seconds_bucket.*"
+                    "grpc_server_handling_seconds_count.*"
+                    "grpc_server_handling_seconds_sum.*"
+                    "grpc_server_msg_received_total.*"
+                    "grpc_server_msg_sent_total.*"
+                    "grpc_server_started_total.*"
+                type: boolean
+                x-go-name: EnableHighCardinalityPlatformMetrics
+                x-go-tag-default: "false"
+                x-go-tag-json: enable_high_cardinality_platform_metrics
             ports:
                 $ref: '#/definitions/PortsConfig'
                 description: Ports configures debug, health and extension ports values.
@@ -232,11 +266,10 @@ definitions:
                 description: List of etcd server endpoints
                 items:
                     type: string
-                minItems: 1
                 type: array
                 x-go-name: Endpoints
-                x-go-tag-json: endpoints
-                x-go-tag-validate: required,gt=0,dive,hostname_port|url|fqdn
+                x-go-tag-json: endpoints,omitempty
+                x-go-tag-validate: omitempty,dive,hostname_port|url|fqdn,omitempty
             lease_ttl:
                 default: 60s
                 description: Lease time-to-live
@@ -246,6 +279,39 @@ definitions:
                 x-go-tag-default: 60s
                 x-go-tag-json: lease_ttl
                 x-go-tag-validate: gte=1s
+            log_level:
+                default: error
+                description: LogLevel of logs coming from inside the etcd client
+                enum:
+                    - debug
+                    - DEBUG
+                    - info
+                    - INFO
+                    - warn
+                    - WARN
+                    - error
+                    - ERROR
+                    - dpanic
+                    - DPANIC
+                    - panic
+                    - PANIC
+                    - fatal
+                    - FATAL
+                pattern: (^$)|(^$)
+                type: string
+                x-go-name: LogLevel
+                x-go-tag-default: error
+                x-go-tag-json: log_level,omitempty
+                x-go-tag-validate: omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR dpanic DPANIC panic PANIC fatal FATAL,omitempty
+                x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | dpanic | DPANIC | panic | PANIC | fatal | FATAL
+                x-pattern-rules: empty | empty
+            namespace:
+                default: aperture
+                description: etcd namespace
+                type: string
+                x-go-name: Namespace
+                x-go-tag-default: aperture
+                x-go-tag-json: namespace
             password:
                 type: string
                 x-go-name: Password
@@ -259,8 +325,6 @@ definitions:
                 type: string
                 x-go-name: Username
                 x-go-tag-json: username
-        required:
-            - endpoints
         title: EtcdConfig holds configuration for etcd client.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/etcd
@@ -746,12 +810,14 @@ definitions:
                     - tcp
                     - tcp4
                     - tcp6
+                pattern: (^$)|(^$)
                 type: string
                 x-go-name: Network
                 x-go-tag-default: tcp
-                x-go-tag-json: network
-                x-go-tag-validate: oneof=tcp tcp4 tcp6
+                x-go-tag-json: network,omitempty
+                x-go-tag-validate: omitempty,oneof=tcp tcp4 tcp6,omitempty
                 x-oneof: tcp | tcp4 | tcp6
+                x-pattern-rules: empty | empty
         title: ListenerConfig holds configuration for socket listeners.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/net/listener
@@ -777,12 +843,14 @@ definitions:
                     - TRACE
                     - disabled
                     - DISABLED
+                pattern: (^$)|(^$)
                 type: string
                 x-go-name: LogLevel
                 x-go-tag-default: info
-                x-go-tag-json: level
-                x-go-tag-validate: oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED
+                x-go-tag-json: level,omitempty
+                x-go-tag-validate: omitempty,oneof=debug DEBUG info INFO warn WARN error ERROR fatal FATAL panic PANIC trace TRACE disabled DISABLED,omitempty
                 x-oneof: debug | DEBUG | info | INFO | warn | WARN | error | ERROR | fatal | FATAL | panic | PANIC | trace | TRACE | disabled | DISABLED
+                x-pattern-rules: empty | empty
             non_blocking:
                 default: true
                 description: Use non-blocking log writer (can lose logs at high throughput)
@@ -995,15 +1063,35 @@ definitions:
         properties:
             address:
                 description: Address of the Prometheus server
-                pattern: ((^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$)
+                pattern: ((((^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$))|(^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$))|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$))|(^$)
                 type: string
                 x-go-name: Address
-                x-go-tag-json: address
-                x-go-tag-validate: required,hostname_port|url|fqdn
-                x-pattern-rules: hostname_port | url | fqdn
-        required:
-            - address
+                x-go-tag-json: address,omitempty
+                x-go-tag-validate: omitempty,hostname_port|url|fqdn,omitempty
+                x-pattern-rules: empty | hostname_port | url | fqdn | empty
+            labels:
+                description: A list of labels to be attached to every query
+                items:
+                    $ref: '#/definitions/PrometheusLabel'
+                type: array
+                x-go-name: Labels
+                x-go-tag-json: labels,omitempty
         title: PrometheusConfig holds configuration for Prometheus Server.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config
+    PrometheusLabel:
+        description: |-
+            PrometheusLabel holds Name->Value mapping for the label that will
+            be attached to every PromQL query executed by the controller.
+        properties:
+            name:
+                type: string
+                x-go-name: Name
+                x-go-tag-json: name
+            value:
+                type: string
+                x-go-name: Value
+                x-go-tag-json: value
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/prometheus/config
     ProxyConfig:

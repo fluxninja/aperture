@@ -7,7 +7,6 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
-	"github.com/moby/locker"
 
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -23,14 +22,13 @@ const (
 
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
-	mu             sync.RWMutex
-	locker         locker.Locker
 	dMap           olric.DMap
 	dc             *distcache.DistCache
 	name           string
 	bucketCapacity float64
 	fillAmount     float64
 	interval       time.Duration
+	mu             sync.RWMutex
 	continuousFill bool
 	passThrough    bool
 }
@@ -115,18 +113,19 @@ func (gtb *GlobalTokenBucket) Close() error {
 }
 
 // TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
-// If an error occurred it returns true, 0 and 0 (fail open).
-func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, float64, float64) {
+// If an error occurred it returns true, 0, 0 and 0 (fail open).
+// It also may return the wait time at which the tokens will be available.
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
-		return true, 0, 0
+		return true, 0, 0, 0
 	}
 
 	if gtb.GetBucketCapacity() == 0 {
-		return false, 0, 0
+		return false, 0, 0, 0
 	}
 
 	if isMarginExceeded(ctx) {
-		return false, 0, 0
+		return false, 0, 0, 0
 	}
 
 	req := takeNRequest{
@@ -137,13 +136,13 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 	reqBytes, err := utils.MarshalGob(req)
 	if err != nil {
 		log.Autosample().Errorf("error encoding request: %v", err)
-		return true, 0, 0
+		return true, 0, 0, 0
 	}
 
 	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
 		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
-		return true, 0, 0
+		return true, 0, 0, 0
 	}
 
 	var resp takeNResponse
@@ -151,10 +150,18 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 	err = utils.UnmarshalGob(resultBytes, &resp)
 	if err != nil {
 		log.Autosample().Errorf("error decoding response: %v", err)
-		return true, 0, 0
+		return true, 0, 0, 0
 	}
 
-	return resp.Ok, resp.Remaining, resp.Current
+	var waitTime time.Duration
+	if !resp.AvailableAt.IsZero() {
+		waitTime = time.Until(resp.AvailableAt)
+		if waitTime < 0 {
+			waitTime = 0
+		}
+	}
+
+	return resp.Ok, waitTime, resp.Remaining, resp.Current
 }
 
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
@@ -217,7 +224,7 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 
 // Return returns n tokens to the bucket.
 func (gtb *GlobalTokenBucket) Return(ctx context.Context, label string, n float64) (float64, float64) {
-	_, remaining, current := gtb.TakeIfAvailable(ctx, label, -n)
+	_, _, remaining, current := gtb.TakeIfAvailable(ctx, label, -n)
 	return remaining, current
 }
 
@@ -244,14 +251,6 @@ type takeNResponse struct {
 func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
 	gtb.mu.RLock()
 	defer gtb.mu.RUnlock()
-
-	gtb.locker.Lock(key)
-	defer func() {
-		err := gtb.locker.Unlock(key)
-		if err != nil {
-			log.Error().Err(err).Str("key", key).Msg("error unlocking key")
-		}
-	}()
 
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()

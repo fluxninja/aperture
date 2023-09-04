@@ -38,6 +38,7 @@ aperturectl install istioconfig --values-file=values.yaml --namespace=istio-syst
 ### Options inherited from parent commands
 
 ```
+      --dry-run              If set to true, only the manifests will be generated and no installation will be performed
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace in which the component will be installed. Defaults to 'default' namespace (default "default")
       --values-file string   Values YAML file containing parameters to customize the installation

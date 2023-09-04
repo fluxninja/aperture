@@ -1,17 +1,17 @@
 {
   new():: {
   },
-  withFairnessKey(fairness_key):: {
-    fairness_key: fairness_key,
-  },
-  withFairnessKeyMixin(fairness_key):: {
-    fairness_key+: fairness_key,
-  },
   withPriority(priority):: {
     priority: priority,
   },
   withPriorityMixin(priority):: {
     priority+: priority,
+  },
+  withQueueTimeout(queue_timeout):: {
+    queue_timeout: queue_timeout,
+  },
+  withQueueTimeoutMixin(queue_timeout):: {
+    queue_timeout+: queue_timeout,
   },
   withTokens(tokens):: {
     tokens: tokens,

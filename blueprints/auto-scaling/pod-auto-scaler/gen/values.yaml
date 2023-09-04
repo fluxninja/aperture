@@ -1,0 +1,14 @@
+# Generated values file for auto-scaling/pod-auto-scaler blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Scaling backend for the policy.
+  # Type: aperture.spec.v1.AutoScalerScalingBackend
+  # Required: True
+  scaling_backend:
+    kubernetes_replicas: __REQUIRED_FIELD__

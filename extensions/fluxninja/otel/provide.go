@@ -32,6 +32,13 @@ const (
 	processorResourceAttributes = "transform/fluxninja"
 
 	exporterFluxNinja = "otlp/fluxninja"
+
+	scrapeInterval = "10s"
+	// BatchTimeout needs to be less than `scrapeInterval` no there is only
+	// one data point for given metrics in each batch.
+	batchTimeout     = 5 * time.Second
+	sendBatchSize    = 10000
+	sendBatchSizeMax = 10000
 )
 
 // Module provides the OTel configuration for FluxNinja.
@@ -78,15 +85,29 @@ func injectOtelConfig(
 			if alertsPipeline, exists := config.Service.Pipeline("logs/alerts"); exists {
 				addFNToPipeline("logs/alerts", config, alertsPipeline)
 			}
+
+			disableLocalPipelines := extensionConfig.EnableCloudController || extensionConfig.DisableLocalOTelPipeline
+
 			if _, exists := config.Service.Pipeline("metrics/fast"); exists {
 				addMetricsSlowPipeline(config)
+				if disableLocalPipelines {
+					deleteLocalMetricsPipeline(config, "metrics/fast")
+				}
 			}
 			if _, exists := config.Service.Pipeline("metrics/controller-fast"); exists {
 				addMetricsControllerSlowPipeline(config)
+				if disableLocalPipelines {
+					deleteLocalMetricsPipeline(config, "metrics/controller-fast")
+				}
 			}
 			for pipelineName, customMetricsPipeline := range config.Service.Pipelines {
 				if !strings.HasPrefix(pipelineName, "metrics/user-defined-") {
 					continue
+				}
+				if disableLocalPipelines {
+					// In case of user defined pipelines, we clean-up list of exporters
+					// and then depend on `addFNToPipeline' to add its own exporter.
+					customMetricsPipeline.Exporters = []string{}
 				}
 				addFNToPipeline(pipelineName, config, customMetricsPipeline)
 			}
@@ -136,7 +157,7 @@ func addFNToPipeline(
 func addMetricsSlowPipeline(config *otelconfig.Config) {
 	log.Info().Msg("Adding metrics/slow pipeline")
 	addFluxNinjaPrometheusReceiver(config)
-	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
+	config.AddBatchProcessor(processorBatchMetricsSlow, batchTimeout, sendBatchSize, sendBatchSizeMax)
 	config.Service.AddPipeline("metrics/slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
@@ -150,7 +171,7 @@ func addMetricsSlowPipeline(config *otelconfig.Config) {
 func addMetricsControllerSlowPipeline(config *otelconfig.Config) {
 	log.Info().Msg("Adding metrics/controller-slow pipeline")
 	addFluxNinjaPrometheusReceiver(config)
-	config.AddBatchProcessor(processorBatchMetricsSlow, 5*time.Second, 10000, 10000)
+	config.AddBatchProcessor(processorBatchMetricsSlow, batchTimeout, sendBatchSize, sendBatchSizeMax)
 	config.Service.AddPipeline("metrics/controller-slow", otelconfig.Pipeline{
 		Receivers: []string{receiverPrometheus},
 		Processors: []string{
@@ -171,7 +192,7 @@ func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
 	configPatch := map[string]any{
 		"config": map[string]any{
 			"global": map[string]any{
-				"scrape_interval": "10s",
+				"scrape_interval": scrapeInterval,
 			},
 		},
 	}
@@ -181,6 +202,11 @@ func addFluxNinjaPrometheusReceiver(config *otelconfig.Config) {
 		log.Fatal().Err(err).Msg("failed to merge configs")
 	}
 	config.AddReceiver(receiverPrometheus, duplicatedReceiverConfig)
+}
+
+func deleteLocalMetricsPipeline(config *otelconfig.Config, pipeline string) {
+	log.Info().Msg("Cleaning up local prometheus pipeline")
+	config.Service.DeletePipeline(pipeline)
 }
 
 func duplicateMap(in map[string]any) (map[string]any, error) {

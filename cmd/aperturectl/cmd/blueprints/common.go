@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -13,15 +14,9 @@ import (
 
 func createValuesFile(blueprintName string, valuesFile string, dynamicConfig bool) error {
 	valFileName := valuesFileName
-	if onlyRequired {
-		valFileName = requiredValuesFileName
-	}
 
 	if dynamicConfig {
 		valFileName = dynamicConfigValuesFileName
-		if onlyRequired {
-			valFileName = requiredDynamicConfigValuesFileName
-		}
 	}
 
 	blueprintDir := filepath.Join(blueprintsDir, blueprintName)
@@ -54,7 +49,7 @@ func createValuesFile(blueprintName string, valuesFile string, dynamicConfig boo
 			fmt.Printf("File %s already exists. Overwrite? [y/N] ", valuesFile)
 			var response string
 			fmt.Scanln(&response)
-			if response != "y" {
+			if strings.ToLower(response) != "y" {
 				return nil
 			}
 		}

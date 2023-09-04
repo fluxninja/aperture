@@ -111,13 +111,12 @@ func (in *ClientConfigSpec) DeepCopy() *ClientConfigSpec {
 func (in *CommonConfigSpec) DeepCopyInto(out *CommonConfigSpec) {
 	*out = *in
 	in.Client.DeepCopyInto(&out.Client)
-	in.Etcd.DeepCopyInto(&out.Etcd)
 	in.Liveness.DeepCopyInto(&out.Liveness)
 	in.Readiness.DeepCopyInto(&out.Readiness)
 	in.Log.DeepCopyInto(&out.Log)
 	out.Metrics = in.Metrics
 	out.Profilers = in.Profilers
-	out.Prometheus = in.Prometheus
+	in.TokenSource.DeepCopyInto(&out.TokenSource)
 	in.Server.DeepCopyInto(&out.Server)
 	in.Watchdog.DeepCopyInto(&out.Watchdog)
 	in.Alertmanagers.DeepCopyInto(&out.Alertmanagers)

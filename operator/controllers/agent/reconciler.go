@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"os"
 	"path"
 	"reflect"
 	"strings"
@@ -343,6 +344,14 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 			if err := r.Delete(ctx, secret); err != nil && !errors.IsNotFound(err) {
 				log.Error(err, fmt.Sprintf("failed to delete object of Secret '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
+
+			if slices.Contains(instance.Spec.Sidecar.EnableNamespaceByDefault, ns.GetName()) {
+				delete(ns.Labels, controllers.SidecarLabelKey)
+				ns := ns
+				if err := controllers.UpdateResource(r.Client, ctx, &ns); err != nil {
+					log.Error(err, fmt.Sprintf("failed to delete aperture label from namespace %s", ns.GetName()))
+				}
+			}
 		}
 	}
 }
@@ -400,37 +409,29 @@ func (r *AgentReconciler) updateAgent(ctx context.Context, instance *agentv1alph
 
 // checkDefaults checks and sets defaults when the Defaulter webhook is not triggered.
 func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
-	if err != nil {
+	updateStatus := func(instance *agentv1alpha1.Agent, reason, message string) error {
 		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToFetch", "Failed to fetch Resource. Error: '%s'", err.Error())
+		r.Recorder.Eventf(instance, corev1.EventTypeWarning, reason, message)
 		errUpdate := r.updateStatus(ctx, instance)
 		if errUpdate != nil {
 			return errUpdate
 		}
 		return nil
+	}
+
+	resource, err := r.DynamicClient.Resource(api.GroupVersion.WithResource("agents")).Namespace(instance.GetNamespace()).Get(ctx, instance.GetName(), v1.GetOptions{})
+	if err != nil {
+		return updateStatus(instance, "FailedToFetch", fmt.Sprintf("Failed to fetch Resource. Error: '%s'", err.Error()))
 	}
 
 	resourceBytes, err := resource.MarshalJSON()
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "FailedToMarshal", "Failed to marshal Resource. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "FailedToMarshal", fmt.Sprintf("Failed to marshal Resource. Error: '%s'", err.Error()))
 	}
 
 	err = config.UnmarshalYAML(resourceBytes, instance)
 	if err != nil {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "Failed to set defaults. Error: '%s'", err.Error())
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
-		}
-		return nil
+		return updateStatus(instance, "ValidationFailed", fmt.Sprintf("Failed to set defaults. Error: '%s'", err.Error()))
 	}
 
 	if instance.Spec.Sidecar.Enabled {
@@ -439,14 +440,24 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
 	}
 
-	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
-		instance.Status.Resources = controllers.FailedStatus
-		r.Recorder.Eventf(instance, corev1.EventTypeWarning, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
-		errUpdate := r.updateStatus(ctx, instance)
-		if errUpdate != nil {
-			return errUpdate
+	if !instance.Spec.ConfigSpec.FluxNinja.EnableCloudController {
+		if len(instance.Spec.ConfigSpec.Etcd.Endpoints) == 0 {
+			return updateStatus(instance, "ValidationFailed", "At least one etcd endpoint must be provided under spec.config.etcd.endpoints.")
 		}
-		return nil
+
+		if instance.Spec.ConfigSpec.Prometheus.Address == "" {
+			return updateStatus(instance, "ValidationFailed", "The address for Prometheus must be provided under spec.config.prometheus.address.")
+		}
+	} else if instance.Spec.ConfigSpec.FluxNinja.Endpoint == "" {
+		return updateStatus(instance, "ValidationFailed", "The endpoint for Flux Ninja must be provided under spec.config.fluxNinja.endpoint.")
+	}
+
+	if instance.Spec.Secrets.FluxNinjaExtension.Create && instance.Spec.Secrets.FluxNinjaExtension.Value == "" {
+		return updateStatus(instance, "ValidationFailed", "The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
+	}
+
+	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
+		return updateStatus(instance, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
 	}
 
 	if instance.Status.Resources == controllers.FailedStatus {
@@ -755,17 +766,29 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		return nil
 	}
 
-	nsList := &corev1.NamespaceList{}
-	err := r.List(ctx, nsList)
-	if err != nil {
-		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
-	}
-
 	var createControllerClientCm bool
 	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
 		createControllerClientCm = true
+	}
+
+	if createControllerClientCm {
+		if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
+			instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
+		}
+		instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
+	}
+
+	if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
+		instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
+		instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
+	}
+
+	nsList := &corev1.NamespaceList{}
+	err := r.List(ctx, nsList)
+	if err != nil {
+		return fmt.Errorf("failed to list Namespaces. Error: %+v", err)
 	}
 
 	for index := range nsList.Items {
@@ -789,24 +812,16 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 		}
 
 		if createControllerClientCm {
-			if instance.Spec.ControllerClientCertConfig.ClientCertKeyName == "" {
-				instance.Spec.ControllerClientCertConfig.ClientCertKeyName = controllers.ControllerClientCertKey
-			}
 			configMap := CreateAgentControllerClientCertConfigMapInNamespace(ctx, r.Client, instance, ns.GetName())
 			if configMap != nil {
 				configMap.Namespace = ns.GetName()
 				configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
-				instance.Spec.ControllerClientCertConfig.ConfigMapName = controllers.AgentControllerClientCertCMName
 				if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 					return err
 				}
 			}
 		}
 
-		if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
-			instance.Spec.ControllerClientCertConfig.ConfigMapName != "" {
-			instance.Spec.ConfigSpec.AgentFunctions.ClientConfig.GRPCClient.ClientTLSConfig.CAFile = path.Join(controllers.AgentControllerClientCertPath, instance.Spec.ControllerClientCertConfig.ClientCertKeyName)
-		}
 		configMap := CreateAgentConfigMapInNamespace(ctx, r.Client, instance.DeepCopy(), ns.GetName())
 		if _, err = CreateConfigMapForAgent(r.Client, r.Recorder, configMap, ctx, instance); err != nil {
 			return err
@@ -830,6 +845,34 @@ func (r *AgentReconciler) reconcileNamespacedResources(ctx context.Context, log 
 	}
 
 	return nil
+}
+
+// RemoveFinalizerFromAgentCR removes the finalizer from the Agent CR when the operator is getting deleted.
+func (r *AgentReconciler) RemoveFinalizerFromAgentCR(ctx context.Context, setupLog logr.Logger) {
+	agentList := &agentv1alpha1.AgentList{}
+	err := r.Client.List(ctx, agentList)
+	if err != nil {
+		setupLog.Error(err, "Error while getting the agent")
+		return
+	}
+	if agentList.Items != nil && len(agentList.Items) != 0 {
+		for _, agentCR := range agentList.Items {
+			agentCR := agentCR
+			if controllerutil.ContainsFinalizer(&agentCR, controllers.FinalizerName) {
+				setupLog.Info(fmt.Sprintf("Operator is getting deleted. Removing finalizer from the Agent CR named %s.", agentCR.Name))
+				controllerutil.RemoveFinalizer(&agentCR, controllers.FinalizerName)
+				if err = r.updateAgent(ctx, &agentCR); err != nil && !errors.IsNotFound(err) {
+					if errors.IsUnauthorized(err) {
+						setupLog.Error(err, fmt.Sprintf("Unauthorized to remove Finalizer from the agent CR named %s, serviceaccount might be deleted.", agentCR.Name))
+						return
+					} else {
+						setupLog.Error(err, fmt.Sprintf("Error while removing Finalizer from the agent CR named %s.", agentCR.Name))
+						return
+					}
+				}
+			}
+		}
+	}
 }
 
 // eventFilters sets up a Predicate filter for the received events.
@@ -867,13 +910,17 @@ func eventFiltersForAgent() predicate.Predicate {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *AgentReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
+	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.Agent{}).
-		Owns(&appsv1.DaemonSet{}).
 		Owns(&corev1.ConfigMap{}).
-		Owns(&corev1.Service{}).
 		Owns(&corev1.Secret{}).
 		Owns(&corev1.ServiceAccount{}).
-		WithEventFilter(eventFiltersForAgent()).
-		Complete(r)
+		WithEventFilter(eventFiltersForAgent())
+
+	sidecarModeEnabled, ok := os.LookupEnv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+	if sidecarModeEnabled != "true" || !ok {
+		builder = builder.Owns(&appsv1.DaemonSet{}).
+			Owns(&corev1.Service{})
+	}
+	return builder.Complete(r)
 }

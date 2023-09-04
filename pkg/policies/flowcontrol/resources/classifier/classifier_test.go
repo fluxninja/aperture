@@ -11,10 +11,12 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 
 	flowlabel "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/label"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	. "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier/compiler"
 )
@@ -143,7 +145,7 @@ var _ = Describe("Classifier", func() {
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
-				map[string]string{"version": "one", "other": "tag"},
+				labels.PlainMap{"version": "one", "other": "tag"},
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": int64(21),
@@ -160,7 +162,7 @@ var _ = Describe("Classifier", func() {
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"egress",
-				map[string]string{"version": "one"},
+				labels.PlainMap{"version": "one"},
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": int64(21),
@@ -174,7 +176,7 @@ var _ = Describe("Classifier", func() {
 				context.TODO(),
 				[]string{"my-service.default.svc.cluster.local"},
 				"ingress",
-				map[string]string{"version": "two"},
+				labels.PlainMap{"version": "two"},
 				attributesWithHeaders(object{
 					"foo": "hello",
 					"bar": int64(21),
@@ -193,7 +195,7 @@ var _ = Describe("Classifier", func() {
 					context.TODO(),
 					[]string{"my-service.default.svc.cluster.local"},
 					"ingress",
-					map[string]string{"version": "one"},
+					labels.PlainMap{"version": "one"},
 					attributesWithHeaders(object{
 						"foo": "hello",
 						"bar": int64(21),
@@ -462,8 +464,8 @@ func fl(s string) flowlabel.FlowLabelValue {
 	}
 }
 
-func attributesWithHeaders(headers object) ast.Value {
-	input := object{
+func attributesWithHeaders(headers object) classifier.Input {
+	return newTestInput(object{
 		"attributes": object{
 			"request": object{
 				"http": object{
@@ -471,8 +473,7 @@ func attributesWithHeaders(headers object) ast.Value {
 				},
 			},
 		},
-	}
-	return ast.MustInterfaceToValue(input)
+	})
 }
 
 func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
@@ -484,3 +485,18 @@ func headerExtractor(headerName string) *policylangv1.Rule_Extractor {
 		},
 	}
 }
+
+type testInput struct {
+	iface interface{}
+	value ast.Value
+}
+
+func newTestInput(input interface{}) classifier.Input {
+	return testInput{
+		iface: input,
+		value: ast.MustInterfaceToValue(input),
+	}
+}
+
+func (i testInput) Value() ast.Value       { return i.value }
+func (i testInput) Interface() interface{} { return i.iface }

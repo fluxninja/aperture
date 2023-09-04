@@ -56,6 +56,8 @@ func (in *Agent) DeepCopyObject() runtime.Object {
 func (in *AgentConfigSpec) DeepCopyInto(out *AgentConfigSpec) {
 	*out = *in
 	in.CommonConfigSpec.DeepCopyInto(&out.CommonConfigSpec)
+	in.Etcd.DeepCopyInto(&out.Etcd)
+	in.Prometheus.DeepCopyInto(&out.Prometheus)
 	out.AgentInfo = in.AgentInfo
 	out.DistCache = in.DistCache
 	in.KubernetesClient.DeepCopyInto(&out.KubernetesClient)

@@ -63,6 +63,10 @@ type ServerConstructor struct {
 	ConfigKey string
 	// Additional server Options
 	ServerOptions []grpc.ServerOption
+	// UnaryServerInterceptors add after all built-in unary interceptors
+	UnaryServerInterceptors []grpc.UnaryServerInterceptor
+	// StreamServerInterceptors add after all built-in stream interceptors
+	StreamServerInterceptors []grpc.StreamServerInterceptor
 	// Default Server Config
 	DefaultConfig GRPCServerConfig
 }
@@ -80,6 +84,8 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 				fx.ParamTags(
 					config.NameTag(constructor.ListenerName),
 					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name)+` optional:"true"`,
 				),
 				fx.ResultTags(
 					config.NameTag(constructor.Name),
@@ -93,6 +99,8 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 func (constructor ServerConstructor) provideServer(
 	listener *listener.Listener,
 	additionalOptions []grpc.ServerOption,
+	additionalUnaryInterceptors []grpc.UnaryServerInterceptor,
+	additionalStreamInterceptors []grpc.StreamServerInterceptor,
 	unmarshaller config.Unmarshaller,
 	lifecycle fx.Lifecycle,
 	shutdowner fx.Shutdowner,
@@ -118,12 +126,16 @@ func (constructor ServerConstructor) provideServer(
 		otelgrpc.UnaryServerInterceptor(),
 		validatorUnaryInterceptor(),
 	}
+	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
+	unaryServerInterceptors = append(unaryServerInterceptors, additionalUnaryInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(unaryServerInterceptors...))
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		grpcServerMetrics.StreamServerInterceptor(),
 		otelgrpc.StreamServerInterceptor(),
 	}
+	streamServerInterceptors = append(streamServerInterceptors, constructor.StreamServerInterceptors...)
+	streamServerInterceptors = append(streamServerInterceptors, additionalStreamInterceptors...)
 	serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(streamServerInterceptors...))
 
 	// add additionalOptions

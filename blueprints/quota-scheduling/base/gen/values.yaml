@@ -1,0 +1,30 @@
+# Generated values file for quota-scheduling/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  quota_scheduler:
+    # Bucket capacity.
+    # Type: float64
+    # Required: True
+    bucket_capacity: __REQUIRED_FIELD__
+    # Fill amount.
+    # Type: float64
+    # Required: True
+    fill_amount: __REQUIRED_FIELD__
+    # Rate Limiter Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    # Required: True
+    rate_limiter:
+      interval: __REQUIRED_FIELD__
+      label_key: ""
+    # Flow selectors to match requests against
+    # Type: []aperture.spec.v1.Selector
+    # Required: True
+    selectors:
+      - control_point: __REQUIRED_FIELD__
+        service: __REQUIRED_FIELD__

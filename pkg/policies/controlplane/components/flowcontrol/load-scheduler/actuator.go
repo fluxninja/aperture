@@ -6,6 +6,7 @@ import (
 	"math"
 	"path"
 
+	prometheusmodel "github.com/prometheus/common/model"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
@@ -23,7 +24,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
-	prometheusmodel "github.com/prometheus/common/model"
 )
 
 // Actuator struct.
@@ -97,7 +97,7 @@ func NewActuatorAndOptions(
 				metrics.WorkloadIndexLabel,
 				metrics.WorkloadLatencyCountMetricName,
 				policyParams),
-			10*policyReadAPI.GetEvaluationInterval(),
+			5*policyReadAPI.GetEvaluationInterval(),
 			runtime.NewComponentID(loadSchedulerComponentID),
 			policyReadAPI,
 			"Tokens",
@@ -114,18 +114,18 @@ func NewActuatorAndOptions(
 	return lsa, fx.Options(options...), nil
 }
 
-func (la *Actuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+func (la *Actuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			la.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
+			la.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			la.decisionWriter.Close()
 			for _, etcdPath := range la.etcdPaths {
-				_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
+				_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
 				if err != nil {
 					logger.Error().Err(err).Msg("Failed to delete load decisions")
 					merr = multierr.Append(merr, err)
@@ -150,7 +150,6 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 	}
 
 	tokensByWorkload := make(map[string]uint64)
-
 	if la.tokensQuery != nil {
 		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(tickInfo)
 		if err != nil {
@@ -184,7 +183,6 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 
 	var lm float64
 	var pt bool
-
 	lmValue := inPortReadings.ReadSingleReadingPort("load_multiplier")
 	if !lmValue.Valid() {
 		pt = true

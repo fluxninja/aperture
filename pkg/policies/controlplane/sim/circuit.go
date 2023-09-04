@@ -65,11 +65,7 @@ func NewCircuitFromYaml(
 
 	policyMeta := newSimPolicyMeta(circuitProto.EvaluationInterval.AsDuration())
 
-	tree, err := circuitfactory.RootTree(&circuitProto)
-	if err != nil {
-		return nil, err
-	}
-	components, _, err := tree.CreateComponents(circuitProto.Components, runtime.NewComponentID(runtime.RootComponentID), policyMeta)
+	_, components, _, err := circuitfactory.CreateComponents(circuitProto.Components, runtime.NewComponentID(runtime.RootComponentID), policyMeta)
 	if err != nil {
 		return nil, err
 	}

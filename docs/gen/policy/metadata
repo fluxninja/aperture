@@ -1,7 +1,7 @@
 ---
 title: Policy Language Specification
-sidebar_position: 2
-sidebar_label: Specification
+sidebar_position: 3
+sidebar_label: Policy Specification
 ---
 <!-- markdownlint-disable -->
 <!-- vale off -->
@@ -12,6 +12,6 @@ sidebar_label: Specification
 
 <!-- vale on -->
 
-Reference for all objects used in [the Policy language](/concepts/policy/policy.md).
+Reference for all objects used in [the Policy language](/concepts/advanced/policy.md).
 
 The top-level object representing a policy is [Policy](#policy).

@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=../../../../blueprints/policies/service-protection/average-latency/gen/definitions.json
-# Generated values file for policies/service-protection/average-latency blueprint.
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/average-latency/gen/definitions.json
+# Generated values file for load-scheduling/average-latency blueprint.
 policy:
   # Name of the policy.
   # Type: string
@@ -12,9 +12,11 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - control_point: egress
+          - agent_group: default
+            control_point: egress
             service: service1-demo-app.demoapp.svc.cluster.local
-          - control_point: egress
+          - agent_group: default
+            control_point: egress
             service: service2-demo-app.demoapp.svc.cluster.local
         scheduler:
           workloads:
@@ -29,7 +31,8 @@ policy:
                           label: aperture.destination_fqdns
                           regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
-                priority: 200
+                priority: 200.0
+              name: "service1"
             - label_matcher:
                 expression:
                   all:
@@ -41,12 +44,15 @@ policy:
                           label: aperture.destination_fqdns
                           regex: service3-demo-app.demoapp.svc.cluster.local
               parameters:
-                priority: 50
+                priority: 50.0
+              name: "service2"
   latency_baseliner:
+    latency_tolerance_multiplier: 1.1
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
     # Required: True
     flux_meter:
       selectors:
-        - control_point: ingress
+        - agent_group: default
+          control_point: ingress
           service: service3-demo-app.demoapp.svc.cluster.local

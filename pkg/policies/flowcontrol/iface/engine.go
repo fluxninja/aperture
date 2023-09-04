@@ -5,13 +5,14 @@ import (
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 )
 
 //go:generate mockgen -source=engine.go -destination=../../mocks/mock_engine.go -package=mocks
 
 // RequestContext provides the request parameters for the Check method.
 type RequestContext struct {
-	FlowLabels   map[string]string
+	FlowLabels   labels.Labels
 	ControlPoint string
 	Services     []string
 }
@@ -37,9 +38,9 @@ type Engine interface {
 	UnregisterRateLimiter(l RateLimiter) error
 	GetRateLimiter(limiterID LimiterID) RateLimiter
 
-	RegisterRegulator(l Limiter) error
-	UnregisterRegulator(l Limiter) error
-	GetRegulator(limiterID LimiterID) Limiter
+	RegisterSampler(l Limiter) error
+	UnregisterSampler(l Limiter) error
+	GetSampler(limiterID LimiterID) Limiter
 
 	RegisterLabelPreview(l LabelPreview) error
 	UnregisterLabelPreview(l LabelPreview) error

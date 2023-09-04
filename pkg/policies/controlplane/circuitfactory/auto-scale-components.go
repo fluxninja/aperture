@@ -4,11 +4,8 @@ import (
 	"fmt"
 
 	"go.uber.org/fx"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -41,12 +38,12 @@ func newAutoScaleNestedAndOptions(
 		}
 		options = append(options, podScalerOptions)
 
-		nestedCircuit, err := podscaler.ParsePodScaler(podScalerProto, componentID, policyReadAPI)
+		configuredComponent, nestedCircuit, err := podscaler.ParsePodScaler(podScalerProto, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
 
-		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
@@ -54,20 +51,12 @@ func newAutoScaleNestedAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if autoScaler := autoScaleComponentProto.GetAutoScaler(); autoScaler != nil {
-		nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, policyReadAPI)
+		configuredComponent, nestedCircuit, err := autoscale.ParseAutoScaler(autoScaler, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}
 
-		return ParseNestedCircuit(componentID, nestedCircuit, policyReadAPI)
-	} else if private := autoScaleComponentProto.GetPrivate(); private != nil {
-		switch private.TypeUrl {
-		case "type.googleapis.com/aperture.policy.private.v1.PodScaleActuator":
-			podScaleActuator := &policyprivatev1.PodScaleActuator{}
-			if err := anypb.UnmarshalTo(private, podScaleActuator, proto.UnmarshalOptions{}); err != nil {
-				return retErr(err)
-			}
-		}
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 	}
 
 	return retErr(fmt.Errorf("unsupported/missing component type, proto: %+v", autoScaleComponentProto))

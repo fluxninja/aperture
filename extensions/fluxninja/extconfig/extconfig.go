@@ -2,11 +2,15 @@
 package extconfig
 
 import (
+	"context"
+
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
+	"github.com/fluxninja/aperture/v2/pkg/prometheus"
 )
 
 const (
@@ -14,20 +18,34 @@ const (
 	ExtensionConfigKey = "fluxninja"
 )
 
-// FluxNinjaExtensionConfig is the configuration for FluxNinja ARC integration.
+// FluxNinjaExtensionConfig is the configuration for [FluxNinja integration](/reference/fluxninja.md).
 // swagger:model
 // +kubebuilder:object:generate=true
 type FluxNinjaExtensionConfig struct {
-	// Interval between each heartbeat.
-	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
-	// Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`.
+	// Address to gRPC or HTTP(s) server listening in agent service.
+	// For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
+	// For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	APIKey string `json:"api_key"`
-	// Client configuration.
-	ClientConfig ClientConfig `json:"client"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
+	// Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
+	//
+	// Enabling this flag configures various agent components to point to the
+	// Aperture Cloud Controller, for example configures remote etcd endpoint and disables
+	// local Prometheus OTel pipelines.
+	//
+	// Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
+	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
+	// Interval between each heartbeat.
+	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
+	// Client configuration.
+	ClientConfig ClientConfig `json:"client"`
+	// Disables local Prometheus OTel pipelines for metrics. Implied by EnableCloudController.
+	DisableLocalOTelPipeline bool `json:"disable_local_otel_pipeline" default:"false"`
+	// Overrides Controller ID for Aperture Controller. If not set, random id will be generated and persisted in etcd.
+	ControllerID string `json:"controller_id,omitempty"`
 }
 
 // ClientConfig is the client configuration.
@@ -44,6 +62,8 @@ type ClientConfig struct {
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(provideConfig),
+		fx.Provide(provideEtcdConfigOverride),
+		fx.Provide(providePrometheusConfigOverride),
 	)
 }
 
@@ -54,4 +74,45 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 		return nil, err
 	}
 	return &extensionConfig, nil
+}
+
+func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
+	if extensionConfig.EnableCloudController {
+		return &etcdclient.ConfigOverride{
+			Namespace: "",
+			Endpoints: []string{extensionConfig.Endpoint},
+			PerRPCCredentials: perRPCHeaders{
+				headers: map[string]string{
+					"apiKey": extensionConfig.APIKey,
+				},
+			},
+			OverriderName: "fluxninja extension",
+		}
+	} else {
+		return nil
+	}
+}
+
+func providePrometheusConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *prometheus.ConfigOverride {
+	if extensionConfig.EnableCloudController {
+		return &prometheus.ConfigOverride{
+			SkipClientCreation: true,
+		}
+	} else {
+		return nil
+	}
+}
+
+type perRPCHeaders struct {
+	headers map[string]string
+}
+
+// GetRequestMetadata returns the request headers to be used with the RPC.
+func (p perRPCHeaders) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return p.headers, nil
+}
+
+// RequireTransportSecurity always returns true for this implementation.
+func (p perRPCHeaders) RequireTransportSecurity() bool {
+	return true
 }

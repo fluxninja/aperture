@@ -7,9 +7,11 @@ package mocks
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	labels "github.com/fluxninja/aperture/v2/pkg/labels"
 	iface "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"
 	prometheus "github.com/prometheus/client_golang/prometheus"
@@ -39,17 +41,17 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockLimiter) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 
 // Decide indicates an expected call of Decide.
-func (mr *MockLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+func (mr *MockLimiterMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockLimiter)(nil).Decide), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockLimiter)(nil).Decide), arg0, arg1)
 }
 
 // GetLimiterID mocks base method.
@@ -109,15 +111,15 @@ func (mr *MockLimiterMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockLimiter) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockLimiter) Revert(arg0 context.Context, arg1 labels.Labels, arg2 *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", ctx, labels, decision)
+	m.ctrl.Call(m, "Revert", arg0, arg1, arg2)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockLimiterMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
+func (mr *MockLimiterMockRecorder) Revert(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLimiter)(nil).Revert), ctx, labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockLimiter)(nil).Revert), arg0, arg1, arg2)
 }
 
 // MockRateLimiter is a mock of RateLimiter interface.
@@ -144,17 +146,17 @@ func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockRateLimiter) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockRateLimiter) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 
 // Decide indicates an expected call of Decide.
-func (mr *MockRateLimiterMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+func (mr *MockRateLimiterMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockRateLimiter)(nil).Decide), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockRateLimiter)(nil).Decide), arg0, arg1)
 }
 
 // GetLimiterID mocks base method.
@@ -214,26 +216,27 @@ func (mr *MockRateLimiterMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockRateLimiter) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockRateLimiter) Revert(arg0 context.Context, arg1 labels.Labels, arg2 *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", ctx, labels, decision)
+	m.ctrl.Call(m, "Revert", arg0, arg1, arg2)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockRateLimiterMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
+func (mr *MockRateLimiterMockRecorder) Revert(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), ctx, labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockRateLimiter)(nil).Revert), arg0, arg1, arg2)
 }
 
 // TakeIfAvailable mocks base method.
-func (m *MockRateLimiter) TakeIfAvailable(ctx context.Context, labels map[string]string, count float64) (string, bool, float64, float64) {
+func (m *MockRateLimiter) TakeIfAvailable(ctx context.Context, labels labels.Labels, count float64) (string, bool, time.Duration, float64, float64) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TakeIfAvailable", ctx, labels, count)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(bool)
-	ret2, _ := ret[2].(float64)
+	ret2, _ := ret[2].(time.Duration)
 	ret3, _ := ret[3].(float64)
-	return ret0, ret1, ret2, ret3
+	ret4, _ := ret[4].(float64)
+	return ret0, ret1, ret2, ret3, ret4
 }
 
 // TakeIfAvailable indicates an expected call of TakeIfAvailable.
@@ -266,17 +269,17 @@ func (m *MockScheduler) EXPECT() *MockSchedulerMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockScheduler) Decide(ctx context.Context, labels map[string]string) *checkv1.LimiterDecision {
+func (m *MockScheduler) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Decide", ctx, labels)
-	ret0, _ := ret[0].(*checkv1.LimiterDecision)
+	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
+	ret0, _ := ret[0].(iface.LimiterDecision)
 	return ret0
 }
 
 // Decide indicates an expected call of Decide.
-func (mr *MockSchedulerMockRecorder) Decide(ctx, labels interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), ctx, labels)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), arg0, arg1)
 }
 
 // GetLatencyObserver mocks base method.
@@ -350,13 +353,13 @@ func (mr *MockSchedulerMockRecorder) GetSelectors() *gomock.Call {
 }
 
 // Revert mocks base method.
-func (m *MockScheduler) Revert(ctx context.Context, labels map[string]string, decision *checkv1.LimiterDecision) {
+func (m *MockScheduler) Revert(arg0 context.Context, arg1 labels.Labels, arg2 *checkv1.LimiterDecision) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Revert", ctx, labels, decision)
+	m.ctrl.Call(m, "Revert", arg0, arg1, arg2)
 }
 
 // Revert indicates an expected call of Revert.
-func (mr *MockSchedulerMockRecorder) Revert(ctx, labels, decision interface{}) *gomock.Call {
+func (mr *MockSchedulerMockRecorder) Revert(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockScheduler)(nil).Revert), ctx, labels, decision)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Revert", reflect.TypeOf((*MockScheduler)(nil).Revert), arg0, arg1, arg2)
 }

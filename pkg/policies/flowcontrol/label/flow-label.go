@@ -2,13 +2,21 @@ package label
 
 import (
 	"errors"
+	"sort"
 	"strconv"
+
+	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"golang.org/x/exp/maps"
 )
 
 // ErrLabelNotFound is returned when a flow label is not found.
 var ErrLabelNotFound = errors.New("label not found")
 
 // FlowLabels is a map from flow labels to their values.
+// Each value also stores some metadata.
+//
+// FlowLabels implement labels.Labels to avoid conversion to
+// plain map.
 type FlowLabels map[string]FlowLabelValue
 
 // FlowLabelValue is a value of a flow label with additional metadata.
@@ -17,25 +25,40 @@ type FlowLabelValue struct {
 	Telemetry bool
 }
 
-// NewFromPlainMap returns flow labels from normal map[string]string. Telemetry flag is set to true for all flow labels.
-func NewFromPlainMap(input map[string]string) FlowLabels {
-	flowLabels := make(FlowLabels, len(input))
-	for key, val := range input {
-		flowLabels[key] = FlowLabelValue{
-			Value:     val,
-			Telemetry: true,
-		}
+// Get implements labels.Labels.
+func (fl FlowLabels) Get(key string) (string, bool) {
+	label, exists := fl[key]
+	if !exists {
+		return "", false
 	}
-	return flowLabels
+	return label.Value, true
 }
 
-// ToPlainMap returns flow labels as normal map[string]string.
-func (fl FlowLabels) ToPlainMap() map[string]string {
+// SortedKeys implements labels.Labels.
+func (fl FlowLabels) SortedKeys() []string {
+	keys := maps.Keys(fl)
+	sort.Strings(keys)
+	return keys
+}
+
+// Copy implements labels.Labels.
+func (fl FlowLabels) Copy() labels.PlainMap {
 	plainMap := make(map[string]string, len(fl))
 	for key, val := range fl {
 		plainMap[key] = val.Value
 	}
 	return plainMap
+}
+
+// TelemetryLabels returns only labels that have Telemetry flag set.
+func (fl FlowLabels) TelemetryLabels() map[string]string {
+	telemetryLabels := make(map[string]string, len(fl))
+	for key, val := range fl {
+		if val.Telemetry {
+			telemetryLabels[key] = val.Value
+		}
+	}
+	return telemetryLabels
 }
 
 // Merge combines two flow labels maps into one. Overwrites overlapping keys with values from src.

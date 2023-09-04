@@ -12,7 +12,7 @@ comprehensive view of individual requests or features within services. This
 stream contains high-cardinality attributes that represent key attributes of the
 requests and features, allowing for a detailed analysis of system performance
 and behavior. The stream can be stored and visualized in
-[FluxNinja ARC](/arc/arc.md), or ingested into popular OLAP databases such as
+[Aperture Cloud](/introduction.md), or ingested into popular OLAP databases such as
 [Apache Druid](https://druid.apache.org/).
 
 ## Dimension Columns
@@ -30,8 +30,8 @@ and behavior. The stream can be stored and visualized in
 | aperture.dropping_rate_limiters   | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Rate limiters dropping the traffic                 | SDKs, Envoy               |
 | aperture.load_schedulers          | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters matched to the traffic        | SDKs, Envoy               |
 | aperture.dropping_load_schedulers | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters dropping the traffic          | SDKs, Envoy               |
-| aperture.load_regulators          | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Load Regulators matched to the traffic             | SDKs, Envoy               |
-| aperture.dropping_load_regulators | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Load Regulators dropping the traffic               | SDKs, Envoy               |
+| aperture.samplers          | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers matched to the traffic             | SDKs, Envoy               |
+| aperture.dropping_samplers | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers dropping the traffic               | SDKs, Envoy               |
 | aperture.workloads                | multi-value | "policy_name:s1, component_id:13, workload_index:0, policy_hash:5kZjj"                                                                                                    | Workloads matched to the traffic                   | SDKs, Envoy               |
 | aperture.dropping_workloads       | multi-value | "policy_name:s1, component_id:13, workload_index:0, policy_hash:5kZjj"                                                                                                    | Workloads dropping the traffic                     | SDKs, Envoy               |
 | aperture.flux_meters              | multi-value | s1                                                                                                                                                                        | Flux Meters matched to the traffic                 | SDKs, Envoy               |
@@ -77,33 +77,33 @@ and behavior. The stream can be stored and visualized in
 
 <!-- vale off -->
 
-| Name                                         | Type                    | Unit  | Description                                           |
-| -------------------------------------------- | ----------------------- | ----- | ----------------------------------------------------- |
-| workload_duration_ms_sum                     | float                   | ms    | Sum of duration of the workload                       |
-| workload_duration_ms_min                     | float                   | ms    | Min of duration of the workload                       |
-| workload_duration_ms_max                     | float                   | ms    | Max of duration of the workload                       |
-| workload_duration_ms_sumOfSquares            | float                   | ms    | Sum of squares of duration of the workload            |
-| workload_duration_ms_datasketch              | [quantilesDoubleSketch] | ms    | Datasktech of Duration of the workload                |
-| flow_duration_ms_sum                         | float                   | ms    | Sum of duration of the flow                           |
-| flow_duration_ms_min                         | float                   | ms    | Min of duration of the flow                           |
-| flow_duration_ms_max                         | float                   | ms    | Max of duration of the flow                           |
-| flow_duration_ms_sumOfSquares                | float                   | ms    | Sum of squares of duration of the flow                |
-| flow_duration_ms_datasketch                  | [quantilesDoubleSketch] | ms    | Sum of Aperture's processing duration                 |
-| aperture_processing_duration_ms_min          | float                   | ms    | Min of Aperture's processing duration                 |
-| aperture_processing_duration_ms_max          | float                   | ms    | Max of Aperture's processing duration                 |
-| aperture_processing_duration_ms_sumOfSquares | float                   | ms    | Sum of squares of Aperture's processing duration      |
-| aperture_processing_duration_ms_datasketch   | [quantilesDoubleSketch] | ms    | Datasktech of Aperture's processing duration          |
-| http.request_content_length_sum              | int                     | bytes | Sum of length of the HTTP request content             |
-| http.request_content_length_min              | int                     | bytes | Min of length of the HTTP request content             |
-| http.request_content_length_max              | int                     | bytes | Max of length of the HTTP request content             |
-| http.request_content_length_sumOfSquares     | int                     | bytes | Sum of squares of length of the HTTP request content  |
-| http.response_content_length_sum             | int                     | bytes | Sum of length of the HTTP response content            |
-| http.response_content_length_min             | int                     | bytes | Min of length of the HTTP response content            |
-| http.response_content_length_max             | int                     | bytes | Max of length of the HTTP response content            |
-| http.response_content_length_sumOfSquares    | int                     | bytes | Sum of squares of length of the HTTP response content |
+| Name                                         | Type                      | Unit  | Description                                           |
+| -------------------------------------------- | ------------------------- | ----- | ----------------------------------------------------- |
+| workload_duration_ms_sum                     | float                     | ms    | Sum of duration of the workload                       |
+| workload_duration_ms_min                     | float                     | ms    | Min of duration of the workload                       |
+| workload_duration_ms_max                     | float                     | ms    | Max of duration of the workload                       |
+| workload_duration_ms_sumOfSquares            | float                     | ms    | Sum of squares of duration of the workload            |
+| workload_duration_ms_datasketch              | [quantilesDoubleSketch][] | ms    | Datasktech of Duration of the workload                |
+| flow_duration_ms_sum                         | float                     | ms    | Sum of duration of the flow                           |
+| flow_duration_ms_min                         | float                     | ms    | Min of duration of the flow                           |
+| flow_duration_ms_max                         | float                     | ms    | Max of duration of the flow                           |
+| flow_duration_ms_sumOfSquares                | float                     | ms    | Sum of squares of duration of the flow                |
+| flow_duration_ms_datasketch                  | [quantilesDoubleSketch][] | ms    | Sum of Aperture's processing duration                 |
+| aperture_processing_duration_ms_min          | float                     | ms    | Min of Aperture's processing duration                 |
+| aperture_processing_duration_ms_max          | float                     | ms    | Max of Aperture's processing duration                 |
+| aperture_processing_duration_ms_sumOfSquares | float                     | ms    | Sum of squares of Aperture's processing duration      |
+| aperture_processing_duration_ms_datasketch   | [quantilesDoubleSketch][] | ms    | Datasktech of Aperture's processing duration          |
+| http.request_content_length_sum              | int                       | bytes | Sum of length of the HTTP request content             |
+| http.request_content_length_min              | int                       | bytes | Min of length of the HTTP request content             |
+| http.request_content_length_max              | int                       | bytes | Max of length of the HTTP request content             |
+| http.request_content_length_sumOfSquares     | int                       | bytes | Sum of squares of length of the HTTP request content  |
+| http.response_content_length_sum             | int                       | bytes | Sum of length of the HTTP response content            |
+| http.response_content_length_min             | int                       | bytes | Min of length of the HTTP response content            |
+| http.response_content_length_max             | int                       | bytes | Max of length of the HTTP response content            |
+| http.response_content_length_sumOfSquares    | int                       | bytes | Sum of squares of length of the HTTP response content |
 
 <!-- vale on -->
 
 [quantilesdoublesketch]:
   https://druid.apache.org/docs/latest/development/extensions-core/datasketches-quantiles.html
-[classifier]: /concepts/flow-control/resources/classifier.md
+[classifier]: /concepts/classifier.md

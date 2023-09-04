@@ -13,6 +13,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/yaml"
 
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
@@ -68,13 +69,14 @@ type PeerDiscoveryPrefix string
 // PeerDiscoveryIn holds parameters for newPeerDiscovery.
 type PeerDiscoveryIn struct {
 	fx.In
-	Lifecycle      fx.Lifecycle
-	Unmarshaller   config.Unmarshaller
-	Client         *etcdclient.Client
-	Listener       *listener.Listener
-	StatusRegistry status.Registry
-	Prefix         PeerDiscoveryPrefix
-	Watchers       PeerWatchers `group:"peer-watchers"`
+	Lifecycle       fx.Lifecycle
+	Unmarshaller    config.Unmarshaller
+	Client          *etcdclient.Client
+	SessionScopedKV *etcdclient.SessionScopedKV
+	Listener        *listener.Listener
+	StatusRegistry  status.Registry
+	Prefix          PeerDiscoveryPrefix
+	Watchers        PeerWatchers `group:"peer-watchers"`
 }
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
@@ -90,7 +92,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		return nil, err
 	}
 
-	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.Watchers)
+	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.SessionScopedKV, in.Watchers)
 	if err != nil {
 		return nil, err
 	}
@@ -142,18 +144,24 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	lock         sync.RWMutex
-	peers        *peersv1.Peers
-	client       *etcdclient.Client
-	etcdWatcher  notifiers.Watcher
-	selfKey      string
-	etcdPath     string
-	peerNotifier notifiers.PrefixNotifier
-	watchers     PeerWatchers
+	lock            sync.RWMutex
+	peers           *peersv1.Peers
+	client          *etcdclient.Client
+	sessionScopedKV *etcdclient.SessionScopedKV
+	etcdWatcher     notifiers.Watcher
+	selfKey         string
+	etcdPath        string
+	peerNotifier    notifiers.PrefixNotifier
+	watchers        PeerWatchers
 }
 
 // NewPeerDiscovery creates a new PeerDiscovery.
-func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWatchers) (*PeerDiscovery, error) {
+func NewPeerDiscovery(
+	prefix string,
+	client *etcdclient.Client,
+	sessionScopedKV *etcdclient.SessionScopedKV,
+	watchers PeerWatchers,
+) (*PeerDiscovery, error) {
 	var err error
 	pd := &PeerDiscovery{
 		peers: &peersv1.Peers{
@@ -162,9 +170,10 @@ func NewPeerDiscovery(prefix string, client *etcdclient.Client, watchers PeerWat
 			},
 			Peers: make(map[string]*peersv1.Peer),
 		},
-		watchers: watchers,
-		etcdPath: path.Join(etcdPath, prefix),
-		client:   client,
+		watchers:        watchers,
+		etcdPath:        path.Join(etcdPath, prefix),
+		client:          client,
+		sessionScopedKV: sessionScopedKV,
 	}
 
 	// create and start etcdwatcher to track peers and sync them to disk
@@ -214,8 +223,7 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 		log.Error().Err(err).Msg("failed to convert json to yaml")
 		return err
 	}
-	_, err = pd.client.KV.Put(clientv3.WithRequireLeader(ctx),
-		pd.selfKey, string(b), clientv3.WithLease(pd.client.LeaseID))
+	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(b))
 
 	return err
 }
@@ -273,7 +281,7 @@ func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
 	pd.lock.RLock()
 	defer pd.lock.RUnlock()
 
-	return pd.peers.DeepCopy()
+	return proto.Clone(pd.peers).(*peersv1.Peers)
 }
 
 // RegisterService accepts a name, full address (host:port) and adds to the list of services in PeerDiscovery.
@@ -319,7 +327,7 @@ func (pd *PeerDiscovery) GetPeer(address string) (*peersv1.Peer, error) {
 		return nil, errors.New("peer not found")
 	}
 
-	return peer.DeepCopy(), nil
+	return proto.Clone(peer).(*peersv1.Peer), nil
 }
 
 // GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
