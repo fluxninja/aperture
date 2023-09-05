@@ -2649,16 +2649,13 @@ definitions:
                 type: string
                 x-go-tag-default: 7200s
             tokens_label_key:
-                default: tokens
-                description: |+
+                description: |-
                     Flow label key that will be used to override the number of tokens
                     for this request.
                     This is an optional parameter and takes highest precedence
                     when assigning tokens to a request.
                     The label value must be a valid uint64 number.
-
                 type: string
-                x-go-tag-default: tokens
         required:
             - interval
         type: object
@@ -3039,23 +3036,17 @@ definitions:
                 $ref: '#/definitions/StatusCode'
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priorities_label_key:
-                default: priorities
-                description: |+
+                description: |-
                     * Key for a flow label that can be used to override the default priority for this flow.
                     * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
                     * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-
                 type: string
-                x-go-tag-default: priorities
             tokens_label_key:
-                default: tokens
-                description: |+
+                description: |-
                     * Key for a flow label that can be used to override the default number of tokens for this flow.
                     * The value associated with this key must be a valid uint64 number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-
                 type: string
-                x-go-tag-default: tokens
             workloads:
                 description: |+
                     List of workloads to be used in scheduler.

@@ -93,7 +93,7 @@ message RateLimiter {
     // This is an optional parameter and takes highest precedence
     // when assigning tokens to a request.
     // The label value must be a valid uint64 number.
-    string tokens_label_key = 2; // @gotags: default:"tokens"
+    string tokens_label_key = 2;
 
     // Interval defines the time interval in which the token bucket
     // will fill tokens specified by `fill_amount` signal.
@@ -303,12 +303,12 @@ message Scheduler {
   // * Key for a flow label that can be used to override the default number of tokens for this flow.
   // * The value associated with this key must be a valid uint64 number.
   // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-  string tokens_label_key = 7; // @gotags: default:"tokens"
+  string tokens_label_key = 7;
 
   // * Key for a flow label that can be used to override the default priority for this flow.
   // * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
   // * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-  string priorities_label_key = 8; // @gotags: default:"priorities"
+  string priorities_label_key = 8;
 
   // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
   flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {defined_only: true}];
