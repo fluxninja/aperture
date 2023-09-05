@@ -33,7 +33,6 @@ func FactoryModule() fx.Option {
 func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
 	return fx.Options(
 		autoScaleModuleForPolicyApp(circuitAPI),
-		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 

@@ -18,6 +18,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	backgroundscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/background-scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/resources/classifier"
@@ -28,7 +29,12 @@ import (
 )
 
 // policyModule returns Fx options of Policy for the Main App.
-func policyModule() fx.Option { return circuitfactory.Module() }
+func policyModule() fx.Option {
+	return fx.Options(
+		circuitfactory.Module(),
+		backgroundscheduler.Module(),
+	)
+}
 
 // Policy invokes the Circuit runtime at tick frequency.
 type Policy struct {
@@ -66,6 +72,8 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 	policyOptions = append(policyOptions, circuitOption)
 
 	policyOptions = append(policyOptions, circuitfactory.FactoryModuleForPolicyApp(circuit))
+
+	policyOptions = append(policyOptions, backgroundscheduler.ModuleForPolicyApp(circuit))
 
 	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
 	policy.circuit = circuit
