@@ -6,7 +6,6 @@
   "scripts": {
     "prebuild": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
-    "postbuild": "cp -r ./proto ./lib/proto",
     "grpc-client": "npm run build && node ./lib/client.js",
     "example": "cd example && npm run build && node ./dist/example.js",
     "prepublishOnly": "npm run build",
