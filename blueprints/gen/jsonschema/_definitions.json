@@ -2583,10 +2583,8 @@
           "x-go-tag-default": "7200s"
         },
         "tokens_label_key": {
-          "default": "tokens",
-          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.\n\n",
-          "type": "string",
-          "x-go-tag-default": "tokens"
+          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.",
+          "type": "string"
         }
       },
       "required": ["interval"],
@@ -2885,16 +2883,12 @@
           "description": "This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied."
         },
         "priorities_label_key": {
-          "default": "priorities",
-          "description": "* Key for a flow label that can be used to override the default priority for this flow.\n* The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.\n* If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.\n\n",
-          "type": "string",
-          "x-go-tag-default": "priorities"
+          "description": "* Key for a flow label that can be used to override the default priority for this flow.\n* The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.\n* If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.",
+          "type": "string"
         },
         "tokens_label_key": {
-          "default": "tokens",
-          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.\n\n",
-          "type": "string",
-          "x-go-tag-default": "tokens"
+          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.",
+          "type": "string"
         },
         "workloads": {
           "description": "List of workloads to be used in scheduler.\n\nCategorizing flows into workloads\nallows for load throttling to be \"intelligent\" instead of queueing flows in an arbitrary order.\nThere are two aspects of this \"intelligence\":\n* Scheduler can more precisely calculate concurrency if it understands\n  that flows belonging to different classes have different weights (for example, insert queries compared to select queries).\n* Setting different priorities to different workloads lets the scheduler\n  avoid dropping important traffic during overload.\n\nEach workload in this list specifies also a matcher that is used to\ndetermine which flow will be categorized into which workload.\nIn case of multiple matching workloads, the first matching one will be used.\nIf none of workloads match, `default_workload` will be used.\n\n:::info\n\nSee also [workload definition in the concepts\nsection](/concepts/scheduler/scheduler.md#workload).\n\n:::\n\n",

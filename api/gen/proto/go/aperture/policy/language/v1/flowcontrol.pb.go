@@ -544,11 +544,11 @@ type Scheduler struct {
 	// * Key for a flow label that can be used to override the default number of tokens for this flow.
 	// * The value associated with this key must be a valid uint64 number.
 	// * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-	TokensLabelKey string `protobuf:"bytes,7,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty" default:"tokens"` // @gotags: default:"tokens"
+	TokensLabelKey string `protobuf:"bytes,7,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// * Key for a flow label that can be used to override the default priority for this flow.
 	// * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
 	// * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-	PrioritiesLabelKey string `protobuf:"bytes,8,opt,name=priorities_label_key,json=prioritiesLabelKey,proto3" json:"priorities_label_key,omitempty" default:"priorities"` // @gotags: default:"priorities"
+	PrioritiesLabelKey string `protobuf:"bytes,8,opt,name=priorities_label_key,json=prioritiesLabelKey,proto3" json:"priorities_label_key,omitempty"`
 	// This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
 	DeniedResponseStatusCode v1.StatusCode `protobuf:"varint,9,opt,name=denied_response_status_code,json=deniedResponseStatusCode,proto3,enum=aperture.flowcontrol.check.v1.StatusCode" json:"denied_response_status_code,omitempty"`
 }
@@ -1923,7 +1923,7 @@ type RateLimiter_Parameters struct {
 	// This is an optional parameter and takes highest precedence
 	// when assigning tokens to a request.
 	// The label value must be a valid uint64 number.
-	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty" default:"tokens"` // @gotags: default:"tokens"
+	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// Interval defines the time interval in which the token bucket
 	// will fill tokens specified by `fill_amount` signal.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
