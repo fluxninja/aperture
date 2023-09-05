@@ -1,12 +1,11 @@
 {
   "name": "@fluxninja/aperture-js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "aperture-js is an SDK to interact with Aperture Agent.",
   "main": "./lib/index.js",
   "scripts": {
-    "pre-build": "rm -rf ./lib",
+    "prebuild": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
-    "post-build": "cp -r ./proto ./lib/proto",
     "grpc-client": "npm run build && node ./lib/client.js",
     "example": "cd example && npm run build && node ./dist/example.js",
     "prepublishOnly": "npm run build",

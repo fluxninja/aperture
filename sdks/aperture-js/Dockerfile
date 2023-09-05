@@ -15,7 +15,7 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
-RUN npm run pre-build && npm run build && npm run post-build
+RUN npm run build
 
 RUN npm link
 
