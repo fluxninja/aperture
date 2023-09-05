@@ -171,32 +171,32 @@
             "visible": true,
             "options": {
               "icon": "Info",
-              "text": "If you are running cloud controller and just want to install the agent, please leave the below fields empty and pass other required fields like endpoint and apikey.",
+              "text": "If you are running cloud controller and just want to install the agent, please provide the required fields like endpoint and apikey.",
               "uri": "https://docs.fluxninja.com/reference/fluxninja#configuration"
             }
           },
           {
-            "name": "etcdEndpoint",
+            "name": "endpoint",
             "type": "Microsoft.Common.TextBox",
-            "label": "Etcd Endpoint",
-            "toolTip": "This will replace the agent.config.etcd.endpoints value inside your values.yaml.If you are running cloud controller no etcdendpoint is required",
+            "label": "Endpoint",
+            "toolTip": "Give the endpoint for the the cloud controller . Eg: 'ORGANIZATION_NAME.app.fluxninja.com:443' ",
             "defaultValue": "",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": ".*",
-              "validationMessage": "The given url is not correct."
+              "validationMessage": "The Given value is not correct"
             }
           },
           {
-            "name": "prometheusAddress",
+            "name": "apiKey",
             "type": "Microsoft.Common.TextBox",
-            "label": "Prometheus Address",
-            "toolTip": "This will replace the agent.config.prometheus.address value inside your values.yaml.If you are running cloud controller no prometheusAddress is required",
+            "label": "API Key",
+            "toolTip": "API key Value for the cloud controller.",
             "defaultValue": "",
             "constraints": {
-              "required": false,
+              "required": true,
               "regex": ".*",
-              "validationMessage": "The given url is not correct."
+              "validationMessage": "The Given value is not correct"
             }
           },
           {
@@ -281,8 +281,8 @@
       "vmSize": "[steps('clusterDetails').newClusterSection.vmSize]",
       "vmEnableAutoScale": "[steps('clusterDetails').newClusterSection.enableAutoScaling]",
       "vmCount": "[steps('clusterDetails').newClusterSection.vmCount]",
-      "etcdEndpoint": "[steps('agentDetails').etcdEndpoint]",
-      "prometheusAddress": "[steps('agentDetails').prometheusAddress]",
+      "endpoint": "[steps('agentDetails').endpoint]",
+      "apiKey": "[steps('agentDetails').apiKey]",
       "dynamicSettings": "[steps('agentDetails').dynamicSettingsSection.dynamicSettings]"
     }
   }

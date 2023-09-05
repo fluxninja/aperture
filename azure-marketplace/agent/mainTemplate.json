@@ -34,13 +34,11 @@
         "description": "The location of AKS resource."
       }
     },
-    "etcdEndpoint": {
-      "type": "String",
-      "defaultValue": ""
+    "endpoint": {
+      "type": "String"
     },
-    "prometheusAddress": {
-      "type": "String",
-      "defaultValue": ""
+    "apiKey": {
+      "type": "String"
     },
     "dynamicSettings": {
       "type": "array"
@@ -157,8 +155,12 @@
     "is_dynamicSettings_defaultState": "[equals(replace(string(parameters('dynamicSettings')), ' ', ''), '[{\"labelName\":\"\",\"labelValue\":\"\"}]')]",
 
     "mandatory_setting_inputs": {
-      "agent.config.etcd.endpoints": "[if(empty(parameters('etcdEndpoint')), '', parameters('etcdEndpoint'))]",
-      "agent.config.prometheus.address": "[if(empty(parameters('prometheusAddress')), '', parameters('prometheusAddress'))]"
+      "agent.config.fluxninja.enable_cloud_controller": true,
+      "agent.config.fluxninja.endpoint": "[parameters('endpoint')]",
+      "agent.secrets.fluxNinjaExtension.create": true,
+      "agent.secrets.fluxNinjaExtension.secretKeyRef.name": "aperture-agent-apikey",
+      "agent.secrets.fluxNinjaExtension.secretKeyRef.key": "apiKey",
+      "agent.secrets.fluxNinjaExtension.value": "[parameters('apiKey')]"
     },
 
     "configurationSettings": "[if(variables('is_dynamicSettings_empty'), variables('mandatory_setting_inputs'), union(variables('mandatory_setting_inputs'), variables('dynamicSettings_json') ))]"
