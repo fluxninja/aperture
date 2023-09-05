@@ -6408,7 +6408,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string, default: `"tokens"`)
+(string)
 
 <!-- vale on -->
 
@@ -7198,7 +7198,7 @@ This field allows you to override the default HTTP status code
 
 <!-- vale off -->
 
-(string, default: `"priorities"`)
+(string)
 
 <!-- vale on -->
 
@@ -7215,7 +7215,7 @@ This field allows you to override the default HTTP status code
 
 <!-- vale off -->
 
-(string, default: `"tokens"`)
+(string)
 
 <!-- vale on -->
 
