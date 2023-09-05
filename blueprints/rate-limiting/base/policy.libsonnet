@@ -17,20 +17,22 @@ function(cfg, metadata={}) {
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')
-      + circuit.withComponents([
-        component.withFlowControl(
-          flowControl.new()
-          + flowControl.withRateLimiter(
-            rateLimiter.new()
-            + rateLimiter.withInPorts({
-              bucket_capacity: port.withConstantSignal(params.policy.rate_limiter.bucket_capacity),
-              fill_amount: port.withConstantSignal(params.policy.rate_limiter.fill_amount),
-            })
-            + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
-            + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
+      + circuit.withComponents(
+        [
+          component.withFlowControl(
+            flowControl.new()
+            + flowControl.withRateLimiter(
+              rateLimiter.new()
+              + rateLimiter.withInPorts({
+                bucket_capacity: port.withConstantSignal(params.policy.rate_limiter.bucket_capacity),
+                fill_amount: port.withConstantSignal(params.policy.rate_limiter.fill_amount),
+              })
+              + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
+              + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
+            ),
           ),
-        ),
-      ]),
+        ] + params.policy.components,
+      )
     ),
 
   local policyResource = {
