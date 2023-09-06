@@ -109,3 +109,4 @@ Elasticsearch
 [Tt]riages
 CodeRabbit
 [Tt]iering
+[Tt]ranslate
