@@ -46,7 +46,7 @@ Imagine a task management application whose usage varies significantly between
 working days and holidays, and even fluctuates during different hours of a
 standard working day. To maintain responsive APIs while managing infrastructure
 costs effectively, the service can use load-based auto-scaling. This strategy
-ensures that service resources are dynamically adjusted in line with usage
+ensures that service resources are dynamically adjusted inline with usage
 patterns, therefore optimizing both user experience and infrastructure
 expenditure.
 

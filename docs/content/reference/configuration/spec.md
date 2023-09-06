@@ -962,7 +962,7 @@ Outputs
 Cooldown override percentage defines a threshold change in scale-out beyond
 which previous cooldown is overridden. For example, if the cooldown is 5 minutes
 and the cooldown override percentage is 10%, then if the scale-increases by 10%
-or more, the previous cooldown is cancelled. Defaults to 50%.
+or more, the previous cooldown is canceled. Defaults to 50%.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
