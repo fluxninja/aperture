@@ -4622,9 +4622,7 @@ See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 To make scheduling decisions the Flows are mapped into Workloads by providing
 match rules. A workload determines the priority and cost of admitting each Flow
 that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
-principles. _Load Scheduler_ measures and controls the incoming tokens per
-second, which can translate to (avg. latency \* in-flight requests) (Little's
-Law) in concurrency limiting use-case.
+principles.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
 that get admitted.
@@ -4790,11 +4788,12 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Automatically estimate the size flows within each workload, based on historical
-latency. Each workload's `tokens` will be set to average latency of flows in
-that workload during the last few seconds (exact duration of this average can
-change). This setting is useful in concurrency limiting use-case, where the
-concurrency is calculated as ``(avg. latency \* in-flight flows)`.
+Automatically estimate the size of flows within each workload, based on
+historical latency. Each workload's `tokens` will be set to average latency of
+flows in that workload during the last few seconds (exact duration of this
+average can change). This setting is useful in concurrency limiting use-case,
+where the concurrency is calculated as `(avg. latency \* in-flight flows)`
+(Little's Law).
 
 The value of tokens estimated takes a lower precedence than the value of
 `tokens` specified in the workload definition and `tokens` explicitly specified
