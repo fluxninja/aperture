@@ -25,8 +25,7 @@ Supported technologies:
 :::info
 
 The latest version of the Aperture Instrumentation Agent `.jar` file can be
-found
-[here]("https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent").
+found [here][aperture-javaagent].
 
 :::
 
@@ -97,3 +96,6 @@ aperture.agent.port=12345
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/health,/connected
 ```
+
+[aperture-javaagent]:
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent
