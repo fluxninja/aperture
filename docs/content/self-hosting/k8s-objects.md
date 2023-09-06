@@ -25,4 +25,5 @@ Dashboards][generating-policies] contains an example how to run this command).
 
 [generate]: /reference/aperturectl/blueprints/generate/generate.md
 [generating-policies]: /get-started/policies/policies.md#generating-policies
-[example]: /use-cases/adaptive-service-protection/average-latency-feedback.md
+[example]:
+  /use-cases/adaptive-service-protection/service/average-latency-feedback.md
