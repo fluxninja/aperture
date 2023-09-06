@@ -7374,7 +7374,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string)
+(int64, minimum: `0`)
 
 <!-- vale on -->
 

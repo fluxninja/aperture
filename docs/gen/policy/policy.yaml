@@ -3138,8 +3138,8 @@ definitions:
                     in the flow labels.
 
                 format: int64
-                minLength: 0
-                type: string
+                minimum: 0
+                type: integer
                 x-go-tag-validate: gte=0
         type: object
     Selector:

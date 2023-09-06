@@ -386,8 +386,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		tokens = tokensEstimated
 	}
 
-	if matchedWorkloadParametersProto.Tokens != 0 {
-		tokens = uint64(matchedWorkloadParametersProto.Tokens)
+	if matchedWorkloadParametersProto.GetTokens() != 0 {
+		tokens = uint64(matchedWorkloadParametersProto.GetTokens())
 	}
 
 	var matchedWorkloadTimeout time.Duration

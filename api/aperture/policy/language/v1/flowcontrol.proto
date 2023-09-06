@@ -238,7 +238,7 @@ message Scheduler {
       // number of flows (3rd party rate limiters).
       // This override is applicable only if tokens for the flow aren't specified
       // in the flow labels.
-      int64 tokens = 2; // @gotags: validate:"gte=0"
+      uint32 tokens = 2; // @gotags: validate:"gte=0"
 
       // Timeout for the flow in the workload.
       // If timeout is provided on the Check call as well, the minimum of the two is picked.
