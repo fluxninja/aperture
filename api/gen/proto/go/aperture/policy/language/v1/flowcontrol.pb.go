@@ -402,8 +402,6 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 // To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
-// _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
-// to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 //
 // The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
 type LoadScheduler struct {
@@ -2152,12 +2150,12 @@ type LoadScheduler_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Automatically estimate the size flows within each workload, based on
+	// Automatically estimate the size of flows within each workload, based on
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during the last few seconds (exact duration
 	// of this average can change).
 	// This setting is useful in concurrency limiting use-case, where the
-	// concurrency is calculated as “(avg. latency \* in-flight flows)`.
+	// concurrency is calculated as `(avg. latency \* in-flight flows)` (Little's Law).
 	//
 	// The value of tokens estimated takes a lower precedence
 	// than the value of `tokens` specified in the workload definition
@@ -2416,7 +2414,7 @@ type Scheduler_Workload_Parameters struct {
 	// number of flows (3rd party rate limiters).
 	// This override is applicable only if tokens for the flow aren't specified
 	// in the flow labels.
-	Tokens int64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
+	Tokens uint32 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
 	// Timeout for the flow in the workload.
 	// If timeout is provided on the Check call as well, the minimum of the two is picked.
 	// If this override is not provided, the timeout provided in the check call is used.
@@ -2464,7 +2462,7 @@ func (x *Scheduler_Workload_Parameters) GetPriority() float64 {
 	return 0
 }
 
-func (x *Scheduler_Workload_Parameters) GetTokens() int64 {
+func (x *Scheduler_Workload_Parameters) GetTokens() uint32 {
 	if x != nil {
 		return x.Tokens
 	}
@@ -3651,7 +3649,7 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x1a, 0x80, 0x01, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12,
 	0x1a, 0x0a, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x01, 0x52, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x16, 0x0a, 0x06, 0x74,
-	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x74, 0x6f, 0x6b,
+	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x74, 0x6f, 0x6b,
 	0x65, 0x6e, 0x73, 0x12, 0x3e, 0x0a, 0x0d, 0x71, 0x75, 0x65, 0x75, 0x65, 0x5f, 0x74, 0x69, 0x6d,
 	0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72,

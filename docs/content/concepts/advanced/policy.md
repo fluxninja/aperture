@@ -25,10 +25,10 @@ operation despite overload and failures.
 Aperture's control loop policies are programmable "circuits" that are evaluated
 periodically. One of the primary goals of these policies is to calculate the
 deviation from objectives and apply counter-measures, such as load throttling
-and workload queueing, to keep the system in a safe operational zone. The
+and workload queuing, to keep the system in a safe operational zone. The
 policies are used to express where the metrics are collected from and where the
-actuation happens, along with signal processing needed to translate health
-metrics to corrective actions. For instance, a policy can be written to detect
+actuation happens, along with signal processing needed to perform corrective
+actions from health metrics. For instance, a policy can be written to detect
 overload build-up at an upstream service and trigger load throttling at a
 downstream service.
 
