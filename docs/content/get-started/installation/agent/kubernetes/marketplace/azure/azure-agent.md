@@ -15,8 +15,8 @@ sidebar_position: 2
 import Zoom from 'react-medium-image-zoom';
 ```
 
-To get started with Agent Deploy on Microsoft Azure, you'll need to go to Azure
-Marketplace.
+To get started with Agent Deploy on Microsoft Azure, you'll need to go to
+Microsoft Azure Marketplace.
 
 1. On Microsoft Azure Marketplace, search for
    [Fluxninja Agent](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/fluxninjainc1684371969511.fluxninja-agent?tab=Overview).
