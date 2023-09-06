@@ -3,7 +3,7 @@ title: Percentage Rollouts
 keywords:
   - tutorial
   - feature-flags
-sidebar_position: 3
+sidebar_position: 6
 sidebar_label: Percentage Rollouts
 ---
 

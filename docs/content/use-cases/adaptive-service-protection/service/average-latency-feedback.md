@@ -8,7 +8,7 @@ sidebar_position: 2
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
+import {apertureVersion} from '../../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -33,6 +33,12 @@ blueprint. The latency of requests processed by the
 variance between current latency and a historical latency baseline, the policy
 facilitates the identification of potential service overload. A deviation of
 **`1.1`** from the baseline is considered as a signal of service overload.
+
+In addition, workload prioritization is specified in the load scheduler based on
+user types accessing the service. User types are identified based on the value
+of a header label http.request.header.user_type. Requests matching label value
+guest are assigned a priority of 50, whereas those matching subscriber are given
+a priority of 200.
 
 To mitigate service overload, the requests to the
 **`cart-service.prod.svc.cluster.local`** service are passed through a load
