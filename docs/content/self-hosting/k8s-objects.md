@@ -19,11 +19,10 @@ Resource Definition.
 Policy objects can be created manually or prepared from blueprints via the
 [`aperturectl blueprints generate`][generate] command ([Generating Policies and
 Dashboards][generating-policies] contains an example how to run this command).
-[Here][example] is an example of how a Policy object could look like (look for
+[Here](/use-cases/adaptive-service-protection/service/average-latency-feedback.md)
+is an example of how a Policy object could look like (look for
 `Generated Policy`). Such a Policy can be then applied with regular
 `kubectl apply`.
 
 [generate]: /reference/aperturectl/blueprints/generate/generate.md
 [generating-policies]: /get-started/policies/policies.md#generating-policies
-[example]:
-  /use-cases/adaptive-service-protection/service/average-latency-feedback.md
