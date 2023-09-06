@@ -136,7 +136,7 @@ kubectl apply -f policy-gen/configuration/load-ramping-cr.yaml -n aperture-contr
 
 Percentage rollout is initiated with
 [dynamic configuration](/concepts/advanced/dynamic-configuration.md) of the
-policy. Dynamic values facilitate run-time modifications, without shutting down
+policy. Dynamic values facilitate runtime modifications, without shutting down
 the policy.
 
 In the generated dynamic values file, set the `start` parameter as `true`. Use

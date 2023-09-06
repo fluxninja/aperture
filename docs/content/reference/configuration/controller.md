@@ -634,8 +634,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the size of a batch to be sent.
 
 </dd>
 <dt>timeout</dt>

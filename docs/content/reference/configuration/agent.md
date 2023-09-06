@@ -1003,8 +1003,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the size of a batch to be sent.
 
 </dd>
 <dt>timeout</dt>
@@ -1029,7 +1028,8 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPostrollupConfig defines configuration for OTel batch processor.
+BatchPostrollupConfig defines post-rollup configuration for OTel batch
+processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1054,8 +1054,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the size of a batch to be sent.
 
 </dd>
 <dt>timeout</dt>
@@ -1080,7 +1079,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPrerollupConfig defines configuration for OTel batch processor.
+BatchPrerollupConfig defines pre-rollup configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1105,8 +1104,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the size of a batch to be sent.
 
 </dd>
 <dt>timeout</dt>

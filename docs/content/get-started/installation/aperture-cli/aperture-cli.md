@@ -36,7 +36,7 @@ chmod +x "\${BIN}/aperturectl"
 );
 ```
 
-The Aperture CLI is available as a binary executable for all major platforms,
+The Aperture CLI is available as an executable program for all major platforms,
 the binaries can be downloaded from GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
