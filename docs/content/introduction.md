@@ -135,9 +135,9 @@ understanding of their key components.
 
 ## Additional Support
 
-Navigating Aperture's capabilities might bring up questions. Don't hesitate to
-engage with us for any queries or clarifications. Our team is here to assist and
-ensure that your experience with Aperture is smooth and beneficial.
+Don't hesitate to engage with us for any queries or clarifications. Our team is
+here to assist and ensure that your experience with Aperture is smooth and
+beneficial.
 
 <!-- vale off -->
 

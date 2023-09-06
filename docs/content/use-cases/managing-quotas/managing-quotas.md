@@ -62,7 +62,7 @@ scheduling policy using Aperture, service operators can ensure fair and
 prioritized access. This policy enables prioritizing critical requests,
 preventing any single client application from monopolizing the database service
 or exhausting the available quota. Additionally, with Aperture's quota
-scheduling, the system becomes spend-aware, ensuring it stays within quota
+scheduling, the system becomes expense-aware, ensuring it stays within quota
 limits and avoids cost overages.
 
 <DocCardList />

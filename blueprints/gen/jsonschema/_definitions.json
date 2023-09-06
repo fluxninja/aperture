@@ -398,7 +398,7 @@
       "properties": {
         "cooldown_override_percentage": {
           "default": 50,
-          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.\n\n",
+          "description": "Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.\nFor example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the\nscale-increases by 10% or more, the previous cooldown is canceled. Defaults to 50%.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "50"
@@ -1832,7 +1832,7 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n_Load Scheduler_ measures and controls the incoming tokens per second, which can translate\nto (avg. latency \\* in-flight requests) (Little's Law) in concurrency limiting use-case.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -1900,7 +1900,7 @@
         },
         "workload_latency_based_tokens": {
           "default": true,
-          "description": "Automatically estimate the size flows within each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during the last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as ``(avg. latency \\* in-flight flows)`.\n\nThe value of tokens estimated takes a lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
+          "description": "Automatically estimate the size of flows within each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during the last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as `(avg. latency \\* in-flight flows)` (Little's Law).\n\nThe value of tokens estimated takes a lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
           "type": "boolean",
           "x-go-tag-default": "true"
         }
@@ -2944,8 +2944,8 @@
         "tokens": {
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.\n\n",
           "format": "int64",
-          "minLength": 0,
-          "type": "string",
+          "minimum": 0,
+          "type": "integer",
           "x-go-tag-validate": "gte=0"
         }
       },

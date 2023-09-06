@@ -1508,8 +1508,8 @@ spec:
                             format: int32
                             type: integer
                           send_batch_size:
-                            description: SendBatchSize is the size of a batch which
-                              after hit, will trigger it to be sent.
+                            description: SendBatchSize is the number of alerts to
+                              send in a batch.
                             format: int32
                             type: integer
                           timeout:
@@ -1527,8 +1527,8 @@ spec:
                             format: int32
                             type: integer
                           send_batch_size:
-                            description: SendBatchSize is the size of a batch which
-                              after hit, will trigger it to be sent.
+                            description: SendBatchSize is the number of metrics to
+                              send in a batch.
                             format: int32
                             type: integer
                           timeout:
@@ -1546,8 +1546,8 @@ spec:
                             format: int32
                             type: integer
                           send_batch_size:
-                            description: SendBatchSize is the size of a batch which
-                              after hit, will trigger it to be sent.
+                            description: SendBatchSize is the number of metrics to
+                              send in a batch.
                             format: int32
                             type: integer
                           timeout:

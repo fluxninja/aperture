@@ -16,8 +16,8 @@ import Zoom from 'react-medium-image-zoom';
 
 :::
 
-The _Flux Meter_ is a type of policy resource that provides a way to translate a
-flux of flows, matching a [Selector][flow-selectors], into a Prometheus
+The _Flux Meter_ is a type of policy resource that provides a way to instrument
+requests, matching a [Selector][flow-selectors], into a Prometheus
 [histogram][histogram-metric]. The histogram created by _Flux Meter_ measures
 the workload latency by default.
 
