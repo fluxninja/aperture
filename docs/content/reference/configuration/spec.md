@@ -7032,6 +7032,18 @@ The flow label key for identifying sessions.
   Percentage of flows are selected randomly for rejection.
 
 </dd>
+<dt>ramp_mode</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Ramp component can accept flows with `ramp_mode` flag set.
+
+</dd>
 <dt>selectors</dt>
 <dd>
 

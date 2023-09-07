@@ -29,9 +29,10 @@ The created instance can then be used to start a flow:
 ```javascript
 // do some business logic to collect labels
 var labelsMap = new Map().set("key", "value");
+var rampMode = false;
 
 apertureClient
-  .StartFlow("feature-name", labelsMap)
+  .StartFlow("feature-name", labelsMap, rampMode)
   .then((flow) => {
     if (flow.ShouldRun()) {
       // Do actual work

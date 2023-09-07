@@ -170,6 +170,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Services:     destinationSvcs,
 			ControlPoint: ctrlPt,
 			FlowLabels:   mergedFlowLabels,
+			RampMode:     req.RampMode,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs
@@ -206,7 +207,9 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 				statusCode = http.StatusTooManyRequests
 			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
 				statusCode = http.StatusServiceUnavailable
-			case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED:
+				statusCode = http.StatusForbidden
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP:
 				statusCode = http.StatusForbidden
 			default:
 				log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")

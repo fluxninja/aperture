@@ -3041,6 +3041,13 @@ definitions:
                     - When label key is not specified, _Sampler_ acts as a stateless filter.
                       Percentage of flows are selected randomly for rejection.
                 type: string
+            ramp_mode:
+                default: false
+                description: |+
+                    Ramp component can accept flows with `ramp_mode` flag set.
+
+                type: boolean
+                x-go-tag-default: "false"
             selectors:
                 description: |+
                     Selectors for the component.

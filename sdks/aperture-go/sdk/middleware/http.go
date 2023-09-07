@@ -46,7 +46,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels)
+		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels, false)
 
 		flow := m.client.StartHTTPFlow(r.Context(), req, true)
 		if flow.Error() != nil {
