@@ -59,6 +59,33 @@ export class Flow {
     }
     this.ended = true;
 
+    if (this.checkResponse) {
+      // HACK: Change timestamps to ISO strings since the protobufjs library uses it in a different format
+      // Issue: https://github.com/protobufjs/protobuf.js/issues/893
+      // PR: https://github.com/protobufjs/protobuf.js/pull/1258
+      // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
+      const localCheckResponse = this.checkResponse as any;
+      if (
+        localCheckResponse.start &&
+        typeof localCheckResponse.start === "object"
+      ) {
+        localCheckResponse.start = new Date(
+          localCheckResponse.start.seconds * 1000 +
+            localCheckResponse.start.nanos / 1000,
+        ).toISOString();
+      }
+      if (
+        localCheckResponse.end &&
+        typeof localCheckResponse.end === "object"
+      ) {
+        localCheckResponse.end = new Date(
+          localCheckResponse.end.seconds * 1000 +
+            localCheckResponse.end.nanos / 1000,
+        ).toISOString();
+      }
+      this.checkResponse = localCheckResponse;
+    }
+
     this.span.setAttribute(FLOW_STATUS_LABEL, this.statusCode);
     this.span.setAttribute(
       CHECK_RESPONSE_LABEL,
