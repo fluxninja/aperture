@@ -1,12 +1,16 @@
 ---
 title: Database
-sidebar_position: 2
-sidebar_label: Database
+sidebar_position: 1
+keywords:
+  - tutorial
+  - policies
+  - use cases
+  - service protection
+  - database
 ---
 
 ```mdx-code-block
-import Zoom from 'react-medium-image-zoom';
 import DocCardList from '@theme/DocCardList';
 ```
 
-Blah blah
+<DocCardList />

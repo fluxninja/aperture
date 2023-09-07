@@ -65,4 +65,6 @@ good throughput and lead to cascading failures. Load scheduling policy ensures
 smooth service operation and a consistent user experience for a successful sales
 event.
 
+## Use Cases
+
 <DocCardList />

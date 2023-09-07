@@ -1,12 +1,16 @@
 ---
 title: Infrastructure
-sidebar_position: 1
-sidebar_label: Infrastructure
+sidebar_position: 2
+keywords:
+  - tutorial
+  - policies
+  - use cases
+  - service protection
+  - infarstructure
 ---
 
 ```mdx-code-block
-import Zoom from 'react-medium-image-zoom';
 import DocCardList from '@theme/DocCardList';
 ```
 
-Blah blah
+<DocCardList />
