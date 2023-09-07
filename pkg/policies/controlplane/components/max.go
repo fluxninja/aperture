@@ -37,7 +37,7 @@ func NewMaxAndOptions(_ *policylangv1.Max, _ runtime.ComponentID, _ iface.Policy
 }
 
 // Execute implements runtime.Component.Execute.
-func (max *Max) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (max *Max) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	maxValue := -math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()

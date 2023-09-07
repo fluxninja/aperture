@@ -19,7 +19,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
-	backgroundscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/background-scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/v2/pkg/prometheus"
@@ -66,14 +65,14 @@ type scalarResultBroker struct {
 }
 
 // Make sure scalarResultBroker complies with the jobResultBroker interface.
-var _ backgroundscheduler.Job = (*scalarResultBroker)(nil)
+var _ runtime.BackgroundJob = (*scalarResultBroker)(nil)
 
-// GetJob implements backgroundscheduler.Job.GetJob.
+// GetJob implements runtime.BackgroundJob.GetJob.
 func (srb *scalarResultBroker) GetJob() jobs.Job {
 	return srb.job
 }
 
-// NotifyCompletion implements backgroundscheduler.Job.NotifyCompletion.
+// NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
 func (srb *scalarResultBroker) NotifyCompletion() {
 	srb.lock.RLock()
 	defer srb.lock.RUnlock()
@@ -107,14 +106,14 @@ type taggedResultBroker struct {
 }
 
 // Make sure promResultBroker complies with the jobResultBroker interface.
-var _ backgroundscheduler.Job = (*taggedResultBroker)(nil)
+var _ runtime.BackgroundJob = (*taggedResultBroker)(nil)
 
-// GetJob implements backgroundscheduler.Job.GetJob.
+// GetJob implements runtime.Job.GetJob.
 func (trb *taggedResultBroker) GetJob() jobs.Job {
 	return trb.job
 }
 
-// NotifyCompletion implements backgroundscheduler.Job.NotifyCompletion.
+// NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
 func (trb *taggedResultBroker) NotifyCompletion() {
 	trb.lock.RLock()
 	defer trb.lock.RUnlock()
@@ -138,14 +137,12 @@ func (trb *taggedResultBroker) handleError(err error, cbArgs ...interface{}) (pr
 }
 
 // Job Register can determine the type of job to register.
-type jobRegistererIfc interface {
-	registerJob(endTimestamp time.Time)
+type queryScheduerIfc interface {
+	scheduleQuery(endTimestamp time.Time, circuitAPI runtime.CircuitAPI)
 }
 
 // PromQL is a component that runs a Prometheus query in the background and returns the result as a signal Reading.
 type PromQL struct {
-	// Last Query Tick
-	tickInfo runtime.TickInfo
 	// Prometheus API
 	promAPI prometheusv1.API
 	// Prometheus Labels Enforcer
@@ -154,16 +151,16 @@ type PromQL struct {
 	policyReadAPI iface.Policy
 	// Current error
 	err error
-	// Job Registerer used to register Prometheus query jobs. Determines the type of job to register.
-	jobRegisterer jobRegistererIfc
-	// Background Scheduler
-	backgroundScheduler backgroundscheduler.Scheduler
+	// Query Scheduler used to scheduler Prometheus query jobs. Determines the type of job to register.
+	queryScheduler queryScheduerIfc
 	// Job name for the query
 	jobName string
 	// The query to run
 	queryString string
 	// Component index
 	componentID string
+	// Execute the query every ticksPerExecution ticks
+	ticksPerExecution int
 	// Current value
 	value float64
 	// Interval of time between evaluations
@@ -186,8 +183,8 @@ func (*PromQL) IsActuator() bool { return false }
 
 var _ runtime.Component = (*PromQL)(nil)
 
-// Make sure PromQL implements jobRegistererIfc.
-var _ jobRegistererIfc = (*PromQL)(nil)
+// Make sure PromQL implements querySchedulerIfc.
+var _ queryScheduerIfc = (*PromQL)(nil)
 
 // NewPromQLAndOptions creates PromQL and its fx options.
 func NewPromQLAndOptions(
@@ -195,16 +192,19 @@ func NewPromQLAndOptions(
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (*PromQL, fx.Option, error) {
+	promQLEvaluationInterval := promQLProto.EvaluationInterval.AsDuration()
+	circuitEvaluationInterval := policyReadAPI.GetEvaluationInterval()
+	ticksPerExecution := int(math.Ceil(float64(promQLEvaluationInterval) / float64(circuitEvaluationInterval)))
 	promQL := &PromQL{
-		evaluationInterval: promQLProto.EvaluationInterval.AsDuration(),
-		policyReadAPI:      policyReadAPI,
-		componentID:        componentID.String(),
+		ticksPerExecution: ticksPerExecution,
+		policyReadAPI:     policyReadAPI,
+		componentID:       componentID.String(),
 		// Set err to make sure the initial runs of Execute return Invalid readings.
 		err: ErrNoQueriesReturned,
 	}
 
 	// Job register is implemented by self
-	promQL.jobRegisterer = promQL
+	promQL.queryScheduler = promQL
 
 	// Job name
 	promQL.jobName = fmt.Sprintf("Component-%s", promQL.componentID)
@@ -221,28 +221,20 @@ func NewPromQLAndOptions(
 	return promQL, options, nil
 }
 
-func (promQL *PromQL) setup(backgroundScheduler backgroundscheduler.Scheduler, promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) error {
+func (promQL *PromQL) setup(promAPI prometheusv1.API, enforcer *prometheus.PrometheusEnforcer) error {
 	promQL.promAPI = promAPI
 	promQL.enforcer = enforcer
-	promQL.backgroundScheduler = backgroundScheduler
 
 	return nil
 }
 
 // Execute implements runtime.Component.Execute.
 func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading,
-	tickInfo runtime.TickInfo,
+	circuitAPI runtime.CircuitAPI,
 ) (outPortReadings runtime.PortToReading, err error) {
-	// Re-run query if evaluationInterval elapsed since last query
-	if tickInfo.Timestamp().Sub(promQL.lastQueryTimestamp()) >= promQL.evaluationInterval {
-		// Run query
-		promQL.tickInfo = tickInfo
-		// Launch job only if previous one is completed
-		// Quantize endTimestamp of query based on tick interval
-		endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
-		// Register query job with the background scheduler
-		promQL.jobRegisterer.registerJob(endTimestamp)
-	}
+	tickInfo := circuitAPI.GetTickInfo()
+	endTimestamp := tickInfo.Timestamp().Truncate(tickInfo.Interval())
+	promQL.scheduleQuery(endTimestamp, circuitAPI)
 
 	// Create current reading based on err and value
 	var currentReading runtime.Reading
@@ -260,39 +252,12 @@ func (promQL *PromQL) Execute(inPortReadings runtime.PortToReading,
 // DynamicConfigUpdate is a no-op for PromQL.
 func (promQL *PromQL) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
-func (promQL *PromQL) registerJob(endTimestamp time.Time) {
-	promQL.registerScalarJob(
-		promQL.jobName,
-		promQL.queryString,
-		endTimestamp,
-		promQL.promAPI,
-		promQL.enforcer,
-		promTimeout,
-		promQL.onScalarResult,
-	)
-}
-
-func (promQL *PromQL) onScalarResult(value float64, err error) {
-	promQL.value = value
-	promQL.err = err
-}
-
-func (promQL *PromQL) lastQueryTimestamp() time.Time {
-	if promQL.tickInfo == nil {
-		return time.Time{}
-	}
-	return promQL.tickInfo.Timestamp()
-}
-
-func (promQL *PromQL) registerScalarJob(
-	jobName string,
-	query string,
-	endTimestamp time.Time,
-	promAPI prometheusv1.API,
-	enforcer *prometheus.PrometheusEnforcer,
-	timeout time.Duration,
-	cb scalarResultCallback,
-) {
+func (promQL *PromQL) scheduleQuery(endTimestamp time.Time, circuitAPI runtime.CircuitAPI) {
+	jobName := promQL.jobName
+	query := promQL.jobName
+	promAPI := promQL.promAPI
+	enforcer := promQL.enforcer
+	cb := promQL.onScalarResult
 	// Result handler for this job
 	scalarResBroker := &scalarResultBroker{
 		cb:    cb,
@@ -304,40 +269,17 @@ func (promQL *PromQL) registerScalarJob(
 			endTimestamp,
 			promAPI,
 			enforcer,
-			timeout,
+			promTimeout,
 			scalarResBroker.handleResult,
 			scalarResBroker.handleError,
 		))
 	scalarResBroker.job = job
-	promQL.backgroundScheduler.RegisterJob(scalarResBroker)
+	circuitAPI.ScheduleBackgroundJob(scalarResBroker, promQL.ticksPerExecution)
 }
 
-func (promQL *PromQL) registerTaggedJob(
-	jobName string,
-	query string,
-	endTimestamp time.Time,
-	promAPI prometheusv1.API,
-	enforcer *prometheus.PrometheusEnforcer,
-	timeout time.Duration,
-	cb promResultCallback,
-) {
-	// Result handler for this job
-	taggedResBroker := &taggedResultBroker{
-		cb:    cb,
-		query: query,
-	}
-	job := jobs.NewBasicJob(jobName,
-		prometheus.NewPromQueryJob(
-			query,
-			endTimestamp,
-			promAPI,
-			enforcer,
-			timeout,
-			taggedResBroker.handleResult,
-			taggedResBroker.handleError,
-		))
-	taggedResBroker.job = job
-	promQL.backgroundScheduler.RegisterJob(taggedResBroker)
+func (promQL *PromQL) onScalarResult(value float64, err error) {
+	promQL.value = value
+	promQL.err = err
 }
 
 // ScalarQuery is a construct that can be used by other components to get tick aligned scalar results of a PromQL query.
@@ -371,17 +313,16 @@ func NewScalarQueryAndOptions(
 }
 
 // ExecuteScalarQuery runs a ScalarQueryJob and returns the current results: value and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
-func (scalarQuery *ScalarQuery) ExecuteScalarQuery(tickInfo runtime.TickInfo) (ScalarResult, error) {
+func (scalarQuery *ScalarQuery) ExecuteScalarQuery(circuitAPI runtime.CircuitAPI) (ScalarResult, error) {
 	inPortReadings := runtime.PortToReading{}
-	_, _ = scalarQuery.promQL.Execute(inPortReadings, tickInfo)
+	_, _ = scalarQuery.promQL.Execute(inPortReadings, circuitAPI)
 	// FYI: promQL ensures that initial runs return err when no queries have returned yet.
-	return ScalarResult{Value: scalarQuery.promQL.value, TickInfo: scalarQuery.promQL.tickInfo}, scalarQuery.promQL.err
+	return ScalarResult{Value: scalarQuery.promQL.value}, scalarQuery.promQL.err
 }
 
 // ScalarResult is the result of a ScalarQuery.
 type ScalarResult struct {
-	TickInfo runtime.TickInfo
-	Value    float64
+	Value float64
 }
 
 // TaggedQuery is a construct that can be used by other components to get tick aligned prometheus value results of a PromQL query.
@@ -391,8 +332,8 @@ type TaggedQuery struct {
 	err         error
 }
 
-// Make sure TaggedQuery implements jobRegistererIfc.
-var _ jobRegistererIfc = (*TaggedQuery)(nil)
+// Make sure TaggedQuery implements queryScheduerIfc.
+var _ queryScheduerIfc = (*TaggedQuery)(nil)
 
 // NewTaggedQueryAndOptions creates a new TaggedQuery and its fx options.
 func NewTaggedQueryAndOptions(
@@ -412,20 +353,33 @@ func NewTaggedQueryAndOptions(
 		err: ErrNoQueriesReturned,
 	}
 	// taggedQuery implements jobRegisterer
-	scalarQuery.promQL.jobRegisterer = taggedQuery
+	scalarQuery.promQL.queryScheduler = taggedQuery
 	return taggedQuery, options, nil
 }
 
-func (taggedQuery *TaggedQuery) registerJob(endTimestamp time.Time) {
-	taggedQuery.scalarQuery.promQL.registerTaggedJob(
-		taggedQuery.scalarQuery.promQL.jobName,
-		taggedQuery.scalarQuery.promQL.queryString,
-		endTimestamp,
-		taggedQuery.scalarQuery.promQL.promAPI,
-		taggedQuery.scalarQuery.promQL.enforcer,
-		promTimeout,
-		taggedQuery.onTaggedResult,
-	)
+func (taggedQuery *TaggedQuery) scheduleQuery(endTimestamp time.Time, circuitAPI runtime.CircuitAPI) {
+	jobName := taggedQuery.scalarQuery.promQL.jobName
+	query := taggedQuery.scalarQuery.promQL.queryString
+	promAPI := taggedQuery.scalarQuery.promQL.promAPI
+	enforcer := taggedQuery.scalarQuery.promQL.enforcer
+	cb := taggedQuery.onTaggedResult
+	// Result handler for this job
+	taggedResBroker := &taggedResultBroker{
+		cb:    cb,
+		query: query,
+	}
+	job := jobs.NewBasicJob(jobName,
+		prometheus.NewPromQueryJob(
+			query,
+			endTimestamp,
+			promAPI,
+			enforcer,
+			promTimeout,
+			taggedResBroker.handleResult,
+			taggedResBroker.handleError,
+		))
+	taggedResBroker.job = job
+	circuitAPI.ScheduleBackgroundJob(taggedResBroker, taggedQuery.scalarQuery.promQL.ticksPerExecution)
 }
 
 func (taggedQuery *TaggedQuery) onTaggedResult(res prometheusmodel.Value, err error) {
@@ -434,13 +388,12 @@ func (taggedQuery *TaggedQuery) onTaggedResult(res prometheusmodel.Value, err er
 }
 
 // ExecuteTaggedQuery runs a PromQueryJob and returns the current results: res and err. This function is supposed to be run under Circuit Execution Lock (Execution of Circuit Components is protected by this lock).
-func (taggedQuery *TaggedQuery) ExecuteTaggedQuery(tickInfo runtime.TickInfo) (TaggedResult, error) {
-	_, _ = taggedQuery.scalarQuery.ExecuteScalarQuery(tickInfo)
-	return TaggedResult{Value: taggedQuery.res, TickInfo: taggedQuery.scalarQuery.promQL.tickInfo}, taggedQuery.err
+func (taggedQuery *TaggedQuery) ExecuteTaggedQuery(circuitAPI runtime.CircuitAPI) (TaggedResult, error) {
+	_, _ = taggedQuery.scalarQuery.ExecuteScalarQuery(circuitAPI)
+	return TaggedResult{Value: taggedQuery.res}, taggedQuery.err
 }
 
 // TaggedResult is the result of a ScalarQuery.
 type TaggedResult struct {
-	TickInfo runtime.TickInfo
-	Value    prometheusmodel.Value
+	Value prometheusmodel.Value
 }

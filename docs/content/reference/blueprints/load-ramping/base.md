@@ -117,7 +117,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='The interval between successive evaluations of the Circuit.'
     type='string'
     reference=''
-    value='"10s"'
+    value='"1s"'
 />
 
 <!-- vale on -->

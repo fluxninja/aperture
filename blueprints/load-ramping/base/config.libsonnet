@@ -91,7 +91,7 @@ local ramp_policy_base_defaults = {
   * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.start: bool) Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   */
-  evaluation_interval: '10s',
+  evaluation_interval: '1s',
   load_ramp: {
     sampler: {
       selectors: commonConfig.selectors_defaults,

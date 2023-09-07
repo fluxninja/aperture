@@ -63,7 +63,7 @@ commonConfig {
   * @param (policy.service_protection_core.kubelet_overload_confirmations: kubelet_overload_confirmations) Overload confirmation signals from kubelet.
   */
   policy+: {
-    evaluation_interval: '10s',
+    evaluation_interval: '1s',
     service_protection_core: service_protection_core_defaults,
   },
 

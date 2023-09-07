@@ -36,7 +36,7 @@ func NewSwitcherAndOptions(_ *policylangv1.Switcher, _ runtime.ComponentID, _ if
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	onSignal := inPortReadings.ReadSingleReadingPort("on_signal")
 	offSignal := inPortReadings.ReadSingleReadingPort("off_signal")
 	switchValue := inPortReadings.ReadSingleReadingPort("switch")

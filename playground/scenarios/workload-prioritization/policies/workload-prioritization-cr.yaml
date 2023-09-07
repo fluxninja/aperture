@@ -81,7 +81,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 10s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers:

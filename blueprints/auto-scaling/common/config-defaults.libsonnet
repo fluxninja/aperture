@@ -27,7 +27,7 @@ local promql_scale_controller_defaults = {
 };
 
 local auto_scaling_defaults = {
-  evaluation_interval: '10s',
+  evaluation_interval: '1s',
 
   promql_scale_out_controllers: [],
 

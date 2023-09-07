@@ -41,7 +41,7 @@
         },
         "evaluation_interval": {
           "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
+          "default": "1s",
           "type": "string"
         },
         "service_protection_core": {

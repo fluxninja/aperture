@@ -696,6 +696,10 @@ message Integrator {
 
   // Initial value of the integrator.
   double initial_value = 3; // @gotags: default:"0"
+
+  // The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+  google.protobuf.Duration evaluation_interval = 4;
 }
 
 // Differentiator calculates rate of change per tick.
@@ -861,9 +865,9 @@ message PIDController {
     double ki = 2; // @gotags: validate:"gte=0" default:"0"
     // The derivative gain of the PID controller.
     double kd = 3; // @gotags: validate:"gte=0" default:"0"
-    // The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
+    // The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-    google.protobuf.Duration sample_period = 4;
+    google.protobuf.Duration evaluation_interval = 4;
     // The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
     int32 reset_after_invalid_samples = 5; // @gotags: validate:"gte=1" default:"4"
   }

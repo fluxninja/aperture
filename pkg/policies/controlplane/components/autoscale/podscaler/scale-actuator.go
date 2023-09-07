@@ -88,7 +88,7 @@ func (sa *ScaleActuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifec
 }
 
 // Execute implements runtime.Component.Execute.
-func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (sa *ScaleActuator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	// Get the decision from the port
 	replicasReading := inPortReadings.ReadSingleReadingPort("replicas")
 	var replicasValue float64
