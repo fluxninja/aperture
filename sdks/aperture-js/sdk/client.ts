@@ -101,8 +101,8 @@ export class ApertureClient {
               // Accept the request if failOpen is true even if we encounter an error
               console.log(
                 `Aperture server unavailable due to ${JSON.stringify(
-                  err
-                )}. Accepting request.`
+                  err,
+                )}. Accepting request.`,
               );
               flow.checkResponse = null;
             } else {
@@ -114,7 +114,7 @@ export class ApertureClient {
           }
 
           resolve(flow);
-        }
+        },
       );
     });
   }

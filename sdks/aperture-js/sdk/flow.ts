@@ -16,7 +16,7 @@ export const FlowDecision = Object.freeze({
   Accepted: "Accepted",
   Rejected: "Rejected",
   Unreachable: "Unreachable",
-})
+});
 
 export class Flow {
   constructor(
@@ -29,12 +29,15 @@ export class Flow {
 
   ShouldRun() {
     var decision = this.Decision();
-    return decision === FlowDecision.Accepted || (this.failOpen && decision === FlowDecision.Unreachable)
+    return (
+      decision === FlowDecision.Accepted ||
+      (this.failOpen && decision === FlowDecision.Unreachable)
+    );
   }
 
   DisableFailOpen() {
-      this.failOpen = false;
-    }
+    this.failOpen = false;
+  }
 
   Decision() {
     if (this.checkResponse === undefined || this.checkResponse === null) {
@@ -63,9 +66,6 @@ export class Flow {
     );
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
 
-    // TODO: attr are unused, can be deleted? MOreover ts throws that attributes do not exist on Span
-    // @ts-ignore
-    let attr = this.span.attributes;
     this.span.end();
   }
 
