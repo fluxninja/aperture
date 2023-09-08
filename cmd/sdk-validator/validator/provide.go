@@ -24,8 +24,15 @@ func ProvideFlowControlHandler(in ConstructorIn) (flowcontrolv1.FlowControlServi
 	return &FlowControlHandler{}, nil
 }
 
+// RegisterIn bundles and annotates parameters.
+type RegisterIn struct {
+	fx.In
+	Server  *grpc.Server `name:"default"`
+	Handler flowcontrolv1.FlowControlServiceServer
+}
+
 // Register registers flowcontrol service on a gRPC server.
-func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServer) {
-	flowcontrolv1.RegisterFlowControlServiceServer(server, handler)
+func Register(in RegisterIn) {
+	flowcontrolv1.RegisterFlowControlServiceServer(in.Server, in.Handler)
 	log.Info().Msg("flowcontrol handler registered")
 }

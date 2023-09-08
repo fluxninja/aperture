@@ -37,8 +37,15 @@ func ServerModule() fx.Option {
 func GMuxServerModule() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
-		ServerConstructor{ListenerName: defaultGMuxListener}.Annotate(),
-		fx.Invoke(RegisterGRPCServerMetrics),
+		ServerConstructor{Name: defaultServerName, ListenerName: defaultGMuxListener}.Annotate(),
+		fx.Invoke(
+			fx.Annotate(
+				RegisterGRPCServerMetrics,
+				fx.ParamTags(
+					config.NameTag(defaultServerName),
+				),
+			),
+		),
 	)
 }
 
