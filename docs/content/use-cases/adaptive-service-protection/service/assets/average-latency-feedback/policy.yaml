@@ -33,18 +33,6 @@ spec:
                 slope: -1
               load_multiplier_linear_increment: 0.025
               load_scheduler:
-                scheduler:
-                  workloads:
-                    - label_matcher:
-                        match_labels:
-                          http.request.header.user_type: guest
-                      parameters:
-                        priority: 50
-                    - label_matcher:
-                        match_labels:
-                          http.request.header.user_type: subscriber
-                      parameters:
-                        priority: 200
                 selectors:
                   - control_point: ingress
                     service: cart-service.prod.svc.cluster.local
@@ -80,7 +68,7 @@ spec:
           out_ports:
             output:
               signal_name: SETPOINT
-    evaluation_interval: 10s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers: []

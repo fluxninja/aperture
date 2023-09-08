@@ -30,10 +30,9 @@ func FactoryModule() fx.Option {
 }
 
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitSuperAPI) fx.Option {
 	return fx.Options(
 		autoScaleModuleForPolicyApp(circuitAPI),
-		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 

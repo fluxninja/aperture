@@ -486,10 +486,10 @@
           "x-go-tag-validate": "dive"
         },
         "evaluation_interval": {
-          "default": "10s",
+          "default": "1s",
           "description": "Evaluation interval (tick) is the time between consecutive runs of the policy circuit.\nThis interval is typically aligned with how often the corrective action (actuation) needs to be taken.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
-          "x-go-tag-default": "10s"
+          "x-go-tag-default": "1s"
         }
       },
       "type": "object",
@@ -556,7 +556,7 @@
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
-          "description": "Differentiator calculates rate of change per tick."
+          "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead."
         },
         "ema": {
           "$ref": "#/definitions/EMA",
@@ -1506,6 +1506,10 @@
     "Integrator": {
       "description": "Accumulates sum of signal every tick.",
       "properties": {
+        "evaluation_interval": {
+          "description": "The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",
+          "type": "string"
+        },
         "in_ports": {
           "$ref": "#/definitions/IntegratorIns",
           "description": "Input ports for the Integrator component."
@@ -2246,6 +2250,10 @@
     },
     "PIDControllerParameters": {
       "properties": {
+        "evaluation_interval": {
+          "description": "The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",
+          "type": "string"
+        },
         "kd": {
           "default": 0,
           "description": "The derivative gain of the PID controller.\n\n",
@@ -2281,10 +2289,6 @@
           "type": "integer",
           "x-go-tag-default": "4",
           "x-go-tag-validate": "gte=1"
-        },
-        "sample_period": {
-          "description": "The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.",
-          "type": "string"
         }
       },
       "type": "object",

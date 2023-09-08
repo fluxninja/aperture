@@ -53,7 +53,6 @@ local service_protection_core_defaults = {
 
 commonConfig {
   /**
-  * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.service_protection_core.overload_confirmations: []overload_confirmation) List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
   * @schema (overload_confirmation.query_string: string) The Prometheus query to be run. Must return a scalar or a vector with a single element.
   * @schema (overload_confirmation.threshold: float64) The threshold for the overload confirmation criteria.
@@ -63,7 +62,6 @@ commonConfig {
   * @param (policy.service_protection_core.kubelet_overload_confirmations: kubelet_overload_confirmations) Overload confirmation signals from kubelet.
   */
   policy+: {
-    evaluation_interval: '10s',
     service_protection_core: service_protection_core_defaults,
   },
 

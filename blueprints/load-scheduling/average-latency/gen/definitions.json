@@ -38,11 +38,6 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,

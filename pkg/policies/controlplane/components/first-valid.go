@@ -33,7 +33,7 @@ func NewFirstValidAndOptions(firstValidProto *policylangv1.FirstValid, _ runtime
 }
 
 // Execute implements runtime.Component.Execute.
-func (fv *FirstValid) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (fv *FirstValid) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()
 

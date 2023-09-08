@@ -1185,7 +1185,7 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale off -->
 
-(string, default: `"10s"`)
+(string, default: `"1s"`)
 
 <!-- vale on -->
 
@@ -1395,7 +1395,8 @@ Decider emits the binary result of comparison operator on two operands.
 
 <!-- vale on -->
 
-Differentiator calculates rate of change per tick.
+Differentiator calculates rate of change per tick. Deprecated: v3.0.0. Use
+`PIDController` instead.
 
 </dd>
 <dt>ema</dt>
@@ -3825,6 +3826,25 @@ MetricsPipelineConfig defines a custom metrics pipeline.
 Accumulates sum of signal every tick.
 
 <dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the Integrator. This determines how often the
+Integrator is incremented. Defaults to the evaluation interval of the circuit.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -5580,6 +5600,25 @@ Output of the PID controller
 <!-- vale on -->
 
 <dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the PID controller. This determines how often the PID
+output is computed. Defaults to the evaluation interval of the circuit. This
+field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>kd</dt>
 <dd>
 
@@ -5627,25 +5666,6 @@ The proportional gain of the PID controller.
 
 The integrator resets after the specified number of ticks if the signal or
 setpoint are continuously invalid. Defaults to 4 invalid samples.
-
-</dd>
-<dt>sample_period</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The sampling period of the PID controller. This determines how often the PID
-output is computed. Defaults to the evaluation period of the circuit. This field
-employs the
-[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers. The format accommodates fractional seconds
-up to nine digits after the decimal point, offering nanosecond precision. Every
-duration value must be suffixed with an "s" to indicate 'seconds.' For example,
-a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
