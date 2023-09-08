@@ -12,12 +12,22 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/Duologic/jsonnet-libsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "7cc2479f21b09a32a86f7128524919f27e90b26b",
+      "sum": "Q8UbL16Hro5GMONfbW5UyrupHTzmOWSK8PZ0xa6OvHM="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/crdsonnet/crdsonnet.git",
           "subdir": "crdsonnet"
         }
       },
-      "version": "3dab27c8c9119eb14ecc19592240caf5f7330d23",
-      "sum": "Vh6Wo/7IIyIkmDE2XAJfWZDlTHClRrdMa9CCBPrcF1U="
+      "version": "148bcc4959273c51a098bac9654a0e1a60ed5118",
+      "sum": "JNQerWOBHj/dmlTCrEc8ko30JOvjg+LQyEhjcduHH/s="
     },
     {
       "source": {
@@ -76,7 +86,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "version": "c0abc546c782a095a22c277d36f871bb94ffc944",
       "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
@@ -86,7 +96,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "version": "c0abc546c782a095a22c277d36f871bb94ffc944",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -96,7 +106,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "f3c7be86c7156678ac30369e85eb4face285b14c",
+      "version": "c0abc546c782a095a22c277d36f871bb94ffc944",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -146,8 +156,8 @@
           "subdir": ""
         }
       },
-      "version": "59533c525e8bc6c54e86d7184c0ddf413a88c91c",
-      "sum": "8YJptN9ErbZFr7AGI6PiWM8A4f70JE5KSgt1cykieDU="
+      "version": "0256a910ac71f0f842696d7bca0bf01ea77eb654",
+      "sum": "zBOpb1oTNvXdq9RF6yzTHill5r1YTJLBBoqyx4JYtAg="
     },
     {
       "source": {
@@ -156,8 +166,8 @@
           "subdir": ""
         }
       },
-      "version": "46fc905d5b2981642043088ac7902ea50db2903e",
-      "sum": "8FAie1MXww5Ip9F8hQWkU9Fio1Af+hO4weQuuexioIQ="
+      "version": "63337d921db856bbcd2e91814a0ac90c250410d6",
+      "sum": "x8/bMVUaNMZEh6mcwhLmTlBJnaleRqhhV+w/+h0H0Pc="
     }
   ],
   "legacyImports": false
