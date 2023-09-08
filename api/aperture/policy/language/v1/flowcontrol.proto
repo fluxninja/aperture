@@ -148,7 +148,7 @@ message RateLimiter {
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
 //
-// The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+// The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.
 message LoadScheduler {
   // Parameters for _Load Scheduler_ component
   message Parameters {
@@ -176,13 +176,13 @@ message LoadScheduler {
   // Input for the LoadScheduler component.
   message Ins {
     // Load multiplier is proportion of incoming
-    // token rate that needs to be accepted.
+    // token rate that needs to be accepted. The signal gets updated once every 10 seconds.
     InPort load_multiplier = 1;
   }
 
   // Output for the LoadScheduler component.
   message Outs {
-    // Observed load multiplier is the proportion of incoming token rate that is being accepted.
+    // Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds.
     OutPort observed_load_multiplier = 1;
   }
 
@@ -325,10 +325,10 @@ message AdaptiveLoadScheduler {
     // The maximum load multiplier that can be reached during recovery from an overload state.
     // - Helps protect the service from request bursts while the system is still recovering.
     // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-    // - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+    // - The pass-through mode gets disabled if the system enters the overload state again.
     double max_load_multiplier = 3; // @gotags: default:"2.0"
 
-    // Linear increment to load multiplier in each execution tick when the system is
+    // Linear increment to load multiplier every 10 seconds while the system is
     // not in the overloaded state, up until the `max_load_multiplier` is reached.
     double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
 

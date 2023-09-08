@@ -403,7 +403,7 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
 //
-// The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+// The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.
 type LoadScheduler struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2229,7 +2229,7 @@ type LoadScheduler_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Load multiplier is proportion of incoming
-	// token rate that needs to be accepted.
+	// token rate that needs to be accepted. The signal gets updated once every 10 seconds.
 	LoadMultiplier *InPort `protobuf:"bytes,1,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
 }
 
@@ -2278,7 +2278,7 @@ type LoadScheduler_Outs struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Observed load multiplier is the proportion of incoming token rate that is being accepted.
+	// Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds.
 	ObservedLoadMultiplier *OutPort `protobuf:"bytes,1,opt,name=observed_load_multiplier,json=observedLoadMultiplier,proto3" json:"observed_load_multiplier,omitempty"`
 }
 
@@ -2489,9 +2489,9 @@ type AdaptiveLoadScheduler_Parameters struct {
 	// The maximum load multiplier that can be reached during recovery from an overload state.
 	// - Helps protect the service from request bursts while the system is still recovering.
 	// - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-	// - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+	// - The pass-through mode gets disabled if the system enters the overload state again.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
-	// Linear increment to load multiplier in each execution tick when the system is
+	// Linear increment to load multiplier every 10 seconds while the system is
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,4,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
 	// Configuration parameters for the embedded Alerter.

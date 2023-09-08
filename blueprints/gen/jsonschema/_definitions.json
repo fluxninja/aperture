@@ -84,7 +84,7 @@
         },
         "load_multiplier_linear_increment": {
           "default": 0.0025,
-          "description": "Linear increment to load multiplier in each execution tick when the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
+          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.0025"
@@ -96,7 +96,7 @@
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.\n\n",
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0"
@@ -1836,7 +1836,7 @@
       "additionalProperties": false
     },
     "LoadScheduler": {
-      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.",
+      "description": ":::info\n\nSee also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).\n\n:::\n\nTo make scheduling decisions the Flows are mapped into Workloads by providing match rules.\nA workload determines the priority and cost of admitting each Flow that belongs to it.\nScheduling of Flows is based on Weighted Fair Queuing principles.\n\nThe signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -1869,7 +1869,7 @@
       "properties": {
         "load_multiplier": {
           "$ref": "#/definitions/InPort",
-          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted."
+          "description": "Load multiplier is proportion of incoming\ntoken rate that needs to be accepted. The signal gets updated once every 10 seconds."
         }
       },
       "type": "object",
@@ -1880,7 +1880,7 @@
       "properties": {
         "observed_load_multiplier": {
           "$ref": "#/definitions/OutPort",
-          "description": "Observed load multiplier is the proportion of incoming token rate that is being accepted."
+          "description": "Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds."
         }
       },
       "type": "object",
