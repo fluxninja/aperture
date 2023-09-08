@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Henry-Sarabia/sliceconv"
 	jsoniter "github.com/json-iterator/go"
 	koanfjson "github.com/knadh/koanf/parsers/json"
 	koanfyaml "github.com/knadh/koanf/parsers/yaml"
@@ -19,8 +20,6 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/pflag"
-
-	"github.com/Henry-Sarabia/sliceconv"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )

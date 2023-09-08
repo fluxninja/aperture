@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -14,27 +16,34 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/fluxninja/aperture/playground/resources/demo-app/app"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-type rabbitMQEnvVar string
-
-type elasticsearchEnvVar string
+type (
+	rabbitMQEnvVar      string
+	elasticsearchEnvVar string
+	pgsqlEnvVar         string
+)
 
 const (
-	rabbitMQEnabled        rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLED"
+	rabbitMQEnabledEnvVar  rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_ENABLED"
 	rabbitMQHostEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_HOST"
 	rabbitMQPortEnvVar     rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PORT"
 	rabbitMQUsernameEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_USERNAME"
 	rabbitMQPasswordEnvVar rabbitMQEnvVar = "SIMPLE_SERVICE_RABBITMQ_PASSWORD"
 
-	elasticsearchEnabled  elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_ENABLED"
-	elasticsearchHost     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_HOST"
-	elasticsearchPort     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PORT"
-	elasticsearchUserName elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_USERNAME"
-	elasticsearchPassword elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PASSWORD"
+	elasticsearchEnabledEnvVar  elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_ENABLED"
+	elasticsearchHostEnvVar     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_HOST"
+	elasticsearchPortEnvVar     elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PORT"
+	elasticsearchUsernameEnvVar elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_USERNAME"
+	elasticsearchPasswordEnvVar elasticsearchEnvVar = "SIMPLE_SERVICE_ELASTICSEARCH_PASSWORD"
+
+	pgsqlEnabledEnvVar  pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_ENABLED"
+	pgsqlHostEnvVar     pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_HOST"
+	pgsqlPortEnvVar     pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_PORT"
+	pgsqlUserEnvVar     pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_USER"
+	pgsqlPasswordEnvVar pgsqlEnvVar = "SIMPLE_SERVICE_PGSQL_PASSWORD"
 )
 
 func main() {
@@ -48,7 +57,7 @@ func main() {
 
 	// RabbitMQ related setup
 	rabbitMQURL := ""
-	if rabbitMQFromEnv(rabbitMQEnabled) == "true" {
+	if rabbitMQFromEnv(rabbitMQEnabledEnvVar) == "true" {
 		rabbitMQHost := rabbitMQFromEnv(rabbitMQHostEnvVar)
 		rabbitMQPort := rabbitMQFromEnv(rabbitMQPortEnvVar)
 		rabbitMQUsername := rabbitMQFromEnv(rabbitMQUsernameEnvVar)
@@ -58,11 +67,11 @@ func main() {
 
 	// Elasticsearch related setup
 	elaticsearchConfig := elasticsearch.Config{}
-	if elasticsearchFromEnv(elasticsearchEnabled) == "true" {
-		elasticsearchHost := elasticsearchFromEnv(elasticsearchHost)
-		elasticsearchPort := elasticsearchFromEnv(elasticsearchPort)
-		elasticsearchUserName := elasticsearchFromEnv(elasticsearchUserName)
-		elasticsearchPassword := elasticsearchFromEnv(elasticsearchPassword)
+	if elasticsearchFromEnv(elasticsearchEnabledEnvVar) == "true" {
+		elasticsearchHost := elasticsearchFromEnv(elasticsearchHostEnvVar)
+		elasticsearchPort := elasticsearchFromEnv(elasticsearchPortEnvVar)
+		elasticsearchUserName := elasticsearchFromEnv(elasticsearchUsernameEnvVar)
+		elasticsearchPassword := elasticsearchFromEnv(elasticsearchPasswordEnvVar)
 
 		elaticsearchConfig = elasticsearch.Config{
 			Addresses: []string{
@@ -76,9 +85,19 @@ func main() {
 			},
 			DiscoverNodesOnStart:  true,
 			DiscoverNodesInterval: 60 * time.Second,
-			Username:   elasticsearchUserName,
-			Password:   elasticsearchPassword,
+			Username:              elasticsearchUserName,
+			Password:              elasticsearchPassword,
 		}
+	}
+
+	// PostgreSQL related setup
+	pgsqlURL := ""
+	if pgsqlFromEnv(pgsqlEnabledEnvVar) == "true" {
+		pgsqlHost := pgsqlFromEnv(pgsqlHostEnvVar)
+		pgsqlPort := pgsqlFromEnv(pgsqlPortEnvVar)
+		pgsqlUser := pgsqlFromEnv(pgsqlUserEnvVar)
+		pgsqlPassword := pgsqlFromEnv(pgsqlPasswordEnvVar)
+		pgsqlURL = fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", pgsqlUser, pgsqlPassword, pgsqlHost, pgsqlPort, pgsqlUser)
 	}
 
 	// We do not necessarily need tracing providers (just propagators), but lets
@@ -103,7 +122,7 @@ func main() {
 		propagation.Baggage{},
 	))
 
-	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, elaticsearchConfig, concurrency, latency, rejectRatio, cpuLoadPercentage)
+	service := app.NewSimpleService(hostname, port, envoyPort, rabbitMQURL, elaticsearchConfig, pgsqlURL, concurrency, latency, rejectRatio, cpuLoadPercentage)
 	err := service.Run()
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -114,7 +133,7 @@ func rabbitMQFromEnv(envVar rabbitMQEnvVar) string {
 	value := os.Getenv(string(envVar))
 	if value == "" {
 		switch envVar {
-		case rabbitMQEnabled:
+		case rabbitMQEnabledEnvVar:
 			return "false"
 		case rabbitMQHostEnvVar:
 			return "localhost"
@@ -135,15 +154,36 @@ func elasticsearchFromEnv(envVar elasticsearchEnvVar) string {
 	value := os.Getenv(string(envVar))
 	if value == "" {
 		switch envVar {
-		case elasticsearchEnabled:
+		case elasticsearchEnabledEnvVar:
 			return "false"
-		case elasticsearchHost:
+		case elasticsearchHostEnvVar:
 			return "localhost"
-		case elasticsearchPort:
+		case elasticsearchPortEnvVar:
 			return "9200"
-		case elasticsearchUserName:
+		case elasticsearchUsernameEnvVar:
 			return "elastic"
-		case elasticsearchPassword:
+		case elasticsearchPasswordEnvVar:
+			return ""
+		default:
+			return ""
+		}
+	}
+	return value
+}
+
+func pgsqlFromEnv(envVar pgsqlEnvVar) string {
+	value := os.Getenv(string(envVar))
+	if value == "" {
+		switch envVar {
+		case pgsqlEnabledEnvVar:
+			return "false"
+		case pgsqlHostEnvVar:
+			return "localhost"
+		case pgsqlPortEnvVar:
+			return "5432"
+		case pgsqlUserEnvVar:
+			return "postgres"
+		case pgsqlPasswordEnvVar:
 			return ""
 		default:
 			return ""

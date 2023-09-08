@@ -15,9 +15,8 @@ healthy.
 
 :::info
 
-Please see reference for the
-[`LoadRamp`](/reference/configuration/spec.md#load-ramp) component that is used
-within this blueprint.
+See reference for the [`LoadRamp`](/reference/configuration/spec.md#load-ramp)
+component that is used within this blueprint.
 
 :::
 
@@ -105,20 +104,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     type='Object (kubelet_metrics)'
     reference='#kubelet-metrics'
     value='{}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->

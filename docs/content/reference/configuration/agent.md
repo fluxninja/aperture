@@ -1003,8 +1003,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of alerts to send in a batch.
 
 </dd>
 <dt>timeout</dt>
@@ -1054,8 +1053,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of metrics to send in a batch.
 
 </dd>
 <dt>timeout</dt>
@@ -1105,8 +1103,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of metrics to send in a batch.
 
 </dd>
 <dt>timeout</dt>

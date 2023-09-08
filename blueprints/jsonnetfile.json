@@ -17,7 +17,16 @@
           "subdir": "gen/grafonnet-v9.4.0"
         }
       },
-      "version": "main"
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2"
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "grafonnet-base"
+        }
+      },
+      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2"
     },
     {
       "source": {

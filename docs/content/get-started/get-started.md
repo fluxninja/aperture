@@ -23,8 +23,8 @@ application.
 
 2. Helm
 
-   Although there is a Helm chart available for installing Aperture, we
-   recommend using `aperturectl` as it provides an easier and less cumbersome
+   Although there is a Helm chart available for installing Aperture, it is
+   recommended to use `aperturectl` as it provides an easier and less cumbersome
    way to get started.
 
 ## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
@@ -37,11 +37,10 @@ application.
 
 2. [**Middleware Insertions**](./set-up-application/middleware-insertions.md)
 
-   To make it easier to integrate Aperture in your application, we have created
-   middleware for popular frameworks like Spring Boot, Netty, Armeria
-   [see available middleware](../integrations/sdk/java/java.md). With the help
-   of middleware, there isn't much code changes required in your application.
-   Some middleware doesn't require any code change at all.
+   To make it easier to integrate Aperture in your application, there are
+   [middleware](../integrations/sdk/java/java.md) for popular frameworks like
+   Spring Boot, Netty, Armeria. With the help of middleware, there isn't much
+   code change required in your application.
 
 3. [**Service Meshes (Istio, Envoy) & API Gateways**](./set-up-application/service-mesh-and-gateways.md)
 

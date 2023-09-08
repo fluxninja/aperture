@@ -31,7 +31,7 @@ no longer overloaded.
 
 :::info
 
-Please see reference for the
+See reference for the
 [`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
 component that is used within this blueprint.
 
@@ -99,20 +99,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Object (aperture.spec.v1.Resources)'
     reference='../../configuration/spec#resources'
     value='{"flow_control": {"classifiers": []}}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->
@@ -531,10 +517,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="postgresql-database"></a>
+<a id="postgresql-databases"></a>
 
 <ParameterDescription
-    name='database'
+    name='databases'
     description='The list of databases for which the receiver will attempt to collect statistics.'
     type='Array of string'
     reference=''

@@ -54,6 +54,7 @@ spec:
                   match_labels:
                     http.target: /service1
                 service: nginx-server.demoapp.svc.cluster.local
+              workload_latency_based_tokens: true
             max_load_multiplier: 2
     - decider:
         in_ports:
@@ -125,7 +126,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 10s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers:

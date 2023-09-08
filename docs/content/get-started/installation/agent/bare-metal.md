@@ -90,8 +90,8 @@ service_discovery:
     enabled: false
 ```
 
-Please verify that the above configuration block is present in the configuration
-file `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
+Verify that the above configuration block is present in the configuration file
+`/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 
 :::
 

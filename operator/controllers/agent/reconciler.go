@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"os"
 	"path"
 	"reflect"
 	"strings"
@@ -909,13 +910,17 @@ func eventFiltersForAgent() predicate.Predicate {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *AgentReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
+	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.Agent{}).
-		Owns(&appsv1.DaemonSet{}).
 		Owns(&corev1.ConfigMap{}).
-		Owns(&corev1.Service{}).
 		Owns(&corev1.Secret{}).
 		Owns(&corev1.ServiceAccount{}).
-		WithEventFilter(eventFiltersForAgent()).
-		Complete(r)
+		WithEventFilter(eventFiltersForAgent())
+
+	sidecarModeEnabled, ok := os.LookupEnv("APERTURE_AGENT_SIDECAR_MODE_ENABLED")
+	if sidecarModeEnabled != "true" || !ok {
+		builder = builder.Owns(&appsv1.DaemonSet{}).
+			Owns(&corev1.Service{})
+	}
+	return builder.Complete(r)
 }

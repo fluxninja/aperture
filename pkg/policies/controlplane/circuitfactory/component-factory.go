@@ -30,10 +30,9 @@ func FactoryModule() fx.Option {
 }
 
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitSuperAPI) fx.Option {
 	return fx.Options(
 		autoScaleModuleForPolicyApp(circuitAPI),
-		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 
@@ -47,6 +46,8 @@ func NewComponentAndOptions(
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
 		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
+	case *policylangv1.Component_PidController:
+		ctor = mkCtor(config.PidController, components.NewPIDControllerAndOptions)
 	case *policylangv1.Component_Ema:
 		ctor = mkCtor(config.Ema, components.NewEMAAndOptions)
 	case *policylangv1.Component_Sma:

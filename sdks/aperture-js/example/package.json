@@ -6,7 +6,8 @@
   "proxy": "http://localhost:8080",
   "scripts": {
     "start": "tsx ./example.ts",
-    "build": "rm -rf ./dist && tsc -p tsconfig.json"
+    "prebuild": "rm -rf ./dist",
+    "build": "tsc -p tsconfig.json"
   },
   "type": "module",
   "keywords": [],
@@ -17,6 +18,7 @@
     "http-terminator": "^3.2.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17"
+    "@types/express": "^4.17.17",
+    "typescript": "^5.2.2"
   }
 }

@@ -410,7 +410,7 @@ definitions:
                 description: |+
                     Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
                     For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-                    scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+                    scale-increases by 10% or more, the previous cooldown is canceled. Defaults to 50%.
 
                 format: double
                 type: number
@@ -675,14 +675,14 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 10s
+                default: 1s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
-                x-go-tag-default: 10s
+                x-go-tag-default: 1s
         type: object
     Classifier:
         description: |-
@@ -825,7 +825,9 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: Differentiator calculates rate of change per tick.
+                description: |-
+                    Differentiator calculates rate of change per tick.
+                    Deprecated: v3.0.0. Use `PIDController` instead.
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -870,6 +872,9 @@ definitions:
             or:
                 $ref: '#/definitions/Or'
                 description: Logical OR.
+            pid_controller:
+                $ref: '#/definitions/PIDController'
+                description: PID Controller is a proportional–integral–derivative controller.
             pulse_generator:
                 $ref: '#/definitions/PulseGenerator'
                 description: Generates 0 and 1 in turns.
@@ -1173,7 +1178,7 @@ definitions:
                 x-go-tag-validate: gte=1.0
             ema_window:
                 description: |+
-                    Duration of EMA sampling window.
+                    EMA window duration.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
@@ -1985,6 +1990,11 @@ definitions:
     Integrator:
         description: Accumulates sum of signal every tick.
         properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             in_ports:
                 $ref: '#/definitions/IntegratorIns'
                 description: Input ports for the Integrator component.
@@ -2453,8 +2463,6 @@ definitions:
             To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
             A workload determines the priority and cost of admitting each Flow that belongs to it.
             Scheduling of Flows is based on Weighted Fair Queuing principles.
-            _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
-            to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
             The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
         properties:
@@ -2515,21 +2523,21 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             workload_latency_based_tokens:
-                default: true
+                default: false
                 description: |+
-                    Automatically estimate the size flows within each workload, based on
+                    Automatically estimate the size of flows within each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
                     latency of flows in that workload during the last few seconds (exact duration
                     of this average can change).
                     This setting is useful in concurrency limiting use-case, where the
-                    concurrency is calculated as ``(avg. latency \* in-flight flows)`.
+                    concurrency is calculated as `(avg. latency \* in-flight flows)` (Little's Law).
 
                     The value of tokens estimated takes a lower precedence
                     than the value of `tokens` specified in the workload definition
                     and `tokens` explicitly specified in the flow labels.
 
                 type: boolean
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
         required:
             - selectors
         title: Parameters for _Load Scheduler_ component
@@ -2782,6 +2790,94 @@ definitions:
                 type: string
             service2:
                 type: string
+        type: object
+    PIDController:
+        properties:
+            in_ports:
+                $ref: '#/definitions/PIDControllerIns'
+            out_ports:
+                $ref: '#/definitions/PIDControllerOuts'
+            parameters:
+                $ref: '#/definitions/PIDControllerParameters'
+                x-go-tag-validate: required
+        title: |-
+            PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
+            <!-- vale off -->
+            $$
+            error = setpoint - signal \\
+            integral_i = integral_{i-1} + k_i \cdot error \\
+            output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
+            $$
+            <!-- vale on -->
+        type: object
+    PIDControllerIns:
+        properties:
+            max:
+                $ref: '#/definitions/InPort'
+                title: Maximum allowed output
+            min:
+                $ref: '#/definitions/InPort'
+                title: Minimum allowed output
+            setpoint:
+                $ref: '#/definitions/InPort'
+                title: The desired setpoint for the signal
+            signal:
+                $ref: '#/definitions/InPort'
+                title: The signal to be controlled
+        type: object
+    PIDControllerOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                title: Output of the PID controller
+        type: object
+    PIDControllerParameters:
+        properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
+            kd:
+                default: 0
+                description: |+
+                    The derivative gain of the PID controller.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: gte=0
+            ki:
+                default: 0
+                description: |+
+                    The integral gain of the PID controller.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: gte=0
+            kp:
+                default: 0
+                description: |+
+                    The proportional gain of the PID controller.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0"
+                x-go-tag-validate: gte=0
+            reset_after_invalid_samples:
+                default: 4
+                description: |+
+                    The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
+
+                format: int32
+                minimum: 1
+                type: integer
+                x-go-tag-default: "4"
+                x-go-tag-validate: gte=1
         type: object
     PathTemplateMatcher:
         description: |-
@@ -3211,16 +3307,13 @@ definitions:
                 type: string
                 x-go-tag-default: 7200s
             tokens_label_key:
-                default: tokens
-                description: |+
+                description: |-
                     Flow label key that will be used to override the number of tokens
                     for this request.
                     This is an optional parameter and takes highest precedence
                     when assigning tokens to a request.
                     The label value must be a valid uint64 number.
-
                 type: string
-                x-go-tag-default: tokens
         required:
             - interval
         type: object
@@ -3662,23 +3755,17 @@ definitions:
                 $ref: '#/definitions/StatusCode'
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priorities_label_key:
-                default: priorities
-                description: |+
+                description: |-
                     * Key for a flow label that can be used to override the default priority for this flow.
                     * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
                     * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-
                 type: string
-                x-go-tag-default: priorities
             tokens_label_key:
-                default: tokens
-                description: |+
+                description: |-
                     * Key for a flow label that can be used to override the default number of tokens for this flow.
                     * The value associated with this key must be a valid uint64 number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-
                 type: string
-                x-go-tag-default: tokens
             workloads:
                 description: |+
                     List of workloads to be used in scheduler.
@@ -3755,12 +3842,13 @@ definitions:
             queue_timeout:
                 description: |-
                     Timeout for the flow in the workload.
-                    If timeout is provided on the Check call as well, we pick the minimum of the two.
+                    If timeout is provided on the Check call as well, the minimum of the two is picked.
                     If this override is not provided, the timeout provided in the check call is used.
-                    0 timeout value implies that the request will not wait in the queue and will be accepted/dropped immediately.
+                    0 timeout value implies that the request will not wait in the queue and will be accepted or dropped immediately.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
             tokens:
+                default: 1
                 description: |+
                     Tokens determines the cost of admitting a single flow in the workload,
                     which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -3770,8 +3858,9 @@ definitions:
                     in the flow labels.
 
                 format: int64
-                minLength: 0
-                type: string
+                minimum: 0
+                type: integer
+                x-go-tag-default: "1"
                 x-go-tag-validate: gte=0
         type: object
     Selector:

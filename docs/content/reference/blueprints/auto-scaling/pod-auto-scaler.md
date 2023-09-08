@@ -10,9 +10,8 @@ PromQL queries for scale-in and scale-out.
 
 :::info
 
-Please see reference for the
-[`AutoScale`](/reference/configuration/spec.md#auto-scale) component that is
-used within this blueprint.
+See reference for the [`AutoScale`](/reference/configuration/spec.md#auto-scale)
+component that is used within this blueprint.
 
 :::
 
@@ -92,20 +91,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
     type='Boolean'
     reference=''
     value='false'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->

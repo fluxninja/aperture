@@ -55,7 +55,7 @@ func NewSignalGeneratorAndOptions(generatorProto *policylangv1.SignalGenerator, 
 }
 
 // Execute implements runtime.Component.Execute.
-func (sg *SignalGenerator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (sg *SignalGenerator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
 	forwardVal := inPortReadings.ReadSingleReadingPort("forward")
 	backwardVal := inPortReadings.ReadSingleReadingPort("backward")

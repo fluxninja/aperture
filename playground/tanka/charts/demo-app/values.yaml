@@ -32,6 +32,13 @@ elasticseach:
   username: ~
   password: ~
 
+postgresql:
+  enabled: false
+  host: ~
+  port: 5432
+  user: ~
+  password: ~
+
 nginx:
   enabled: false
   resources: {}

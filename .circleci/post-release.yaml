@@ -343,8 +343,8 @@ workflows:
           component: cli
           matrix:
             parameters:
-              goos: ["linux","darwin"]
-              goarch: ["amd64","arm64"]
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
 
       - update-environment:
           filters:

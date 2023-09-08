@@ -106,7 +106,7 @@ To try Aperture in a local Kubernetes environment, refer to
 
 ### 🏎️ Installation
 
-To install the Aperture system, please follow the
+To install the Aperture system, follow the
 [Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Use Cases
@@ -116,25 +116,25 @@ To install the Aperture system, please follow the
 
 ### 🖥️ Slide Decks
 
-- [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs/edit?usp=sharing)
+- [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs)
   deck covers the overview and use-cases of Aperture.
 
 ## 🎥 Videos
 
-- [SREcon 23 APAC - Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
-- [Chaos Carnival 2023-Graceful Degradation:Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
-- [Graceful Degradation: When All Goes Wrong | Tanveer Gill | Conf42 Chaos Engineering 2023](https://www.youtube.com/watch?v=nm62d2gYqNk)
-- [How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
-- [Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
+- [SREcon'23 APAC | Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
+- [Chaos Carnival 2023 | Graceful Degradation: Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
+- [Conf42 Chaos Engineering 2023 | Graceful Degradation: When All Goes Wrong](https://www.youtube.com/watch?v=nm62d2gYqNk)
+- [Demo | How Concurrency Limits Help Protect Against Cascading Failures](https://youtu.be/m070bAvrDHM)
+- [Explainer | Build Indestructible Applications with Aperture Flow Control](https://www.youtube.com/watch?v=sEl4SMo3KNo)
 
 ## 👷 Contributing
 
 [Reporting bugs](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
-helps us improve Aperture to be more reliable and user-friendly. Please make
-sure to include all the required information to reproduce and understand the bug
-you are reporting. Follow helper questions in the bug report template to make it
-easier. If you see a way to improve Aperture, use the
+helps us improve Aperture to be more reliable and user-friendly. Include all the
+required information to reproduce and understand the bug you are reporting.
+Follow helper questions in the bug report template to make it easier. If you see
+a way to improve Aperture, use the
 [feature request](https://github.com/fluxninja/aperture/issues/new?assignees=&labels=feature+request&template=feature_request.md&title=)
 template to create an issue.
 
-To contribute code, please read the [Contribution guide](CONTRIBUTING.md).
+To contribute code, read the [Contribution guide](CONTRIBUTING.md).

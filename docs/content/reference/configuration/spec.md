@@ -962,7 +962,7 @@ Outputs
 Cooldown override percentage defines a threshold change in scale-out beyond
 which previous cooldown is overridden. For example, if the cooldown is 5 minutes
 and the cooldown override percentage is 10%, then if the scale-increases by 10%
-or more, the previous cooldown is cancelled. Defaults to 50%.
+or more, the previous cooldown is canceled. Defaults to 50%.
 
 </dd>
 <dt>max_scale_in_percentage</dt>
@@ -1185,7 +1185,7 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale off -->
 
-(string, default: `"10s"`)
+(string, default: `"1s"`)
 
 <!-- vale on -->
 
@@ -1395,7 +1395,8 @@ Decider emits the binary result of comparison operator on two operands.
 
 <!-- vale on -->
 
-Differentiator calculates rate of change per tick.
+Differentiator calculates rate of change per tick. Deprecated: v3.0.0. Use
+`PIDController` instead.
 
 </dd>
 <dt>ema</dt>
@@ -1573,6 +1574,18 @@ signal into a nested circuit.
 <!-- vale on -->
 
 Logical OR.
+
+</dd>
+<dt>pid_controller</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDController](#p-id-controller))
+
+<!-- vale on -->
+
+PID Controller is a proportional–integral–derivative controller.
 
 </dd>
 <dt>pulse_generator</dt>
@@ -2282,7 +2295,7 @@ envelope.
 
 <!-- vale on -->
 
-Duration of EMA sampling window. This field employs the
+EMA window duration. This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
 representation from Protocol Buffers. The format accommodates fractional seconds
 up to nine digits after the decimal point, offering nanosecond precision. Every
@@ -3813,6 +3826,25 @@ MetricsPipelineConfig defines a custom metrics pipeline.
 Accumulates sum of signal every tick.
 
 <dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the Integrator. This determines how often the
+Integrator is incremented. Defaults to the evaluation interval of the circuit.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -4610,9 +4642,7 @@ See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
 To make scheduling decisions the Flows are mapped into Workloads by providing
 match rules. A workload determines the priority and cost of admitting each Flow
 that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
-principles. _Load Scheduler_ measures and controls the incoming tokens per
-second, which can translate to (avg. latency \* in-flight requests) (Little's
-Law) in concurrency limiting use-case.
+principles.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
 that get admitted.
@@ -4774,15 +4804,16 @@ Selectors for the component.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
-Automatically estimate the size flows within each workload, based on historical
-latency. Each workload's `tokens` will be set to average latency of flows in
-that workload during the last few seconds (exact duration of this average can
-change). This setting is useful in concurrency limiting use-case, where the
-concurrency is calculated as ``(avg. latency \* in-flight flows)`.
+Automatically estimate the size of flows within each workload, based on
+historical latency. Each workload's `tokens` will be set to average latency of
+flows in that workload during the last few seconds (exact duration of this
+average can change). This setting is useful in concurrency limiting use-case,
+where the concurrency is calculated as `(avg. latency \* in-flight flows)`
+(Little's Law).
 
 The value of tokens estimated takes a lower precedence than the value of
 `tokens` specified in the workload definition and `tokens` explicitly specified
@@ -5417,6 +5448,224 @@ Components produce output for other components through OutPorts
 <!-- vale on -->
 
 Name of the outgoing Signal on the OutPort.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDController {#p-id-controller}
+
+<!-- vale on -->
+
+PID Controller is a popular control mechanism for closed-loop feedback control.
+It takes a signal and a setpoint as inputs and uses the PID algorithm to compute
+proportional (proportional to the magnitude of error), integral (proportional to
+accumulation of error), and derivative (proportional to how fast the signal is
+changing) terms which are summed up to get a desired output.
+
+<!-- vale off -->
+
+$$
+error = setpoint - signal \\
+integral_i = integral_{i-1} + k_i \cdot error \\
+output_i = k_p \cdot error + k_d \cdot (signal_i - signal_{i-1}) + integral_i
+$$
+
+<!-- vale on -->
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerIns](#p-id-controller-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerOuts](#p-id-controller-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([PIDControllerParameters](#p-id-controller-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerIns {#p-id-controller-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>max</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Maximum allowed output
+
+</dd>
+<dt>min</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+Minimum allowed output
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The desired setpoint for the signal
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The signal to be controlled
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerOuts {#p-id-controller-outs}
+
+<!-- vale on -->
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Output of the PID controller
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PIDControllerParameters {#p-id-controller-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the PID controller. This determines how often the PID
+output is computed. Defaults to the evaluation interval of the circuit. This
+field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
+<dt>kd</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0`)
+
+<!-- vale on -->
+
+The derivative gain of the PID controller.
+
+</dd>
+<dt>ki</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0`)
+
+<!-- vale on -->
+
+The integral gain of the PID controller.
+
+</dd>
+<dt>kp</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0`)
+
+<!-- vale on -->
+
+The proportional gain of the PID controller.
+
+</dd>
+<dt>reset_after_invalid_samples</dt>
+<dd>
+
+<!-- vale off -->
+
+(int32, minimum: `1`, default: `4`)
+
+<!-- vale on -->
+
+The integrator resets after the specified number of ticks if the signal or
+setpoint are continuously invalid. Defaults to 4 invalid samples.
 
 </dd>
 </dl>
@@ -6178,7 +6427,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string, default: `"tokens"`)
+(string)
 
 <!-- vale on -->
 
@@ -6968,7 +7217,7 @@ This field allows you to override the default HTTP status code
 
 <!-- vale off -->
 
-(string, default: `"priorities"`)
+(string)
 
 <!-- vale on -->
 
@@ -6985,7 +7234,7 @@ This field allows you to override the default HTTP status code
 
 <!-- vale off -->
 
-(string, default: `"tokens"`)
+(string)
 
 <!-- vale on -->
 
@@ -7128,9 +7377,9 @@ $$
 <!-- vale on -->
 
 Timeout for the flow in the workload. If timeout is provided on the Check call
-as well, we pick the minimum of the two. If this override is not provided, the
+as well, the minimum of the two is picked. If this override is not provided, the
 timeout provided in the check call is used. 0 timeout value implies that the
-request will not wait in the queue and will be accepted/dropped immediately.
+request will not wait in the queue and will be accepted or dropped immediately.
 This field employs the
 [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
 representation from Protocol Buffers. The format accommodates fractional seconds
@@ -7144,7 +7393,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string)
+(int64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 

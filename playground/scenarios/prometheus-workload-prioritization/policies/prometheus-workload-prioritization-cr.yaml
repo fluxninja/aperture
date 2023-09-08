@@ -53,6 +53,7 @@ spec:
                     http.path: /api/v1/write
                     is_demo_app: "true"
                 service: controller-prometheus-server.aperture-controller.svc.cluster.local
+              workload_latency_based_tokens: true
             max_load_multiplier: 2
     - query:
         promql:
@@ -83,7 +84,7 @@ spec:
         out_ports:
           output:
             signal_name: SETPOINT
-    evaluation_interval: 10s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers:

@@ -50,7 +50,7 @@ type BatchPrerollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"10s"`
 
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	// SendBatchSize is the number of metrics to send in a batch.
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"10000"`
 
 	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split
@@ -66,7 +66,7 @@ type BatchPostrollupConfig struct {
 	// Timeout sets the time after which a batch will be sent regardless of size.
 	Timeout config.Duration `json:"timeout" validate:"gt=0" default:"1s"`
 
-	// SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+	// SendBatchSize is the number of metrics to send in a batch.
 	SendBatchSize uint32 `json:"send_batch_size" validate:"gt=0" default:"100"`
 
 	// SendBatchMaxSize is the upper limit of the batch size. Bigger batches will be split

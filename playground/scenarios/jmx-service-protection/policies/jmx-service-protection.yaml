@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../blueprints/load-scheduling/average-latency/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/jmx/gen/definitions.json
 # Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
@@ -69,6 +69,7 @@ policy:
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:
+        workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
         # Type: []aperture.spec.v1.Selector
         # Required: True
@@ -95,4 +96,4 @@ policy:
       load_multiplier_linear_increment: 0.025
 
   jmx:
-    app_namespace: 'demoapp'
+    app_namespace: "demoapp"
