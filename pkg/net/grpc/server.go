@@ -29,7 +29,14 @@ const (
 func ServerModule() fx.Option {
 	return fx.Options(
 		ServerConstructor{Name: defaultServerName}.Annotate(),
-		fx.Invoke(RegisterGRPCServerMetrics),
+		fx.Invoke(
+			fx.Annotate(
+				RegisterGRPCServerMetrics,
+				fx.ParamTags(
+					config.NameTag(defaultServerName),
+				),
+			),
+		),
 	)
 }
 

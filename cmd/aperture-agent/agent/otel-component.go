@@ -41,7 +41,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/adapterconnector"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsreceiver"
-	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/rollupprocessor"
@@ -66,23 +65,17 @@ func ModuleForAgentOTel() fx.Option {
 		fx.Provide(
 			cache.Provide[selectors.TypedControlPointID],
 			provideAgent,
-			fx.Annotate(
-				AgentOTelComponents,
-				fx.ParamTags(
-					alerts.AlertsFxTag,
-					otelconsts.ReceiverFactoriesFxTag,
-					otelconsts.ProcessorFactoriesFxTag,
-				),
-			),
+			AgentOTelComponents,
 		),
 	)
 }
 
 // AgentOTelComponentsIn bundles and annotates parameters.
 type AgentOTelComponentsIn struct {
-	Alerter            alerts.Alerter
-	ReceiverFactories  []receiver.Factory
-	ProcessorFactories []processor.Factory
+	fx.In
+	Alerter            alerts.Alerter      `name:"AlertsFx"`
+	ReceiverFactories  []receiver.Factory  `group:"otel-collector-receiver-factories"`
+	ProcessorFactories []processor.Factory `group:"otel-collector-processor-factories"`
 	PromRegistry       *prometheus.Registry
 	Engine             iface.Engine
 	ClasEng            iface.ClassificationEngine
