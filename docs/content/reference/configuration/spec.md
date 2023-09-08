@@ -4804,7 +4804,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -7393,7 +7393,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(int64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 

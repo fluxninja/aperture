@@ -162,7 +162,7 @@ message LoadScheduler {
     // The value of tokens estimated takes a lower precedence
     // than the value of `tokens` specified in the workload definition
     // and `tokens` explicitly specified in the flow labels.
-    bool workload_latency_based_tokens = 1; // @gotags: default:"true"
+    bool workload_latency_based_tokens = 1; // @gotags: default:"false"
 
     // Configuration of Weighted Fair Queuing-based workload scheduler.
     //
@@ -236,7 +236,7 @@ message Scheduler {
       // number of flows (3rd party rate limiters).
       // This override is applicable only if tokens for the flow aren't specified
       // in the flow labels.
-      uint32 tokens = 2; // @gotags: validate:"gte=0"
+      uint32 tokens = 2; // @gotags: validate:"gte=0" default:"1"
 
       // Timeout for the flow in the workload.
       // If timeout is provided on the Check call as well, the minimum of the two is picked.

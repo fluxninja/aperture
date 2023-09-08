@@ -2160,7 +2160,7 @@ type LoadScheduler_Parameters struct {
 	// The value of tokens estimated takes a lower precedence
 	// than the value of `tokens` specified in the workload definition
 	// and `tokens` explicitly specified in the flow labels.
-	WorkloadLatencyBasedTokens bool `protobuf:"varint,1,opt,name=workload_latency_based_tokens,json=workloadLatencyBasedTokens,proto3" json:"workload_latency_based_tokens,omitempty" default:"true"` // @gotags: default:"true"
+	WorkloadLatencyBasedTokens bool `protobuf:"varint,1,opt,name=workload_latency_based_tokens,json=workloadLatencyBasedTokens,proto3" json:"workload_latency_based_tokens,omitempty" default:"false"` // @gotags: default:"false"
 	// Configuration of Weighted Fair Queuing-based workload scheduler.
 	//
 	// Contains configuration of per-agent scheduler
@@ -2414,7 +2414,7 @@ type Scheduler_Workload_Parameters struct {
 	// number of flows (3rd party rate limiters).
 	// This override is applicable only if tokens for the flow aren't specified
 	// in the flow labels.
-	Tokens uint32 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
+	Tokens uint32 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0" default:"1"` // @gotags: validate:"gte=0" default:"1"
 	// Timeout for the flow in the workload.
 	// If timeout is provided on the Check call as well, the minimum of the two is picked.
 	// If this override is not provided, the timeout provided in the check call is used.
