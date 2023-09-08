@@ -6,7 +6,8 @@ function(cfg) {
     var.datasource.new('datasource', 'prometheus')
     + var.datasource.generalOptions.withLabel('Data Source')
     + var.datasource.selectionOptions.withMulti(false)
-    + var.datasource.selectionOptions.withIncludeAll(false),
+    + var.datasource.selectionOptions.withIncludeAll(false)
+    + var.datasource.generalOptions.showOnDashboard.withNothing(),
 
   local dashboardDef =
     g.dashboard.new(cfg.dashboard.title)
