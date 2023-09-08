@@ -55,6 +55,7 @@ spec:
                   match_labels:
                     http.target: /service1/request
                 service: kong-server.demoapp.svc.cluster.local
+              workload_latency_based_tokens: true
             max_load_multiplier: 2
     - decider:
         in_ports:
