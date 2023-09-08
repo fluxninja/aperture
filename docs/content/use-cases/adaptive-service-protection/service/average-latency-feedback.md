@@ -1,10 +1,10 @@
 ---
 title: Average Latency Feedback
+sidebar_position: 1
 keywords:
   - policies
   - concurrency
   - service-protection
-sidebar_position: 2
 ---
 
 ```mdx-code-block
@@ -126,7 +126,7 @@ Apply the policy YAML generated (Kubernetes Custom Resource) using the above
 example with `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/configuration/basic-service-protection-cr.yaml -n aperture-controller
+kubectl apply -f policy-gen/policies/basic-service-protection-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
