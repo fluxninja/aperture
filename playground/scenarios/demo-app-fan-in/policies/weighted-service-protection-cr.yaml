@@ -1,0 +1,111 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: weighted-service-protection
+spec:
+  circuit:
+    components:
+    - flow_control:
+        adaptive_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    expression:
+                      all:
+                        of:
+                        - label_matches:
+                            label: aperture.source_fqdns
+                            regex: service1-demo-app.demoapp.svc.cluster.local
+                        - label_matches:
+                            label: aperture.destination_fqdns
+                            regex: service3-demo-app.demoapp.svc.cluster.local
+                  name: service1
+                  parameters:
+                    priority: 200
+                - label_matcher:
+                    expression:
+                      all:
+                        of:
+                        - label_matches:
+                            label: aperture.source_fqdns
+                            regex: service2-demo-app.demoapp.svc.cluster.local
+                        - label_matches:
+                            label: aperture.destination_fqdns
+                            regex: service3-demo-app.demoapp.svc.cluster.local
+                  name: service2
+                  parameters:
+                    priority: 50
+              selectors:
+              - agent_group: default
+                control_point: egress
+                service: service1-demo-app.demoapp.svc.cluster.local
+              - agent_group: default
+                control_point: egress
+                service: service2-demo-app.demoapp.svc.cluster.local
+            max_load_multiplier: 2
+    - query:
+        promql:
+          evaluation_interval: 10s
+          out_ports:
+            output:
+              signal_name: SIGNAL
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="weighted-service-protection",
+            policy_name="weighted-service-protection"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="weighted-service-protection", policy_name="weighted-service-protection"}[30s]))
+    - query:
+        promql:
+          evaluation_interval: 30s
+          out_ports:
+            output:
+              signal_name: SIGNAL_LONG_TERM
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="weighted-service-protection",
+            policy_name="weighted-service-protection"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="weighted-service-protection", policy_name="weighted-service-protection"}[1800s]))
+    - arithmetic_combinator:
+        in_ports:
+          lhs:
+            signal_name: SIGNAL_LONG_TERM
+          rhs:
+            constant_signal:
+              value: 1.1
+        operator: mul
+        out_ports:
+          output:
+            signal_name: SETPOINT
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
+      flux_meters:
+        weighted-service-protection:
+          selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service3-demo-app.demoapp.svc.cluster.local
+    infra_meters: {}

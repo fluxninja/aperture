@@ -1,4 +1,4 @@
 {
-  circuitEvalulationInterval: '1s',
+  circuitEvaluationInterval: '1s',
   metricScrapeInterval: '10s',
 }
