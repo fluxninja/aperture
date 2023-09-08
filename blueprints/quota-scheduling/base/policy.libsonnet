@@ -17,21 +17,23 @@ function(cfg, metadata={}) {
     + policy.withCircuit(
       circuit.new()
       + circuit.withEvaluationInterval('1s')
-      + circuit.withComponents([
-        component.withFlowControl(
-          flowControl.new()
-          + flowControl.withQuotaScheduler(
-            quotaScheduler.new()
-            + quotaScheduler.withInPorts({
-              bucket_capacity: port.withConstantSignal(params.policy.quota_scheduler.bucket_capacity),
-              fill_amount: port.withConstantSignal(params.policy.quota_scheduler.fill_amount),
-            })
-            + quotaScheduler.withSelectors(params.policy.quota_scheduler.selectors)
-            + quotaScheduler.withRateLimiter(params.policy.quota_scheduler.rate_limiter)
-            + quotaScheduler.withScheduler(params.policy.quota_scheduler.scheduler)
+      + circuit.withComponents(
+        [
+          component.withFlowControl(
+            flowControl.new()
+            + flowControl.withQuotaScheduler(
+              quotaScheduler.new()
+              + quotaScheduler.withInPorts({
+                bucket_capacity: port.withConstantSignal(params.policy.quota_scheduler.bucket_capacity),
+                fill_amount: port.withConstantSignal(params.policy.quota_scheduler.fill_amount),
+              })
+              + quotaScheduler.withSelectors(params.policy.quota_scheduler.selectors)
+              + quotaScheduler.withRateLimiter(params.policy.quota_scheduler.rate_limiter)
+              + quotaScheduler.withScheduler(params.policy.quota_scheduler.scheduler)
+            ),
           ),
-        ),
-      ]),
+        ] + params.policy.components,
+      ),
     ),
 
   local policyResource = {

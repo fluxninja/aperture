@@ -402,8 +402,6 @@ func (x *RateLimiter) GetSelectors() []*Selector {
 // To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
 // A workload determines the priority and cost of admitting each Flow that belongs to it.
 // Scheduling of Flows is based on Weighted Fair Queuing principles.
-// _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
-// to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 //
 // The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
 type LoadScheduler struct {
@@ -544,11 +542,11 @@ type Scheduler struct {
 	// * Key for a flow label that can be used to override the default number of tokens for this flow.
 	// * The value associated with this key must be a valid uint64 number.
 	// * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
-	TokensLabelKey string `protobuf:"bytes,7,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty" default:"tokens"` // @gotags: default:"tokens"
+	TokensLabelKey string `protobuf:"bytes,7,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// * Key for a flow label that can be used to override the default priority for this flow.
 	// * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
 	// * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-	PrioritiesLabelKey string `protobuf:"bytes,8,opt,name=priorities_label_key,json=prioritiesLabelKey,proto3" json:"priorities_label_key,omitempty" default:"priorities"` // @gotags: default:"priorities"
+	PrioritiesLabelKey string `protobuf:"bytes,8,opt,name=priorities_label_key,json=prioritiesLabelKey,proto3" json:"priorities_label_key,omitempty"`
 	// This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
 	DeniedResponseStatusCode v1.StatusCode `protobuf:"varint,9,opt,name=denied_response_status_code,json=deniedResponseStatusCode,proto3,enum=aperture.flowcontrol.check.v1.StatusCode" json:"denied_response_status_code,omitempty"`
 }
@@ -1923,7 +1921,7 @@ type RateLimiter_Parameters struct {
 	// This is an optional parameter and takes highest precedence
 	// when assigning tokens to a request.
 	// The label value must be a valid uint64 number.
-	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty" default:"tokens"` // @gotags: default:"tokens"
+	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// Interval defines the time interval in which the token bucket
 	// will fill tokens specified by `fill_amount` signal.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
@@ -2152,12 +2150,12 @@ type LoadScheduler_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Automatically estimate the size flows within each workload, based on
+	// Automatically estimate the size of flows within each workload, based on
 	// historical latency. Each workload's `tokens` will be set to average
 	// latency of flows in that workload during the last few seconds (exact duration
 	// of this average can change).
 	// This setting is useful in concurrency limiting use-case, where the
-	// concurrency is calculated as “(avg. latency \* in-flight flows)`.
+	// concurrency is calculated as `(avg. latency \* in-flight flows)` (Little's Law).
 	//
 	// The value of tokens estimated takes a lower precedence
 	// than the value of `tokens` specified in the workload definition
@@ -2416,7 +2414,7 @@ type Scheduler_Workload_Parameters struct {
 	// number of flows (3rd party rate limiters).
 	// This override is applicable only if tokens for the flow aren't specified
 	// in the flow labels.
-	Tokens int64 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
+	Tokens uint32 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0"` // @gotags: validate:"gte=0"
 	// Timeout for the flow in the workload.
 	// If timeout is provided on the Check call as well, the minimum of the two is picked.
 	// If this override is not provided, the timeout provided in the check call is used.
@@ -2464,7 +2462,7 @@ func (x *Scheduler_Workload_Parameters) GetPriority() float64 {
 	return 0
 }
 
-func (x *Scheduler_Workload_Parameters) GetTokens() int64 {
+func (x *Scheduler_Workload_Parameters) GetTokens() uint32 {
 	if x != nil {
 		return x.Tokens
 	}
@@ -3651,7 +3649,7 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x1a, 0x80, 0x01, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12,
 	0x1a, 0x0a, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x01, 0x52, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x16, 0x0a, 0x06, 0x74,
-	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x74, 0x6f, 0x6b,
+	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x74, 0x6f, 0x6b,
 	0x65, 0x6e, 0x73, 0x12, 0x3e, 0x0a, 0x0d, 0x71, 0x75, 0x65, 0x75, 0x65, 0x5f, 0x74, 0x69, 0x6d,
 	0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72,

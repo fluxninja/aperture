@@ -23,13 +23,13 @@ Supported technologies:
 | Netty     | 4.1+               |
 
 <div class="alert alert--primary">
-  The latest version of the Aperture Instrumentation Agent JAR file can be <strong><a href="https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent">downloaded here</a></strong>.
+  The latest version of the Aperture Instrumentation Agent archive file can be <strong><a href="https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent">downloaded here</a></strong>.
 </div>
 <p>&nbsp;</p>
 
 ## Running the java agent
 
-To statically load the java agent when running some application jar, use the
+To statically load the java agent when running some application `.jar`, use the
 following command:
 
 `java -javaagent:path/to/javaagent.jar -jar path/to/application.jar`

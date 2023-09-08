@@ -52,7 +52,7 @@ are still benefits of using Aperture:
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience? {#reject-impact}
 
 Queuing requests should not affect user experience (apart from increased
-latency). When it comes to rejecting requests, clients (whether it's frontend
+latency). When it comes to rejecting requests, clients (whether it's front end
 code or some other service) should be prepared to receive 429 Too Many Requests
 or 503 Service Unavailable response and react accordingly.
 
