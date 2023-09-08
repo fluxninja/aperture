@@ -80,7 +80,7 @@ definitions:
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
-                    Linear increment to load multiplier in each execution tick when the system is
+                    Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
 
                 format: double
@@ -98,7 +98,7 @@ definitions:
                     The maximum load multiplier that can be reached during recovery from an overload state.
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-                    - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
 
                 format: double
                 type: number
@@ -2464,7 +2464,7 @@ definitions:
             A workload determines the priority and cost of admitting each Flow that belongs to it.
             Scheduling of Flows is based on Weighted Fair Queuing principles.
 
-            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.
         properties:
             dry_run:
                 description: |-
@@ -2495,14 +2495,14 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: |-
                     Load multiplier is proportion of incoming
-                    token rate that needs to be accepted.
+                    token rate that needs to be accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerOuts:
         description: Output for the LoadScheduler component.
         properties:
             observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
-                description: Observed load multiplier is the proportion of incoming token rate that is being accepted.
+                description: Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerParameters:
         properties:

@@ -246,8 +246,8 @@ Parameters for the _Gradient Controller_.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system is
-not in the overloaded state, up until the `max_load_multiplier` is reached.
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -278,8 +278,8 @@ state.
   recovering.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
-- Any future overload state is detected by the control policy, and the load
-  multiplier increment cycle is restarted.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
 
 </dd>
 </dl>
@@ -4645,7 +4645,7 @@ that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
 principles.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
-that get admitted.
+that get admitted. The signals gets acted on once every 10 seconds.
 
 <dl>
 <dt>dry_run</dt>
@@ -4732,6 +4732,7 @@ Input for the LoadScheduler component.
 <!-- vale on -->
 
 Load multiplier is proportion of incoming token rate that needs to be accepted.
+The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
@@ -4757,7 +4758,7 @@ Output for the LoadScheduler component.
 <!-- vale on -->
 
 Observed load multiplier is the proportion of incoming token rate that is being
-accepted.
+accepted. The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
