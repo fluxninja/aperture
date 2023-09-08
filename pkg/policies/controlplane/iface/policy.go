@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -31,6 +32,8 @@ type Policy interface {
 	PolicyBase
 	GetEvaluationInterval() time.Duration
 	GetStatusRegistry() status.Registry
+	TicksInDurationPb(*durationpb.Duration) int
+	TicksInDuration(time.Duration) int
 }
 
 // GetSelectorsShortDescription returns a short description of the selectors.

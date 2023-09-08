@@ -132,7 +132,7 @@ func (samplerSync *samplerSync) setupSync(scopedKV *etcdclient.SessionScopedKV, 
 }
 
 // Execute implements runtime.Component.Execute.
-func (samplerSync *samplerSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (samplerSync *samplerSync) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	acceptPercentage, ok := inPortReadings["accept_percentage"]
 	if !ok {
 		return nil, nil

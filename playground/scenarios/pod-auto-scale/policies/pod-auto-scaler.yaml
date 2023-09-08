@@ -1,4 +1,5 @@
-# yaml-language-server: $schema=file:/home/hardik/Work/fluxninja/aperture/blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
+# yaml-language-server: $schema=file:../../../../blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
+#
 # Generated values file for auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler

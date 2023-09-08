@@ -179,7 +179,7 @@ message Circuit {
   // Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
   // This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
   // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"10s"
+  google.protobuf.Duration evaluation_interval = 1; // @gotags: default:"1s"
 
   // Defines a signal processing graph as a list of components.
   repeated Component components = 2; // @gotags: validate:"dive"
@@ -301,6 +301,7 @@ message Component {
     Integrator integrator = 16;
 
     // Differentiator calculates rate of change per tick.
+    // Deprecated: v3.0.0. Use `PIDController` instead.
     Differentiator differentiator = 17;
 
     // Logical AND.

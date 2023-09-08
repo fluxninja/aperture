@@ -92,7 +92,7 @@ func (ema *EMA) resetStages() {
 }
 
 // Execute implements runtime.Component.Execute.
-func (ema *EMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (ema *EMA) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	logger := ema.policyReadAPI.GetStatusRegistry().GetLogger()
 	retErr := func(err error) (runtime.PortToReading, error) {
 		return runtime.PortToReading{

@@ -52,9 +52,10 @@ func NewExtrapolatorAndOptions(extrapolatorProto *policylangv1.Extrapolator, _ r
 }
 
 // Execute implements runtime.Component.Execute.
-func (exp *Extrapolator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (exp *Extrapolator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
+	tickInfo := circuitAPI.GetTickInfo()
 
 	if input.Valid() {
 		output = input

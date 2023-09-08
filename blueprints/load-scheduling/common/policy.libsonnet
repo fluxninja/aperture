@@ -1,3 +1,4 @@
+local consts = import '../../consts.libsonnet';
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config-defaults.libsonnet';
@@ -10,7 +11,7 @@ function(cfg, params={}, metadata={}) {
 
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(
       spec.v1.PromQL.withQueryString(confirmation.query_string)
-      + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
+      + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
       + spec.v1.PromQL.withOutPorts({
         output: spec.v1.Port.withSignalName(promQLSignalName),
       })
@@ -98,7 +99,7 @@ function(cfg, params={}, metadata={}) {
     + spec.v1.Policy.withResources(utils.resources(updatedConfig.policy.resources).updatedResources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=consts.circuitEvaluationInterval)
       + spec.v1.Circuit.withComponents(
         confirmationAccumulator.components
         + (if isConfirmationCriteria then [overloadConfirmationAnd] else [])

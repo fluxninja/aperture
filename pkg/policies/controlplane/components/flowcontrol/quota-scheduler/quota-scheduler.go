@@ -133,7 +133,7 @@ func (limiterSync *quotaSchedulerSync) setupSync(scopedKV *etcdclient.SessionSco
 }
 
 // Execute implements runtime.Component.Execute.
-func (limiterSync *quotaSchedulerSync) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (limiterSync *quotaSchedulerSync) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	bucketCapacity := inPortReadings.ReadSingleReadingPort("bucket_capacity")
 	fillAmount := inPortReadings.ReadSingleReadingPort("fill_amount")
 	ptBool := tristate.FromReading(inPortReadings.ReadSingleReadingPort("pass_through"))

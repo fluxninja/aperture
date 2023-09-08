@@ -73,11 +73,6 @@
           "type": "object",
           "$ref": "#/$defs/kubelet_metrics"
         },
-        "evaluation_interval": {
-          "description": "The interval between successive evaluations of the Circuit.",
-          "default": "10s",
-          "type": "string"
-        },
         "load_ramp": {
           "description": "Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.",
           "default": {
