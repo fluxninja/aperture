@@ -1903,10 +1903,10 @@
           "x-go-tag-validate": "required,gt=0,dive"
         },
         "workload_latency_based_tokens": {
-          "default": true,
+          "default": false,
           "description": "Automatically estimate the size of flows within each workload, based on\nhistorical latency. Each workload's `tokens` will be set to average\nlatency of flows in that workload during the last few seconds (exact duration\nof this average can change).\nThis setting is useful in concurrency limiting use-case, where the\nconcurrency is calculated as `(avg. latency \\* in-flight flows)` (Little's Law).\n\nThe value of tokens estimated takes a lower precedence\nthan the value of `tokens` specified in the workload definition\nand `tokens` explicitly specified in the flow labels.\n\n",
           "type": "boolean",
-          "x-go-tag-default": "true"
+          "x-go-tag-default": "false"
         }
       },
       "required": ["selectors"],
@@ -2946,10 +2946,12 @@
           "type": "string"
         },
         "tokens": {
+          "default": 1,
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.\n\n",
           "format": "int64",
           "minimum": 0,
           "type": "integer",
+          "x-go-tag-default": "1",
           "x-go-tag-validate": "gte=0"
         }
       },
