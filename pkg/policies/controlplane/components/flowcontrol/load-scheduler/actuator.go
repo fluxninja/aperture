@@ -152,7 +152,7 @@ func (la *Actuator) setup(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lif
 
 // Execute implements runtime.Component.Execute.
 func (la *Actuator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
-	circuitAPI.ScheduleBackgroundJob(la, la.ticksPerExecution)
+	circuitAPI.ScheduleConditionalBackgroundJob(la, la.ticksPerExecution)
 	retErr := func(err error) (runtime.PortToReading, error) {
 		var errMulti error
 		pErr := la.publishDefaultDecision(circuitAPI.GetTickInfo())

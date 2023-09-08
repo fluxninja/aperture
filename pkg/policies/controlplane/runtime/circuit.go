@@ -434,9 +434,9 @@ func (circuit *Circuit) GetTickInfo() TickInfo {
 	return circuit.tickInfo
 }
 
-// ScheduleBackgroundJob schedules a background job for one time execution. The job gets scheduled only if currentTick is a multiple of ticksPerExecution. There can be at most a single job with a certain name pending to be run at a time. Subsequent invocations with the same job name overwrite the previous one.
+// ScheduleConditionalBackgroundJob schedules a background job for one time execution. The job gets scheduled only if currentTick is a multiple of ticksPerExecution. There can be at most a single job with a certain name pending to be run at a time. Subsequent invocations with the same job name overwrite the previous one.
 // Warning: This method should only be called by the Components during a tick execution.
-func (circuit *Circuit) ScheduleBackgroundJob(job BackgroundJob, ticksPerExecution int) {
+func (circuit *Circuit) ScheduleConditionalBackgroundJob(job BackgroundJob, ticksPerExecution int) {
 	// Do not schedule if currentTick is not a multiple of ticksPerExecution
 	if circuit.tickInfo.Tick()%ticksPerExecution != 0 {
 		return

@@ -56,7 +56,7 @@ func NewPIDControllerAndOptions(pidProto *policylangv1.PIDController, componentI
 
 // Execute implements runtime.Component.Execute.
 func (pid *PIDController) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
-	circuitAPI.ScheduleBackgroundJob(pid, pid.ticksPerExecution)
+	circuitAPI.ScheduleConditionalBackgroundJob(pid, pid.ticksPerExecution)
 	if !pid.doExecute {
 		return runtime.PortToReading{
 			"output": []runtime.Reading{pid.lastOutput},

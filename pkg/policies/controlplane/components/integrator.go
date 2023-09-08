@@ -58,7 +58,7 @@ func NewIntegratorAndOptions(integratorProto *policylangv1.Integrator, component
 
 // Execute implements runtime.Component.Execute.
 func (in *Integrator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
-	circuitAPI.ScheduleBackgroundJob(in, in.ticksPerExecution)
+	circuitAPI.ScheduleConditionalBackgroundJob(in, in.ticksPerExecution)
 
 	if !in.doExecute {
 		return runtime.PortToReading{

@@ -274,7 +274,7 @@ func (promQL *PromQL) scheduleQuery(endTimestamp time.Time, circuitAPI runtime.C
 			scalarResBroker.handleError,
 		))
 	scalarResBroker.job = job
-	circuitAPI.ScheduleBackgroundJob(scalarResBroker, promQL.ticksPerExecution)
+	circuitAPI.ScheduleConditionalBackgroundJob(scalarResBroker, promQL.ticksPerExecution)
 }
 
 func (promQL *PromQL) onScalarResult(value float64, err error) {
@@ -379,7 +379,7 @@ func (taggedQuery *TaggedQuery) scheduleQuery(endTimestamp time.Time, circuitAPI
 			taggedResBroker.handleError,
 		))
 	taggedResBroker.job = job
-	circuitAPI.ScheduleBackgroundJob(taggedResBroker, taggedQuery.scalarQuery.promQL.ticksPerExecution)
+	circuitAPI.ScheduleConditionalBackgroundJob(taggedResBroker, taggedQuery.scalarQuery.promQL.ticksPerExecution)
 }
 
 func (taggedQuery *TaggedQuery) onTaggedResult(res prometheusmodel.Value, err error) {

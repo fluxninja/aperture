@@ -11,7 +11,7 @@ type TickStartCallback func(circuit CircuitAPI) error
 // CircuitAPI is for read only access to policy and scheduling of background jobs.
 type CircuitAPI interface {
 	iface.Policy
-	ScheduleBackgroundJob(backgroundJob BackgroundJob, ticksPerExecution int)
+	ScheduleConditionalBackgroundJob(backgroundJob BackgroundJob, ticksPerExecution int)
 	GetTickInfo() TickInfo
 }
 
