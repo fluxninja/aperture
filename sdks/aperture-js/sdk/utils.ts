@@ -43,7 +43,7 @@ export abstract class FlowControlService extends Client {
 }
 
 const clientPackage = protoLoader.loadSync(PROTO_PATH, {
-  keepCase: false,
+  keepCase: true,
   longs: String,
   enums: String,
   defaults: true,
