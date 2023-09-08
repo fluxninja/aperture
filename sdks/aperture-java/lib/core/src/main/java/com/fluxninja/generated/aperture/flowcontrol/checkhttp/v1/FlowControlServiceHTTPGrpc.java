@@ -5,7 +5,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.57.2)",
+    value = "by gRPC proto compiler (version 1.58.0)",
     comments = "Source: aperture/flowcontrol/checkhttp/v1/checkhttp.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class FlowControlServiceHTTPGrpc {

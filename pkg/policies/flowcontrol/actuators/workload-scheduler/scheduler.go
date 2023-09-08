@@ -378,16 +378,16 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	fairnessLabel := "workload:" + matchedWorkloadIndex
 
 	tokens := uint64(1)
-	// Precedence order (lowest to highest):
-	// 1. Estimated Tokens
-	// 2. Workload tokens
-	// 3. Label tokens
-	if tokensEstimated, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
-		tokens = tokensEstimated
-	}
-
+	// Precedence order:
+	// 1. Label tokens
+	// 2. Estimated Tokens
+	// 3. Workload tokens
 	if matchedWorkloadParametersProto.GetTokens() != 0 {
 		tokens = uint64(matchedWorkloadParametersProto.GetTokens())
+	}
+
+	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
+		tokens = estimatedTokens
 	}
 
 	var matchedWorkloadTimeout time.Duration

@@ -1998,7 +1998,7 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             workload_latency_based_tokens:
-                default: true
+                default: false
                 description: |+
                     Automatically estimate the size of flows within each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
@@ -2012,7 +2012,7 @@ definitions:
                     and `tokens` explicitly specified in the flow labels.
 
                 type: boolean
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
         required:
             - selectors
         title: Parameters for _Load Scheduler_ component
@@ -3134,6 +3134,7 @@ definitions:
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
             tokens:
+                default: 1
                 description: |+
                     Tokens determines the cost of admitting a single flow in the workload,
                     which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -3145,6 +3146,7 @@ definitions:
                 format: int64
                 minimum: 0
                 type: integer
+                x-go-tag-default: "1"
                 x-go-tag-validate: gte=0
         type: object
     Selector:
