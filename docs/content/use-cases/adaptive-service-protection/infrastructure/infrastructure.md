@@ -6,7 +6,7 @@ keywords:
   - policies
   - use cases
   - service protection
-  - infarstructure
+  - infrastructure
 ---
 
 ```mdx-code-block
