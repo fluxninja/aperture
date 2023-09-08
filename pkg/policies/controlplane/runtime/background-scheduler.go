@@ -55,8 +55,8 @@ func BackgroundSchedulerModuleForPolicyApp(circuitAPI CircuitSuperAPI) fx.Option
 		scheduler.multiJob = backgroundMultiJob
 
 		executionPeriod := config.MakeDuration(-1)
-		// Do not want this jobs to timeout
-		executionTimeout := config.MakeDuration(0)
+		// Execution timeout for background jobs
+		executionTimeout := config.MakeDuration(time.Second * 60)
 		jobConfig := jobs.JobConfig{
 			InitiallyHealthy: true,
 			ExecutionPeriod:  executionPeriod,

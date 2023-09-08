@@ -225,10 +225,10 @@ func (p *simPolicyMeta) GetStatusRegistry() status.Registry { return p.Registry 
 
 // TicksInDurationPb implements PolicyReadAPI.
 func (p *simPolicyMeta) TicksInDurationPb(d *durationpb.Duration) int {
-	return 0
+	return 1
 }
 
 // TicksInDuration implements PolicyReadAPI.
 func (p *simPolicyMeta) TicksInDuration(d time.Duration) int {
-	return 0
+	return 1
 }
