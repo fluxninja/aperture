@@ -254,7 +254,7 @@ func (promQL *PromQL) DynamicConfigUpdate(event notifiers.Event, unmarshaller co
 
 func (promQL *PromQL) scheduleQuery(endTimestamp time.Time, circuitAPI runtime.CircuitAPI) {
 	jobName := promQL.jobName
-	query := promQL.jobName
+	query := promQL.queryString
 	promAPI := promQL.promAPI
 	enforcer := promQL.enforcer
 	cb := promQL.onScalarResult
