@@ -1,5 +1,4 @@
-import grpc from "@grpc/grpc-js";
-import { ConnectivityState } from "@grpc/grpc-js/build/src/connectivity-state.js";
+import grpc, { connectivityState } from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
@@ -62,7 +61,7 @@ export class ApertureClient {
 
     const kickChannel = () => {
       const state = this.fcsClient.getChannel().getConnectivityState(true);
-      if (state != ConnectivityState.SHUTDOWN) {
+      if (state != connectivityState.SHUTDOWN) {
         this.fcsClient
           .getChannel()
           .watchConnectivityState(state, Infinity, kickChannel);
@@ -102,7 +101,7 @@ export class ApertureClient {
       // if ready, call check
       if (
         this.fcsClient.getChannel().getConnectivityState(true) !=
-        ConnectivityState.READY
+        connectivityState.READY
       ) {
         if (flow.failOpen) {
           // Accept the request if failOpen is true even if we encounter an error
