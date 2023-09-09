@@ -49,10 +49,10 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	if c.Rejected < c.Rejects && shouldBeTested(path) {
-		log.Trace().Msg("Rejecting call")
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
 		c.Rejected++
+		log.Trace().Msgf("Rejecting request from path %v, control point %v, services %v, rejected %v", path, controlPoint, services, c.Rejected)
 	}
 
 	return resp
