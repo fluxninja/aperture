@@ -106,7 +106,6 @@ export class ApertureClient {
       ) {
         if (flow.failOpen) {
           // Accept the request if failOpen is true even if we encounter an error
-          console.log(`Aperture server unavailable. Accepting request.`);
           flow.checkResponse = null;
         } else {
           // Reject the request if failOpen is false if we encounter an error
@@ -128,11 +127,6 @@ export class ApertureClient {
           if (err) {
             if (flow.failOpen) {
               // Accept the request if failOpen is true even if we encounter an error
-              console.log(
-                `Aperture server unavailable due to ${JSON.stringify(
-                  err,
-                )}. Accepting request.`,
-              );
               flow.checkResponse = null;
             } else {
               // Reject the request if failOpen is false if we encounter an error
