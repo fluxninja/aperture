@@ -47,7 +47,7 @@ var (
 func init() {
 	logLevel, logLevelSet := os.LookupEnv("LOG_LEVEL")
 	if !logLevelSet {
-		logLevel = log.DebugLevel.String()
+		logLevel = log.TraceLevel.String()
 	}
 	logger = log.NewLogger(log.GetPrettyConsoleWriter(), logLevel)
 	log.SetGlobalLogger(logger)

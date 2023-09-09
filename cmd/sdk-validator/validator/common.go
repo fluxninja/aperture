@@ -45,7 +45,7 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 		RejectReason:  flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
 	}
 
-	if c.Rejected != c.Rejects && shouldBeTested(path) {
+	if c.Rejected < c.Rejects && shouldBeTested(path) {
 		log.Trace().Msg("Rejecting call")
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
