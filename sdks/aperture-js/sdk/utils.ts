@@ -22,7 +22,7 @@ export type ApertureGrpcObject = {
   };
 };
 
-type CheckOptions1 = { control_point: unknown; labels: unknown };
+type CheckOptions1 = { controlPoint: unknown; labels: unknown };
 
 type CheckOptions2 = {
   deadline: number;
@@ -43,7 +43,7 @@ export abstract class FlowControlService extends Client {
 }
 
 const clientPackage = protoLoader.loadSync(PROTO_PATH, {
-  keepCase: false,
+  keepCase: false, // NOTE: make sure we are using camelCase to access the proto
   longs: String,
   enums: String,
   defaults: true,

@@ -1,4 +1,4 @@
-import grpc from "@grpc/grpc-js";
+import grpc, { connectivityState } from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
@@ -6,8 +6,6 @@ import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
-import { Flow } from "./flow.js";
-import { fcs, FlowControlService } from "./utils.js";
 import {
   FLOW_START_TIMESTAMP_LABEL,
   LIBRARY_NAME,
@@ -16,12 +14,13 @@ import {
   URL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
+import { Flow } from "./flow.js";
+import { fcs, FlowControlService } from "./utils.js";
 
 /**
  * Types to be exported from package
  */
 export type { FlowControlService, Flow };
-
 export { grpc };
 
 type ControlPoint = unknown;
@@ -59,6 +58,16 @@ export class ApertureClient {
     this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
 
     this.timeout = timeout;
+
+    const kickChannel = () => {
+      const state = this.fcsClient.getChannel().getConnectivityState(true);
+      if (state != connectivityState.SHUTDOWN) {
+        this.fcsClient
+          .getChannel()
+          .watchConnectivityState(state, Infinity, kickChannel);
+      }
+    };
+    kickChannel();
   }
 
   // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
@@ -87,9 +96,27 @@ export class ApertureClient {
         checkParams = { deadline: Date.now() + this.timeout };
       }
 
+      // check connection state
+      // if not ready, return flow with fail-to-wire semantics
+      // if ready, call check
+      if (
+        this.fcsClient.getChannel().getConnectivityState(true) !=
+        connectivityState.READY
+      ) {
+        if (flow.failOpen) {
+          // Accept the request if failOpen is true even if we encounter an error
+          flow.checkResponse = null;
+        } else {
+          // Reject the request if failOpen is false if we encounter an error
+          reject("Aperture server unavailable");
+        }
+        resolve(flow);
+        return;
+      }
+
       this.fcsClient.Check(
         {
-          control_point: controlPointArg,
+          controlPoint: controlPointArg,
           labels: mergedLabels,
         },
         checkParams,
@@ -99,11 +126,6 @@ export class ApertureClient {
           if (err) {
             if (flow.failOpen) {
               // Accept the request if failOpen is true even if we encounter an error
-              console.log(
-                `Aperture server unavailable due to ${JSON.stringify(
-                  err,
-                )}. Accepting request.`,
-              );
               flow.checkResponse = null;
             } else {
               // Reject the request if failOpen is false if we encounter an error
@@ -120,7 +142,7 @@ export class ApertureClient {
   }
 
   Shutdown() {
-    grpc.closeClient(this.fcsClient);
+    this.fcsClient.getChannel().close();
     this.exporter.shutdown();
     this.tracerProvider.shutdown();
     return;
