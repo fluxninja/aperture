@@ -145,18 +145,17 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	f := newFlow(span)
 
-	res, err := c.flowControlClient.Check(ctx, req)
-	if err != nil {
-		f.checkResponse = nil
-	} else {
-		f.checkResponse = res
-	}
-
-	span.SetAttributes(
+	defer span.SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
 
-	return f, nil
+	res, err := c.flowControlClient.Check(ctx, req)
+	if err != nil {
+		return f, err
+	}
+	f.checkResponse = res
+
+	return f, err
 }
 
 // StartHTTPFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolhttp.CheckHTTP call.
@@ -171,16 +170,15 @@ func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *flowcontrol
 
 	f := newHTTPFlow(span)
 
-	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
-	if err != nil {
-		f.checkResponse = nil
-	} else {
-		f.checkResponse = res
-	}
-
-	span.SetAttributes(
+	defer span.SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
+
+	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
+	if err != nil {
+		return f, err
+	}
+	f.checkResponse = res
 
 	return f, nil
 }

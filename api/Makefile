@@ -34,6 +34,14 @@ buf-generate:
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
 	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/
+	@{ \
+		set -e; \
+		pushd ../sdks/aperture-js; \
+		npm install; \
+		node ./node_modules/@grpc/proto-loader/build/bin/proto-loader-gen-types.js --keepCase=false --longs=String --enums=String --defaults=true --oneofs=true --outDir=sdk/gen --grpcLib=@grpc/grpc-js proto/flowcontrol/check/v1/check.proto; \
+		git add ./sdk/gen; \
+		popd; \
+	}
 	@#python
 	@rm -rf ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/*
 	@cp -R gen/proto/python/aperture/flowcontrol/check ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/

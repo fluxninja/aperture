@@ -23,7 +23,7 @@ type FlowControlHandler struct {
 
 // Check is a dummy Check handler.
 func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
-	log.Trace().Msg("Received FlowControl Check request")
+	log.Trace().Msgf("Check request: %+v", req)
 
 	services := []string{}
 	rpcPeer, peerExists := peer.FromContext(ctx)

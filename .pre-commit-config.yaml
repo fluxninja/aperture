@@ -24,9 +24,9 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|\.github/.*
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|\.github/.*|sdks/aperture-js/sdk/gen/.*
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*|\.github/.*
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*|\.github/.*|sdks/aperture-js/sdk/gen/.*
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*|playground/scenarios/.*/charts/.*|\.github/.*)
         args:
@@ -93,7 +93,7 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@2.8.8
-        exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen)
         types_or:
           [
             sh,
