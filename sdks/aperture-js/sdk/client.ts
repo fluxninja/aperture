@@ -123,7 +123,7 @@ export class ApertureClient {
         resolve(new Flow(span, failOpen, null, err));
         return;
       } finally {
-        span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
+        span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now() * 1000);
       }
     });
   }
