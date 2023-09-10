@@ -108,7 +108,7 @@ type flowTracker struct {
 func (flow *flowTracker) String() string {
 	return fmt.Sprintf("FlowTracker<"+
 		"Flow<FairnessLabel: %s "+
-		"| RequestTokens: %d "+
+		"| RequestTokens: %0.2f "+
 		"| Priority: %f "+
 		"| Timeout: %v "+
 		"| RequestRate: %d "+
@@ -355,16 +355,6 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	flowRunTime := time.Second * 10
 
 	sumPriority := float64(0)
-	priorities := []uint64{}
-	for _, flow := range flows {
-		// if minInvPrio > (math.MaxUint8 - flow.priority) {
-		// 	minInvPrio = math.MaxUint8 - flow.priority
-		// }
-		// if minPrio > flow.priority {
-		// 	minPrio = flow.priority
-		// }
-		priorities = append(priorities, uint64(flow.priority))
-	}
 	adjustedPriority := make([]float64, len(flows))
 	for i, flow := range flows {
 		adjustedPriority[i] = 1 / flow.priority
@@ -407,7 +397,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 				if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
 					ratio := float64(acceptedTokens[i]) / float64(estimatedTokens[i])
 					if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
-						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %d, allocatedTokens: %d\n", _testTolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
+						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %0.2f, allocatedTokens: %d\n", _testTolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
 						t.Fail()
 					}
 				}
@@ -566,7 +556,7 @@ func TestFairnessWithinPriority(t *testing.T) {
 		tokensB := float64(flows[i+1].acceptedRequests) * flows[i+1].tokens
 		// check fairness within priority levels
 		if math.Abs(1-float64(tokensA)/float64(tokensB)) > _testTolerance {
-			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %d, %d", _testTolerance*100, tokensA, tokensB)
+			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %0.2f, %0.2f", _testTolerance*100, tokensA, tokensB)
 			t.Fail()
 		}
 	}
@@ -634,8 +624,8 @@ func TestLoadMultiplierBucket(t *testing.T) {
 			totalAcceptedTokens += float64(flow.acceptedRequests) * flow.tokens
 			totalSentToken += float64(flow.totalRequests) * flow.tokens
 		}
-		t.Logf("Total tokens sent: %d", totalSentToken)
-		t.Logf("Total tokens accepted: %d", totalAcceptedTokens)
+		t.Logf("Total tokens sent: %0.2f", totalSentToken)
+		t.Logf("Total tokens accepted: %0.2f", totalAcceptedTokens)
 		totalSentToken = float64(totalSentToken) * lm
 		ratio := float64(totalAcceptedTokens) / float64(totalSentToken)
 

@@ -153,9 +153,9 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 
 func (sched *WFQScheduler) updateMetricsAndReturnDecision(accepted bool, request *Request) bool {
 	if accepted {
-		sched.metrics.AcceptedTokensCounter.Add(request.Tokens / 1000)
+		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
-	sched.metrics.IncomingTokensCounter.Add(request.Tokens / 1000)
+	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
 	return accepted
 }
 
