@@ -39,6 +39,6 @@ export interface ClassifierInfo {
 export interface ClassifierInfo__Output {
   'policyName': (string);
   'policyHash': (string);
-  'classifierIndex': (Long);
+  'classifierIndex': (string);
   'error': (_aperture_flowcontrol_check_v1_ClassifierInfo_Error__Output);
 }

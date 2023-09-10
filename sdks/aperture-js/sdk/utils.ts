@@ -7,6 +7,7 @@ import { ProtoGrpcType } from "./gen/check.js";
 
 const clientPackage = protoLoader.loadSync(PROTO_PATH, {
   defaults: true,
+  longs: String,
 });
 
 export const fcs = (
