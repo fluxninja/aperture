@@ -87,7 +87,7 @@ export class ApertureClient {
           connectivityState.READY
         ) {
           resolve(
-            new Flow(span, null, new Error("connection not ready"), failOpen),
+            new Flow(span, failOpen, null, new Error("connection not ready")),
           );
           return;
         }
@@ -115,12 +115,12 @@ export class ApertureClient {
           } as CheckRequest,
           checkParams as grpc.CallOptions,
           ((err, response) => {
-            resolve(new Flow(span, response, err, failOpen));
+            resolve(new Flow(span, failOpen, response, err));
             return;
           }) as grpc.requestCallback<CheckResponse>,
         );
       } catch (err: any) {
-        resolve(new Flow(span, null, err, failOpen));
+        resolve(new Flow(span, failOpen, null, err));
         return;
       } finally {
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());

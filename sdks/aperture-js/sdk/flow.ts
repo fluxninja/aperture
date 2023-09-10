@@ -23,9 +23,9 @@ export class Flow {
 
   constructor(
     private span: Span,
+    private failOpen: boolean = true,
     private checkResponse: CheckResponse | null = null,
     private error: Error | null = null,
-    private failOpen: boolean = true,
   ) {}
 
   ShouldRun() {
