@@ -71,7 +71,7 @@ export class ApertureClient {
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
   async StartFlow(
     controlPointArg: string,
-    labelsArg: { [key: string]: string },
+    labels: Record<string, string> = {},
     failOpen: boolean = true,
   ): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
@@ -93,7 +93,7 @@ export class ApertureClient {
           return;
         }
 
-        let labelsBaggage = {} as { [key: string]: string };
+        let labelsBaggage = {} as Record<string, string>;
         let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
 
         if (baggage !== undefined) {
@@ -102,7 +102,7 @@ export class ApertureClient {
           }
         }
 
-        let mergedLabels = { ...labelsArg, ...labelsBaggage };
+        let mergedLabels = { ...labels, ...labelsBaggage };
 
         let checkParams: grpc.CallOptions = {};
         if (this.timeoutMilliseconds != 0) {

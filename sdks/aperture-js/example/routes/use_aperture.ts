@@ -8,7 +8,7 @@ export const apertureClient = new ApertureClient();
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {
   // do some business logic to collect labels
-  const labels: { [key: string]: string } = {
+  const labels: Record<string, string> = {
     user: "kenobi",
   };
 
