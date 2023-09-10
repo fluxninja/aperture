@@ -8,6 +8,6 @@ export interface Duration {
 }
 
 export interface Duration__Output {
-  'seconds': (string);
+  'seconds': (Long);
   'nanos': (number);
 }

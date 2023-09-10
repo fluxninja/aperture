@@ -19,10 +19,10 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       // See whether flow was accepted by Aperture Agent.
       if (flow.ShouldRun()) {
         // Simulate work being done
-        sleep(2000).then(() => {
+        sleep(200).then(() => {
           console.log("Work done!");
+          res.sendStatus(202);
         });
-        res.sendStatus(202);
       } else {
         // Flow has been rejected by Aperture Agent.
         flow.SetStatus(FlowStatusEnum.Error);

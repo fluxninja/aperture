@@ -6,7 +6,7 @@ import {
   FLOW_STATUS_LABEL,
 } from "./consts.js";
 import {
-  CheckResponse,
+  CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 
@@ -24,7 +24,7 @@ export class Flow {
   constructor(
     private span: Span,
     private failOpen: boolean = true,
-    private checkResponse: CheckResponse | null = null,
+    private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {}
 
