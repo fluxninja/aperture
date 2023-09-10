@@ -9,14 +9,7 @@ import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.j
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
-import {
-  FLOW_START_TIMESTAMP_LABEL,
-  LIBRARY_NAME,
-  LIBRARY_VERSION,
-  SOURCE_LABEL,
-  URL,
-  WORKLOAD_START_TIMESTAMP_LABEL,
-} from "./consts.js";
+import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
@@ -76,8 +69,11 @@ export class ApertureClient {
   ): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       let span = this.tracer.startSpan("Aperture Check");
-      span.setAttribute(FLOW_START_TIMESTAMP_LABEL, Date.now() * 1000);
-      span.setAttribute(SOURCE_LABEL, "sdk");
+      let startDate = Date.now();
+
+      const resolveFlow = (response: any, err: any) => {
+        resolve(new Flow(span, startDate, failOpen, response, err));
+      };
 
       try {
         // check connection state
@@ -87,9 +83,7 @@ export class ApertureClient {
           this.fcsClient.getChannel().getConnectivityState(true) !=
           connectivityState.READY
         ) {
-          resolve(
-            new Flow(span, failOpen, null, new Error("connection not ready")),
-          );
+          resolveFlow(null, new Error("connection not ready"));
           return;
         }
 
@@ -120,15 +114,12 @@ export class ApertureClient {
           } as CheckRequest,
           checkParams as grpc.CallOptions,
           ((err, response) => {
-            resolve(new Flow(span, failOpen, response, err));
+            resolveFlow(err ? null : response, err);
             return;
           }) as grpc.requestCallback<CheckResponse__Output>,
         );
       } catch (err: any) {
-        resolve(new Flow(span, failOpen, null, err));
-        return;
-      } finally {
-        span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now() * 1000);
+        resolveFlow(null, err);
       }
     });
   }
