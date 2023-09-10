@@ -33,7 +33,7 @@ message FlowControl {
     // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
     LoadScheduler load_scheduler = 7;
 
-    // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+    // _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
     // Sampler is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -312,7 +312,7 @@ message Scheduler {
   flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {defined_only: true}];
 }
 
-// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.
 message AdaptiveLoadScheduler {
   // Parameters for the _Adaptive Load Scheduler_ component.
   message Parameters {
@@ -320,6 +320,7 @@ message AdaptiveLoadScheduler {
     LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
 
     // Parameters for the _Gradient Controller_.
+    // Deprecated: v3.0.0. Use _gradient_controller_ inside the _Gradient Throttling Strategy_ instead.
     GradientController.Parameters gradient = 2; // @gotags: validate:"required"
 
     // The maximum load multiplier that can be reached during recovery from an overload state.
@@ -334,6 +335,61 @@ message AdaptiveLoadScheduler {
 
     // Configuration parameters for the embedded Alerter.
     Alerter.Parameters alerter = 5; // @gotags: validate:"required"
+  }
+
+  // _Gradient Throttling Strategy uses the _Gradient Controller_ to throttle the token rate based on the deviation of the signal from the setpoint.
+  // It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+  message GradientThrottlingStrategy {
+    // Input ports for the _Gradient Throttling Strategy_ component.
+    message Ins {
+      // The input signal to the controller.
+      InPort signal = 1; // @gotags: validate:"required"
+      // The setpoint input to the controller.
+      InPort setpoint = 2; // @gotags: validate:"required"
+      // The `overload_confirmation` port provides additional criteria to determine overload state which
+      // results in _Flow_ throttling at the service.
+      InPort overload_confirmation = 3;
+    }
+
+    // Input ports for the _Gradient Throttling Strategy_.
+    Ins in_ports = 1; // @gotags: validate:"required"
+
+    // Parameters for the _Gradient Controller_.
+    GradientController.Parameters parameters = 2; // @gotags: validate:"required"
+  }
+
+  // _Range Throttling Strategy uses the _Polynomial Range Function_ to throttle the token rate based on the range of the signal.
+  message RangeThrottlingStrategy {
+    // Input ports for the _Range Throttling Strategy_ component.
+    message Ins {
+      // The input signal to the controller.
+      InPort signal = 1; // @gotags: validate:"required"
+      // The `overload_confirmation` port provides additional criteria to determine overload state which
+      // results in _Flow_ throttling at the service.
+      InPort overload_confirmation = 2;
+    }
+
+    message Parameters {
+      message Datapoint {
+        double input_signal = 1;
+        double load_multiplier = 2;
+      }
+      // Starting datapoint of the throttling range
+      Datapoint start = 1;
+      // Ending datapoint of the throttling range
+      Datapoint end = 2;
+      // Degree determines shape of the throttling curve.
+      // degree=1: linear
+      // degree=2: quadratic
+      // degree=3: cubic
+      double degree = 3;
+    }
+
+    // Collection of input ports for the _Range Throttling Strategy_.
+    Ins in_ports = 1; // @gotags: validate:"required"
+
+    // Parameters for the _Range Function.
+    Parameters parameters = 2; // @gotags: validate:"required"
   }
 
   // Input ports for the _Adaptive Load Scheduler_ component.
@@ -365,6 +421,13 @@ message AdaptiveLoadScheduler {
 
   // Parameters for the _Adaptive Load Scheduler_ component.
   Parameters parameters = 3; // @gotags: validate:"required"
+
+  oneof throttling_strategy {
+    // The _Gradient_ strategy throttles the token rate based on the deviation of the signal from the setpoint.
+    GradientThrottlingStrategy gradient_throttling_strategy = 4;
+    // The _Range_ strategy throttles the token rate based on the range of the signal.
+    RangeThrottlingStrategy range_throttling_strategy = 5;
+  }
 
   // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
   // It is useful for observing the behavior of load scheduler without disrupting any real traffic.

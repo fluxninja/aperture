@@ -33,7 +33,7 @@ Generated File Starts
 <!-- vale on -->
 
 The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
-deviation of the input signal from the setpoint.
+application health signals and the provided throttling strategy.
 
 <dl>
 <dt>dry_run</dt>
@@ -61,6 +61,19 @@ traffic.
 <!-- vale on -->
 
 Configuration key for setting dry run mode through dynamic configuration.
+
+</dd>
+<dt>gradient_throttling_strategy</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerGradientThrottlingStrategy](#adaptive-load-scheduler-gradient-throttling-strategy))
+
+<!-- vale on -->
+
+The _Gradient_ strategy throttles the token rate based on the deviation of the
+signal from the setpoint.
 
 </dd>
 <dt>in_ports</dt>
@@ -97,6 +110,108 @@ Collection of output ports for the _Adaptive Load Scheduler_ component.
 <!-- vale on -->
 
 Parameters for the _Adaptive Load Scheduler_ component.
+
+</dd>
+<dt>range_throttling_strategy</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerRangeThrottlingStrategy](#adaptive-load-scheduler-range-throttling-strategy))
+
+<!-- vale on -->
+
+The _Range_ strategy throttles the token rate based on the range of the signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerGradientThrottlingStrategy {#adaptive-load-scheduler-gradient-throttling-strategy}
+
+<!-- vale on -->
+
+_Gradient Throttling Strategy uses the \_Gradient Controller_ to throttle the
+token rate based on the deviation of the signal from the setpoint. It takes a
+signal and setpoint as inputs and reduces token rate proportionally (or any
+arbitrary power) based on deviation of the signal from setpoint.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerGradientThrottlingStrategyIns](#adaptive-load-scheduler-gradient-throttling-strategy-ins))
+
+<!-- vale on -->
+
+Input ports for the _Gradient Throttling Strategy_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([GradientControllerParameters](#gradient-controller-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Gradient Controller_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerGradientThrottlingStrategyIns {#adaptive-load-scheduler-gradient-throttling-strategy-ins}
+
+<!-- vale on -->
+
+Input ports for the _Gradient Throttling Strategy_ component.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint input to the controller.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
 
 </dd>
 </dl>
@@ -234,7 +349,8 @@ Configuration parameters for the embedded Alerter.
 
 <!-- vale on -->
 
-Parameters for the _Gradient Controller_.
+Parameters for the _Gradient Controller_. Deprecated: v3.0.0. Use
+_gradient_controller_ inside the _Gradient Throttling Strategy_ instead.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
@@ -280,6 +396,161 @@ state.
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
   again.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerRangeThrottlingStrategy {#adaptive-load-scheduler-range-throttling-strategy}
+
+<!-- vale on -->
+
+_Range Throttling Strategy uses the \_Polynomial Range Function_ to throttle the
+token rate based on the range of the signal.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerRangeThrottlingStrategyIns](#adaptive-load-scheduler-range-throttling-strategy-ins))
+
+<!-- vale on -->
+
+Collection of input ports for the _Range Throttling Strategy_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerRangeThrottlingStrategyParameters](#adaptive-load-scheduler-range-throttling-strategy-parameters))
+
+<!-- vale on -->
+
+Parameters for the \_Range Function.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerRangeThrottlingStrategyIns {#adaptive-load-scheduler-range-throttling-strategy-ins}
+
+<!-- vale on -->
+
+Input ports for the _Range Throttling Strategy_ component.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerRangeThrottlingStrategyParameters {#adaptive-load-scheduler-range-throttling-strategy-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>degree</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Degree determines shape of the throttling curve. degree=1: linear degree=2:
+quadratic degree=3: cubic
+
+</dd>
+<dt>end</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint](#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint))
+
+<!-- vale on -->
+
+Ending datapoint of the throttling range
+
+</dd>
+<dt>start</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint](#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint))
+
+<!-- vale on -->
+
+Starting datapoint of the throttling range
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint {#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint}
+
+<!-- vale on -->
+
+<dl>
+<dt>input_signal</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+<dt>load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
 
 </dd>
 </dl>
@@ -2712,10 +2983,9 @@ to features within a service.
 
 <!-- vale on -->
 
-_Adaptive Load Scheduler_ component is based on additive increase and
-multiplicative decrease of token rate. It takes a signal and setpoint as inputs
-and reduces token rate proportionally (or any arbitrary power) based on
-deviation of the signal from setpoint.
+_Adaptive Load Scheduler_ component does additive increase of load multiplier
+during non-overload state. During overload, the load multiplier is throttled
+based on the provided strategy.
 
 </dd>
 <dt>load_ramp</dt>

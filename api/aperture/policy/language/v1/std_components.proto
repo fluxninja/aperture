@@ -892,3 +892,40 @@ message PIDController {
   Outs out_ports = 2;
   Parameters parameters = 3; // @gotags: validate:"required"
 }
+
+// _Polynomial Range Function_ is a function that maps a range of input values to a range of output values and is defined by a starting datapoint, an ending datapoint, and a curve.
+// E.g. a range function with a starting datapoint of (0, 0), an ending datapoint of (10, 100), and degree=1 (a "linear" curve) will map the input value of 5 to the output value of 50.
+// Another e.g. with a negative growth relation would be a range function with a starting datapoint of (0, 100), an ending datapoint of (10, 0), and degree=1 will map the input value of 5 to the output value of 50.
+// If an input is outside the input range, the output will be equal to the closest datapoint (start or end).
+// The output curve is determined based on the degree, e.g.:
+// * degree=1: Linear curve.
+// * degree=2: Quadratic curve.
+// * degree=3: Cubic curve.
+message PolynomialRangeFunction {
+  message Parameters {
+    message Datapoint {
+      double input = 1;
+      double output = 2;
+    }
+    // Starting datapoint for the range function
+    Datapoint start = 1;
+    // Ending datapoint for the range function
+    Datapoint end = 2;
+    // Degree of the polynomial
+    double degree = 3;
+  }
+
+  message Ins {
+    // The input signal.
+    InPort input = 1;
+  }
+
+  message Outs {
+    // The output signal.
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+  Parameters parameters = 3; // @gotags: validate:"required"
+}

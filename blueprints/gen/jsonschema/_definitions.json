@@ -1,7 +1,7 @@
 {
   "definitions": {
     "AdaptiveLoadScheduler": {
-      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -10,6 +10,10 @@
         "dry_run_config_key": {
           "description": "Configuration key for setting dry run mode through dynamic configuration.",
           "type": "string"
+        },
+        "gradient_throttling_strategy": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerGradientThrottlingStrategy",
+          "description": "The _Gradient_ strategy throttles the token rate based on the deviation of the signal from the setpoint."
         },
         "in_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerIns",
@@ -23,6 +27,48 @@
         "parameters": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerParameters",
           "description": "Parameters for the _Adaptive Load Scheduler_ component.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "range_throttling_strategy": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy",
+          "description": "The _Range_ strategy throttles the token rate based on the range of the signal."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerGradientThrottlingStrategy": {
+      "description": "_Gradient Throttling Strategy uses the _Gradient Controller_ to throttle the token rate based on the deviation of the signal from the setpoint.\nIt takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerGradientThrottlingStrategyIns",
+          "description": "Input ports for the _Gradient Throttling Strategy_.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "parameters": {
+          "$ref": "#/definitions/GradientControllerParameters",
+          "description": "Parameters for the _Gradient Controller_.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerGradientThrottlingStrategyIns": {
+      "description": "Input ports for the _Gradient Throttling Strategy_ component.",
+      "properties": {
+        "overload_confirmation": {
+          "$ref": "#/definitions/InPort",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
+        },
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "description": "The setpoint input to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal to the controller.\n\n",
           "x-go-tag-validate": "required"
         }
       },
@@ -79,7 +125,7 @@
         },
         "gradient": {
           "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Parameters for the _Gradient Controller_.\n\n",
+          "description": "Parameters for the _Gradient Controller_.\nDeprecated: v3.0.0. Use _gradient_controller_ inside the _Gradient Throttling Strategy_ instead.\n\n",
           "x-go-tag-validate": "required"
         },
         "load_multiplier_linear_increment": {
@@ -100,6 +146,72 @@
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerRangeThrottlingStrategy": {
+      "description": "_Range Throttling Strategy uses the _Polynomial Range Function_ to throttle the token rate based on the range of the signal.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyIns",
+          "description": "Collection of input ports for the _Range Throttling Strategy_.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "parameters": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParameters",
+          "description": "Parameters for the _Range Function.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerRangeThrottlingStrategyIns": {
+      "description": "Input ports for the _Range Throttling Strategy_ component.",
+      "properties": {
+        "overload_confirmation": {
+          "$ref": "#/definitions/InPort",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerRangeThrottlingStrategyParameters": {
+      "properties": {
+        "degree": {
+          "format": "double",
+          "title": "Degree determines shape of the throttling curve.\ndegree=1: linear\ndegree=2: quadratic\ndegree=3: cubic",
+          "type": "number"
+        },
+        "end": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint",
+          "title": "Ending datapoint of the throttling range"
+        },
+        "start": {
+          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint",
+          "title": "Starting datapoint of the throttling range"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint": {
+      "properties": {
+        "input_signal": {
+          "format": "double",
+          "type": "number"
+        },
+        "load_multiplier": {
+          "format": "double",
+          "type": "number"
         }
       },
       "type": "object",
@@ -1063,7 +1175,7 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint."
+          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy."
         },
         "load_ramp": {
           "$ref": "#/definitions/LoadRamp",
