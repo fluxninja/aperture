@@ -31,8 +31,8 @@ export class Flow {
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {
-    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate * 1000);
     span.setAttribute(SOURCE_LABEL, "sdk");
+    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate * 1000);
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now() * 1000);
   }
 

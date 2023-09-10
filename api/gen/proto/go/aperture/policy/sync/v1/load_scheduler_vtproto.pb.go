@@ -160,9 +160,10 @@ func (m *LoadDecision) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		for k := range m.TokensByWorkloadIndex {
 			v := m.TokensByWorkloadIndex[k]
 			baseI := i
-			i = encodeVarint(dAtA, i, uint64(v))
+			i -= 8
+			binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(v))))
 			i--
-			dAtA[i] = 0x10
+			dAtA[i] = 0x11
 			i -= len(k)
 			copy(dAtA[i:], k)
 			i = encodeVarint(dAtA, i, uint64(len(k)))
@@ -258,7 +259,7 @@ func (m *LoadDecision) SizeVT() (n int) {
 		for k, v := range m.TokensByWorkloadIndex {
 			_ = k
 			_ = v
-			mapEntrySize := 1 + len(k) + sov(uint64(len(k))) + 1 + sov(uint64(v))
+			mapEntrySize := 1 + len(k) + sov(uint64(len(k))) + 1 + 8
 			n += mapEntrySize + 1 + sov(uint64(mapEntrySize))
 		}
 	}
@@ -638,10 +639,10 @@ func (m *LoadDecision) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.TokensByWorkloadIndex == nil {
-				m.TokensByWorkloadIndex = make(map[string]uint64)
+				m.TokensByWorkloadIndex = make(map[string]float64)
 			}
 			var mapkey string
-			var mapvalue uint64
+			var mapvalue float64
 			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
@@ -690,20 +691,13 @@ func (m *LoadDecision) UnmarshalVT(dAtA []byte) error {
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
 				} else if fieldNum == 2 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflow
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+					var mapvaluetemp uint64
+					if (iNdEx + 8) > l {
+						return io.ErrUnexpectedEOF
 					}
+					mapvaluetemp = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+					iNdEx += 8
+					mapvalue = math.Float64frombits(mapvaluetemp)
 				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skip(dAtA[iNdEx:])

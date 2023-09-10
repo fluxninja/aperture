@@ -284,7 +284,7 @@ type Scheduler struct {
 	proto                 *policylangv1.Scheduler
 	defaultWorkload       *workload
 	workloadMultiMatcher  *multiMatcher
-	tokensByWorkloadIndex map[string]uint64
+	tokensByWorkloadIndex map[string]float64
 	metrics               *SchedulerMetrics
 	mutex                 sync.RWMutex
 }
@@ -377,13 +377,13 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	fairnessLabel := "workload:" + matchedWorkloadIndex
 
-	tokens := uint64(1)
+	tokens := float64(1)
 	// Precedence order:
 	// 1. Label tokens
 	// 2. Estimated Tokens
 	// 3. Workload tokens
 	if matchedWorkloadParametersProto.GetTokens() != 0 {
-		tokens = uint64(matchedWorkloadParametersProto.GetTokens())
+		tokens = matchedWorkloadParametersProto.GetTokens()
 	}
 
 	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
@@ -399,7 +399,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	if s.proto.TokensLabelKey != "" {
 		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
-			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
+			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 				tokens = parsedTokens
 			}
 		}
@@ -450,7 +450,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	accepted := s.scheduler.Schedule(reqCtx, req)
 
-	tokensConsumed := uint64(0)
+	tokensConsumed := float64(0)
 	if accepted {
 		tokensConsumed = req.Tokens
 	}
@@ -493,7 +493,7 @@ func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Count
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.
-func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
+func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (float64, bool) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	val, ok := s.tokensByWorkloadIndex[workloadIndex]
@@ -501,7 +501,7 @@ func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
 }
 
 // SetEstimatedTokens sets estimated tokens for specific workload.
-func (s *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64) {
+func (s *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]float64) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.tokensByWorkloadIndex = tokensByWorkloadIndex

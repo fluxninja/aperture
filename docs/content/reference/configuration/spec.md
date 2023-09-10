@@ -6434,7 +6434,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 Flow label key that will be used to override the number of tokens for this
 request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid uint64 number.
+assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -7224,8 +7224,8 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default priority for
   this flow.
-- The value associated with this key must be a valid uint64 number. Higher
-  numbers means higher priority.
+- The value associated with this key must be a valid number. Higher numbers
+  means higher priority.
 - If this parameter is not provided, the priority for the flow will be
   determined by the matched workload's priority.
 
@@ -7241,7 +7241,7 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default number of tokens
   for this flow.
-- The value associated with this key must be a valid uint64 number.
+- The value associated with this key must be a valid number.
 - If this parameter is not provided, the number of tokens for the flow will be
   determined by the matched workload's token count.
 
@@ -7394,7 +7394,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(int64, minimum: `0`, default: `1`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 

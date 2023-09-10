@@ -2587,7 +2587,7 @@
           "x-go-tag-default": "7200s"
         },
         "tokens_label_key": {
-          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid uint64 number.",
+          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid number.",
           "type": "string"
         }
       },
@@ -2887,11 +2887,11 @@
           "description": "This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied."
         },
         "priorities_label_key": {
-          "description": "* Key for a flow label that can be used to override the default priority for this flow.\n* The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.\n* If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.",
+          "description": "* Key for a flow label that can be used to override the default priority for this flow.\n* The value associated with this key must be a valid number. Higher numbers means higher priority.\n* If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.",
           "type": "string"
         },
         "tokens_label_key": {
-          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid uint64 number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.",
+          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.",
           "type": "string"
         },
         "workloads": {
@@ -2948,9 +2948,9 @@
         "tokens": {
           "default": 1,
           "description": "Tokens determines the cost of admitting a single flow in the workload,\nwhich is typically defined as milliseconds of flow latency (time to response or duration of a feature) or\nsimply equal to 1 if the resource being accessed is constrained by the\nnumber of flows (3rd party rate limiters).\nThis override is applicable only if tokens for the flow aren't specified\nin the flow labels.\n\n",
-          "format": "int64",
+          "format": "double",
           "minimum": 0,
-          "type": "integer",
+          "type": "number",
           "x-go-tag-default": "1",
           "x-go-tag-validate": "gte=0"
         }
