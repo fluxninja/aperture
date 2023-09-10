@@ -1,7 +1,6 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
-import type { Long } from '@grpc/proto-loader';
 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
@@ -52,12 +51,12 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Out
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo {
   'workloadIndex'?: (string);
-  'tokensConsumed'?: (number | string | Long);
+  'tokensConsumed'?: (number | string);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output {
   'workloadIndex': (string);
-  'tokensConsumed': (string);
+  'tokensConsumed': (number);
 }
 
 export interface LimiterDecision {

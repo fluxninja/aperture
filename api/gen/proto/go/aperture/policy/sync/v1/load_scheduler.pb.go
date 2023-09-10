@@ -140,10 +140,10 @@ type LoadDecision struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TickInfo              *TickInfo         `protobuf:"bytes,1,opt,name=tick_info,json=tickInfo,proto3" json:"tick_info,omitempty"`
-	LoadMultiplier        float64           `protobuf:"fixed64,2,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
-	PassThrough           bool              `protobuf:"varint,3,opt,name=pass_through,json=passThrough,proto3" json:"pass_through,omitempty"`
-	TokensByWorkloadIndex map[string]uint64 `protobuf:"bytes,4,rep,name=tokens_by_workload_index,json=tokensByWorkloadIndex,proto3" json:"tokens_by_workload_index,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	TickInfo              *TickInfo          `protobuf:"bytes,1,opt,name=tick_info,json=tickInfo,proto3" json:"tick_info,omitempty"`
+	LoadMultiplier        float64            `protobuf:"fixed64,2,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
+	PassThrough           bool               `protobuf:"varint,3,opt,name=pass_through,json=passThrough,proto3" json:"pass_through,omitempty"`
+	TokensByWorkloadIndex map[string]float64 `protobuf:"bytes,4,rep,name=tokens_by_workload_index,json=tokensByWorkloadIndex,proto3" json:"tokens_by_workload_index,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"fixed64,2,opt,name=value,proto3"`
 }
 
 func (x *LoadDecision) Reset() {
@@ -199,7 +199,7 @@ func (x *LoadDecision) GetPassThrough() bool {
 	return false
 }
 
-func (x *LoadDecision) GetTokensByWorkloadIndex() map[string]uint64 {
+func (x *LoadDecision) GetTokensByWorkloadIndex() map[string]float64 {
 	if x != nil {
 		return x.TokensByWorkloadIndex
 	}
@@ -267,7 +267,7 @@ var file_aperture_policy_sync_v1_load_scheduler_proto_rawDesc = []byte{
 	0x6f, 0x72, 0x6b, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x45, 0x6e, 0x74, 0x72,
 	0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
 	0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x04, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x96, 0x02,
+	0x28, 0x01, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x96, 0x02,
 	0x0a, 0x2f, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e,
 	0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75,
 	0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x73, 0x79, 0x6e, 0x63, 0x2e, 0x76,

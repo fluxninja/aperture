@@ -540,11 +540,11 @@ type Scheduler struct {
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	DecisionDeadlineMargin *durationpb.Duration `protobuf:"bytes,6,opt,name=decision_deadline_margin,json=decisionDeadlineMargin,proto3" json:"decision_deadline_margin,omitempty" default:"0.01s"` // @gotags: default:"0.01s"
 	// * Key for a flow label that can be used to override the default number of tokens for this flow.
-	// * The value associated with this key must be a valid uint64 number.
+	// * The value associated with this key must be a valid number.
 	// * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
 	TokensLabelKey string `protobuf:"bytes,7,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// * Key for a flow label that can be used to override the default priority for this flow.
-	// * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
+	// * The value associated with this key must be a valid number. Higher numbers means higher priority.
 	// * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
 	PrioritiesLabelKey string `protobuf:"bytes,8,opt,name=priorities_label_key,json=prioritiesLabelKey,proto3" json:"priorities_label_key,omitempty"`
 	// This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
@@ -1920,7 +1920,7 @@ type RateLimiter_Parameters struct {
 	// for this request.
 	// This is an optional parameter and takes highest precedence
 	// when assigning tokens to a request.
-	// The label value must be a valid uint64 number.
+	// The label value must be a valid number.
 	TokensLabelKey string `protobuf:"bytes,2,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	// Interval defines the time interval in which the token bucket
 	// will fill tokens specified by `fill_amount` signal.
@@ -2414,7 +2414,7 @@ type Scheduler_Workload_Parameters struct {
 	// number of flows (3rd party rate limiters).
 	// This override is applicable only if tokens for the flow aren't specified
 	// in the flow labels.
-	Tokens uint32 `protobuf:"varint,2,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0" default:"1"` // @gotags: validate:"gte=0" default:"1"
+	Tokens float64 `protobuf:"fixed64,4,opt,name=tokens,proto3" json:"tokens,omitempty" validate:"gte=0" default:"1"` // @gotags: validate:"gte=0" default:"1"
 	// Timeout for the flow in the workload.
 	// If timeout is provided on the Check call as well, the minimum of the two is picked.
 	// If this override is not provided, the timeout provided in the check call is used.
@@ -2462,7 +2462,7 @@ func (x *Scheduler_Workload_Parameters) GetPriority() float64 {
 	return 0
 }
 
-func (x *Scheduler_Workload_Parameters) GetTokens() uint32 {
+func (x *Scheduler_Workload_Parameters) GetTokens() float64 {
 	if x != nil {
 		return x.Tokens
 	}
@@ -3649,7 +3649,7 @@ var file_aperture_policy_language_v1_flowcontrol_proto_rawDesc = []byte{
 	0x1a, 0x80, 0x01, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12,
 	0x1a, 0x0a, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x01, 0x52, 0x08, 0x70, 0x72, 0x69, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x16, 0x0a, 0x06, 0x74,
-	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x74, 0x6f, 0x6b,
+	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06, 0x74, 0x6f, 0x6b,
 	0x65, 0x6e, 0x73, 0x12, 0x3e, 0x0a, 0x0d, 0x71, 0x75, 0x65, 0x75, 0x65, 0x5f, 0x74, 0x69, 0x6d,
 	0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72,
