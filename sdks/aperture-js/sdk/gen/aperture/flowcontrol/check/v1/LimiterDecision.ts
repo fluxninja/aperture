@@ -57,7 +57,7 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo {
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output {
   'workloadIndex': (string);
-  'tokensConsumed': (Long);
+  'tokensConsumed': (string);
 }
 
 export interface LimiterDecision {

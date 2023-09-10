@@ -8,6 +8,6 @@ export interface Timestamp {
 }
 
 export interface Timestamp__Output {
-  'seconds': (Long);
+  'seconds': (string);
   'nanos': (number);
 }
