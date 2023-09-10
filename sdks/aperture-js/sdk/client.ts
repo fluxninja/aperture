@@ -21,18 +21,19 @@ import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
 export class ApertureClient {
-  public readonly fcsClient: FlowControlServiceClient;
+  private readonly fcsClient: FlowControlServiceClient;
 
-  public readonly exporter: OTLPTraceExporter;
+  private readonly exporter: OTLPTraceExporter;
 
-  public readonly tracerProvider: NodeTracerProvider;
+  private readonly tracerProvider: NodeTracerProvider;
 
-  public readonly tracer: Tracer;
+  private readonly tracer: Tracer;
 
-  public readonly timeout: number;
+  // Timeout is duration in milliseconds.
+  private readonly timeoutMilliseconds: number;
 
   constructor({
-    timeout = 200,
+    timeout: timeoutMilliseconds = 200,
     channelCredentials = grpc.credentials.createInsecure(),
   } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
@@ -51,7 +52,7 @@ export class ApertureClient {
     this.tracerProvider.register();
     this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
 
-    this.timeout = timeout;
+    this.timeoutMilliseconds = timeoutMilliseconds;
 
     const kickChannel = () => {
       const state = this.fcsClient.getChannel().getConnectivityState(true);
@@ -103,9 +104,13 @@ export class ApertureClient {
 
         let mergedLabels = { ...labelsArg, ...labelsBaggage };
 
-        let checkParams = { deadline: 0 };
-        if (this.timeout != null && this.timeout != 0) {
-          checkParams = { deadline: Date.now() + this.timeout };
+        let checkParams: grpc.CallOptions = {};
+        if (this.timeoutMilliseconds != 0) {
+          const deadline = new Date();
+          deadline.setMilliseconds(
+            deadline.getMilliseconds() + this.timeoutMilliseconds,
+          );
+          checkParams.deadline = deadline;
         }
 
         this.fcsClient.Check(
