@@ -3,7 +3,10 @@ import { Span } from "@opentelemetry/api";
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
+  FLOW_START_TIMESTAMP_LABEL,
   FLOW_STATUS_LABEL,
+  SOURCE_LABEL,
+  WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
 import {
   CheckResponse__Output,
@@ -23,10 +26,15 @@ export class Flow {
 
   constructor(
     private span: Span,
+    startDate: number,
     private failOpen: boolean = true,
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
-  ) {}
+  ) {
+    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate * 1000);
+    span.setAttribute(SOURCE_LABEL, "sdk");
+    span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now() * 1000);
+  }
 
   ShouldRun() {
     if (
@@ -52,9 +60,13 @@ export class Flow {
     return this.checkResponse;
   }
 
+  Span() {
+    return this.span;
+  }
+
   End() {
     if (this.ended) {
-      return new Error("flow already ended");
+      return;
     }
     this.ended = true;
 
