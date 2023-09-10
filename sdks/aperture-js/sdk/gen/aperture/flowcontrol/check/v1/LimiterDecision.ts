@@ -6,8 +6,8 @@ import type { Long } from '@grpc/proto-loader';
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 export const _aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason = {
-  LIMITER_REASON_UNSPECIFIED: 'LIMITER_REASON_UNSPECIFIED',
-  LIMITER_REASON_KEY_NOT_FOUND: 'LIMITER_REASON_KEY_NOT_FOUND',
+  LIMITER_REASON_UNSPECIFIED: 0,
+  LIMITER_REASON_KEY_NOT_FOUND: 1,
 } as const;
 
 export type _aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason =
@@ -57,7 +57,7 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo {
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output {
   'workloadIndex': (string);
-  'tokensConsumed': (string);
+  'tokensConsumed': (Long);
 }
 
 export interface LimiterDecision {
@@ -85,5 +85,4 @@ export interface LimiterDecision__Output {
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Output | null);
   'quotaSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo__Output | null);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
-  'details': "rateLimiterInfo"|"loadSchedulerInfo"|"samplerInfo"|"quotaSchedulerInfo";
 }

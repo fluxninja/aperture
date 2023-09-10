@@ -38,7 +38,7 @@ buf-generate:
 		set -e; \
 		pushd ../sdks/aperture-js; \
 		npm install; \
-		node ./node_modules/@grpc/proto-loader/build/bin/proto-loader-gen-types.js --keepCase=false --longs=String --enums=String --defaults=true --oneofs=true --outDir=sdk/gen --grpcLib=@grpc/grpc-js proto/flowcontrol/check/v1/check.proto; \
+		node ./node_modules/@grpc/proto-loader/build/bin/proto-loader-gen-types.js --defaults=true --outDir=sdk/gen --grpcLib=@grpc/grpc-js proto/flowcontrol/check/v1/check.proto; \
 		git add ./sdk/gen; \
 		popd; \
 	}

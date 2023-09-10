@@ -10,8 +10,8 @@ import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCod
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 export const _aperture_flowcontrol_check_v1_CheckResponse_DecisionType = {
-  DECISION_TYPE_ACCEPTED: 'DECISION_TYPE_ACCEPTED',
-  DECISION_TYPE_REJECTED: 'DECISION_TYPE_REJECTED',
+  DECISION_TYPE_ACCEPTED: 0,
+  DECISION_TYPE_REJECTED: 1,
 } as const;
 
 export type _aperture_flowcontrol_check_v1_CheckResponse_DecisionType =
@@ -25,10 +25,10 @@ export type _aperture_flowcontrol_check_v1_CheckResponse_DecisionType__Output = 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 export const _aperture_flowcontrol_check_v1_CheckResponse_RejectReason = {
-  REJECT_REASON_NONE: 'REJECT_REASON_NONE',
-  REJECT_REASON_RATE_LIMITED: 'REJECT_REASON_RATE_LIMITED',
-  REJECT_REASON_NO_TOKENS: 'REJECT_REASON_NO_TOKENS',
-  REJECT_REASON_REGULATED: 'REJECT_REASON_REGULATED',
+  REJECT_REASON_NONE: 0,
+  REJECT_REASON_RATE_LIMITED: 1,
+  REJECT_REASON_NO_TOKENS: 2,
+  REJECT_REASON_REGULATED: 3,
 } as const;
 
 export type _aperture_flowcontrol_check_v1_CheckResponse_RejectReason =

@@ -6,7 +6,7 @@ import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
-import { CheckResponse } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
 import {
@@ -33,7 +33,7 @@ export class ApertureClient {
   private readonly timeoutMilliseconds: number;
 
   constructor({
-    timeout: timeoutMilliseconds = 200,
+    timeoutMilliseconds = 200,
     channelCredentials = grpc.credentials.createInsecure(),
   } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
@@ -122,7 +122,7 @@ export class ApertureClient {
           ((err, response) => {
             resolve(new Flow(span, failOpen, response, err));
             return;
-          }) as grpc.requestCallback<CheckResponse>,
+          }) as grpc.requestCallback<CheckResponse__Output>,
         );
       } catch (err: any) {
         resolve(new Flow(span, failOpen, null, err));
