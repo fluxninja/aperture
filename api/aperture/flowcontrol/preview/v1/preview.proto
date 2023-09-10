@@ -47,7 +47,7 @@ message PreviewRequest {
   // Control point to preview.
   string control_point = 2 [(validate.rules).string.min_len = 1];
   // Service to preview.
-  string service = 3 [(validate.rules).string.min_len = 1];
+  string service = 3;
   // Flow labels to match. Optional parameter for advanced filtering.
   policy.language.v1.LabelMatcher label_matcher = 4;
 }
