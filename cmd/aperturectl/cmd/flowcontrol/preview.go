@@ -36,7 +36,7 @@ var PreviewCmd = &cobra.Command{
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(2),
 	RunE: func(_ *cobra.Command, args []string) error {
-		client, err := controller.Client()
+		client, err := controller.IntrospectionClient()
 		if err != nil {
 			return err
 		}

@@ -20,7 +20,7 @@ var ControlPointsCmd = &cobra.Command{
 	SilenceErrors: true,
 	Example:       `aperturectl flow-control control-points`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		client, err := controller.Client()
+		client, err := controller.IntrospectionClient()
 		if err != nil {
 			return err
 		}

@@ -34,7 +34,7 @@ var StatusCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := controller.Client()
+		client, err := controller.StatusClient()
 		if err != nil {
 			return err
 		}
