@@ -162,7 +162,7 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, circuitAPI run
 		return nil, errMulti
 	}
 
-	tokensByWorkload := make(map[string]uint64)
+	tokensByWorkload := make(map[string]float64)
 	if la.tokensQuery != nil {
 		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(circuitAPI)
 		if err != nil {
@@ -185,7 +185,7 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, circuitAPI run
 							continue
 						}
 						workloadIndex := string(v)
-						sampleValue := uint64(sample.Value)
+						sampleValue := float64(sample.Value)
 						tokensByWorkload[workloadIndex] = sampleValue
 						break
 					}
@@ -217,7 +217,7 @@ func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
 	return la.publishDecision(tickInfo, 1.0, true, nil)
 }
 
-func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]uint64) error {
+func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]float64) error {
 	if !la.doActuate {
 		return nil
 	}

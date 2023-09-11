@@ -96,10 +96,10 @@ time window.
 Tokens are determined in the following order of precedence:
 
 - Specified in the flow labels.
-- Specified in the `Workload.tokens` setting.
 - Estimated tokens (see
   [`workload_latency_based_tokens`](/reference/configuration/spec.md#load-scheduler)
   setting).
+- Specified in the `Workload.tokens` setting.
 
 ### Queue Timeout {#queue-timeout}
 

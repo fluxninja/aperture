@@ -348,6 +348,9 @@ func (p *metricsProcessor) updateMetricsForFluxMeters(
 }
 
 func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv1.CheckResponse, controlPointType string) {
+	if len(checkResponse.GetServices()) == 0 {
+		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(checkResponse.GetControlPoint(), controlPointType, ""))
+	}
 	for _, service := range checkResponse.GetServices() {
 		p.cfg.controlPointCache.Put(selectors.NewTypedControlPointID(checkResponse.GetControlPoint(), controlPointType, service))
 	}

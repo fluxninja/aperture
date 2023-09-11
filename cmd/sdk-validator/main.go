@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -47,7 +48,7 @@ var (
 func init() {
 	logLevel, logLevelSet := os.LookupEnv("LOG_LEVEL")
 	if !logLevelSet {
-		logLevel = log.DebugLevel.String()
+		logLevel = log.TraceLevel.String()
 	}
 	logger = log.NewLogger(log.GetPrettyConsoleWriter(), logLevel)
 	log.SetGlobalLogger(logger)
@@ -271,6 +272,7 @@ func runDockerContainer(image string, port string) (string, error) {
 		}
 		if containerJSON.State != nil {
 			if containerJSON.State.Status == "exited" {
+				printContainerLogs(resp.ID)
 				log.Fatal().Msg("Container exited")
 			}
 			if containerJSON.State.Health != nil {
@@ -282,12 +284,28 @@ func runDockerContainer(image string, port string) (string, error) {
 	}
 }
 
+func printContainerLogs(id string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return
+	}
+	// print all container logs
+	out, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	if err != nil {
+		return
+	}
+	_, _ = io.Copy(os.Stdout, out)
+}
+
 func stopDockerContainer(id string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
+
+	printContainerLogs(id)
 
 	err = cli.ContainerStop(ctx, id, container.StopOptions{})
 	if err != nil {
@@ -320,11 +338,11 @@ func confirmConnectedAndStartTraffic(url string, requests int) int {
 
 func startTraffic(url string, requests int) int {
 	rejected := 0
-	superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
-	if err != nil {
-		log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
-	}
 	for i := 0; i < requests; i++ {
+		superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
+		if err != nil {
+			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
+		}
 		res, err := http.DefaultClient.Do(superReq)
 		if err != nil {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
@@ -332,7 +350,8 @@ func startTraffic(url string, requests int) int {
 		if res.Body != nil {
 			res.Body.Close()
 		}
-		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
+		if res.StatusCode >= 400 {
+			log.Trace().Int("status code", res.StatusCode).Msg("Request rejected")
 			rejected += 1
 		}
 	}

@@ -907,6 +907,12 @@ func (m *Scheduler_Workload_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Tokens != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Tokens))))
+		i--
+		dAtA[i] = 0x21
+	}
 	if m.QueueTimeout != nil {
 		if vtmsg, ok := interface{}(m.QueueTimeout).(interface {
 			MarshalToSizedBufferVT([]byte) (int, error)
@@ -928,11 +934,6 @@ func (m *Scheduler_Workload_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int
 		}
 		i--
 		dAtA[i] = 0x1a
-	}
-	if m.Tokens != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.Tokens))
-		i--
-		dAtA[i] = 0x10
 	}
 	if m.Priority != 0 {
 		i -= 8
@@ -3199,9 +3200,6 @@ func (m *Scheduler_Workload_Parameters) SizeVT() (n int) {
 	if m.Priority != 0 {
 		n += 9
 	}
-	if m.Tokens != 0 {
-		n += 1 + sov(uint64(m.Tokens))
-	}
 	if m.QueueTimeout != nil {
 		if size, ok := interface{}(m.QueueTimeout).(interface {
 			SizeVT() int
@@ -3211,6 +3209,9 @@ func (m *Scheduler_Workload_Parameters) SizeVT() (n int) {
 			l = proto.Size(m.QueueTimeout)
 		}
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.Tokens != 0 {
+		n += 9
 	}
 	n += len(m.unknownFields)
 	return n
@@ -5985,25 +5986,6 @@ func (m *Scheduler_Workload_Parameters) UnmarshalVT(dAtA []byte) error {
 			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.Priority = float64(math.Float64frombits(v))
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
-			}
-			m.Tokens = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Tokens |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field QueueTimeout", wireType)
@@ -6048,6 +6030,17 @@ func (m *Scheduler_Workload_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tokens", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Tokens = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

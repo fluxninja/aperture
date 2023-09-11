@@ -212,7 +212,8 @@ func ParseAdaptiveLoadScheduler(
 			{
 				Component: &policylangv1.Component_Integrator{
 					Integrator: &policylangv1.Integrator{
-						InitialValue: adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
+						InitialValue:       adaptiveLoadScheduler.Parameters.MaxLoadMultiplier,
+						EvaluationInterval: durationpb.New(metricScrapeInterval),
 						InPorts: &policylangv1.Integrator_Ins{
 							Input: &policylangv1.InPort{
 								Value: &policylangv1.InPort_ConstantSignal{

@@ -68,6 +68,7 @@ spec:
               - agent_group: default
                 control_point: egress
                 service: service2-demo-app.demoapp.svc.cluster.local
+              workload_latency_based_tokens: true
             max_load_multiplier: 2
     - query:
         promql:

@@ -246,8 +246,8 @@ Parameters for the _Gradient Controller_.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system is
-not in the overloaded state, up until the `max_load_multiplier` is reached.
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -278,8 +278,8 @@ state.
   recovering.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
-- Any future overload state is detected by the control policy, and the load
-  multiplier increment cycle is restarted.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
 
 </dd>
 </dl>
@@ -4645,7 +4645,7 @@ that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
 principles.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
-that get admitted.
+that get admitted. The signals gets acted on once every 10 seconds.
 
 <dl>
 <dt>dry_run</dt>
@@ -4732,6 +4732,7 @@ Input for the LoadScheduler component.
 <!-- vale on -->
 
 Load multiplier is proportion of incoming token rate that needs to be accepted.
+The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
@@ -4757,7 +4758,7 @@ Output for the LoadScheduler component.
 <!-- vale on -->
 
 Observed load multiplier is the proportion of incoming token rate that is being
-accepted.
+accepted. The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
@@ -4804,7 +4805,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -6433,7 +6434,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 Flow label key that will be used to override the number of tokens for this
 request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid uint64 number.
+assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -7223,8 +7224,8 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default priority for
   this flow.
-- The value associated with this key must be a valid uint64 number. Higher
-  numbers means higher priority.
+- The value associated with this key must be a valid number. Higher numbers
+  means higher priority.
 - If this parameter is not provided, the priority for the flow will be
   determined by the matched workload's priority.
 
@@ -7240,7 +7241,7 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default number of tokens
   for this flow.
-- The value associated with this key must be a valid uint64 number.
+- The value associated with this key must be a valid number.
 - If this parameter is not provided, the number of tokens for the flow will be
   determined by the matched workload's token count.
 
@@ -7393,7 +7394,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 
