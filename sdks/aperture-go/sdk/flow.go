@@ -4,8 +4,7 @@ import (
 	"errors"
 	"time"
 
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
-
+	checkproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -19,14 +18,14 @@ type Flow interface {
 	DisableFailOpen()
 	SetStatus(status FlowStatus)
 	End() error
-	CheckResponse() *flowcontrol.CheckResponse
+	CheckResponse() *checkproto.CheckResponse
 }
 
 // TODO: set fail open?
 
 type flow struct {
 	span          trace.Span
-	checkResponse *flowcontrol.CheckResponse
+	checkResponse *checkproto.CheckResponse
 	statusCode    FlowStatus
 	ended         bool
 	failOpen      bool
@@ -47,7 +46,7 @@ func newFlow(span trace.Span) *flow {
 func (f *flow) Decision() FlowDecision {
 	if f.checkResponse == nil {
 		return Unreachable
-	} else if f.checkResponse.DecisionType == flowcontrol.CheckResponse_DECISION_TYPE_ACCEPTED {
+	} else if f.checkResponse.DecisionType == checkproto.CheckResponse_DECISION_TYPE_ACCEPTED {
 		return Accepted
 	} else {
 		return Rejected
@@ -67,7 +66,7 @@ func (f *flow) DisableFailOpen() {
 }
 
 // CheckResponse returns the response from the server.
-func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
+func (f *flow) CheckResponse() *checkproto.CheckResponse {
 	return f.checkResponse
 }
 
