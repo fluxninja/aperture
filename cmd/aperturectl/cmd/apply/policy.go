@@ -59,6 +59,10 @@ aperturectl apply policy --dir=policies`,
 				return err
 			}
 
+			if len(policies) == 0 {
+				return errors.New("no policies found in the directory")
+			}
+
 			model := tui.InitialCheckboxModel(policies, "Which policies to apply?")
 			if !selectAll {
 				p := tea.NewProgram(model)
@@ -87,17 +91,23 @@ aperturectl apply policy --dir=policies`,
 // getPolicies applies all policies in a directory to the cluster.
 func getPolicies(policyDir string) ([]string, error) {
 	policies := []string{}
+	policyMap := map[string]string{}
 	// walk the directory and apply all policies
 	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if filepath.Ext(info.Name()) == ".yaml" {
-			_, _, err := getPolicy(path)
+			_, policyName, err := getPolicy(path)
 			if err != nil {
 				return err
 			}
-			policies = append(policies, path)
+			if _, ok := policyMap[policyName]; !ok {
+				policyMap[policyName] = path
+				policies = append(policies, path)
+			} else {
+				log.Info().Str("policy", policyName).Msg("Duplicate policy found. Skipping...")
+			}
 		}
 		return nil
 	})
