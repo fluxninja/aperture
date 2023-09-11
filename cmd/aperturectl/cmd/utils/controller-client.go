@@ -28,7 +28,7 @@ type IntrospectionClient interface {
 	PreviewHTTPRequests(ctx context.Context, in *cmdv1.PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*cmdv1.PreviewHTTPRequestsControllerResponse, error)
 }
 
-// IntrospectionClient is a subset of cmdv1.ControllerClient that covers APIs related to policies.
+// PolicyClient is a subset of cmdv1.ControllerClient that covers APIs related to policies.
 //
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
 type PolicyClient interface {
@@ -39,7 +39,7 @@ type PolicyClient interface {
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
 }
 
-// IntrospectionClient is a subset of cmdv1.ControllerClient that covers APIs related to status.
+// StatusClient is a subset of cmdv1.ControllerClient that covers APIs related to status.
 //
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
 type StatusClient interface {
