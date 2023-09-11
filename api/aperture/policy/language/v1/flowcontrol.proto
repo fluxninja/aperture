@@ -361,12 +361,10 @@ message AdaptiveLoadScheduler {
     // - Helps protect the service from request bursts while the system is still recovering.
     // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
     // - The pass-through mode gets disabled if the system enters the overload state again.
-    // Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
     double max_load_multiplier = 3; // @gotags: default:"2.0"
 
     // Linear increment to load multiplier every 10 seconds while the system is
     // not in the overloaded state, up until the `max_load_multiplier` is reached.
-    // Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
     double load_multiplier_linear_increment = 4; // @gotags: default:"0.025"
   }
 
@@ -404,8 +402,10 @@ message AdaptiveLoadScheduler {
   // Input ports for the _Adaptive Load Scheduler_ component.
   message Ins {
     // The input signal to the controller.
+    // Deprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.
     InPort signal = 1; // @gotags: validate:"required"
     // The setpoint input to the controller.
+    // Deprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.
     InPort setpoint = 2; // @gotags: validate:"required"
     // The `overload_confirmation` port provides additional criteria to determine overload state which
     // results in _Flow_ throttling at the service.

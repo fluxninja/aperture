@@ -51,14 +51,14 @@
         },
         "load_multiplier_linear_increment": {
           "default": 0.025,
-          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\nDeprecated: v3.0.0. Use \"gradient_controller\" inside the _AIMD Throttling Strategy_ instead.\n\n",
+          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.025"
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\nDeprecated: v3.0.0. Use \"gradient_controller\" inside the _AIMD Throttling Strategy_ instead.\n\n",
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0"
@@ -93,12 +93,12 @@
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint input to the controller.\n\n",
+          "description": "The setpoint input to the controller.\nDeprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.\n\n",
           "x-go-tag-validate": "required"
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The input signal to the controller.\n\n",
+          "description": "The input signal to the controller.\nDeprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.\n\n",
           "x-go-tag-validate": "required"
         }
       },

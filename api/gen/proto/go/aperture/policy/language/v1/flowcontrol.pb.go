@@ -2628,11 +2628,9 @@ type AdaptiveLoadScheduler_AIMDThrottlingStrategy struct {
 	// - Helps protect the service from request bursts while the system is still recovering.
 	// - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
 	// - The pass-through mode gets disabled if the system enters the overload state again.
-	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier every 10 seconds while the system is
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.
-	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,4,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.025"` // @gotags: default:"0.025"
 }
 
@@ -2761,8 +2759,10 @@ type AdaptiveLoadScheduler_Ins struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The input signal to the controller.
+	// Deprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.
 	Signal *InPort `protobuf:"bytes,1,opt,name=signal,proto3" json:"signal,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The setpoint input to the controller.
+	// Deprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.
 	Setpoint *InPort `protobuf:"bytes,2,opt,name=setpoint,proto3" json:"setpoint,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The `overload_confirmation` port provides additional criteria to determine overload state which
 	// results in _Flow_ throttling at the service.

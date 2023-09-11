@@ -175,9 +175,7 @@ Input ports for the _AIMD Throttling Strategy_.
 <!-- vale on -->
 
 Linear increment to load multiplier every 10 seconds while the system is not in
-the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
-v3.0.0. Use "gradient*controller" inside the \_AIMD Throttling Strategy*
-instead.
+the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -197,8 +195,7 @@ state.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
-  again. Deprecated: v3.0.0. Use "gradient*controller" inside the \_AIMD
-  Throttling Strategy* instead.
+  again.
 
 </dd>
 </dl>
@@ -273,7 +270,8 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale on -->
 
-The setpoint input to the controller.
+The setpoint input to the controller. Deprecated: v3.0.0. Use setpoint inside
+the _AIMD Throttling Strategy_ instead.
 
 </dd>
 <dt>signal</dt>
@@ -285,7 +283,8 @@ The setpoint input to the controller.
 
 <!-- vale on -->
 
-The input signal to the controller.
+The input signal to the controller. Deprecated: v3.0.0. Use signal inside the
+_AIMD Throttling Strategy_ instead.
 
 </dd>
 </dl>

@@ -54,7 +54,6 @@ definitions:
                 description: |+
                     Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
-                    Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
@@ -66,7 +65,6 @@ definitions:
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
                     - The pass-through mode gets disabled if the system enters the overload state again.
-                    Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
@@ -100,12 +98,14 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: |+
                     The setpoint input to the controller.
+                    Deprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.
 
                 x-go-tag-validate: required
             signal:
                 $ref: '#/definitions/InPort'
                 description: |+
                     The input signal to the controller.
+                    Deprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.
 
                 x-go-tag-validate: required
         type: object
