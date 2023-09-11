@@ -24,9 +24,9 @@ export const FLOW_STATUS_LABEL = "aperture.flow.status";
 // Label to hold JSON encoded check response struct.
 export const CHECK_RESPONSE_LABEL = "aperture.check_response";
 // Label to hold flow's start timestamp in Unix nanoseconds since Epoch.
-export const FLOW_START_TIMESTAMP_LABEL = "aperture.flow_start_timestamp";
+export const FLOW_START_TIMESTAMP_LABEL = "aperture.flow_start_timestamp_ms";
 // Label to hold flow's stop timestamp in Unix nanoseconds since Epoch.
-export const FLOW_END_TIMESTAMP_LABEL = "aperture.flow_end_timestamp";
+export const FLOW_END_TIMESTAMP_LABEL = "aperture.flow_end_timestamp_ms";
 // Label to hold workload start timestamp in Unix nanoseconds since Epoch.
 export const WORKLOAD_START_TIMESTAMP_LABEL =
-  "aperture.workload_start_timestamp";
+  "aperture.workload_start_timestamp_ms";

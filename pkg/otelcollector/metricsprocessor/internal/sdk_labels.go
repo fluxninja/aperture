@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -13,8 +14,19 @@ import (
 func AddSDKSpecificLabels(attributes pcommon.Map) {
 	// Compute durations
 	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabel)
+	if !flowStartExists {
+		flowStart, flowStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabelMs)
+	}
+
 	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabel)
+	if !workloadStartExists {
+		workloadStart, workloadStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabelMs)
+	}
+
 	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabel)
+	if !flowEndExists {
+		flowEnd, flowEndExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabelMs)
+	}
 
 	// Add ResponseReceivedLabel based on whether flowEnd is present
 	if flowEndExists {
@@ -66,7 +78,11 @@ func _getLabelTimestampValue(value pcommon.Value, labelKey, source string) (time
 		return time.Time{}, false
 	}
 
-	return time.Unix(0, valueInt), true
+	if strings.HasSuffix(labelKey, "_ms") {
+		return time.UnixMilli(valueInt), true
+	} else {
+		return time.Unix(0, valueInt), true
+	}
 }
 
 var (
