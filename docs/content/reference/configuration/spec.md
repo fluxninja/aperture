@@ -45,7 +45,7 @@ application health signals and the provided throttling strategy.
 
 <!-- vale on -->
 
-The \_AIMD strategy throttles the token rate based on an additive increase and
+The AIMD strategy throttles the token rate based on an additive increase and
 multiplicative decrease fashion.
 
 </dd>
@@ -121,10 +121,7 @@ Parameters for the _Adaptive Load Scheduler_ component.
 
 <!-- vale on -->
 
-The _Range_ strategy throttles the token rate based on the range of the signal.
-
-The AIAD strategy throttles the token rate based on an additive increase and
-adaptive decrease fashion. AIADThrottlingStrategy aiad_throttling_strategy = 8;
+The Range strategy throttles the token rate based on the range of the signal.
 
 </dd>
 </dl>
@@ -137,9 +134,9 @@ adaptive decrease fashion. AIADThrottlingStrategy aiad_throttling_strategy = 8;
 
 <!-- vale on -->
 
-_AIMD Throttling Strategy uses a \_Gradient Controller_ to throttle the token
-rate based on the deviation of the signal from the setpoint. It takes a signal
-and setpoint as inputs and reduces token rate proportionally (or any arbitrary
+\_AIMD Throttling Strategy uses a Gradient Controller to throttle the token rate
+based on the deviation of the signal from the setpoint. It takes a signal and
+setpoint as inputs and reduces token rate proportionally (or any arbitrary
 power) based on deviation of the signal from setpoint. During recovery, it
 increases the token rate linearly until the system is not overloaded.
 
@@ -153,7 +150,7 @@ increases the token rate linearly until the system is not overloaded.
 
 <!-- vale on -->
 
-Parameters for the _Gradient Controller_.
+Parameters for the Gradient Controller.
 
 </dd>
 <dt>in_ports</dt>
@@ -179,7 +176,8 @@ Input ports for the _AIMD Throttling Strategy_.
 
 Linear increment to load multiplier every 10 seconds while the system is not in
 the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
-v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+v3.0.0. Use "gradient*controller" inside the \_AIMD Throttling Strategy*
+instead.
 
 </dd>
 <dt>max_load_multiplier</dt>
@@ -199,8 +197,8 @@ state.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
-  again. Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD
-  Throttling Strategy_ instead.
+  again. Deprecated: v3.0.0. Use "gradient*controller" inside the \_AIMD
+  Throttling Strategy* instead.
 
 </dd>
 </dl>
@@ -375,8 +373,8 @@ Configuration parameters for the embedded Alerter.
 
 <!-- vale on -->
 
-Parameters for the _Gradient Controller_. Deprecated: v3.0.0. Use
-_gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+Parameters for the Gradient Controller. Deprecated: v3.0.0. Use
+"gradient*controller" inside the \_AIMD Throttling Strategy* instead.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
@@ -390,7 +388,8 @@ _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
 
 Linear increment to load multiplier every 10 seconds while the system is not in
 the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
-v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+v3.0.0. Use "gradient*controller" inside the \_AIMD Throttling Strategy*
+instead.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -422,8 +421,8 @@ state.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
-  again. Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD
-  Throttling Strategy_ instead.
+  again. Deprecated: v3.0.0. Use "gradient*controller" inside the \_AIMD
+  Throttling Strategy* instead.
 
 </dd>
 </dl>
@@ -436,8 +435,9 @@ state.
 
 <!-- vale on -->
 
-_Range Throttling Strategy uses the \_Polynomial Range Function_ to throttle the
-token rate based on the range of the signal.
+Range Throttling Strategy uses the
+[polynomial range function](#polynomial-range-function) to throttle the token
+rate based on the range of the signal.
 
 <dl>
 <dt>in_ports</dt>
@@ -449,7 +449,7 @@ token rate based on the range of the signal.
 
 <!-- vale on -->
 
-Collection of input ports for the _Range Throttling Strategy_.
+Collection of input ports for the Range Throttling Strategy.
 
 </dd>
 <dt>parameters</dt>
@@ -461,7 +461,7 @@ Collection of input ports for the _Range Throttling Strategy_.
 
 <!-- vale on -->
 
-Parameters for the \_Range Function.
+Parameters for the Range Throttling Function.
 
 </dd>
 </dl>
@@ -474,7 +474,7 @@ Parameters for the \_Range Function.
 
 <!-- vale on -->
 
-Input ports for the _Range Throttling Strategy_ component.
+Input ports for the Range Throttling Strategy component.
 
 <dl>
 <dt>signal</dt>
@@ -522,7 +522,7 @@ quadratic degree=3: cubic
 
 <!-- vale on -->
 
-Ending datapoint of the throttling range
+Ending data-point of the throttling range
 
 </dd>
 <dt>start</dt>
@@ -534,7 +534,7 @@ Ending datapoint of the throttling range
 
 <!-- vale on -->
 
-Starting datapoint of the throttling range
+Starting data-point of the throttling range
 
 </dd>
 </dl>
@@ -6257,7 +6257,8 @@ Curve Types by Degree:
 
 - Degree 1: Linear
 - Degree 2: Quadratic
-- Degree 3: Cubic ... and so on.
+- Degree 3: Cubic
+- and so on.
 
 <dl>
 <dt>in_ports</dt>
@@ -6368,7 +6369,7 @@ Clamp to custom values
 
 <!-- vale on -->
 
-Clamp to the nearest datapoint
+Clamp to the nearest data-point
 
 </dd>
 <dt>continue_curve</dt>
@@ -6404,7 +6405,7 @@ Degree of the polynomial
 
 <!-- vale on -->
 
-Ending datapoint for the range function
+Ending data-point for the range function
 
 </dd>
 <dt>start</dt>
@@ -6416,7 +6417,7 @@ Ending datapoint for the range function
 
 <!-- vale on -->
 
-Starting datapoint for the range function
+Starting data-point for the range function
 
 </dd>
 </dl>

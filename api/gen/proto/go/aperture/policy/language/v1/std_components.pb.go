@@ -1805,7 +1805,7 @@ func (x *PIDController) GetParameters() *PIDController_Parameters {
 // - Degree 1: Linear
 // - Degree 2: Quadratic
 // - Degree 3: Cubic
-// ... and so on.
+// - and so on.
 type PolynomialRangeFunction struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4813,15 +4813,15 @@ type PolynomialRangeFunction_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Starting datapoint for the range function
+	// Starting data-point for the range function
 	Start *PolynomialRangeFunction_Parameters_Datapoint `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`
-	// Ending datapoint for the range function
+	// Ending data-point for the range function
 	End *PolynomialRangeFunction_Parameters_Datapoint `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty"`
 	// Degree of the polynomial
 	Degree float64 `protobuf:"fixed64,3,opt,name=degree,proto3" json:"degree,omitempty"`
 	// Behavior outside range. Select one of the following:
 	// 1. Continue polynomial curve
-	// 2. Clamp to the nearest datapoint
+	// 2. Clamp to the nearest data-point
 	// 3. Clamp to custom values
 	//
 	// Types that are assignable to OutsideRange:
@@ -4918,7 +4918,7 @@ type isPolynomialRangeFunction_Parameters_OutsideRange interface {
 }
 
 type PolynomialRangeFunction_Parameters_ClampToDatapoint struct {
-	// Clamp to the nearest datapoint
+	// Clamp to the nearest data-point
 	ClampToDatapoint bool `protobuf:"varint,4,opt,name=clamp_to_datapoint,json=clampToDatapoint,proto3,oneof"`
 }
 

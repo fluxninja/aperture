@@ -742,12 +742,12 @@ type isAdaptiveLoadScheduler_ThrottlingStrategy interface {
 }
 
 type AdaptiveLoadScheduler_AimdThrottlingStrategy struct {
-	// The _AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion.
+	// The AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion.
 	AimdThrottlingStrategy *AdaptiveLoadScheduler_AIMDThrottlingStrategy `protobuf:"bytes,4,opt,name=aimd_throttling_strategy,json=aimdThrottlingStrategy,proto3,oneof"`
 }
 
 type AdaptiveLoadScheduler_RangeThrottlingStrategy_ struct {
-	// The _Range_ strategy throttles the token rate based on the range of the signal.
+	// The Range strategy throttles the token rate based on the range of the signal.
 	RangeThrottlingStrategy *AdaptiveLoadScheduler_RangeThrottlingStrategy `protobuf:"bytes,5,opt,name=range_throttling_strategy,json=rangeThrottlingStrategy,proto3,oneof"`
 }
 
@@ -2528,18 +2528,18 @@ type AdaptiveLoadScheduler_Parameters struct {
 
 	// Parameters for the _Load Scheduler_.
 	LoadScheduler *LoadScheduler_Parameters `protobuf:"bytes,1,opt,name=load_scheduler,json=loadScheduler,proto3" json:"load_scheduler,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Parameters for the _Gradient Controller_.
-	// Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+	// Parameters for the Gradient Controller.
+	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	Gradient *GradientController_Parameters `protobuf:"bytes,2,opt,name=gradient,proto3" json:"gradient,omitempty"`
 	// The maximum load multiplier that can be reached during recovery from an overload state.
 	// - Helps protect the service from request bursts while the system is still recovering.
 	// - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
 	// - The pass-through mode gets disabled if the system enters the overload state again.
-	// Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier every 10 seconds while the system is
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.
-	// Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,4,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.0025"` // @gotags: default:"0.0025"
 	// Configuration parameters for the embedded Alerter.
 	Alerter *Alerter_Parameters `protobuf:"bytes,5,opt,name=alerter,proto3" json:"alerter,omitempty" validate:"required"` // @gotags: validate:"required"
@@ -2612,7 +2612,7 @@ func (x *AdaptiveLoadScheduler_Parameters) GetAlerter() *Alerter_Parameters {
 	return nil
 }
 
-// _AIMD Throttling Strategy uses a _Gradient Controller_ to throttle the token rate based on the deviation of the signal from the setpoint.
+// _AIMD Throttling Strategy uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
 // It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
 // During recovery, it increases the token rate linearly until the system is not overloaded.
 type AdaptiveLoadScheduler_AIMDThrottlingStrategy struct {
@@ -2622,17 +2622,17 @@ type AdaptiveLoadScheduler_AIMDThrottlingStrategy struct {
 
 	// Input ports for the _AIMD Throttling Strategy_.
 	InPorts *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Parameters for the _Gradient Controller_.
+	// Parameters for the Gradient Controller.
 	Gradient *GradientController_Parameters `protobuf:"bytes,2,opt,name=gradient,proto3" json:"gradient,omitempty" validate:"required"` // @gotags: validate:"required"
 	// The maximum load multiplier that can be reached during recovery from an overload state.
 	// - Helps protect the service from request bursts while the system is still recovering.
 	// - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
 	// - The pass-through mode gets disabled if the system enters the overload state again.
-	// Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	MaxLoadMultiplier float64 `protobuf:"fixed64,3,opt,name=max_load_multiplier,json=maxLoadMultiplier,proto3" json:"max_load_multiplier,omitempty" default:"2.0"` // @gotags: default:"2.0"
 	// Linear increment to load multiplier every 10 seconds while the system is
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.
-	// Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+	// Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,4,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.025"` // @gotags: default:"0.025"
 }
 
@@ -2696,15 +2696,15 @@ func (x *AdaptiveLoadScheduler_AIMDThrottlingStrategy) GetLoadMultiplierLinearIn
 	return 0
 }
 
-// _Range Throttling Strategy uses the _Polynomial Range Function_ to throttle the token rate based on the range of the signal.
+// Range Throttling Strategy uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
 type AdaptiveLoadScheduler_RangeThrottlingStrategy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Collection of input ports for the _Range Throttling Strategy_.
+	// Collection of input ports for the Range Throttling Strategy.
 	InPorts *AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Parameters for the _Range Function.
+	// Parameters for the Range Throttling Function.
 	Parameters *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 }
 
@@ -2947,7 +2947,7 @@ func (x *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) GetSetpoint() *InPort
 	return nil
 }
 
-// Input ports for the _Range Throttling Strategy_ component.
+// Input ports for the Range Throttling Strategy component.
 type AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3001,9 +3001,9 @@ type AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Starting datapoint of the throttling range
+	// Starting data-point of the throttling range
 	Start *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Ending datapoint of the throttling range
+	// Ending data-point of the throttling range
 	End *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Degree determines shape of the throttling curve.
 	// degree=1: linear
