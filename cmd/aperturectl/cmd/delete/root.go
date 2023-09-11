@@ -6,13 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (
 	controller   utils.ControllerConn
-	client       cmdv1.ControllerClient
+	client       utils.PolicyClient
 	controllerNs string
 	policyName   string
 )
@@ -44,7 +43,7 @@ Use this command to delete the Aperture Policies.`,
 
 		controllerNs = utils.GetControllerNs()
 
-		client, err = controller.Client()
+		client, err = controller.PolicyClient()
 		if err != nil {
 			return fmt.Errorf("failed to get controller client: %w", err)
 		}

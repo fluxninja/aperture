@@ -30,7 +30,7 @@ aperturectl discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wml
 
 aperturectl discovery entities --find-by=“ip=10.244.1.24”`,
 	RunE: func(_ *cobra.Command, _ []string) error {
-		client, err := controller.Client()
+		client, err := controller.IntrospectionClient()
 		if err != nil {
 			return err
 		}
