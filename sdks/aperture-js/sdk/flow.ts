@@ -32,8 +32,8 @@ export class Flow {
     private error: Error | null = null,
   ) {
     span.setAttribute(SOURCE_LABEL, "sdk");
-    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate * 1000);
-    span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now() * 1000);
+    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate);
+    span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
   }
 
   ShouldRun() {
@@ -103,7 +103,7 @@ export class Flow {
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
 
-    this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now() * 1000);
+    this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
 
     this.span.end();
   }
