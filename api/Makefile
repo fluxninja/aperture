@@ -19,18 +19,18 @@ buf-generate:
 	@buf lint
 	@buf generate --path aperture --template buf.gen.aperture-langs.yaml
 	@buf generate --path aperture --template buf.gen.aperture-grpc-ecosystem.yaml
+
 	@#inject go annotations
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
+
 	@#generate sdk flowcontrol stubs and copy them over
-	@#golang
-	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
-	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
-	@cp -R gen/proto/go/aperture/flowcontrol/checkhttp ../sdks/aperture-go/gen/proto/flowcontrol/
+
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/checkhttp ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/
 	@rm -rf gen/proto/java
+
 	@#javascript
 	@rm -rf ../sdks/aperture-js/src/generated/aperture/flowcontrol/*
 	@cp -R aperture/flowcontrol/check ../sdks/aperture-js/proto/flowcontrol/
@@ -42,6 +42,7 @@ buf-generate:
 		git add ./sdk/gen; \
 		popd; \
 	}
+
 	@#python
 	@rm -rf ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/*
 	@cp -R gen/proto/python/aperture/flowcontrol/check ../sdks/aperture-py/aperture_sdk/_gen/aperture/flowcontrol/
@@ -73,6 +74,7 @@ buf-generate:
 		$$FIND "$$python_gen" -type d -exec touch "{}/__init__.py" \;; \
 	}
 	@rm -rf gen/proto/python
+
 	@#generate api docs
 	@rm -rfd $(DOCS_OPENAPI)
 	@mv gen/openapiv2 $(DOCS_OPENAPI)

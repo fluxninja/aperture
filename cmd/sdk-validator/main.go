@@ -13,14 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
-	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
-
-	"google.golang.org/grpc/credentials"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -28,13 +20,19 @@ import (
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/fluxninja/aperture/v2/cmd/sdk-validator/validator"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )

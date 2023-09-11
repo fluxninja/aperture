@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 	"net"
 	"net/http"
 
+	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
-func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *flowcontrolhttp.SocketAddress {
+func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto.SocketAddress {
 	host, port := splitAddress(logger, addr.String())
-	protocol := flowcontrolhttp.SocketAddress_TCP
+	protocol := checkhttpproto.SocketAddress_TCP
 	if addr.Network() == "udp" {
-		protocol = flowcontrolhttp.SocketAddress_UDP
+		protocol = checkhttpproto.SocketAddress_UDP
 	}
-	return &flowcontrolhttp.SocketAddress{
+	return &checkhttpproto.SocketAddress{
 		Address:  host,
 		Protocol: protocol,
 		Port:     port,

@@ -6,6 +6,10 @@ import (
 	"net/url"
 	"time"
 
+	checkgrpc "buf.build/gen/go/fluxninja/aperture/grpc/go/aperture/flowcontrol/check/v1/checkv1grpc"
+	checkhttpgrpc "buf.build/gen/go/fluxninja/aperture/grpc/go/aperture/flowcontrol/checkhttp/v1/checkhttpv1grpc"
+	checkproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/check/v1"
+	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/stdr"
 	"go.opentelemetry.io/otel"
@@ -18,22 +22,19 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
-
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
 	StartFlow(ctx context.Context, controlPoint string, labels map[string]string) (Flow, error)
-	StartHTTPFlow(ctx context.Context, request *flowcontrolhttp.CheckHTTPRequest) (HTTPFlow, error)
+	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest) (HTTPFlow, error)
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
 }
 
 type apertureClient struct {
-	flowControlClient     flowcontrol.FlowControlServiceClient
-	flowControlHTTPClient flowcontrolhttp.FlowControlServiceHTTPClient
+	flowControlClient     checkgrpc.FlowControlServiceClient
+	flowControlHTTPClient checkhttpgrpc.FlowControlServiceHTTPClient
 	tracer                trace.Tracer
 	timeout               time.Duration
 	exporter              *otlptrace.Exporter
@@ -80,8 +81,8 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		logger = stdr.New(log.Default()).WithName("aperture-go-sdk")
 	}
 
-	fcClient := flowcontrol.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
-	fcHTTPClient := flowcontrolhttp.NewFlowControlServiceHTTPClient(opts.ApertureAgentGRPCClientConn)
+	fcClient := checkgrpc.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
+	fcHTTPClient := checkhttpgrpc.NewFlowControlServiceHTTPClient(opts.ApertureAgentGRPCClientConn)
 
 	c := &apertureClient{
 		flowControlClient:     fcClient,
@@ -136,7 +137,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		labels[key] = value
 	}
 
-	req := &flowcontrol.CheckRequest{
+	req := &checkproto.CheckRequest{
 		ControlPoint: controlPoint,
 		Labels:       labels,
 	}
@@ -162,7 +163,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 // Return value is a HTTPFlow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
-func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *flowcontrolhttp.CheckHTTPRequest) (HTTPFlow, error) {
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest) (HTTPFlow, error) {
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 

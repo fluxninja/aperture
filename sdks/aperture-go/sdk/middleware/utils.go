@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"bytes"
@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"strings"
 
+	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
@@ -66,7 +66,7 @@ func getLocalIP(logger logr.Logger) string {
 }
 
 // PrepareCheckHTTPRequestForHTTP takes a http.Request, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logger, controlPoint string) *flowcontrolhttp.CheckHTTPRequest {
+func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logger, controlPoint string) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(httpRequest.Context())
 
 	for key, value := range httpRequest.Header {
@@ -78,7 +78,7 @@ func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logge
 
 	// We know that the protocol is TCP because Golang's http package doesn't support UDP
 	// TODO: Should we support `httpu`?
-	protocol := flowcontrolhttp.SocketAddress_TCP
+	protocol := checkhttpproto.SocketAddress_TCP
 
 	sourceHost, sourcePort := splitAddress(logger, httpRequest.RemoteAddr)
 	// TODO: Figure out if we can narrow down the port or figure out the host in a better way
@@ -90,19 +90,19 @@ func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logge
 		logger.V(2).Info("Error reading body", "error", err)
 	}
 
-	return &flowcontrolhttp.CheckHTTPRequest{
-		Source: &flowcontrolhttp.SocketAddress{
+	return &checkhttpproto.CheckHTTPRequest{
+		Source: &checkhttpproto.SocketAddress{
 			Address:  sourceHost,
 			Protocol: protocol,
 			Port:     sourcePort,
 		},
-		Destination: &flowcontrolhttp.SocketAddress{
+		Destination: &checkhttpproto.SocketAddress{
 			Address:  destinationHost,
 			Protocol: protocol,
 			Port:     destinationPort,
 		},
 		ControlPoint: controlPoint,
-		Request: &flowcontrolhttp.CheckHTTPRequest_HttpRequest{
+		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   httpRequest.Method,
 			Path:     httpRequest.URL.Path,
 			Host:     httpRequest.Host,
@@ -116,7 +116,7 @@ func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logge
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string) *flowcontrolhttp.CheckHTTPRequest {
+func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(ctx)
 
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -140,13 +140,13 @@ func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		method = getMetaValue(":method")
 	}
 
-	var sourceSocket *flowcontrolhttp.SocketAddress
+	var sourceSocket *checkhttpproto.SocketAddress
 	if sourceAddr, ok := peer.FromContext(ctx); ok {
 		sourceSocket = socketAddressFromNetAddr(logger, sourceAddr.Addr)
 	}
-	destinationSocket := &flowcontrolhttp.SocketAddress{
+	destinationSocket := &checkhttpproto.SocketAddress{
 		Address:  getLocalIP(logger),
-		Protocol: flowcontrolhttp.SocketAddress_TCP,
+		Protocol: checkhttpproto.SocketAddress_TCP,
 		Port:     0,
 	}
 
@@ -155,11 +155,11 @@ func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		logger.V(2).Info("Unable to marshal request body")
 	}
 
-	return &flowcontrolhttp.CheckHTTPRequest{
+	return &checkhttpproto.CheckHTTPRequest{
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
-		Request: &flowcontrolhttp.CheckHTTPRequest_HttpRequest{
+		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     info.FullMethod,
 			Host:     authority,
