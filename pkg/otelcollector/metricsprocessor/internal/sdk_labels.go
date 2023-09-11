@@ -13,19 +13,19 @@ import (
 // AddSDKSpecificLabels adds labels specific to SDK data source.
 func AddSDKSpecificLabels(attributes pcommon.Map) {
 	// Compute durations
-	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabel)
+	flowStart, flowStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabelMs)
 	if !flowStartExists {
-		flowStart, flowStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabelMs)
+		flowStart, flowStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowStartTimestampLabel)
 	}
 
-	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabel)
+	workloadStart, workloadStartExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabelMs)
 	if !workloadStartExists {
-		workloadStart, workloadStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabelMs)
+		workloadStart, workloadStartExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureWorkloadStartTimestampLabel)
 	}
 
-	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabel)
+	flowEnd, flowEndExists := getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabelMs)
 	if !flowEndExists {
-		flowEnd, flowEndExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabelMs)
+		flowEnd, flowEndExists = getSDKLabelTimestampValue(attributes, otelconsts.ApertureFlowEndTimestampLabel)
 	}
 
 	// Add ResponseReceivedLabel based on whether flowEnd is present
