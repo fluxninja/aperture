@@ -33,21 +33,25 @@ type PolicyService struct {
 	etcdClient    *etcdclient.Client
 }
 
+// RegisterPolicyServiceIn bundles and annotates parameters.
+type RegisterPolicyServiceIn struct {
+	fx.In
+	Server        *grpc.Server `name:"default"`
+	PolicyFactory *PolicyFactory
+	ETCDClient    *etcdclient.Client
+	Lifecycle     fx.Lifecycle
+}
+
 // RegisterPolicyService registers a service for policy.
-func RegisterPolicyService(
-	server *grpc.Server,
-	policyFactory *PolicyFactory,
-	etcdClient *etcdclient.Client,
-	lifecycle fx.Lifecycle,
-) *PolicyService {
+func RegisterPolicyService(in RegisterPolicyServiceIn) *PolicyService {
 	svc := &PolicyService{
-		policyFactory: policyFactory,
-		etcdClient:    etcdClient,
+		policyFactory: in.PolicyFactory,
+		etcdClient:    in.ETCDClient,
 	}
 
-	lifecycle.Append(fx.Hook{
+	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			svc.etcdWriter = etcdwriter.NewWriter(&etcdClient.KVWrapper)
+			svc.etcdWriter = etcdwriter.NewWriter(&in.ETCDClient.KVWrapper)
 			return nil
 		},
 		OnStop: func(context.Context) error {
@@ -58,7 +62,7 @@ func RegisterPolicyService(
 		},
 	})
 
-	policylangv1.RegisterPolicyServiceServer(server, svc)
+	policylangv1.RegisterPolicyServiceServer(in.Server, svc)
 	return svc
 }
 
