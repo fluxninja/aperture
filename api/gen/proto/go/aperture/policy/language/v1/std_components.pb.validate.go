@@ -11949,6 +11949,76 @@ func (m *PolynomialRangeFunction_Parameters) validate(all bool) error {
 
 	// no validation rules for Degree
 
+	switch v := m.OutsideRange.(type) {
+	case *PolynomialRangeFunction_Parameters_ClampToDatapoint:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for ClampToDatapoint
+	case *PolynomialRangeFunction_Parameters_ClampToCustomValues_:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClampToCustomValues()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+						field:  "ClampToCustomValues",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+						field:  "ClampToCustomValues",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClampToCustomValues()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PolynomialRangeFunction_ParametersValidationError{
+					field:  "ClampToCustomValues",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *PolynomialRangeFunction_Parameters_ContinueCurve:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for ContinueCurve
+	default:
+		_ = v // ensures v is used
+	}
+
 	if len(errors) > 0 {
 		return PolynomialRangeFunction_ParametersMultiError(errors)
 	}
@@ -12405,3 +12475,125 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PolynomialRangeFunction_Parameters_DatapointValidationError{}
+
+// Validate checks the field values on
+// PolynomialRangeFunction_Parameters_ClampToCustomValues with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// PolynomialRangeFunction_Parameters_ClampToCustomValues with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError, or nil if
+// none found.
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PreStart
+
+	// no validation rules for PostEnd
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError is an error
+// wrapping multiple validation errors returned by
+// PolynomialRangeFunction_Parameters_ClampToCustomValues.ValidateAll() if the
+// designated constraints aren't met.
+type PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError) AllErrors() []error {
+	return m
+}
+
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError is the
+// validation error returned by
+// PolynomialRangeFunction_Parameters_ClampToCustomValues.Validate if the
+// designated constraints aren't met.
+type PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Parameters_ClampToCustomValues.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError{}

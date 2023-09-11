@@ -4,6 +4,9 @@ definitions:
     AdaptiveLoadScheduler:
         description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.
         properties:
+            aimd_throttling_strategy:
+                $ref: '#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategy'
+                description: The _AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion.
             dry_run:
                 description: |-
                     Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
@@ -12,15 +15,9 @@ definitions:
             dry_run_config_key:
                 description: Configuration key for setting dry run mode through dynamic configuration.
                 type: string
-            gradient_throttling_strategy:
-                $ref: '#/definitions/AdaptiveLoadSchedulerGradientThrottlingStrategy'
-                description: The _Gradient_ strategy throttles the token rate based on the deviation of the signal from the setpoint.
             in_ports:
                 $ref: '#/definitions/AdaptiveLoadSchedulerIns'
-                description: |+
-                    Collection of input ports for the _Adaptive Load Scheduler_ component.
-
-                x-go-tag-validate: required
+                description: Collection of input ports for the _Adaptive Load Scheduler_ component.
             out_ports:
                 $ref: '#/definitions/AdaptiveLoadSchedulerOuts'
                 description: Collection of output ports for the _Adaptive Load Scheduler_ component.
@@ -32,34 +29,56 @@ definitions:
                 x-go-tag-validate: required
             range_throttling_strategy:
                 $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy'
-                description: The _Range_ strategy throttles the token rate based on the range of the signal.
-        type: object
-    AdaptiveLoadSchedulerGradientThrottlingStrategy:
-        description: |-
-            _Gradient Throttling Strategy uses the _Gradient Controller_ to throttle the token rate based on the deviation of the signal from the setpoint.
-            It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
-        properties:
-            in_ports:
-                $ref: '#/definitions/AdaptiveLoadSchedulerGradientThrottlingStrategyIns'
-                description: |+
-                    Input ports for the _Gradient Throttling Strategy_.
+                description: |-
+                    The _Range_ strategy throttles the token rate based on the range of the signal.
 
-                x-go-tag-validate: required
-            parameters:
+                    The AIAD strategy throttles the token rate based on an additive increase and adaptive decrease fashion.
+                    AIADThrottlingStrategy aiad_throttling_strategy = 8;
+        type: object
+    AdaptiveLoadSchedulerAIMDThrottlingStrategy:
+        description: |-
+            _AIMD Throttling Strategy uses a _Gradient Controller_ to throttle the token rate based on the deviation of the signal from the setpoint.
+            It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+            During recovery, it increases the token rate linearly until the system is not overloaded.
+        properties:
+            gradient:
                 $ref: '#/definitions/GradientControllerParameters'
                 description: |+
                     Parameters for the _Gradient Controller_.
 
                 x-go-tag-validate: required
+            in_ports:
+                $ref: '#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategyIns'
+                description: |+
+                    Input ports for the _AIMD Throttling Strategy_.
+
+                x-go-tag-validate: required
+            load_multiplier_linear_increment:
+                default: 0.025
+                description: |+
+                    Linear increment to load multiplier every 10 seconds while the system is
+                    not in the overloaded state, up until the `max_load_multiplier` is reached.
+                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+
+                format: double
+                type: number
+                x-go-tag-default: "0.025"
+            max_load_multiplier:
+                default: 2
+                description: |+
+                    The maximum load multiplier that can be reached during recovery from an overload state.
+                    - Helps protect the service from request bursts while the system is still recovering.
+                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
+                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+
+                format: double
+                type: number
+                x-go-tag-default: "2.0"
         type: object
-    AdaptiveLoadSchedulerGradientThrottlingStrategyIns:
-        description: Input ports for the _Gradient Throttling Strategy_ component.
+    AdaptiveLoadSchedulerAIMDThrottlingStrategyIns:
+        description: Input ports for the _AIMD Throttling Strategy_.
         properties:
-            overload_confirmation:
-                $ref: '#/definitions/InPort'
-                description: |-
-                    The `overload_confirmation` port provides additional criteria to determine overload state which
-                    results in _Flow_ throttling at the service.
             setpoint:
                 $ref: '#/definitions/InPort'
                 description: |+
@@ -118,16 +137,15 @@ definitions:
                 x-go-tag-validate: required
             gradient:
                 $ref: '#/definitions/GradientControllerParameters'
-                description: |+
+                description: |-
                     Parameters for the _Gradient Controller_.
-                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _Gradient Throttling Strategy_ instead.
-
-                x-go-tag-validate: required
+                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
                     Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
+                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
@@ -145,6 +163,7 @@ definitions:
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
                     - The pass-through mode gets disabled if the system enters the overload state again.
+                    Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
@@ -169,11 +188,6 @@ definitions:
     AdaptiveLoadSchedulerRangeThrottlingStrategyIns:
         description: Input ports for the _Range Throttling Strategy_ component.
         properties:
-            overload_confirmation:
-                $ref: '#/definitions/InPort'
-                description: |-
-                    The `overload_confirmation` port provides additional criteria to determine overload state which
-                    results in _Flow_ throttling at the service.
             signal:
                 $ref: '#/definitions/InPort'
                 description: |+
@@ -191,21 +205,32 @@ definitions:
                     degree=2: quadratic
                     degree=3: cubic
                 type: number
+                x-go-tag-validate: required
             end:
                 $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint'
                 title: Ending datapoint of the throttling range
+                x-go-tag-validate: required
             start:
                 $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint'
                 title: Starting datapoint of the throttling range
+                x-go-tag-validate: required
+        required:
+            - degree
         type: object
     AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint:
         properties:
             input_signal:
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
+                x-go-tag-validate: gte=0,lte=1
             load_multiplier:
                 format: double
+                maximum: 1
+                minimum: 0
                 type: number
+                x-go-tag-validate: gte=0,lte=1
         type: object
     AddressExtractor:
         description: |-
@@ -760,6 +785,9 @@ definitions:
             pid_controller:
                 $ref: '#/definitions/PIDController'
                 description: PID Controller is a proportional–integral–derivative controller.
+            polynomial_range_function:
+                $ref: '#/definitions/PolynomialRangeFunction'
+                description: Polynomial Range Function is a function that maps a signal to a range of values following a polynomial function.
             pulse_generator:
                 $ref: '#/definitions/PulseGenerator'
                 description: Generates 0 and 1 in turns.
@@ -2616,6 +2644,74 @@ definitions:
             resources:
                 $ref: '#/definitions/Resources'
                 description: Resources (such as Flux Meters, Classifiers) to setup.
+        type: object
+    PolynomialRangeFunction:
+        description: |-
+            Curve Types by Degree:
+            - Degree 1: Linear
+            - Degree 2: Quadratic
+            - Degree 3: Cubic
+            ... and so on.
+        properties:
+            in_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionIns'
+            out_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionOuts'
+            parameters:
+                $ref: '#/definitions/PolynomialRangeFunctionParameters'
+                x-go-tag-validate: required
+        type: object
+    PolynomialRangeFunctionIns:
+        properties:
+            input:
+                $ref: '#/definitions/InPort'
+                description: The input signal.
+        type: object
+    PolynomialRangeFunctionOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: The output signal.
+        type: object
+    PolynomialRangeFunctionParameters:
+        properties:
+            clamp_to_custom_values:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersClampToCustomValues'
+                title: Clamp to custom values
+            clamp_to_datapoint:
+                title: Clamp to the nearest datapoint
+                type: boolean
+            continue_curve:
+                title: Continue polynomial curve
+                type: boolean
+            degree:
+                format: double
+                title: Degree of the polynomial
+                type: number
+            end:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Ending datapoint for the range function
+            start:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Starting datapoint for the range function
+        type: object
+    PolynomialRangeFunctionParametersClampToCustomValues:
+        properties:
+            post_end:
+                format: double
+                type: number
+            pre_start:
+                format: double
+                type: number
+        type: object
+    PolynomialRangeFunctionParametersDatapoint:
+        properties:
+            input:
+                format: double
+                type: number
+            output:
+                format: double
+                type: number
         type: object
     ProcessInfo:
         properties:

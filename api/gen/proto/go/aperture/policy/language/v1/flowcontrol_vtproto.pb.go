@@ -1174,7 +1174,7 @@ func (m *AdaptiveLoadScheduler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalVT() (dAtA []byte, err error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1187,12 +1187,12 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalVT() (dAtA
 	return dAtA[:n], nil
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalToVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1203,16 +1203,6 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalToSizedBuf
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.OverloadConfirmation != nil {
-		size, err := m.OverloadConfirmation.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x1a
 	}
 	if m.Setpoint != nil {
 		size, err := m.Setpoint.MarshalToSizedBufferVT(dAtA[:i])
@@ -1237,7 +1227,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalToSizedBuf
 	return len(dAtA) - i, nil
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalVT() (dAtA []byte, err error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -1250,12 +1240,12 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalVT() (dAtA []b
 	return dAtA[:n], nil
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalToVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -1267,8 +1257,20 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalToSizedBufferV
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.Parameters != nil {
-		size, err := m.Parameters.MarshalToSizedBufferVT(dAtA[:i])
+	if m.LoadMultiplierLinearIncrement != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.LoadMultiplierLinearIncrement))))
+		i--
+		dAtA[i] = 0x21
+	}
+	if m.MaxLoadMultiplier != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.MaxLoadMultiplier))))
+		i--
+		dAtA[i] = 0x19
+	}
+	if m.Gradient != nil {
+		size, err := m.Gradient.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -1319,16 +1321,6 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins) MarshalToSizedBuffer
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.OverloadConfirmation != nil {
-		size, err := m.OverloadConfirmation.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x12
 	}
 	if m.Signal != nil {
 		size, err := m.Signal.MarshalToSizedBufferVT(dAtA[:i])
@@ -1715,15 +1707,15 @@ func (m *AdaptiveLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_) MarshalToVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AimdThrottlingStrategy) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *AdaptiveLoadScheduler_AimdThrottlingStrategy) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.GradientThrottlingStrategy != nil {
-		size, err := m.GradientThrottlingStrategy.MarshalToSizedBufferVT(dAtA[:i])
+	if m.AimdThrottlingStrategy != nil {
+		size, err := m.AimdThrottlingStrategy.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -3680,7 +3672,7 @@ func (m *AdaptiveLoadScheduler_Parameters) SizeVT() (n int) {
 	return n
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) SizeVT() (n int) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3694,15 +3686,11 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) SizeVT() (n int) 
 		l = m.Setpoint.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.OverloadConfirmation != nil {
-		l = m.OverloadConfirmation.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
 	n += len(m.unknownFields)
 	return n
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) SizeVT() (n int) {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3712,9 +3700,15 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) SizeVT() (n int) {
 		l = m.InPorts.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.Parameters != nil {
-		l = m.Parameters.SizeVT()
+	if m.Gradient != nil {
+		l = m.Gradient.SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.MaxLoadMultiplier != 0 {
+		n += 9
+	}
+	if m.LoadMultiplierLinearIncrement != 0 {
+		n += 9
 	}
 	n += len(m.unknownFields)
 	return n
@@ -3728,10 +3722,6 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins) SizeVT() (n int) {
 	_ = l
 	if m.Signal != nil {
 		l = m.Signal.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
-	if m.OverloadConfirmation != nil {
-		l = m.OverloadConfirmation.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -3869,14 +3859,14 @@ func (m *AdaptiveLoadScheduler) SizeVT() (n int) {
 	return n
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_) SizeVT() (n int) {
+func (m *AdaptiveLoadScheduler_AimdThrottlingStrategy) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.GradientThrottlingStrategy != nil {
-		l = m.GradientThrottlingStrategy.SizeVT()
+	if m.AimdThrottlingStrategy != nil {
+		l = m.AimdThrottlingStrategy.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	return n
@@ -7167,7 +7157,7 @@ func (m *AdaptiveLoadScheduler_Parameters) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) UnmarshalVT(dAtA []byte) error {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7190,10 +7180,10 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) UnmarshalVT(dAtA 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins: wiretype end group for non-group")
+			return fmt.Errorf("proto: AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -7268,42 +7258,6 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) UnmarshalVT(dAtA 
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OverloadConfirmation", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OverloadConfirmation == nil {
-				m.OverloadConfirmation = &InPort{}
-			}
-			if err := m.OverloadConfirmation.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -7326,7 +7280,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) UnmarshalVT(dAtA 
 	}
 	return nil
 }
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalVT(dAtA []byte) error {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7349,10 +7303,10 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalVT(dAtA []by
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: AdaptiveLoadScheduler_GradientThrottlingStrategy: wiretype end group for non-group")
+			return fmt.Errorf("proto: AdaptiveLoadScheduler_AIMDThrottlingStrategy: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AdaptiveLoadScheduler_GradientThrottlingStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AdaptiveLoadScheduler_AIMDThrottlingStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -7385,7 +7339,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalVT(dAtA []by
 				return io.ErrUnexpectedEOF
 			}
 			if m.InPorts == nil {
-				m.InPorts = &AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins{}
+				m.InPorts = &AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins{}
 			}
 			if err := m.InPorts.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -7393,7 +7347,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalVT(dAtA []by
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Parameters", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Gradient", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7420,13 +7374,35 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalVT(dAtA []by
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Parameters == nil {
-				m.Parameters = &GradientController_Parameters{}
+			if m.Gradient == nil {
+				m.Gradient = &GradientController_Parameters{}
 			}
-			if err := m.Parameters.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Gradient.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxLoadMultiplier", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.MaxLoadMultiplier = float64(math.Float64frombits(v))
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LoadMultiplierLinearIncrement", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.LoadMultiplierLinearIncrement = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -7511,42 +7487,6 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins) UnmarshalVT(dAtA []b
 				m.Signal = &InPort{}
 			}
 			if err := m.Signal.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OverloadConfirmation", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.OverloadConfirmation == nil {
-				m.OverloadConfirmation = &InPort{}
-			}
-			if err := m.OverloadConfirmation.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -8359,7 +8299,7 @@ func (m *AdaptiveLoadScheduler) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GradientThrottlingStrategy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AimdThrottlingStrategy", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -8386,16 +8326,16 @@ func (m *AdaptiveLoadScheduler) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.ThrottlingStrategy.(*AdaptiveLoadScheduler_GradientThrottlingStrategy_); ok {
-				if err := oneof.GradientThrottlingStrategy.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if oneof, ok := m.ThrottlingStrategy.(*AdaptiveLoadScheduler_AimdThrottlingStrategy); ok {
+				if err := oneof.AimdThrottlingStrategy.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &AdaptiveLoadScheduler_GradientThrottlingStrategy{}
+				v := &AdaptiveLoadScheduler_AIMDThrottlingStrategy{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.ThrottlingStrategy = &AdaptiveLoadScheduler_GradientThrottlingStrategy_{GradientThrottlingStrategy: v}
+				m.ThrottlingStrategy = &AdaptiveLoadScheduler_AimdThrottlingStrategy{AimdThrottlingStrategy: v}
 			}
 			iNdEx = postIndex
 		case 5:

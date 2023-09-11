@@ -1801,14 +1801,11 @@ func (x *PIDController) GetParameters() *PIDController_Parameters {
 	return nil
 }
 
-// _Polynomial Range Function_ is a function that maps a range of input values to a range of output values and is defined by a starting datapoint, an ending datapoint, and a curve.
-// E.g. a range function with a starting datapoint of (0, 0), an ending datapoint of (10, 100), and degree=1 (a "linear" curve) will map the input value of 5 to the output value of 50.
-// Another e.g. with a negative growth relation would be a range function with a starting datapoint of (0, 100), an ending datapoint of (10, 0), and degree=1 will map the input value of 5 to the output value of 50.
-// If an input is outside the input range, the output will be equal to the closest datapoint (start or end).
-// The output curve is determined based on the degree, e.g.:
-// * degree=1: Linear curve.
-// * degree=2: Quadratic curve.
-// * degree=3: Cubic curve.
+// Curve Types by Degree:
+// - Degree 1: Linear
+// - Degree 2: Quadratic
+// - Degree 3: Cubic
+// ... and so on.
 type PolynomialRangeFunction struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4822,6 +4819,17 @@ type PolynomialRangeFunction_Parameters struct {
 	End *PolynomialRangeFunction_Parameters_Datapoint `protobuf:"bytes,2,opt,name=end,proto3" json:"end,omitempty"`
 	// Degree of the polynomial
 	Degree float64 `protobuf:"fixed64,3,opt,name=degree,proto3" json:"degree,omitempty"`
+	// Behavior outside range. Select one of the following:
+	// 1. Continue polynomial curve
+	// 2. Clamp to the nearest datapoint
+	// 3. Clamp to custom values
+	//
+	// Types that are assignable to OutsideRange:
+	//
+	//	*PolynomialRangeFunction_Parameters_ClampToDatapoint
+	//	*PolynomialRangeFunction_Parameters_ClampToCustomValues_
+	//	*PolynomialRangeFunction_Parameters_ContinueCurve
+	OutsideRange isPolynomialRangeFunction_Parameters_OutsideRange `protobuf_oneof:"outside_range"`
 }
 
 func (x *PolynomialRangeFunction_Parameters) Reset() {
@@ -4875,6 +4883,62 @@ func (x *PolynomialRangeFunction_Parameters) GetDegree() float64 {
 		return x.Degree
 	}
 	return 0
+}
+
+func (m *PolynomialRangeFunction_Parameters) GetOutsideRange() isPolynomialRangeFunction_Parameters_OutsideRange {
+	if m != nil {
+		return m.OutsideRange
+	}
+	return nil
+}
+
+func (x *PolynomialRangeFunction_Parameters) GetClampToDatapoint() bool {
+	if x, ok := x.GetOutsideRange().(*PolynomialRangeFunction_Parameters_ClampToDatapoint); ok {
+		return x.ClampToDatapoint
+	}
+	return false
+}
+
+func (x *PolynomialRangeFunction_Parameters) GetClampToCustomValues() *PolynomialRangeFunction_Parameters_ClampToCustomValues {
+	if x, ok := x.GetOutsideRange().(*PolynomialRangeFunction_Parameters_ClampToCustomValues_); ok {
+		return x.ClampToCustomValues
+	}
+	return nil
+}
+
+func (x *PolynomialRangeFunction_Parameters) GetContinueCurve() bool {
+	if x, ok := x.GetOutsideRange().(*PolynomialRangeFunction_Parameters_ContinueCurve); ok {
+		return x.ContinueCurve
+	}
+	return false
+}
+
+type isPolynomialRangeFunction_Parameters_OutsideRange interface {
+	isPolynomialRangeFunction_Parameters_OutsideRange()
+}
+
+type PolynomialRangeFunction_Parameters_ClampToDatapoint struct {
+	// Clamp to the nearest datapoint
+	ClampToDatapoint bool `protobuf:"varint,4,opt,name=clamp_to_datapoint,json=clampToDatapoint,proto3,oneof"`
+}
+
+type PolynomialRangeFunction_Parameters_ClampToCustomValues_ struct {
+	// Clamp to custom values
+	ClampToCustomValues *PolynomialRangeFunction_Parameters_ClampToCustomValues `protobuf:"bytes,5,opt,name=clamp_to_custom_values,json=clampToCustomValues,proto3,oneof"`
+}
+
+type PolynomialRangeFunction_Parameters_ContinueCurve struct {
+	// Continue polynomial curve
+	ContinueCurve bool `protobuf:"varint,6,opt,name=continue_curve,json=continueCurve,proto3,oneof"`
+}
+
+func (*PolynomialRangeFunction_Parameters_ClampToDatapoint) isPolynomialRangeFunction_Parameters_OutsideRange() {
+}
+
+func (*PolynomialRangeFunction_Parameters_ClampToCustomValues_) isPolynomialRangeFunction_Parameters_OutsideRange() {
+}
+
+func (*PolynomialRangeFunction_Parameters_ContinueCurve) isPolynomialRangeFunction_Parameters_OutsideRange() {
 }
 
 type PolynomialRangeFunction_Ins struct {
@@ -5024,6 +5088,61 @@ func (x *PolynomialRangeFunction_Parameters_Datapoint) GetInput() float64 {
 func (x *PolynomialRangeFunction_Parameters_Datapoint) GetOutput() float64 {
 	if x != nil {
 		return x.Output
+	}
+	return 0
+}
+
+type PolynomialRangeFunction_Parameters_ClampToCustomValues struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PreStart float64 `protobuf:"fixed64,1,opt,name=pre_start,json=preStart,proto3" json:"pre_start,omitempty"`
+	PostEnd  float64 `protobuf:"fixed64,2,opt,name=post_end,json=postEnd,proto3" json:"post_end,omitempty"`
+}
+
+func (x *PolynomialRangeFunction_Parameters_ClampToCustomValues) Reset() {
+	*x = PolynomialRangeFunction_Parameters_ClampToCustomValues{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[83]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PolynomialRangeFunction_Parameters_ClampToCustomValues) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PolynomialRangeFunction_Parameters_ClampToCustomValues) ProtoMessage() {}
+
+func (x *PolynomialRangeFunction_Parameters_ClampToCustomValues) ProtoReflect() protoreflect.Message {
+	mi := &file_aperture_policy_language_v1_std_components_proto_msgTypes[83]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PolynomialRangeFunction_Parameters_ClampToCustomValues.ProtoReflect.Descriptor instead.
+func (*PolynomialRangeFunction_Parameters_ClampToCustomValues) Descriptor() ([]byte, []int) {
+	return file_aperture_policy_language_v1_std_components_proto_rawDescGZIP(), []int{25, 0, 1}
+}
+
+func (x *PolynomialRangeFunction_Parameters_ClampToCustomValues) GetPreStart() float64 {
+	if x != nil {
+		return x.PreStart
+	}
+	return 0
+}
+
+func (x *PolynomialRangeFunction_Parameters_ClampToCustomValues) GetPostEnd() float64 {
+	if x != nil {
+		return x.PostEnd
 	}
 	return 0
 }
@@ -5716,8 +5835,8 @@ var file_aperture_policy_language_v1_std_components_proto_rawDesc = []byte{
 	0x12, 0x3c, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
 	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f,
-	0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x22, 0xcf,
-	0x05, 0x0a, 0x17, 0x50, 0x6f, 0x6c, 0x79, 0x6e, 0x6f, 0x6d, 0x69, 0x61, 0x6c, 0x52, 0x61, 0x6e,
+	0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x22, 0x95,
+	0x08, 0x0a, 0x17, 0x50, 0x6f, 0x6c, 0x79, 0x6e, 0x6f, 0x6d, 0x69, 0x61, 0x6c, 0x52, 0x61, 0x6e,
 	0x67, 0x65, 0x46, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x53, 0x0a, 0x08, 0x69, 0x6e,
 	0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x38, 0x2e, 0x61,
 	0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c,
@@ -5735,7 +5854,7 @@ var file_aperture_policy_language_v1_std_components_proto_rawDesc = []byte{
 	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x6c, 0x79, 0x6e, 0x6f,
 	0x6d, 0x69, 0x61, 0x6c, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x46, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f,
 	0x6e, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x52, 0x0a, 0x70, 0x61,
-	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0x9d, 0x02, 0x0a, 0x0a, 0x50, 0x61, 0x72,
+	0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x1a, 0xe3, 0x04, 0x0a, 0x0a, 0x50, 0x61, 0x72,
 	0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x5f, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x49, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72,
 	0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
@@ -5749,39 +5868,60 @@ var file_aperture_policy_language_v1_std_components_proto_rawDesc = []byte{
 	0x6e, 0x67, 0x65, 0x46, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x50, 0x61, 0x72, 0x61,
 	0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x70, 0x6f, 0x69, 0x6e, 0x74,
 	0x52, 0x03, 0x65, 0x6e, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x65, 0x67, 0x72, 0x65, 0x65, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06, 0x64, 0x65, 0x67, 0x72, 0x65, 0x65, 0x1a, 0x39, 0x0a,
-	0x09, 0x44, 0x61, 0x74, 0x61, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e,
-	0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74,
-	0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01,
-	0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x1a, 0x40, 0x0a, 0x03, 0x49, 0x6e, 0x73, 0x12,
-	0x39, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23,
+	0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06, 0x64, 0x65, 0x67, 0x72, 0x65, 0x65, 0x12, 0x2e, 0x0a,
+	0x12, 0x63, 0x6c, 0x61, 0x6d, 0x70, 0x5f, 0x74, 0x6f, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x70, 0x6f,
+	0x69, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x10, 0x63, 0x6c, 0x61,
+	0x6d, 0x70, 0x54, 0x6f, 0x44, 0x61, 0x74, 0x61, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x8a, 0x01,
+	0x0a, 0x16, 0x63, 0x6c, 0x61, 0x6d, 0x70, 0x5f, 0x74, 0x6f, 0x5f, 0x63, 0x75, 0x73, 0x74, 0x6f,
+	0x6d, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x53,
 	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
-	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50,
-	0x6f, 0x72, 0x74, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x1a, 0x44, 0x0a, 0x04, 0x4f, 0x75,
-	0x74, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f,
-	0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31,
-	0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74,
-	0x42, 0xb2, 0x02, 0x0a, 0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e,
-	0x6a, 0x61, 0x2e, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64, 0x2e, 0x61, 0x70, 0x65,
-	0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e,
-	0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x42, 0x12, 0x53, 0x74, 0x64, 0x43, 0x6f, 0x6d,
-	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x58,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x75, 0x78, 0x6e,
-	0x69, 0x6e, 0x6a, 0x61, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x76, 0x32,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67,
-	0x6f, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2f, 0x70, 0x6f, 0x6c, 0x69, 0x63,
-	0x79, 0x2f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2f, 0x76, 0x31, 0x3b, 0x6c, 0x61,
-	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x4c, 0xaa, 0x02,
-	0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79,
-	0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x1b, 0x41,
-	0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c,
-	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x27, 0x41, 0x70, 0x65,
-	0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e,
-	0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1e, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x3a,
-	0x3a, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
-	0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x6c,
+	0x79, 0x6e, 0x6f, 0x6d, 0x69, 0x61, 0x6c, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x46, 0x75, 0x6e, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x2e,
+	0x43, 0x6c, 0x61, 0x6d, 0x70, 0x54, 0x6f, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x73, 0x48, 0x00, 0x52, 0x13, 0x63, 0x6c, 0x61, 0x6d, 0x70, 0x54, 0x6f, 0x43, 0x75,
+	0x73, 0x74, 0x6f, 0x6d, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x12, 0x27, 0x0a, 0x0e, 0x63, 0x6f,
+	0x6e, 0x74, 0x69, 0x6e, 0x75, 0x65, 0x5f, 0x63, 0x75, 0x72, 0x76, 0x65, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x08, 0x48, 0x00, 0x52, 0x0d, 0x63, 0x6f, 0x6e, 0x74, 0x69, 0x6e, 0x75, 0x65, 0x43, 0x75,
+	0x72, 0x76, 0x65, 0x1a, 0x39, 0x0a, 0x09, 0x44, 0x61, 0x74, 0x61, 0x70, 0x6f, 0x69, 0x6e, 0x74,
+	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52,
+	0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x1a, 0x4d,
+	0x0a, 0x13, 0x43, 0x6c, 0x61, 0x6d, 0x70, 0x54, 0x6f, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x72, 0x65, 0x5f, 0x73, 0x74, 0x61,
+	0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x08, 0x70, 0x72, 0x65, 0x53, 0x74, 0x61,
+	0x72, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x65, 0x6e, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x07, 0x70, 0x6f, 0x73, 0x74, 0x45, 0x6e, 0x64, 0x42, 0x0f, 0x0a,
+	0x0d, 0x6f, 0x75, 0x74, 0x73, 0x69, 0x64, 0x65, 0x5f, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x1a, 0x40,
+	0x0a, 0x03, 0x49, 0x6e, 0x73, 0x12, 0x39, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74,
+	0x1a, 0x44, 0x0a, 0x04, 0x4f, 0x75, 0x74, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x6f, 0x75, 0x74, 0x70,
+	0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75,
+	0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x4f, 0x75, 0x74, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x06,
+	0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x42, 0xb2, 0x02, 0x0a, 0x33, 0x63, 0x6f, 0x6d, 0x2e, 0x66,
+	0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2e, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x64, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x42, 0x12,
+	0x53, 0x74, 0x64, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x58, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x66, 0x6c, 0x75, 0x78, 0x6e, 0x69, 0x6e, 0x6a, 0x61, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74,
+	0x75, 0x72, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x2f, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
+	0x2f, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2f, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
+	0x2f, 0x76, 0x31, 0x3b, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x76, 0x31, 0xa2, 0x02,
+	0x03, 0x41, 0x50, 0x4c, 0xaa, 0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e,
+	0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e,
+	0x56, 0x31, 0xca, 0x02, 0x1b, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f,
+	0x6c, 0x69, 0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31,
+	0xe2, 0x02, 0x27, 0x41, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x5c, 0x50, 0x6f, 0x6c, 0x69,
+	0x63, 0x79, 0x5c, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x5c, 0x56, 0x31, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1e, 0x41, 0x70, 0x65,
+	0x72, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x3a, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x3a, 0x3a, 0x4c,
+	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -5796,7 +5936,7 @@ func file_aperture_policy_language_v1_std_components_proto_rawDescGZIP() []byte 
 	return file_aperture_policy_language_v1_std_components_proto_rawDescData
 }
 
-var file_aperture_policy_language_v1_std_components_proto_msgTypes = make([]protoimpl.MessageInfo, 83)
+var file_aperture_policy_language_v1_std_components_proto_msgTypes = make([]protoimpl.MessageInfo, 84)
 var file_aperture_policy_language_v1_std_components_proto_goTypes = []interface{}{
 	(*GradientController)(nil),                 // 0: aperture.policy.language.v1.GradientController
 	(*EMA)(nil),                                // 1: aperture.policy.language.v1.EMA
@@ -5880,11 +6020,12 @@ var file_aperture_policy_language_v1_std_components_proto_goTypes = []interface{
 	(*PolynomialRangeFunction_Parameters)(nil), // 79: aperture.policy.language.v1.PolynomialRangeFunction.Parameters
 	(*PolynomialRangeFunction_Ins)(nil),        // 80: aperture.policy.language.v1.PolynomialRangeFunction.Ins
 	(*PolynomialRangeFunction_Outs)(nil),       // 81: aperture.policy.language.v1.PolynomialRangeFunction.Outs
-	(*PolynomialRangeFunction_Parameters_Datapoint)(nil), // 82: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.Datapoint
-	(*durationpb.Duration)(nil),                          // 83: google.protobuf.Duration
-	(*ConstantSignal)(nil),                               // 84: aperture.policy.language.v1.ConstantSignal
-	(*InPort)(nil),                                       // 85: aperture.policy.language.v1.InPort
-	(*OutPort)(nil),                                      // 86: aperture.policy.language.v1.OutPort
+	(*PolynomialRangeFunction_Parameters_Datapoint)(nil),           // 82: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.Datapoint
+	(*PolynomialRangeFunction_Parameters_ClampToCustomValues)(nil), // 83: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.ClampToCustomValues
+	(*durationpb.Duration)(nil),                                    // 84: google.protobuf.Duration
+	(*ConstantSignal)(nil),                                         // 85: aperture.policy.language.v1.ConstantSignal
+	(*InPort)(nil),                                                 // 86: aperture.policy.language.v1.InPort
+	(*OutPort)(nil),                                                // 87: aperture.policy.language.v1.OutPort
 }
 var file_aperture_policy_language_v1_std_components_proto_depIdxs = []int32{
 	27,  // 0: aperture.policy.language.v1.GradientController.in_ports:type_name -> aperture.policy.language.v1.GradientController.Ins
@@ -5900,12 +6041,12 @@ var file_aperture_policy_language_v1_std_components_proto_depIdxs = []int32{
 	36,  // 10: aperture.policy.language.v1.ArithmeticCombinator.out_ports:type_name -> aperture.policy.language.v1.ArithmeticCombinator.Outs
 	37,  // 11: aperture.policy.language.v1.Decider.in_ports:type_name -> aperture.policy.language.v1.Decider.Ins
 	38,  // 12: aperture.policy.language.v1.Decider.out_ports:type_name -> aperture.policy.language.v1.Decider.Outs
-	83,  // 13: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
-	83,  // 14: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
+	84,  // 13: aperture.policy.language.v1.Decider.true_for:type_name -> google.protobuf.Duration
+	84,  // 14: aperture.policy.language.v1.Decider.false_for:type_name -> google.protobuf.Duration
 	39,  // 15: aperture.policy.language.v1.Switcher.in_ports:type_name -> aperture.policy.language.v1.Switcher.Ins
 	40,  // 16: aperture.policy.language.v1.Switcher.out_ports:type_name -> aperture.policy.language.v1.Switcher.Outs
 	41,  // 17: aperture.policy.language.v1.Variable.out_ports:type_name -> aperture.policy.language.v1.Variable.Outs
-	84,  // 18: aperture.policy.language.v1.Variable.constant_output:type_name -> aperture.policy.language.v1.ConstantSignal
+	85,  // 18: aperture.policy.language.v1.Variable.constant_output:type_name -> aperture.policy.language.v1.ConstantSignal
 	42,  // 19: aperture.policy.language.v1.BoolVariable.out_ports:type_name -> aperture.policy.language.v1.BoolVariable.Outs
 	43,  // 20: aperture.policy.language.v1.UnaryOperator.in_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Ins
 	44,  // 21: aperture.policy.language.v1.UnaryOperator.out_ports:type_name -> aperture.policy.language.v1.UnaryOperator.Outs
@@ -5928,16 +6069,16 @@ var file_aperture_policy_language_v1_std_components_proto_depIdxs = []int32{
 	60,  // 38: aperture.policy.language.v1.Alerter.parameters:type_name -> aperture.policy.language.v1.Alerter.Parameters
 	63,  // 39: aperture.policy.language.v1.Integrator.in_ports:type_name -> aperture.policy.language.v1.Integrator.Ins
 	64,  // 40: aperture.policy.language.v1.Integrator.out_ports:type_name -> aperture.policy.language.v1.Integrator.Outs
-	83,  // 41: aperture.policy.language.v1.Integrator.evaluation_interval:type_name -> google.protobuf.Duration
+	84,  // 41: aperture.policy.language.v1.Integrator.evaluation_interval:type_name -> google.protobuf.Duration
 	65,  // 42: aperture.policy.language.v1.Differentiator.in_ports:type_name -> aperture.policy.language.v1.Differentiator.Ins
 	66,  // 43: aperture.policy.language.v1.Differentiator.out_ports:type_name -> aperture.policy.language.v1.Differentiator.Outs
-	83,  // 44: aperture.policy.language.v1.Differentiator.window:type_name -> google.protobuf.Duration
+	84,  // 44: aperture.policy.language.v1.Differentiator.window:type_name -> google.protobuf.Duration
 	67,  // 45: aperture.policy.language.v1.PulseGenerator.out_ports:type_name -> aperture.policy.language.v1.PulseGenerator.Outs
-	83,  // 46: aperture.policy.language.v1.PulseGenerator.true_for:type_name -> google.protobuf.Duration
-	83,  // 47: aperture.policy.language.v1.PulseGenerator.false_for:type_name -> google.protobuf.Duration
+	84,  // 46: aperture.policy.language.v1.PulseGenerator.true_for:type_name -> google.protobuf.Duration
+	84,  // 47: aperture.policy.language.v1.PulseGenerator.false_for:type_name -> google.protobuf.Duration
 	68,  // 48: aperture.policy.language.v1.Holder.in_ports:type_name -> aperture.policy.language.v1.Holder.Ins
 	69,  // 49: aperture.policy.language.v1.Holder.out_ports:type_name -> aperture.policy.language.v1.Holder.Outs
-	83,  // 50: aperture.policy.language.v1.Holder.hold_for:type_name -> google.protobuf.Duration
+	84,  // 50: aperture.policy.language.v1.Holder.hold_for:type_name -> google.protobuf.Duration
 	70,  // 51: aperture.policy.language.v1.NestedSignalIngress.out_ports:type_name -> aperture.policy.language.v1.NestedSignalIngress.Outs
 	71,  // 52: aperture.policy.language.v1.NestedSignalEgress.in_ports:type_name -> aperture.policy.language.v1.NestedSignalEgress.Ins
 	73,  // 53: aperture.policy.language.v1.SignalGenerator.in_ports:type_name -> aperture.policy.language.v1.SignalGenerator.Ins
@@ -5949,90 +6090,91 @@ var file_aperture_policy_language_v1_std_components_proto_depIdxs = []int32{
 	80,  // 59: aperture.policy.language.v1.PolynomialRangeFunction.in_ports:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Ins
 	81,  // 60: aperture.policy.language.v1.PolynomialRangeFunction.out_ports:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Outs
 	79,  // 61: aperture.policy.language.v1.PolynomialRangeFunction.parameters:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Parameters
-	85,  // 62: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	85,  // 63: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	85,  // 64: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.InPort
-	85,  // 65: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.InPort
-	85,  // 66: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.InPort
-	86,  // 67: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 68: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	85,  // 69: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.InPort
-	85,  // 70: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.InPort
-	86,  // 71: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	83,  // 72: aperture.policy.language.v1.EMA.Parameters.ema_window:type_name -> google.protobuf.Duration
-	83,  // 73: aperture.policy.language.v1.EMA.Parameters.warmup_window:type_name -> google.protobuf.Duration
-	85,  // 74: aperture.policy.language.v1.SMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 75: aperture.policy.language.v1.SMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	83,  // 76: aperture.policy.language.v1.SMA.Parameters.sma_window:type_name -> google.protobuf.Duration
-	85,  // 77: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
-	85,  // 78: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 79: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 80: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
-	85,  // 81: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 82: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 83: aperture.policy.language.v1.Switcher.Ins.on_signal:type_name -> aperture.policy.language.v1.InPort
-	85,  // 84: aperture.policy.language.v1.Switcher.Ins.off_signal:type_name -> aperture.policy.language.v1.InPort
-	85,  // 85: aperture.policy.language.v1.Switcher.Ins.switch:type_name -> aperture.policy.language.v1.InPort
-	86,  // 86: aperture.policy.language.v1.Switcher.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 87: aperture.policy.language.v1.Variable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 88: aperture.policy.language.v1.BoolVariable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 89: aperture.policy.language.v1.UnaryOperator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 90: aperture.policy.language.v1.UnaryOperator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	83,  // 91: aperture.policy.language.v1.Extrapolator.Parameters.max_extrapolation_interval:type_name -> google.protobuf.Duration
-	85,  // 92: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 93: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 94: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 95: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 96: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 97: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 98: aperture.policy.language.v1.And.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 99: aperture.policy.language.v1.And.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 100: aperture.policy.language.v1.Or.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 101: aperture.policy.language.v1.Or.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 102: aperture.policy.language.v1.Inverter.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 103: aperture.policy.language.v1.Inverter.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 104: aperture.policy.language.v1.FirstValid.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
-	86,  // 105: aperture.policy.language.v1.FirstValid.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	83,  // 106: aperture.policy.language.v1.Alerter.Parameters.resolve_timeout:type_name -> google.protobuf.Duration
+	86,  // 62: aperture.policy.language.v1.GradientController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 63: aperture.policy.language.v1.GradientController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	86,  // 64: aperture.policy.language.v1.GradientController.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	86,  // 65: aperture.policy.language.v1.GradientController.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	86,  // 66: aperture.policy.language.v1.GradientController.Ins.control_variable:type_name -> aperture.policy.language.v1.InPort
+	87,  // 67: aperture.policy.language.v1.GradientController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 68: aperture.policy.language.v1.EMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	86,  // 69: aperture.policy.language.v1.EMA.Ins.max_envelope:type_name -> aperture.policy.language.v1.InPort
+	86,  // 70: aperture.policy.language.v1.EMA.Ins.min_envelope:type_name -> aperture.policy.language.v1.InPort
+	87,  // 71: aperture.policy.language.v1.EMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	84,  // 72: aperture.policy.language.v1.EMA.Parameters.ema_window:type_name -> google.protobuf.Duration
+	84,  // 73: aperture.policy.language.v1.EMA.Parameters.warmup_window:type_name -> google.protobuf.Duration
+	86,  // 74: aperture.policy.language.v1.SMA.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 75: aperture.policy.language.v1.SMA.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	84,  // 76: aperture.policy.language.v1.SMA.Parameters.sma_window:type_name -> google.protobuf.Duration
+	86,  // 77: aperture.policy.language.v1.ArithmeticCombinator.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
+	86,  // 78: aperture.policy.language.v1.ArithmeticCombinator.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 79: aperture.policy.language.v1.ArithmeticCombinator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 80: aperture.policy.language.v1.Decider.Ins.lhs:type_name -> aperture.policy.language.v1.InPort
+	86,  // 81: aperture.policy.language.v1.Decider.Ins.rhs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 82: aperture.policy.language.v1.Decider.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 83: aperture.policy.language.v1.Switcher.Ins.on_signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 84: aperture.policy.language.v1.Switcher.Ins.off_signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 85: aperture.policy.language.v1.Switcher.Ins.switch:type_name -> aperture.policy.language.v1.InPort
+	87,  // 86: aperture.policy.language.v1.Switcher.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 87: aperture.policy.language.v1.Variable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 88: aperture.policy.language.v1.BoolVariable.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 89: aperture.policy.language.v1.UnaryOperator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 90: aperture.policy.language.v1.UnaryOperator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	84,  // 91: aperture.policy.language.v1.Extrapolator.Parameters.max_extrapolation_interval:type_name -> google.protobuf.Duration
+	86,  // 92: aperture.policy.language.v1.Extrapolator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 93: aperture.policy.language.v1.Extrapolator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 94: aperture.policy.language.v1.Max.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 95: aperture.policy.language.v1.Max.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 96: aperture.policy.language.v1.Min.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 97: aperture.policy.language.v1.Min.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 98: aperture.policy.language.v1.And.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 99: aperture.policy.language.v1.And.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 100: aperture.policy.language.v1.Or.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 101: aperture.policy.language.v1.Or.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 102: aperture.policy.language.v1.Inverter.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 103: aperture.policy.language.v1.Inverter.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 104: aperture.policy.language.v1.FirstValid.Ins.inputs:type_name -> aperture.policy.language.v1.InPort
+	87,  // 105: aperture.policy.language.v1.FirstValid.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	84,  // 106: aperture.policy.language.v1.Alerter.Parameters.resolve_timeout:type_name -> google.protobuf.Duration
 	62,  // 107: aperture.policy.language.v1.Alerter.Parameters.labels:type_name -> aperture.policy.language.v1.Alerter.Parameters.LabelsEntry
-	85,  // 108: aperture.policy.language.v1.Alerter.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	85,  // 109: aperture.policy.language.v1.Integrator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	85,  // 110: aperture.policy.language.v1.Integrator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	85,  // 111: aperture.policy.language.v1.Integrator.Ins.max:type_name -> aperture.policy.language.v1.InPort
-	85,  // 112: aperture.policy.language.v1.Integrator.Ins.min:type_name -> aperture.policy.language.v1.InPort
-	86,  // 113: aperture.policy.language.v1.Integrator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 114: aperture.policy.language.v1.Differentiator.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 115: aperture.policy.language.v1.Differentiator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 116: aperture.policy.language.v1.PulseGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 117: aperture.policy.language.v1.Holder.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	85,  // 118: aperture.policy.language.v1.Holder.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	86,  // 119: aperture.policy.language.v1.Holder.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 120: aperture.policy.language.v1.NestedSignalIngress.Outs.signal:type_name -> aperture.policy.language.v1.OutPort
-	85,  // 121: aperture.policy.language.v1.NestedSignalEgress.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 108: aperture.policy.language.v1.Alerter.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 109: aperture.policy.language.v1.Integrator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	86,  // 110: aperture.policy.language.v1.Integrator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	86,  // 111: aperture.policy.language.v1.Integrator.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	86,  // 112: aperture.policy.language.v1.Integrator.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	87,  // 113: aperture.policy.language.v1.Integrator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 114: aperture.policy.language.v1.Differentiator.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 115: aperture.policy.language.v1.Differentiator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 116: aperture.policy.language.v1.PulseGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 117: aperture.policy.language.v1.Holder.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	86,  // 118: aperture.policy.language.v1.Holder.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	87,  // 119: aperture.policy.language.v1.Holder.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 120: aperture.policy.language.v1.NestedSignalIngress.Outs.signal:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 121: aperture.policy.language.v1.NestedSignalEgress.Ins.signal:type_name -> aperture.policy.language.v1.InPort
 	75,  // 122: aperture.policy.language.v1.SignalGenerator.Parameters.steps:type_name -> aperture.policy.language.v1.SignalGenerator.Parameters.Step
-	85,  // 123: aperture.policy.language.v1.SignalGenerator.Ins.forward:type_name -> aperture.policy.language.v1.InPort
-	85,  // 124: aperture.policy.language.v1.SignalGenerator.Ins.backward:type_name -> aperture.policy.language.v1.InPort
-	85,  // 125: aperture.policy.language.v1.SignalGenerator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
-	86,  // 126: aperture.policy.language.v1.SignalGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 127: aperture.policy.language.v1.SignalGenerator.Outs.at_start:type_name -> aperture.policy.language.v1.OutPort
-	86,  // 128: aperture.policy.language.v1.SignalGenerator.Outs.at_end:type_name -> aperture.policy.language.v1.OutPort
-	84,  // 129: aperture.policy.language.v1.SignalGenerator.Parameters.Step.target_output:type_name -> aperture.policy.language.v1.ConstantSignal
-	83,  // 130: aperture.policy.language.v1.SignalGenerator.Parameters.Step.duration:type_name -> google.protobuf.Duration
-	83,  // 131: aperture.policy.language.v1.PIDController.Parameters.evaluation_interval:type_name -> google.protobuf.Duration
-	85,  // 132: aperture.policy.language.v1.PIDController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
-	85,  // 133: aperture.policy.language.v1.PIDController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
-	85,  // 134: aperture.policy.language.v1.PIDController.Ins.min:type_name -> aperture.policy.language.v1.InPort
-	85,  // 135: aperture.policy.language.v1.PIDController.Ins.max:type_name -> aperture.policy.language.v1.InPort
-	86,  // 136: aperture.policy.language.v1.PIDController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	86,  // 123: aperture.policy.language.v1.SignalGenerator.Ins.forward:type_name -> aperture.policy.language.v1.InPort
+	86,  // 124: aperture.policy.language.v1.SignalGenerator.Ins.backward:type_name -> aperture.policy.language.v1.InPort
+	86,  // 125: aperture.policy.language.v1.SignalGenerator.Ins.reset:type_name -> aperture.policy.language.v1.InPort
+	87,  // 126: aperture.policy.language.v1.SignalGenerator.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 127: aperture.policy.language.v1.SignalGenerator.Outs.at_start:type_name -> aperture.policy.language.v1.OutPort
+	87,  // 128: aperture.policy.language.v1.SignalGenerator.Outs.at_end:type_name -> aperture.policy.language.v1.OutPort
+	85,  // 129: aperture.policy.language.v1.SignalGenerator.Parameters.Step.target_output:type_name -> aperture.policy.language.v1.ConstantSignal
+	84,  // 130: aperture.policy.language.v1.SignalGenerator.Parameters.Step.duration:type_name -> google.protobuf.Duration
+	84,  // 131: aperture.policy.language.v1.PIDController.Parameters.evaluation_interval:type_name -> google.protobuf.Duration
+	86,  // 132: aperture.policy.language.v1.PIDController.Ins.signal:type_name -> aperture.policy.language.v1.InPort
+	86,  // 133: aperture.policy.language.v1.PIDController.Ins.setpoint:type_name -> aperture.policy.language.v1.InPort
+	86,  // 134: aperture.policy.language.v1.PIDController.Ins.min:type_name -> aperture.policy.language.v1.InPort
+	86,  // 135: aperture.policy.language.v1.PIDController.Ins.max:type_name -> aperture.policy.language.v1.InPort
+	87,  // 136: aperture.policy.language.v1.PIDController.Outs.output:type_name -> aperture.policy.language.v1.OutPort
 	82,  // 137: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.start:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Parameters.Datapoint
 	82,  // 138: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.end:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Parameters.Datapoint
-	85,  // 139: aperture.policy.language.v1.PolynomialRangeFunction.Ins.input:type_name -> aperture.policy.language.v1.InPort
-	86,  // 140: aperture.policy.language.v1.PolynomialRangeFunction.Outs.output:type_name -> aperture.policy.language.v1.OutPort
-	141, // [141:141] is the sub-list for method output_type
-	141, // [141:141] is the sub-list for method input_type
-	141, // [141:141] is the sub-list for extension type_name
-	141, // [141:141] is the sub-list for extension extendee
-	0,   // [0:141] is the sub-list for field type_name
+	83,  // 139: aperture.policy.language.v1.PolynomialRangeFunction.Parameters.clamp_to_custom_values:type_name -> aperture.policy.language.v1.PolynomialRangeFunction.Parameters.ClampToCustomValues
+	86,  // 140: aperture.policy.language.v1.PolynomialRangeFunction.Ins.input:type_name -> aperture.policy.language.v1.InPort
+	87,  // 141: aperture.policy.language.v1.PolynomialRangeFunction.Outs.output:type_name -> aperture.policy.language.v1.OutPort
+	142, // [142:142] is the sub-list for method output_type
+	142, // [142:142] is the sub-list for method input_type
+	142, // [142:142] is the sub-list for extension type_name
+	142, // [142:142] is the sub-list for extension extendee
+	0,   // [0:142] is the sub-list for field type_name
 }
 
 func init() { file_aperture_policy_language_v1_std_components_proto_init() }
@@ -7026,6 +7168,23 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 				return nil
 			}
 		}
+		file_aperture_policy_language_v1_std_components_proto_msgTypes[83].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PolynomialRangeFunction_Parameters_ClampToCustomValues); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+	}
+	file_aperture_policy_language_v1_std_components_proto_msgTypes[79].OneofWrappers = []interface{}{
+		(*PolynomialRangeFunction_Parameters_ClampToDatapoint)(nil),
+		(*PolynomialRangeFunction_Parameters_ClampToCustomValues_)(nil),
+		(*PolynomialRangeFunction_Parameters_ContinueCurve)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -7033,7 +7192,7 @@ func file_aperture_policy_language_v1_std_components_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_aperture_policy_language_v1_std_components_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   83,
+			NumMessages:   84,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

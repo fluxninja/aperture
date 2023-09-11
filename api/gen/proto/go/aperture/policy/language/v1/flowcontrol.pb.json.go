@@ -264,7 +264,7 @@ func (msg *AdaptiveLoadScheduler_Parameters) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalJSON() ([]byte, error) {
+func (msg *AdaptiveLoadScheduler_AIMDThrottlingStrategy) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -273,14 +273,14 @@ func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy) MarshalJSON() ([]by
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy) UnmarshalJSON(b []byte) error {
+func (msg *AdaptiveLoadScheduler_AIMDThrottlingStrategy) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalJSON() ([]byte, error) {
+func (msg *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: false,
@@ -289,7 +289,7 @@ func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) MarshalJSON() (
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) UnmarshalJSON(b []byte) error {
+func (msg *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}.Unmarshal(b, msg)

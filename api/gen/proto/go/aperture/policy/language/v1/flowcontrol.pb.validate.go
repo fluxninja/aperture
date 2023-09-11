@@ -1535,7 +1535,7 @@ func (m *AdaptiveLoadScheduler) validate(all bool) error {
 	// no validation rules for DryRunConfigKey
 
 	switch v := m.ThrottlingStrategy.(type) {
-	case *AdaptiveLoadScheduler_GradientThrottlingStrategy_:
+	case *AdaptiveLoadScheduler_AimdThrottlingStrategy:
 		if v == nil {
 			err := AdaptiveLoadSchedulerValidationError{
 				field:  "ThrottlingStrategy",
@@ -1548,11 +1548,11 @@ func (m *AdaptiveLoadScheduler) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetGradientThrottlingStrategy()).(type) {
+			switch v := interface{}(m.GetAimdThrottlingStrategy()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, AdaptiveLoadSchedulerValidationError{
-						field:  "GradientThrottlingStrategy",
+						field:  "AimdThrottlingStrategy",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1560,16 +1560,16 @@ func (m *AdaptiveLoadScheduler) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, AdaptiveLoadSchedulerValidationError{
-						field:  "GradientThrottlingStrategy",
+						field:  "AimdThrottlingStrategy",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetGradientThrottlingStrategy()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetAimdThrottlingStrategy()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return AdaptiveLoadSchedulerValidationError{
-					field:  "GradientThrottlingStrategy",
+					field:  "AimdThrottlingStrategy",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -5102,23 +5102,23 @@ var _ interface {
 } = AdaptiveLoadScheduler_ParametersValidationError{}
 
 // Validate checks the field values on
-// AdaptiveLoadScheduler_GradientThrottlingStrategy with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) Validate() error {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) Validate() error {
 	return m.validate(false)
 }
 
 // ValidateAll checks the field values on
-// AdaptiveLoadScheduler_GradientThrottlingStrategy with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in
-// AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError, or nil if none found.
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) ValidateAll() error {
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError, or nil if none found.
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) validate(all bool) error {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -5129,7 +5129,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) validate(all bool) er
 		switch v := interface{}(m.GetInPorts()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5137,7 +5137,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) validate(all bool) er
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
 					field:  "InPorts",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5146,7 +5146,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) validate(all bool) er
 		}
 	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
+			return AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
 				field:  "InPorts",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -5155,49 +5155,53 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy) validate(all bool) er
 	}
 
 	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
+		switch v := interface{}(m.GetGradient()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
-					field:  "Parameters",
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
+					field:  "Gradient",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
-					field:  "Parameters",
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
+					field:  "Gradient",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetGradient()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{
-				field:  "Parameters",
+			return AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{
+				field:  "Gradient",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
+	// no validation rules for MaxLoadMultiplier
+
+	// no validation rules for LoadMultiplierLinearIncrement
+
 	if len(errors) > 0 {
-		return AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError(errors)
+		return AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError(errors)
 	}
 
 	return nil
 }
 
-// AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError is an error
-// wrapping multiple validation errors returned by
-// AdaptiveLoadScheduler_GradientThrottlingStrategy.ValidateAll() if the
+// AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError is an error wrapping
+// multiple validation errors returned by
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy.ValidateAll() if the
 // designated constraints aren't met.
-type AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError []error
+type AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError) Error() string {
+func (m AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -5206,13 +5210,13 @@ func (m AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError) Error() stri
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AdaptiveLoadScheduler_GradientThrottlingStrategyMultiError) AllErrors() []error { return m }
+func (m AdaptiveLoadScheduler_AIMDThrottlingStrategyMultiError) AllErrors() []error { return m }
 
-// AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError is the
+// AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError is the
 // validation error returned by
-// AdaptiveLoadScheduler_GradientThrottlingStrategy.Validate if the designated
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy.Validate if the designated
 // constraints aren't met.
-type AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError struct {
+type AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -5220,30 +5224,24 @@ type AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError struct {
 }
 
 // Field function returns field value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Field() string {
-	return e.field
-}
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Reason() string {
-	return e.reason
-}
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Cause() error {
-	return e.cause
-}
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Key() bool { return e.key }
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) ErrorName() string {
-	return "AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError"
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) ErrorName() string {
+	return "AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Error() string {
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -5255,14 +5253,14 @@ func (e AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError) Error()
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAdaptiveLoadScheduler_GradientThrottlingStrategy.%s: %s%s",
+		"invalid %sAdaptiveLoadScheduler_AIMDThrottlingStrategy.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{}
+var _ error = AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{}
 
 var _ interface {
 	Field() string
@@ -5270,7 +5268,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AdaptiveLoadScheduler_GradientThrottlingStrategyValidationError{}
+} = AdaptiveLoadScheduler_AIMDThrottlingStrategyValidationError{}
 
 // Validate checks the field values on
 // AdaptiveLoadScheduler_RangeThrottlingStrategy with the rules defined in the
@@ -5818,24 +5816,23 @@ var _ interface {
 } = AdaptiveLoadScheduler_OutsValidationError{}
 
 // Validate checks the field values on
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) Validate() error {
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) Validate() error {
 	return m.validate(false)
 }
 
 // ValidateAll checks the field values on
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins with the rules defined
-// in the proto definition for this message. If any rules are violated, the
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins with the rules defined in
+// the proto definition for this message. If any rules are violated, the
 // result is a list of violation errors wrapped in
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError, or nil if
-// none found.
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) ValidateAll() error {
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError, or nil if none found.
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool) error {
+func (m *AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -5846,7 +5843,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 		switch v := interface{}(m.GetSignal()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5854,7 +5851,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 					field:  "Signal",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5863,7 +5860,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 		}
 	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+			return AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 				field:  "Signal",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -5875,7 +5872,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 		switch v := interface{}(m.GetSetpoint()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 					field:  "Setpoint",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5883,7 +5880,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+				errors = append(errors, AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 					field:  "Setpoint",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -5892,7 +5889,7 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 		}
 	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
+			return AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{
 				field:  "Setpoint",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -5900,50 +5897,21 @@ func (m *AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins) validate(all bool
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetOverloadConfirmation()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
-					field:  "OverloadConfirmation",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
-					field:  "OverloadConfirmation",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOverloadConfirmation()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{
-				field:  "OverloadConfirmation",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
-		return AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError(errors)
+		return AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError(errors)
 	}
 
 	return nil
 }
 
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError is an error
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError is an error
 // wrapping multiple validation errors returned by
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins.ValidateAll() if the
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins.ValidateAll() if the
 // designated constraints aren't met.
-type AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError []error
+type AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError) Error() string {
+func (m AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -5952,13 +5920,13 @@ func (m AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError) Error() 
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AdaptiveLoadScheduler_GradientThrottlingStrategy_InsMultiError) AllErrors() []error { return m }
+func (m AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsMultiError) AllErrors() []error { return m }
 
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError is the
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError is the
 // validation error returned by
-// AdaptiveLoadScheduler_GradientThrottlingStrategy_Ins.Validate if the
-// designated constraints aren't met.
-type AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError struct {
+// AdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins.Validate if the designated
+// constraints aren't met.
+type AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -5966,30 +5934,30 @@ type AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError struct 
 }
 
 // Field function returns field value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Field() string {
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) Field() string {
 	return e.field
 }
 
 // Reason function returns reason value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Reason() string {
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) Reason() string {
 	return e.reason
 }
 
 // Cause function returns cause value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Cause() error {
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) Cause() error {
 	return e.cause
 }
 
 // Key function returns key value.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Key() bool { return e.key }
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) ErrorName() string {
-	return "AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError"
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) ErrorName() string {
+	return "AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Error() string {
+func (e AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -6001,14 +5969,14 @@ func (e AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError) Err
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAdaptiveLoadScheduler_GradientThrottlingStrategy_Ins.%s: %s%s",
+		"invalid %sAdaptiveLoadScheduler_AIMDThrottlingStrategy_Ins.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{}
+var _ error = AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{}
 
 var _ interface {
 	Field() string
@@ -6016,7 +5984,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AdaptiveLoadScheduler_GradientThrottlingStrategy_InsValidationError{}
+} = AdaptiveLoadScheduler_AIMDThrottlingStrategy_InsValidationError{}
 
 // Validate checks the field values on
 // AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins with the rules defined in
@@ -6065,35 +6033,6 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Ins) validate(all bool) e
 		if err := v.Validate(); err != nil {
 			return AdaptiveLoadScheduler_RangeThrottlingStrategy_InsValidationError{
 				field:  "Signal",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOverloadConfirmation()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_RangeThrottlingStrategy_InsValidationError{
-					field:  "OverloadConfirmation",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, AdaptiveLoadScheduler_RangeThrottlingStrategy_InsValidationError{
-					field:  "OverloadConfirmation",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOverloadConfirmation()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AdaptiveLoadScheduler_RangeThrottlingStrategy_InsValidationError{
-				field:  "OverloadConfirmation",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

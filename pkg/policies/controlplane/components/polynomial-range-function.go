@@ -34,8 +34,8 @@ func (*PolynomialRangeFunction) IsActuator() bool { return false }
 // Make sure PolynomialRangeFunction complies with Component interface.
 var _ runtime.Component = (*PolynomialRangeFunction)(nil)
 
-// NewRangeFunctionAndOptions returns a new PolynomialRangeFunction and its Fx options.
-func NewRangeFunctionAndOptions(rangeFunctionProto *policylangv1.PolynomialRangeFunction, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+// NewPolynomialRangeFunctionAndOptions returns a new PolynomialRangeFunction and its Fx options.
+func NewPolynomialRangeFunctionAndOptions(rangeFunctionProto *policylangv1.PolynomialRangeFunction, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	arith := PolynomialRangeFunction{
 		parameters: rangeFunctionProto.Parameters,
 	}
@@ -58,6 +58,26 @@ func (rangeFunc *PolynomialRangeFunction) Execute(inPortReadings runtime.PortToR
 		}, nil
 	}
 
+	// Helper function to handle outside range behavior.
+	handleOutsideRange := func(t float64, output float64) float64 {
+		if t < 0 {
+			if rangeFunc.parameters.GetClampToDatapoint() {
+				return rangeFunc.parameters.Start.Output
+			} else if rangeFunc.parameters.GetClampToCustomValues() != nil {
+				return rangeFunc.parameters.GetClampToCustomValues().PreStart
+			}
+		}
+
+		if t > 1 {
+			if rangeFunc.parameters.GetClampToDatapoint() {
+				return rangeFunc.parameters.End.Output
+			} else if rangeFunc.parameters.GetClampToCustomValues() != nil {
+				return rangeFunc.parameters.GetClampToCustomValues().PostEnd
+			}
+		}
+		return output
+	}
+
 	input := inPortReadings.ReadSingleReadingPort("input")
 	if !input.Valid() {
 		return returnInvalidReading()
@@ -68,28 +88,26 @@ func (rangeFunc *PolynomialRangeFunction) Execute(inPortReadings runtime.PortToR
 	endInput, endOutput := rangeFunc.parameters.End.Input, rangeFunc.parameters.End.Output
 	inputVal := input.Value()
 
-	// Edge case: both input values are equal
-	if endInput == startInput {
-		if inputVal <= startInput {
-			return returnReading(startOutput)
-		}
-		return returnReading(endOutput)
-	}
-
 	// Compute normalized value for interpolation
-	t := (inputVal - startInput) / (endInput - startInput)
-
-	// Check bounds using t and order of start and end inputs
-	if t <= 0 {
-		return returnReading(startOutput)
+	var t float64
+	if endInput != startInput {
+		t = (inputVal - startInput) / (endInput - startInput)
+	} else {
+		// Handling the edge case where startInput and endInput are the same
+		if inputVal <= startInput {
+			t = 0
+		} else {
+			t = 1
+		}
 	}
 
-	if t >= 1 {
-		return returnReading(endOutput)
-	}
+	// Calculate the polynomial output
+	output := startOutput + math.Pow(t, rangeFunc.parameters.Degree)*(endOutput-startOutput)
 
-	// Compute the range function value based on the degree of the polynomial curve
-	return returnReading(startOutput + math.Pow(t, rangeFunc.parameters.Degree)*(endOutput-startOutput))
+	// Handle outside range behavior
+	output = handleOutsideRange(t, output)
+
+	return returnReading(output)
 }
 
 // DynamicConfigUpdate is a no-op for PolynomialRangeFunction.

@@ -36,6 +36,19 @@ The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
 application health signals and the provided throttling strategy.
 
 <dl>
+<dt>aimd_throttling_strategy</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerAIMDThrottlingStrategy](#adaptive-load-scheduler-a-i-m-d-throttling-strategy))
+
+<!-- vale on -->
+
+The \_AIMD strategy throttles the token rate based on an additive increase and
+multiplicative decrease fashion.
+
+</dd>
 <dt>dry_run</dt>
 <dd>
 
@@ -61,19 +74,6 @@ traffic.
 <!-- vale on -->
 
 Configuration key for setting dry run mode through dynamic configuration.
-
-</dd>
-<dt>gradient_throttling_strategy</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerGradientThrottlingStrategy](#adaptive-load-scheduler-gradient-throttling-strategy))
-
-<!-- vale on -->
-
-The _Gradient_ strategy throttles the token rate based on the deviation of the
-signal from the setpoint.
 
 </dd>
 <dt>in_ports</dt>
@@ -123,6 +123,9 @@ Parameters for the _Adaptive Load Scheduler_ component.
 
 The _Range_ strategy throttles the token rate based on the range of the signal.
 
+The AIAD strategy throttles the token rate based on an additive increase and
+adaptive decrease fashion. AIADThrottlingStrategy aiad_throttling_strategy = 8;
+
 </dd>
 </dl>
 
@@ -130,29 +133,18 @@ The _Range_ strategy throttles the token rate based on the range of the signal.
 
 <!-- vale off -->
 
-### AdaptiveLoadSchedulerGradientThrottlingStrategy {#adaptive-load-scheduler-gradient-throttling-strategy}
+### AdaptiveLoadSchedulerAIMDThrottlingStrategy {#adaptive-load-scheduler-a-i-m-d-throttling-strategy}
 
 <!-- vale on -->
 
-_Gradient Throttling Strategy uses the \_Gradient Controller_ to throttle the
-token rate based on the deviation of the signal from the setpoint. It takes a
-signal and setpoint as inputs and reduces token rate proportionally (or any
-arbitrary power) based on deviation of the signal from setpoint.
+_AIMD Throttling Strategy uses a \_Gradient Controller_ to throttle the token
+rate based on the deviation of the signal from the setpoint. It takes a signal
+and setpoint as inputs and reduces token rate proportionally (or any arbitrary
+power) based on deviation of the signal from setpoint. During recovery, it
+increases the token rate linearly until the system is not overloaded.
 
 <dl>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerGradientThrottlingStrategyIns](#adaptive-load-scheduler-gradient-throttling-strategy-ins))
-
-<!-- vale on -->
-
-Input ports for the _Gradient Throttling Strategy_.
-
-</dd>
-<dt>parameters</dt>
+<dt>gradient</dt>
 <dd>
 
 <!-- vale off -->
@@ -164,32 +156,66 @@ Input ports for the _Gradient Throttling Strategy_.
 Parameters for the _Gradient Controller_.
 
 </dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadSchedulerAIMDThrottlingStrategyIns](#adaptive-load-scheduler-a-i-m-d-throttling-strategy-ins))
+
+<!-- vale on -->
+
+Input ports for the _AIMD Throttling Strategy_.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `0.025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
+v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `2`)
+
+<!-- vale on -->
+
+The maximum load multiplier that can be reached during recovery from an overload
+state.
+
+- Helps protect the service from request bursts while the system is still
+  recovering.
+- Once this value is reached, the scheduler enters the pass-through mode,
+  allowing requests to bypass the scheduler and be sent directly to the service.
+- The pass-through mode gets disabled if the system enters the overload state
+  again. Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD
+  Throttling Strategy_ instead.
+
+</dd>
 </dl>
 
 ---
 
 <!-- vale off -->
 
-### AdaptiveLoadSchedulerGradientThrottlingStrategyIns {#adaptive-load-scheduler-gradient-throttling-strategy-ins}
+### AdaptiveLoadSchedulerAIMDThrottlingStrategyIns {#adaptive-load-scheduler-a-i-m-d-throttling-strategy-ins}
 
 <!-- vale on -->
 
-Input ports for the _Gradient Throttling Strategy_ component.
+Input ports for the _AIMD Throttling Strategy_.
 
 <dl>
-<dt>overload_confirmation</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The `overload_confirmation` port provides additional criteria to determine
-overload state which results in _Flow_ throttling at the service.
-
-</dd>
 <dt>setpoint</dt>
 <dd>
 
@@ -350,7 +376,7 @@ Configuration parameters for the embedded Alerter.
 <!-- vale on -->
 
 Parameters for the _Gradient Controller_. Deprecated: v3.0.0. Use
-_gradient_controller_ inside the _Gradient Throttling Strategy_ instead.
+_gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
@@ -363,7 +389,8 @@ _gradient_controller_ inside the _Gradient Throttling Strategy_ instead.
 <!-- vale on -->
 
 Linear increment to load multiplier every 10 seconds while the system is not in
-the overloaded state, up until the `max_load_multiplier` is reached.
+the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
+v3.0.0. Use _gradient_controller_ inside the _AIMD Throttling Strategy_ instead.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -395,7 +422,8 @@ state.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
-  again.
+  again. Deprecated: v3.0.0. Use _gradient_controller_ inside the _AIMD
+  Throttling Strategy_ instead.
 
 </dd>
 </dl>
@@ -449,19 +477,6 @@ Parameters for the \_Range Function.
 Input ports for the _Range Throttling Strategy_ component.
 
 <dl>
-<dt>overload_confirmation</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The `overload_confirmation` port provides additional criteria to determine
-overload state which results in _Flow_ throttling at the service.
-
-</dd>
 <dt>signal</dt>
 <dd>
 
@@ -490,7 +505,7 @@ The input signal to the controller.
 
 <!-- vale off -->
 
-(float64)
+(float64, **required**)
 
 <!-- vale on -->
 
@@ -538,7 +553,7 @@ Starting datapoint of the throttling range
 
 <!-- vale off -->
 
-(float64)
+(float64, minimum: `0`, maximum: `1`)
 
 <!-- vale on -->
 
@@ -548,7 +563,7 @@ Starting datapoint of the throttling range
 
 <!-- vale off -->
 
-(float64)
+(float64, minimum: `0`, maximum: `1`)
 
 <!-- vale on -->
 
@@ -1857,6 +1872,19 @@ Logical OR.
 <!-- vale on -->
 
 PID Controller is a proportional–integral–derivative controller.
+
+</dd>
+<dt>polynomial_range_function</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunction](#polynomial-range-function))
+
+<!-- vale on -->
+
+Polynomial Range Function is a function that maps a signal to a range of values
+following a polynomial function.
 
 </dd>
 <dt>pulse_generator</dt>
@@ -6213,6 +6241,244 @@ Defines the control-loop logic of the policy.
 <!-- vale on -->
 
 Resources (such as Flux Meters, Classifiers) to setup.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunction {#polynomial-range-function}
+
+<!-- vale on -->
+
+Curve Types by Degree:
+
+- Degree 1: Linear
+- Degree 2: Quadratic
+- Degree 3: Cubic ... and so on.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionIns](#polynomial-range-function-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionOuts](#polynomial-range-function-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParameters](#polynomial-range-function-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionIns {#polynomial-range-function-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>input</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionOuts {#polynomial-range-function-outs}
+
+<!-- vale on -->
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The output signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParameters {#polynomial-range-function-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>clamp_to_custom_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersClampToCustomValues](#polynomial-range-function-parameters-clamp-to-custom-values))
+
+<!-- vale on -->
+
+Clamp to custom values
+
+</dd>
+<dt>clamp_to_datapoint</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Clamp to the nearest datapoint
+
+</dd>
+<dt>continue_curve</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Continue polynomial curve
+
+</dd>
+<dt>degree</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Degree of the polynomial
+
+</dd>
+<dt>end</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersDatapoint](#polynomial-range-function-parameters-datapoint))
+
+<!-- vale on -->
+
+Ending datapoint for the range function
+
+</dd>
+<dt>start</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersDatapoint](#polynomial-range-function-parameters-datapoint))
+
+<!-- vale on -->
+
+Starting datapoint for the range function
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParametersClampToCustomValues {#polynomial-range-function-parameters-clamp-to-custom-values}
+
+<!-- vale on -->
+
+<dl>
+<dt>post_end</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+<dt>pre_start</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParametersDatapoint {#polynomial-range-function-parameters-datapoint}
+
+<!-- vale on -->
+
+<dl>
+<dt>input</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
 
 </dd>
 </dl>

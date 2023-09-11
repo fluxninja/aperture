@@ -5,6 +5,12 @@ local adaptiveloadschedulerouts = import './adaptiveloadschedulerouts.libsonnet'
   },
   inPorts:: adaptiveloadschedulerins,
   outPorts:: adaptiveloadschedulerouts,
+  withAimdThrottlingStrategy(aimd_throttling_strategy):: {
+    aimd_throttling_strategy: aimd_throttling_strategy,
+  },
+  withAimdThrottlingStrategyMixin(aimd_throttling_strategy):: {
+    aimd_throttling_strategy+: aimd_throttling_strategy,
+  },
   withDryRun(dry_run):: {
     dry_run: dry_run,
   },
@@ -16,12 +22,6 @@ local adaptiveloadschedulerouts = import './adaptiveloadschedulerouts.libsonnet'
   },
   withDryRunConfigKeyMixin(dry_run_config_key):: {
     dry_run_config_key+: dry_run_config_key,
-  },
-  withGradientThrottlingStrategy(gradient_throttling_strategy):: {
-    gradient_throttling_strategy: gradient_throttling_strategy,
-  },
-  withGradientThrottlingStrategyMixin(gradient_throttling_strategy):: {
-    gradient_throttling_strategy+: gradient_throttling_strategy,
   },
   withInPorts(in_ports):: {
     in_ports: in_ports,
