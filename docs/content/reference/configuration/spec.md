@@ -246,8 +246,8 @@ Parameters for the _Gradient Controller_.
 
 <!-- vale on -->
 
-Linear increment to load multiplier in each execution tick when the system is
-not in the overloaded state, up until the `max_load_multiplier` is reached.
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -278,8 +278,8 @@ state.
   recovering.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
-- Any future overload state is detected by the control policy, and the load
-  multiplier increment cycle is restarted.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
 
 </dd>
 </dl>
@@ -1185,7 +1185,7 @@ Defines a signal processing graph as a list of components.
 
 <!-- vale off -->
 
-(string, default: `"10s"`)
+(string, default: `"1s"`)
 
 <!-- vale on -->
 
@@ -1395,7 +1395,8 @@ Decider emits the binary result of comparison operator on two operands.
 
 <!-- vale on -->
 
-Differentiator calculates rate of change per tick.
+Differentiator calculates rate of change per tick. Deprecated: v3.0.0. Use
+`PIDController` instead.
 
 </dd>
 <dt>ema</dt>
@@ -3825,6 +3826,25 @@ MetricsPipelineConfig defines a custom metrics pipeline.
 Accumulates sum of signal every tick.
 
 <dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the Integrator. This determines how often the
+Integrator is incremented. Defaults to the evaluation interval of the circuit.
+This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>in_ports</dt>
 <dd>
 
@@ -4625,7 +4645,7 @@ that belongs to it. Scheduling of Flows is based on Weighted Fair Queuing
 principles.
 
 The signal at port `load_multiplier` determines the fraction of incoming tokens
-that get admitted.
+that get admitted. The signals gets acted on once every 10 seconds.
 
 <dl>
 <dt>dry_run</dt>
@@ -4712,6 +4732,7 @@ Input for the LoadScheduler component.
 <!-- vale on -->
 
 Load multiplier is proportion of incoming token rate that needs to be accepted.
+The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
@@ -4737,7 +4758,7 @@ Output for the LoadScheduler component.
 <!-- vale on -->
 
 Observed load multiplier is the proportion of incoming token rate that is being
-accepted.
+accepted. The signal gets updated once every 10 seconds.
 
 </dd>
 </dl>
@@ -4784,7 +4805,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -5580,6 +5601,25 @@ Output of the PID controller
 <!-- vale on -->
 
 <dl>
+<dt>evaluation_interval</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The evaluation interval of the PID controller. This determines how often the PID
+output is computed. Defaults to the evaluation interval of the circuit. This
+field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
 <dt>kd</dt>
 <dd>
 
@@ -5627,25 +5667,6 @@ The proportional gain of the PID controller.
 
 The integrator resets after the specified number of ticks if the signal or
 setpoint are continuously invalid. Defaults to 4 invalid samples.
-
-</dd>
-<dt>sample_period</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The sampling period of the PID controller. This determines how often the PID
-output is computed. Defaults to the evaluation period of the circuit. This field
-employs the
-[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
-representation from Protocol Buffers. The format accommodates fractional seconds
-up to nine digits after the decimal point, offering nanosecond precision. Every
-duration value must be suffixed with an "s" to indicate 'seconds.' For example,
-a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
 </dl>
@@ -6413,7 +6434,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 Flow label key that will be used to override the number of tokens for this
 request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid uint64 number.
+assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -7203,8 +7224,8 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default priority for
   this flow.
-- The value associated with this key must be a valid uint64 number. Higher
-  numbers means higher priority.
+- The value associated with this key must be a valid number. Higher numbers
+  means higher priority.
 - If this parameter is not provided, the priority for the flow will be
   determined by the matched workload's priority.
 
@@ -7220,7 +7241,7 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default number of tokens
   for this flow.
-- The value associated with this key must be a valid uint64 number.
+- The value associated with this key must be a valid number.
 - If this parameter is not provided, the number of tokens for the flow will be
   determined by the matched workload's token count.
 
@@ -7373,7 +7394,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(int64, minimum: `0`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 

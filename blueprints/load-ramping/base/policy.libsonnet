@@ -1,3 +1,4 @@
+local consts = import '../../consts.libsonnet';
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config.libsonnet';
@@ -10,7 +11,7 @@ function(cfg, metadata={}) {
   local addPromQLDriver = function(driverAccumulator, driver) {
     local promQLSignalName = 'PROMQL_' + std.toString(driverAccumulator.promql_driver_count),
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(driver.query_string)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(promQLSignalName),
                                                                                  }))),
@@ -64,7 +65,7 @@ function(cfg, metadata={}) {
     local averageLatencySignalName = 'AVERAGE_LATENCY_' + std.toString(driverAccumulator.average_latency_driver_count),
     local q = 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s]))' % { flux_meter_name: flux_meter_name, policy_name: policyName },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(averageLatencySignalName),
                                                                                  }))),
@@ -122,7 +123,7 @@ function(cfg, metadata={}) {
     local percentileLatencySignalName = 'PERCENTILE_LATENCY_' + std.toString(driverAccumulator.percentile_latency_driver_count),
     local q = 'histogram_quantile(%(percentile)f, sum(rate(flux_meter_bucket{flow_status="OK", flux_meter_name="%(flux_meter_name)s", policy_name="%(policy_name)s"}[30s])) by (le))' % { percentile: driver.percentile, flux_meter_name: flux_meter_name, policy_name: policyName },
     local promQLComponent = spec.v1.Component.withQuery(spec.v1.Query.withPromql(spec.v1.PromQL.withQueryString(q)
-                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+                                                                                 + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
                                                                                  + spec.v1.PromQL.withOutPorts({
                                                                                    output: spec.v1.Port.withSignalName(percentileLatencySignalName),
                                                                                  }))),
@@ -353,7 +354,7 @@ function(cfg, metadata={}) {
     )
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=consts.circuitEvaluationInterval)
       + spec.v1.Circuit.withComponents(
         driverAccumulator.components + [
           userStartControlComponent,

@@ -5,6 +5,12 @@ local integratorouts = import './integratorouts.libsonnet';
   },
   inPorts:: integratorins,
   outPorts:: integratorouts,
+  withEvaluationInterval(evaluation_interval):: {
+    evaluation_interval: evaluation_interval,
+  },
+  withEvaluationIntervalMixin(evaluation_interval):: {
+    evaluation_interval+: evaluation_interval,
+  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },

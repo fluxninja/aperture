@@ -5,11 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math"
 	"time"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -28,7 +30,12 @@ import (
 )
 
 // policyModule returns Fx options of Policy for the Main App.
-func policyModule() fx.Option { return circuitfactory.Module() }
+func policyModule() fx.Option {
+	return fx.Options(
+		circuitfactory.Module(),
+		runtime.BackgroundSchedulerModule(),
+	)
+}
 
 // Policy invokes the Circuit runtime at tick frequency.
 type Policy struct {
@@ -67,7 +74,9 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 	policyOptions = append(policyOptions, circuitfactory.FactoryModuleForPolicyApp(circuit))
 
-	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitAPI)))))
+	policyOptions = append(policyOptions, runtime.BackgroundSchedulerModuleForPolicyApp(circuit))
+
+	policyOptions = append(policyOptions, fx.Supply(fx.Annotate(circuit, fx.As(new(runtime.CircuitSuperAPI)))))
 	policy.circuit = circuit
 
 	return fx.Options(policyOptions...), nil
@@ -185,6 +194,20 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 // GetEvaluationInterval returns the ID of the policy.
 func (policy *Policy) GetEvaluationInterval() time.Duration {
 	return policy.evaluationInterval
+}
+
+// TicksInDurationPb returns the number of ticks in duration pb. If duration pb is nil, it returns 1.
+func (policy *Policy) TicksInDurationPb(duration *durationpb.Duration) int {
+	if duration == nil {
+		return 1
+	}
+	return policy.TicksInDuration(duration.AsDuration())
+}
+
+// TicksInDuration returns the number of ticks in duration.
+func (policy *Policy) TicksInDuration(duration time.Duration) int {
+	// period of tick
+	return int(math.Ceil(float64(duration) / float64(policy.evaluationInterval)))
 }
 
 func (policy *Policy) setupCircuitJob(lifecycle fx.Lifecycle, circuitJobGroup *jobs.JobGroup) error {

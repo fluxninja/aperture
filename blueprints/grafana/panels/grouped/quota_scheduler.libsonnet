@@ -1,5 +1,5 @@
-local accepted_concurrency = import '../accepted_concurrency.libsonnet';
-local incoming_concurrency = import '../incoming_concurrency.libsonnet';
+local accepted_token_rate = import '../accepted_token_rate.libsonnet';
+local incoming_token_rate = import '../incoming_token_rate.libsonnet';
 local quota_checks = import '../quota_checks.libsonnet';
 local wfq_scheduler_flows = import '../wfq_scheduler_flows.libsonnet';
 local wfq_scheduler_heap_requests = import '../wfq_scheduler_heap_requests.libsonnet';
@@ -19,9 +19,9 @@ function(cfg) {
     + g.panel.timeSeries.gridPos.withY(30),
     workload_latency(cfg).panel
     + g.panel.timeSeries.gridPos.withY(40),
-    incoming_concurrency(cfg).panel
+    incoming_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withY(50),
-    accepted_concurrency(cfg).panel
+    accepted_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withX(12)
     + g.panel.timeSeries.gridPos.withY(50),
     wfq_scheduler_flows(cfg).panel

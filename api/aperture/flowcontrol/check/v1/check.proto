@@ -92,7 +92,7 @@ message LimiterDecision {
 
   message SchedulerInfo {
     string workload_index = 1;
-    uint64 tokens_consumed = 2;
+    double tokens_consumed = 3;
   }
 
   message SamplerInfo {

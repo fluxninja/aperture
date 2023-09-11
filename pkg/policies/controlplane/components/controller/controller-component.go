@@ -73,12 +73,14 @@ func (cc *ControllerComponent) ShortDescription() string {
 func (*ControllerComponent) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
-func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (outPortReadings runtime.PortToReading, err error) {
+func (cc *ControllerComponent) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (outPortReadings runtime.PortToReading, err error) {
 	retErr := func(err error) (runtime.PortToReading, error) {
 		return runtime.PortToReading{
 			"output": []runtime.Reading{runtime.InvalidReading()},
 		}, err
 	}
+
+	tickInfo := circuitAPI.GetTickInfo()
 
 	signal := inPortReadings.ReadSingleReadingPort("signal")
 	setpoint := inPortReadings.ReadSingleReadingPort("setpoint")

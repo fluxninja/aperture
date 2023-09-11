@@ -192,8 +192,30 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	return nil
 }
 
-// Client returns Controller Client, connecting to controller if not yet connected.
-func (c *ControllerConn) Client() (cmdv1.ControllerClient, error) {
+// client returns Controller IntrospectionClient, connecting to controller if not yet connected.
+func (c *ControllerConn) IntrospectionClient() (IntrospectionClient, error) {
+	if !c.kube && c.apiKey != "" {
+		return nil, errors.New("this subcommand cannot be used with the Cloud Controller")
+	}
+	return c.client()
+}
+
+// client returns Controller PolicyClient, connecting to controller if not yet connected.
+func (c *ControllerConn) PolicyClient() (PolicyClient, error) {
+	// PolicyClient has no restrictions.
+	return c.client()
+}
+
+// client returns Controller StatusClient, connecting to controller if not yet connected.
+func (c *ControllerConn) StatusClient() (StatusClient, error) {
+	// StatusClient has no restrictions.
+	return c.client()
+}
+
+// client returns Controller Client, connecting to controller if not yet connected.
+//
+// This functions is not exposed to force callers to go through the check above.
+func (c *ControllerConn) client() (cmdv1.ControllerClient, error) {
 	if c.conn != nil {
 		return cmdv1.NewControllerClient(c.conn), nil
 	}

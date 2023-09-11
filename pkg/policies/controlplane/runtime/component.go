@@ -7,7 +7,7 @@ import (
 
 // Component is the interface that all components must implement.
 type Component interface {
-	Execute(inPortReadings PortToReading, tickInfo TickInfo) (outPortReadings PortToReading, err error)
+	Execute(inPortReadings PortToReading, circuitAPI CircuitAPI) (outPortReadings PortToReading, err error)
 	DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller)
 	// Generic name of the component, eg. "Gradient"
 	Name() string
@@ -52,7 +52,7 @@ type dummyComponent struct {
 }
 
 // Execute implements runtime.Component.
-func (c dummyComponent) Execute(inPortReadings PortToReading, tickInfo TickInfo) (outPortReadings PortToReading, err error) {
+func (c dummyComponent) Execute(inPortReadings PortToReading, circuitAPI CircuitAPI) (outPortReadings PortToReading, err error) {
 	return nil, nil
 }
 

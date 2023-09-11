@@ -2,10 +2,10 @@ package components
 
 import (
 	"math"
-	"time"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -14,16 +14,21 @@ import (
 
 // PIDController .
 type PIDController struct {
-	lastSignal     runtime.Reading
-	lastOutput     runtime.Reading
-	parameters     *policylangv1.PIDController_Parameters
-	integral       float64
-	invalidCount   int
-	ticksPerSample int
+	lastSignal        runtime.Reading
+	lastOutput        runtime.Reading
+	parameters        *policylangv1.PIDController_Parameters
+	cpID              string
+	integral          float64
+	invalidCount      int
+	ticksPerExecution int
+	doExecute         bool
 }
 
 // Make sure PID complies with Component interface.
 var _ runtime.Component = (*PIDController)(nil)
+
+// Make sure PID implements background job.
+var _ runtime.BackgroundJob = (*PIDController)(nil)
 
 // Name implements runtime.Component.
 func (*PIDController) Name() string { return "PID" }
@@ -38,33 +43,27 @@ func (*PIDController) ShortDescription() string { return "PID Controller" }
 func (*PIDController) IsActuator() bool { return false }
 
 // NewPIDControllerAndOptions creates a PID component and its fx options.
-func NewPIDControllerAndOptions(pidProto *policylangv1.PIDController, _ runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewPIDControllerAndOptions(pidProto *policylangv1.PIDController, componentID runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	pid := &PIDController{
 		parameters: pidProto.Parameters,
 		lastSignal: runtime.InvalidReading(),
 		lastOutput: runtime.InvalidReading(),
+		cpID:       componentID.String(),
 	}
-	// period of tick
-	evaluationPeriod := policyReadAPI.GetEvaluationInterval()
-	var samplePeriod time.Duration
-	if pidProto.Parameters.SamplePeriod == nil {
-		samplePeriod = evaluationPeriod
-	} else {
-		samplePeriod = pidProto.Parameters.SamplePeriod.AsDuration()
-	}
-	//
-	pid.ticksPerSample = int(math.Ceil(float64(samplePeriod) / float64(evaluationPeriod)))
+	pid.ticksPerExecution = policyReadAPI.TicksInDurationPb(pidProto.Parameters.EvaluationInterval)
 	return pid, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (pid *PIDController) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
-	if tickInfo.Tick()%pid.ticksPerSample != 0 {
+func (pid *PIDController) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
+	circuitAPI.ScheduleConditionalBackgroundJob(pid, pid.ticksPerExecution)
+	if !pid.doExecute {
 		return runtime.PortToReading{
 			"output": []runtime.Reading{pid.lastOutput},
 		}, nil
 	}
 
+	pid.doExecute = false
 	signalVal := inPortReadings.ReadSingleReadingPort("signal")
 	setpointVal := inPortReadings.ReadSingleReadingPort("setpoint")
 
@@ -136,4 +135,14 @@ func (pid *PIDController) Execute(inPortReadings runtime.PortToReading, tickInfo
 
 // DynamicConfigUpdate is a no-op for PID.
 func (pid *PIDController) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
+}
+
+// GetJob implements runtime.BackgroundJob.GetJob.
+func (pid *PIDController) GetJob() jobs.Job {
+	return jobs.NewNoOpJob(pid.cpID)
+}
+
+// NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
+func (pid *PIDController) NotifyCompletion() {
+	pid.doExecute = true
 }

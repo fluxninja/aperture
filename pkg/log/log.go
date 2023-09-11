@@ -133,7 +133,10 @@ func WaitFlush() {
 
 // GetPrettyConsoleWriter returns a pretty console writer.
 func GetPrettyConsoleWriter() io.Writer {
-	output := zerolog.NewConsoleWriter()
+	output := zerolog.NewConsoleWriter(
+		func(w *zerolog.ConsoleWriter) {
+			w.Out = os.Stderr
+		})
 	return output
 }
 

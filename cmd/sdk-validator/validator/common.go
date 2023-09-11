@@ -3,7 +3,7 @@ package validator
 import (
 	"context"
 	"strings"
-	"sync/atomic"
+	"sync"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -15,6 +15,7 @@ import (
 type CommonHandler struct {
 	check.HandlerWithValues
 
+	mutex    sync.Mutex
 	Rejects  int64
 	Rejected int64
 }
@@ -35,7 +36,7 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 		log.Trace().Msg("Missing request path label")
 		path = targetLabelMissing
 	}
-	log.Trace().Msgf("Received FlowControl Check request from path %v", path)
+	log.Trace().Msgf("Received FlowControl Check request from path %v, control point %v, services %v", path, controlPoint, services)
 
 	resp := &flowcontrolv1.CheckResponse{
 		DecisionType:  flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED,
@@ -45,11 +46,13 @@ func (c *CommonHandler) CheckRequest(ctx context.Context,
 		RejectReason:  flowcontrolv1.CheckResponse_REJECT_REASON_NONE,
 	}
 
-	if c.Rejected != c.Rejects && shouldBeTested(path) {
-		log.Trace().Msg("Rejecting call")
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	if c.Rejected < c.Rejects && shouldBeTested(path) {
 		resp.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
 		resp.RejectReason = flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED
-		atomic.AddInt64(&c.Rejected, 1)
+		c.Rejected++
+		log.Trace().Msgf("Rejecting request from path %v, control point %v, services %v, rejected %v", path, controlPoint, services, c.Rejected)
 	}
 
 	return resp

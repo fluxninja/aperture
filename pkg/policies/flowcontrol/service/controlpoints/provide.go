@@ -18,9 +18,16 @@ func Module() fx.Option {
 	)
 }
 
+// RegisterIn bundles and annotates parameters.
+type RegisterIn struct {
+	fx.In
+	Server  *grpc.Server `name:"default"`
+	Handler *Handler
+}
+
 // Register registers the handler on grpc.Server.
-func Register(handler *Handler, server *grpc.Server) error {
-	flowcontrolpointsv1.RegisterFlowControlPointsServiceServer(server, handler)
+func Register(in RegisterIn) error {
+	flowcontrolpointsv1.RegisterFlowControlPointsServiceServer(in.Server, in.Handler)
 
 	log.Info().Msg("FlowControl ControlPoints handler registered")
 	return nil
