@@ -946,10 +946,10 @@ private static final long serialVersionUID = 0L;
         getWorkloadIndexBytes();
 
     /**
-     * <code>uint64 tokens_consumed = 2 [json_name = "tokensConsumed"];</code>
+     * <code>double tokens_consumed = 3 [json_name = "tokensConsumed"];</code>
      * @return The tokensConsumed.
      */
-    long getTokensConsumed();
+    double getTokensConsumed();
   }
   /**
    * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo}
@@ -1026,14 +1026,14 @@ private static final long serialVersionUID = 0L;
       }
     }
 
-    public static final int TOKENS_CONSUMED_FIELD_NUMBER = 2;
-    private long tokensConsumed_ = 0L;
+    public static final int TOKENS_CONSUMED_FIELD_NUMBER = 3;
+    private double tokensConsumed_ = 0D;
     /**
-     * <code>uint64 tokens_consumed = 2 [json_name = "tokensConsumed"];</code>
+     * <code>double tokens_consumed = 3 [json_name = "tokensConsumed"];</code>
      * @return The tokensConsumed.
      */
     @java.lang.Override
-    public long getTokensConsumed() {
+    public double getTokensConsumed() {
       return tokensConsumed_;
     }
 
@@ -1054,8 +1054,8 @@ private static final long serialVersionUID = 0L;
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, workloadIndex_);
       }
-      if (tokensConsumed_ != 0L) {
-        output.writeUInt64(2, tokensConsumed_);
+      if (java.lang.Double.doubleToRawLongBits(tokensConsumed_) != 0) {
+        output.writeDouble(3, tokensConsumed_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1069,9 +1069,9 @@ private static final long serialVersionUID = 0L;
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, workloadIndex_);
       }
-      if (tokensConsumed_ != 0L) {
+      if (java.lang.Double.doubleToRawLongBits(tokensConsumed_) != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(2, tokensConsumed_);
+          .computeDoubleSize(3, tokensConsumed_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1090,8 +1090,9 @@ private static final long serialVersionUID = 0L;
 
       if (!getWorkloadIndex()
           .equals(other.getWorkloadIndex())) return false;
-      if (getTokensConsumed()
-          != other.getTokensConsumed()) return false;
+      if (java.lang.Double.doubleToLongBits(getTokensConsumed())
+          != java.lang.Double.doubleToLongBits(
+              other.getTokensConsumed())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1107,7 +1108,7 @@ private static final long serialVersionUID = 0L;
       hash = (53 * hash) + getWorkloadIndex().hashCode();
       hash = (37 * hash) + TOKENS_CONSUMED_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTokensConsumed());
+          java.lang.Double.doubleToLongBits(getTokensConsumed()));
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1240,7 +1241,7 @@ private static final long serialVersionUID = 0L;
         super.clear();
         bitField0_ = 0;
         workloadIndex_ = "";
-        tokensConsumed_ = 0L;
+        tokensConsumed_ = 0D;
         return this;
       }
 
@@ -1331,7 +1332,7 @@ private static final long serialVersionUID = 0L;
           bitField0_ |= 0x00000001;
           onChanged();
         }
-        if (other.getTokensConsumed() != 0L) {
+        if (other.getTokensConsumed() != 0D) {
           setTokensConsumed(other.getTokensConsumed());
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -1365,11 +1366,11 @@ private static final long serialVersionUID = 0L;
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
-              case 16: {
-                tokensConsumed_ = input.readUInt64();
+              case 25: {
+                tokensConsumed_ = input.readDouble();
                 bitField0_ |= 0x00000002;
                 break;
-              } // case 16
+              } // case 25
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1459,21 +1460,21 @@ private static final long serialVersionUID = 0L;
         return this;
       }
 
-      private long tokensConsumed_ ;
+      private double tokensConsumed_ ;
       /**
-       * <code>uint64 tokens_consumed = 2 [json_name = "tokensConsumed"];</code>
+       * <code>double tokens_consumed = 3 [json_name = "tokensConsumed"];</code>
        * @return The tokensConsumed.
        */
       @java.lang.Override
-      public long getTokensConsumed() {
+      public double getTokensConsumed() {
         return tokensConsumed_;
       }
       /**
-       * <code>uint64 tokens_consumed = 2 [json_name = "tokensConsumed"];</code>
+       * <code>double tokens_consumed = 3 [json_name = "tokensConsumed"];</code>
        * @param value The tokensConsumed to set.
        * @return This builder for chaining.
        */
-      public Builder setTokensConsumed(long value) {
+      public Builder setTokensConsumed(double value) {
 
         tokensConsumed_ = value;
         bitField0_ |= 0x00000002;
@@ -1481,12 +1482,12 @@ private static final long serialVersionUID = 0L;
         return this;
       }
       /**
-       * <code>uint64 tokens_consumed = 2 [json_name = "tokensConsumed"];</code>
+       * <code>double tokens_consumed = 3 [json_name = "tokensConsumed"];</code>
        * @return This builder for chaining.
        */
       public Builder clearTokensConsumed() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        tokensConsumed_ = 0L;
+        tokensConsumed_ = 0D;
         onChanged();
         return this;
       }

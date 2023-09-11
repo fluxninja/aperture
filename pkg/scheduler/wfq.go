@@ -153,9 +153,9 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 
 func (sched *WFQScheduler) updateMetricsAndReturnDecision(accepted bool, request *Request) bool {
 	if accepted {
-		sched.metrics.AcceptedTokensCounter.Add(float64(request.Tokens) / 1000)
+		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
-	sched.metrics.IncomingTokensCounter.Add(float64(request.Tokens) / 1000)
+	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
 	return accepted
 }
 
@@ -177,7 +177,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 
 	// try to schedule right now
 	if !queueOpen {
-		ok := sched.manager.TakeIfAvailable(ctx, float64(request.Tokens))
+		ok := sched.manager.TakeIfAvailable(ctx, request.Tokens)
 		if ok {
 			// we got the tokens, no need to queue
 			return sched.updateMetricsAndReturnDecision(true, request)
@@ -283,7 +283,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 				returnCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 				go func(cancel context.CancelFunc) {
 					defer cancel()
-					sched.manager.Return(returnCtx, float64(request.Tokens))
+					sched.manager.Return(returnCtx, request.Tokens)
 				}(cancel)
 			}
 		}
@@ -299,7 +299,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 				// return the tokens
 				go func(cancel context.CancelFunc) {
 					defer cancel()
-					sched.manager.Return(returnCtx, float64(request.Tokens))
+					sched.manager.Return(returnCtx, request.Tokens)
 				}(cancel)
 			case <-timer.Chan():
 			}
@@ -426,8 +426,8 @@ func (sched *WFQScheduler) cleanup(qRequest *queuedRequest) {
 }
 
 // Revert returns tokens to the token bucket.
-func (sched *WFQScheduler) Revert(ctx context.Context, tokens uint64) {
-	sched.manager.Return(ctx, float64(tokens))
+func (sched *WFQScheduler) Revert(ctx context.Context, tokens float64) {
+	sched.manager.Return(ctx, tokens)
 }
 
 func (sched *WFQScheduler) setFlowsGauge(v float64) {
