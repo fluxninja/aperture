@@ -1,10 +1,10 @@
 ---
-title: Percentage Rollouts
+title: Load Ramping
 keywords:
   - tutorial
   - feature-flags
-sidebar_position: 3
-sidebar_label: Percentage Rollouts
+sidebar_position: 6
+sidebar_label: Load Ramping
 ---
 
 ```mdx-code-block

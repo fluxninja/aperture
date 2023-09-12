@@ -1,5 +1,5 @@
 ---
-title: Managing Quotas
+title: Quotas
 keywords:
   - tutorial
   - quota-scheduler
