@@ -20,7 +20,7 @@ var agentsCmd = &cobra.Command{
 	PersistentPreRunE: controller.PreRunE,
 	PersistentPostRun: controller.PostRun,
 	RunE: func(*cobra.Command, []string) error {
-		client, err := controller.Client()
+		client, err := controller.IntrospectionClient()
 		if err != nil {
 			return err
 		}

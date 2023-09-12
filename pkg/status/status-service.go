@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
@@ -18,16 +19,23 @@ type StatusService struct {
 }
 
 // ProvideStatusService provides a StatusService implementation.
-func ProvideStatusService(server *grpc.Server, reg Registry) *StatusService {
+func ProvideStatusService(reg Registry) *StatusService {
 	svc := &StatusService{
 		registry: reg,
 	}
 	return svc
 }
 
+// RegisterStatusServiceIn bundles and annotates parameters.
+type RegisterStatusServiceIn struct {
+	fx.In
+	Server  *grpc.Server `name:"default"`
+	Service *StatusService
+}
+
 // RegisterStatusService registers the StatusService implementation with the provided grpc server.
-func RegisterStatusService(server *grpc.Server, svc *StatusService) {
-	statusv1.RegisterStatusServiceServer(server, svc)
+func RegisterStatusService(in RegisterStatusServiceIn) {
+	statusv1.RegisterStatusServiceServer(in.Server, in.Service)
 }
 
 // GetGroupStatus returns the group status for the requested group in the Registry.

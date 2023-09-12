@@ -22,13 +22,21 @@ const (
 	defaultServerConfigKey = "server.grpc"
 	// Name of gmux based listener.
 	defaultGMuxListener = "grpc-gmux-listener"
+	defaultServerName   = "default"
 )
 
 // ServerModule is an fx module that provides annotated gRPC Server using the default listener and registers its metrics with the prometheus registry.
 func ServerModule() fx.Option {
 	return fx.Options(
-		ServerConstructor{}.Annotate(),
-		fx.Invoke(RegisterGRPCServerMetrics),
+		ServerConstructor{Name: defaultServerName}.Annotate(),
+		fx.Invoke(
+			fx.Annotate(
+				RegisterGRPCServerMetrics,
+				fx.ParamTags(
+					config.NameTag(defaultServerName),
+				),
+			),
+		),
 	)
 }
 
@@ -36,8 +44,15 @@ func ServerModule() fx.Option {
 func GMuxServerModule() fx.Option {
 	return fx.Options(
 		listener.GMuxConstructor{ListenerName: defaultGMuxListener}.Annotate(),
-		ServerConstructor{ListenerName: defaultGMuxListener}.Annotate(),
-		fx.Invoke(RegisterGRPCServerMetrics),
+		ServerConstructor{Name: defaultServerName, ListenerName: defaultGMuxListener}.Annotate(),
+		fx.Invoke(
+			fx.Annotate(
+				RegisterGRPCServerMetrics,
+				fx.ParamTags(
+					config.NameTag(defaultServerName),
+				),
+			),
+		),
 	)
 }
 
@@ -83,9 +98,9 @@ func (constructor ServerConstructor) Annotate() fx.Option {
 				constructor.provideServer,
 				fx.ParamTags(
 					config.NameTag(constructor.ListenerName),
-					config.GroupTag(constructor.Name)+` optional:"true"`,
-					config.GroupTag(constructor.Name)+` optional:"true"`,
-					config.GroupTag(constructor.Name)+` optional:"true"`,
+					config.GroupTag(constructor.Name),
+					config.GroupTag(constructor.Name),
+					config.GroupTag(constructor.Name),
 				),
 				fx.ResultTags(
 					config.NameTag(constructor.Name),

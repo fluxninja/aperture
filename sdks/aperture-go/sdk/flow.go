@@ -4,8 +4,7 @@ import (
 	"errors"
 	"time"
 
-	flowcontrol "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
-
+	checkproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -14,51 +13,44 @@ import (
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
 // The user can check the status of the check call, response from the server, and end the flow once the workload is executed.
 type Flow interface {
-	Decision() FlowDecision
 	ShouldRun() bool
-	DisableFailOpen()
 	SetStatus(status FlowStatus)
+	Error() error
+	Span() trace.Span
 	End() error
-	CheckResponse() *flowcontrol.CheckResponse
+	CheckResponse() *checkproto.CheckResponse
 }
 
 // TODO: set fail open?
 
 type flow struct {
 	span          trace.Span
-	checkResponse *flowcontrol.CheckResponse
+	err           error
+	checkResponse *checkproto.CheckResponse
 	statusCode    FlowStatus
 	ended         bool
 	failOpen      bool
 }
 
 // newFlow creates a new flow with default field values.
-func newFlow(span trace.Span) *flow {
+func newFlow(span trace.Span, failOpen bool) *flow {
 	return &flow{
 		span:          span,
 		checkResponse: nil,
 		statusCode:    OK,
 		ended:         false,
-		failOpen:      true,
-	}
-}
-
-// Decision returns Aperture Agent's decision or information on Agent being unreachable.
-func (f *flow) Decision() FlowDecision {
-	if f.checkResponse == nil {
-		return Unreachable
-	} else if f.checkResponse.DecisionType == flowcontrol.CheckResponse_DECISION_TYPE_ACCEPTED {
-		return Accepted
-	} else {
-		return Rejected
+		failOpen:      failOpen,
 	}
 }
 
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
 // By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
 func (f *flow) ShouldRun() bool {
-	decision := f.Decision()
-	return decision == Accepted || (f.failOpen && decision == Unreachable)
+	if (f.failOpen && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkproto.CheckResponse_DECISION_TYPE_ACCEPTED) {
+		return true
+	} else {
+		return false
+	}
 }
 
 // DisableFailOpen disables fail-open behavior for the flow.
@@ -67,7 +59,7 @@ func (f *flow) DisableFailOpen() {
 }
 
 // CheckResponse returns the response from the server.
-func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
+func (f *flow) CheckResponse() *checkproto.CheckResponse {
 	return f.checkResponse
 }
 
@@ -75,6 +67,16 @@ func (f *flow) CheckResponse() *flowcontrol.CheckResponse {
 // If not set explicitly, defaults to FlowStatus.OK.
 func (f *flow) SetStatus(statusCode FlowStatus) {
 	f.statusCode = statusCode
+}
+
+// Error returns the error that occurred during the flow.
+func (f *flow) Error() error {
+	return f.err
+}
+
+// Span returns the span associated with the flow.
+func (f *flow) Span() trace.Span {
+	return f.span
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.

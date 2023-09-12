@@ -18,7 +18,6 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
-	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/cache"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
@@ -151,14 +150,7 @@ var _ = BeforeSuite(func() {
 		service.Module(),
 		fx.Provide(
 			clockwork.NewRealClock,
-			fx.Annotate(
-				agent.AgentOTelComponents,
-				fx.ParamTags(
-					alerts.AlertsFxTag,
-					otelconsts.ReceiverFactoriesFxTag,
-					otelconsts.ProcessorFactoriesFxTag,
-				),
-			),
+			agent.AgentOTelComponents,
 			entities.NewEntities,
 			servicegetter.NewEmpty,
 			agentinfo.ProvideAgentInfo,
