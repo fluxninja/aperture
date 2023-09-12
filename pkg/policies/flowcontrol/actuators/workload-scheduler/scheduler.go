@@ -405,8 +405,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		}
 	}
 
-	if s.proto.PrioritiesLabelKey != "" {
-		if val, ok := labels.Get(s.proto.PrioritiesLabelKey); ok {
+	if s.proto.PriorityLabelKey != "" {
+		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
 				invPriority = 1 / parsedPriority
 			}

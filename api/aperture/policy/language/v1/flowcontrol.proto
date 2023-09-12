@@ -306,7 +306,7 @@ message Scheduler {
   // * Key for a flow label that can be used to override the default priority for this flow.
   // * The value associated with this key must be a valid number. Higher numbers means higher priority.
   // * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
-  string priorities_label_key = 8;
+  string priority_label_key = 8;
 
   // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
   flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {defined_only: true}];
