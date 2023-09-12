@@ -151,7 +151,7 @@ public final class CheckProto {
       "label\030\003 \001(\tR\005label\022\'\n\017tokens_consumed\030\004 " +
       "\001(\001R\016tokensConsumed\032_\n\rSchedulerInfo\022%\n\016" +
       "workload_index\030\001 \001(\tR\rworkloadIndex\022\'\n\017t" +
-      "okens_consumed\030\002 \001(\004R\016tokensConsumed\032#\n\013" +
+      "okens_consumed\030\003 \001(\001R\016tokensConsumed\032#\n\013" +
       "SamplerInfo\022\024\n\005label\030\001 \001(\tR\005label\032\217\001\n\022Qu" +
       "otaSchedulerInfo\022\024\n\005label\030\001 \001(\tR\005label\022c" +
       "\n\016scheduler_info\030\002 \001(\0132<.aperture.flowco" +

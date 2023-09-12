@@ -69,7 +69,7 @@ var DecisionsCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := controller.Client()
+		client, err := controller.PolicyClient()
 		if err != nil {
 			return err
 		}

@@ -243,8 +243,8 @@ class LimiterDecision(_message.Message):
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_CONSUMED_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
-        tokens_consumed: int
-        def __init__(self, workload_index: _Optional[str] = ..., tokens_consumed: _Optional[int] = ...) -> None: ...
+        tokens_consumed: float
+        def __init__(self, workload_index: _Optional[str] = ..., tokens_consumed: _Optional[float] = ...) -> None: ...
     class SamplerInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]

@@ -1,8 +1,8 @@
 {
   accept_percentage: import './panels/accept_percentage.libsonnet',
-  accepted_concurrency: import './panels/accepted_concurrency.libsonnet',
+  accepted_token_rate: import './panels/accepted_token_rate.libsonnet',
   average_load_multiplier: import './panels/average_load_multiplier.libsonnet',
-  incoming_concurrency: import './panels/incoming_concurrency.libsonnet',
+  incoming_token_rate: import './panels/incoming_token_rate.libsonnet',
   rate_limiter: import './panels/rate_limiter.libsonnet',
   signal_average: import './panels/signal_average.libsonnet',
   signal_frequency: import './panels/signal_frequency.libsonnet',

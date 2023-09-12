@@ -14,7 +14,7 @@ type Scheduler interface {
 	// Useful in case the request was rejected by any
 	// other scheduler and the tokens are returned
 	// back to the scheduler.
-	Revert(ctx context.Context, tokens uint64)
+	Revert(ctx context.Context, tokens float64)
 	// Info returns the last access time and number of requests that are currently in the queue.
 	Info() (time.Time, int)
 }

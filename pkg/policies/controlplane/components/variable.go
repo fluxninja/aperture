@@ -52,7 +52,7 @@ func NewVariableAndOptions(variableProto *policylangv1.Variable, _ runtime.Compo
 }
 
 // Execute implements runtime.Component.Execute.
-func (v *Variable) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (v *Variable) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	// Always emit the value.
 	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewReading(v.constantOutput.Float())},

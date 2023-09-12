@@ -4,8 +4,7 @@ import (
 	"errors"
 	"time"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
-
+	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
@@ -21,12 +20,12 @@ type HTTPFlow interface {
 	DisableFailOpen()
 	SetStatus(status FlowStatus)
 	End() error
-	CheckResponse() *flowcontrolhttp.CheckHTTPResponse
+	CheckResponse() *checkhttpproto.CheckHTTPResponse
 }
 
 type httpflow struct {
 	span          trace.Span
-	checkResponse *flowcontrolhttp.CheckHTTPResponse
+	checkResponse *checkhttpproto.CheckHTTPResponse
 	statusCode    FlowStatus
 	ended         bool
 	failOpen      bool
@@ -67,7 +66,7 @@ func (f *httpflow) DisableFailOpen() {
 }
 
 // CheckResponse returns the response from the server.
-func (f *httpflow) CheckResponse() *flowcontrolhttp.CheckHTTPResponse {
+func (f *httpflow) CheckResponse() *checkhttpproto.CheckHTTPResponse {
 	return f.checkResponse
 }
 

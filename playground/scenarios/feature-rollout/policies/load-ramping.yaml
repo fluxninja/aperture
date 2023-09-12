@@ -24,7 +24,6 @@ policy:
           reset:
             threshold: 75
   start: true
-  evaluation_interval: "10s"
   load_ramp:
     sampler:
       selectors:

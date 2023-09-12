@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -66,16 +67,21 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		result, warnings, err = pq.promAPI.Query(ctx, query, pq.endTimestamp)
 		// if jobCtxt is closed, return PermanentError
 		if jobCtxt.Err() != nil {
+			log.Error().Err(jobCtxt.Err()).Msg("Job context canceled while executing promQL query")
 			return backoff.Permanent(jobCtxt.Err())
-		}
-		if err != nil {
-			log.Error().Err(err).Str("query", query).Msg("Encountered error while executing promQL query")
-			return err
 		}
 		for _, warning := range warnings {
 			log.Warn().Str("query", query).Str("warning", warning).Msg("Encountered warning while executing promQL query")
 		}
-		log.Trace().Str("query", query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Running prometheus query")
+		if err != nil {
+			if !isErrorRetryable(err) {
+				log.Error().Err(err).Str("query", query).Msg("Encountered non-retryable error while executing promQL query")
+				return backoff.Permanent(err)
+			}
+			log.Error().Err(err).Str("query", query).Msg("Encountered retryable error while executing promQL query")
+			return err
+		}
+		log.Trace().Str("query", query).Time("end timestamp", pq.endTimestamp).Interface("result", result).Msg("Result of prometheus query")
 		return nil
 	}
 
@@ -85,9 +91,35 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 		if cbErr != nil {
 			merr = multierr.Combine(merr, cbErr)
 		}
-		log.Error().Err(merr).Msg("Context canceled while executing promQL query")
 		return msg, merr
 	}
 
 	return pq.resultCallback(jobCtxt, result, pq.cbArgs...)
+}
+
+func isErrorRetryable(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := err.Error()
+
+	// Extract the prefix up to the colon (if it exists)
+	prefix := errStr
+	if idx := strings.Index(errStr, ":"); idx != -1 {
+		prefix = errStr[:idx]
+	}
+
+	// Convert the prefix to an ErrorType to make the comparison more explicit
+	errType := prometheusv1.ErrorType(prefix)
+
+	switch errType {
+	case prometheusv1.ErrTimeout, prometheusv1.ErrCanceled, prometheusv1.ErrServer:
+		return true
+	case prometheusv1.ErrBadData, prometheusv1.ErrBadResponse, prometheusv1.ErrExec, prometheusv1.ErrClient:
+		return false
+	default:
+		// If the error type isn't recognized, default to not retrying.
+		return false
+	}
 }

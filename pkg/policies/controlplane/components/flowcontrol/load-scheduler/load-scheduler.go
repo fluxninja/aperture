@@ -2,6 +2,7 @@ package loadscheduler
 
 import (
 	"fmt"
+	"time"
 
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -17,6 +18,8 @@ import (
 const (
 	inputLoadMultiplierPortName          = "load_multiplier"
 	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
+	// TODO: move to a common area so that it is shared with OTEL collector.
+	metricScrapeInterval = time.Second * 10
 )
 
 // ParseLoadScheduler parses a load scheduler from a spec.
@@ -59,6 +62,7 @@ func ParseLoadScheduler(
 		componentID,
 	)
 
+	// TODO: 30s is derived from Agent's load multiplier token bucket's window size. Define the constant at a common location.
 	acceptedTokensQuery := fmt.Sprintf(
 		"sum(rate(%s{%s}[30s]))",
 		metrics.AcceptedTokensMetricName,
@@ -157,7 +161,7 @@ func ParseLoadScheduler(
 									},
 								},
 								QueryString:        acceptedTokensQuery,
-								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
+								EvaluationInterval: durationpb.New(metricScrapeInterval),
 							},
 						},
 					},
@@ -174,7 +178,7 @@ func ParseLoadScheduler(
 									},
 								},
 								QueryString:        incomingTokenRate,
-								EvaluationInterval: durationpb.New(policyReadAPI.GetEvaluationInterval()),
+								EvaluationInterval: durationpb.New(metricScrapeInterval),
 							},
 						},
 					},

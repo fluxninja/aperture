@@ -1,6 +1,6 @@
 import express from "express";
 
-import { ApertureClient, FlowStatus } from "@fluxninja/aperture-js";
+import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
@@ -8,22 +8,24 @@ export const apertureClient = new ApertureClient();
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {
   // do some business logic to collect labels
-  var labelsMap = new Map<string, string>().set("user", "kenobi");
+  const labels: Record<string, string> = {
+    user: "kenobi",
+  };
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
-    .StartFlow("awesome-feature", labelsMap)
+    .StartFlow("awesome-feature", labels)
     .then((flow) => {
       // See whether flow was accepted by Aperture Agent.
       if (flow.ShouldRun()) {
         // Simulate work being done
-        sleep(2000).then(() => {
+        sleep(200).then(() => {
           console.log("Work done!");
+          res.sendStatus(202);
         });
-        res.sendStatus(202);
       } else {
         // Flow has been rejected by Aperture Agent.
-        flow.SetStatus(FlowStatus.Error);
+        flow.SetStatus(FlowStatusEnum.Error);
         res.sendStatus(403);
       }
       // Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.

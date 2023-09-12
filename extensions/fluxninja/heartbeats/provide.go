@@ -49,7 +49,7 @@ type ConstructorIn struct {
 
 	Lifecycle                        fx.Lifecycle
 	ExtensionConfig                  *extconfig.FluxNinjaExtensionConfig
-	GRPCServer                       *grpc.Server
+	GRPCServer                       *grpc.Server                       `name:"default"`
 	JobGroup                         *jobs.JobGroup                     `name:"heartbeats-job-group"`
 	GRPClientConnectionBuilder       grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
 	HTTPClient                       *http.Client                       `name:"heartbeats-http-client"`

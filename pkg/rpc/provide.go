@@ -23,13 +23,21 @@ var ServerModule = fx.Options(
 // know what to connect to.
 var ClientModule = fx.Provide(NewHandlerRegistry)
 
+// RegisterStreamServerIn bundles and annotates parameters.
+type RegisterStreamServerIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	Handler      *StreamServer
+	HealthServer *health.Server
+}
+
 // RegisterStreamServer registers the handler on grpc.Server
 //
 // To be used in fx.Invoke.
-func RegisterStreamServer(handler *StreamServer, server *grpc.Server, healthsrv *health.Server) {
-	rpcv1.RegisterCoordinatorServer(server, handler)
+func RegisterStreamServer(in RegisterStreamServerIn) {
+	rpcv1.RegisterCoordinatorServer(in.Server, in.Handler)
 
-	healthsrv.SetServingStatus(
+	in.HealthServer.SetServingStatus(
 		"aperture.rpc.v1.Coordinator",
 		grpc_health_v1.HealthCheckResponse_SERVING,
 	)

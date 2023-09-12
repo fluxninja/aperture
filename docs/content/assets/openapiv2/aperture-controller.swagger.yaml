@@ -80,7 +80,7 @@ definitions:
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
-                    Linear increment to load multiplier in each execution tick when the system is
+                    Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
 
                 format: double
@@ -98,7 +98,7 @@ definitions:
                     The maximum load multiplier that can be reached during recovery from an overload state.
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-                    - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
 
                 format: double
                 type: number
@@ -501,14 +501,14 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 10s
+                default: 1s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
-                x-go-tag-default: 10s
+                x-go-tag-default: 1s
         type: object
     Classifier:
         description: |-
@@ -607,7 +607,9 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: Differentiator calculates rate of change per tick.
+                description: |-
+                    Differentiator calculates rate of change per tick.
+                    Deprecated: v3.0.0. Use `PIDController` instead.
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -1640,6 +1642,11 @@ definitions:
     Integrator:
         description: Accumulates sum of signal every tick.
         properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             in_ports:
                 $ref: '#/definitions/IntegratorIns'
                 description: Input ports for the Integrator component.
@@ -1985,7 +1992,7 @@ definitions:
             A workload determines the priority and cost of admitting each Flow that belongs to it.
             Scheduling of Flows is based on Weighted Fair Queuing principles.
 
-            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.
         properties:
             dry_run:
                 description: |-
@@ -2016,14 +2023,14 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: |-
                     Load multiplier is proportion of incoming
-                    token rate that needs to be accepted.
+                    token rate that needs to be accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerOuts:
         description: Output for the LoadScheduler component.
         properties:
             observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
-                description: Observed load multiplier is the proportion of incoming token rate that is being accepted.
+                description: Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerParameters:
         properties:
@@ -2044,7 +2051,7 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             workload_latency_based_tokens:
-                default: true
+                default: false
                 description: |+
                     Automatically estimate the size of flows within each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
@@ -2058,7 +2065,7 @@ definitions:
                     and `tokens` explicitly specified in the flow labels.
 
                 type: boolean
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
         required:
             - selectors
         title: Parameters for _Load Scheduler_ component
@@ -2332,6 +2339,11 @@ definitions:
         type: object
     PIDControllerParameters:
         properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             kd:
                 default: 0
                 description: |+
@@ -2372,11 +2384,6 @@ definitions:
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gte=1
-            sample_period:
-                description: |-
-                    The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
-                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-                type: string
         type: object
     PathTemplateMatcher:
         description: |-
@@ -2725,7 +2732,7 @@ definitions:
                     for this request.
                     This is an optional parameter and takes highest precedence
                     when assigning tokens to a request.
-                    The label value must be a valid uint64 number.
+                    The label value must be a valid number.
                 type: string
         required:
             - interval
@@ -3109,13 +3116,13 @@ definitions:
             priorities_label_key:
                 description: |-
                     * Key for a flow label that can be used to override the default priority for this flow.
-                    * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
+                    * The value associated with this key must be a valid number. Higher numbers means higher priority.
                     * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
                 type: string
             tokens_label_key:
                 description: |-
                     * Key for a flow label that can be used to override the default number of tokens for this flow.
-                    * The value associated with this key must be a valid uint64 number.
+                    * The value associated with this key must be a valid number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
                 type: string
             workloads:
@@ -3200,6 +3207,7 @@ definitions:
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
             tokens:
+                default: 1
                 description: |+
                     Tokens determines the cost of admitting a single flow in the workload,
                     which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -3208,9 +3216,10 @@ definitions:
                     This override is applicable only if tokens for the flow aren't specified
                     in the flow labels.
 
-                format: int64
+                format: double
                 minimum: 0
-                type: integer
+                type: number
+                x-go-tag-default: "1"
                 x-go-tag-validate: gte=0
         type: object
     Selector:

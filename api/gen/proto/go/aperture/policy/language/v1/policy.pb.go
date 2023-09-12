@@ -649,7 +649,7 @@ type Circuit struct {
 	// Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
 	// This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"10s"` // @gotags: default:"10s"
+	EvaluationInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=evaluation_interval,json=evaluationInterval,proto3" json:"evaluation_interval,omitempty" default:"1s"` // @gotags: default:"1s"
 	// Defines a signal processing graph as a list of components.
 	Components []*Component `protobuf:"bytes,2,rep,name=components,proto3" json:"components,omitempty" validate:"dive"` // @gotags: validate:"dive"
 }
@@ -1184,6 +1184,7 @@ type Component_Integrator struct {
 
 type Component_Differentiator struct {
 	// Differentiator calculates rate of change per tick.
+	// Deprecated: v3.0.0. Use `PIDController` instead.
 	Differentiator *Differentiator `protobuf:"bytes,17,opt,name=differentiator,proto3,oneof"`
 }
 

@@ -65,10 +65,18 @@ func ProvideMetrics(promRegistry *prometheus.Registry) (Metrics, error) {
 // ProvideNopMetrics provides disabled flowcontrol metrics.
 func ProvideNopMetrics() Metrics { return NopMetrics{} }
 
-// Register registers flowcontrol service on a gRPC server.
-func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceServer, healthsrv *health.Server) {
-	flowcontrolv1.RegisterFlowControlServiceServer(server, handler)
+// RegisterIn bundles and annotates parameters.
+type RegisterIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	Handler      flowcontrolv1.FlowControlServiceServer
+	HealthServer *health.Server
+}
 
-	healthsrv.SetServingStatus("aperture.flowcontrol.v1.FlowControlService", grpc_health_v1.HealthCheckResponse_SERVING)
+// Register registers flowcontrol service on a gRPC server.
+func Register(in RegisterIn) {
+	flowcontrolv1.RegisterFlowControlServiceServer(in.Server, in.Handler)
+
+	in.HealthServer.SetServingStatus("aperture.flowcontrol.v1.FlowControlService", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("flowcontrol handler registered")
 }
