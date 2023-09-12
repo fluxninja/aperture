@@ -30,9 +30,13 @@ func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto
 }
 
 // GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServerInterceptor {
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string) grpc.UnaryServerInterceptor {
+	if explicitLabels == nil {
+		explicitLabels = make(map[string]string)
+	}
+
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := PrepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint)
+		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels)
 
 		flow, err := c.StartHTTPFlow(ctx, checkreq)
 		if err != nil {
