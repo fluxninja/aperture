@@ -66,10 +66,16 @@ func getLocalIP(logger logr.Logger) string {
 }
 
 // PrepareCheckHTTPRequestForHTTP takes a http.Request, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logger, controlPoint string) *checkhttpproto.CheckHTTPRequest {
-	labels := aperture.LabelsFromCtx(httpRequest.Context())
+func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, explicitLabels map[string]string) *checkhttpproto.CheckHTTPRequest {
+	labels := aperture.LabelsFromCtx(req.Context())
 
-	for key, value := range httpRequest.Header {
+	// override labels with explicit labels
+	for key, value := range explicitLabels {
+		labels[key] = value
+	}
+
+	// override labels with labels from headers
+	for key, value := range req.Header {
 		if strings.HasPrefix(key, ":") {
 			continue
 		}
@@ -80,12 +86,12 @@ func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logge
 	// TODO: Should we support `httpu`?
 	protocol := checkhttpproto.SocketAddress_TCP
 
-	sourceHost, sourcePort := splitAddress(logger, httpRequest.RemoteAddr)
+	sourceHost, sourcePort := splitAddress(logger, req.RemoteAddr)
 	// TODO: Figure out if we can narrow down the port or figure out the host in a better way
 	destinationPort := uint32(0)
 	destinationHost := getLocalIP(logger)
 
-	bodyBytes, err := readClonedBody(httpRequest)
+	bodyBytes, err := readClonedBody(req)
 	if err != nil {
 		logger.V(2).Info("Error reading body", "error", err)
 	}
@@ -103,21 +109,26 @@ func PrepareCheckHTTPRequestForHTTP(httpRequest *http.Request, logger logr.Logge
 		},
 		ControlPoint: controlPoint,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
-			Method:   httpRequest.Method,
-			Path:     httpRequest.URL.Path,
-			Host:     httpRequest.Host,
+			Method:   req.Method,
+			Path:     req.URL.Path,
+			Host:     req.Host,
 			Headers:  labels,
-			Scheme:   httpRequest.URL.Scheme,
-			Size:     httpRequest.ContentLength,
-			Protocol: httpRequest.Proto,
+			Scheme:   req.URL.Scheme,
+			Size:     req.ContentLength,
+			Protocol: req.Proto,
 			Body:     string(bodyBytes),
 		},
 	}
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, explicitLabels map[string]string) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(ctx)
+
+	// override labels with explicit labels
+	for key, value := range explicitLabels {
+		labels[key] = value
+	}
 
 	md, ok := metadata.FromIncomingContext(ctx)
 	authority := ""
@@ -125,6 +136,7 @@ func PrepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 	method := ""
 
 	if ok {
+		// override labels with labels from metadata
 		for key, value := range md {
 			labels[key] = strings.Join(value, ",")
 		}
