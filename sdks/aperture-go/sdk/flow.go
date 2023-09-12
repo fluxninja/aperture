@@ -16,6 +16,7 @@ type Flow interface {
 	ShouldRun() bool
 	SetStatus(status FlowStatus)
 	Error() error
+	Span() trace.Span
 	End() error
 	CheckResponse() *checkproto.CheckResponse
 }
@@ -71,6 +72,11 @@ func (f *flow) SetStatus(statusCode FlowStatus) {
 // Error returns the error that occurred during the flow.
 func (f *flow) Error() error {
 	return f.err
+}
+
+// Span returns the span associated with the flow.
+func (f *flow) Span() trace.Span {
+	return f.span
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.

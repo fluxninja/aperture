@@ -2,6 +2,7 @@ package aperture
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/url"
 	"time"
@@ -22,6 +23,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -33,6 +35,7 @@ type Client interface {
 }
 
 type apertureClient struct {
+	grpcClientConn        *grpc.ClientConn
 	flowControlClient     checkgrpc.FlowControlServiceClient
 	flowControlHTTPClient checkhttpgrpc.FlowControlServiceHTTPClient
 	tracer                trace.Tracer
@@ -85,6 +88,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 	fcHTTPClient := checkhttpgrpc.NewFlowControlServiceHTTPClient(opts.ApertureAgentGRPCClientConn)
 
 	c := &apertureClient{
+		grpcClientConn:        opts.ApertureAgentGRPCClientConn,
 		flowControlClient:     fcClient,
 		flowControlHTTPClient: fcHTTPClient,
 		tracer:                tracer,
@@ -146,17 +150,22 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	f := newFlow(span, failOpen)
 
-	defer span.SetAttributes(
+	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
+
+	if c.grpcClientConn.GetState() != connectivity.Ready {
+		f.err = errors.New("grpc client connection is not ready")
+		return f
+	}
 
 	res, err := c.flowControlClient.Check(ctx, req)
 	if err != nil {
 		f.err = err
-		return f
+	} else {
+		f.checkResponse = res
 	}
 
-	f.checkResponse = res
 	return f
 }
 
@@ -172,16 +181,21 @@ func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttppr
 
 	f := newHTTPFlow(span, failOpen)
 
-	defer span.SetAttributes(
+	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
+
+	if c.grpcClientConn.GetState() != connectivity.Ready {
+		f.err = errors.New("grpc client connection is not ready")
+		return f
+	}
 
 	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
 	if err != nil {
 		f.err = err
-		return f
+	} else {
+		f.checkResponse = res
 	}
-	f.checkResponse = res
 
 	return f
 }

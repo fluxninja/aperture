@@ -18,6 +18,7 @@ type HTTPFlow interface {
 	ShouldRun() bool
 	SetStatus(status FlowStatus)
 	Error() error
+	Span() trace.Span
 	End() error
 	CheckResponse() *checkhttpproto.CheckHTTPResponse
 }
@@ -67,6 +68,11 @@ func (f *httpflow) SetStatus(statusCode FlowStatus) {
 // Error returns the error that occurred during the flow.
 func (f *httpflow) Error() error {
 	return f.err
+}
+
+// Span returns the span associated with the flow.
+func (f *httpflow) Span() trace.Span {
+	return f.span
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.
