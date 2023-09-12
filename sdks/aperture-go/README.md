@@ -26,7 +26,7 @@ if err != nil {
 
 ### Flow Interface
 
-`Flow` is created every time `ApertureClient.BeginFlow` is called.
+`Flow` is created every time `ApertureClient.StartFlow` is called.
 
 ```go
 // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
