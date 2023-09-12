@@ -26,7 +26,7 @@ export class ApertureClient {
   private readonly timeoutMilliseconds: number;
 
   constructor({
-    timeoutMilliseconds = 200,
+    timeoutMilliseconds = 0,
     channelCredentials = grpc.credentials.createInsecure(),
   } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
