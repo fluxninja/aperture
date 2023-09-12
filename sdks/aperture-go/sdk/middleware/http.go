@@ -48,9 +48,9 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 
 		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels)
 
-		flow, err := m.client.StartHTTPFlow(r.Context(), req)
-		if err != nil {
-			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
+		flow := m.client.StartHTTPFlow(r.Context(), req, true)
+		if flow.Error() != nil {
+			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
 
 		defer func() {

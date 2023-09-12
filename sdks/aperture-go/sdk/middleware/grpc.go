@@ -38,9 +38,9 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels)
 
-		flow, err := c.StartHTTPFlow(ctx, checkreq)
-		if err != nil {
-			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
+		flow := c.StartHTTPFlow(ctx, checkreq, true)
+		if flow.Error() != nil {
+			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
 
 		defer func() {

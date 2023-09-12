@@ -26,8 +26,8 @@ import (
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, controlPoint string, labels map[string]string) (Flow, error)
-	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest) (HTTPFlow, error)
+	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, failOpen bool) Flow
+	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, failOpen bool) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
 }
@@ -122,7 +122,7 @@ func LabelsFromCtx(ctx context.Context) map[string]string {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string) (Flow, error) {
+func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, failOpen bool) Flow {
 	// if c.timeout is not 0, then create a new context with timeout
 	if c.timeout != 0 {
 		var cancel context.CancelFunc
@@ -144,7 +144,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(span)
+	f := newFlow(span, failOpen)
 
 	defer span.SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
@@ -152,24 +152,25 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 
 	res, err := c.flowControlClient.Check(ctx, req)
 	if err != nil {
-		return f, err
+		f.err = err
+		return f
 	}
-	f.checkResponse = res
 
-	return f, err
+	f.checkResponse = res
+	return f
 }
 
 // StartHTTPFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolhttp.CheckHTTP call.
 // Return value is a HTTPFlow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
-func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest) (HTTPFlow, error) {
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, failOpen bool) HTTPFlow {
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 
 	span := c.getSpan(ctx)
 
-	f := newHTTPFlow(span)
+	f := newHTTPFlow(span, failOpen)
 
 	defer span.SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
@@ -177,11 +178,12 @@ func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttppr
 
 	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
 	if err != nil {
-		return f, err
+		f.err = err
+		return f
 	}
 	f.checkResponse = res
 
-	return f, nil
+	return f
 }
 
 // Shutdown shuts down the aperture client.
