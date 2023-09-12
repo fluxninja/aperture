@@ -43,5 +43,6 @@ function(params, metadata={}) {
   dashboards: {
     [std.format('%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.mainDashboard,
     [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.signalsDashboard,
+    [std.format('pgsql-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.pgsqlDashboard,
   },
 }
