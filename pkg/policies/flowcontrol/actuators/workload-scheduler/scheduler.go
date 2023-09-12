@@ -390,13 +390,6 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		tokens = estimatedTokens
 	}
 
-	var matchedWorkloadTimeout time.Duration
-	hasWorkloadTimeout := false
-	if matchedWorkloadParametersProto.QueueTimeout != nil {
-		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
-		hasWorkloadTimeout = true
-	}
-
 	if s.proto.TokensLabelKey != "" {
 		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
 			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
@@ -405,8 +398,8 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		}
 	}
 
-	if s.proto.PrioritiesLabelKey != "" {
-		if val, ok := labels.Get(s.proto.PrioritiesLabelKey); ok {
+	if s.proto.PriorityLabelKey != "" {
+		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
 				invPriority = 1 / parsedPriority
 			}
@@ -414,6 +407,13 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 	}
 
 	reqCtx := ctx
+
+	var matchedWorkloadTimeout time.Duration
+	hasWorkloadTimeout := false
+	if matchedWorkloadParametersProto.QueueTimeout != nil {
+		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
+		hasWorkloadTimeout = true
+	}
 
 	clientDeadline, hasClientDeadline := ctx.Deadline()
 	if hasClientDeadline {

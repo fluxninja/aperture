@@ -1331,7 +1331,7 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for TokensLabelKey
 
-	// no validation rules for PrioritiesLabelKey
+	// no validation rules for PriorityLabelKey
 
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := SchedulerValidationError{

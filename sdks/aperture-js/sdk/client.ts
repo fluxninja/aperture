@@ -1,17 +1,17 @@
-import grpc, { connectivityState } from "@grpc/grpc-js";
+import grpc, {connectivityState} from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
-import { Resource } from "@opentelemetry/resources";
-import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
-import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
-import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import {OTLPTraceExporter} from "@opentelemetry/exporter-trace-otlp-grpc";
+import {Resource} from "@opentelemetry/resources";
+import {BatchSpanProcessor, Tracer} from "@opentelemetry/sdk-trace-base";
+import {NodeTracerProvider} from "@opentelemetry/sdk-trace-node";
+import {SemanticResourceAttributes} from "@opentelemetry/semantic-conventions";
+import {CheckRequest} from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
+import {CheckResponse__Output} from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import {FlowControlServiceClient} from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
-import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
-import { Flow } from "./flow.js";
-import { fcs } from "./utils.js";
+import {LIBRARY_NAME, LIBRARY_VERSION, URL} from "./consts.js";
+import {Flow} from "./flow.js";
+import {fcs} from "./utils.js";
 
 export class ApertureClient {
   private readonly fcsClient: FlowControlServiceClient;
@@ -26,7 +26,7 @@ export class ApertureClient {
   private readonly timeoutMilliseconds: number;
 
   constructor({
-    timeoutMilliseconds = 200,
+    timeoutMilliseconds = 0,
     channelCredentials = grpc.credentials.createInsecure(),
   } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
@@ -98,26 +98,27 @@ export class ApertureClient {
 
         let mergedLabels = { ...labels, ...labelsBaggage };
 
-        let checkParams: grpc.CallOptions = {};
-        if (this.timeoutMilliseconds != 0) {
-          const deadline = new Date();
-          deadline.setMilliseconds(
-            deadline.getMilliseconds() + this.timeoutMilliseconds,
-          );
-          checkParams.deadline = deadline;
-        }
+        const request: CheckRequest = {
+          controlPoint: controlPointArg,
+          labels: mergedLabels,
+        };
 
-        this.fcsClient.Check(
-          {
-            controlPoint: controlPointArg,
-            labels: mergedLabels,
-          } as CheckRequest,
-          checkParams as grpc.CallOptions,
-          ((err, response) => {
-            resolveFlow(err ? null : response, err);
-            return;
-          }) as grpc.requestCallback<CheckResponse__Output>,
-        );
+        const grpcParams: grpc.CallOptions = {
+          deadline:
+            this.timeoutMilliseconds != 0
+              ? new Date(Date.now() + this.timeoutMilliseconds)
+              : undefined,
+        };
+
+        const cb: grpc.requestCallback<CheckResponse__Output> = (
+          err: any,
+          response: any,
+        ) => {
+          resolveFlow(err ? null : response, err);
+          return;
+        };
+
+        this.fcsClient.Check(request, grpcParams, cb);
       } catch (err: any) {
         resolveFlow(null, err);
       }
