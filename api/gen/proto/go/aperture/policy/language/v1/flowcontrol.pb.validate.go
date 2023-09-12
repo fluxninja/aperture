@@ -6331,7 +6331,7 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint) val
 
 	var errors []error
 
-	// no validation rules for InputSignal
+	// no validation rules for Threshold
 
 	// no validation rules for LoadMultiplier
 

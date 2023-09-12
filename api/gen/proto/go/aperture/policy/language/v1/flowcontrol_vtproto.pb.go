@@ -1372,9 +1372,9 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint) Mar
 		i--
 		dAtA[i] = 0x11
 	}
-	if m.InputSignal != 0 {
+	if m.Threshold != 0 {
 		i -= 8
-		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.InputSignal))))
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Threshold))))
 		i--
 		dAtA[i] = 0x9
 	}
@@ -3735,7 +3735,7 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint) Siz
 	}
 	var l int
 	_ = l
-	if m.InputSignal != 0 {
+	if m.Threshold != 0 {
 		n += 9
 	}
 	if m.LoadMultiplier != 0 {
@@ -7536,7 +7536,7 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint) Unm
 		switch fieldNum {
 		case 1:
 			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InputSignal", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Threshold", wireType)
 			}
 			var v uint64
 			if (iNdEx + 8) > l {
@@ -7544,7 +7544,7 @@ func (m *AdaptiveLoadScheduler_RangeThrottlingStrategy_Parameters_Datapoint) Unm
 			}
 			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
-			m.InputSignal = float64(math.Float64frombits(v))
+			m.Threshold = float64(math.Float64frombits(v))
 		case 2:
 			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LoadMultiplier", wireType)

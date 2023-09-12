@@ -339,7 +339,7 @@ message AdaptiveLoadScheduler {
     Alerter.Parameters alerter = 5; // @gotags: validate:"required"
   }
 
-  // _AIMD Throttling Strategy uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
+  // _AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
   // It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
   // During recovery, it increases the token rate linearly until the system is not overloaded.
   message AIMDThrottlingStrategy {
@@ -378,7 +378,7 @@ message AdaptiveLoadScheduler {
 
     message Parameters {
       message Datapoint {
-        double input_signal = 1; // @gotags: validate:"gte=0,lte=1"
+        double threshold = 1; // @gotags: validate:"gte=0,lte=1"
         double load_multiplier = 2; // @gotags: validate:"gte=0,lte=1"
       }
       // Starting data-point of the throttling range

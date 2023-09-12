@@ -134,7 +134,7 @@ The Range strategy throttles the token rate based on the range of the signal.
 
 <!-- vale on -->
 
-\_AIMD Throttling Strategy uses a Gradient Controller to throttle the token rate
+_AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate
 based on the deviation of the signal from the setpoint. It takes a signal and
 setpoint as inputs and reduces token rate proportionally (or any arbitrary
 power) based on deviation of the signal from setpoint. During recovery, it
@@ -547,7 +547,7 @@ Starting data-point of the throttling range
 <!-- vale on -->
 
 <dl>
-<dt>input_signal</dt>
+<dt>load_multiplier</dt>
 <dd>
 
 <!-- vale off -->
@@ -557,7 +557,7 @@ Starting data-point of the throttling range
 <!-- vale on -->
 
 </dd>
-<dt>load_multiplier</dt>
+<dt>threshold</dt>
 <dd>
 
 <!-- vale off -->

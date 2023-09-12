@@ -34,7 +34,7 @@ definitions:
         type: object
     AdaptiveLoadSchedulerAIMDThrottlingStrategy:
         description: |-
-            _AIMD Throttling Strategy uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
+            _AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
             It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
             During recovery, it increases the token rate linearly until the system is not overloaded.
         properties:
@@ -216,13 +216,13 @@ definitions:
         type: object
     AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint:
         properties:
-            input_signal:
+            load_multiplier:
                 format: double
                 maximum: 1
                 minimum: 0
                 type: number
                 x-go-tag-validate: gte=0,lte=1
-            load_multiplier:
+            threshold:
                 format: double
                 maximum: 1
                 minimum: 0

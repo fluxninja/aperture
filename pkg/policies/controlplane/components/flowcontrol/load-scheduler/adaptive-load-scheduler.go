@@ -480,11 +480,11 @@ func parseRangeThrottlingStrategy(rangeThrottling *policylangv1.AdaptiveLoadSche
 				PolynomialRangeFunction: &policylangv1.PolynomialRangeFunction{
 					Parameters: &policylangv1.PolynomialRangeFunction_Parameters{
 						Start: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.Start.InputSignal,
+							Input:  parameters.Start.Threshold,
 							Output: parameters.Start.LoadMultiplier,
 						},
 						End: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.End.InputSignal,
+							Input:  parameters.End.Threshold,
 							Output: parameters.End.LoadMultiplier,
 						},
 						OutsideRange: &policylangv1.PolynomialRangeFunction_Parameters_ClampToCustomValues_{
