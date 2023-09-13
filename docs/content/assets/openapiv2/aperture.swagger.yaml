@@ -5144,11 +5144,12 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: FlowControlService
+    - name: PolicyService
+    - name: PolicyService
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
-    - name: FlowControlService
-    - name: PolicyService
     - name: StatusService
     - name: Controller
     - name: DistCacheService

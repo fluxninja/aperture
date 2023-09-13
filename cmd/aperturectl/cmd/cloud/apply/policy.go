@@ -9,18 +9,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"google.golang.org/genproto/protobuf/field_mask"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/v2/operator/api"
-	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -38,15 +31,15 @@ func init() {
 	ApplyPolicyCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all policies in the directory")
 }
 
-// ApplyPolicyCmd is the command to apply a policy to the cluster.
+// ApplyPolicyCmd is the command to apply a policy to the Aperture Cloud Controller.
 var ApplyPolicyCmd = &cobra.Command{
 	Use:           "policy",
-	Short:         "Apply Aperture Policy to the cluster",
-	Long:          `Use this command to apply the Aperture Policy to the cluster.`,
+	Short:         "Apply Aperture Policy to the Aperture Cloud Controller",
+	Long:          `Use this command to apply the Aperture Policy to the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example: `aperturectl apply policy --file=policies/rate-limiting.yaml
+	Example: `aperturectl cloud apply policy --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key API_KEY
 
-aperturectl apply policy --dir=policies`,
+aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key API_KEY`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
 			return applyPolicy(file)
@@ -80,70 +73,9 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
-	policyBytes, err := policy.MarshalJSON()
-	if err != nil {
-		return err
-	}
-
-	if Controller.IsKube() {
-		policyCR := &policyv1alpha1.Policy{}
-		policyCR.Spec.Raw = policyBytes
-		policyCR.Name = name
-
-		deployment, err := utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
-		if err != nil {
-			return err
-		}
-		controllerNs = deployment.GetNamespace()
-
-		err = api.AddToScheme(scheme.Scheme)
-		if err != nil {
-			return fmt.Errorf("failed to connect to Kubernetes: %w", err)
-		}
-
-		kubeClient, err := k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
-			Scheme: scheme.Scheme,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to create Kubernetes client: %w", err)
-		}
-
-		policyCR.Namespace = deployment.GetNamespace()
-		policyCR.Annotations = map[string]string{
-			"fluxninja.com/validate": "true",
-		}
-		err = kubeClient.Create(context.Background(), policyCR)
-		if err != nil {
-			if apimeta.IsNoMatchError(err) {
-				var isUpdated bool
-				isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
-				if !isUpdated {
-					return updatePolicyUsingAPIErr
-				}
-			} else if apierrors.IsAlreadyExists(err) {
-				var update bool
-				update, checkForUpdateErr := checkForUpdate(name)
-				if checkForUpdateErr != nil {
-					return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
-				}
-				if !update {
-					log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
-					return nil
-				}
-				updatePolicyCRErr := updatePolicyCR(name, policyCR, kubeClient)
-				if updatePolicyCRErr != nil {
-					return updatePolicyCRErr
-				}
-			} else {
-				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
-			}
-		}
-
-	} else {
-		isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
-		if !isUpdated {
-			return updatePolicyUsingAPIErr
-		}
+	isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
+	if !isUpdated {
+		return updatePolicyUsingAPIErr
 	}
 
 	log.Info().Str("policy", name).Msg("Applied Policy successfully")
@@ -182,27 +114,6 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 		}
 	}
 	return true, nil
-}
-
-// updatePolicyCR updates the policy CR.
-func updatePolicyCR(name string, policy *policyv1alpha1.Policy, kubeClient k8sclient.Client) error {
-	existingPolicy := &policyv1alpha1.Policy{}
-	err := kubeClient.Get(context.Background(), types.NamespacedName{Name: name, Namespace: controllerNs}, existingPolicy)
-	if err != nil {
-		return err
-	}
-
-	existingPolicy.Spec = policy.Spec
-	if existingPolicy.GetAnnotations() == nil {
-		existingPolicy.Annotations = map[string]string{}
-	}
-	existingPolicy.Annotations["fluxninja.com/validate"] = "true"
-
-	err = kubeClient.Update(context.Background(), existingPolicy)
-	if err != nil && apierrors.IsConflict(err) {
-		return updatePolicyCR(name, policy, kubeClient)
-	}
-	return err
 }
 
 // checkForUpdate checks if the user wants to update the policy.

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+// Messages for aperturectl → cloud controller communication.
+package aperture.cloud.v1;
+
+import "aperture/policy/language/v1/policy.proto";
+import "google/protobuf/empty.proto";
+
+// PolicyService describes Policy APIs of the cloud controller from the aperturectl POV
+service PolicyService {
+  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
+  rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
+}
