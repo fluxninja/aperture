@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	cloudcmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
+	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -159,9 +159,9 @@ func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
 // client returns Cloud Controller Client, connecting to controller if not yet connected.
 //
 // This functions is not exposed to force callers to go through the check above.
-func (c *ControllerConn) policyServiceClient() (cloudcmdv1.PolicyServiceClient, error) {
+func (c *ControllerConn) policyServiceClient() (cloudv1.PolicyServiceClient, error) {
 	if c.conn != nil {
-		return cloudcmdv1.NewPolicyServiceClient(c.conn), nil
+		return cloudv1.NewPolicyServiceClient(c.conn), nil
 	}
 
 	var addr string
@@ -182,7 +182,7 @@ func (c *ControllerConn) policyServiceClient() (cloudcmdv1.PolicyServiceClient, 
 		return nil, err
 	}
 
-	return cloudcmdv1.NewPolicyServiceClient(c.conn), nil
+	return cloudv1.NewPolicyServiceClient(c.conn), nil
 }
 
 // PostRun cleans up ControllerConn's resources, and should be run at PostRun stage.

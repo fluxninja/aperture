@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: aperture/cloud/v1/cmd.proto
+// source: aperture/cloud/v1/policy.proto
 
 // Messages for aperturectl → cloud controller communication.
 
@@ -144,5 +144,5 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "aperture/cloud/v1/cmd.proto",
+	Metadata: "aperture/cloud/v1/policy.proto",
 }
