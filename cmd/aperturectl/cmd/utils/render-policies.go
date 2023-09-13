@@ -13,6 +13,7 @@ import (
 	"github.com/ghodss/yaml"
 )
 
+// GetPolicyTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
 func GetPolicyTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBoxModel, error) {
 	policies, err := GetPolicies(policyDir)
 	if err != nil {
@@ -38,7 +39,7 @@ func GetPolicyTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBo
 	return policies, model, nil
 }
 
-// GetPolicies applies all policies in a directory to the cluster.
+// GetPolicies returns path of valid files having a valid Aperture Policy .
 func GetPolicies(policyDir string) ([]string, error) {
 	policies := []string{}
 	policyMap := map[string]string{}
