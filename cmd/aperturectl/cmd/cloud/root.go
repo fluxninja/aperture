@@ -4,10 +4,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/delete"
 )
 
 func init() {
-	CloudCmd.AddCommand(apply.ApplyPolicyCmd)
+	CloudCmd.AddCommand(apply.ApplyCmd)
+	CloudCmd.AddCommand(delete.DeleteCmd)
 }
 
 // CloudCmd is the command to apply a policy to the Cloud Controller.

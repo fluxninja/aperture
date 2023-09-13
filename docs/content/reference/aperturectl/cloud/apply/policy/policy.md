@@ -3,12 +3,12 @@ sidebar_label: Policy
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_policy
+  - aperturectl_cloud_apply_policy
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud policy
+## aperturectl cloud apply policy
 
 Apply Aperture Policy to the Aperture Cloud Controller
 
@@ -17,7 +17,7 @@ Apply Aperture Policy to the Aperture Cloud Controller
 Use this command to apply the Aperture Policy to the Aperture Cloud Controller.
 
 ```
-aperturectl cloud policy [flags]
+aperturectl cloud apply policy [flags]
 ```
 
 ### Examples
@@ -38,6 +38,16 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
   -s, --select-all    Apply all policies in the directory
 ```
 
+### Options inherited from parent commands
+
+```
+      --api-key string      Aperture Cloud API Key to be used when using Cloud Controller
+      --config string       Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string   Address of Aperture Cloud Controller
+      --insecure            Allow connection to controller running without TLS
+      --skip-verify         Skip TLS certificate verification while connecting to controller
+```
+
 ### SEE ALSO
 
-- [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
+- [aperturectl cloud apply](/reference/aperturectl/cloud/apply/apply.md) - Apply Aperture Policies to the Cloud Controller
