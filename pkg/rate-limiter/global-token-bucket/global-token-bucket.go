@@ -120,10 +120,6 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 		return true, 0, 0, 0
 	}
 
-	if gtb.GetBucketCapacity() == 0 {
-		return false, 0, 0, 0
-	}
-
 	if isMarginExceeded(ctx) {
 		return false, 0, 0, 0
 	}
@@ -169,10 +165,6 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
-	}
-
-	if gtb.GetBucketCapacity() == 0 {
-		return false, 0, 0, 0
 	}
 
 	deadline := time.Time{}
