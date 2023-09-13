@@ -10,11 +10,11 @@ keywords:
 
 ## aperturectl cloud policy
 
-Apply Aperture Policy to the cluster
+Apply Aperture Policy to the Aperture Cloud Controller
 
 ### Synopsis
 
-Use this command to apply the Aperture Policy to the cluster.
+Use this command to apply the Aperture Policy to the Aperture Cloud Controller.
 
 ```
 aperturectl cloud policy [flags]

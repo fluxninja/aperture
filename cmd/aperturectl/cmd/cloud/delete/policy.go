@@ -11,7 +11,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// DeletePolicyCmd is the command to apply a policy to the Aperture Cloud Controller.
+// DeletePolicyCmd is the command to delete a policy from the Aperture Cloud Controller.
 var DeletePolicyCmd = &cobra.Command{
 	Use:           "policy",
 	Short:         "Delete Aperture Policy from the Aperture Cloud Controller",

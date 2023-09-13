@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -17,7 +15,6 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
@@ -54,25 +51,9 @@ aperturectl apply policy --dir=policies`,
 		if file != "" {
 			return applyPolicy(file)
 		} else if dir != "" {
-			policies, err := getPolicies(dir)
+			policies, model, err := utils.GetPolicyTUIModel(dir, selectAll)
 			if err != nil {
 				return err
-			}
-
-			if len(policies) == 0 {
-				return errors.New("no policies found in the directory")
-			}
-
-			model := tui.InitialCheckboxModel(policies, "Which policies to apply?")
-			if !selectAll {
-				p := tea.NewProgram(model)
-				if _, err := p.Run(); err != nil {
-					return err
-				}
-			} else {
-				for i := range policies {
-					model.Selected[i] = struct{}{}
-				}
 			}
 
 			for policyIndex := range model.Selected {
@@ -88,77 +69,9 @@ aperturectl apply policy --dir=policies`,
 	},
 }
 
-// getPolicies applies all policies in a directory to the cluster.
-func getPolicies(policyDir string) ([]string, error) {
-	policies := []string{}
-	policyMap := map[string]string{}
-	// walk the directory and apply all policies
-	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if filepath.Ext(info.Name()) == ".yaml" {
-			_, policyName, err := getPolicy(path)
-			if err != nil {
-				return err
-			}
-			if _, ok := policyMap[policyName]; !ok {
-				policyMap[policyName] = path
-				policies = append(policies, path)
-			} else {
-				log.Info().Str("policy", policyName).Msg("Duplicate policy found. Skipping...")
-			}
-		}
-		return nil
-	})
-}
-
-func getPolicy(policyFile string) (*languagev1.Policy, string, error) {
-	policyFileBase := filepath.Base(policyFile)
-	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
-
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, policyName, err
-	}
-	_, policy, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
-	if err != nil {
-		policyCR, err := getPolicyCR(policyFile)
-		if err != nil {
-			return nil, policyName, err
-		}
-
-		policy = &languagev1.Policy{}
-		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
-		if err != nil {
-			return nil, policyName, err
-		}
-
-		policyName = policyCR.Name
-		return policy, policyName, nil
-	}
-
-	return policy, policyName, nil
-}
-
-func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, err
-	}
-
-	policyCR := &policyv1alpha1.Policy{}
-	err = yaml.Unmarshal(policyBytes, policyCR)
-	if err != nil {
-		return nil, err
-	}
-
-	return policyCR, nil
-}
-
 // applyPolicy applies a policy to the cluster.
 func applyPolicy(policyFile string) error {
-	policy, policyName, err := getPolicy(policyFile)
+	policy, policyName, err := utils.GetPolicy(policyFile)
 	if err != nil {
 		return err
 	}
