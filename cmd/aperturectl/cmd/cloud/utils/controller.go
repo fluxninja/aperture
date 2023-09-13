@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	cloudcmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/cmd/v1"
+	cloudcmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -140,7 +140,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 // CloudPolicyClient returns Cloud Controller PolicyClient, connecting to cloud controller if not yet connected.
 func (c *ControllerConn) CloudPolicyClient() (CloudPolicyClient, error) {
 	// PolicyClient has no restrictions.
-	return c.cloudControllerClient()
+	return c.policyServiceClient()
 }
 
 func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
@@ -159,9 +159,9 @@ func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
 // client returns Cloud Controller Client, connecting to controller if not yet connected.
 //
 // This functions is not exposed to force callers to go through the check above.
-func (c *ControllerConn) cloudControllerClient() (cloudcmdv1.CloudControllerClient, error) {
+func (c *ControllerConn) policyServiceClient() (cloudcmdv1.PolicyServiceClient, error) {
 	if c.conn != nil {
-		return cloudcmdv1.NewCloudControllerClient(c.conn), nil
+		return cloudcmdv1.NewPolicyServiceClient(c.conn), nil
 	}
 
 	var addr string
@@ -182,7 +182,7 @@ func (c *ControllerConn) cloudControllerClient() (cloudcmdv1.CloudControllerClie
 		return nil, err
 	}
 
-	return cloudcmdv1.NewCloudControllerClient(c.conn), nil
+	return cloudcmdv1.NewPolicyServiceClient(c.conn), nil
 }
 
 // PostRun cleans up ControllerConn's resources, and should be run at PostRun stage.

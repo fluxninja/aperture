@@ -5146,7 +5146,7 @@ tags:
     - name: AutoScaleKubernetesControlPointsService
     - name: FlowControlService
     - name: PolicyService
-    - name: CloudController
+    - name: PolicyService
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
