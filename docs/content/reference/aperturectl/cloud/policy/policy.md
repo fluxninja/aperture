@@ -1,0 +1,43 @@
+---
+sidebar_label: Policy
+hide_title: true
+keywords:
+  - aperturectl
+  - aperturectl_cloud_policy
+---
+
+<!-- markdownlint-disable -->
+
+## aperturectl cloud policy
+
+Apply Aperture Policy to the cluster
+
+### Synopsis
+
+Use this command to apply the Aperture Policy to the cluster.
+
+```
+aperturectl cloud policy [flags]
+```
+
+### Examples
+
+```
+aperturectl apply policy --file=policies/rate-limiting.yaml
+
+aperturectl apply policy --dir=policies
+```
+
+### Options
+
+```
+      --dir string    Path to directory containing Aperture Policy files
+      --file string   Path to Aperture Policy file
+  -f, --force         Force apply policy even if it already exists
+  -h, --help          help for policy
+  -s, --select-all    Apply all policies in the directory
+```
+
+### SEE ALSO
+
+- [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
