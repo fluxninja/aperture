@@ -3,7 +3,9 @@ import express from "express";
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 // Create aperture client
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient({
+  timeoutMilliseconds: 300000,
+});
 
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {

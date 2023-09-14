@@ -186,7 +186,7 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 
 			// Update quota scheduler metrics.
 			if qs := decision.GetQuotaSchedulerInfo(); qs != nil {
-				labels[metrics.WorkloadIndexLabel] = qs.GetSchedulerInfo().GetWorkloadIndex()
+				labels[metrics.WorkloadIndexLabel] = qs.GetWorkloadIndex()
 				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
 			}
 

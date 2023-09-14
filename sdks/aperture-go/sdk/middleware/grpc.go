@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 	"net"
 	"net/http"
 
+	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	flowcontrolhttp "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
-func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *flowcontrolhttp.SocketAddress {
+func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto.SocketAddress {
 	host, port := splitAddress(logger, addr.String())
-	protocol := flowcontrolhttp.SocketAddress_TCP
+	protocol := checkhttpproto.SocketAddress_TCP
 	if addr.Network() == "udp" {
-		protocol = flowcontrolhttp.SocketAddress_UDP
+		protocol = checkhttpproto.SocketAddress_UDP
 	}
-	return &flowcontrolhttp.SocketAddress{
+	return &checkhttpproto.SocketAddress{
 		Address:  host,
 		Protocol: protocol,
 		Port:     port,
@@ -30,13 +30,17 @@ func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *flowcontrolhtt
 }
 
 // GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := PrepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint)
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string) grpc.UnaryServerInterceptor {
+	if explicitLabels == nil {
+		explicitLabels = make(map[string]string)
+	}
 
-		flow, err := c.StartHTTPFlow(ctx, checkreq)
-		if err != nil {
-			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.ShouldRun()", flow.ShouldRun())
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels)
+
+		flow := c.StartHTTPFlow(ctx, checkreq, true)
+		if flow.Error() != nil {
+			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
 
 		defer func() {

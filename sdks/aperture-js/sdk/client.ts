@@ -26,7 +26,7 @@ export class ApertureClient {
   private readonly timeoutMilliseconds: number;
 
   constructor({
-    timeoutMilliseconds = 200,
+    timeoutMilliseconds = 0,
     channelCredentials = grpc.credentials.createInsecure(),
   } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
@@ -98,26 +98,27 @@ export class ApertureClient {
 
         let mergedLabels = { ...labels, ...labelsBaggage };
 
-        let checkParams: grpc.CallOptions = {};
-        if (this.timeoutMilliseconds != 0) {
-          const deadline = new Date();
-          deadline.setMilliseconds(
-            deadline.getMilliseconds() + this.timeoutMilliseconds,
-          );
-          checkParams.deadline = deadline;
-        }
+        const request: CheckRequest = {
+          controlPoint: controlPointArg,
+          labels: mergedLabels,
+        };
 
-        this.fcsClient.Check(
-          {
-            controlPoint: controlPointArg,
-            labels: mergedLabels,
-          } as CheckRequest,
-          checkParams as grpc.CallOptions,
-          ((err, response) => {
-            resolveFlow(err ? null : response, err);
-            return;
-          }) as grpc.requestCallback<CheckResponse__Output>,
-        );
+        const grpcParams: grpc.CallOptions = {
+          deadline:
+            this.timeoutMilliseconds != 0
+              ? new Date(Date.now() + this.timeoutMilliseconds)
+              : undefined,
+        };
+
+        const cb: grpc.requestCallback<CheckResponse__Output> = (
+          err: any,
+          response: any,
+        ) => {
+          resolveFlow(err ? null : response, err);
+          return;
+        };
+
+        this.fcsClient.Check(request, grpcParams, cb);
       } catch (err: any) {
         resolveFlow(null, err);
       }

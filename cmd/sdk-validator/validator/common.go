@@ -23,7 +23,8 @@ type CommonHandler struct {
 const targetLabelMissing = "UNKNOWN"
 
 // CheckRequest is a dummy function for creating *flowcontrolv1.CheckResponse from given parameters.
-func (c *CommonHandler) CheckRequest(ctx context.Context,
+func (c *CommonHandler) CheckRequest(
+	ctx context.Context,
 	requestContext iface.RequestContext,
 ) *flowcontrolv1.CheckResponse {
 	labels := requestContext.FlowLabels

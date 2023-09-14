@@ -947,6 +947,8 @@ func (m *RateLimiter) validate(all bool) error {
 
 	}
 
+	// no validation rules for TokensLabelKey
+
 	if len(errors) > 0 {
 		return RateLimiterMultiError(errors)
 	}
@@ -1331,7 +1333,7 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for TokensLabelKey
 
-	// no validation rules for PrioritiesLabelKey
+	// no validation rules for PriorityLabelKey
 
 	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
 		err := SchedulerValidationError{
@@ -3614,8 +3616,6 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for LabelKey
-
-	// no validation rules for TokensLabelKey
 
 	if all {
 		switch v := interface{}(m.GetInterval()).(type) {
