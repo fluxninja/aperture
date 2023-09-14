@@ -31,6 +31,11 @@ func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.Check
 		services = append(services, rpcPeer.Addr.String())
 	}
 
+	// log the deadline of the request
+	if deadline, ok := ctx.Deadline(); ok {
+		log.Trace().Msgf("Deadline: %s, timeout: %s", deadline, time.Until(deadline))
+	}
+
 	start := time.Now()
 	resp := f.CommonHandler.CheckRequest(ctx, iface.RequestContext{
 		FlowLabels:   labels.PlainMap(req.Labels),

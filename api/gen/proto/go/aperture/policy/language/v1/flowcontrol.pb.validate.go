@@ -947,6 +947,8 @@ func (m *RateLimiter) validate(all bool) error {
 
 	}
 
+	// no validation rules for TokensLabelKey
+
 	if len(errors) > 0 {
 		return RateLimiterMultiError(errors)
 	}
@@ -3701,8 +3703,6 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for LabelKey
-
-	// no validation rules for TokensLabelKey
 
 	if all {
 		switch v := interface{}(m.GetInterval()).(type) {

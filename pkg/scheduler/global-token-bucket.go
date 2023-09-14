@@ -39,15 +39,13 @@ func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Req
 }
 
 // TakeIfAvailable takes tokens if available.
-func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) bool {
-	ok, _, _, _ := rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
-	return ok
+func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
+	return rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
 }
 
 // Take takes tokens.
-func (rltb *GlobalTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
-	ok, waitTime, _, _ := rltb.limiter.Take(ctx, rltb.key, tokens)
-	return waitTime, ok
+func (rltb *GlobalTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
+	return rltb.limiter.Take(ctx, rltb.key, tokens)
 }
 
 // Return returns tokens.

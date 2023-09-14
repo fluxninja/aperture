@@ -88,13 +88,6 @@ message RateLimiter {
     // selectors will be rate limited based on the global bucket.
     string label_key = 1;
 
-    // Flow label key that will be used to override the number of tokens
-    // for this request.
-    // This is an optional parameter and takes highest precedence
-    // when assigning tokens to a request.
-    // The label value must be a valid number.
-    string tokens_label_key = 2;
-
     // Interval defines the time interval in which the token bucket
     // will fill tokens specified by `fill_amount` signal.
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
@@ -134,6 +127,13 @@ message RateLimiter {
 
   // Selectors for the component.
   repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+
+  // Flow label key that will be used to override the number of tokens
+  // for this request.
+  // This is an optional parameter and takes highest precedence
+  // when assigning tokens to a request.
+  // The label value must be a valid number.
+  string tokens_label_key = 4;
 }
 
 // _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection

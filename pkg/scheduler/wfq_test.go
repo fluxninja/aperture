@@ -184,7 +184,7 @@ func runRequest(sched Scheduler, wg *sync.WaitGroup, flow *flowTracker) {
 	defer wg.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
 	defer cancel()
-	ok := sched.Schedule(ctx, flow.makeRequest())
+	ok, _, _ := sched.Schedule(ctx, flow.makeRequest())
 	if ok {
 		atomic.AddUint64(&flow.acceptedRequests, 1)
 	}
@@ -254,7 +254,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			_, _, _ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
 			cancel()
 		}
 	})
@@ -291,7 +291,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	for c.Now().Before(startTime.Add(bootstrapTime)) {
 		for _, flow := range flows {
 			ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
-			_ = sched.Schedule(ctx, flow.makeRequest())
+			_, _, _ = sched.Schedule(ctx, flow.makeRequest())
 			cancel()
 		}
 	}
@@ -306,7 +306,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			_, _, _ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
 			cancel()
 		}
 	})

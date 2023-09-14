@@ -83,16 +83,24 @@ message ClassifierInfo {
 
 // LimiterDecision describes details for each limiter.
 message LimiterDecision {
-  message RateLimiterInfo {
+  message TokensInfo {
+    // remaining and current may not
+    // provide accurate values in case
+    // the request times out while waiting
+    // for tokens.
     double remaining = 1;
     double current = 2;
-    string label = 3;
-    double tokens_consumed = 4;
+    double consumed = 3;
+  }
+
+  message RateLimiterInfo {
+    string label = 1;
+    TokensInfo tokens_info = 2;
   }
 
   message SchedulerInfo {
     string workload_index = 1;
-    double tokens_consumed = 3;
+    TokensInfo tokens_info = 2;
   }
 
   message SamplerInfo {
@@ -101,7 +109,8 @@ message LimiterDecision {
 
   message QuotaSchedulerInfo {
     string label = 1;
-    SchedulerInfo scheduler_info = 2;
+    string workload_index = 2;
+    TokensInfo tokens_info = 3;
   }
 
   enum LimiterReason {
@@ -114,13 +123,14 @@ message LimiterDecision {
   string component_id = 3;
   bool dropped = 4;
   LimiterReason reason = 5;
-  oneof details {
-    RateLimiterInfo rate_limiter_info = 6;
-    SchedulerInfo load_scheduler_info = 7;
-    SamplerInfo sampler_info = 8;
-    QuotaSchedulerInfo quota_scheduler_info = 9;
-  }
   StatusCode denied_response_status_code = 10;
+  google.protobuf.Duration wait_time = 11;
+  oneof details {
+    RateLimiterInfo rate_limiter_info = 20;
+    SchedulerInfo load_scheduler_info = 21;
+    SamplerInfo sampler_info = 22;
+    QuotaSchedulerInfo quota_scheduler_info = 23;
+  }
 }
 
 // FluxMeterInfo describes detail for each FluxMeterInfo.

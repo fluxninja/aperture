@@ -1093,7 +1093,7 @@ jobs:
           name: Apply Policy
           working_directory: .
           command: |
-            go run ./cmd/aperturectl/main.go apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
+            go run ./cmd/aperturectl/main.go cloud apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
             --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
       - save_cache:
           name: Save go cache

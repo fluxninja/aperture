@@ -129,7 +129,7 @@ func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(_ context.Context, requ
 }
 
 // TakeIfAvailable takes tokens from the token bucket if available, otherwise return false.
-func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) bool {
+func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) (bool, time.Duration, float64, float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.takeIfAvailable(tokens)
@@ -138,7 +138,7 @@ func (tbls *LoadMultiplierTokenBucket) TakeIfAvailable(_ context.Context, tokens
 // Take takes tokens from the token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (tbls *LoadMultiplierTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
+func (tbls *LoadMultiplierTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
 	return tbls.tbb.take(ctx, tokens)
