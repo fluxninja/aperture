@@ -3286,9 +3286,7 @@ based on the provided strategy.
 
 <!-- vale on -->
 
-AIMD Load Scheduler component does additive increase of load multiplier during
-non-overload state. During overload, the load multiplier is throttled based on
-the provided strategy.
+AIMD Load Scheduler.
 
 </dd>
 <dt>load_ramp</dt>
@@ -3335,7 +3333,7 @@ queue in front of the service using Weighted Fair Queuing.
 
 <!-- vale on -->
 
-Range Driven Load Scheduler
+Range Driven Load Scheduler.
 
 </dd>
 <dt>rate_limiter</dt>

@@ -408,88 +408,6 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
-	case *FlowControl_AimdLoadScheduler:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetAimdLoadScheduler()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "AimdLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "AimdLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetAimdLoadScheduler()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "AimdLoadScheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *FlowControl_RangeDrivenLoadScheduler:
-		if v == nil {
-			err := FlowControlValidationError{
-				field:  "Component",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetRangeDrivenLoadScheduler()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "RangeDrivenLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, FlowControlValidationError{
-						field:  "RangeDrivenLoadScheduler",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetRangeDrivenLoadScheduler()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FlowControlValidationError{
-					field:  "RangeDrivenLoadScheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *FlowControl_Sampler:
 		if v == nil {
 			err := FlowControlValidationError{
@@ -566,6 +484,88 @@ func (m *FlowControl) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return FlowControlValidationError{
 					field:  "LoadRamp",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_AimdLoadScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAimdLoadScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AimdLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AimdLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAimdLoadScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "AimdLoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *FlowControl_RangeDrivenLoadScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRangeDrivenLoadScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "RangeDrivenLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "RangeDrivenLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRangeDrivenLoadScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "RangeDrivenLoadScheduler",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

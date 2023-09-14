@@ -208,44 +208,6 @@ func (m *FlowControl_AdaptiveLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *FlowControl_AimdLoadScheduler) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *FlowControl_AimdLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AimdLoadScheduler != nil {
-		size, err := m.AimdLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x4a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *FlowControl_RangeDrivenLoadScheduler) MarshalToVT(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVT(dAtA[:size])
-}
-
-func (m *FlowControl_RangeDrivenLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.RangeDrivenLoadScheduler != nil {
-		size, err := m.RangeDrivenLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x52
-	}
-	return len(dAtA) - i, nil
-}
 func (m *FlowControl_Sampler) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
@@ -261,7 +223,7 @@ func (m *FlowControl_Sampler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= size
 		i = encodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x4a
 	}
 	return len(dAtA) - i, nil
 }
@@ -274,6 +236,44 @@ func (m *FlowControl_LoadRamp) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 	i := len(dAtA)
 	if m.LoadRamp != nil {
 		size, err := m.LoadRamp.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
+	return len(dAtA) - i, nil
+}
+func (m *FlowControl_AimdLoadScheduler) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *FlowControl_AimdLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.AimdLoadScheduler != nil {
+		size, err := m.AimdLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x5a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *FlowControl_RangeDrivenLoadScheduler) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *FlowControl_RangeDrivenLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RangeDrivenLoadScheduler != nil {
+		size, err := m.RangeDrivenLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -3935,30 +3935,6 @@ func (m *FlowControl_AdaptiveLoadScheduler) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *FlowControl_AimdLoadScheduler) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AimdLoadScheduler != nil {
-		l = m.AimdLoadScheduler.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
-	return n
-}
-func (m *FlowControl_RangeDrivenLoadScheduler) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.RangeDrivenLoadScheduler != nil {
-		l = m.RangeDrivenLoadScheduler.SizeVT()
-		n += 1 + l + sov(uint64(l))
-	}
-	return n
-}
 func (m *FlowControl_Sampler) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -3979,6 +3955,30 @@ func (m *FlowControl_LoadRamp) SizeVT() (n int) {
 	_ = l
 	if m.LoadRamp != nil {
 		l = m.LoadRamp.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	return n
+}
+func (m *FlowControl_AimdLoadScheduler) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AimdLoadScheduler != nil {
+		l = m.AimdLoadScheduler.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	return n
+}
+func (m *FlowControl_RangeDrivenLoadScheduler) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RangeDrivenLoadScheduler != nil {
+		l = m.RangeDrivenLoadScheduler.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	return n
@@ -5765,88 +5765,6 @@ func (m *FlowControl) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AimdLoadScheduler", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if oneof, ok := m.Component.(*FlowControl_AimdLoadScheduler); ok {
-				if err := oneof.AimdLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-			} else {
-				v := &AIMDLoadScheduler{}
-				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-				m.Component = &FlowControl_AimdLoadScheduler{AimdLoadScheduler: v}
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RangeDrivenLoadScheduler", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if oneof, ok := m.Component.(*FlowControl_RangeDrivenLoadScheduler); ok {
-				if err := oneof.RangeDrivenLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-			} else {
-				v := &RangeDrivenLoadScheduler{}
-				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
-					return err
-				}
-				m.Component = &FlowControl_RangeDrivenLoadScheduler{RangeDrivenLoadScheduler: v}
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sampler", wireType)
 			}
 			var msglen int
@@ -5886,7 +5804,7 @@ func (m *FlowControl) UnmarshalVT(dAtA []byte) error {
 				m.Component = &FlowControl_Sampler{Sampler: v}
 			}
 			iNdEx = postIndex
-		case 12:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LoadRamp", wireType)
 			}
@@ -5925,6 +5843,88 @@ func (m *FlowControl) UnmarshalVT(dAtA []byte) error {
 					return err
 				}
 				m.Component = &FlowControl_LoadRamp{LoadRamp: v}
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AimdLoadScheduler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if oneof, ok := m.Component.(*FlowControl_AimdLoadScheduler); ok {
+				if err := oneof.AimdLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				v := &AIMDLoadScheduler{}
+				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+				m.Component = &FlowControl_AimdLoadScheduler{AimdLoadScheduler: v}
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RangeDrivenLoadScheduler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if oneof, ok := m.Component.(*FlowControl_RangeDrivenLoadScheduler); ok {
+				if err := oneof.RangeDrivenLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				v := &RangeDrivenLoadScheduler{}
+				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+				m.Component = &FlowControl_RangeDrivenLoadScheduler{RangeDrivenLoadScheduler: v}
 			}
 			iNdEx = postIndex
 		case 1000:

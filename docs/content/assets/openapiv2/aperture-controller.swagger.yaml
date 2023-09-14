@@ -1317,7 +1317,7 @@ definitions:
                 description: _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
             aimd_load_scheduler:
                 $ref: '#/definitions/AIMDLoadScheduler'
-                description: AIMD Load Scheduler component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                description: AIMD Load Scheduler.
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
@@ -1328,7 +1328,7 @@ definitions:
                 $ref: '#/definitions/QuotaScheduler'
             range_driven_load_scheduler:
                 $ref: '#/definitions/RangeDrivenLoadScheduler'
-                title: Range Driven Load Scheduler
+                description: Range Driven Load Scheduler.
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
                 description: _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.

@@ -36,17 +36,17 @@ message FlowControl {
     // _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
-    // AIMD Load Scheduler component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
-    AIMDLoadScheduler aimd_load_scheduler = 9;
-
-    // Range Driven Load Scheduler
-    RangeDrivenLoadScheduler range_driven_load_scheduler = 10;
-
     // Sampler is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
-    Sampler sampler = 11;
+    Sampler sampler = 9;
 
     // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
-    LoadRamp load_ramp = 12;
+    LoadRamp load_ramp = 10;
+
+    // AIMD Load Scheduler.
+    AIMDLoadScheduler aimd_load_scheduler = 11;
+
+    // Range Driven Load Scheduler.
+    RangeDrivenLoadScheduler range_driven_load_scheduler = 12;
 
     // Extends flow control with private components.
     google.protobuf.Any private = 1000;
