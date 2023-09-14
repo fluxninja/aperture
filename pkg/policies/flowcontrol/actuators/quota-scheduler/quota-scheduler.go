@@ -504,3 +504,8 @@ func (qs *quotaScheduler) GetLatencyObserver(labels map[string]string) prometheu
 func (qs *quotaScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	return qs.qsFactory.wsFactory.GetRequestCounter(labels)
 }
+
+// GetFlowDurationSummary returns the flow duration summary.
+func (qs *quotaScheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
+	return qs.qsFactory.wsFactory.GetFlowDurationSummary(labels)
+}
