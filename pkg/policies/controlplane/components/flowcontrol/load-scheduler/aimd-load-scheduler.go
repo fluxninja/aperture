@@ -68,167 +68,9 @@ func ParseAIMDLoadScheduler(
 	alerterLabels["type"] = "aimd_load_scheduler"
 	aimdLoadScheduler.Parameters.Alerter.Labels = alerterLabels
 
-	// Needs PASS_THROUGH_FROM_STRATEGY, LOAD_MULTIPLIER_FROM_STRATEGY and OVERLOAD_FROM_STRATEGY
-	// Provides IS_OVERLOAD, DESIRED_LOAD_MULTIPLIER, OBSERVED_LOAD_MULTIPLIER
-	nestedCircuit := &policylangv1.NestedCircuit{
-		InPortsMap:  nestedInPortsMap,
-		OutPortsMap: nestedOutPortsMap,
-		Components: []*policylangv1.Component{
-			{
-				Component: &policylangv1.Component_FirstValid{
-					FirstValid: &policylangv1.FirstValid{
-						InPorts: &policylangv1.FirstValid_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "OVERLOAD_CONFIRMATION",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_ConstantSignal{
-										ConstantSignal: &policylangv1.ConstantSignal{
-											Const: &policylangv1.ConstantSignal_Value{
-												Value: 1, // Overload confirmation is assumed true by default. This makes the same circuit work in case overload confirmation is not provided. If the required behavior is to assume false by default then the policy needs to make sure to provide a valid signal with desired defaults.
-											},
-										},
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.FirstValid_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "OVERLOAD_CONFIRMATION_WITH_DEFAULT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_And{
-					And: &policylangv1.And{
-						InPorts: &policylangv1.And_Ins{
-							Inputs: []*policylangv1.InPort{
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "OVERLOAD_FROM_STRATEGY",
-									},
-								},
-								{
-									Value: &policylangv1.InPort_SignalName{
-										SignalName: "OVERLOAD_CONFIRMATION_WITH_DEFAULT",
-									},
-								},
-							},
-						},
-						OutPorts: &policylangv1.And_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "IS_OVERLOAD",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Switcher{
-					Switcher: &policylangv1.Switcher{
-						InPorts: &policylangv1.Switcher_Ins{
-							Switch: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "PASS_THROUGH_FROM_STRATEGY",
-								},
-							},
-							OnSignal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_SpecialValue{
-											SpecialValue: "NaN",
-										},
-									},
-								},
-							},
-							OffSignal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_FROM_STRATEGY",
-								},
-							},
-						},
-						OutPorts: &policylangv1.Switcher_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "DESIRED_LOAD_MULTIPLIER",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_FlowControl{
-					FlowControl: &policylangv1.FlowControl{
-						Component: &policylangv1.FlowControl_LoadScheduler{
-							LoadScheduler: &policylangv1.LoadScheduler{
-								InPorts: &policylangv1.LoadScheduler_Ins{
-									LoadMultiplier: &policylangv1.InPort{
-										Value: &policylangv1.InPort_SignalName{
-											SignalName: "DESIRED_LOAD_MULTIPLIER",
-										},
-									},
-								},
-								OutPorts: &policylangv1.LoadScheduler_Outs{
-									ObservedLoadMultiplier: &policylangv1.OutPort{
-										SignalName: "OBSERVED_LOAD_MULTIPLIER",
-									},
-								},
-								DryRunConfigKey: aimdLoadScheduler.DryRunConfigKey,
-								DryRun:          aimdLoadScheduler.DryRun,
-								Parameters:      aimdLoadScheduler.Parameters.LoadScheduler,
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Decider{
-					Decider: &policylangv1.Decider{
-						InPorts: &policylangv1.Decider_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "DESIRED_LOAD_MULTIPLIER",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_ConstantSignal{
-									ConstantSignal: &policylangv1.ConstantSignal{
-										Const: &policylangv1.ConstantSignal_Value{
-											Value: 1,
-										},
-									},
-								},
-							},
-						},
-						Operator: components.LT.String(),
-						OutPorts: &policylangv1.Decider_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "LOAD_MULTIPLIER_ALERT",
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Alerter{
-					Alerter: &policylangv1.Alerter{
-						Parameters: aimdLoadScheduler.Parameters.Alerter,
-						InPorts: &policylangv1.Alerter_Ins{
-							Signal: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "LOAD_MULTIPLIER_ALERT",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+	nestedCircuit := prepareLoadSchedulerCommonComponents()
+	nestedCircuit.InPortsMap = nestedInPortsMap
+	nestedCircuit.OutPortsMap = nestedOutPortsMap
 
 	overloadDeciderOperator := components.GT.String()
 	// if slope is greater than 0 then we want to use less than operator
@@ -237,6 +79,45 @@ func ParseAIMDLoadScheduler(
 	}
 
 	nestedCircuit.Components = append(nestedCircuit.Components,
+		&policylangv1.Component{
+			Component: &policylangv1.Component_FlowControl{
+				FlowControl: &policylangv1.FlowControl{
+					Component: &policylangv1.FlowControl_LoadScheduler{
+						LoadScheduler: &policylangv1.LoadScheduler{
+							InPorts: &policylangv1.LoadScheduler_Ins{
+								LoadMultiplier: &policylangv1.InPort{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "DESIRED_LOAD_MULTIPLIER",
+									},
+								},
+							},
+							OutPorts: &policylangv1.LoadScheduler_Outs{
+								ObservedLoadMultiplier: &policylangv1.OutPort{
+									SignalName: "OBSERVED_LOAD_MULTIPLIER",
+								},
+							},
+							DryRunConfigKey: aimdLoadScheduler.DryRunConfigKey,
+							DryRun:          aimdLoadScheduler.DryRun,
+							Parameters:      aimdLoadScheduler.Parameters.LoadScheduler,
+						},
+					},
+				},
+			},
+		},
+		&policylangv1.Component{
+			Component: &policylangv1.Component_Alerter{
+				Alerter: &policylangv1.Alerter{
+					Parameters: aimdLoadScheduler.Parameters.Alerter,
+					InPorts: &policylangv1.Alerter_Ins{
+						Signal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "LOAD_MULTIPLIER_ALERT",
+							},
+						},
+					},
+				},
+			},
+		},
 		&policylangv1.Component{
 			Component: &policylangv1.Component_Decider{
 				Decider: &policylangv1.Decider{
