@@ -193,9 +193,12 @@ func runLimiters(
 			}
 			lock.Lock()
 			defer lock.Unlock()
-			decisions[limiter] = decision.LimiterDecision
-			if decision.WaitTime > waitTime {
-				waitTime = decision.WaitTime
+			decisions[limiter] = decision
+			if decision.WaitTime != nil {
+				wt := decision.WaitTime.AsDuration()
+				if wt > waitTime {
+					waitTime = wt
+				}
 			}
 		}
 	}
@@ -217,7 +220,7 @@ func runLimiters(
 }
 
 func revertRemaining(
-	ctx context.Context,
+	_ context.Context,
 	labels labels.Labels,
 	limiterDecisions map[iface.Limiter]*flowcontrolv1.LimiterDecision,
 ) {

@@ -220,7 +220,7 @@ class ClassifierInfo(_message.Message):
     def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
-    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "denied_response_status_code", "rate_limiter_info", "load_scheduler_info", "sampler_info", "quota_scheduler_info"]
+    __slots__ = ["policy_name", "policy_hash", "component_id", "dropped", "reason", "denied_response_status_code", "wait_time", "rate_limiter_info", "load_scheduler_info", "sampler_info", "quota_scheduler_info"]
     class LimiterReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         LIMITER_REASON_UNSPECIFIED: _ClassVar[LimiterDecision.LimiterReason]
@@ -270,6 +270,7 @@ class LimiterDecision(_message.Message):
     DROPPED_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
+    WAIT_TIME_FIELD_NUMBER: _ClassVar[int]
     RATE_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
     LOAD_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
     SAMPLER_INFO_FIELD_NUMBER: _ClassVar[int]
@@ -280,11 +281,12 @@ class LimiterDecision(_message.Message):
     dropped: bool
     reason: LimiterDecision.LimiterReason
     denied_response_status_code: StatusCode
+    wait_time: _duration_pb2.Duration
     rate_limiter_info: LimiterDecision.RateLimiterInfo
     load_scheduler_info: LimiterDecision.SchedulerInfo
     sampler_info: LimiterDecision.SamplerInfo
     quota_scheduler_info: LimiterDecision.QuotaSchedulerInfo
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., sampler_info: _Optional[_Union[LimiterDecision.SamplerInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., sampler_info: _Optional[_Union[LimiterDecision.SamplerInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ...) -> None: ...
 
 class FluxMeterInfo(_message.Message):
     __slots__ = ["flux_meter_name"]

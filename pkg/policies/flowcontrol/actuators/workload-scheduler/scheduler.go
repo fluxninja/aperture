@@ -345,7 +345,7 @@ func (wsFactory *Factory) NewScheduler(
 
 // Decide processes a single flow by load scheduler in a blocking manner.
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
 	var matchedWorkloadIndex string
@@ -455,21 +455,19 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		tokensConsumed = req.Tokens
 	}
 
-	return iface.LimiterDecision{
-		LimiterDecision: &flowcontrolv1.LimiterDecision{
-			PolicyName:               s.component.GetPolicyName(),
-			PolicyHash:               s.component.GetPolicyHash(),
-			ComponentId:              s.component.GetComponentId(),
-			Dropped:                  !accepted,
-			DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
-			Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
-				LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
-					WorkloadIndex: matchedWorkloadIndex,
-					TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
-						Consumed:  tokensConsumed,
-						Remaining: remaining,
-						Current:   current,
-					},
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:               s.component.GetPolicyName(),
+		PolicyHash:               s.component.GetPolicyHash(),
+		ComponentId:              s.component.GetComponentId(),
+		Dropped:                  !accepted,
+		DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
+		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
+				WorkloadIndex: matchedWorkloadIndex,
+				TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+					Consumed:  tokensConsumed,
+					Remaining: remaining,
+					Current:   current,
 				},
 			},
 		},

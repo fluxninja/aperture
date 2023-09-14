@@ -72,6 +72,21 @@ public interface LimiterDecisionOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
 
   /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  boolean hasWaitTime();
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  com.google.protobuf.Duration getWaitTime();
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   */
+  com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder();
+
+  /**
    * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 20 [json_name = "rateLimiterInfo"];</code>
    * @return Whether the rateLimiterInfo field is set.
    */

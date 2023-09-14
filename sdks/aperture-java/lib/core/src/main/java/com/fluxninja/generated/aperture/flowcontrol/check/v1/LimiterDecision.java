@@ -3796,6 +3796,7 @@ private static final long serialVersionUID = 0L;
 
   }
 
+  private int bitField0_;
   private int detailsCase_ = 0;
   @SuppressWarnings("serial")
   private java.lang.Object details_;
@@ -4006,6 +4007,32 @@ private static final long serialVersionUID = 0L;
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
   }
 
+  public static final int WAIT_TIME_FIELD_NUMBER = 11;
+  private com.google.protobuf.Duration waitTime_;
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  @java.lang.Override
+  public boolean hasWaitTime() {
+    return ((bitField0_ & 0x00000001) != 0);
+  }
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  @java.lang.Override
+  public com.google.protobuf.Duration getWaitTime() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   */
+  @java.lang.Override
+  public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+    return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+  }
+
   public static final int RATE_LIMITER_INFO_FIELD_NUMBER = 20;
   /**
    * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 20 [json_name = "rateLimiterInfo"];</code>
@@ -4162,6 +4189,9 @@ private static final long serialVersionUID = 0L;
     if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
       output.writeEnum(10, deniedResponseStatusCode_);
     }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(11, getWaitTime());
+    }
     if (detailsCase_ == 20) {
       output.writeMessage(20, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo) details_);
     }
@@ -4204,6 +4234,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(10, deniedResponseStatusCode_);
     }
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(11, getWaitTime());
+    }
     if (detailsCase_ == 20) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(20, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo) details_);
@@ -4245,6 +4279,11 @@ private static final long serialVersionUID = 0L;
         != other.getDropped()) return false;
     if (reason_ != other.reason_) return false;
     if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
+    if (hasWaitTime() != other.hasWaitTime()) return false;
+    if (hasWaitTime()) {
+      if (!getWaitTime()
+          .equals(other.getWaitTime())) return false;
+    }
     if (!getDetailsCase().equals(other.getDetailsCase())) return false;
     switch (detailsCase_) {
       case 20:
@@ -4290,6 +4329,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + reason_;
     hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
     hash = (53 * hash) + deniedResponseStatusCode_;
+    if (hasWaitTime()) {
+      hash = (37 * hash) + WAIT_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + getWaitTime().hashCode();
+    }
     switch (detailsCase_) {
       case 20:
         hash = (37 * hash) + RATE_LIMITER_INFO_FIELD_NUMBER;
@@ -4433,13 +4476,19 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getWaitTimeFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -4451,6 +4500,11 @@ private static final long serialVersionUID = 0L;
       dropped_ = false;
       reason_ = 0;
       deniedResponseStatusCode_ = 0;
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
       if (rateLimiterInfoBuilder_ != null) {
         rateLimiterInfoBuilder_.clear();
       }
@@ -4517,6 +4571,14 @@ private static final long serialVersionUID = 0L;
       if (((from_bitField0_ & 0x00000020) != 0)) {
         result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
       }
+      int to_bitField0_ = 0;
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.waitTime_ = waitTimeBuilder_ == null
+            ? waitTime_
+            : waitTimeBuilder_.build();
+        to_bitField0_ |= 0x00000001;
+      }
+      result.bitField0_ |= to_bitField0_;
     }
 
     private void buildPartialOneofs(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision result) {
@@ -4608,6 +4670,9 @@ private static final long serialVersionUID = 0L;
       if (other.deniedResponseStatusCode_ != 0) {
         setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
       }
+      if (other.hasWaitTime()) {
+        mergeWaitTime(other.getWaitTime());
+      }
       switch (other.getDetailsCase()) {
         case RATE_LIMITER_INFO: {
           mergeRateLimiterInfo(other.getRateLimiterInfo());
@@ -4685,6 +4750,13 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000020;
               break;
             } // case 80
+            case 90: {
+              input.readMessage(
+                  getWaitTimeFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 90
             case 162: {
               input.readMessage(
                   getRateLimiterInfoFieldBuilder().getBuilder(),
@@ -5097,6 +5169,127 @@ private static final long serialVersionUID = 0L;
       deniedResponseStatusCode_ = 0;
       onChanged();
       return this;
+    }
+
+    private com.google.protobuf.Duration waitTime_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> waitTimeBuilder_;
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     * @return Whether the waitTime field is set.
+     */
+    public boolean hasWaitTime() {
+      return ((bitField0_ & 0x00000040) != 0);
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     * @return The waitTime.
+     */
+    public com.google.protobuf.Duration getWaitTime() {
+      if (waitTimeBuilder_ == null) {
+        return waitTime_ == null ? com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      } else {
+        return waitTimeBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        waitTime_ = value;
+      } else {
+        waitTimeBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public Builder setWaitTime(
+        com.google.protobuf.Duration.Builder builderForValue) {
+      if (waitTimeBuilder_ == null) {
+        waitTime_ = builderForValue.build();
+      } else {
+        waitTimeBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public Builder mergeWaitTime(com.google.protobuf.Duration value) {
+      if (waitTimeBuilder_ == null) {
+        if (((bitField0_ & 0x00000040) != 0) &&
+          waitTime_ != null &&
+          waitTime_ != com.google.protobuf.Duration.getDefaultInstance()) {
+          getWaitTimeBuilder().mergeFrom(value);
+        } else {
+          waitTime_ = value;
+        }
+      } else {
+        waitTimeBuilder_.mergeFrom(value);
+      }
+      if (waitTime_ != null) {
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public Builder clearWaitTime() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      waitTime_ = null;
+      if (waitTimeBuilder_ != null) {
+        waitTimeBuilder_.dispose();
+        waitTimeBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.Duration.Builder getWaitTimeBuilder() {
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return getWaitTimeFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder() {
+      if (waitTimeBuilder_ != null) {
+        return waitTimeBuilder_.getMessageOrBuilder();
+      } else {
+        return waitTime_ == null ?
+            com.google.protobuf.Duration.getDefaultInstance() : waitTime_;
+      }
+    }
+    /**
+     * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+        getWaitTimeFieldBuilder() {
+      if (waitTimeBuilder_ == null) {
+        waitTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                getWaitTime(),
+                getParentForChildren(),
+                isClean());
+        waitTime_ = null;
+      }
+      return waitTimeBuilder_;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<

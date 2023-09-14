@@ -1,6 +1,7 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
+import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
@@ -76,6 +77,7 @@ export interface LimiterDecision {
   'dropped'?: (boolean);
   'reason'?: (_aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason);
   'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
+  'waitTime'?: (_google_protobuf_Duration | null);
   'rateLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo | null);
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo | null);
@@ -90,6 +92,7 @@ export interface LimiterDecision__Output {
   'dropped': (boolean);
   'reason': (_aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason__Output);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
+  'waitTime': (_google_protobuf_Duration__Output | null);
   'rateLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo__Output | null);
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Output | null);

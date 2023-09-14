@@ -124,6 +124,7 @@ message LimiterDecision {
   bool dropped = 4;
   LimiterReason reason = 5;
   StatusCode denied_response_status_code = 10;
+  google.protobuf.Duration wait_time = 11;
   oneof details {
     RateLimiterInfo rate_limiter_info = 20;
     SchedulerInfo load_scheduler_info = 21;

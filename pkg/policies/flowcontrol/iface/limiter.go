@@ -30,19 +30,10 @@ func (limiterID LimiterID) String() string {
 type Limiter interface {
 	GetPolicyName() string
 	GetSelectors() []*policylangv1.Selector
-	Decide(context.Context, labels.Labels) LimiterDecision
+	Decide(context.Context, labels.Labels) *flowcontrolv1.LimiterDecision
 	Revert(context.Context, labels.Labels, *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID
 	GetRequestCounter(labels map[string]string) prometheus.Counter
-}
-
-// LimiterDecision wraps flowcontrolv1.LimiterDecision with some additional
-// metadata that won't end up in the CheckResponse.
-type LimiterDecision struct {
-	*flowcontrolv1.LimiterDecision
-	// If non-zero, it's a recommended minimal time before retrying failed
-	// request.
-	WaitTime time.Duration
 }
 
 // RateLimiter interface.
