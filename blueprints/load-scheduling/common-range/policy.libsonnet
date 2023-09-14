@@ -78,10 +78,9 @@ function(cfg, params={}, metadata={}) {
   local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAdaptiveLoadScheduler(
       local adaptiveLoadScheduler = updatedConfig.policy.service_protection_core.adaptive_load_scheduler;
+      local range = updatedConfig.policy.service_protection_core.range_throttling_strategy;
+
       spec.v1.AdaptiveLoadScheduler.new()
-      + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
-      + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AdaptiveLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
       + spec.v1.AdaptiveLoadScheduler.withInPorts({
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
         signal: spec.v1.Port.withSignalName('SIGNAL'),
@@ -90,7 +89,19 @@ function(cfg, params={}, metadata={}) {
       + spec.v1.AdaptiveLoadScheduler.withOutPorts({
         desired_load_multiplier: spec.v1.Port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
         observed_load_multiplier: spec.v1.Port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
-      }),
+      })
+      + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
+      + spec.v1.AdaptiveLoadScheduler.withRangeThrottlingStrategy(
+        spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategy.new()
+        + spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategy.withInPorts({
+          signal: spec.v1.Port.withSignalName('SIGNAL'),
+        })
+        + spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategyParameters.withStart(range.parameters.start)
+        + spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategyParameters.withEnd(range.parameters.end)
+        + spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategyParameters.withDegree(range.parameters.degree)
+      )
+      + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
+      + spec.v1.AdaptiveLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
     ),
   ),
 

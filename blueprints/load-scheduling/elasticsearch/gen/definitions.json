@@ -8,12 +8,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "setpoint",
-        "elasticsearch"
-      ],
+      "required": ["policy_name", "service_protection_core", "elasticsearch"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -42,7 +37,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["adaptive_load_scheduler"],
+          "required": ["adaptive_load_scheduler", "range_throttling_strategy"],
           "properties": {
             "adaptive_load_scheduler": {
               "description": "Parameters for Adaptive Load Scheduler.",
@@ -50,12 +45,6 @@
                 "alerter": {
                   "alert_name": "Load Throttling Event"
                 },
-                "gradient": {
-                  "max_gradient": 1,
-                  "min_gradient": 0.1,
-                  "slope": -1
-                },
-                "load_multiplier_linear_increment": 0.025,
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -63,8 +52,7 @@
                       "service": "__REQUIRED_FIELD__"
                     }
                   ]
-                },
-                "max_load_multiplier": 2
+                }
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
@@ -88,6 +76,18 @@
                 "type": "object",
                 "$ref": "#/$defs/overload_confirmation"
               }
+            },
+            "range_throttling_strategy": {
+              "description": "Parameters for Range Throttling Strategy.",
+              "default": {
+                "parameters": {
+                  "degree": "__REQUIRED_FIELD__",
+                  "end": "__REQUIRED_FIELD__",
+                  "start": "__REQUIRED_FIELD__"
+                }
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy"
             }
           }
         },
@@ -95,12 +95,6 @@
           "description": "PromQL query to detect ElasticSearch overload.",
           "default": "avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))",
           "type": "string"
-        },
-        "setpoint": {
-          "description": "Setpoint.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "number",
-          "format": "double"
         },
         "elasticsearch": {
           "description": "Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.",

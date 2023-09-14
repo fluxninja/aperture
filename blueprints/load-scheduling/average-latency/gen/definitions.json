@@ -49,12 +49,6 @@
                 "alerter": {
                   "alert_name": "Load Throttling Event"
                 },
-                "gradient": {
-                  "max_gradient": 1,
-                  "min_gradient": 0.1,
-                  "slope": -1
-                },
-                "load_multiplier_linear_increment": 0.025,
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -62,11 +56,24 @@
                       "service": "__REQUIRED_FIELD__"
                     }
                   ]
-                },
-                "max_load_multiplier": 2
+                }
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
+            },
+            "aimd_throttling_strategy": {
+              "description": "Parameters for AIMD throttling strategy.",
+              "default": {
+                "gradient": {
+                  "max_gradient": 1,
+                  "min_gradient": 0.1,
+                  "slope": -1
+                },
+                "load_multiplier_linear_increment": 0.025,
+                "max_load_multiplier": 2
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategy"
             },
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",

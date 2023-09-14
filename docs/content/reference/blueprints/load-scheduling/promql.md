@@ -88,20 +88,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-setpoint"></a>
-
-<ParameterDescription
-    name='policy.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -115,7 +101,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for Adaptive Load Scheduler.'
     type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
     reference='../../configuration/spec#adaptive-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
+    value='{"alerter": {"alert_name": "Load Throttling Event"}, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}}'
 />
 
 <!-- vale on -->
@@ -158,6 +144,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-service-protection-core-range-throttling-strategy"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.range_throttling_strategy'
+    description='Parameters for Range Throttling Strategy.'
+    type='Object (aperture.spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategy)'
+    reference='../../configuration/spec#adaptive-load-scheduler-range-throttling-strategy'
+    value='{"parameters": {"degree": "__REQUIRED_FIELD__", "end": "__REQUIRED_FIELD__", "start": "__REQUIRED_FIELD__"}}'
 />
 
 <!-- vale on -->

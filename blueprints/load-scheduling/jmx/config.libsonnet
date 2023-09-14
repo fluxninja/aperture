@@ -1,4 +1,4 @@
-local serviceProtectionDefaults = import '../common/config-defaults.libsonnet';
+local serviceProtectionDefaults = import '../common-range/config-defaults.libsonnet';
 
 
 serviceProtectionDefaults {
@@ -7,6 +7,7 @@ serviceProtectionDefaults {
     * @param (policy.promql_query: string) PromQL query.
     */
     promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
+
     /**
     * @param (policy.setpoint: float64) Setpoint.
     */

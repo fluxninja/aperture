@@ -2,7 +2,6 @@
 
 policy:
   policy_name: postgres-connections
-  setpoint: 20
   resources:
     flow_control:
       classifiers:
@@ -25,6 +24,15 @@ policy:
     tls:
       insecure: true
   service_protection_core:
+    range_throttling_strategy:
+      parameters:
+        degree: 1
+        start:
+          load_multiplier: 0.025
+          threshold: 0.5
+        end:
+          load_multiplier: 1
+          threshold: 1
     dry_run: false
     adaptive_load_scheduler:
       load_scheduler:

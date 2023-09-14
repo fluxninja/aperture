@@ -1,5 +1,5 @@
 local creator = import '../../grafana/dashboard_group.libsonnet';
-local utils = import '../common/utils.libsonnet';
+local utils = import '../common-range/utils.libsonnet';
 local blueprint = import './promql.libsonnet';
 
 local policy = blueprint.policy;
