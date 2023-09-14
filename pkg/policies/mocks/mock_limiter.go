@@ -41,10 +41,10 @@ func (m *MockLimiter) EXPECT() *MockLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockLimiter) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
+func (m *MockLimiter) Decide(arg0 context.Context, arg1 labels.Labels) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
-	ret0, _ := ret[0].(iface.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
@@ -146,10 +146,10 @@ func (m *MockRateLimiter) EXPECT() *MockRateLimiterMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockRateLimiter) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
+func (m *MockRateLimiter) Decide(arg0 context.Context, arg1 labels.Labels) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
-	ret0, _ := ret[0].(iface.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
@@ -269,10 +269,10 @@ func (m *MockScheduler) EXPECT() *MockSchedulerMockRecorder {
 }
 
 // Decide mocks base method.
-func (m *MockScheduler) Decide(arg0 context.Context, arg1 labels.Labels) iface.LimiterDecision {
+func (m *MockScheduler) Decide(arg0 context.Context, arg1 labels.Labels) *checkv1.LimiterDecision {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decide", arg0, arg1)
-	ret0, _ := ret[0].(iface.LimiterDecision)
+	ret0, _ := ret[0].(*checkv1.LimiterDecision)
 	return ret0
 }
 
@@ -280,6 +280,20 @@ func (m *MockScheduler) Decide(arg0 context.Context, arg1 labels.Labels) iface.L
 func (mr *MockSchedulerMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), arg0, arg1)
+}
+
+// GetFlowDurationSummary mocks base method.
+func (m *MockScheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowDurationSummary", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetFlowDurationSummary indicates an expected call of GetFlowDurationSummary.
+func (mr *MockSchedulerMockRecorder) GetFlowDurationSummary(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowDurationSummary", reflect.TypeOf((*MockScheduler)(nil).GetFlowDurationSummary), labels)
 }
 
 // GetLatencyObserver mocks base method.

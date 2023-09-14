@@ -6271,6 +6271,20 @@ Parameters for the RateLimiter component
 Selectors for the component.
 
 </dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid number.
+
+</dd>
 </dl>
 
 ---
@@ -6421,20 +6435,6 @@ representation from Protocol Buffers. The format accommodates fractional seconds
 up to nine digits after the decimal point, offering nanosecond precision. Every
 duration value must be suffixed with an "s" to indicate 'seconds.' For example,
 a value of "10s" would signify a duration of 10 seconds.
-
-</dd>
-<dt>tokens_label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Flow label key that will be used to override the number of tokens for this
-request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>

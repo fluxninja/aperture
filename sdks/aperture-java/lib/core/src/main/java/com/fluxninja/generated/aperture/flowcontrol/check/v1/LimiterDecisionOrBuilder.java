@@ -61,66 +61,6 @@ public interface LimiterDecisionOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.LimiterReason getReason();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
-   * @return Whether the rateLimiterInfo field is set.
-   */
-  boolean hasRateLimiterInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
-   * @return The rateLimiterInfo.
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo getRateLimiterInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 6 [json_name = "rateLimiterInfo"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder();
-
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
-   * @return Whether the loadSchedulerInfo field is set.
-   */
-  boolean hasLoadSchedulerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
-   * @return The loadSchedulerInfo.
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo getLoadSchedulerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 7 [json_name = "loadSchedulerInfo"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder();
-
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 8 [json_name = "samplerInfo"];</code>
-   * @return Whether the samplerInfo field is set.
-   */
-  boolean hasSamplerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 8 [json_name = "samplerInfo"];</code>
-   * @return The samplerInfo.
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo getSamplerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 8 [json_name = "samplerInfo"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfoOrBuilder getSamplerInfoOrBuilder();
-
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 9 [json_name = "quotaSchedulerInfo"];</code>
-   * @return Whether the quotaSchedulerInfo field is set.
-   */
-  boolean hasQuotaSchedulerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 9 [json_name = "quotaSchedulerInfo"];</code>
-   * @return The quotaSchedulerInfo.
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo getQuotaSchedulerInfo();
-  /**
-   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 9 [json_name = "quotaSchedulerInfo"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfoOrBuilder getQuotaSchedulerInfoOrBuilder();
-
-  /**
    * <code>.aperture.flowcontrol.check.v1.StatusCode denied_response_status_code = 10 [json_name = "deniedResponseStatusCode"];</code>
    * @return The enum numeric value on the wire for deniedResponseStatusCode.
    */
@@ -130,6 +70,81 @@ public interface LimiterDecisionOrBuilder extends
    * @return The deniedResponseStatusCode.
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
+
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return Whether the waitTime field is set.
+   */
+  boolean hasWaitTime();
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   * @return The waitTime.
+   */
+  com.google.protobuf.Duration getWaitTime();
+  /**
+   * <code>.google.protobuf.Duration wait_time = 11 [json_name = "waitTime"];</code>
+   */
+  com.google.protobuf.DurationOrBuilder getWaitTimeOrBuilder();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 20 [json_name = "rateLimiterInfo"];</code>
+   * @return Whether the rateLimiterInfo field is set.
+   */
+  boolean hasRateLimiterInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 20 [json_name = "rateLimiterInfo"];</code>
+   * @return The rateLimiterInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo getRateLimiterInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfo rate_limiter_info = 20 [json_name = "rateLimiterInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.RateLimiterInfoOrBuilder getRateLimiterInfoOrBuilder();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 21 [json_name = "loadSchedulerInfo"];</code>
+   * @return Whether the loadSchedulerInfo field is set.
+   */
+  boolean hasLoadSchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 21 [json_name = "loadSchedulerInfo"];</code>
+   * @return The loadSchedulerInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo getLoadSchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo load_scheduler_info = 21 [json_name = "loadSchedulerInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfoOrBuilder getLoadSchedulerInfoOrBuilder();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 22 [json_name = "samplerInfo"];</code>
+   * @return Whether the samplerInfo field is set.
+   */
+  boolean hasSamplerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 22 [json_name = "samplerInfo"];</code>
+   * @return The samplerInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo getSamplerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfo sampler_info = 22 [json_name = "samplerInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.SamplerInfoOrBuilder getSamplerInfoOrBuilder();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 23 [json_name = "quotaSchedulerInfo"];</code>
+   * @return Whether the quotaSchedulerInfo field is set.
+   */
+  boolean hasQuotaSchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 23 [json_name = "quotaSchedulerInfo"];</code>
+   * @return The quotaSchedulerInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo getQuotaSchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo quota_scheduler_info = 23 [json_name = "quotaSchedulerInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfoOrBuilder getQuotaSchedulerInfoOrBuilder();
 
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.DetailsCase getDetailsCase();
 }

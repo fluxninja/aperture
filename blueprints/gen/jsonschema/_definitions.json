@@ -2527,6 +2527,10 @@
           "minItems": 1,
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive"
+        },
+        "tokens_label_key": {
+          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid number.",
+          "type": "string"
         }
       },
       "required": ["selectors"],
@@ -2585,10 +2589,6 @@
           "description": "Max idle time before token bucket state for a label is removed.\nIf set to 0, the state is never removed.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-default": "7200s"
-        },
-        "tokens_label_key": {
-          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid number.",
-          "type": "string"
         }
       },
       "required": ["interval"],

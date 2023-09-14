@@ -1,6 +1,7 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
+import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
@@ -19,26 +20,24 @@ export type _aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason__Output
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo {
   'label'?: (string);
-  'schedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo | null);
+  'workloadIndex'?: (string);
+  'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo__Output {
   'label': (string);
-  'schedulerInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output | null);
+  'workloadIndex': (string);
+  'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo {
-  'remaining'?: (number | string);
-  'current'?: (number | string);
   'label'?: (string);
-  'tokensConsumed'?: (number | string);
+  'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo__Output {
-  'remaining': (number);
-  'current': (number);
   'label': (string);
-  'tokensConsumed': (number);
+  'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo {
@@ -51,12 +50,24 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Out
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo {
   'workloadIndex'?: (string);
-  'tokensConsumed'?: (number | string);
+  'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output {
   'workloadIndex': (string);
-  'tokensConsumed': (number);
+  'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
+}
+
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo {
+  'remaining'?: (number | string);
+  'current'?: (number | string);
+  'consumed'?: (number | string);
+}
+
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output {
+  'remaining': (number);
+  'current': (number);
+  'consumed': (number);
 }
 
 export interface LimiterDecision {
@@ -65,11 +76,12 @@ export interface LimiterDecision {
   'componentId'?: (string);
   'dropped'?: (boolean);
   'reason'?: (_aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason);
+  'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
+  'waitTime'?: (_google_protobuf_Duration | null);
   'rateLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo | null);
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo | null);
   'quotaSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo | null);
-  'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
   'details'?: "rateLimiterInfo"|"loadSchedulerInfo"|"samplerInfo"|"quotaSchedulerInfo";
 }
 
@@ -79,9 +91,10 @@ export interface LimiterDecision__Output {
   'componentId': (string);
   'dropped': (boolean);
   'reason': (_aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason__Output);
+  'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
+  'waitTime': (_google_protobuf_Duration__Output | null);
   'rateLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo__Output | null);
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Output | null);
   'quotaSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo__Output | null);
-  'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
 }
