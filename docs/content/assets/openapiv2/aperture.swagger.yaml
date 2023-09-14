@@ -2253,6 +2253,8 @@ definitions:
                 $ref: '#/definitions/LimiterDecisionLimiterReason'
             sampler_info:
                 $ref: '#/definitions/LimiterDecisionSamplerInfo'
+            wait_time:
+                type: string
         type: object
     LimiterDecisionLimiterReason:
         default: LIMITER_REASON_UNSPECIFIED
@@ -2264,22 +2266,17 @@ definitions:
         properties:
             label:
                 type: string
-            scheduler_info:
-                $ref: '#/definitions/LimiterDecisionSchedulerInfo'
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
+                type: string
         type: object
     LimiterDecisionRateLimiterInfo:
         properties:
-            current:
-                format: double
-                type: number
             label:
                 type: string
-            remaining:
-                format: double
-                type: number
-            tokens_consumed:
-                format: double
-                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
         type: object
     LimiterDecisionSamplerInfo:
         properties:
@@ -2288,11 +2285,27 @@ definitions:
         type: object
     LimiterDecisionSchedulerInfo:
         properties:
-            tokens_consumed:
-                format: double
-                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
             workload_index:
                 type: string
+        type: object
+    LimiterDecisionTokensInfo:
+        properties:
+            consumed:
+                format: double
+                type: number
+            current:
+                format: double
+                type: number
+            remaining:
+                description: |-
+                    remaining and current may not
+                    provide accurate values in case
+                    the request times out while waiting
+                    for tokens.
+                format: double
+                type: number
         type: object
     ListAgentsResponse:
         properties:
@@ -3238,6 +3251,14 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
         required:
             - selectors
         title: Limits the traffic on a control point to specified rate
@@ -3306,14 +3327,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 7200s
-            tokens_label_key:
-                description: |-
-                    Flow label key that will be used to override the number of tokens
-                    for this request.
-                    This is an optional parameter and takes highest precedence
-                    when assigning tokens to a request.
-                    The label value must be a valid number.
-                type: string
         required:
             - interval
         type: object

@@ -2658,6 +2658,14 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
         required:
             - selectors
         title: Limits the traffic on a control point to specified rate
@@ -2726,14 +2734,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 7200s
-            tokens_label_key:
-                description: |-
-                    Flow label key that will be used to override the number of tokens
-                    for this request.
-                    This is an optional parameter and takes highest precedence
-                    when assigning tokens to a request.
-                    The label value must be a valid number.
-                type: string
         required:
             - interval
         type: object

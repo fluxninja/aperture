@@ -24,4 +24,10 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withSelectorsMixin(selectors):: {
     selectors+: selectors,
   },
+  withTokensLabelKey(tokens_label_key):: {
+    tokens_label_key: tokens_label_key,
+  },
+  withTokensLabelKeyMixin(tokens_label_key):: {
+    tokens_label_key+: tokens_label_key,
+  },
 }
