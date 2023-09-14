@@ -37,26 +37,8 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["adaptive_load_scheduler", "range_throttling_strategy"],
+          "required": ["range_driven_load_scheduler"],
           "properties": {
-            "adaptive_load_scheduler": {
-              "description": "Parameters for Adaptive Load Scheduler.",
-              "default": {
-                "alerter": {
-                  "alert_name": "Load Throttling Event"
-                },
-                "load_scheduler": {
-                  "selectors": [
-                    {
-                      "control_point": "__REQUIRED_FIELD__",
-                      "service": "__REQUIRED_FIELD__"
-                    }
-                  ]
-                }
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
-            },
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
               "default": false,
@@ -77,17 +59,26 @@
                 "$ref": "#/$defs/overload_confirmation"
               }
             },
-            "range_throttling_strategy": {
+            "range_driven_load_scheduler": {
               "description": "Parameters for Range Throttling Strategy.",
               "default": {
-                "parameters": {
-                  "degree": "__REQUIRED_FIELD__",
-                  "end": "__REQUIRED_FIELD__",
-                  "start": "__REQUIRED_FIELD__"
-                }
+                "alerter": {
+                  "alert_name": "Load Throttling Event"
+                },
+                "degree": "__REQUIRED_FIELD__",
+                "end": "__REQUIRED_FIELD__",
+                "load_scheduler": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  ]
+                },
+                "start": "__REQUIRED_FIELD__"
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RangeDrivenLoadSchedulerParameters"
             }
           }
         },

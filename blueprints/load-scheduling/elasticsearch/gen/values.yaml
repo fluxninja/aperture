@@ -8,24 +8,19 @@ policy:
   # Required: True
   policy_name: __REQUIRED_FIELD__
   service_protection_core:
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Parameters for Range Throttling Strategy.
+    # Type: aperture.spec.v1.RangeDrivenLoadSchedulerParameters
     # Required: True
-    adaptive_load_scheduler:
+    range_driven_load_scheduler:
       alerter:
         alert_name: "Load Throttling Event"
+      degree: __REQUIRED_FIELD__
+      end: __REQUIRED_FIELD__
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
-    # Parameters for Range Throttling Strategy.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategy
-    # Required: True
-    range_throttling_strategy:
-      parameters:
-        degree: __REQUIRED_FIELD__
-        end: __REQUIRED_FIELD__
-        start: __REQUIRED_FIELD__
+      start: __REQUIRED_FIELD__
   # Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
   # Type: elasticsearch
   # Required: True

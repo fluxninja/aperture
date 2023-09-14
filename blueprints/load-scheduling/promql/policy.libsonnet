@@ -21,15 +21,6 @@ function(cfg, params={}, metadata={}) {
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),
-        spec.v1.Component.withVariable(
-          spec.v1.Variable.new()
-          + spec.v1.Variable.withConstantOutput(
-            local s = updatedConfig.policy.setpoint;
-            spec.v1.ConstantSignal.new()
-            + spec.v1.ConstantSignal.withValue(s)
-          )
-          + spec.v1.Variable.withOutPorts({ output: spec.v1.Port.withSignalName('SETPOINT') }),
-        ),
       ],
     },
   },

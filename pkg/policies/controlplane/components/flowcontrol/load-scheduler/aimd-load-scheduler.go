@@ -23,10 +23,6 @@ func ParseAIMDLoadScheduler(
 	aimdLoadScheduler *policylangv1.AIMDLoadScheduler,
 	componentID runtime.ComponentID,
 ) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-		return nil, nil, err
-	}
-
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := aimdLoadScheduler.InPorts
 	if inPorts != nil {
@@ -309,7 +305,7 @@ func ParseAIMDLoadScheduler(
 		false,
 	)
 	if err != nil {
-		return retErr(err)
+		return nil, nil, err
 	}
 
 	return configuredComponent, nestedCircuit, nil

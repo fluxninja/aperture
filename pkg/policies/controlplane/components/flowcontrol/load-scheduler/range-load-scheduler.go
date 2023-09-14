@@ -20,10 +20,6 @@ func ParseRangeDrivenLoadScheduler(
 	rangeDrivenLoadScheduler *policylangv1.RangeDrivenLoadScheduler,
 	componentID runtime.ComponentID,
 ) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-		return nil, nil, err
-	}
-
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := rangeDrivenLoadScheduler.InPorts
 	if inPorts != nil {
@@ -220,7 +216,7 @@ func ParseRangeDrivenLoadScheduler(
 		false,
 	)
 	if err != nil {
-		return retErr(err)
+		return nil, nil, err
 	}
 
 	return configuredComponent, nestedCircuit, nil

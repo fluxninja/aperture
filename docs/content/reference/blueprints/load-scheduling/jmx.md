@@ -88,35 +88,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-setpoint"></a>
-
-<ParameterDescription
-    name='policy.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='20'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.service_protection_core {#policy-service-protection-core}
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-adaptive-load-scheduler"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler'
-    description='Parameters for Adaptive Load Scheduler.'
-    type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
-    reference='../../configuration/spec#adaptive-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Load Throttling Event"}, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}}'
-/>
 
 <!-- vale on -->
 
@@ -164,14 +136,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-range-throttling-strategy"></a>
+<a id="policy-service-protection-core-range-driven-load-scheduler"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.range_throttling_strategy'
+    name='policy.service_protection_core.range_driven_load_scheduler'
     description='Parameters for Range Throttling Strategy.'
-    type='Object (aperture.spec.v1.AdaptiveLoadSchedulerRangeThrottlingStrategy)'
-    reference='../../configuration/spec#adaptive-load-scheduler-range-throttling-strategy'
-    value='{"parameters": {"degree": "__REQUIRED_FIELD__", "end": "__REQUIRED_FIELD__", "start": "__REQUIRED_FIELD__"}}'
+    type='Object (aperture.spec.v1.RangeDrivenLoadSchedulerParameters)'
+    reference='../../configuration/spec#range-driven-load-scheduler-parameters'
+    value='{"alerter": {"alert_name": "Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "end": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "start": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

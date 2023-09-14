@@ -6,10 +6,6 @@ import (
 )
 
 func prepareLoadSchedulerCommonComponents() *policylangv1.NestedCircuit {
-	// Needs PASS_THROUGH_FROM_STRATEGY, LOAD_MULTIPLIER_FROM_STRATEGY and OVERLOAD_FROM_STRATEGY
-	// Provides IS_OVERLOAD, DESIRED_LOAD_MULTIPLIER, OBSERVED_LOAD_MULTIPLIER
-	// Needs PASS_THROUGH_FROM_STRATEGY, LOAD_MULTIPLIER_FROM_STRATEGY and OVERLOAD_FROM_STRATEGY
-	// Provides IS_OVERLOAD, DESIRED_LOAD_MULTIPLIER, OBSERVED_LOAD_MULTIPLIER
 	nestedCircuit := &policylangv1.NestedCircuit{
 		Components: []*policylangv1.Component{
 			{

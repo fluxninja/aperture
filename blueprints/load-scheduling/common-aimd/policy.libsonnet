@@ -75,32 +75,23 @@ function(cfg, params={}, metadata={}) {
 
   local isConfirmationCriteria = std.length(confirmationAccumulator.overload_confirmation_signals) > 0,
 
-  local adaptiveLoadSchedulerComponent = spec.v1.Component.withFlowControl(
-    spec.v1.FlowControl.withAdaptiveLoadScheduler(
-      local adaptiveLoadScheduler = updatedConfig.policy.service_protection_core.adaptive_load_scheduler;
-      local aimd = updatedConfig.policy.service_protection_core.aimd_throttling_strategy;
+  local aimdLoadSchedulerComponent = spec.v1.Component.withFlowControl(
+    spec.v1.FlowControl.withAimdLoadScheduler(
+      local aimd = updatedConfig.policy.service_protection_core.aimd_load_scheduler;
 
-      spec.v1.AdaptiveLoadScheduler.new()
-      + spec.v1.AdaptiveLoadScheduler.withInPorts({
+      spec.v1.AIMDLoadScheduler.new()
+      + spec.v1.AIMDLoadScheduler.withInPorts({
+        signal: spec.v1.Port.withSignalName('SIGNAL'),
+        setpoint: spec.v1.Port.withSignalName('SETPOINT'),
         overload_confirmation: (if isConfirmationCriteria then spec.v1.Port.withSignalName('OVERLOAD_CONFIRMATION') else spec.v1.Port.withConstantSignal(1)),
       })
-      + spec.v1.AdaptiveLoadScheduler.withOutPorts({
+      + spec.v1.AIMDLoadScheduler.withOutPorts({
         desired_load_multiplier: spec.v1.Port.withSignalName('DESIRED_LOAD_MULTIPLIER'),
         observed_load_multiplier: spec.v1.Port.withSignalName('OBSERVED_LOAD_MULTIPLIER'),
       })
-      + spec.v1.AdaptiveLoadScheduler.withParameters(adaptiveLoadScheduler)
-      + spec.v1.AdaptiveLoadScheduler.withAimdThrottlingStrategy(
-        spec.v1.AdaptiveLoadSchedulerAIMDThrottlingStrategy.new()
-        + spec.v1.AdaptiveLoadSchedulerAIMDThrottlingStrategy.withInPorts({
-          signal: spec.v1.Port.withSignalName('SIGNAL'),
-          setpoint: spec.v1.Port.withSignalName('SETPOINT'),
-        })
-        + spec.v1.AdaptiveLoadSchedulerAIMDThrottlingStrategy.withGradient(aimd.gradient)
-        + spec.v1.AdaptiveLoadSchedulerAIMDThrottlingStrategy.withMaxLoadMultiplier(aimd.max_load_multiplier)
-        + spec.v1.AdaptiveLoadSchedulerAIMDThrottlingStrategy.withLoadMultiplierLinearIncrement(aimd.load_multiplier_linear_increment)
-      )
-      + spec.v1.AdaptiveLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AdaptiveLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
+      + spec.v1.AIMDLoadScheduler.withParameters(aimd)
+      + spec.v1.AIMDLoadScheduler.withDryRunConfigKey('dry_run')
+      + spec.v1.AIMDLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
     ),
   ),
 
@@ -114,7 +105,7 @@ function(cfg, params={}, metadata={}) {
         confirmationAccumulator.components
         + (if isConfirmationCriteria then [overloadConfirmationAnd] else [])
         + [
-          adaptiveLoadSchedulerComponent,
+          aimdLoadSchedulerComponent,
         ]
         + updatedConfig.policy.components,
       ),

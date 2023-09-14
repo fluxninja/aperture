@@ -8,16 +8,22 @@ policy:
   # Required: True
   policy_name: __REQUIRED_FIELD__
   service_protection_core:
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Parameters for AIMD throttling strategy.
+    # Type: aperture.spec.v1.AIMDLoadSchedulerParameters
     # Required: True
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       alerter:
         alert_name: "Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      load_multiplier_linear_increment: 0.025
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
+      max_load_multiplier: 2
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
     # Type: aperture.spec.v1.FluxMeter
