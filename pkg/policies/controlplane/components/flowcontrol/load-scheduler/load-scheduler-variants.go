@@ -26,7 +26,10 @@ func prepareLoadSchedulerCommonComponents() *policylangv1.NestedCircuit {
 									Value: &policylangv1.InPort_ConstantSignal{
 										ConstantSignal: &policylangv1.ConstantSignal{
 											Const: &policylangv1.ConstantSignal_Value{
-												Value: 1, // Overload confirmation is assumed true by default. This makes the same circuit work in case overload confirmation is not provided. If the required behavior is to assume false by default then the policy needs to make sure to provide a valid signal with desired defaults.
+												// Overload confirmation is assumed true by default. This allows the circuit to function even if
+												// overload confirmation is not provided. If the required behavior is to assume false by default,
+												// the policy needs to ensure a valid signal with the desired defaults is provided.
+												Value: 1,
 											},
 										},
 									},
