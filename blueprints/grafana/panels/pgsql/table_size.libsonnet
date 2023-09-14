@@ -4,9 +4,9 @@ local statPanel = import '../../utils/stat_panel.libsonnet';
 function(cfg) {
   local stringFilters = utils.dictToPrometheusFilter(cfg.dashboard.extra_filters { policy_name: cfg.policy.policy_name }),
 
-  local tbCount = statPanel('Number of tables',
-                            cfg.dashboard.datasource.name,
-                            'postgresql_table_count{%(filters)s}',
-                            stringFilters),
-  panel: tbCount.panel,
+  local tbSize = statPanel('Tables Size (MB) ',
+                           cfg.dashboard.datasource.name,
+                           'sum(postgresql_table_size_bytes{%(filters)s}) / 1024 / 1024',
+                           stringFilters),
+  panel: tbSize.panel,
 }

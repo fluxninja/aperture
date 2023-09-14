@@ -1,11 +1,12 @@
 local backends = import '../pgsql/backends.libsonnet';
-local bgwriter_allocated = import '../pgsql/bgwriter_allocated.libsonnet';
-local bgwriter_writes = import '../pgsql/bgwriter_writes.libsonnet';
+local bgwriter_signals = import '../pgsql/bgwriter_signals.libsonnet';
 local blocks = import '../pgsql/blocks.libsonnet';
 local db_count = import '../pgsql/db_count.libsonnet';
-local index_scans_total = import '../pgsql/index_scans_total.libsonnet';
+local db_size = import '../pgsql/db_size.libsonnet';
 local max_connections = import '../pgsql/max_connections.libsonnet';
+local operations = import '../pgsql/operations.libsonnet';
 local table_count = import '../pgsql/table_count.libsonnet';
+local table_size = import '../pgsql/table_size.libsonnet';
 local total_commits = import '../pgsql/total_commits.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
@@ -13,28 +14,43 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonn
 function(cfg) {
   panels: [
     db_count(cfg).panel
-    + g.panel.stat.gridPos.withY(5),
+    + g.panel.stat.gridPos.withX(0)
+    + g.panel.stat.gridPos.withY(5)
+    + g.panel.stat.gridPos.withH(4)
+    + g.panel.stat.gridPos.withW(4),
+    db_size(cfg).panel
+    + g.panel.stat.gridPos.withX(5)
+    + g.panel.stat.gridPos.withY(5)
+    + g.panel.stat.gridPos.withH(4)
+    + g.panel.stat.gridPos.withW(4),
     table_count(cfg).panel
-    + g.panel.stat.gridPos.withX(6)
-    + g.panel.stat.gridPos.withY(5),
+    + g.panel.stat.gridPos.withX(10)
+    + g.panel.stat.gridPos.withY(5)
+    + g.panel.stat.gridPos.withH(4)
+    + g.panel.stat.gridPos.withW(4),
+    table_size(cfg).panel
+    + g.panel.stat.gridPos.withX(15)
+    + g.panel.stat.gridPos.withY(5)
+    + g.panel.stat.gridPos.withH(4)
+    + g.panel.stat.gridPos.withW(4),
     max_connections(cfg).panel
-    + g.panel.stat.gridPos.withX(12)
-    + g.panel.stat.gridPos.withY(5),
-    bgwriter_writes(cfg).panel
-    + g.panel.stat.gridPos.withY(10),
-    bgwriter_allocated(cfg).panel
-    + g.panel.stat.gridPos.withX(6)
-    + g.panel.stat.gridPos.withY(10),
+    + g.panel.stat.gridPos.withX(20)
+    + g.panel.stat.gridPos.withY(5)
+    + g.panel.stat.gridPos.withH(4)
+    + g.panel.stat.gridPos.withW(4),
+    bgwriter_signals(cfg, 'BgWriter Writes').panel
+    + g.panel.timeSeries.gridPos.withY(10)
+    + g.panel.timeSeries.options.legend.withAsTable(true),
+    //+ g.panel.timeSeries.fieldConfig.defaults.custom.withDrawStyle("bars"),
     total_commits(cfg).panel
     + g.panel.timeSeries.gridPos.withY(20),
     blocks(cfg).panel
-    + g.panel.stat.gridPos.withY(40),
+    + g.panel.timeSeries.gridPos.withY(30),
     backends(cfg).panel
-    + g.panel.timeSeries.gridPos.withY(60),
-    index_scans_total(cfg).panel
-    + g.panel.barGauge.gridPos.withH(6)
-    + g.panel.barGauge.gridPos.withW(12)
-    + g.panel.barGauge.gridPos.withX(24)
-    + g.panel.timeSeries.gridPos.withY(80),
+    + g.panel.barGauge.gridPos.withY(40),
+    operations(cfg, 'Operations').panel
+    + g.panel.timeSeries.gridPos.withY(50)
+    + g.panel.timeSeries.standardOptions.withMax(true)
+    + g.panel.timeSeries.options.legend.withPlacement('right'),
   ],
 }
