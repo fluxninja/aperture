@@ -283,7 +283,14 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		if state.Available < 0 {
 			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
-				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
+				var waitTime time.Duration
+				if gtb.continuousFill {
+					waitTime = time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
+				} else {
+					// calculate how many fills we need
+					fills := int(-state.Available/gtb.fillAmount) + 1
+					waitTime = time.Duration(fills) * gtb.interval
+				}
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
 				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
