@@ -151,24 +151,19 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
-func (sched *WFQScheduler) updateMetrics(accepted bool, request *Request) {
+func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request) (bool, float64, float64) {
 	if accepted {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
+	return accepted, remaining, current
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
-func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (accepted bool, remaining float64, current float64) {
-	accepted = true
-	remaining = 0
-	current = 0
-
-	defer sched.updateMetrics(accepted, request)
-
+func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool, float64, float64) {
 	if request.Tokens == 0 {
-		return
+		return sched.updateMetricsAndReturn(true, 0, 0, request)
 	}
 
 	sched.lock.Lock()
@@ -177,15 +172,15 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return
+		return sched.updateMetricsAndReturn(true, 0, 0, request)
 	}
 
 	// try to schedule right now
 	if !queueOpen {
-		accepted, _, remaining, current = sched.manager.TakeIfAvailable(ctx, request.Tokens)
+		accepted, _, remaining, current := sched.manager.TakeIfAvailable(ctx, request.Tokens)
 		if accepted {
 			// we got the tokens, no need to queue
-			return
+			return sched.updateMetricsAndReturn(true, remaining, current, request)
 		}
 	}
 
@@ -195,12 +190,11 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
-		accepted, remaining, current = sched.scheduleRequest(ctx, request, qRequest)
-		return
+		accepted, remaining, current := sched.scheduleRequest(ctx, request, qRequest)
+		return sched.updateMetricsAndReturn(accepted, remaining, current, request)
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		accepted = false
-		return
+		return sched.updateMetricsAndReturn(false, 0, 0, request)
 	}
 }
 
