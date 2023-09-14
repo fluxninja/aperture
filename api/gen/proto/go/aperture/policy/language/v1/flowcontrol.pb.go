@@ -2026,7 +2026,7 @@ type RateLimiter_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Capacity of the bucket.
+	// Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.
 	BucketCapacity *InPort `protobuf:"bytes,1,opt,name=bucket_capacity,json=bucketCapacity,proto3" json:"bucket_capacity,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Number of tokens to fill within an `interval`.
 	FillAmount *InPort `protobuf:"bytes,2,opt,name=fill_amount,json=fillAmount,proto3" json:"fill_amount,omitempty" validate:"required"` // @gotags: validate:"required"

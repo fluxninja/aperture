@@ -6307,7 +6307,8 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Capacity of the bucket.
+Capacity of the bucket to allow for bursty traffic. The bucket is given a chance
+to empty out before the filling starts.
 
 </dd>
 <dt>fill_amount</dt>
