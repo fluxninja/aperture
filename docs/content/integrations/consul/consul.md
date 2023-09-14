@@ -17,9 +17,9 @@ import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js
 import Zoom from 'react-medium-image-zoom';
 ```
 
-![Istio](./assets/consul-light.png#gh-light-mode-only)
+![Istio](./assets/consul-light.svg#gh-light-mode-only)
 
-![Istio](./assets/consul-light.png#gh-dark-mode-only)
+![Istio](./assets/consul-dark.svg#gh-dark-mode-only)
 
 ## Supported Versions
 
