@@ -7213,7 +7213,7 @@ This field allows you to override the default HTTP status code
 (`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
-<dt>priorities_label_key</dt>
+<dt>priority_label_key</dt>
 <dd>
 
 <!-- vale off -->

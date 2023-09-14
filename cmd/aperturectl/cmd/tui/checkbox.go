@@ -6,15 +6,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type checkBoxModel struct {
+type CheckBoxModel struct {
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	Selected map[int]struct{} // which to-do items are selected
 	msg      string
 }
 
-func InitialCheckboxModel(options []string, msg string) *checkBoxModel {
-	return &checkBoxModel{
+func InitialCheckboxModel(options []string, msg string) *CheckBoxModel {
+	return &CheckBoxModel{
 		// Our to-do list is a grocery list
 		choices: options,
 
@@ -27,12 +27,12 @@ func InitialCheckboxModel(options []string, msg string) *checkBoxModel {
 	}
 }
 
-func (m checkBoxModel) Init() tea.Cmd {
+func (m CheckBoxModel) Init() tea.Cmd {
 	// Just return `nil`, which means "no I/O right now, please."
 	return nil
 }
 
-func (m checkBoxModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m CheckBoxModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	// Is it a key press?
 	case tea.KeyMsg:
@@ -85,7 +85,7 @@ func (m checkBoxModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m checkBoxModel) View() string {
+func (m CheckBoxModel) View() string {
 	// The header
 	s := fmt.Sprintf("\n%s\n\n", m.msg)
 

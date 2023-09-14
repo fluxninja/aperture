@@ -10,6 +10,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
@@ -31,6 +32,7 @@ var (
 )
 
 func init() {
+	RootCmd.AddCommand(cloud.CloudCmd)
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
 	RootCmd.AddCommand(apply.ApplyCmd)

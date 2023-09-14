@@ -1039,10 +1039,10 @@ func (m *Scheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x48
 	}
-	if len(m.PrioritiesLabelKey) > 0 {
-		i -= len(m.PrioritiesLabelKey)
-		copy(dAtA[i:], m.PrioritiesLabelKey)
-		i = encodeVarint(dAtA, i, uint64(len(m.PrioritiesLabelKey)))
+	if len(m.PriorityLabelKey) > 0 {
+		i -= len(m.PriorityLabelKey)
+		copy(dAtA[i:], m.PriorityLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.PriorityLabelKey)))
 		i--
 		dAtA[i] = 0x42
 	}
@@ -3269,7 +3269,7 @@ func (m *Scheduler) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
-	l = len(m.PrioritiesLabelKey)
+	l = len(m.PriorityLabelKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -6395,7 +6395,7 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PrioritiesLabelKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PriorityLabelKey", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6423,7 +6423,7 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PrioritiesLabelKey = string(dAtA[iNdEx:postIndex])
+			m.PriorityLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 9:
 			if wireType != 0 {
