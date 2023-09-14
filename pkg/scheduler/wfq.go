@@ -276,7 +276,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
-func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request, qRequest *queuedRequest) (allowed bool, remaining float64, current float64) {
+func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request, qRequest *queuedRequest) (bool, float64, float64) {
 	// This request has been selected to be executed next
 	allowed, waitTime, remaining, current := sched.manager.Take(ctx, float64(request.Tokens))
 	// check if we need to wait
@@ -328,7 +328,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 
 	sched.cleanup(qRequest)
 
-	return
+	return allowed, remaining, current
 }
 
 func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
