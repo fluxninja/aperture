@@ -55,6 +55,11 @@ const (
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
 
+	// Check flow metrics.
+
+	// FlowDurationMetricName - metric used for grouping durations for Check calls.
+	FlowDurationMetricName = "flow_duration_ms"
+
 	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
 	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
