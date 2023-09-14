@@ -161,10 +161,14 @@ func (sched *WFQScheduler) updateMetrics(accepted bool, request *Request) {
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (accepted bool, remaining float64, current float64) {
+	accepted = true
+	remaining = 0
+	current = 0
+
 	defer sched.updateMetrics(accepted, request)
 
 	if request.Tokens == 0 {
-		return true, 0, 0
+		return
 	}
 
 	sched.lock.Lock()
@@ -173,15 +177,15 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return true, 0, 0
+		return
 	}
 
 	// try to schedule right now
 	if !queueOpen {
-		ok, _, remaining, current := sched.manager.TakeIfAvailable(ctx, request.Tokens)
-		if ok {
+		accepted, _, remaining, current = sched.manager.TakeIfAvailable(ctx, request.Tokens)
+		if accepted {
 			// we got the tokens, no need to queue
-			return true, remaining, current
+			return
 		}
 	}
 
@@ -191,10 +195,12 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
-		return sched.scheduleRequest(ctx, request, qRequest)
+		accepted, remaining, current = sched.scheduleRequest(ctx, request, qRequest)
+		return
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		return false, 0, 0
+		accepted = false
+		return
 	}
 }
 
