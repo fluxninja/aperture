@@ -320,8 +320,8 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.L
 
 	tokens := float64(1)
 	// get tokens from labels
-	if rl.lbProto.Parameters.TokensLabelKey != "" {
-		if val, ok := labels.Get(rl.lbProto.Parameters.TokensLabelKey); ok {
+	if rl.lbProto.TokensLabelKey != "" {
+		if val, ok := labels.Get(rl.lbProto.TokensLabelKey); ok {
 			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 				tokens = parsedTokens
 			}
@@ -349,10 +349,12 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.L
 			Reason:                   reason,
 			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
-					Label:          label,
-					Remaining:      remaining,
-					Current:        current,
-					TokensConsumed: tokensConsumed,
+					Label: label,
+					TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+						Remaining: remaining,
+						Current:   current,
+						Consumed:  tokensConsumed,
+					},
 				},
 			},
 		},
@@ -363,7 +365,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.L
 // Revert returns the tokens to the limiter.
 func (rl *rateLimiter) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
-		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
+		tokens := rateLimiterDecision.RateLimiterInfo.TokensInfo.Consumed
 		if tokens > 0 {
 			rl.TakeIfAvailable(ctx, labels, -tokens)
 		}

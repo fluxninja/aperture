@@ -379,7 +379,8 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) ifac
 				Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
 					QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
 						Label:         label,
-						SchedulerInfo: schedulerInfo,
+						WorkloadIndex: schedulerInfo.WorkloadIndex,
+						TokensInfo:    schedulerInfo.TokensInfo,
 					},
 				},
 			},
@@ -431,7 +432,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) ifac
 func (qs *quotaScheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	// return to the underlying rate limiter
 	if qsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_); ok {
-		tokens := qsDecision.QuotaSchedulerInfo.SchedulerInfo.TokensConsumed
+		tokens := qsDecision.QuotaSchedulerInfo.TokensInfo.Consumed
 		if tokens > 0 {
 			label, found := qs.getLabelKey(labels)
 			if found {

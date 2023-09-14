@@ -448,7 +448,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	req := scheduler.NewRequest(fairnessLabel, tokens, invPriority)
 
-	accepted := s.scheduler.Schedule(reqCtx, req)
+	accepted, remaining, current := s.scheduler.Schedule(reqCtx, req)
 
 	tokensConsumed := float64(0)
 	if accepted {
@@ -464,8 +464,12 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 			DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
 			Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 				LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
-					WorkloadIndex:  matchedWorkloadIndex,
-					TokensConsumed: tokensConsumed,
+					WorkloadIndex: matchedWorkloadIndex,
+					TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+						Consumed:  tokensConsumed,
+						Remaining: remaining,
+						Current:   current,
+					},
 				},
 			},
 		},
@@ -475,7 +479,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 // Revert reverts the decision made by the limiter.
 func (s *Scheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
-		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
+		tokens := lsDecision.LoadSchedulerInfo.TokensInfo.Consumed
 		if tokens > 0 {
 			s.scheduler.Revert(ctx, tokens)
 		}
