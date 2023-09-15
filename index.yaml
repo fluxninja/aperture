@@ -2943,6 +2943,28 @@ entries:
     version: v0.2.0
   aperture-controller:
   - apiVersion: v2
+    appVersion: v2.15.1-rc.1
+    created: "2023-09-15T17:09:09.205097249Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: =1.17.1
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: =8.9.0
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: =15.18.0
+    description: A Helm chart to deploy Aperture Controller
+    digest: 4724d4ae2fe5f9f6fbcb947f81ecdaa0e4b8e4b5f26804285fb65011e229e52d
+    icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
+    name: aperture-controller
+    urls:
+    - https://fluxninja.github.io/aperture/aperture-controller-v2.15.1-rc.1.tgz
+    version: v2.15.1-rc.1
+  - apiVersion: v2
     appVersion: v2.15.0
     created: "2023-09-11T09:08:59.470409093Z"
     dependencies:
@@ -9829,4 +9851,4 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/istioconfig-v0.2.0.tgz
     version: v0.2.0
-generated: "2023-09-15T17:08:55.022493151Z"
+generated: "2023-09-15T17:09:09.191555004Z"
