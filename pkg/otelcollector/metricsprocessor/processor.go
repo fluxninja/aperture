@@ -165,6 +165,7 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 	if len(checkResponse.LimiterDecisions) > 0 {
 		// Update workload metrics
 		latency, latencyFound := otelcollector.GetFloat64(attributes, otelconsts.WorkloadDurationLabel, []string{})
+		duration, durationFound := otelcollector.GetFloat64(attributes, otelconsts.FlowDurationLabel, []string{})
 		for _, decision := range checkResponse.LimiterDecisions {
 			limiterID := iface.LimiterID{
 				PolicyName:  decision.PolicyName,
@@ -181,23 +182,25 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 			// Update load scheduler metrics.
 			if cl := decision.GetLoadSchedulerInfo(); cl != nil {
 				labels[metrics.WorkloadIndexLabel] = cl.GetWorkloadIndex()
-				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
+				p.updateMetricsForFlow(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType, duration, durationFound)
+				p.updateMetricsForWorkload(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
 			}
 
 			// Update quota scheduler metrics.
 			if qs := decision.GetQuotaSchedulerInfo(); qs != nil {
 				labels[metrics.WorkloadIndexLabel] = qs.GetWorkloadIndex()
-				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
+				p.updateMetricsForFlow(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType, duration, durationFound)
+				p.updateMetricsForWorkload(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
 			}
 
 			// Update rate limiter metrics.
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
-				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+				p.updateMetricsForRateLimiter(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType)
 			}
 
 			// Update flow sampler metrics.
 			if fr := decision.GetSamplerInfo(); fr != nil {
-				p.updateMetricsForSampler(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+				p.updateMetricsForSampler(limiterID, deepCopyMap(labels), decision.Dropped, checkResponse.DecisionType)
 			}
 		}
 	}
@@ -251,6 +254,23 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 	requestCounter := loadScheduler.GetRequestCounter(labels)
 	if requestCounter != nil {
 		requestCounter.Inc()
+	}
+}
+
+func (p *metricsProcessor) updateMetricsForFlow(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, duration float64, durationFound bool) {
+	loadScheduler := p.cfg.engine.GetScheduler(limiterID)
+	if loadScheduler == nil {
+		log.Sample(noLoadSchedulerSampler).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
+			Msg("LoadScheduler not found")
+		return
+	}
+	labels[metrics.DecisionTypeLabel] = decisionType.String()
+	latencyObserver := loadScheduler.GetFlowDurationSummary(labels)
+	if latencyObserver != nil {
+		latencyObserver.Observe(duration)
 	}
 }
 
@@ -363,3 +383,11 @@ var (
 	noClassifierSampler    = log.NewRatelimitingSampler()
 	noFluxMeterSampler     = log.NewRatelimitingSampler()
 )
+
+func deepCopyMap(m map[string]string) map[string]string {
+	copiedMap := make(map[string]string, len(m))
+	for k, v := range m {
+		copiedMap[k] = v
+	}
+	return copiedMap
+}

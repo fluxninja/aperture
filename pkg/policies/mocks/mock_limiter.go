@@ -282,6 +282,20 @@ func (mr *MockSchedulerMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), arg0, arg1)
 }
 
+// GetFlowDurationSummary mocks base method.
+func (m *MockScheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFlowDurationSummary", labels)
+	ret0, _ := ret[0].(prometheus.Observer)
+	return ret0
+}
+
+// GetFlowDurationSummary indicates an expected call of GetFlowDurationSummary.
+func (mr *MockSchedulerMockRecorder) GetFlowDurationSummary(labels interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowDurationSummary", reflect.TypeOf((*MockScheduler)(nil).GetFlowDurationSummary), labels)
+}
+
 // GetLatencyObserver mocks base method.
 func (m *MockScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
