@@ -12,7 +12,7 @@ function(title, dsName, query, strFilters, h=6, w=6, targets=[]) {
     ])
     + g.panel.barChart.standardOptions.color.withMode('thresholds')
     + g.panel.barChart.standardOptions.thresholds.withMode('absolute')
-    + g.panel.barChart.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
+    //+ g.panel.barChart.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
     + g.panel.barChart.options.withOrientation('vertical')
     + g.panel.barChart.options.withText('auto')
     + g.panel.barChart.gridPos.withH(h)

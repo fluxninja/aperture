@@ -95,6 +95,6 @@ function(cfg) {
     + g.panel.barGauge.gridPos.withY(40)
     + g.panel.barGauge.gridPos.withH(10)
     + g.panel.barGauge.gridPos.withW(12)
-    + g.panel.barGauge.options.reduceOptions.withValues(true),
+    + g.panel.barGauge.options.withValueMode('text'),
   ],
 }

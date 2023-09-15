@@ -1,5 +1,5 @@
-local barChartPanel = import '../../utils/bar_chart_panel.libsonnet';
 local utils = import '../../utils/policy_utils.libsonnet';
+local timeSeriesPanel = import '../../utils/time_series_panel.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
@@ -24,6 +24,6 @@ function(cfg, title) {
     + g.query.prometheus.withLegendFormat('Hot Update'),
   ],
 
-  local operations = barChartPanel(title, cfg.dashboard.datasource.name, '', stringFilters, h=8, w=10, targets=targets),
+  local operations = timeSeriesPanel(title, cfg.dashboard.datasource.name, '', stringFilters, h=8, w=10, targets=targets),
   panel: operations.panel,
 }
