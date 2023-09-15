@@ -6,7 +6,7 @@ function(cfg) {
 
   local activeConn = statPanel('Active Connections %',
                                cfg.dashboard.datasource.name,
-                               '(postgresql_backends{%(filters)s} / postgresql_connection_max{%(filters)s}) * 100',
+                               'sum(postgresql_backends{%(filters)s}) / sum(postgresql_connection_max{%(filters)s}) * 100',
                                stringFilters),
   panel: activeConn.panel,
 }

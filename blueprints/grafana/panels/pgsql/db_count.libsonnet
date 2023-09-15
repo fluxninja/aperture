@@ -6,7 +6,7 @@ function(cfg) {
 
   local dbCount = statPanel('PGSQL Instances',
                             cfg.dashboard.datasource.name,
-                            'postgresql_database_count{%(filters)s}',
+                            'count(postgresql_database_count{%(filters)s})',
                             stringFilters),
   panel: dbCount.panel,
 }

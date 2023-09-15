@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=6, w=12) {
+function(title, dsName, query, strFilters, h=10, w=24, targets=[]) {
   local barGaugePanel =
     g.panel.barGauge.new(title)
     + g.panel.barGauge.datasource.withType('prometheus')
@@ -21,5 +21,15 @@ function(title, dsName, query, strFilters, h=6, w=12) {
     + g.panel.barGauge.gridPos.withH(h)
     + g.panel.barGauge.gridPos.withW(w),
 
-  panel: barGaugePanel,
+  local withMultipleTargets =
+    if targets != []
+    then
+      barGaugePanel + g.panel.barGauge.withTargets(targets)
+    else
+      barGaugePanel + g.panel.barGauge.withTargets([
+        g.query.prometheus.new(dsName, query % { filters: strFilters })
+        + g.query.prometheus.withIntervalFactor(1),
+      ]),
+
+  panel: withMultipleTargets,
 }

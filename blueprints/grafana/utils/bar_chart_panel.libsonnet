@@ -1,7 +1,7 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=6, w=6) {
-  local barChartPanel =
+function(title, dsName, query, strFilters, h=6, w=6, targets=[]) {
+  local barChart =
     g.panel.barChart.new(title)
     + g.panel.barChart.queryOptions.withDatasource(dsName)
     + g.panel.barChart.queryOptions.withTargets([
@@ -18,5 +18,15 @@ function(title, dsName, query, strFilters, h=6, w=6) {
     + g.panel.barChart.gridPos.withH(h)
     + g.panel.barChart.gridPos.withW(w),
 
-  panel: barChartPanel,
+  local withMultipleTargets =
+    if targets != []
+    then
+      barChart + g.panel.barChart.withTargets(targets)
+    else
+      barChart + g.panel.barChart.withTargets([
+        g.query.prometheus.new(dsName, query % { filters: strFilters })
+        + g.query.prometheus.withIntervalFactor(1),
+      ]),
+
+  panel: withMultipleTargets,
 }

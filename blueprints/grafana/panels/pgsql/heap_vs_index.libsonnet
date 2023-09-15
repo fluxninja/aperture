@@ -7,11 +7,11 @@ function(cfg, title) {
   local stringFilters = utils.dictToPrometheusFilter(cfg.dashboard.extra_filters { policy_name: cfg.policy.policy_name }),
 
   local targets = [
-    g.query.prometheus.new(cfg.dashboard.datasource.name, 'rate(postgresql_blocks_read_total{%(filters)s, source="heap_read"}[5m])' % { filters: stringFilters })
+    g.query.prometheus.new(cfg.dashboard.datasource.name, 'sum(rate(postgresql_blocks_read_total{%(filters)s, source="heap_read"}[5m]))' % { filters: stringFilters })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Heap Read'),
 
-    g.query.prometheus.new(cfg.dashboard.datasource.name, 'rate(postgresql_blocks_read_total{%(filters)s, source="idx_read"}[5m])' % { filters: stringFilters })
+    g.query.prometheus.new(cfg.dashboard.datasource.name, 'sum(rate(postgresql_blocks_read_total{%(filters)s, source="idx_read"}[5m]))' % { filters: stringFilters })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Index Read'),
   ],
