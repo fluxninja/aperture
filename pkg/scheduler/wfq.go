@@ -151,19 +151,19 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
-func (sched *WFQScheduler) updateMetricsAndReturnDecision(accepted bool, request *Request) bool {
+func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request) (bool, float64, float64) {
 	if accepted {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
-	return accepted
+	return accepted, remaining, current
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
-func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (accepted bool) {
+func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool, float64, float64) {
 	if request.Tokens == 0 {
-		return sched.updateMetricsAndReturnDecision(true, request)
+		return sched.updateMetricsAndReturn(true, 0, 0, request)
 	}
 
 	sched.lock.Lock()
@@ -172,15 +172,15 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return sched.updateMetricsAndReturnDecision(true, request)
+		return sched.updateMetricsAndReturn(true, 0, 0, request)
 	}
 
 	// try to schedule right now
 	if !queueOpen {
-		ok := sched.manager.TakeIfAvailable(ctx, request.Tokens)
-		if ok {
+		accepted, _, remaining, current := sched.manager.TakeIfAvailable(ctx, request.Tokens)
+		if accepted {
 			// we got the tokens, no need to queue
-			return sched.updateMetricsAndReturnDecision(true, request)
+			return sched.updateMetricsAndReturn(true, remaining, current, request)
 		}
 	}
 
@@ -190,10 +190,11 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (acce
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
-		return sched.updateMetricsAndReturnDecision(sched.scheduleRequest(ctx, request, qRequest), request)
+		accepted, remaining, current := sched.scheduleRequest(ctx, request, qRequest)
+		return sched.updateMetricsAndReturn(accepted, remaining, current, request)
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		return sched.updateMetricsAndReturnDecision(false, request)
+		return sched.updateMetricsAndReturn(false, 0, 0, request)
 	}
 }
 
@@ -269,9 +270,9 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 }
 
 // adjust queue counters. Note: qRequest pointer should not be used after calling this function as it will get recycled via Pool.
-func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request, qRequest *queuedRequest) (allowed bool) {
+func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request, qRequest *queuedRequest) (bool, float64, float64) {
 	// This request has been selected to be executed next
-	waitTime, allowed := sched.manager.Take(ctx, float64(request.Tokens))
+	allowed, waitTime, remaining, current := sched.manager.Take(ctx, float64(request.Tokens))
 	// check if we need to wait
 	if allowed && waitTime > 0 {
 		// check whether ctx has deadline
@@ -321,7 +322,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 
 	sched.cleanup(qRequest)
 
-	return
+	return allowed, remaining, current
 }
 
 func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
