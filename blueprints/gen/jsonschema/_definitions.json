@@ -2542,7 +2542,7 @@
       "properties": {
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Capacity of the bucket.\n\n",
+          "description": "Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.\n\n",
           "x-go-tag-validate": "required"
         },
         "fill_amount": {
