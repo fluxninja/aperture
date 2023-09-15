@@ -46,4 +46,5 @@ type RateLimiter interface {
 type Scheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
+	GetFlowDurationSummary(labels map[string]string) prometheus.Observer
 }
