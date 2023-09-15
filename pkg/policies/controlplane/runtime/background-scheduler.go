@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
@@ -51,7 +52,8 @@ func BackgroundSchedulerModuleForPolicyApp(circuitAPI CircuitSuperAPI) fx.Option
 		jws = append(jws, scheduler)
 
 		// Create backgroundMultiJob for running background jobs in this circuit
-		backgroundMultiJob := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child("policy", circuitAPI.GetPolicyName()), jws, nil)
+		jobName := fmt.Sprintf("policy-%s", circuitAPI.GetPolicyHash())
+		backgroundMultiJob := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(jobName, circuitAPI.GetPolicyName()), jws, nil)
 		scheduler.multiJob = backgroundMultiJob
 
 		executionPeriod := config.MakeDuration(-1)
