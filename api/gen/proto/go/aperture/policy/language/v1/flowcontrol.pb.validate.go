@@ -6319,7 +6319,7 @@ func (m *RangeDrivenLoadScheduler_Datapoint) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Threshold
+	// no validation rules for SignalValue
 
 	// no validation rules for LoadMultiplier
 
@@ -6458,11 +6458,11 @@ func (m *RangeDrivenLoadScheduler_Parameters) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetStart()).(type) {
+		switch v := interface{}(m.GetLowWatermark()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RangeDrivenLoadScheduler_ParametersValidationError{
-					field:  "Start",
+					field:  "LowWatermark",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -6470,16 +6470,16 @@ func (m *RangeDrivenLoadScheduler_Parameters) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RangeDrivenLoadScheduler_ParametersValidationError{
-					field:  "Start",
+					field:  "LowWatermark",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetStart()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetLowWatermark()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RangeDrivenLoadScheduler_ParametersValidationError{
-				field:  "Start",
+				field:  "LowWatermark",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -6487,11 +6487,11 @@ func (m *RangeDrivenLoadScheduler_Parameters) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetEnd()).(type) {
+		switch v := interface{}(m.GetHighWatermark()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RangeDrivenLoadScheduler_ParametersValidationError{
-					field:  "End",
+					field:  "HighWatermark",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -6499,16 +6499,16 @@ func (m *RangeDrivenLoadScheduler_Parameters) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RangeDrivenLoadScheduler_ParametersValidationError{
-					field:  "End",
+					field:  "HighWatermark",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetEnd()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetHighWatermark()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RangeDrivenLoadScheduler_ParametersValidationError{
-				field:  "End",
+				field:  "HighWatermark",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

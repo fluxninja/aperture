@@ -63,10 +63,10 @@
               "description": "Parameters for Range Throttling Strategy.",
               "default": {
                 "alerter": {
-                  "alert_name": "Load Throttling Event"
+                  "alert_name": "Range Driven Load Throttling Event"
                 },
                 "degree": "__REQUIRED_FIELD__",
-                "end": "__REQUIRED_FIELD__",
+                "high_watermark": "__REQUIRED_FIELD__",
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -75,7 +75,7 @@
                     }
                   ]
                 },
-                "start": "__REQUIRED_FIELD__"
+                "low_watermark": "__REQUIRED_FIELD__"
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RangeDrivenLoadSchedulerParameters"

@@ -3556,12 +3556,9 @@ definitions:
                 minimum: 0
                 type: number
                 x-go-tag-validate: gte=0,lte=1
-            threshold:
+            signal_value:
                 format: double
-                maximum: 1
-                minimum: 0
                 type: number
-                x-go-tag-validate: gte=0,lte=1
         type: object
     RangeDrivenLoadSchedulerIns:
         description: Input ports for the _Range Load Scheduler_.
@@ -3608,7 +3605,7 @@ definitions:
                     degree=3: cubic
                 type: number
                 x-go-tag-validate: required
-            end:
+            high_watermark:
                 $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
                 title: Ending data-point of the throttling range
                 x-go-tag-validate: required
@@ -3618,7 +3615,7 @@ definitions:
                     Parameters for the _Load Scheduler_.
 
                 x-go-tag-validate: required
-            start:
+            low_watermark:
                 $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
                 title: Starting data-point of the throttling range
                 x-go-tag-validate: required

@@ -1571,9 +1571,9 @@ func (m *RangeDrivenLoadScheduler_Datapoint) MarshalToSizedBufferVT(dAtA []byte)
 		i--
 		dAtA[i] = 0x11
 	}
-	if m.Threshold != 0 {
+	if m.SignalValue != 0 {
 		i -= 8
-		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Threshold))))
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.SignalValue))))
 		i--
 		dAtA[i] = 0x9
 	}
@@ -1626,8 +1626,8 @@ func (m *RangeDrivenLoadScheduler_Parameters) MarshalToSizedBufferVT(dAtA []byte
 		i--
 		dAtA[i] = 0x21
 	}
-	if m.End != nil {
-		size, err := m.End.MarshalToSizedBufferVT(dAtA[:i])
+	if m.HighWatermark != nil {
+		size, err := m.HighWatermark.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -1636,8 +1636,8 @@ func (m *RangeDrivenLoadScheduler_Parameters) MarshalToSizedBufferVT(dAtA []byte
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.Start != nil {
-		size, err := m.Start.MarshalToSizedBufferVT(dAtA[:i])
+	if m.LowWatermark != nil {
+		size, err := m.LowWatermark.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -4455,7 +4455,7 @@ func (m *RangeDrivenLoadScheduler_Datapoint) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Threshold != 0 {
+	if m.SignalValue != 0 {
 		n += 9
 	}
 	if m.LoadMultiplier != 0 {
@@ -4475,12 +4475,12 @@ func (m *RangeDrivenLoadScheduler_Parameters) SizeVT() (n int) {
 		l = m.LoadScheduler.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.Start != nil {
-		l = m.Start.SizeVT()
+	if m.LowWatermark != nil {
+		l = m.LowWatermark.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.End != nil {
-		l = m.End.SizeVT()
+	if m.HighWatermark != nil {
+		l = m.HighWatermark.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	if m.Degree != 0 {
@@ -8952,7 +8952,7 @@ func (m *RangeDrivenLoadScheduler_Datapoint) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Threshold", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SignalValue", wireType)
 			}
 			var v uint64
 			if (iNdEx + 8) > l {
@@ -8960,7 +8960,7 @@ func (m *RangeDrivenLoadScheduler_Datapoint) UnmarshalVT(dAtA []byte) error {
 			}
 			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
-			m.Threshold = float64(math.Float64frombits(v))
+			m.SignalValue = float64(math.Float64frombits(v))
 		case 2:
 			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LoadMultiplier", wireType)
@@ -9061,7 +9061,7 @@ func (m *RangeDrivenLoadScheduler_Parameters) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Start", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LowWatermark", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9088,16 +9088,16 @@ func (m *RangeDrivenLoadScheduler_Parameters) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Start == nil {
-				m.Start = &RangeDrivenLoadScheduler_Datapoint{}
+			if m.LowWatermark == nil {
+				m.LowWatermark = &RangeDrivenLoadScheduler_Datapoint{}
 			}
-			if err := m.Start.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.LowWatermark.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field End", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field HighWatermark", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -9124,10 +9124,10 @@ func (m *RangeDrivenLoadScheduler_Parameters) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.End == nil {
-				m.End = &RangeDrivenLoadScheduler_Datapoint{}
+			if m.HighWatermark == nil {
+				m.HighWatermark = &RangeDrivenLoadScheduler_Datapoint{}
 			}
-			if err := m.End.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.HighWatermark.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

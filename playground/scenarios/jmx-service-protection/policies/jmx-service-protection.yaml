@@ -70,12 +70,12 @@ policy:
     dry_run: false
     range_driven_load_scheduler:
       degree: 1
-      start:
+      low_watermark:
         load_multiplier: 0.025
-        threshold: 0.5
-      end:
+        signal_value: 0.5
+      high_watermark:
         load_multiplier: 1
-        threshold: 1
+        signal_value: 1
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.

@@ -403,7 +403,7 @@ message RangeDrivenLoadScheduler {
   }
 
   message Datapoint {
-    double threshold = 1; // @gotags: validate:"gte=0,lte=1"
+    double signal_value = 1;
     double load_multiplier = 2; // @gotags: validate:"gte=0,lte=1"
   }
 
@@ -412,10 +412,10 @@ message RangeDrivenLoadScheduler {
     LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
 
     // Starting data-point of the throttling range
-    Datapoint start = 2; // @gotags: validate:"required"
+    Datapoint low_watermark = 2; // @gotags: validate:"required"
 
     // Ending data-point of the throttling range
-    Datapoint end = 3; // @gotags: validate:"required"
+    Datapoint high_watermark = 3; // @gotags: validate:"required"
 
     // Degree determines shape of the throttling curve.
     // degree=1: linear

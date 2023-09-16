@@ -13,7 +13,7 @@ policy:
     # Required: True
     aimd_load_scheduler:
       alerter:
-        alert_name: "Load Throttling Event"
+        alert_name: "AIMD Load Throttling Event"
       gradient:
         max_gradient: 1
         min_gradient: 0.1

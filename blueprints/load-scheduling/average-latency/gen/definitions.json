@@ -47,7 +47,7 @@
               "description": "Parameters for AIMD throttling strategy.",
               "default": {
                 "alerter": {
-                  "alert_name": "Load Throttling Event"
+                  "alert_name": "AIMD Load Throttling Event"
                 },
                 "gradient": {
                   "max_gradient": 1,

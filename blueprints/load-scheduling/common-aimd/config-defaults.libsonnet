@@ -42,7 +42,7 @@ local service_protection_core_defaults = {
     max_load_multiplier: 2.0,
     load_multiplier_linear_increment: 0.025,
     alerter: {
-      alert_name: 'Load Throttling Event',
+      alert_name: 'AIMD Load Throttling Event',
     },
   },
 

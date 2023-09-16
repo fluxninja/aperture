@@ -24,20 +24,20 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           parameters:
             alerter:
-              alert_name: Load Throttling Event
+              alert_name: Range Driven Load Throttling Event
             degree: 1
-            end:
-              load_multiplier: 1
-              threshold: 1
+            high_watermark:
+              load_multiplier: 0
+              signal_value: 1000
             load_scheduler:
               selectors:
               - agent_group: default
                 control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
-            start:
-              load_multiplier: 0.025
-              threshold: 0.5
+            low_watermark:
+              load_multiplier: 1
+              signal_value: 800
     - query:
         promql:
           evaluation_interval: 10s

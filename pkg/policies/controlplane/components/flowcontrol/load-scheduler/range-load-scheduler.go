@@ -63,9 +63,9 @@ func ParseRangeDrivenLoadScheduler(
 
 	parameters := rangeDrivenLoadScheduler.Parameters
 	preStart := 1.0
-	postEnd := parameters.End.LoadMultiplier
-	if parameters.Start.LoadMultiplier < parameters.End.LoadMultiplier {
-		preStart = parameters.Start.LoadMultiplier
+	postEnd := parameters.HighWatermark.LoadMultiplier
+	if parameters.LowWatermark.LoadMultiplier < parameters.HighWatermark.LoadMultiplier {
+		preStart = parameters.LowWatermark.LoadMultiplier
 		postEnd = 1.0
 	}
 
@@ -114,12 +114,12 @@ func ParseRangeDrivenLoadScheduler(
 				PolynomialRangeFunction: &policylangv1.PolynomialRangeFunction{
 					Parameters: &policylangv1.PolynomialRangeFunction_Parameters{
 						Start: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.Start.Threshold,
-							Output: parameters.Start.LoadMultiplier,
+							Input:  parameters.LowWatermark.SignalValue,
+							Output: parameters.LowWatermark.LoadMultiplier,
 						},
 						End: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.End.Threshold,
-							Output: parameters.End.LoadMultiplier,
+							Input:  parameters.HighWatermark.SignalValue,
+							Output: parameters.HighWatermark.LoadMultiplier,
 						},
 						OutsideRange: &policylangv1.PolynomialRangeFunction_Parameters_ClampToCustomValues_{
 							ClampToCustomValues: &policylangv1.PolynomialRangeFunction_Parameters_ClampToCustomValues{
@@ -127,6 +127,7 @@ func ParseRangeDrivenLoadScheduler(
 								PostEnd:  postEnd,
 							},
 						},
+						Degree: parameters.Degree,
 					},
 					InPorts: &policylangv1.PolynomialRangeFunction_Ins{
 						Input: &policylangv1.InPort{

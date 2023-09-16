@@ -7134,12 +7134,12 @@ Parameters for the _Range Load Scheduler_.
 <!-- vale on -->
 
 </dd>
-<dt>threshold</dt>
+<dt>signal_value</dt>
 <dd>
 
 <!-- vale off -->
 
-(float64, minimum: `0`, maximum: `1`)
+(float64)
 
 <!-- vale on -->
 
@@ -7269,7 +7269,7 @@ Degree determines shape of the throttling curve. degree=1: linear degree=2:
 quadratic degree=3: cubic
 
 </dd>
-<dt>end</dt>
+<dt>high_watermark</dt>
 <dd>
 
 <!-- vale off -->
@@ -7293,7 +7293,7 @@ Ending data-point of the throttling range
 Parameters for the _Load Scheduler_.
 
 </dd>
-<dt>start</dt>
+<dt>low_watermark</dt>
 <dd>
 
 <!-- vale off -->

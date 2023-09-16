@@ -26,12 +26,12 @@ policy:
   service_protection_core:
     range_driven_load_scheduler:
       degree: 1
-      start:
-        load_multiplier: 0.025
-        threshold: 0.5
-      end:
+      low_watermark:
         load_multiplier: 1
-        threshold: 1
+        signal_value: 30
+      high_watermark:
+        load_multiplier: 0
+        signal_value: 80
       load_scheduler:
         workload_latency_based_tokens: true
         selectors:

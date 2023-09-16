@@ -13,11 +13,11 @@
   withDegreeMixin(degree):: {
     degree+: degree,
   },
-  withEnd(end):: {
-    end: end,
+  withHighWatermark(high_watermark):: {
+    high_watermark: high_watermark,
   },
-  withEndMixin(end):: {
-    end+: end,
+  withHighWatermarkMixin(high_watermark):: {
+    high_watermark+: high_watermark,
   },
   withLoadScheduler(load_scheduler):: {
     load_scheduler: load_scheduler,
@@ -25,10 +25,10 @@
   withLoadSchedulerMixin(load_scheduler):: {
     load_scheduler+: load_scheduler,
   },
-  withStart(start):: {
-    start: start,
+  withLowWatermark(low_watermark):: {
+    low_watermark: low_watermark,
   },
-  withStartMixin(start):: {
-    start+: start,
+  withLowWatermarkMixin(low_watermark):: {
+    low_watermark+: low_watermark,
   },
 }

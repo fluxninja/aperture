@@ -34,11 +34,11 @@ local service_protection_core_defaults = {
     load_scheduler: {
       selectors: commonConfig.selectors_defaults,
     },
-    start: '__REQUIRED_FIELD__',
-    end: '__REQUIRED_FIELD__',
+    low_watermark: '__REQUIRED_FIELD__',
+    high_watermark: '__REQUIRED_FIELD__',
     degree: '__REQUIRED_FIELD__',
     alerter: {
-      alert_name: 'Load Throttling Event',
+      alert_name: 'Range Driven Load Throttling Event',
     },
   },
 

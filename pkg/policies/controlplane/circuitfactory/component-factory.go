@@ -126,7 +126,6 @@ func NewComponentAndOptions(
 				log.Error().Err(err).Msg("unknown flow control type")
 				return Tree{}, nil, nil, err
 			}
-
 		default:
 			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}
