@@ -441,8 +441,10 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 	if s.proto.PriorityLabelKey != "" {
 		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
-				priority = parsedPriority
-				invPriority = 1 / parsedPriority
+				if parsedPriority > 0 {
+					priority = parsedPriority
+					invPriority = 1 / parsedPriority
+				}
 			}
 		}
 	}
