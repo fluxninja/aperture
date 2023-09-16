@@ -385,6 +385,7 @@ func (wsFactory *Factory) NewScheduler(
 func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
+	var priority float64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
 	mmr := s.workloadMultiMatcher.Match(labels)
@@ -398,6 +399,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
+		priority = matchedWorkload.priority
 		invPriority = 1 / matchedWorkload.priority
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
 		if matchedWorkload.proto.GetName() != "" {
@@ -407,6 +409,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		}
 	} else {
 		// no match, return default workload
+		priority = s.defaultWorkload.priority
 		invPriority = 1 / s.defaultWorkload.priority
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
 		matchedWorkloadIndex = s.defaultWorkload.proto.Name
@@ -438,7 +441,10 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 	if s.proto.PriorityLabelKey != "" {
 		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
-				invPriority = 1 / parsedPriority
+				if parsedPriority > 0 {
+					priority = parsedPriority
+					invPriority = 1 / parsedPriority
+				}
 			}
 		}
 	}
@@ -506,6 +512,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 					Remaining: remaining,
 					Current:   current,
 				},
+				Priority: priority,
 			},
 		},
 	}
