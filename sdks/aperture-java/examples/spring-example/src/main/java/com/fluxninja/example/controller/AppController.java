@@ -41,9 +41,9 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        String agentHost = env.getProperty("FN_AGENT_HOST");
+        String agentHost = env.getProperty("APERTURE_AGENT_HOST");
         registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("FN_AGENT_PORT");
+        String agentPort = env.getProperty("APERTURE_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
         String failOpen = env.getProperty("FN_ENABLE_FAIL_OPEN");
         registrationBean.addInitParameter("enable_fail_open", failOpen);
@@ -68,9 +68,9 @@ public class AppController {
         registrationBean.setFilter(new ApertureFeatureFilter());
         registrationBean.addUrlPatterns("/super2");
 
-        String agentHost = env.getProperty("FN_AGENT_HOST");
+        String agentHost = env.getProperty("APERTURE_AGENT_HOST");
         registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("FN_AGENT_PORT");
+        String agentPort = env.getProperty("APERTURE_AGENT_PORT");
         registrationBean.addInitParameter("agent_port", agentPort);
         String failOpen = env.getProperty("FN_ENABLE_FAIL_OPEN");
         registrationBean.addInitParameter("enable_fail_open", failOpen);

@@ -52,9 +52,9 @@ spec:
           env:
             - name: SIMPLE_SERVICE_PORT
               value: "8099"
-            - name: FN_AGENT_HOST
+            - name: APERTURE_AGENT_HOST
               value: "{{ .Values.agent.host }}"
-            - name: FN_AGENT_PORT
+            - name: APERTURE_AGENT_PORT
               value: "{{ .Values.agent.port }}"
             - name: REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"

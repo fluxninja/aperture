@@ -18,11 +18,11 @@ public class NettyServer {
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) throws Exception {
-        String agentHost = System.getenv("FN_AGENT_HOST");
+        String agentHost = System.getenv("APERTURE_AGENT_HOST");
         if (agentHost == null) {
             agentHost = DEFAULT_AGENT_HOST;
         }
-        String agentPort = System.getenv("FN_AGENT_PORT");
+        String agentPort = System.getenv("APERTURE_AGENT_PORT");
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
