@@ -380,6 +380,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 					Label:         label,
 					WorkloadIndex: schedulerInfo.WorkloadIndex,
 					TokensInfo:    schedulerInfo.TokensInfo,
+					Priority:      schedulerInfo.Priority,
 				},
 			},
 		}

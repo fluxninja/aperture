@@ -2266,6 +2266,9 @@ definitions:
         properties:
             label:
                 type: string
+            priority:
+                format: double
+                type: number
             tokens_info:
                 $ref: '#/definitions/LimiterDecisionTokensInfo'
             workload_index:
@@ -2285,6 +2288,9 @@ definitions:
         type: object
     LimiterDecisionSchedulerInfo:
         properties:
+            priority:
+                format: double
+                type: number
             tokens_info:
                 $ref: '#/definitions/LimiterDecisionTokensInfo'
             workload_index:

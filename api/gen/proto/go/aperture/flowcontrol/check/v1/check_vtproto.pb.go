@@ -465,6 +465,12 @@ func (m *LimiterDecision_SchedulerInfo) MarshalToSizedBufferVT(dAtA []byte) (int
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Priority != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Priority))))
+		i--
+		dAtA[i] = 0x19
+	}
 	if m.TokensInfo != nil {
 		size, err := m.TokensInfo.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -554,6 +560,12 @@ func (m *LimiterDecision_QuotaSchedulerInfo) MarshalToSizedBufferVT(dAtA []byte)
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Priority != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Priority))))
+		i--
+		dAtA[i] = 0x21
 	}
 	if m.TokensInfo != nil {
 		size, err := m.TokensInfo.MarshalToSizedBufferVT(dAtA[:i])
@@ -1067,6 +1079,9 @@ func (m *LimiterDecision_SchedulerInfo) SizeVT() (n int) {
 		l = m.TokensInfo.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
+	if m.Priority != 0 {
+		n += 9
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1102,6 +1117,9 @@ func (m *LimiterDecision_QuotaSchedulerInfo) SizeVT() (n int) {
 	if m.TokensInfo != nil {
 		l = m.TokensInfo.SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.Priority != 0 {
+		n += 9
 	}
 	n += len(m.unknownFields)
 	return n
@@ -2468,6 +2486,17 @@ func (m *LimiterDecision_SchedulerInfo) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Priority = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -2702,6 +2731,17 @@ func (m *LimiterDecision_QuotaSchedulerInfo) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Priority = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

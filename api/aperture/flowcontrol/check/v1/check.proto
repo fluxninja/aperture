@@ -101,6 +101,7 @@ message LimiterDecision {
   message SchedulerInfo {
     string workload_index = 1;
     TokensInfo tokens_info = 2;
+    double priority = 3;
   }
 
   message SamplerInfo {
@@ -111,6 +112,7 @@ message LimiterDecision {
     string label = 1;
     string workload_index = 2;
     TokensInfo tokens_info = 3;
+    double priority = 4;
   }
 
   enum LimiterReason {
