@@ -13,6 +13,10 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 
+import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
+
+import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
+
 export const FlowStatusEnum = {
   OK: "OK",
   Error: "Error",
@@ -98,16 +102,23 @@ export class Flow {
     this.span.end();
   }
 
-  private protoTimestampToJSON(timestamp: any) {
-    if (timestamp && typeof timestamp === "object") {
+  private protoTimestampToJSON(
+    timestamp: _google_protobuf_Timestamp__Output | null,
+  ) {
+    if (timestamp) {
       return new Date(
-        timestamp.seconds * 1000 + timestamp.nanos / 1000000,
+        Number(timestamp.seconds) * 1000 + timestamp.nanos / 1000000,
       ).toISOString();
     }
     return timestamp;
   }
 
-  private protoDurationToJSON(duration: any) {
-    return `${duration.seconds}.${duration.nanos}s`;
+  private protoDurationToJSON(
+    duration: _google_protobuf_Duration__Output | null,
+  ) {
+    if (duration) {
+      return `${duration.seconds}.${duration.nanos}s`;
+    }
+    return duration;
   }
 }
