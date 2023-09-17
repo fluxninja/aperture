@@ -76,25 +76,15 @@ export class Flow {
       // PR: https://github.com/protobufjs/protobuf.js/pull/1258
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this.checkResponse as any;
-      if (
-        localCheckResponse.start &&
-        typeof localCheckResponse.start === "object"
-      ) {
-        localCheckResponse.start = new Date(
-          localCheckResponse.start.seconds * 1000 +
-            localCheckResponse.start.nanos / 1000,
-        ).toISOString();
-      }
-      if (
-        localCheckResponse.end &&
-        typeof localCheckResponse.end === "object"
-      ) {
-        localCheckResponse.end = new Date(
-          localCheckResponse.end.seconds * 1000 +
-            localCheckResponse.end.nanos / 1000,
-        ).toISOString();
-      }
-
+      localCheckResponse.start = this.protoTimestampToJSON(
+        this.checkResponse.start,
+      );
+      localCheckResponse.end = this.protoTimestampToJSON(
+        this.checkResponse.end,
+      );
+      localCheckResponse.waitTime = this.protoDurationToJSON(
+        this.checkResponse.waitTime,
+      );
       this.span.setAttribute(
         CHECK_RESPONSE_LABEL,
         JSON.stringify(localCheckResponse),
@@ -106,5 +96,18 @@ export class Flow {
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
 
     this.span.end();
+  }
+
+  private protoTimestampToJSON(timestamp: any) {
+    if (timestamp && typeof timestamp === "object") {
+      return new Date(
+        timestamp.seconds * 1000 + timestamp.nanos / 1000000,
+      ).toISOString();
+    }
+    return timestamp;
+  }
+
+  private protoDurationToJSON(duration: any) {
+    return `${duration.seconds}.${duration.nanos}s`;
   }
 }
