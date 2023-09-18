@@ -2575,6 +2575,9 @@ definitions:
                 $ref: '#/definitions/RateLimiterParameters'
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
+            request_parameters:
+                $ref: '#/definitions/RateLimiterRequestParameters'
+                title: RequestParameters for the component
             selectors:
                 description: |+
                     Selectors for the component.
@@ -2585,14 +2588,6 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-            tokens_label_key:
-                description: |-
-                    Flow label key that will be used to override the number of tokens
-                    for this request.
-                    This is an optional parameter and takes highest precedence
-                    when assigning tokens to a request.
-                    The label value must be a valid number.
-                type: string
         required:
             - selectors
         title: Limits the traffic on a control point to specified rate
@@ -2626,9 +2621,6 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
-            denied_response_status_code:
-                $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -2682,6 +2674,20 @@ definitions:
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gt=0
+        type: object
+    RateLimiterRequestParameters:
+        properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
         type: object
     Rego:
         description: |-
@@ -3048,7 +3054,7 @@ definitions:
                 type: string
             tokens_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default number of tokens for this flow.
+                    * Key for a flow label that can be used to override the default number of tokens for this request.
                     * The value associated with this key must be a valid number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
                 type: string

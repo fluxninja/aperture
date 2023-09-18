@@ -19,6 +19,7 @@ spec:
           parameters:
             interval: 1s
             label_key: http.request.header.user_id
+          request_parameters: {}
           selectors:
           - agent_group: default
             control_point: ingress
