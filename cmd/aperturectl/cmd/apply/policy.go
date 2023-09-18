@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
@@ -121,12 +122,12 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 					return updatePolicyUsingAPIErr
 				}
 			} else if apierrors.IsAlreadyExists(err) {
-				var update bool
-				update, checkForUpdateErr := checkForUpdate(name)
+				var shouldUpdate bool
+				shouldUpdate, checkForUpdateErr := checkForUpdate(name)
 				if checkForUpdateErr != nil {
 					return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
 				}
-				if !update {
+				if !shouldUpdate {
 					log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
 					return nil
 				}
@@ -158,14 +159,14 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 	}
 	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
-		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
-			var update bool
-			update, err = checkForUpdate(name)
+		if status.Code(err) == codes.AlreadyExists {
+			var shouldUpdate bool
+			shouldUpdate, err = checkForUpdate(name)
 			if err != nil {
 				return false, fmt.Errorf("failed to check for update: %w", err)
 			}
 
-			if !update {
+			if !shouldUpdate {
 				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
 				return false, nil
 			}

@@ -1315,11 +1315,18 @@ definitions:
     GetPolicyResponseStatus:
         default: VALID
         description: |4-
-             - VALID: Policy is valid.
-             - INVALID: Policy is invalid.
+             - VALID: Policy is valid, present in etcd and running in the controller.
+             - INVALID: Policy is present in etcd, but fails to parse.
+             - NOT_LOADED: Policy is present in etcd, but is not (yet) running in the controller.
+             - STALE: Policy is running on the controller, but is not present in etcd.
+             - OUTDATED: Policy is present in etcd and policy with the same name is running in
+            the controller, but these policies differ.
         enum:
             - VALID
             - INVALID
+            - NOT_LOADED
+            - STALE
+            - OUTDATED
         type: string
     GradientController:
         description: |-
