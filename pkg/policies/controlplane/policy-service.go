@@ -276,7 +276,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if len(etcdPolicy.Kvs) == 0 || s.policyFactory.GetPolicyWrapper(req.PolicyName) == nil {
+	if len(etcdPolicy.Kvs) == 0 && s.policyFactory.GetPolicyWrapper(req.PolicyName) == nil {
 		return nil, status.Error(codes.NotFound, "no such policy")
 	}
 
