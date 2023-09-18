@@ -3,9 +3,7 @@ import express from "express";
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 // Create aperture client
-export const apertureClient = new ApertureClient({
-  timeoutMilliseconds: 300000,
-});
+export const apertureClient = new ApertureClient();
 
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {
@@ -16,7 +14,10 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
-    .StartFlow("awesome-feature", labels)
+    .StartFlow("awesome-feature", {
+      labels: labels,
+      timeoutMilliseconds: 300000,
+    })
     .then((flow) => {
       // See whether flow was accepted by Aperture Agent.
       if (flow.ShouldRun()) {

@@ -89,12 +89,13 @@ spec:
             fill_amount:
               signal_name: RATE_LIMIT
           parameters:
-            denied_response_status_code: BadRequest
             interval: 1s
             label_key: http.request.header.user_id
             lazy_sync:
               enabled: true
               num_sync: 4
+          request_parameters:
+            denied_response_status_code: BadRequest
           selectors:
           - agent_group: default
             control_point: ingress

@@ -13,6 +13,10 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 
+import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
+
+import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
+
 export const FlowStatusEnum = {
   OK: "OK",
   Error: "Error",
@@ -76,25 +80,15 @@ export class Flow {
       // PR: https://github.com/protobufjs/protobuf.js/pull/1258
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this.checkResponse as any;
-      if (
-        localCheckResponse.start &&
-        typeof localCheckResponse.start === "object"
-      ) {
-        localCheckResponse.start = new Date(
-          localCheckResponse.start.seconds * 1000 +
-            localCheckResponse.start.nanos / 1000,
-        ).toISOString();
-      }
-      if (
-        localCheckResponse.end &&
-        typeof localCheckResponse.end === "object"
-      ) {
-        localCheckResponse.end = new Date(
-          localCheckResponse.end.seconds * 1000 +
-            localCheckResponse.end.nanos / 1000,
-        ).toISOString();
-      }
-
+      localCheckResponse.start = this.protoTimestampToJSON(
+        this.checkResponse.start,
+      );
+      localCheckResponse.end = this.protoTimestampToJSON(
+        this.checkResponse.end,
+      );
+      localCheckResponse.waitTime = this.protoDurationToJSON(
+        this.checkResponse.waitTime,
+      );
       this.span.setAttribute(
         CHECK_RESPONSE_LABEL,
         JSON.stringify(localCheckResponse),
@@ -106,5 +100,25 @@ export class Flow {
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
 
     this.span.end();
+  }
+
+  private protoTimestampToJSON(
+    timestamp: _google_protobuf_Timestamp__Output | null,
+  ) {
+    if (timestamp) {
+      return new Date(
+        Number(timestamp.seconds) * 1000 + timestamp.nanos / 1000000,
+      ).toISOString();
+    }
+    return timestamp;
+  }
+
+  private protoDurationToJSON(
+    duration: _google_protobuf_Duration__Output | null,
+  ) {
+    if (duration) {
+      return `${duration.seconds}.${duration.nanos}s`;
+    }
+    return duration;
   }
 }

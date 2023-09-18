@@ -11,7 +11,7 @@ policy:
   # Type: []aperture.spec.v1.Component
   components: []
   service_protection_core:
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       load_scheduler:
         # The selectors determine the flows that are protected by this policy.
         # Type: []aperture.spec.v1.Selector

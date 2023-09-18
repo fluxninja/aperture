@@ -131,7 +131,7 @@ public final class CheckProto {
       "NE\020\000\022\025\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERROR_EMP" +
       "TY_RESULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_RESULT" +
       "SET\020\003\022\032\n\026ERROR_MULTI_EXPRESSION\020\004\022\034\n\030ERR" +
-      "OR_EXPRESSION_NOT_MAP\020\005\"\356\013\n\017LimiterDecis" +
+      "OR_EXPRESSION_NOT_MAP\020\005\"\246\014\n\017LimiterDecis" +
       "ion\022\037\n\013policy_name\030\001 \001(\tR\npolicyName\022\037\n\013" +
       "policy_hash\030\002 \001(\tR\npolicyHash\022!\n\014compone" +
       "nt_id\030\003 \001(\tR\013componentId\022\030\n\007dropped\030\004 \001(" +
@@ -158,61 +158,62 @@ public final class CheckProto {
       "ateLimiterInfo\022\024\n\005label\030\001 \001(\tR\005label\022Z\n\013" +
       "tokens_info\030\002 \001(\01329.aperture.flowcontrol" +
       ".check.v1.LimiterDecision.TokensInfoR\nto" +
-      "kensInfo\032\222\001\n\rSchedulerInfo\022%\n\016workload_i" +
+      "kensInfo\032\256\001\n\rSchedulerInfo\022%\n\016workload_i" +
       "ndex\030\001 \001(\tR\rworkloadIndex\022Z\n\013tokens_info" +
       "\030\002 \001(\01329.aperture.flowcontrol.check.v1.L" +
-      "imiterDecision.TokensInfoR\ntokensInfo\032#\n" +
-      "\013SamplerInfo\022\024\n\005label\030\001 \001(\tR\005label\032\255\001\n\022Q" +
-      "uotaSchedulerInfo\022\024\n\005label\030\001 \001(\tR\005label\022" +
-      "%\n\016workload_index\030\002 \001(\tR\rworkloadIndex\022Z" +
-      "\n\013tokens_info\030\003 \001(\01329.aperture.flowcontr" +
-      "ol.check.v1.LimiterDecision.TokensInfoR\n" +
-      "tokensInfo\"Q\n\rLimiterReason\022\036\n\032LIMITER_R" +
-      "EASON_UNSPECIFIED\020\000\022 \n\034LIMITER_REASON_KE" +
-      "Y_NOT_FOUND\020\001B\t\n\007details\"7\n\rFluxMeterInf" +
-      "o\022&\n\017flux_meter_name\030\001 \001(\tR\rfluxMeterNam" +
-      "e*\265\t\n\nStatusCode\022\t\n\005Empty\020\000\022\014\n\010Continue\020" +
-      "d\022\007\n\002OK\020\310\001\022\014\n\007Created\020\311\001\022\r\n\010Accepted\020\312\001\022" +
-      " \n\033NonAuthoritativeInformation\020\313\001\022\016\n\tNoC" +
-      "ontent\020\314\001\022\021\n\014ResetContent\020\315\001\022\023\n\016PartialC" +
-      "ontent\020\316\001\022\020\n\013MultiStatus\020\317\001\022\024\n\017AlreadyRe" +
-      "ported\020\320\001\022\013\n\006IMUsed\020\342\001\022\024\n\017MultipleChoice" +
-      "s\020\254\002\022\025\n\020MovedPermanently\020\255\002\022\n\n\005Found\020\256\002\022" +
-      "\r\n\010SeeOther\020\257\002\022\020\n\013NotModified\020\260\002\022\r\n\010UseP" +
-      "roxy\020\261\002\022\026\n\021TemporaryRedirect\020\263\002\022\026\n\021Perma" +
-      "nentRedirect\020\264\002\022\017\n\nBadRequest\020\220\003\022\021\n\014Unau" +
-      "thorized\020\221\003\022\024\n\017PaymentRequired\020\222\003\022\016\n\tFor" +
-      "bidden\020\223\003\022\r\n\010NotFound\020\224\003\022\025\n\020MethodNotAll" +
-      "owed\020\225\003\022\022\n\rNotAcceptable\020\226\003\022 \n\033ProxyAuth" +
-      "enticationRequired\020\227\003\022\023\n\016RequestTimeout\020" +
-      "\230\003\022\r\n\010Conflict\020\231\003\022\t\n\004Gone\020\232\003\022\023\n\016LengthRe" +
-      "quired\020\233\003\022\027\n\022PreconditionFailed\020\234\003\022\024\n\017Pa" +
-      "yloadTooLarge\020\235\003\022\017\n\nURITooLong\020\236\003\022\031\n\024Uns" +
-      "upportedMediaType\020\237\003\022\030\n\023RangeNotSatisfia" +
-      "ble\020\240\003\022\026\n\021ExpectationFailed\020\241\003\022\027\n\022Misdir" +
-      "ectedRequest\020\245\003\022\030\n\023UnprocessableEntity\020\246" +
-      "\003\022\013\n\006Locked\020\247\003\022\025\n\020FailedDependency\020\250\003\022\024\n" +
-      "\017UpgradeRequired\020\252\003\022\031\n\024PreconditionRequi" +
-      "red\020\254\003\022\024\n\017TooManyRequests\020\255\003\022 \n\033RequestH" +
-      "eaderFieldsTooLarge\020\257\003\022\030\n\023InternalServer" +
-      "Error\020\364\003\022\023\n\016NotImplemented\020\365\003\022\017\n\nBadGate" +
-      "way\020\366\003\022\027\n\022ServiceUnavailable\020\367\003\022\023\n\016Gatew" +
-      "ayTimeout\020\370\003\022\034\n\027HTTPVersionNotSupported\020" +
-      "\371\003\022\032\n\025VariantAlsoNegotiates\020\372\003\022\030\n\023Insuff" +
-      "icientStorage\020\373\003\022\021\n\014LoopDetected\020\374\003\022\020\n\013N" +
-      "otExtended\020\376\003\022\"\n\035NetworkAuthenticationRe" +
-      "quired\020\377\0032z\n\022FlowControlService\022d\n\005Check" +
-      "\022+.aperture.flowcontrol.check.v1.CheckRe" +
-      "quest\032,.aperture.flowcontrol.check.v1.Ch" +
-      "eckResponse\"\000B\263\002\n5com.fluxninja.generate" +
-      "d.aperture.flowcontrol.check.v1B\nCheckPr" +
-      "otoP\001ZWgithub.com/fluxninja/aperture/v2/" +
-      "api/gen/proto/go/aperture/flowcontrol/ch" +
-      "eck/v1;checkv1\242\002\003AFC\252\002\035Aperture.Flowcont" +
-      "rol.Check.V1\312\002\035Aperture\\Flowcontrol\\Chec" +
-      "k\\V1\342\002)Aperture\\Flowcontrol\\Check\\V1\\GPB" +
-      "Metadata\352\002 Aperture::Flowcontrol::Check:" +
-      ":V1b\006proto3"
+      "imiterDecision.TokensInfoR\ntokensInfo\022\032\n" +
+      "\010priority\030\003 \001(\001R\010priority\032#\n\013SamplerInfo" +
+      "\022\024\n\005label\030\001 \001(\tR\005label\032\311\001\n\022QuotaSchedule" +
+      "rInfo\022\024\n\005label\030\001 \001(\tR\005label\022%\n\016workload_" +
+      "index\030\002 \001(\tR\rworkloadIndex\022Z\n\013tokens_inf" +
+      "o\030\003 \001(\01329.aperture.flowcontrol.check.v1." +
+      "LimiterDecision.TokensInfoR\ntokensInfo\022\032" +
+      "\n\010priority\030\004 \001(\001R\010priority\"Q\n\rLimiterRea" +
+      "son\022\036\n\032LIMITER_REASON_UNSPECIFIED\020\000\022 \n\034L" +
+      "IMITER_REASON_KEY_NOT_FOUND\020\001B\t\n\007details" +
+      "\"7\n\rFluxMeterInfo\022&\n\017flux_meter_name\030\001 \001" +
+      "(\tR\rfluxMeterName*\265\t\n\nStatusCode\022\t\n\005Empt" +
+      "y\020\000\022\014\n\010Continue\020d\022\007\n\002OK\020\310\001\022\014\n\007Created\020\311\001" +
+      "\022\r\n\010Accepted\020\312\001\022 \n\033NonAuthoritativeInfor" +
+      "mation\020\313\001\022\016\n\tNoContent\020\314\001\022\021\n\014ResetConten" +
+      "t\020\315\001\022\023\n\016PartialContent\020\316\001\022\020\n\013MultiStatus" +
+      "\020\317\001\022\024\n\017AlreadyReported\020\320\001\022\013\n\006IMUsed\020\342\001\022\024" +
+      "\n\017MultipleChoices\020\254\002\022\025\n\020MovedPermanently" +
+      "\020\255\002\022\n\n\005Found\020\256\002\022\r\n\010SeeOther\020\257\002\022\020\n\013NotMod" +
+      "ified\020\260\002\022\r\n\010UseProxy\020\261\002\022\026\n\021TemporaryRedi" +
+      "rect\020\263\002\022\026\n\021PermanentRedirect\020\264\002\022\017\n\nBadRe" +
+      "quest\020\220\003\022\021\n\014Unauthorized\020\221\003\022\024\n\017PaymentRe" +
+      "quired\020\222\003\022\016\n\tForbidden\020\223\003\022\r\n\010NotFound\020\224\003" +
+      "\022\025\n\020MethodNotAllowed\020\225\003\022\022\n\rNotAcceptable" +
+      "\020\226\003\022 \n\033ProxyAuthenticationRequired\020\227\003\022\023\n" +
+      "\016RequestTimeout\020\230\003\022\r\n\010Conflict\020\231\003\022\t\n\004Gon" +
+      "e\020\232\003\022\023\n\016LengthRequired\020\233\003\022\027\n\022Preconditio" +
+      "nFailed\020\234\003\022\024\n\017PayloadTooLarge\020\235\003\022\017\n\nURIT" +
+      "ooLong\020\236\003\022\031\n\024UnsupportedMediaType\020\237\003\022\030\n\023" +
+      "RangeNotSatisfiable\020\240\003\022\026\n\021ExpectationFai" +
+      "led\020\241\003\022\027\n\022MisdirectedRequest\020\245\003\022\030\n\023Unpro" +
+      "cessableEntity\020\246\003\022\013\n\006Locked\020\247\003\022\025\n\020Failed" +
+      "Dependency\020\250\003\022\024\n\017UpgradeRequired\020\252\003\022\031\n\024P" +
+      "reconditionRequired\020\254\003\022\024\n\017TooManyRequest" +
+      "s\020\255\003\022 \n\033RequestHeaderFieldsTooLarge\020\257\003\022\030" +
+      "\n\023InternalServerError\020\364\003\022\023\n\016NotImplement" +
+      "ed\020\365\003\022\017\n\nBadGateway\020\366\003\022\027\n\022ServiceUnavail" +
+      "able\020\367\003\022\023\n\016GatewayTimeout\020\370\003\022\034\n\027HTTPVers" +
+      "ionNotSupported\020\371\003\022\032\n\025VariantAlsoNegotia" +
+      "tes\020\372\003\022\030\n\023InsufficientStorage\020\373\003\022\021\n\014Loop" +
+      "Detected\020\374\003\022\020\n\013NotExtended\020\376\003\022\"\n\035Network" +
+      "AuthenticationRequired\020\377\0032z\n\022FlowControl" +
+      "Service\022d\n\005Check\022+.aperture.flowcontrol." +
+      "check.v1.CheckRequest\032,.aperture.flowcon" +
+      "trol.check.v1.CheckResponse\"\000B\263\002\n5com.fl" +
+      "uxninja.generated.aperture.flowcontrol.c" +
+      "heck.v1B\nCheckProtoP\001ZWgithub.com/fluxni" +
+      "nja/aperture/v2/api/gen/proto/go/apertur" +
+      "e/flowcontrol/check/v1;checkv1\242\002\003AFC\252\002\035A" +
+      "perture.Flowcontrol.Check.V1\312\002\035Aperture\\" +
+      "Flowcontrol\\Check\\V1\342\002)Aperture\\Flowcont" +
+      "rol\\Check\\V1\\GPBMetadata\352\002 Aperture::Flo" +
+      "wcontrol::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -273,7 +274,7 @@ public final class CheckProto {
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo_descriptor,
-        new java.lang.String[] { "WorkloadIndex", "TokensInfo", });
+        new java.lang.String[] { "WorkloadIndex", "TokensInfo", "Priority", });
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo_descriptor =
       internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor.getNestedTypes().get(3);
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo_fieldAccessorTable = new
@@ -285,7 +286,7 @@ public final class CheckProto {
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_descriptor,
-        new java.lang.String[] { "Label", "WorkloadIndex", "TokensInfo", });
+        new java.lang.String[] { "Label", "WorkloadIndex", "TokensInfo", "Priority", });
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_fieldAccessorTable = new

@@ -244,26 +244,30 @@ class LimiterDecision(_message.Message):
         tokens_info: LimiterDecision.TokensInfo
         def __init__(self, label: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
     class SchedulerInfo(_message.Message):
-        __slots__ = ["workload_index", "tokens_info"]
+        __slots__ = ["workload_index", "tokens_info", "priority"]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        PRIORITY_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
         tokens_info: LimiterDecision.TokensInfo
-        def __init__(self, workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
+        priority: float
+        def __init__(self, workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ...) -> None: ...
     class SamplerInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         label: str
         def __init__(self, label: _Optional[str] = ...) -> None: ...
     class QuotaSchedulerInfo(_message.Message):
-        __slots__ = ["label", "workload_index", "tokens_info"]
+        __slots__ = ["label", "workload_index", "tokens_info", "priority"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        PRIORITY_FIELD_NUMBER: _ClassVar[int]
         label: str
         workload_index: str
         tokens_info: LimiterDecision.TokensInfo
-        def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
+        priority: float
+        def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ...) -> None: ...
     POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
     COMPONENT_ID_FIELD_NUMBER: _ClassVar[int]

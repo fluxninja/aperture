@@ -29,6 +29,7 @@ function(cfg, metadata={}) {
               })
               + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
               + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
+              + rateLimiter.withRequestParameters(params.policy.rate_limiter.request_parameters)
             ),
           ),
         ] + params.policy.components,
