@@ -17,6 +17,7 @@ export interface FlowParams {
   labels?: Record<string, string>;
   timeoutMilliseconds?: number;
   failOpen?: boolean;
+  tryConnect?: boolean;
 }
 
 export class ApertureClient {
@@ -78,8 +79,9 @@ export class ApertureClient {
         // if not ready, return flow with fail-to-wire semantics
         // if ready, call check
         if (
+          (params.tryConnect === undefined || params.tryConnect == false) &&
           this.fcsClient.getChannel().getConnectivityState(true) !=
-          connectivityState.READY
+            connectivityState.READY
         ) {
           resolveFlow(null, new Error("connection not ready"));
           return;
