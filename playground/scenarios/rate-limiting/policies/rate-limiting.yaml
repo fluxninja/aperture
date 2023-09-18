@@ -4,13 +4,6 @@
 # https://docs.fluxninja.com/reference/blueprints/rate-limiting
 policy:
   policy_name: rate-limiting
-  resources:
-    infra_meters:
-      aerospike:
-        agent_group: default
-        per_agent_group: true
-        receivers:
-          aerospike: {}
   rate_limiter:
     bucket_capacity: 40
     fill_amount: 2
@@ -21,3 +14,5 @@ policy:
     parameters:
       label_key: http.request.header.user_id
       interval: 1s
+    request_parameters:
+      tokens_label_key: http.request.header.tokens
