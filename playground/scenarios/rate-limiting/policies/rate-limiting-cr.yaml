@@ -19,7 +19,8 @@ spec:
           parameters:
             interval: 1s
             label_key: http.request.header.user_id
-          request_parameters: {}
+          request_parameters:
+            tokens_label_key: http.request.header.tokens
           selectors:
           - agent_group: default
             control_point: ingress
@@ -28,9 +29,3 @@ spec:
   resources:
     flow_control:
       classifiers: []
-    infra_meters:
-      aerospike:
-        agent_group: default
-        per_agent_group: true
-        receivers:
-          aerospike: {}

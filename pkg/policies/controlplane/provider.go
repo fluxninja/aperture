@@ -9,6 +9,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdnotifier "github.com/fluxninja/aperture/v2/pkg/etcd/notifier"
@@ -116,7 +117,12 @@ func setupPoliciesNotifier(
 	scopedKV *etcdclient.SessionScopedKV,
 	lifecycle fx.Lifecycle,
 ) {
-	wrapPolicy := func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
+	wrapPolicy := func(
+		key notifiers.Key,
+		bytes []byte,
+		etype notifiers.EventType,
+		source policysyncv1.PolicyWrapper_Source,
+	) (notifiers.Key, []byte, error) {
 		var dat []byte
 		if bytes == nil {
 			return key, dat, nil
@@ -136,6 +142,7 @@ func setupPoliciesNotifier(
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr
 			}
+			wrapper.Source = source
 			var marshalWrapErr error
 			jsonDat, marshalWrapErr := json.Marshal(wrapper)
 			if marshalWrapErr != nil {
@@ -152,18 +159,36 @@ func setupPoliciesNotifier(
 		return key, dat, nil
 	}
 
-	policyEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
+	policyEtcdToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
 	// content transform callback to wrap policy in config properties wrapper
-	policyEtcdNotifier.SetTransformFunc(wrapPolicy)
+	policyEtcdToEtcdNotifier.SetTransformFunc(
+		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
+			return wrapPolicy(key, bytes, etype, policysyncv1.PolicyWrapper_ETCD)
+		},
+	)
+
+	// FIXME: Don't use multiple etcdnotifiers writing to the same prefix.
+	// Note: This solution is not perfect, but still works:
+	// * The whole etcd subtree is purged on Start(), but that shouldn't be a
+	//   problem, as no other logic runs between these starts.
+	// * Multiple notifiers writing the same key to etcd are a problem, but
+	//   it's not handled correctly anyway (FIXME).
+	policyCRToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
+	policyCRToEtcdNotifier.SetTransformFunc(
+		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
+			return wrapPolicy(key, bytes, etype, policysyncv1.PolicyWrapper_K8S)
+		},
+	)
 
 	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, &scopedKV.KVWrapper)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			return multierr.Combine(
-				policyEtcdNotifier.Start(),
-				policyTrackers.AddPrefixNotifier(policyEtcdNotifier),
-				policyAPIWatcher.AddPrefixNotifier(policyEtcdNotifier),
+				policyEtcdToEtcdNotifier.Start(),
+				policyCRToEtcdNotifier.Start(),
+				policyTrackers.AddPrefixNotifier(policyCRToEtcdNotifier),
+				policyAPIWatcher.AddPrefixNotifier(policyEtcdToEtcdNotifier),
 				policyDynamicConfigEtcdNotifier.Start(),
 				policyDynamicConfigTrackers.AddPrefixNotifier(policyDynamicConfigEtcdNotifier),
 				policyAPIDynamicConfigWatcher.AddPrefixNotifier(policyDynamicConfigEtcdNotifier),
@@ -171,9 +196,10 @@ func setupPoliciesNotifier(
 		},
 		OnStop: func(_ context.Context) error {
 			return multierr.Combine(
-				policyTrackers.RemovePrefixNotifier(policyEtcdNotifier),
-				policyAPIWatcher.RemovePrefixNotifier(policyEtcdNotifier),
-				policyEtcdNotifier.Stop(),
+				policyTrackers.RemovePrefixNotifier(policyCRToEtcdNotifier),
+				policyAPIWatcher.RemovePrefixNotifier(policyEtcdToEtcdNotifier),
+				policyEtcdToEtcdNotifier.Stop(),
+				policyCRToEtcdNotifier.Stop(),
 				policyDynamicConfigTrackers.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
 				policyAPIDynamicConfigWatcher.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
 				policyDynamicConfigEtcdNotifier.Stop(),
