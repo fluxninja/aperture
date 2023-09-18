@@ -198,8 +198,8 @@ func setupPoliciesNotifier(
 			return multierr.Combine(
 				policyTrackers.RemovePrefixNotifier(policyCRToEtcdNotifier),
 				policyAPIWatcher.RemovePrefixNotifier(policyEtcdToEtcdNotifier),
-				policyEtcdToEtcdNotifier.Start(),
-				policyCRToEtcdNotifier.Start(),
+				policyEtcdToEtcdNotifier.Stop(),
+				policyCRToEtcdNotifier.Stop(),
 				policyDynamicConfigTrackers.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
 				policyAPIDynamicConfigWatcher.RemovePrefixNotifier(policyDynamicConfigEtcdNotifier),
 				policyDynamicConfigEtcdNotifier.Stop(),
