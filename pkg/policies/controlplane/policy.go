@@ -298,24 +298,10 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
 func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
-	jsonDat, marshalErr := json.Marshal(policyMessage)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policyMessage)
-		return nil, marshalErr
+	hash, err := hashPolicy(policyMessage)
+	if err != nil {
+		return nil, err
 	}
-	// convert dat to yaml format
-	dat, marshalErr := yaml.JSONToYAML(jsonDat)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
-		return nil, marshalErr
-	}
-	log.Trace().Msgf("Policy message: %s", string(dat))
-	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
-	if hashErr != nil {
-		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
-		return nil, hashErr
-	}
-	hash := base64.StdEncoding.EncodeToString(hashBytes[:])
 
 	return &policysyncv1.PolicyWrapper{
 		Policy: policyMessage,
@@ -324,4 +310,27 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 			PolicyHash: hash,
 		},
 	}, nil
+}
+
+// hashPolicy returns hash of the policy.
+func hashPolicy(policy *policylangv1.Policy) (string, error) {
+	jsonDat, marshalErr := json.Marshal(policy)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policy)
+		return "", marshalErr
+	}
+	// convert dat to yaml format
+	dat, marshalErr := yaml.JSONToYAML(jsonDat)
+	if marshalErr != nil {
+		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
+		return "", marshalErr
+	}
+	log.Trace().Msgf("Policy message: %s", string(dat))
+	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
+	if hashErr != nil {
+		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
+		return "", hashErr
+	}
+
+	return base64.StdEncoding.EncodeToString(hashBytes[:]), nil
 }

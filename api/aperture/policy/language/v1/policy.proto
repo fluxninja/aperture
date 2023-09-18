@@ -83,10 +83,17 @@ message GetPolicyRequest {
 // GetPolicyResponse is a response containing the requested Policy.
 message GetPolicyResponse {
   enum Status {
-    // Policy is valid.
+    // Policy is valid, present in etcd and running in the controller.
     VALID = 0;
-    // Policy is invalid.
+    // Policy is present in etcd, but fails to parse.
     INVALID = 1;
+    // Policy is present in etcd, but is not (yet) running in the controller.
+    NOT_LOADED = 2;
+    // Policy is running on the controller, but is not present in etcd.
+    STALE = 3;
+    // Policy is present in etcd and policy with the same name is running in
+    // the controller, but these policies differ.
+    OUTDATED = 4;
   }
   Policy policy = 1;
   Status status = 2;
