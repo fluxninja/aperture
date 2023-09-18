@@ -2,6 +2,7 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -18,6 +19,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -66,126 +68,197 @@ func RegisterPolicyService(in RegisterPolicyServiceIn) *PolicyService {
 	return svc
 }
 
-// GetPolicies returns all the policies running in the system.
+// GetPolicies returns all the policies running (or supposed to be running) in the system.
 func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
-	policies := s.policyFactory.GetPolicies()
-
-	// Fetching policies from etcd if they are not stored in factory due to invalid state.
-	response, err := s.etcdClient.Client.KV.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
-	if err != nil || len(response.Kvs) == 0 {
-		if err != nil {
-			log.Warn().Msgf("failed to fetch policies from etcd: '%s'", err.Error())
-		}
-		return &policylangv1.GetPoliciesResponse{
-			Policies: policies,
-		}, nil
+	localPolicies := s.policyFactory.GetPolicyWrappers()
+	remotePolicies, err := s.etcdClient.Client.KV.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
+	if err != nil {
+		log.Warn().Err(err).Msg("GetPolicies: failed to fetch policies from etcd")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policies from etcd: %s", err))
 	}
 
-	for _, kv := range response.Kvs {
-		keySplit := strings.Split(string(kv.Key), fmt.Sprintf("%s/", paths.PoliciesAPIConfigPath))
-		var key string
-		if len(keySplit) == 2 {
-			key = keySplit[1]
-		} else {
-			log.Warn().Msgf("failed to parse policy name from key '%s'", string(kv.Key))
+	resp := make(map[string]*policylangv1.GetPolicyResponse, len(remotePolicies.Kvs))
+	for _, kv := range remotePolicies.Kvs {
+		name, ok := strings.CutPrefix(string(kv.Key), fmt.Sprintf("%s/", paths.PoliciesAPIConfigPath))
+		if !ok {
+			log.Bug().Str("key", string(kv.Key)).Msg("failed to parse policy name from key")
 			continue
 		}
+		resp[name] = getPolicyResponse(kv.Value, localPolicies[name])
+	}
 
-		if policies.Policies[key] != nil {
+	for name, policy := range localPolicies {
+		if _, ok := resp[name]; ok {
 			continue
 		}
-
-		policy := &policylangv1.Policy{}
-		err = protojson.Unmarshal(kv.Value, policy)
-		if err != nil {
-			policies.Policies[key] = &policylangv1.GetPolicyResponse{
-				Status: policylangv1.GetPolicyResponse_INVALID,
-				Reason: err.Error(),
-			}
-			continue
-		}
-
-		_, _, err = ValidateAndCompile(ctx, key, kv.Value)
-		if err != nil {
-			policies.Policies[key] = &policylangv1.GetPolicyResponse{
-				Policy: policy,
-				Status: policylangv1.GetPolicyResponse_INVALID,
-				Reason: err.Error(),
-			}
-		}
+		resp[name] = getLocalOnlyPolicyResponse(policy)
 	}
 
 	return &policylangv1.GetPoliciesResponse{
-		Policies: policies,
+		Policies: &policylangv1.Policies{
+			Policies: resp,
+		},
 	}, nil
 }
 
-// GetPolicy returns the policy running in the system which matches the given name.
+// GetPolicy returns the policy which matches the given name.
+//
+// Returns error if policy cannot be found in *neither* etcd nor locally.
 func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.GetPolicyRequest) (*policylangv1.GetPolicyResponse, error) {
-	policy := s.policyFactory.GetPolicy(request.Name)
-	if policy == nil {
-		response, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
-		if err != nil {
-			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policy '%s'", request.Name))
-		}
+	localPolicy := s.policyFactory.GetPolicyWrapper(request.Name)
+	remotePolicies, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
+	if err != nil {
+		log.Warn().Err(err).Str("policy", request.Name).Msg("GetPolicy: failed to fetch policy from etcd")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policy from etcd: %s", err))
 
-		if len(response.Kvs) == 0 {
-			return nil, status.Error(codes.NotFound, fmt.Sprintf("policy '%s' not found", request.Name))
-		}
+	}
 
-		policy = &policylangv1.Policy{}
-		policyBytes := response.Kvs[0].Value
-		err = protojson.Unmarshal(policyBytes, policy)
-		if err != nil {
-			return nil, status.Error(codes.Internal, fmt.Sprintf("policy '%s' is invalid. Spec: '%s'", request.Name, string(policyBytes)))
+	if len(remotePolicies.Kvs) == 0 {
+		if localPolicy == nil {
+			return nil, status.Error(codes.NotFound, "policy not found")
 		}
+		return getLocalOnlyPolicyResponse(localPolicy), nil
+	}
 
-		_, _, err = ValidateAndCompile(ctx, request.Name, policyBytes)
-		if err != nil {
+	return getPolicyResponse(remotePolicies.Kvs[0].Value, localPolicy), nil
+}
+
+// getPolicyResponse combines info about the policy from etcd and local
+// policyFactory to create a response for GetPolicy/GetPolicies
+//
+// localPolicy can be nil.
+func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
+	// FIXME: Policies should be unmarshaled via config.UnmarshalJSON, not
+	// directly via json.Unmarshal, as it doesn't handle the defaults
+	// correctly.  json.Unmarshal is used here to match the hashing logic in
+	// wrapPolicy in provider.go.
+	var remotePolicy policylangv1.Policy
+	err := json.Unmarshal(remoteBytes, &remotePolicy)
+	if err != nil {
+		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
-				Policy: policy,
 				Status: policylangv1.GetPolicyResponse_INVALID,
-				Reason: err.Error(),
-			}, nil
+				Reason: fmt.Sprintf("parse error: %s", err),
+			}
+		}
+		return &policylangv1.GetPolicyResponse{
+			Policy: localPolicy.Policy,
+			Status: policylangv1.GetPolicyResponse_OUTDATED,
+			Reason: fmt.Sprintf("parse error: %s", err),
+		}
+	}
+
+	if localPolicy == nil {
+		return &policylangv1.GetPolicyResponse{
+			Policy: &remotePolicy,
+			Status: policylangv1.GetPolicyResponse_NOT_LOADED,
+			Reason: "not loaded into controller",
+		}
+	}
+
+	remoteHash, err := hashPolicy(&remotePolicy)
+	if err != nil {
+		return &policylangv1.GetPolicyResponse{
+			Policy: localPolicy.Policy,
+			Status: policylangv1.GetPolicyResponse_OUTDATED,
+			Reason: fmt.Sprintf("failed to compute remote policy hash: %s", err),
+		}
+	}
+
+	localHash := localPolicy.GetCommonAttributes().GetPolicyHash()
+	if remoteHash != localHash {
+		return &policylangv1.GetPolicyResponse{
+			Policy: localPolicy.Policy,
+			Status: policylangv1.GetPolicyResponse_OUTDATED,
+			Reason: fmt.Sprintf(
+				"policy mismatch, remote hash: %s, local hash %s",
+				remoteHash,
+				localHash,
+			),
 		}
 	}
 
 	return &policylangv1.GetPolicyResponse{
-		Policy: policy,
+		Policy: localPolicy.Policy,
 		Status: policylangv1.GetPolicyResponse_VALID,
-	}, nil
+	}
+}
+
+func getLocalOnlyPolicyResponse(localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
+	if localPolicy.Source == policysyncv1.PolicyWrapper_ETCD {
+		return &policylangv1.GetPolicyResponse{
+			Policy: localPolicy.Policy,
+			Status: policylangv1.GetPolicyResponse_STALE,
+			Reason: "deleted, but still running",
+		}
+	}
+
+	return &policylangv1.GetPolicyResponse{
+		// It's expected for policies from K8S CRs to not be present in /config/api/policies
+		Policy: localPolicy.Policy,
+		Status: policylangv1.GetPolicyResponse_VALID,
+	}
 }
 
 // UpsertPolicy creates/updates policy to the system.
 func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
-	updateMask := req.UpdateMask != nil && len(req.UpdateMask.GetPaths()) > 0
-	policy, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
-	if err != nil && updateMask {
-		return nil, err
+	if wrapper := s.policyFactory.GetPolicyWrapper(req.PolicyName); wrapper.GetSource() == policysyncv1.PolicyWrapper_K8S {
+		return nil, status.Error(codes.AlreadyExists, "policy already exists and is managed by K8S object")
 	}
 
-	if policy != nil {
-		if !updateMask && policy.Status == policylangv1.GetPolicyResponse_VALID {
-			return nil, status.Errorf(codes.AlreadyExists, "Policy '%s' already exists. Use UpsertPolicy with PATCH call to update it.", req.PolicyName)
-		}
-
-		if !(len(req.UpdateMask.GetPaths()) == 1 && req.UpdateMask.GetPaths()[0] == "all") {
-			utils.ApplyFieldMask(policy.Policy, req.Policy, req.UpdateMask)
-			req.Policy = policy.Policy
-		}
-	}
-
-	policyBytes, err := s.getPolicyBytes(req.PolicyName, req.Policy)
+	etcdPolicy, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName))
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	txn := s.etcdClient.Client.Txn(s.etcdClient.Client.Ctx())
-	_, err = txn.If(
-		clientv3.Compare(clientv3.Version(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName)), ">", -1),
-	).Then(
-		clientv3.OpPut(path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(policyBytes)),
-	).Commit()
+	if len(req.GetUpdateMask().GetPaths()) > 0 {
+		if len(etcdPolicy.Kvs) == 0 {
+			return nil, status.Error(codes.NotFound, "cannot patch, no such policy")
+		}
+
+		var oldPolicy policylangv1.Policy
+		err = config.UnmarshalYAML(etcdPolicy.Kvs[0].Value, &oldPolicy)
+		if err != nil {
+			return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+		}
+
+		if len(req.UpdateMask.Paths) == 1 && req.UpdateMask.Paths[0] == "all" {
+			// We use update_mask: { paths: ["all"] } to convey that we want to
+			// update the whole Policy.  This is non-standard usage of update
+			// masks, so we cannot call ApplyFieldMask here.
+			// FIXME Do we need field masks at all? Looks like they're only
+			// used to pass a "force" flag from aperturectl.
+		} else {
+			utils.ApplyFieldMask(&oldPolicy, req.Policy, req.UpdateMask)
+			req.Policy = &oldPolicy
+		}
+	} else if len(etcdPolicy.Kvs) > 0 {
+		// We want to prevent accidentally overwriting valid policy, that's why
+		// it's only possible when PATCH (update mask) is specified.
+		_, _, err = ValidateAndCompile(ctx, "dummy-name", etcdPolicy.Kvs[0].Value)
+		if err == nil {
+			// Note: Older aperturectl versions and Aperture Cloud rely on
+			// exact string of error message!
+			return nil, status.Error(codes.AlreadyExists, "policy already exists. Use UpsertPolicy with PATCH call to update it.")
+		}
+		if ctx.Err() != nil {
+			return nil, err
+		}
+		// Otherwise, we know policy is invalid and thus we allow overwriting it.
+	}
+
+	policyBytes, err := req.Policy.MarshalJSON()
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to marshal policy: %s", err)
+	}
+
+	_, _, err = ValidateAndCompile(ctx, req.PolicyName, policyBytes)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to compile policy: %s", err)
+	}
+
+	// FIXME compare original mod revision to make sure the policy we're patching hasn't changed meanwhile
+	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(policyBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -194,9 +267,17 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 
 // PostDynamicConfig updates dynamic config to the system.
 func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
-	_, err := s.GetPolicy(ctx, &policylangv1.GetPolicyRequest{Name: req.PolicyName})
+	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+		ctx,
+		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
+		clientv3.WithKeysOnly(),
+	)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(etcdPolicy.Kvs) == 0 && s.policyFactory.GetPolicyWrapper(req.PolicyName) == nil {
+		return nil, status.Error(codes.NotFound, "no such policy")
 	}
 
 	jsonDynamicConfig, err := req.DynamicConfig.MarshalJSON()
@@ -204,6 +285,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 		return nil, fmt.Errorf("failed to marshal dynamic config '%s': '%s'", req.PolicyName, err)
 	}
 
+	// FIXME use a transaction so that it's not possible to post dynamic config to non-existed policy.
 	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
 	if err != nil {
 		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
@@ -217,21 +299,6 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
 	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	return &emptypb.Empty{}, nil
-}
-
-// getPolicyBytes returns the policy bytes after checking validity of the policy.
-func (s *PolicyService) getPolicyBytes(name string, policy *policylangv1.Policy) ([]byte, error) {
-	policyBytes, err := policy.MarshalJSON()
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal policy '%s': '%s'", name, err)
-	}
-
-	_, _, err = ValidateAndCompile(context.Background(), name, policyBytes)
-	if err != nil {
-		return nil, fmt.Errorf("failed to compile policy '%s': '%s'", name, err)
-	}
-
-	return policyBytes, nil
 }
 
 // GetDecisions returns the decisions.
