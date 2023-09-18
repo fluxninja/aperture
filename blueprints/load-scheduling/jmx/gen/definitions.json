@@ -66,7 +66,7 @@
                   "alert_name": "Range Driven Load Throttling Event"
                 },
                 "degree": "__REQUIRED_FIELD__",
-                "high_watermark": "__REQUIRED_FIELD__",
+                "high_throttle_threshold": "__REQUIRED_FIELD__",
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -75,17 +75,12 @@
                     }
                   ]
                 },
-                "low_watermark": "__REQUIRED_FIELD__"
+                "low_throttle_threshold": "__REQUIRED_FIELD__"
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RangeDrivenLoadSchedulerParameters"
             }
           }
-        },
-        "promql_query": {
-          "description": "PromQL query.",
-          "default": "avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})",
-          "type": "string"
         },
         "jmx": {
           "type": "object",

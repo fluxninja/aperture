@@ -70,10 +70,10 @@ policy:
     dry_run: false
     range_driven_load_scheduler:
       degree: 1
-      low_watermark:
+      low_throttle_threshold:
         load_multiplier: 0.025
         signal_value: 0.5
-      high_watermark:
+      high_throttle_threshold:
         load_multiplier: 1
         signal_value: 1
       load_scheduler:

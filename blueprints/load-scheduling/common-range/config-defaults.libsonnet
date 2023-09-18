@@ -34,8 +34,8 @@ local service_protection_core_defaults = {
     load_scheduler: {
       selectors: commonConfig.selectors_defaults,
     },
-    low_watermark: '__REQUIRED_FIELD__',
-    high_watermark: '__REQUIRED_FIELD__',
+    low_throttle_threshold: '__REQUIRED_FIELD__',
+    high_throttle_threshold: '__REQUIRED_FIELD__',
     degree: '__REQUIRED_FIELD__',
     alerter: {
       alert_name: 'Range Driven Load Throttling Event',

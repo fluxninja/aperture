@@ -5,10 +5,10 @@ policy:
   service_protection_core:
     range_driven_load_scheduler:
       degree: 1
-      low_watermark:
+      low_throttle_threshold:
         load_multiplier: 1
         signal_value: 800
-      high_watermark:
+      high_throttle_threshold:
         load_multiplier: 0
         signal_value: 1000
       load_scheduler:

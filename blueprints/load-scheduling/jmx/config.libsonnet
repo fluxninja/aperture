@@ -3,11 +3,6 @@ local serviceProtectionDefaults = import '../common-range/config-defaults.libson
 
 serviceProtectionDefaults {
   policy+: {
-    /**
-    * @param (policy.promql_query: string) PromQL query.
-    */
-    promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
-
     jmx: {
       /**
       * @param (policy.jmx.jmx_metrics_port: int32) Port number for scraping metrics provided by JMX Promtheus Java Agent.

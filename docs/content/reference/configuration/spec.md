@@ -294,23 +294,10 @@ state.
 <!-- vale on -->
 
 The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
-application health signals and the provided throttling strategy. Deprecated:
-v3.0.0. Use _AIMD Load Scheduler_ OR _Range Load Scheduler_ instead.
+deviation of the input signal from the setpoint. Deprecated: v3.0.0. Use _AIMD
+Load Scheduler_ OR _Range Driven Load Scheduler_ instead.
 
 <dl>
-<dt>aimd_throttling_strategy</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerAIMDThrottlingStrategy](#adaptive-load-scheduler-a-i-m-d-throttling-strategy))
-
-<!-- vale on -->
-
-The AIMD strategy throttles the token rate based on an additive increase and
-multiplicative decrease fashion.
-
-</dd>
 <dt>dry_run</dt>
 <dd>
 
@@ -374,129 +361,6 @@ Collection of output ports for the _Adaptive Load Scheduler_ component.
 Parameters for the _Adaptive Load Scheduler_ component.
 
 </dd>
-<dt>range_throttling_strategy</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerRangeThrottlingStrategy](#adaptive-load-scheduler-range-throttling-strategy))
-
-<!-- vale on -->
-
-The Range strategy throttles the token rate based on the range of the signal.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerAIMDThrottlingStrategy {#adaptive-load-scheduler-a-i-m-d-throttling-strategy}
-
-<!-- vale on -->
-
-_AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate
-based on the deviation of the signal from the setpoint. It takes a signal and
-setpoint as inputs and reduces token rate proportionally (or any arbitrary
-power) based on deviation of the signal from setpoint. During recovery, it
-increases the token rate linearly until the system is not overloaded.
-
-<dl>
-<dt>gradient</dt>
-<dd>
-
-<!-- vale off -->
-
-([GradientControllerParameters](#gradient-controller-parameters))
-
-<!-- vale on -->
-
-Parameters for the Gradient Controller.
-
-</dd>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerAIMDThrottlingStrategyIns](#adaptive-load-scheduler-a-i-m-d-throttling-strategy-ins))
-
-<!-- vale on -->
-
-Input ports for the _AIMD Throttling Strategy_.
-
-</dd>
-<dt>load_multiplier_linear_increment</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `0.025`)
-
-<!-- vale on -->
-
-Linear increment to load multiplier every 10 seconds while the system is not in
-the overloaded state, up until the `max_load_multiplier` is reached.
-
-</dd>
-<dt>max_load_multiplier</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `2`)
-
-<!-- vale on -->
-
-The maximum load multiplier that can be reached during recovery from an overload
-state.
-
-- Helps protect the service from request bursts while the system is still
-  recovering.
-- Once this value is reached, the scheduler enters the pass-through mode,
-  allowing requests to bypass the scheduler and be sent directly to the service.
-- The pass-through mode gets disabled if the system enters the overload state
-  again.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerAIMDThrottlingStrategyIns {#adaptive-load-scheduler-a-i-m-d-throttling-strategy-ins}
-
-<!-- vale on -->
-
-Input ports for the _AIMD Throttling Strategy_.
-
-<dl>
-<dt>setpoint</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The setpoint input to the controller.
-
-</dd>
-<dt>signal</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The input signal to the controller.
-
-</dd>
 </dl>
 
 ---
@@ -532,8 +396,7 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale on -->
 
-The setpoint input to the controller. Deprecated: v3.0.0. Use setpoint inside
-the _AIMD Throttling Strategy_ instead.
+The setpoint input to the controller.
 
 </dd>
 <dt>signal</dt>
@@ -545,8 +408,7 @@ the _AIMD Throttling Strategy_ instead.
 
 <!-- vale on -->
 
-The input signal to the controller. Deprecated: v3.0.0. Use signal inside the
-_AIMD Throttling Strategy_ instead.
+The input signal to the controller.
 
 </dd>
 </dl>
@@ -634,8 +496,7 @@ Configuration parameters for the embedded Alerter.
 
 <!-- vale on -->
 
-Parameters for the Gradient Controller. Deprecated: v3.0.0. Use
-"gradient*controller" inside the \_AIMD Throttling Strategy* instead.
+Parameters for the _Gradient Controller_.
 
 </dd>
 <dt>load_multiplier_linear_increment</dt>
@@ -648,9 +509,7 @@ Parameters for the Gradient Controller. Deprecated: v3.0.0. Use
 <!-- vale on -->
 
 Linear increment to load multiplier every 10 seconds while the system is not in
-the overloaded state, up until the `max_load_multiplier` is reached. Deprecated:
-v3.0.0. Use "gradient*controller" inside the \_AIMD Throttling Strategy*
-instead.
+the overloaded state, up until the `max_load_multiplier` is reached.
 
 </dd>
 <dt>load_scheduler</dt>
@@ -682,151 +541,7 @@ state.
 - Once this value is reached, the scheduler enters the pass-through mode,
   allowing requests to bypass the scheduler and be sent directly to the service.
 - The pass-through mode gets disabled if the system enters the overload state
-  again. Deprecated: v3.0.0. Use "gradient*controller" inside the \_AIMD
-  Throttling Strategy* instead.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerRangeThrottlingStrategy {#adaptive-load-scheduler-range-throttling-strategy}
-
-<!-- vale on -->
-
-Range Throttling Strategy uses the
-[polynomial range function](#polynomial-range-function) to throttle the token
-rate based on the range of the signal.
-
-<dl>
-<dt>in_ports</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerRangeThrottlingStrategyIns](#adaptive-load-scheduler-range-throttling-strategy-ins))
-
-<!-- vale on -->
-
-Collection of input ports for the Range Throttling Strategy.
-
-</dd>
-<dt>parameters</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerRangeThrottlingStrategyParameters](#adaptive-load-scheduler-range-throttling-strategy-parameters))
-
-<!-- vale on -->
-
-Parameters for the Range Throttling Function.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerRangeThrottlingStrategyIns {#adaptive-load-scheduler-range-throttling-strategy-ins}
-
-<!-- vale on -->
-
-Input ports for the Range Throttling Strategy component.
-
-<dl>
-<dt>signal</dt>
-<dd>
-
-<!-- vale off -->
-
-([InPort](#in-port))
-
-<!-- vale on -->
-
-The input signal to the controller.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerRangeThrottlingStrategyParameters {#adaptive-load-scheduler-range-throttling-strategy-parameters}
-
-<!-- vale on -->
-
-<dl>
-<dt>degree</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, **required**)
-
-<!-- vale on -->
-
-Degree determines shape of the throttling curve. degree=1: linear degree=2:
-quadratic degree=3: cubic
-
-</dd>
-<dt>end</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint](#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint))
-
-<!-- vale on -->
-
-Ending data-point of the throttling range
-
-</dd>
-<dt>start</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint](#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint))
-
-<!-- vale on -->
-
-Starting data-point of the throttling range
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint {#adaptive-load-scheduler-range-throttling-strategy-parameters-datapoint}
-
-<!-- vale on -->
-
-<dl>
-<dt>load_multiplier</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, minimum: `0`, maximum: `1`)
-
-<!-- vale on -->
-
-</dd>
-<dt>threshold</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, minimum: `0`, maximum: `1`)
-
-<!-- vale on -->
+  again.
 
 </dd>
 </dl>
@@ -7269,7 +6984,7 @@ Degree determines shape of the throttling curve. degree=1: linear degree=2:
 quadratic degree=3: cubic
 
 </dd>
-<dt>high_watermark</dt>
+<dt>high_throttle_threshold</dt>
 <dd>
 
 <!-- vale off -->
@@ -7293,7 +7008,7 @@ Ending data-point of the throttling range
 Parameters for the _Load Scheduler_.
 
 </dd>
-<dt>low_watermark</dt>
+<dt>low_throttle_threshold</dt>
 <dd>
 
 <!-- vale off -->

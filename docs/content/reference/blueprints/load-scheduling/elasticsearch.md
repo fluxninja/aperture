@@ -88,20 +88,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query to detect ElasticSearch overload.'
-    type='string'
-    reference=''
-    value='"avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-elasticsearch"></a>
 
 <ParameterDescription
@@ -171,7 +157,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for Range Throttling Strategy.'
     type='Object (aperture.spec.v1.RangeDrivenLoadSchedulerParameters)'
     reference='../../configuration/spec#range-driven-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Range Driven Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "high_watermark": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "low_watermark": "__REQUIRED_FIELD__"}'
+    value='{"alerter": {"alert_name": "Range Driven Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "high_throttle_threshold": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "low_throttle_threshold": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

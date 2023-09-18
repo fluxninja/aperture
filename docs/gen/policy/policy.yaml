@@ -106,12 +106,9 @@ definitions:
         type: object
     AdaptiveLoadScheduler:
         description: |-
-            The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.
-            Deprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Load Scheduler_ instead.
+            The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+            Deprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Driven Load Scheduler_ instead.
         properties:
-            aimd_throttling_strategy:
-                $ref: '#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategy'
-                description: The AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion.
             dry_run:
                 description: |-
                     Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
@@ -122,7 +119,10 @@ definitions:
                 type: string
             in_ports:
                 $ref: '#/definitions/AdaptiveLoadSchedulerIns'
-                description: Collection of input ports for the _Adaptive Load Scheduler_ component.
+                description: |+
+                    Collection of input ports for the _Adaptive Load Scheduler_ component.
+
+                x-go-tag-validate: required
             out_ports:
                 $ref: '#/definitions/AdaptiveLoadSchedulerOuts'
                 description: Collection of output ports for the _Adaptive Load Scheduler_ component.
@@ -130,64 +130,6 @@ definitions:
                 $ref: '#/definitions/AdaptiveLoadSchedulerParameters'
                 description: |+
                     Parameters for the _Adaptive Load Scheduler_ component.
-
-                x-go-tag-validate: required
-            range_throttling_strategy:
-                $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy'
-                description: The Range strategy throttles the token rate based on the range of the signal.
-        type: object
-    AdaptiveLoadSchedulerAIMDThrottlingStrategy:
-        description: |-
-            _AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
-            It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
-            During recovery, it increases the token rate linearly until the system is not overloaded.
-        properties:
-            gradient:
-                $ref: '#/definitions/GradientControllerParameters'
-                description: |+
-                    Parameters for the Gradient Controller.
-
-                x-go-tag-validate: required
-            in_ports:
-                $ref: '#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategyIns'
-                description: |+
-                    Input ports for the _AIMD Throttling Strategy_.
-
-                x-go-tag-validate: required
-            load_multiplier_linear_increment:
-                default: 0.025
-                description: |+
-                    Linear increment to load multiplier every 10 seconds while the system is
-                    not in the overloaded state, up until the `max_load_multiplier` is reached.
-
-                format: double
-                type: number
-                x-go-tag-default: "0.025"
-            max_load_multiplier:
-                default: 2
-                description: |+
-                    The maximum load multiplier that can be reached during recovery from an overload state.
-                    - Helps protect the service from request bursts while the system is still recovering.
-                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-                    - The pass-through mode gets disabled if the system enters the overload state again.
-
-                format: double
-                type: number
-                x-go-tag-default: "2.0"
-        type: object
-    AdaptiveLoadSchedulerAIMDThrottlingStrategyIns:
-        description: Input ports for the _AIMD Throttling Strategy_.
-        properties:
-            setpoint:
-                $ref: '#/definitions/InPort'
-                description: |+
-                    The setpoint input to the controller.
-
-                x-go-tag-validate: required
-            signal:
-                $ref: '#/definitions/InPort'
-                description: |+
-                    The input signal to the controller.
 
                 x-go-tag-validate: required
         type: object
@@ -201,14 +143,16 @@ definitions:
                     results in _Flow_ throttling at the service.
             setpoint:
                 $ref: '#/definitions/InPort'
-                description: |-
+                description: |+
                     The setpoint input to the controller.
-                    Deprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.
+
+                x-go-tag-validate: required
             signal:
                 $ref: '#/definitions/InPort'
-                description: |-
+                description: |+
                     The input signal to the controller.
-                    Deprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.
+
+                x-go-tag-validate: required
         type: object
     AdaptiveLoadSchedulerOuts:
         description: Output ports for the _Adaptive Load Scheduler_ component.
@@ -234,15 +178,15 @@ definitions:
                 x-go-tag-validate: required
             gradient:
                 $ref: '#/definitions/GradientControllerParameters'
-                description: |-
-                    Parameters for the Gradient Controller.
-                    Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
+                description: |+
+                    Parameters for the _Gradient Controller_.
+
+                x-go-tag-validate: required
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
                     Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
-                    Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
@@ -260,74 +204,10 @@ definitions:
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
                     - The pass-through mode gets disabled if the system enters the overload state again.
-                    Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
 
                 format: double
                 type: number
                 x-go-tag-default: "2.0"
-        type: object
-    AdaptiveLoadSchedulerRangeThrottlingStrategy:
-        description: Range Throttling Strategy uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
-        properties:
-            in_ports:
-                $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyIns'
-                description: |+
-                    Collection of input ports for the Range Throttling Strategy.
-
-                x-go-tag-validate: required
-            parameters:
-                $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParameters'
-                description: |+
-                    Parameters for the Range Throttling Function.
-
-                x-go-tag-validate: required
-        type: object
-    AdaptiveLoadSchedulerRangeThrottlingStrategyIns:
-        description: Input ports for the Range Throttling Strategy component.
-        properties:
-            signal:
-                $ref: '#/definitions/InPort'
-                description: |+
-                    The input signal to the controller.
-
-                x-go-tag-validate: required
-        type: object
-    AdaptiveLoadSchedulerRangeThrottlingStrategyParameters:
-        properties:
-            degree:
-                format: double
-                title: |-
-                    Degree determines shape of the throttling curve.
-                    degree=1: linear
-                    degree=2: quadratic
-                    degree=3: cubic
-                type: number
-                x-go-tag-validate: required
-            end:
-                $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint'
-                title: Ending data-point of the throttling range
-                x-go-tag-validate: required
-            start:
-                $ref: '#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint'
-                title: Starting data-point of the throttling range
-                x-go-tag-validate: required
-        required:
-            - degree
-        type: object
-    AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint:
-        properties:
-            load_multiplier:
-                format: double
-                maximum: 1
-                minimum: 0
-                type: number
-                x-go-tag-validate: gte=0,lte=1
-            threshold:
-                format: double
-                maximum: 1
-                minimum: 0
-                type: number
-                x-go-tag-validate: gte=0,lte=1
         type: object
     AddressExtractor:
         description: |-
@@ -2939,7 +2819,7 @@ definitions:
                     degree=3: cubic
                 type: number
                 x-go-tag-validate: required
-            high_watermark:
+            high_throttle_threshold:
                 $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
                 title: Ending data-point of the throttling range
                 x-go-tag-validate: required
@@ -2949,7 +2829,7 @@ definitions:
                     Parameters for the _Load Scheduler_.
 
                 x-go-tag-validate: required
-            low_watermark:
+            low_throttle_threshold:
                 $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
                 title: Starting data-point of the throttling range
                 x-go-tag-validate: required

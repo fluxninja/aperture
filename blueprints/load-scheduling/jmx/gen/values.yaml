@@ -15,12 +15,12 @@ policy:
       alerter:
         alert_name: "Range Driven Load Throttling Event"
       degree: __REQUIRED_FIELD__
-      high_watermark: __REQUIRED_FIELD__
+      high_throttle_threshold: __REQUIRED_FIELD__
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
-      low_watermark: __REQUIRED_FIELD__
+      low_throttle_threshold: __REQUIRED_FIELD__
   jmx:
     # Namespace of the application for which JMX metrics are scraped.
     # Type: string

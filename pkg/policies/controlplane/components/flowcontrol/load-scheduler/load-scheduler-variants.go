@@ -66,12 +66,55 @@ func prepareLoadSchedulerCommonComponents() *policylangv1.NestedCircuit {
 				},
 			},
 			{
+				Component: &policylangv1.Component_Inverter{
+					Inverter: &policylangv1.Inverter{
+						InPorts: &policylangv1.Inverter_Ins{
+							Input: &policylangv1.InPort{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "IS_OVERLOAD",
+								},
+							},
+						},
+						OutPorts: &policylangv1.Inverter_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "NOT_IS_OVERLOAD",
+							},
+						},
+					},
+				},
+			},
+			{
+				Component: &policylangv1.Component_Or{
+					Or: &policylangv1.Or{
+						InPorts: &policylangv1.Or_Ins{
+							Inputs: []*policylangv1.InPort{
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "PASS_THROUGH_FROM_STRATEGY",
+									},
+								},
+								{
+									Value: &policylangv1.InPort_SignalName{
+										SignalName: "NOT_IS_OVERLOAD",
+									},
+								},
+							},
+						},
+						OutPorts: &policylangv1.Or_Outs{
+							Output: &policylangv1.OutPort{
+								SignalName: "PASS_THROUGH",
+							},
+						},
+					},
+				},
+			},
+			{
 				Component: &policylangv1.Component_Switcher{
 					Switcher: &policylangv1.Switcher{
 						InPorts: &policylangv1.Switcher_Ins{
 							Switch: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{
-									SignalName: "PASS_THROUGH_FROM_STRATEGY",
+									SignalName: "PASS_THROUGH",
 								},
 							},
 							OnSignal: &policylangv1.InPort{

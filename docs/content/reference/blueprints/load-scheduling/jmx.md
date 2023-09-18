@@ -74,20 +74,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query.'
-    type='string'
-    reference=''
-    value='"avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~\"service3-demo-app-.*\"})"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -143,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for Range Throttling Strategy.'
     type='Object (aperture.spec.v1.RangeDrivenLoadSchedulerParameters)'
     reference='../../configuration/spec#range-driven-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Range Driven Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "high_watermark": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "low_watermark": "__REQUIRED_FIELD__"}'
+    value='{"alerter": {"alert_name": "Range Driven Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "high_throttle_threshold": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "low_throttle_threshold": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

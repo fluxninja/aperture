@@ -26,7 +26,7 @@ spec:
             alerter:
               alert_name: Range Driven Load Throttling Event
             degree: 1
-            high_watermark:
+            high_throttle_threshold:
               load_multiplier: 1
               signal_value: 1
             load_scheduler:
@@ -47,7 +47,7 @@ spec:
                 control_point: awesomeFeature
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
-            low_watermark:
+            low_throttle_threshold:
               load_multiplier: 0.025
               signal_value: 0.5
     - decider:

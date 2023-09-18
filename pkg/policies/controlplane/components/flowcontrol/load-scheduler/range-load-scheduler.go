@@ -63,9 +63,9 @@ func ParseRangeDrivenLoadScheduler(
 
 	parameters := rangeDrivenLoadScheduler.Parameters
 	preStart := 1.0
-	postEnd := parameters.HighWatermark.LoadMultiplier
-	if parameters.LowWatermark.LoadMultiplier < parameters.HighWatermark.LoadMultiplier {
-		preStart = parameters.LowWatermark.LoadMultiplier
+	postEnd := parameters.HighThrottleThreshold.LoadMultiplier
+	if parameters.LowThrottleThreshold.LoadMultiplier < parameters.HighThrottleThreshold.LoadMultiplier {
+		preStart = parameters.LowThrottleThreshold.LoadMultiplier
 		postEnd = 1.0
 	}
 
@@ -114,12 +114,12 @@ func ParseRangeDrivenLoadScheduler(
 				PolynomialRangeFunction: &policylangv1.PolynomialRangeFunction{
 					Parameters: &policylangv1.PolynomialRangeFunction_Parameters{
 						Start: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.LowWatermark.SignalValue,
-							Output: parameters.LowWatermark.LoadMultiplier,
+							Input:  parameters.LowThrottleThreshold.SignalValue,
+							Output: parameters.LowThrottleThreshold.LoadMultiplier,
 						},
 						End: &policylangv1.PolynomialRangeFunction_Parameters_Datapoint{
-							Input:  parameters.HighWatermark.SignalValue,
-							Output: parameters.HighWatermark.LoadMultiplier,
+							Input:  parameters.HighThrottleThreshold.SignalValue,
+							Output: parameters.HighThrottleThreshold.LoadMultiplier,
 						},
 						OutsideRange: &policylangv1.PolynomialRangeFunction_Parameters_ClampToCustomValues_{
 							ClampToCustomValues: &policylangv1.PolynomialRangeFunction_Parameters_ClampToCustomValues{

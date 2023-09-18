@@ -104,12 +104,8 @@
       "additionalProperties": false
     },
     "AdaptiveLoadScheduler": {
-      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Load Scheduler_ instead.",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Driven Load Scheduler_ instead.",
       "properties": {
-        "aimd_throttling_strategy": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategy",
-          "description": "The AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion."
-        },
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
           "type": "boolean"
@@ -120,7 +116,8 @@
         },
         "in_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerIns",
-          "description": "Collection of input ports for the _Adaptive Load Scheduler_ component."
+          "description": "Collection of input ports for the _Adaptive Load Scheduler_ component.\n\n",
+          "x-go-tag-validate": "required"
         },
         "out_ports": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerOuts",
@@ -129,58 +126,6 @@
         "parameters": {
           "$ref": "#/definitions/AdaptiveLoadSchedulerParameters",
           "description": "Parameters for the _Adaptive Load Scheduler_ component.\n\n",
-          "x-go-tag-validate": "required"
-        },
-        "range_throttling_strategy": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategy",
-          "description": "The Range strategy throttles the token rate based on the range of the signal."
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerAIMDThrottlingStrategy": {
-      "description": "_AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.\nIt takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
-      "properties": {
-        "gradient": {
-          "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Parameters for the Gradient Controller.\n\n",
-          "x-go-tag-validate": "required"
-        },
-        "in_ports": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerAIMDThrottlingStrategyIns",
-          "description": "Input ports for the _AIMD Throttling Strategy_.\n\n",
-          "x-go-tag-validate": "required"
-        },
-        "load_multiplier_linear_increment": {
-          "default": 0.025,
-          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "0.025"
-        },
-        "max_load_multiplier": {
-          "default": 2,
-          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
-          "format": "double",
-          "type": "number",
-          "x-go-tag-default": "2.0"
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerAIMDThrottlingStrategyIns": {
-      "description": "Input ports for the _AIMD Throttling Strategy_.",
-      "properties": {
-        "setpoint": {
-          "$ref": "#/definitions/InPort",
-          "description": "The setpoint input to the controller.\n\n",
-          "x-go-tag-validate": "required"
-        },
-        "signal": {
-          "$ref": "#/definitions/InPort",
-          "description": "The input signal to the controller.\n\n",
           "x-go-tag-validate": "required"
         }
       },
@@ -196,11 +141,13 @@
         },
         "setpoint": {
           "$ref": "#/definitions/InPort",
-          "description": "The setpoint input to the controller.\nDeprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead."
+          "description": "The setpoint input to the controller.\n\n",
+          "x-go-tag-validate": "required"
         },
         "signal": {
           "$ref": "#/definitions/InPort",
-          "description": "The input signal to the controller.\nDeprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead."
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required"
         }
       },
       "type": "object",
@@ -235,11 +182,12 @@
         },
         "gradient": {
           "$ref": "#/definitions/GradientControllerParameters",
-          "description": "Parameters for the Gradient Controller.\nDeprecated: v3.0.0. Use \"gradient_controller\" inside the _AIMD Throttling Strategy_ instead."
+          "description": "Parameters for the _Gradient Controller_.\n\n",
+          "x-go-tag-validate": "required"
         },
         "load_multiplier_linear_increment": {
           "default": 0.0025,
-          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\nDeprecated: v3.0.0. Use \"gradient_controller\" inside the _AIMD Throttling Strategy_ instead.\n\n",
+          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "0.0025"
@@ -251,82 +199,10 @@
         },
         "max_load_multiplier": {
           "default": 2,
-          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\nDeprecated: v3.0.0. Use \"gradient_controller\" inside the _AIMD Throttling Strategy_ instead.\n\n",
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
           "format": "double",
           "type": "number",
           "x-go-tag-default": "2.0"
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerRangeThrottlingStrategy": {
-      "description": "Range Throttling Strategy uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.",
-      "properties": {
-        "in_ports": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyIns",
-          "description": "Collection of input ports for the Range Throttling Strategy.\n\n",
-          "x-go-tag-validate": "required"
-        },
-        "parameters": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParameters",
-          "description": "Parameters for the Range Throttling Function.\n\n",
-          "x-go-tag-validate": "required"
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerRangeThrottlingStrategyIns": {
-      "description": "Input ports for the Range Throttling Strategy component.",
-      "properties": {
-        "signal": {
-          "$ref": "#/definitions/InPort",
-          "description": "The input signal to the controller.\n\n",
-          "x-go-tag-validate": "required"
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerRangeThrottlingStrategyParameters": {
-      "properties": {
-        "degree": {
-          "format": "double",
-          "title": "Degree determines shape of the throttling curve.\ndegree=1: linear\ndegree=2: quadratic\ndegree=3: cubic",
-          "type": "number",
-          "x-go-tag-validate": "required"
-        },
-        "end": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint",
-          "title": "Ending data-point of the throttling range",
-          "x-go-tag-validate": "required"
-        },
-        "start": {
-          "$ref": "#/definitions/AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint",
-          "title": "Starting data-point of the throttling range",
-          "x-go-tag-validate": "required"
-        }
-      },
-      "required": ["degree"],
-      "type": "object",
-      "additionalProperties": false
-    },
-    "AdaptiveLoadSchedulerRangeThrottlingStrategyParametersDatapoint": {
-      "properties": {
-        "load_multiplier": {
-          "format": "double",
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number",
-          "x-go-tag-validate": "gte=0,lte=1"
-        },
-        "threshold": {
-          "format": "double",
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number",
-          "x-go-tag-validate": "gte=0,lte=1"
         }
       },
       "type": "object",
@@ -2933,7 +2809,7 @@
           "type": "number",
           "x-go-tag-validate": "required"
         },
-        "high_watermark": {
+        "high_throttle_threshold": {
           "$ref": "#/definitions/RangeDrivenLoadSchedulerDatapoint",
           "title": "Ending data-point of the throttling range",
           "x-go-tag-validate": "required"
@@ -2943,7 +2819,7 @@
           "description": "Parameters for the _Load Scheduler_.\n\n",
           "x-go-tag-validate": "required"
         },
-        "low_watermark": {
+        "low_throttle_threshold": {
           "$ref": "#/definitions/RangeDrivenLoadSchedulerDatapoint",
           "title": "Starting data-point of the throttling range",
           "x-go-tag-validate": "required"

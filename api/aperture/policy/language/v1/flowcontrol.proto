@@ -416,10 +416,10 @@ message RangeDrivenLoadScheduler {
     LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
 
     // Starting data-point of the throttling range
-    Datapoint low_watermark = 2; // @gotags: validate:"required"
+    Datapoint low_throttle_threshold = 2; // @gotags: validate:"required"
 
     // Ending data-point of the throttling range
-    Datapoint high_watermark = 3; // @gotags: validate:"required"
+    Datapoint high_throttle_threshold = 3; // @gotags: validate:"required"
 
     // Degree determines shape of the throttling curve.
     // degree=1: linear
@@ -448,50 +448,15 @@ message RangeDrivenLoadScheduler {
   string dry_run_config_key = 5;
 }
 
-// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the application health signals and the provided throttling strategy.
-// Deprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Load Scheduler_ instead.
+// The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+// Deprecated: v3.0.0. Use _AIMD Load Scheduler_ OR _Range Driven Load Scheduler_ instead.
 message AdaptiveLoadScheduler {
   // Parameters for the _Adaptive Load Scheduler_ component.
   message Parameters {
     // Parameters for the _Load Scheduler_.
     LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
 
-    // Parameters for the Gradient Controller.
-    // Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
-    GradientController.Parameters gradient = 2;
-
-    // The maximum load multiplier that can be reached during recovery from an overload state.
-    // - Helps protect the service from request bursts while the system is still recovering.
-    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-    // - The pass-through mode gets disabled if the system enters the overload state again.
-    // Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
-    double max_load_multiplier = 3; // @gotags: default:"2.0"
-
-    // Linear increment to load multiplier every 10 seconds while the system is
-    // not in the overloaded state, up until the `max_load_multiplier` is reached.
-    // Deprecated: v3.0.0. Use "gradient_controller" inside the _AIMD Throttling Strategy_ instead.
-    double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
-
-    // Configuration parameters for the embedded Alerter.
-    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
-  }
-
-  // _AIMD Throttling Strategy_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
-  // It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
-  // During recovery, it increases the token rate linearly until the system is not overloaded.
-  message AIMDThrottlingStrategy {
-    // Input ports for the _AIMD Throttling Strategy_.
-    message Ins {
-      // The input signal to the controller.
-      InPort signal = 1; // @gotags: validate:"required"
-      // The setpoint input to the controller.
-      InPort setpoint = 2; // @gotags: validate:"required"
-    }
-
-    // Input ports for the _AIMD Throttling Strategy_.
-    Ins in_ports = 1; // @gotags: validate:"required"
-
-    // Parameters for the Gradient Controller.
+    // Parameters for the _Gradient Controller_.
     GradientController.Parameters gradient = 2; // @gotags: validate:"required"
 
     // The maximum load multiplier that can be reached during recovery from an overload state.
@@ -502,48 +467,18 @@ message AdaptiveLoadScheduler {
 
     // Linear increment to load multiplier every 10 seconds while the system is
     // not in the overloaded state, up until the `max_load_multiplier` is reached.
-    double load_multiplier_linear_increment = 4; // @gotags: default:"0.025"
-  }
+    double load_multiplier_linear_increment = 4; // @gotags: default:"0.0025"
 
-  // Range Throttling Strategy uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
-  message RangeThrottlingStrategy {
-    // Input ports for the Range Throttling Strategy component.
-    message Ins {
-      // The input signal to the controller.
-      InPort signal = 1; // @gotags: validate:"required"
-    }
-
-    message Parameters {
-      message Datapoint {
-        double threshold = 1; // @gotags: validate:"gte=0,lte=1"
-        double load_multiplier = 2; // @gotags: validate:"gte=0,lte=1"
-      }
-      // Starting data-point of the throttling range
-      Datapoint start = 1; // @gotags: validate:"required"
-      // Ending data-point of the throttling range
-      Datapoint end = 2; // @gotags: validate:"required"
-      // Degree determines shape of the throttling curve.
-      // degree=1: linear
-      // degree=2: quadratic
-      // degree=3: cubic
-      double degree = 3; // @gotags: validate:"required"
-    }
-
-    // Collection of input ports for the Range Throttling Strategy.
-    Ins in_ports = 1; // @gotags: validate:"required"
-
-    // Parameters for the Range Throttling Function.
-    Parameters parameters = 2; // @gotags: validate:"required"
+    // Configuration parameters for the embedded Alerter.
+    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
   }
 
   // Input ports for the _Adaptive Load Scheduler_ component.
   message Ins {
     // The input signal to the controller.
-    // Deprecated: v3.0.0. Use signal inside the _AIMD Throttling Strategy_ instead.
-    InPort signal = 1;
+    InPort signal = 1; // @gotags: validate:"required"
     // The setpoint input to the controller.
-    // Deprecated: v3.0.0. Use setpoint inside the _AIMD Throttling Strategy_ instead.
-    InPort setpoint = 2;
+    InPort setpoint = 2; // @gotags: validate:"required"
     // The `overload_confirmation` port provides additional criteria to determine overload state which
     // results in _Flow_ throttling at the service.
     InPort overload_confirmation = 3;
@@ -560,20 +495,13 @@ message AdaptiveLoadScheduler {
   }
 
   // Collection of input ports for the _Adaptive Load Scheduler_ component.
-  Ins in_ports = 1;
+  Ins in_ports = 1; // @gotags: validate:"required"
 
   // Collection of output ports for the _Adaptive Load Scheduler_ component.
   Outs out_ports = 2;
 
   // Parameters for the _Adaptive Load Scheduler_ component.
   Parameters parameters = 3; // @gotags: validate:"required"
-
-  oneof throttling_strategy {
-    // The AIMD strategy throttles the token rate based on an additive increase and multiplicative decrease fashion.
-    AIMDThrottlingStrategy aimd_throttling_strategy = 4;
-    // The Range strategy throttles the token rate based on the range of the signal.
-    RangeThrottlingStrategy range_throttling_strategy = 5;
-  }
 
   // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
   // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
