@@ -48,8 +48,6 @@ type Factory struct {
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
-
-	flowDurationSummaryVec *prometheus.SummaryVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -115,17 +113,6 @@ func newFactory(
 		metrics.LimiterDroppedLabel,
 	})
 
-	wsFactory.flowDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name: metrics.FlowDurationMetricName,
-		Help: "Duration of flow",
-	}, []string{
-		metrics.PolicyNameLabel,
-		metrics.PolicyHashLabel,
-		metrics.ComponentIDLabel,
-		metrics.DecisionTypeLabel,
-		metrics.WorkloadIndexLabel,
-	})
-
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var merr error
@@ -151,10 +138,6 @@ func newFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = prometheusRegistry.Register(wsFactory.workloadCounterVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = prometheusRegistry.Register(wsFactory.flowDurationSummaryVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -188,10 +171,6 @@ func newFactory(
 				err := fmt.Errorf("failed to unregister workload_counter metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(wsFactory.flowDurationSummaryVec) {
-				err := fmt.Errorf("failed to unregister flow_duration_ms metric")
-				merr = multierr.Append(merr, err)
-			}
 
 			return merr
 		},
@@ -220,17 +199,6 @@ func (wsFactory *Factory) GetRequestCounter(labels map[string]string) prometheus
 	}
 
 	return counter
-}
-
-// GetFlowDurationSummary returns a flow duration summary for a given workload.
-func (wsFactory *Factory) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	summary, err := wsFactory.flowDurationSummaryVec.GetMetricWith(labels)
-	if err != nil {
-		log.Warn().Err(err).Msg("Getting flow duration summary")
-		return nil
-	}
-
-	return summary
 }
 
 // SchedulerMetrics is a struct that holds all metrics for Scheduler.
@@ -305,11 +273,6 @@ func (metrics *SchedulerMetrics) Delete() error {
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 	}
-	deletedCount = metrics.wsFactory.flowDurationSummaryVec.DeletePartialMatch(metrics.metricLabels)
-	if deletedCount == 0 {
-		log.Warn().Msg("Could not delete flow_duration_ms summary from its metric vector. No traffic to generate metrics?")
-	}
-
 	return merr
 }
 
@@ -536,11 +499,6 @@ func (s *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Obse
 // GetRequestCounter returns request counter for specific workload.
 func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	return s.metrics.wsFactory.GetRequestCounter(labels)
-}
-
-// GetFlowDurationSummary returns flow duration summary for specific workload.
-func (s *Scheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	return s.metrics.wsFactory.GetFlowDurationSummary(labels)
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.
