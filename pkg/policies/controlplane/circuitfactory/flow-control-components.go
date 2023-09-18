@@ -50,6 +50,13 @@ func newFlowControlNestedAndOptions(
 		isRangeDrivenLoadScheduler = true
 	}
 
+	aiadLoadSchedulerProto := &policylangv1.AIADLoadScheduler{}
+	isAIADLoadScheduler := false
+	if proto := flowControlComponentProto.GetAiadLoadScheduler(); proto != nil {
+		aiadLoadSchedulerProto = proto
+		isAIADLoadScheduler = true
+	}
+
 	loadRampProto := &policylangv1.LoadRamp{}
 	isLoadRamp := false
 	if proto := flowControlComponentProto.GetLoadRamp(); proto != nil {
@@ -97,6 +104,13 @@ func newFlowControlNestedAndOptions(
 		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
 	} else if isRangeDrivenLoadScheduler {
 		configuredComponent, nestedCircuit, err := loadscheduler.ParseRangeDrivenLoadScheduler(rangeDrivenLoadSchedulerProto, componentID)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+	} else if isAIADLoadScheduler {
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAIADLoadScheduler(aiadLoadSchedulerProto, componentID)
 		if err != nil {
 			return retErr(err)
 		}

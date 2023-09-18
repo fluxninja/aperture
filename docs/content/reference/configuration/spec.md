@@ -28,6 +28,297 @@ Generated File Starts
 
 <!-- vale off -->
 
+### AIADLoadScheduler {#a-i-a-d-load-scheduler}
+
+<!-- vale on -->
+
+_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload
+state. During recovery, it increases the token rate linearly until the system is
+not overloaded.
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting dry run mode through dynamic configuration.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerIns](#a-i-a-d-load-scheduler-ins))
+
+<!-- vale on -->
+
+Input ports for the _AIAD Load Scheduler_.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerOuts](#a-i-a-d-load-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _AIAD Load Scheduler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerParameters](#a-i-a-d-load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _AIAD Load Scheduler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerIns {#a-i-a-d-load-scheduler-ins}
+
+<!-- vale on -->
+
+Input ports for the _AIAD Load Scheduler_.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint input to the controller.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerOuts {#a-i-a-d-load-scheduler-outs}
+
+<!-- vale on -->
+
+Output ports for the _AIAD Load Scheduler_.
+
+<dl>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired token rate to the incoming token
+rate.
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal that indicates whether the service is in overload state.
+
+</dd>
+<dt>observed_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted token rate to the incoming
+token rate.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerParameters {#a-i-a-d-load-scheduler-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>alerter</dt>
+<dd>
+
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration parameters for the embedded Alerter.
+
+</dd>
+<dt>load_multiplier_linear_decrement</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.05`)
+
+<!-- vale on -->
+
+Linear decrement to load multiplier every 10 seconds while the system is in the
+overloaded state, up until the `min_load_multiplier` is reached.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerParameters](#load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Load Scheduler_.
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `2`)
+
+<!-- vale on -->
+
+The maximum load multiplier that can be reached during recovery from an overload
+state.
+
+- Helps protect the service from request bursts while the system is still
+  recovering.
+- Once this value is reached, the scheduler enters the pass-through mode,
+  allowing requests to bypass the scheduler and be sent directly to the service.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
+
+</dd>
+<dt>min_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0`)
+
+<!-- vale on -->
+
+The minimum load multiplier that can be reached during an overload state.
+
+</dd>
+<dt>overload_condition</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gt | lt | gte | lte`, **required**, default: `"gt"`)
+
+<!-- vale on -->
+
+Overload condition determines the criteria to determine overload state. The
+default condition is "gt", that is, when the signal is greater than the
+setpoint. The condition must be one of:
+
+- "gt": greater than
+- "lt": less than
+- "gte": greater than or equal to
+- "lte": less than or equal to
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### AIMDLoadScheduler {#a-i-m-d-load-scheduler}
 
 <!-- vale on -->
@@ -243,7 +534,7 @@ Parameters for the Gradient Controller.
 
 <!-- vale off -->
 
-(float64, default: `0.025`)
+(float64, minimum: `0`, default: `0.025`)
 
 <!-- vale on -->
 
@@ -268,7 +559,7 @@ Parameters for the _Load Scheduler_.
 
 <!-- vale off -->
 
-(float64, default: `2`)
+(float64, minimum: `0`, default: `2`)
 
 <!-- vale on -->
 
@@ -295,7 +586,7 @@ state.
 
 The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
 deviation of the input signal from the setpoint. Deprecated: v3.0.0. Use _AIMD
-Load Scheduler_ OR _Range Driven Load Scheduler_ instead.
+Load Scheduler_ instead.
 
 <dl>
 <dt>dry_run</dt>
@@ -2990,6 +3281,18 @@ to features within a service.
 _Adaptive Load Scheduler_ component does additive increase of load multiplier
 during non-overload state. During overload, the load multiplier is throttled
 based on the provided strategy.
+
+</dd>
+<dt>aiad_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadScheduler](#a-i-a-d-load-scheduler))
+
+<!-- vale on -->
+
+AIAD Load Scheduler.
 
 </dd>
 <dt>aimd_load_scheduler</dt>

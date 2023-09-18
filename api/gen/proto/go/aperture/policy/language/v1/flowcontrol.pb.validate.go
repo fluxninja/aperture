@@ -572,6 +572,47 @@ func (m *FlowControl) validate(all bool) error {
 			}
 		}
 
+	case *FlowControl_AiadLoadScheduler:
+		if v == nil {
+			err := FlowControlValidationError{
+				field:  "Component",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAiadLoadScheduler()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AiadLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowControlValidationError{
+						field:  "AiadLoadScheduler",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAiadLoadScheduler()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowControlValidationError{
+					field:  "AiadLoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *FlowControl_Private:
 		if v == nil {
 			err := FlowControlValidationError{
@@ -1908,6 +1949,199 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RangeDrivenLoadSchedulerValidationError{}
+
+// Validate checks the field values on AIADLoadScheduler with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AIADLoadScheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AIADLoadScheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AIADLoadSchedulerMultiError, or nil if none found.
+func (m *AIADLoadScheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AIADLoadScheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadSchedulerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadSchedulerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadSchedulerValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadSchedulerValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DryRun
+
+	// no validation rules for DryRunConfigKey
+
+	if len(errors) > 0 {
+		return AIADLoadSchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// AIADLoadSchedulerMultiError is an error wrapping multiple validation errors
+// returned by AIADLoadScheduler.ValidateAll() if the designated constraints
+// aren't met.
+type AIADLoadSchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AIADLoadSchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AIADLoadSchedulerMultiError) AllErrors() []error { return m }
+
+// AIADLoadSchedulerValidationError is the validation error returned by
+// AIADLoadScheduler.Validate if the designated constraints aren't met.
+type AIADLoadSchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AIADLoadSchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AIADLoadSchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AIADLoadSchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AIADLoadSchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AIADLoadSchedulerValidationError) ErrorName() string {
+	return "AIADLoadSchedulerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AIADLoadSchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAIADLoadScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AIADLoadSchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AIADLoadSchedulerValidationError{}
 
 // Validate checks the field values on AdaptiveLoadScheduler with the rules
 // defined in the proto definition for this message. If any rules are
@@ -6654,6 +6888,555 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RangeDrivenLoadScheduler_ParametersValidationError{}
+
+// Validate checks the field values on AIADLoadScheduler_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AIADLoadScheduler_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AIADLoadScheduler_Ins with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AIADLoadScheduler_InsMultiError, or nil if none found.
+func (m *AIADLoadScheduler_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AIADLoadScheduler_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSignal()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "Signal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "Signal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSignal()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_InsValidationError{
+				field:  "Signal",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSetpoint()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "Setpoint",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSetpoint()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_InsValidationError{
+				field:  "Setpoint",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOverloadConfirmation()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "OverloadConfirmation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_InsValidationError{
+					field:  "OverloadConfirmation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOverloadConfirmation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_InsValidationError{
+				field:  "OverloadConfirmation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AIADLoadScheduler_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AIADLoadScheduler_InsMultiError is an error wrapping multiple validation
+// errors returned by AIADLoadScheduler_Ins.ValidateAll() if the designated
+// constraints aren't met.
+type AIADLoadScheduler_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AIADLoadScheduler_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AIADLoadScheduler_InsMultiError) AllErrors() []error { return m }
+
+// AIADLoadScheduler_InsValidationError is the validation error returned by
+// AIADLoadScheduler_Ins.Validate if the designated constraints aren't met.
+type AIADLoadScheduler_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AIADLoadScheduler_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AIADLoadScheduler_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AIADLoadScheduler_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AIADLoadScheduler_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AIADLoadScheduler_InsValidationError) ErrorName() string {
+	return "AIADLoadScheduler_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AIADLoadScheduler_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAIADLoadScheduler_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AIADLoadScheduler_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AIADLoadScheduler_InsValidationError{}
+
+// Validate checks the field values on AIADLoadScheduler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AIADLoadScheduler_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AIADLoadScheduler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AIADLoadScheduler_OutsMultiError, or nil if none found.
+func (m *AIADLoadScheduler_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AIADLoadScheduler_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetIsOverload()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "IsOverload",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "IsOverload",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIsOverload()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_OutsValidationError{
+				field:  "IsOverload",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDesiredLoadMultiplier()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "DesiredLoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "DesiredLoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDesiredLoadMultiplier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_OutsValidationError{
+				field:  "DesiredLoadMultiplier",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetObservedLoadMultiplier()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "ObservedLoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_OutsValidationError{
+					field:  "ObservedLoadMultiplier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetObservedLoadMultiplier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_OutsValidationError{
+				field:  "ObservedLoadMultiplier",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AIADLoadScheduler_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AIADLoadScheduler_OutsMultiError is an error wrapping multiple validation
+// errors returned by AIADLoadScheduler_Outs.ValidateAll() if the designated
+// constraints aren't met.
+type AIADLoadScheduler_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AIADLoadScheduler_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AIADLoadScheduler_OutsMultiError) AllErrors() []error { return m }
+
+// AIADLoadScheduler_OutsValidationError is the validation error returned by
+// AIADLoadScheduler_Outs.Validate if the designated constraints aren't met.
+type AIADLoadScheduler_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AIADLoadScheduler_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AIADLoadScheduler_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AIADLoadScheduler_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AIADLoadScheduler_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AIADLoadScheduler_OutsValidationError) ErrorName() string {
+	return "AIADLoadScheduler_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AIADLoadScheduler_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAIADLoadScheduler_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AIADLoadScheduler_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AIADLoadScheduler_OutsValidationError{}
+
+// Validate checks the field values on AIADLoadScheduler_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AIADLoadScheduler_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AIADLoadScheduler_Parameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AIADLoadScheduler_ParametersMultiError, or nil if none found.
+func (m *AIADLoadScheduler_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AIADLoadScheduler_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLoadScheduler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_ParametersValidationError{
+					field:  "LoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_ParametersValidationError{
+					field:  "LoadScheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLoadScheduler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_ParametersValidationError{
+				field:  "LoadScheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for MinLoadMultiplier
+
+	// no validation rules for LoadMultiplierLinearDecrement
+
+	// no validation rules for MaxLoadMultiplier
+
+	// no validation rules for LoadMultiplierLinearIncrement
+
+	// no validation rules for OverloadCondition
+
+	if all {
+		switch v := interface{}(m.GetAlerter()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AIADLoadScheduler_ParametersValidationError{
+					field:  "Alerter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AIADLoadScheduler_ParametersValidationError{
+					field:  "Alerter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlerter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AIADLoadScheduler_ParametersValidationError{
+				field:  "Alerter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AIADLoadScheduler_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// AIADLoadScheduler_ParametersMultiError is an error wrapping multiple
+// validation errors returned by AIADLoadScheduler_Parameters.ValidateAll() if
+// the designated constraints aren't met.
+type AIADLoadScheduler_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AIADLoadScheduler_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AIADLoadScheduler_ParametersMultiError) AllErrors() []error { return m }
+
+// AIADLoadScheduler_ParametersValidationError is the validation error returned
+// by AIADLoadScheduler_Parameters.Validate if the designated constraints
+// aren't met.
+type AIADLoadScheduler_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AIADLoadScheduler_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AIADLoadScheduler_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AIADLoadScheduler_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AIADLoadScheduler_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AIADLoadScheduler_ParametersValidationError) ErrorName() string {
+	return "AIADLoadScheduler_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AIADLoadScheduler_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAIADLoadScheduler_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AIADLoadScheduler_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AIADLoadScheduler_ParametersValidationError{}
 
 // Validate checks the field values on AdaptiveLoadScheduler_Parameters with
 // the rules defined in the proto definition for this message. If any rules

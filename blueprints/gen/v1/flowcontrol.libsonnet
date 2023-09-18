@@ -7,6 +7,12 @@
   withAdaptiveLoadSchedulerMixin(adaptive_load_scheduler):: {
     adaptive_load_scheduler+: adaptive_load_scheduler,
   },
+  withAiadLoadScheduler(aiad_load_scheduler):: {
+    aiad_load_scheduler: aiad_load_scheduler,
+  },
+  withAiadLoadSchedulerMixin(aiad_load_scheduler):: {
+    aiad_load_scheduler+: aiad_load_scheduler,
+  },
   withAimdLoadScheduler(aimd_load_scheduler):: {
     aimd_load_scheduler: aimd_load_scheduler,
   },

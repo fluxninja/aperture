@@ -1,4 +1,8 @@
 {
+  AIADLoadScheduler: import 'aiadloadscheduler.libsonnet',
+  AIADLoadSchedulerIns: import 'aiadloadschedulerins.libsonnet',
+  AIADLoadSchedulerOuts: import 'aiadloadschedulerouts.libsonnet',
+  AIADLoadSchedulerParameters: import 'aiadloadschedulerparameters.libsonnet',
   AIMDLoadScheduler: import 'aimdloadscheduler.libsonnet',
   AIMDLoadSchedulerIns: import 'aimdloadschedulerins.libsonnet',
   AIMDLoadSchedulerOuts: import 'aimdloadschedulerouts.libsonnet',
