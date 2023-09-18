@@ -1,5 +1,5 @@
 flowchart LR
-subgraph root.0[<center>PromQL<br/>every 10s</center>]
+subgraph root.0[<center>PromQL<br/>every 0s</center>]
 subgraph root.0_outports[ ]
 style root.0_outports fill:none,stroke:none
 root.0output[output]
@@ -62,7 +62,7 @@ style root.13_outports fill:none,stroke:none
 root.13output[output]
 end
 end
-subgraph root.14[<center>LoadRamp<br/>1 selectors</center>]
+subgraph root.14[<center>LoadScheduler<br/>1 selectors</center>]
 subgraph root.14_inports[ ]
 style root.14_inports fill:none,stroke:none
 root.14backward[backward]
@@ -156,7 +156,7 @@ root.1output --> |FORWARD_0| root.7inputs
 root.1_rhs_FakeConstantout --> root.1rhs
 root.2output --> |RESET_0| root.6inputs
 root.2_rhs_FakeConstantout --> root.2rhs
-root.3output --> |USER_ROLLOUT_CONTROL| root.12inputs
+root.3output --> |USER_START_CONTROL| root.12inputs
 root.4output --> |USER_RESET_CONTROL| root.6inputs
 root.5output --> |BACKWARD_INTENT| root.13inputs
 root.5output --> |BACKWARD_INTENT| root.8input
