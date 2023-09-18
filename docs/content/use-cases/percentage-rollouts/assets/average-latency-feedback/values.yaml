@@ -20,9 +20,6 @@ policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
   # Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
   # Type: aperture.spec.v1.LoadRampParameters
   # Required: True

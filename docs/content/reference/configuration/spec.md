@@ -6259,6 +6259,18 @@ Input ports for the RateLimiter component
 Parameters for the RateLimiter component
 
 </dd>
+<dt>request_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterRequestParameters](#rate-limiter-request-parameters))
+
+<!-- vale on -->
+
+RequestParameters for the component
+
+</dd>
 <dt>selectors</dt>
 <dd>
 
@@ -6269,20 +6281,6 @@ Parameters for the RateLimiter component
 <!-- vale on -->
 
 Selectors for the component.
-
-</dd>
-<dt>tokens_label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Flow label key that will be used to override the number of tokens for this
-request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -6357,19 +6355,6 @@ PassThrough port determines whether all requests
 
 Continuous fill determines whether the token bucket should be filled
 continuously or only on discrete intervals.
-
-</dd>
-<dt>denied_response_status_code</dt>
-<dd>
-
-<!-- vale off -->
-
-([StatusCode](#status-code))
-
-<!-- vale on -->
-
-This field allows you to override the default HTTP status code
-(`429 Too Many Requests`) that is returned when a request is denied.
 
 </dd>
 <dt>interval</dt>
@@ -6471,6 +6456,44 @@ Enables lazy sync
 <!-- vale on -->
 
 Number of times to lazy sync within the `interval`.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RateLimiterRequestParameters {#rate-limiter-request-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`429 Too Many Requests`) that is returned when a request is denied.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -7241,7 +7264,7 @@ This field allows you to override the default HTTP status code
 <!-- vale on -->
 
 - Key for a flow label that can be used to override the default number of tokens
-  for this flow.
+  for this request.
 - The value associated with this key must be a valid number.
 - If this parameter is not provided, the number of tokens for the flow will be
   determined by the matched workload's token count.

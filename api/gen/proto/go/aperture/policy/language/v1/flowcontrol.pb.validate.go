@@ -947,7 +947,34 @@ func (m *RateLimiter) validate(all bool) error {
 
 	}
 
-	// no validation rules for TokensLabelKey
+	if all {
+		switch v := interface{}(m.GetRequestParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "RequestParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "RequestParameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequestParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiterValidationError{
+				field:  "RequestParameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return RateLimiterMultiError(errors)
@@ -1335,16 +1362,7 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for PriorityLabelKey
 
-	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := SchedulerValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for DeniedResponseStatusCode
 
 	if len(errors) > 0 {
 		return SchedulerMultiError(errors)
@@ -3706,17 +3724,6 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
-	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := RateLimiter_ParametersValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if len(errors) > 0 {
 		return RateLimiter_ParametersMultiError(errors)
 	}
@@ -3796,6 +3803,113 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiter_ParametersValidationError{}
+
+// Validate checks the field values on RateLimiter_RequestParameters with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RateLimiter_RequestParameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimiter_RequestParameters with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// RateLimiter_RequestParametersMultiError, or nil if none found.
+func (m *RateLimiter_RequestParameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimiter_RequestParameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TokensLabelKey
+
+	// no validation rules for DeniedResponseStatusCode
+
+	if len(errors) > 0 {
+		return RateLimiter_RequestParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// RateLimiter_RequestParametersMultiError is an error wrapping multiple
+// validation errors returned by RateLimiter_RequestParameters.ValidateAll()
+// if the designated constraints aren't met.
+type RateLimiter_RequestParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimiter_RequestParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimiter_RequestParametersMultiError) AllErrors() []error { return m }
+
+// RateLimiter_RequestParametersValidationError is the validation error
+// returned by RateLimiter_RequestParameters.Validate if the designated
+// constraints aren't met.
+type RateLimiter_RequestParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimiter_RequestParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimiter_RequestParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimiter_RequestParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimiter_RequestParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimiter_RequestParametersValidationError) ErrorName() string {
+	return "RateLimiter_RequestParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimiter_RequestParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimiter_RequestParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimiter_RequestParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimiter_RequestParametersValidationError{}
 
 // Validate checks the field values on RateLimiter_Ins with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -5450,16 +5564,7 @@ func (m *Sampler_Parameters) validate(all bool) error {
 
 	}
 
-	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := Sampler_ParametersValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for DeniedResponseStatusCode
 
 	if len(errors) > 0 {
 		return Sampler_ParametersMultiError(errors)
@@ -6260,16 +6365,7 @@ func (m *LoadRamp_Parameters_Step) validate(all bool) error {
 		}
 	}
 
-	if _, ok := checkv1.StatusCode_name[int32(m.GetDeniedResponseStatusCode())]; !ok {
-		err := LoadRamp_Parameters_StepValidationError{
-			field:  "DeniedResponseStatusCode",
-			reason: "value must be one of the defined enum values",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for DeniedResponseStatusCode
 
 	if len(errors) > 0 {
 		return LoadRamp_Parameters_StepMultiError(errors)

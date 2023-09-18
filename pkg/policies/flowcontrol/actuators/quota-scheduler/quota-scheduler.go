@@ -373,7 +373,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 			PolicyHash:               qs.GetPolicyHash(),
 			ComponentId:              qs.GetComponentId(),
 			Dropped:                  dropped,
-			DeniedResponseStatusCode: qs.proto.GetRateLimiter().GetDeniedResponseStatusCode(),
+			DeniedResponseStatusCode: qs.proto.GetScheduler().GetDeniedResponseStatusCode(),
 			Reason:                   reason,
 			Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
 				QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{

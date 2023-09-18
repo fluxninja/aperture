@@ -8,7 +8,6 @@ import "aperture/policy/language/v1/ports.proto";
 import "aperture/policy/language/v1/std_components.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
-import "validate/validate.proto";
 
 // FlowControl Resources
 message FlowControlResources {
@@ -104,9 +103,18 @@ message RateLimiter {
 
     // Configuration of lazy-syncing behavior of rate limiter
     LazySync lazy_sync = 6;
+  }
+
+  message RequestParameters {
+    // Flow label key that will be used to override the number of tokens
+    // for this request.
+    // This is an optional parameter and takes highest precedence
+    // when assigning tokens to a request.
+    // The label value must be a valid number.
+    string tokens_label_key = 1;
 
     // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 7 [(validate.rules).enum = {defined_only: true}];
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 2;
   }
 
   // Inputs for the RateLimiter component
@@ -128,12 +136,8 @@ message RateLimiter {
   // Selectors for the component.
   repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 
-  // Flow label key that will be used to override the number of tokens
-  // for this request.
-  // This is an optional parameter and takes highest precedence
-  // when assigning tokens to a request.
-  // The label value must be a valid number.
-  string tokens_label_key = 4;
+  // RequestParameters for the component
+  RequestParameters request_parameters = 4;
 }
 
 // _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection
@@ -298,7 +302,7 @@ message Scheduler {
   // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
   google.protobuf.Duration decision_deadline_margin = 6; // @gotags: default:"0.01s"
 
-  // * Key for a flow label that can be used to override the default number of tokens for this flow.
+  // * Key for a flow label that can be used to override the default number of tokens for this request.
   // * The value associated with this key must be a valid number.
   // * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
   string tokens_label_key = 7;
@@ -309,7 +313,7 @@ message Scheduler {
   string priority_label_key = 8;
 
   // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-  flowcontrol.check.v1.StatusCode denied_response_status_code = 9 [(validate.rules).enum = {defined_only: true}];
+  flowcontrol.check.v1.StatusCode denied_response_status_code = 9;
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
@@ -397,7 +401,7 @@ message Sampler {
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 
     // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 4 [(validate.rules).enum = {defined_only: true}];
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 4;
   }
 
   message Ins {
@@ -441,7 +445,7 @@ message LoadRamp {
       // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
       // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-      flowcontrol.check.v1.StatusCode denied_response_status_code = 3 [(validate.rules).enum = {defined_only: true}];
+      flowcontrol.check.v1.StatusCode denied_response_status_code = 3;
     }
 
     // Parameters for the _Sampler_.

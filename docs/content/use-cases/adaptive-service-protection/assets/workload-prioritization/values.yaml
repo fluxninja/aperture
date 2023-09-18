@@ -10,9 +10,6 @@ policy:
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components: []
-  # The interval between successive evaluations of the Circuit.
-  # Type: string
-  evaluation_interval: "10s"
   service_protection_core:
     adaptive_load_scheduler:
       load_scheduler:
