@@ -1606,6 +1606,12 @@ private static final long serialVersionUID = 0L;
      * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
      */
     com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder();
+
+    /**
+     * <code>double priority = 3 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    double getPriority();
   }
   /**
    * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.SchedulerInfo}
@@ -1709,6 +1715,17 @@ private static final long serialVersionUID = 0L;
       return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
     }
 
+    public static final int PRIORITY_FIELD_NUMBER = 3;
+    private double priority_ = 0D;
+    /**
+     * <code>double priority = 3 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    @java.lang.Override
+    public double getPriority() {
+      return priority_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1729,6 +1746,9 @@ private static final long serialVersionUID = 0L;
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(2, getTokensInfo());
       }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        output.writeDouble(3, priority_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1744,6 +1764,10 @@ private static final long serialVersionUID = 0L;
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getTokensInfo());
+      }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(3, priority_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1767,6 +1791,9 @@ private static final long serialVersionUID = 0L;
         if (!getTokensInfo()
             .equals(other.getTokensInfo())) return false;
       }
+      if (java.lang.Double.doubleToLongBits(getPriority())
+          != java.lang.Double.doubleToLongBits(
+              other.getPriority())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1784,6 +1811,9 @@ private static final long serialVersionUID = 0L;
         hash = (37 * hash) + TOKENS_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getTokensInfo().hashCode();
       }
+      hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getPriority()));
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1927,6 +1957,7 @@ private static final long serialVersionUID = 0L;
           tokensInfoBuilder_.dispose();
           tokensInfoBuilder_ = null;
         }
+        priority_ = 0D;
         return this;
       }
 
@@ -1969,6 +2000,9 @@ private static final long serialVersionUID = 0L;
               ? tokensInfo_
               : tokensInfoBuilder_.build();
           to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.priority_ = priority_;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -2025,6 +2059,9 @@ private static final long serialVersionUID = 0L;
         if (other.hasTokensInfo()) {
           mergeTokensInfo(other.getTokensInfo());
         }
+        if (other.getPriority() != 0D) {
+          setPriority(other.getPriority());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -2063,6 +2100,11 @@ private static final long serialVersionUID = 0L;
                 bitField0_ |= 0x00000002;
                 break;
               } // case 18
+              case 25: {
+                priority_ = input.readDouble();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 25
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2271,6 +2313,38 @@ private static final long serialVersionUID = 0L;
           tokensInfo_ = null;
         }
         return tokensInfoBuilder_;
+      }
+
+      private double priority_ ;
+      /**
+       * <code>double priority = 3 [json_name = "priority"];</code>
+       * @return The priority.
+       */
+      @java.lang.Override
+      public double getPriority() {
+        return priority_;
+      }
+      /**
+       * <code>double priority = 3 [json_name = "priority"];</code>
+       * @param value The priority to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPriority(double value) {
+
+        priority_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double priority = 3 [json_name = "priority"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPriority() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        priority_ = 0D;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -2930,6 +3004,12 @@ private static final long serialVersionUID = 0L;
      * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
      */
     com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder();
+
+    /**
+     * <code>double priority = 4 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    double getPriority();
   }
   /**
    * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo}
@@ -3073,6 +3153,17 @@ private static final long serialVersionUID = 0L;
       return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
     }
 
+    public static final int PRIORITY_FIELD_NUMBER = 4;
+    private double priority_ = 0D;
+    /**
+     * <code>double priority = 4 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    @java.lang.Override
+    public double getPriority() {
+      return priority_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3096,6 +3187,9 @@ private static final long serialVersionUID = 0L;
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(3, getTokensInfo());
       }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        output.writeDouble(4, priority_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -3114,6 +3208,10 @@ private static final long serialVersionUID = 0L;
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getTokensInfo());
+      }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(4, priority_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3139,6 +3237,9 @@ private static final long serialVersionUID = 0L;
         if (!getTokensInfo()
             .equals(other.getTokensInfo())) return false;
       }
+      if (java.lang.Double.doubleToLongBits(getPriority())
+          != java.lang.Double.doubleToLongBits(
+              other.getPriority())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3158,6 +3259,9 @@ private static final long serialVersionUID = 0L;
         hash = (37 * hash) + TOKENS_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getTokensInfo().hashCode();
       }
+      hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getPriority()));
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3302,6 +3406,7 @@ private static final long serialVersionUID = 0L;
           tokensInfoBuilder_.dispose();
           tokensInfoBuilder_ = null;
         }
+        priority_ = 0D;
         return this;
       }
 
@@ -3347,6 +3452,9 @@ private static final long serialVersionUID = 0L;
               ? tokensInfo_
               : tokensInfoBuilder_.build();
           to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.priority_ = priority_;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -3408,6 +3516,9 @@ private static final long serialVersionUID = 0L;
         if (other.hasTokensInfo()) {
           mergeTokensInfo(other.getTokensInfo());
         }
+        if (other.getPriority() != 0D) {
+          setPriority(other.getPriority());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -3451,6 +3562,11 @@ private static final long serialVersionUID = 0L;
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
+              case 33: {
+                priority_ = input.readDouble();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 33
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3731,6 +3847,38 @@ private static final long serialVersionUID = 0L;
           tokensInfo_ = null;
         }
         return tokensInfoBuilder_;
+      }
+
+      private double priority_ ;
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @return The priority.
+       */
+      @java.lang.Override
+      public double getPriority() {
+        return priority_;
+      }
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @param value The priority to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPriority(double value) {
+
+        priority_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPriority() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        priority_ = 0D;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(

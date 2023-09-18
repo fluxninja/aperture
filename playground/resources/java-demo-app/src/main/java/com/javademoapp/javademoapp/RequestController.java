@@ -142,9 +142,9 @@ public class RequestController {
 
         registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
-        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("FN_AGENT_HOST", DEFAULT_HOST));
+        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("APERTURE_AGENT_HOST", DEFAULT_HOST));
         registrationBean.addInitParameter("agent_port",
-                System.getenv().getOrDefault("FN_AGENT_PORT", DEFAULT_AGENT_PORT));
+                System.getenv().getOrDefault("APERTURE_AGENT_PORT", DEFAULT_AGENT_PORT));
         registrationBean.addInitParameter("control_point_name", "awesomeFeature");
         registrationBean.addInitParameter("enable_fail_open", "true");
         registrationBean.addInitParameter("insecure_grpc", "true");

@@ -49,8 +49,9 @@ policy:
               signal_name: RATE_LIMIT
             fill_amount:
               signal_name: RATE_LIMIT
-          parameters:
+          request_parameters:
             denied_response_status_code: BadRequest
+          parameters:
             interval: "1s"
             label_key: http.request.header.user_id
             lazy_sync:

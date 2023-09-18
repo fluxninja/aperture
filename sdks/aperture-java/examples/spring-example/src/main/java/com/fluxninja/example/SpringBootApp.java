@@ -17,16 +17,16 @@ public class SpringBootApp {
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
+        String agentHost = System.getenv("APERTURE_AGENT_HOST");
         if (agentHost == null) {
             agentHost = DEFAULT_AGENT_HOST;
         }
-        System.setProperty("FN_AGENT_HOST", agentHost);
-        String agentPort = System.getenv("FN_AGENT_PORT");
+        System.setProperty("APERTURE_AGENT_HOST", agentHost);
+        String agentPort = System.getenv("APERTURE_AGENT_PORT");
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
-        System.setProperty("FN_AGENT_PORT", agentPort);
+        System.setProperty("APERTURE_AGENT_PORT", agentPort);
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;

@@ -47,11 +47,11 @@ public class ArmeriaServer {
     }
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
+        String agentHost = System.getenv("APERTURE_AGENT_HOST");
         if (agentHost == null) {
             agentHost = DEFAULT_AGENT_HOST;
         }
-        String agentPort = System.getenv("FN_AGENT_PORT");
+        String agentPort = System.getenv("APERTURE_AGENT_PORT");
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
