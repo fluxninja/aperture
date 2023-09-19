@@ -501,6 +501,11 @@ func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Count
 	return s.metrics.wsFactory.GetRequestCounter(labels)
 }
 
+// GetRampMode is always false for Schedulers.
+func (s *Scheduler) GetRampMode() bool {
+	return false
+}
+
 // GetEstimatedTokens returns estimated tokens for specific workload.
 func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (float64, bool) {
 	s.mutex.RLock()

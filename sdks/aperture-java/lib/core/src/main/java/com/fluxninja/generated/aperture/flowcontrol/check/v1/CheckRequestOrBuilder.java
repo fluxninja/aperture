@@ -52,4 +52,10 @@ java.lang.String defaultValue);
    */
   java.lang.String getLabelsOrThrow(
       java.lang.String key);
+
+  /**
+   * <code>bool ramp_mode = 3 [json_name = "rampMode"];</code>
+   * @return The rampMode.
+   */
+  boolean getRampMode();
 }

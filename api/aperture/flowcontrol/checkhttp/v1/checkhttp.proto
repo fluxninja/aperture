@@ -66,6 +66,9 @@ message CheckHTTPRequest {
   // For an SDK based insertion, a Control Point can represent a particular feature or execution block within a Service.
   // In case of Service Mesh or Middleware insertion, a Control Point can identify ingress vs egress calls or distinct listeners or filter chains.
   string control_point = 4;
+
+  // A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+  bool ramp_mode = 5;
 }
 
 // HTTP attributes for a denied response.

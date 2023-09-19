@@ -110,6 +110,7 @@ class HttpUtils {
         TrafficFlowRequestBuilder builder = TrafficFlowRequest.newBuilder();
 
         builder.setControlPoint(controlPointName)
+                .setRampMode(false)
                 .setHttpMethod(req.method().toString())
                 .setHttpPath(req.path())
                 .setHttpHost(req.authority())

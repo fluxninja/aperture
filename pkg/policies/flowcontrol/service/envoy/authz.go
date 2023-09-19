@@ -225,7 +225,9 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 				statusCode = typev3.StatusCode_TooManyRequests
 			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS:
 				statusCode = typev3.StatusCode_ServiceUnavailable
-			case flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED:
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED:
+				statusCode = typev3.StatusCode_Forbidden
+			case flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP:
 				statusCode = typev3.StatusCode_Forbidden
 			default:
 				log.Bug().Stringer("reason", checkResponse.RejectReason).Msg("Unexpected reject reason")

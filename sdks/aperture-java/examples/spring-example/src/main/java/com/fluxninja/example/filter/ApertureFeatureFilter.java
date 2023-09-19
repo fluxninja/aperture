@@ -26,7 +26,7 @@ public class ApertureFeatureFilter implements Filter {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
+        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels, false);
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 

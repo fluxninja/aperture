@@ -89,13 +89,18 @@ class ApertureClient:
         )
 
     def start_flow(
-        self, control_point: str, explicit_labels: Optional[Labels] = None
+        self,
+        control_point: str,
+        explicit_labels: Optional[Labels] = None,
+        ramp_mode: bool = False,
     ) -> Flow:
         labels: Labels = {}
         labels.update({key: str(value) for key, value in baggage.get_all().items()})
         # Explicit labels override baggage
         labels.update(explicit_labels or {})
-        request = CheckRequest(control_point=control_point, labels=labels)
+        request = CheckRequest(
+            control_point=control_point, labels=labels, ramp_mode=ramp_mode
+        )
         span_attributes: otel_types.Attributes = {
             flow_start_timestamp_label: time.monotonic_ns(),
             source_label: "sdk",
@@ -123,11 +128,12 @@ class ApertureClient:
         explicit_labels: Optional[Dict[str, str]] = None,
         on_reject: Optional[Callable] = None,
         fail_open: bool = True,
+        ramp_mode: bool = False,
     ) -> Callable[[TWrappedFunction], TWrappedFunction]:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                with self.start_flow(control_point, explicit_labels) as flow:
+                with self.start_flow(control_point, explicit_labels, ramp_mode) as flow:
                     if flow.should_run():
                         return await run_fn(fn, *args, **kwargs)
                     else:

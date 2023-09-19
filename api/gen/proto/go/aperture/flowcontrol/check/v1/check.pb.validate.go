@@ -61,6 +61,8 @@ func (m *CheckRequest) validate(all bool) error {
 
 	// no validation rules for Labels
 
+	// no validation rules for RampMode
+
 	if len(errors) > 0 {
 		return CheckRequestMultiError(errors)
 	}

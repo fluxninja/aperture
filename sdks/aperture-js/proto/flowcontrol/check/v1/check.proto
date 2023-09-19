@@ -15,6 +15,7 @@ service FlowControlService {
 message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
+  bool ramp_mode = 3;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -24,7 +25,8 @@ message CheckResponse {
     REJECT_REASON_NONE = 0;
     REJECT_REASON_RATE_LIMITED = 1;
     REJECT_REASON_NO_TOKENS = 2;
-    REJECT_REASON_REGULATED = 3;
+    REJECT_REASON_NOT_SAMPLED = 3;
+    REJECT_REASON_NO_MATCHING_RAMP = 4;
   }
 
   // DecisionType contains fields that represent decision made by Check call.

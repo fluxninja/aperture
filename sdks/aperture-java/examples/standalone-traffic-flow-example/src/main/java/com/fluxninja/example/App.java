@@ -110,7 +110,8 @@ public class App {
                 .setHttpSize(req.contentLength())
                 .setHttpHeaders(allHeaders)
                 .setSource(req.ip(), req.port(), "TCP")
-                .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP");
+                .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP")
+                .setRampMode(false);
 
         TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
 

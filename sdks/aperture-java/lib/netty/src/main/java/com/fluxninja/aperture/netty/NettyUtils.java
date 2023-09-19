@@ -44,7 +44,7 @@ public class NettyUtils {
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, ctx, req);
-        builder.setControlPoint(controlPointName);
+        builder.setControlPoint(controlPointName).setRampMode(false);
         return builder.build();
     }
 
