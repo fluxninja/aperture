@@ -73,9 +73,11 @@ public final class ApertureSDK {
      *
      * @param controlPoint Name of the control point
      * @param explicitLabels Labels sent to Aperture Agent
+     * @param rampMode Whether the flow should require ramp component match
      * @return A Flow object
      */
-    public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
+    public Flow startFlow(
+            String controlPoint, Map<String, String> explicitLabels, Boolean rampMode) {
         Map<String, String> labels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -100,6 +102,7 @@ public final class ApertureSDK {
                 CheckRequest.newBuilder()
                         .setControlPoint(controlPoint)
                         .putAllLabels(labels)
+                        .setRampMode(rampMode)
                         .build();
 
         Span span =

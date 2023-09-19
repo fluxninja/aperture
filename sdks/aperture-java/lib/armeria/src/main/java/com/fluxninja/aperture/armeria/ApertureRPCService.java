@@ -46,7 +46,7 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
     @Override
     public RpcResponse serve(ServiceRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
+        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels, false);
 
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =

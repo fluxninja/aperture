@@ -66,7 +66,7 @@ func getLocalIP(logger logr.Logger) string {
 }
 
 // PrepareCheckHTTPRequestForHTTP takes a http.Request, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, explicitLabels map[string]string) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, explicitLabels map[string]string, rampMode bool) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(req.Context())
 
 	// override labels with explicit labels
@@ -96,6 +96,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 		logger.V(2).Info("Error reading body", "error", err)
 	}
 
+	// TODO: Set RampMode to rampMode after updating go proto dependency
 	return &checkhttpproto.CheckHTTPRequest{
 		Source: &checkhttpproto.SocketAddress{
 			Address:  sourceHost,
@@ -108,6 +109,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 			Port:     destinationPort,
 		},
 		ControlPoint: controlPoint,
+		// RampMode:     rampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
 			Path:     req.URL.Path,
@@ -122,7 +124,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, explicitLabels map[string]string) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, explicitLabels map[string]string, rampMode bool) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels
@@ -167,10 +169,12 @@ func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		logger.V(2).Info("Unable to marshal request body")
 	}
 
+	// TODO: Set RampMode to rampMode after updating go proto dependency
 	return &checkhttpproto.CheckHTTPRequest{
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
+		// RampMode:     rampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     info.FullMethod,

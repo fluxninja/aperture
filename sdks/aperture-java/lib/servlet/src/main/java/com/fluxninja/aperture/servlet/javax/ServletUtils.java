@@ -49,7 +49,7 @@ public class ServletUtils {
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, req);
-        builder.setControlPoint(controlPointName);
+        builder.setControlPoint(controlPointName).setRampMode(false);
         return builder.build();
     }
 

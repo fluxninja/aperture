@@ -409,3 +409,8 @@ func (fr *sampler) GetRequestCounter(labels map[string]string) prometheus.Counte
 
 	return counter
 }
+
+// GetRampMode returns the ramp mode flag of the sampler.
+func (fr *sampler) GetRampMode() bool {
+	return fr.proto.Parameters.RampMode
+}

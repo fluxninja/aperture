@@ -27,6 +27,7 @@ type multiMatchResult struct {
 	fluxMeters    map[iface.FluxMeter]struct{}
 	rateLimiters  map[iface.Limiter]struct{}
 	samplers      map[iface.Limiter]struct{}
+	rampSamplers  map[iface.Limiter]struct{}
 	labelPreviews map[iface.LabelPreview]struct{}
 }
 
@@ -37,6 +38,7 @@ func newMultiMatchResult() *multiMatchResult {
 		fluxMeters:    make(map[iface.FluxMeter]struct{}),
 		rateLimiters:  make(map[iface.Limiter]struct{}),
 		samplers:      make(map[iface.Limiter]struct{}),
+		rampSamplers:  make(map[iface.Limiter]struct{}),
 		labelPreviews: make(map[iface.LabelPreview]struct{}),
 	}
 }
@@ -53,6 +55,7 @@ func NewEngine(agentInfo *agentinfo.AgentInfo) iface.Engine {
 		schedulers:    make(map[iface.LimiterID]iface.Scheduler),
 		rateLimiters:  make(map[iface.LimiterID]iface.RateLimiter),
 		samplers:      make(map[iface.LimiterID]iface.Limiter),
+		rampSamplers:  make(map[iface.LimiterID]iface.Limiter),
 		labelPreviews: make(map[iface.PreviewID]iface.LabelPreview),
 	}
 	return e
@@ -72,6 +75,7 @@ type Engine struct {
 	schedulers    map[iface.LimiterID]iface.Scheduler
 	rateLimiters  map[iface.LimiterID]iface.RateLimiter
 	samplers      map[iface.LimiterID]iface.Limiter
+	rampSamplers  map[iface.LimiterID]iface.Limiter
 	labelPreviews map[iface.PreviewID]iface.LabelPreview
 	multiMatchers map[selectors.ControlPointID]*multiMatcher
 	mutex         sync.RWMutex
@@ -115,15 +119,23 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	response.FluxMeterInfos = fluxMeterProtos
 
 	limiterTypes := []struct {
-		limiters     map[iface.Limiter]struct{}
-		rejectReason flowcontrolv1.CheckResponse_RejectReason
+		rampComponent bool
+		limiters      map[iface.Limiter]struct{}
+		rejectReason  flowcontrolv1.CheckResponse_RejectReason
 	}{
-		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_REGULATED},
-		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
-		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
+		{true, mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP},
+		{false, mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED},
+		{false, mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
+		{false, mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
 	}
 
 	for _, limiterType := range limiterTypes {
+		if limiterType.rampComponent && requestContext.RampMode && len(limiterType.limiters) == 0 {
+			// There must be at least one ramp component accepting a ramp mode flow.
+			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+			response.RejectReason = limiterType.rejectReason
+			return
+		}
 		limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
 		for _, limiterDecision := range limiterDecisions {
 			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
@@ -367,10 +379,15 @@ func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
 
 // RegisterSampler adds limiter actuator to multimatcher.
 func (e *Engine) RegisterSampler(l iface.Limiter) error {
+	samplersMap := e.samplers
+	if l.GetRampMode() {
+		samplersMap = e.rampSamplers
+	}
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	if _, ok := e.samplers[l.GetLimiterID()]; !ok {
-		e.samplers[l.GetLimiterID()] = l
+
+	if _, ok := samplersMap[l.GetLimiterID()]; !ok {
+		samplersMap[l.GetLimiterID()] = l
 	} else {
 		return fmt.Errorf("sampler already registered")
 	}
@@ -385,9 +402,13 @@ func (e *Engine) RegisterSampler(l iface.Limiter) error {
 
 // UnregisterSampler removes limiter actuator from multimatcher.
 func (e *Engine) UnregisterSampler(rl iface.Limiter) error {
+	samplersMap := e.samplers
+	if rl.GetRampMode() {
+		samplersMap = e.rampSamplers
+	}
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.samplers, rl.GetLimiterID())
+	delete(samplersMap, rl.GetLimiterID())
 
 	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
@@ -396,7 +417,11 @@ func (e *Engine) UnregisterSampler(rl iface.Limiter) error {
 func (e *Engine) GetSampler(limiterID iface.LimiterID) iface.Limiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-	return e.samplers[limiterID]
+	if s, ok := e.samplers[limiterID]; ok {
+		return s
+	} else {
+		return e.rampSamplers[limiterID]
+	}
 }
 
 // getMatches returns schedulers and fluxmeters for given labels.

@@ -2212,6 +2212,21 @@ java.lang.String defaultValue) {
     }
   }
 
+  public static final int RAMP_MODE_FIELD_NUMBER = 5;
+  private boolean rampMode_ = false;
+  /**
+   * <pre>
+   * A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+   * </pre>
+   *
+   * <code>bool ramp_mode = 5 [json_name = "rampMode"];</code>
+   * @return The rampMode.
+   */
+  @java.lang.Override
+  public boolean getRampMode() {
+    return rampMode_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -2238,6 +2253,9 @@ java.lang.String defaultValue) {
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, controlPoint_);
     }
+    if (rampMode_ != false) {
+      output.writeBool(5, rampMode_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -2261,6 +2279,10 @@ java.lang.String defaultValue) {
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(controlPoint_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, controlPoint_);
+    }
+    if (rampMode_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(5, rampMode_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -2294,6 +2316,8 @@ java.lang.String defaultValue) {
     }
     if (!getControlPoint()
         .equals(other.getControlPoint())) return false;
+    if (getRampMode()
+        != other.getRampMode()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -2319,6 +2343,9 @@ java.lang.String defaultValue) {
     }
     hash = (37 * hash) + CONTROL_POINT_FIELD_NUMBER;
     hash = (53 * hash) + getControlPoint().hashCode();
+    hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getRampMode());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -2474,6 +2501,7 @@ java.lang.String defaultValue) {
         requestBuilder_ = null;
       }
       controlPoint_ = "";
+      rampMode_ = false;
       return this;
     }
 
@@ -2528,6 +2556,9 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.controlPoint_ = controlPoint_;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.rampMode_ = rampMode_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -2590,6 +2621,9 @@ java.lang.String defaultValue) {
         bitField0_ |= 0x00000008;
         onChanged();
       }
+      if (other.getRampMode() != false) {
+        setRampMode(other.getRampMode());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -2642,6 +2676,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000008;
               break;
             } // case 34
+            case 40: {
+              rampMode_ = input.readBool();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 40
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3259,6 +3298,50 @@ java.lang.String defaultValue) {
       checkByteStringIsUtf8(value);
       controlPoint_ = value;
       bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+
+    private boolean rampMode_ ;
+    /**
+     * <pre>
+     * A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+     * </pre>
+     *
+     * <code>bool ramp_mode = 5 [json_name = "rampMode"];</code>
+     * @return The rampMode.
+     */
+    @java.lang.Override
+    public boolean getRampMode() {
+      return rampMode_;
+    }
+    /**
+     * <pre>
+     * A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+     * </pre>
+     *
+     * <code>bool ramp_mode = 5 [json_name = "rampMode"];</code>
+     * @param value The rampMode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setRampMode(boolean value) {
+
+      rampMode_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+     * </pre>
+     *
+     * <code>bool ramp_mode = 5 [json_name = "rampMode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearRampMode() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      rampMode_ = false;
       onChanged();
       return this;
     }

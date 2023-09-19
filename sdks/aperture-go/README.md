@@ -30,7 +30,7 @@ if err != nil {
 
 ```go
 // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-flow, err := a.apertureClient.StartFlow(ctx, "awesomeFeature", labels)
+flow, err := a.apertureClient.StartFlow(ctx, "awesomeFeature", labels, false)
 if err != nil {
    log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
 }

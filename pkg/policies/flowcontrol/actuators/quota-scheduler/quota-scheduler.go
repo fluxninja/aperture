@@ -505,3 +505,8 @@ func (qs *quotaScheduler) GetLatencyObserver(labels map[string]string) prometheu
 func (qs *quotaScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	return qs.qsFactory.wsFactory.GetRequestCounter(labels)
 }
+
+// GetRampMode is always false for quotaSchedulers.
+func (qs *quotaScheduler) GetRampMode() bool {
+	return false
+}
