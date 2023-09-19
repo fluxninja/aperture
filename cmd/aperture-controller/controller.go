@@ -34,6 +34,7 @@ func main() {
 			clockwork.NewRealClock,
 		),
 		otelcollector.Module(),
+		enforceSingleControllerModule, // needs to be before controlplane
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),

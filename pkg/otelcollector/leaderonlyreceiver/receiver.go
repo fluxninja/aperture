@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"go.opentelemetry.io/collector/component"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
 const (
@@ -78,12 +78,11 @@ func createMetricsReceiver(
 }
 
 type leaderOnlyReceiver struct {
-	backgroundWG       sync.WaitGroup
+	backgroundWG       *panichandler.CancellableWaitGroup // nil if background goroutine not started
 	consumer           consumer.Metrics
 	factory            receiver.Factory
 	host               component.Host
-	inner              receiver.Metrics   // nil if inner receiver not started
-	cancelBackground   context.CancelFunc // nil if background goroutine not started
+	inner              receiver.Metrics // nil if inner receiver not started
 	origCreateSettings receiver.CreateSettings
 	config             Config
 }
@@ -107,19 +106,16 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 		return nil
 	}
 
-	var runCtx context.Context
-	runCtx, r.cancelBackground = context.WithCancel(context.Background())
-	r.backgroundWG.Add(1)
-	go r.startWhenLeader(runCtx)
+	r.backgroundWG = panichandler.NewCancellableWaitGroup()
+	r.backgroundWG.GoOnDone(r.config.leaderElection.Done(), r.onLeaderElectionDone)
 
 	return nil
 }
 
 // Shutdown implements component.Component.
 func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
-	if r.cancelBackground != nil {
-		r.cancelBackground()
-		r.backgroundWG.Wait()
+	if r.backgroundWG != nil {
+		r.backgroundWG.CancelAndWait()
 	}
 	if r.inner != nil {
 		return r.inner.Shutdown(ctx)
@@ -127,16 +123,9 @@ func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func (r *leaderOnlyReceiver) startWhenLeader(ctx context.Context) {
-	defer r.backgroundWG.Done()
-
-	select {
-	case <-ctx.Done():
+func (r *leaderOnlyReceiver) onLeaderElectionDone(ctx context.Context) {
+	if !r.config.leaderElection.IsLeader() {
 		return
-	case <-r.config.leaderElection.Done():
-		if !r.config.leaderElection.IsLeader() {
-			return
-		}
 	}
 
 	startCtx, cancel := context.WithTimeout(ctx, lateStartTimeout)
