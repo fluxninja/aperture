@@ -1,5 +1,5 @@
 local creator = import '../../grafana/dashboard_group.libsonnet';
-local utils = import '../common-aimd/utils.libsonnet';
+local utils = import '../common/utils.libsonnet';
 local blueprint = import './average-latency.libsonnet';
 
 local policy = blueprint.policy;

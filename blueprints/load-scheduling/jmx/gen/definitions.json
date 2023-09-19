@@ -37,7 +37,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["range_driven_load_scheduler"],
+          "required": ["aiad_load_scheduler"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -59,14 +59,14 @@
                 "$ref": "#/$defs/overload_confirmation"
               }
             },
-            "range_driven_load_scheduler": {
-              "description": "Parameters for Range Throttling Strategy.",
+            "aiad_load_scheduler": {
+              "description": "Parameters for AIMD throttling strategy.",
               "default": {
                 "alerter": {
-                  "alert_name": "Range Driven Load Throttling Event"
+                  "alert_name": "AIAD Load Throttling Event"
                 },
-                "degree": "__REQUIRED_FIELD__",
-                "high_throttle_threshold": "__REQUIRED_FIELD__",
+                "load_multiplier_linear_decrement": 0.05,
+                "load_multiplier_linear_increment": 0.025,
                 "load_scheduler": {
                   "selectors": [
                     {
@@ -75,10 +75,12 @@
                     }
                   ]
                 },
-                "low_throttle_threshold": "__REQUIRED_FIELD__"
+                "max_load_multiplier": 2,
+                "min_load_multiplier": 0,
+                "overload_condition": "gt"
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RangeDrivenLoadSchedulerParameters"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
             }
           }
         },

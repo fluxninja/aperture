@@ -7,6 +7,47 @@ metadata:
 spec:
   circuit:
     components:
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: DESIRED_LOAD_MULTIPLIER
+          rhs:
+            constant_signal:
+              value: 1
+        operator: lt
+        out_ports:
+          output:
+            signal_name: IS_CRAWLER_ESCALATION
+        true_for: 30s
+    - switcher:
+        in_ports:
+          off_signal:
+            constant_signal:
+              value: 10
+          on_signal:
+            constant_signal:
+              value: 0
+          switch:
+            signal_name: IS_CRAWLER_ESCALATION
+        out_ports:
+          output:
+            signal_name: RATE_LIMIT
+    - flow_control:
+        rate_limiter:
+          in_ports:
+            bucket_capacity:
+              signal_name: RATE_LIMIT
+            fill_amount:
+              signal_name: RATE_LIMIT
+          parameters:
+            interval: 1s
+            label_key: http.request.header.user_id
+          selectors:
+          - agent_group: default
+            control_point: service1-demo-app
+            label_matcher:
+              match_labels:
+                http.request.header.user_type: crawler
     - flow_control:
         aimd_load_scheduler:
           dry_run: false
@@ -56,47 +97,6 @@ spec:
                 service: nginx-server.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
             max_load_multiplier: 2
-    - decider:
-        in_ports:
-          lhs:
-            signal_name: DESIRED_LOAD_MULTIPLIER
-          rhs:
-            constant_signal:
-              value: 1
-        operator: lt
-        out_ports:
-          output:
-            signal_name: IS_CRAWLER_ESCALATION
-        true_for: 30s
-    - switcher:
-        in_ports:
-          off_signal:
-            constant_signal:
-              value: 10
-          on_signal:
-            constant_signal:
-              value: 0
-          switch:
-            signal_name: IS_CRAWLER_ESCALATION
-        out_ports:
-          output:
-            signal_name: RATE_LIMIT
-    - flow_control:
-        rate_limiter:
-          in_ports:
-            bucket_capacity:
-              signal_name: RATE_LIMIT
-            fill_amount:
-              signal_name: RATE_LIMIT
-          parameters:
-            interval: 1s
-            label_key: http.request.header.user_id
-          selectors:
-          - agent_group: default
-            control_point: service1-demo-app
-            label_matcher:
-              match_labels:
-                http.request.header.user_type: crawler
     - query:
         promql:
           evaluation_interval: 10s

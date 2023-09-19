@@ -1,5 +1,4 @@
-local serviceProtectionDefaults = import '../common-range/config-defaults.libsonnet';
-
+local serviceProtectionDefaults = import '../common-aiad/config-defaults.libsonnet';
 
 serviceProtectionDefaults {
   policy+: {
@@ -7,6 +6,10 @@ serviceProtectionDefaults {
     * @param (policy.promql_query: string) PromQL query.
     */
     promql_query: '__REQUIRED_FIELD__',
+    /**
+    * @param (policy.setpoint: float64) Setpoint.
+    */
+    setpoint: '__REQUIRED_FIELD__',
   },
 
   dashboard+: {

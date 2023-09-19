@@ -1,4 +1,4 @@
-local serviceProtectionDefaults = import '../common-range/config-defaults.libsonnet';
+local serviceProtectionDefaults = import '../common-aiad/config-defaults.libsonnet';
 
 serviceProtectionDefaults {
   policy+: {

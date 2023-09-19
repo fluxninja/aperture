@@ -43,6 +43,26 @@
           "additionalProperties": false,
           "required": ["aimd_load_scheduler"],
           "properties": {
+            "dry_run": {
+              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
+              "default": false,
+              "type": "boolean"
+            },
+            "kubelet_overload_confirmations": {
+              "description": "Overload confirmation signals from kubelet.",
+              "default": {},
+              "type": "object",
+              "$ref": "#/$defs/kubelet_overload_confirmations"
+            },
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
+              }
+            },
             "aimd_load_scheduler": {
               "description": "Parameters for AIMD throttling strategy.",
               "default": {
@@ -67,26 +87,6 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIMDLoadSchedulerParameters"
-            },
-            "dry_run": {
-              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
-              "default": false,
-              "type": "boolean"
-            },
-            "kubelet_overload_confirmations": {
-              "description": "Overload confirmation signals from kubelet.",
-              "default": {},
-              "type": "object",
-              "$ref": "#/$defs/kubelet_overload_confirmations"
-            },
-            "overload_confirmations": {
-              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/$defs/overload_confirmation"
-              }
             }
           }
         },

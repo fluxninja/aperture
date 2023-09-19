@@ -8,13 +8,15 @@ spec:
   circuit:
     components:
     - flow_control:
-        range_driven_load_scheduler:
+        aiad_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
             overload_confirmation:
               constant_signal:
                 value: 1
+            setpoint:
+              signal_name: SETPOINT
             signal:
               signal_name: SIGNAL
           out_ports:
@@ -24,11 +26,9 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           parameters:
             alerter:
-              alert_name: Range Driven Load Throttling Event
-            degree: 1
-            high_throttle_threshold:
-              load_multiplier: 0
-              signal_value: 80
+              alert_name: AIAD Load Throttling Event
+            load_multiplier_linear_decrement: 0.2
+            load_multiplier_linear_increment: 0.05
             load_scheduler:
               scheduler:
                 workloads:
@@ -49,9 +49,9 @@ spec:
                 control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
-            low_throttle_threshold:
-              load_multiplier: 1
-              signal_value: 30
+            max_load_multiplier: 2
+            min_load_multiplier: 0
+            overload_condition: gt
     - query:
         promql:
           evaluation_interval: 10s
@@ -60,6 +60,12 @@ spec:
               signal_name: SIGNAL
           query_string: (sum(postgresql_backends) / sum(postgresql_connection_max))
             * 100
+    - variable:
+        constant_output:
+          value: 40
+        out_ports:
+          output:
+            signal_name: SETPOINT
     evaluation_interval: 1s
   resources:
     flow_control:

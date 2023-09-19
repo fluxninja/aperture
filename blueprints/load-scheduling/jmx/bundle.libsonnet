@@ -1,5 +1,5 @@
 local creator = import '../../grafana/dashboard_group.libsonnet';
-local utils = import '../common-range/utils.libsonnet';
+local utils = import '../common/utils.libsonnet';
 local blueprint = import './jmx.libsonnet';
 local jmxUtils = import './utils.libsonnet';
 

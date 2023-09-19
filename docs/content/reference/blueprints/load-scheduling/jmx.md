@@ -122,14 +122,14 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-range-driven-load-scheduler"></a>
+<a id="policy-service-protection-core-aiad-load-scheduler"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.range_driven_load_scheduler'
-    description='Parameters for Range Throttling Strategy.'
-    type='Object (aperture.spec.v1.RangeDrivenLoadSchedulerParameters)'
-    reference='../../configuration/spec#range-driven-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Range Driven Load Throttling Event"}, "degree": "__REQUIRED_FIELD__", "high_throttle_threshold": "__REQUIRED_FIELD__", "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "low_throttle_threshold": "__REQUIRED_FIELD__"}'
+    name='policy.service_protection_core.aiad_load_scheduler'
+    description='Parameters for AIMD throttling strategy.'
+    type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
+    reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
+    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0, "overload_condition": "gt"}'
 />
 
 <!-- vale on -->

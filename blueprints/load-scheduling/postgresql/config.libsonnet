@@ -1,6 +1,6 @@
-local serviceProtectionDefaults = import '../common-range/config-defaults.libsonnet';
+local commonConfig = import '../common-aiad/config-defaults.libsonnet';
 
-serviceProtectionDefaults {
+commonConfig {
   policy+: {
     /**
     * @param (policy.postgresql: postgresql) Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.
