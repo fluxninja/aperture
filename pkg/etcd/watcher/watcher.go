@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"path"
-	"sync"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -20,7 +19,7 @@ import (
 // watcher holds the state of the watcher.
 type watcher struct {
 	notifiers.Trackers
-	waitGroup  sync.WaitGroup
+	waitGroup  panichandler.WaitGroup
 	ctx        context.Context
 	etcdClient *etcdclient.Client
 	cancel     context.CancelFunc
@@ -58,9 +57,7 @@ func (w *watcher) Start() error {
 		return err
 	}
 
-	w.waitGroup.Add(1)
-	panichandler.Go(func() {
-		defer w.waitGroup.Done()
+	w.waitGroup.Go(func() {
 		for {
 			err := w.doWatch()
 			if w.ctx.Err() != nil {
