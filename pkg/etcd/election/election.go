@@ -16,7 +16,7 @@ import (
 
 // Module is a fx module that provides etcd based leader election per agent group.
 func Module() fx.Option {
-	return fx.Provide(ProvideElection)
+	return fx.Provide(ProvideAgentElection)
 }
 
 // ElectionIn holds parameters for ProvideElection.
@@ -25,11 +25,15 @@ type ElectionIn struct {
 	Lifecycle  fx.Lifecycle
 	Shutdowner fx.Shutdowner
 	Session    *etcd.Session
-	AgentInfo  *agentinfo.AgentInfo
 }
 
-// ProvideElection provides a wrapper around etcd based leader election.
-func ProvideElection(in ElectionIn) (*Election, error) {
+// ProvideAgentElection provides a wrapper around etcd based leader election for agents.
+func ProvideAgentElection(in ElectionIn, agentInfo *agentinfo.AgentInfo) *Election {
+	return ProvideElection("/election/"+agentInfo.GetAgentGroup(), in)
+}
+
+// ProvideElection provides a wrapper around etcd based leader election for arbitrary key.
+func ProvideElection(key string, in ElectionIn) *Election {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	election := &Election{
@@ -50,7 +54,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 				}
 
 				// Create an election for this client
-				election.election = concurrencyv3.NewElection(session, "/election/"+in.AgentInfo.GetAgentGroup())
+				election.election = concurrencyv3.NewElection(session, key)
 				// Campaign for leadership
 				err = election.election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
@@ -89,7 +93,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 		},
 	})
 
-	return election, nil
+	return election
 }
 
 // Election is a wrapper around etcd election.
