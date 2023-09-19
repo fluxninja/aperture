@@ -89,7 +89,18 @@ func newFlowControlNestedAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if isAdaptiveLoadScheduler {
-		configuredComponent, nestedCircuit, err := loadscheduler.ParseAdaptiveLoadScheduler(adaptiveLoadSchedulerProto, componentID)
+		// convert to aimd load scheduler
+		adaptiveLoadSchedulerProtoBytes, err := adaptiveLoadSchedulerProto.MarshalJSON()
+		if err != nil {
+			return retErr(err)
+		}
+		aimdProto := &policylangv1.AIMDLoadScheduler{}
+		err = aimdProto.UnmarshalJSON(adaptiveLoadSchedulerProtoBytes)
+		if err != nil {
+			return retErr(err)
+		}
+
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAIMDLoadScheduler(aimdProto, componentID)
 		if err != nil {
 			return retErr(err)
 		}
