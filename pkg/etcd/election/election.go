@@ -4,34 +4,14 @@ import (
 	"context"
 	"sync/atomic"
 
-	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
-	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcd "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	"go.uber.org/fx"
 )
-
-var (
-	// FxTagBase is the tag's base used to identify the election result Tracker.
-	FxTagBase = "etcd_election"
-	// FxTag is the tag used to identify the election result Tracker.
-	FxTag = config.NameTag(FxTagBase)
-	// ElectionResultKey is the key used to identify the election result in the election Tracker.
-	ElectionResultKey = notifiers.Key("election_result")
-)
-
-// Module is a fx module that provides etcd based leader election per agent group.
-func Module() fx.Option {
-	return fx.Options(
-		notifiers.TrackersConstructor{Name: FxTagBase}.Annotate(),
-		fx.Provide(ProvideElection),
-	)
-}
 
 // ElectionIn holds parameters for ProvideElection.
 type ElectionIn struct {
@@ -39,12 +19,13 @@ type ElectionIn struct {
 	Lifecycle  fx.Lifecycle
 	Shutdowner fx.Shutdowner
 	Session    *etcd.Session
-	AgentInfo  *agentinfo.AgentInfo
-	Trackers   notifiers.Trackers `name:"etcd_election"`
 }
 
-// ProvideElection provides a wrapper around etcd based leader election.
-func ProvideElection(in ElectionIn) (*Election, error) {
+// ProvideElection provides a wrapper around etcd based leader election for arbitrary key.
+//
+// Note: This is not exposed directly by any module – controller and agent have
+// their own leader election fx Options.
+func ProvideElection(key string, in ElectionIn) *Election {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	election := &Election{
@@ -65,7 +46,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 				}
 
 				// Create an election for this client
-				election.election = concurrencyv3.NewElection(session, "/election/"+in.AgentInfo.GetAgentGroup())
+				election.election = concurrencyv3.NewElection(session, key)
 				// Campaign for leadership
 				err = election.election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
@@ -80,7 +61,6 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 				// This is the leader
 				election.isLeader.Store(true)
 				log.Info().Msg("Node is now a leader")
-				in.Trackers.WriteEvent(ElectionResultKey, []byte("true"))
 			})
 
 			return nil
@@ -105,7 +85,7 @@ func ProvideElection(in ElectionIn) (*Election, error) {
 		},
 	})
 
-	return election, nil
+	return election
 }
 
 // Election is a wrapper around etcd election.
