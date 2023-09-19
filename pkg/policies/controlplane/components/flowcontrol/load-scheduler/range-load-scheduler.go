@@ -173,6 +173,49 @@ func ParseRangeDrivenLoadScheduler(
 			},
 		},
 		&policylangv1.Component{
+			Component: &policylangv1.Component_Inverter{
+				Inverter: &policylangv1.Inverter{
+					InPorts: &policylangv1.Inverter_Ins{
+						Input: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "IS_OVERLOAD",
+							},
+						},
+					},
+					OutPorts: &policylangv1.Inverter_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "NOT_IS_OVERLOAD",
+						},
+					},
+				},
+			},
+		},
+		&policylangv1.Component{
+			Component: &policylangv1.Component_Or{
+				Or: &policylangv1.Or{
+					InPorts: &policylangv1.Or_Ins{
+						Inputs: []*policylangv1.InPort{
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "PASS_THROUGH_FROM_STRATEGY",
+								},
+							},
+							{
+								Value: &policylangv1.InPort_SignalName{
+									SignalName: "NOT_IS_OVERLOAD",
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Or_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "PASS_THROUGH",
+						},
+					},
+				},
+			},
+		},
+		&policylangv1.Component{
 			Component: &policylangv1.Component_Decider{
 				Decider: &policylangv1.Decider{
 					Operator: components.LT.String(),

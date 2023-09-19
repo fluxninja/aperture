@@ -137,16 +137,24 @@ func ParseAIADLoadScheduler(
 			},
 		},
 		&policylangv1.Component{
-			Component: &policylangv1.Component_ArithmeticCombinator{
-				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-					Operator: components.Add.String(),
-					InPorts: &policylangv1.ArithmeticCombinator_Ins{
-						Lhs: &policylangv1.InPort{
+			Component: &policylangv1.Component_Switcher{
+				Switcher: &policylangv1.Switcher{
+					InPorts: &policylangv1.Switcher_Ins{
+						Switch: &policylangv1.InPort{
 							Value: &policylangv1.InPort_SignalName{
-								SignalName: "OBSERVED_LOAD_MULTIPLIER",
+								SignalName: "IS_OVERLOAD",
 							},
 						},
-						Rhs: &policylangv1.InPort{
+						OnSignal: &policylangv1.InPort{
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_Value{
+										Value: (-1.0 * aiadLoadScheduler.Parameters.LoadMultiplierLinearDecrement),
+									},
+								},
+							},
+						},
+						OffSignal: &policylangv1.InPort{
 							Value: &policylangv1.InPort_ConstantSignal{
 								ConstantSignal: &policylangv1.ConstantSignal{
 									Const: &policylangv1.ConstantSignal_Value{
@@ -156,37 +164,9 @@ func ParseAIADLoadScheduler(
 							},
 						},
 					},
-					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
+					OutPorts: &policylangv1.Switcher_Outs{
 						Output: &policylangv1.OutPort{
-							SignalName: "LOAD_MULTIPLIER_IF_NORMAL",
-						},
-					},
-				},
-			},
-		},
-		&policylangv1.Component{
-			Component: &policylangv1.Component_ArithmeticCombinator{
-				ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-					Operator: components.Add.String(),
-					InPorts: &policylangv1.ArithmeticCombinator_Ins{
-						Lhs: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "OBSERVED_LOAD_MULTIPLIER",
-							},
-						},
-						Rhs: &policylangv1.InPort{
-							Value: &policylangv1.InPort_ConstantSignal{
-								ConstantSignal: &policylangv1.ConstantSignal{
-									Const: &policylangv1.ConstantSignal_Value{
-										Value: aiadLoadScheduler.Parameters.LoadMultiplierLinearDecrement,
-									},
-								},
-							},
-						},
-					},
-					OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-						Output: &policylangv1.OutPort{
-							SignalName: "LOAD_MULTIPLIER_IF_OVERLOAD",
+							SignalName: "LOAD_MULTIPLIER_DELTA",
 						},
 					},
 				},
@@ -202,17 +182,59 @@ func ParseAIADLoadScheduler(
 							},
 						},
 						OnSignal: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "LOAD_MULTIPLIER_IF_OVERLOAD",
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_Value{
+										Value: (1.0 - aiadLoadScheduler.Parameters.LoadMultiplierLinearDecrement),
+									},
+								},
 							},
 						},
 						OffSignal: &policylangv1.InPort{
-							Value: &policylangv1.InPort_SignalName{
-								SignalName: "LOAD_MULTIPLIER_IF_NORMAL",
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_Value{
+										Value: aiadLoadScheduler.Parameters.MaxLoadMultiplier,
+									},
+								},
 							},
 						},
 					},
 					OutPorts: &policylangv1.Switcher_Outs{
+						Output: &policylangv1.OutPort{
+							SignalName: "INTEGRATOR_MAX",
+						},
+					},
+				},
+			},
+		},
+		&policylangv1.Component{
+			Component: &policylangv1.Component_Integrator{
+				Integrator: &policylangv1.Integrator{
+					InitialValue:       aiadLoadScheduler.Parameters.MaxLoadMultiplier,
+					EvaluationInterval: durationpb.New(metricScrapeInterval),
+					InPorts: &policylangv1.Integrator_Ins{
+						Input: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "LOAD_MULTIPLIER_DELTA",
+							},
+						},
+						Max: &policylangv1.InPort{
+							Value: &policylangv1.InPort_SignalName{
+								SignalName: "INTEGRATOR_MAX",
+							},
+						},
+						Min: &policylangv1.InPort{
+							Value: &policylangv1.InPort_ConstantSignal{
+								ConstantSignal: &policylangv1.ConstantSignal{
+									Const: &policylangv1.ConstantSignal_Value{
+										Value: aiadLoadScheduler.Parameters.MinLoadMultiplier,
+									},
+								},
+							},
+						},
+					},
+					OutPorts: &policylangv1.Integrator_Outs{
 						Output: &policylangv1.OutPort{
 							SignalName: "LOAD_MULTIPLIER_FROM_STRATEGY",
 						},
