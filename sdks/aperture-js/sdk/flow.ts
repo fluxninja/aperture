@@ -89,10 +89,6 @@ export class Flow {
       localCheckResponse.waitTime = this.protoDurationToJSON(
         this.checkResponse.waitTime,
       );
-      this.span.setAttribute(
-        CHECK_RESPONSE_LABEL,
-        JSON.stringify(localCheckResponse),
-      );
       // Walk through individual decisions and convert waitTime fields,
       // then add to localCheckResponse, preserving immutability.
       if (this.checkResponse.limiterDecisions) {
@@ -106,6 +102,10 @@ export class Flow {
         );
         localCheckResponse.limiterDecisions = decisions;
       }
+      this.span.setAttribute(
+        CHECK_RESPONSE_LABEL,
+        JSON.stringify(localCheckResponse),
+      );
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
