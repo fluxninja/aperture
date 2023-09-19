@@ -93,6 +93,16 @@ export class Flow {
         CHECK_RESPONSE_LABEL,
         JSON.stringify(localCheckResponse),
       );
+      // walk through individual decisions and convert waitTime fields
+      // and add to localCheckResponse
+      if (this.checkResponse.limiterDecisions) {
+        const decisions = this.checkResponse.limiterDecisions as any;
+        for (let i = 0; i < decisions.length; i++) {
+          const decision = decisions[i];
+          decision.waitTime = this.protoDurationToJSON(decision.waitTime);
+        }
+        localCheckResponse.decisions = decisions;
+      }
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
