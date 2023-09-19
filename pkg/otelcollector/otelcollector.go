@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
@@ -55,7 +54,7 @@ type ConstructorIn struct {
 // setup creates and runs a new instance of OTel Collector with the passed configuration.
 func setup(in ConstructorIn) error {
 	var otelService *otelcol.Collector
-	var wg sync.WaitGroup
+	var wg panichandler.WaitGroup
 	var cancelRun context.CancelFunc // See OnStop why we need this.
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -103,9 +102,7 @@ func setup(in ConstructorIn) error {
 			log.Info().Msg("Starting OTel Collector")
 			var runCtx context.Context
 			runCtx, cancelRun = context.WithCancel(context.Background())
-			wg.Add(1)
-			panichandler.Go(func() {
-				defer wg.Done()
+			wg.Go(func() {
 				err := otelService.Run(runCtx)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to run OTel Collector")

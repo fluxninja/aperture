@@ -115,19 +115,17 @@ func newAutoScaleControlPoints(trackers notifiers.Trackers, k8sClient k8s.K8sCli
 }
 
 type podNotifier struct {
-	stateMutex       sync.Mutex
-	electionTrackers notifiers.Trackers
-	podCounter       *prometheus.GaugeVec
-	agentGroup       string
-	isLeader         bool
+	stateMutex sync.Mutex
+	election   *election.Election
+	podCounter *prometheus.GaugeVec
+	agentGroup string
 }
 
-func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers, lifecycle fx.Lifecycle, agentGroup string) (*podNotifier, error) {
+func newPodNotifier(pr *prometheus.Registry, election *election.Election, lifecycle fx.Lifecycle, agentGroup string) (*podNotifier, error) {
 	pn := &podNotifier{
-		electionTrackers: electionTrackers,
-		agentGroup:       agentGroup,
+		election:   election,
+		agentGroup: agentGroup,
 	}
-	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, pn.electionResultCallback)
 
 	defaultLabels := []string{
 		metrics.K8sNamespaceName, metrics.K8sDaemonsetName, metrics.K8sDeploymentName, metrics.K8sReplicasetName, metrics.K8sStatefulsetName, metrics.AgentGroupLabel,
@@ -147,14 +145,14 @@ func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers
 					return fmt.Errorf("could not register prometheus metrics: %w", err)
 				}
 			}
-			return pn.electionTrackers.AddKeyNotifier(electionNotifier)
+			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			unregistered := pr.Unregister(podCounter)
 			if !unregistered {
 				return fmt.Errorf("failed to unregister metric %s", metrics.K8sPodCount)
 			}
-			return pn.electionTrackers.RemoveKeyNotifier(electionNotifier)
+			return nil
 		},
 	})
 	pn.podCounter = podCounter
@@ -162,15 +160,8 @@ func newPodNotifier(pr *prometheus.Registry, electionTrackers notifiers.Trackers
 	return pn, nil
 }
 
-func (p *podNotifier) electionResultCallback(e notifiers.Event) {
-	log.Debug().Msg("Election result callback")
-	p.stateMutex.Lock()
-	defer p.stateMutex.Unlock()
-	p.isLeader = true
-}
-
 func (p *podNotifier) setScale(scale *autoscalingv1.Scale, cp AutoScaleControlPoint) error {
-	if !p.isLeader {
+	if !p.election.IsLeader() {
 		return nil
 	}
 	p.stateMutex.Lock()

@@ -28,6 +28,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
@@ -54,7 +55,6 @@ func Module() fx.Option {
 				fx.ParamTags(
 					fxTag,
 					discovery.FxTag,
-					election.FxTag,
 				),
 			),
 		),
@@ -81,7 +81,7 @@ type podScalerFactory struct {
 	registry             status.Registry
 	decisionsWatcher     notifiers.Watcher
 	controlPointTrackers notifiers.Trackers
-	electionTrackers     notifiers.Trackers
+	election             *election.Election
 	k8sClient            k8s.K8sClient
 	sessionScopedKV      *etcdclient.SessionScopedKV
 	agentGroup           string
@@ -91,7 +91,7 @@ type podScalerFactory struct {
 func setupPodScalerFactory(
 	watcher notifiers.Watcher,
 	controlPointTrackers notifiers.Trackers,
-	electionTrackers notifiers.Trackers,
+	election *election.Election,
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
@@ -127,7 +127,7 @@ func setupPodScalerFactory(
 		registry:             reg,
 		sessionScopedKV:      sessionScopedKV,
 		k8sClient:            k8sClient,
-		electionTrackers:     electionTrackers,
+		election:             election,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -215,7 +215,6 @@ type podScaler struct {
 	scaleWaitGroup    *conc.WaitGroup
 	controlPoint      discovery.AutoScaleControlPoint
 	statusEtcdPath    string
-	isLeader          bool
 }
 
 func (ps *podScaler) setup(
@@ -229,9 +228,6 @@ func (ps *podScaler) setup(
 	etcdKey := paths.AgentComponentKey(ps.podScalerFactory.agentGroup,
 		ps.GetPolicyName(),
 		ps.GetComponentId())
-
-	// election notifier
-	electionNotifier := notifiers.NewBasicKeyNotifier(election.ElectionResultKey, ps.electionResultCallback)
 
 	// decision notifier
 	decisionUnmarshaler, err := config.NewProtobufUnmarshaller(nil)
@@ -278,12 +274,6 @@ func (ps *podScaler) setup(
 			ps.statusWriter = etcdwriter.NewWriter(&ps.sessionScopedKV.KVWrapper)
 			ps.ctx, ps.cancel = context.WithCancel(context.Background())
 
-			// add election notifier
-			err = ps.podScalerFactory.electionTrackers.AddKeyNotifier(electionNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add election notifier")
-				return err
-			}
 			// add decisions notifier
 			err = ps.podScalerFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
@@ -300,12 +290,7 @@ func (ps *podScaler) setup(
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
-			// remove election notifier
-			err = ps.podScalerFactory.electionTrackers.RemoveKeyNotifier(electionNotifier)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to remove election notifier")
-				merr = multierror.Append(merr, err)
-			}
+
 			// remove decisions notifier
 			err = ps.podScalerFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
@@ -330,19 +315,21 @@ func (ps *podScaler) setup(
 			return merr
 		},
 	})
+
+	panichandler.FxOnDone(ps.podScalerFactory.election.Done(), ps.electionResultCallback, lifecycle)
+
 	return nil
 }
 
-func (ps *podScaler) electionResultCallback(_ notifiers.Event) {
+func (ps *podScaler) electionResultCallback(_ context.Context) {
 	log.Info().Msg("Election result callback")
 
 	// invoke the lastScaleDecision
 	ps.stateMutex.Lock()
 	defer ps.stateMutex.Unlock()
-	if ps.lastScaleDecision != nil {
+	if ps.lastScaleDecision != nil && ps.podScalerFactory.election.IsLeader() {
 		ps.scale(ps.lastScaleDecision)
 	}
-	ps.isLeader = true
 }
 
 func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
@@ -371,7 +358,7 @@ func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
 	ps.lastScaleDecision = scaleDecision
-	if ps.isLeader {
+	if ps.podScalerFactory.election.IsLeader() {
 		ps.scale(scaleDecision)
 	}
 }
