@@ -6,7 +6,7 @@ function(cfg) {
 
   local currentInsert = statPanel('Table cache hit rate %',
                                   cfg.dashboard.datasource.name,
-                                  'sum(postgresql_blocks_read_total{%(filters)s,source="heap_hit"}) /\n(sum(postgresql_blocks_read_total{%(filters)s,source="heap_hit"}) + sum(postgresql_blocks_read_total{%(filters)s,source="heap_read"}))',
+                                  'sum(postgresql_blocks_read_total{%(filters)s,source="heap_hit"}) / (sum(postgresql_blocks_read_total{%(filters)s,source="heap_hit"}) + sum(postgresql_blocks_read_total{%(filters)s,source="heap_read"}))',
                                   stringFilters),
   panel: currentInsert.panel,
 }

@@ -8,9 +8,9 @@ local max_connections = import '../pgsql/max_connections.libsonnet';
 local table_count = import '../pgsql/table_count.libsonnet';
 local table_size = import '../pgsql/table_size.libsonnet';
 
-// Time Series and Bar Gauge/Chart Panels
+// Time Series and Bar Gauge Panels
 local checkpoint_comparison = import '../pgsql/checkpoint_comparison.libsonnet';
-local commits_vs_backends_vs_rollbacks = import '../pgsql/commits_vs_backends_vs_rollbacks.libsonnet';
+local commits_vs_rollbacks = import '../pgsql/commits_vs_rollbacks.libsonnet';
 local heap_vs_index = import '../pgsql/heap_vs_index.libsonnet';
 local operations = import '../pgsql/operations.libsonnet';
 local top_tables_disk = import '../pgsql/top_tables_disk.libsonnet';
@@ -60,7 +60,7 @@ function(cfg) {
     + g.panel.stat.gridPos.withY(5)
     + g.panel.stat.gridPos.withH(3)
     + g.panel.stat.gridPos.withW(6),
-    commits_vs_backends_vs_rollbacks(cfg, 'Commits vs Backends vs Rollbacks').panel
+    commits_vs_rollbacks(cfg, 'Commits vs Rollbacks').panel
     + g.panel.timeSeries.gridPos.withX(0)
     + g.panel.timeSeries.gridPos.withY(20)
     + g.panel.timeSeries.gridPos.withH(6)
@@ -87,13 +87,13 @@ function(cfg) {
     top_tables_rows(cfg).panel
     + g.panel.barGauge.gridPos.withX(0)
     + g.panel.barGauge.gridPos.withY(40)
-    + g.panel.barGauge.gridPos.withH(10)
+    + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.options.withValueMode('text'),
     top_tables_disk(cfg).panel
     + g.panel.barGauge.gridPos.withX(12)
     + g.panel.barGauge.gridPos.withY(40)
-    + g.panel.barGauge.gridPos.withH(10)
+    + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.options.withValueMode('text'),
   ],

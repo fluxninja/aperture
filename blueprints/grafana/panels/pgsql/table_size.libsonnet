@@ -6,7 +6,7 @@ function(cfg) {
 
   local tbSize = statPanel('Tables Size (MB) ',
                            cfg.dashboard.datasource.name,
-                           'sum(postgresql_table_size_bytes{%(filters)s}) / 1024 / 1024',
+                           'sum(postgresql_table_size_bytes{%(filters)s,infra_meter_name="postgresql"}) / 1024 / 1024',
                            stringFilters),
   panel: tbSize.panel,
 }

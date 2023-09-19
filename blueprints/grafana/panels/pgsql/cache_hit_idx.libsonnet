@@ -6,7 +6,7 @@ function(cfg) {
 
   local currentIndex = statPanel('Index cache hit rate %',
                                  cfg.dashboard.datasource.name,
-                                 'sum(postgresql_blocks_read_total{%(filters)s,source="idx_hit"}) /\n(sum(postgresql_blocks_read_total{%(filters)s,source="idx_hit"}) + sum(postgresql_blocks_read_total{%(filters)s,source="idx_read"}))',
+                                 'sum(postgresql_blocks_read_total{%(filters)s,infra_meter_name="postgresql",source="idx_hit"}) / (sum(postgresql_blocks_read_total{%(filters)s,infra_meter_name="postgresql",source="idx_hit"}) + sum(postgresql_blocks_read_total{%(filters)s,infra_meter_name="postgresql",source="idx_read"}))',
                                  stringFilters),
   panel: currentIndex.panel,
 }

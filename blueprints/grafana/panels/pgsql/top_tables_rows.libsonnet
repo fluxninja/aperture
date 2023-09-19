@@ -6,7 +6,8 @@ function(cfg) {
 
   local topTables = barGaugePanel('Tables with most live rows',
                                   cfg.dashboard.datasource.name,
-                                  'topk(5, sum by (postgresql_table_name) (postgresql_rows{%(filters)s,state="live"}))',
+                                  'topk(5, sum by (postgresql_table_name,postgresql_database_name) (postgresql_rows{%(filters)s,infra_meter_name="postgresql",state="live"}))',
                                   stringFilters),
+
   panel: topTables.panel,
 }

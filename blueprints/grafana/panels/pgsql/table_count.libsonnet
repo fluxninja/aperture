@@ -6,7 +6,7 @@ function(cfg) {
 
   local tbCount = statPanel('Number of tables',
                             cfg.dashboard.datasource.name,
-                            'sum(postgresql_table_count{%(filters)s})',
+                            'sum(postgresql_table_count{%(filters)s,infra_meter_name="postgresql"})',
                             stringFilters),
   panel: tbCount.panel,
 }

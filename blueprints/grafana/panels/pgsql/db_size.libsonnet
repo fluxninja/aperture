@@ -6,7 +6,7 @@ function(cfg) {
 
   local dbSize = statPanel('PGSQL Instances Size (GB)',
                            cfg.dashboard.datasource.name,
-                           'sum(postgresql_db_size_bytes{%(filters)s}) / 1024 / 1024 / 1024',
+                           'sum(postgresql_db_size_bytes{%(filters)s,infra_meter_name="postgresql"}) / 1024 / 1024 / 1024',
                            stringFilters),
   panel: dbSize.panel,
 }

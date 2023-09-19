@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=10, w=24, targets=[]) {
+function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null) {
   local barGaugePanel =
     g.panel.barGauge.new(title)
     + g.panel.barGauge.datasource.withType('prometheus')
@@ -8,7 +8,7 @@ function(title, dsName, query, strFilters, h=10, w=24, targets=[]) {
     + g.panel.barGauge.queryOptions.withTargets([
       g.query.prometheus.new(dsName, query % { filters: strFilters })
       + g.query.prometheus.withIntervalFactor(1)
-      + g.query.prometheus.withLegendFormat('{{ instance }} - {{ policy_name }}')
+      + g.query.prometheus.withLegendFormat(legendFormat)
       + g.query.prometheus.withFormat('time_series')
       + g.query.prometheus.withInstant(false)
       + g.query.prometheus.withRange(true),
@@ -21,15 +21,5 @@ function(title, dsName, query, strFilters, h=10, w=24, targets=[]) {
     + g.panel.barGauge.gridPos.withH(h)
     + g.panel.barGauge.gridPos.withW(w),
 
-  local withMultipleTargets =
-    if targets != []
-    then
-      barGaugePanel + g.panel.barGauge.withTargets(targets)
-    else
-      barGaugePanel + g.panel.barGauge.withTargets([
-        g.query.prometheus.new(dsName, query % { filters: strFilters })
-        + g.query.prometheus.withIntervalFactor(1),
-      ]),
-
-  panel: withMultipleTargets,
+  panel: barGaugePanel,
 }
