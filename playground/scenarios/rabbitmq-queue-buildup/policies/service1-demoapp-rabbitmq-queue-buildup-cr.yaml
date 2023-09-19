@@ -8,7 +8,7 @@ spec:
   circuit:
     components:
     - flow_control:
-        adaptive_load_scheduler:
+        aiad_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
@@ -26,11 +26,8 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           parameters:
             alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
+              alert_name: AIAD Load Throttling Event
+            load_multiplier_linear_decrement: 0.05
             load_multiplier_linear_increment: 0.025
             load_scheduler:
               selectors:
@@ -39,6 +36,8 @@ spec:
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
             max_load_multiplier: 2
+            min_load_multiplier: 0
+            overload_condition: gt
     - query:
         promql:
           evaluation_interval: 10s

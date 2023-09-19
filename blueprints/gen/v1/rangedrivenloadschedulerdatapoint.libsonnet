@@ -7,10 +7,10 @@
   withLoadMultiplierMixin(load_multiplier):: {
     load_multiplier+: load_multiplier,
   },
-  withThreshold(threshold):: {
-    threshold: threshold,
+  withSignalValue(signal_value):: {
+    signal_value: signal_value,
   },
-  withThresholdMixin(threshold):: {
-    threshold+: threshold,
+  withSignalValueMixin(signal_value):: {
+    signal_value+: signal_value,
   },
 }

@@ -14,7 +14,8 @@ import (
 
 // PolynomialRangeFunction .
 type PolynomialRangeFunction struct {
-	parameters *policylangv1.PolynomialRangeFunction_Parameters
+	parameters  *policylangv1.PolynomialRangeFunction_Parameters
+	componentID runtime.ComponentID
 }
 
 // Name implements runtime.Component.
@@ -35,9 +36,10 @@ func (*PolynomialRangeFunction) IsActuator() bool { return false }
 var _ runtime.Component = (*PolynomialRangeFunction)(nil)
 
 // NewPolynomialRangeFunctionAndOptions returns a new PolynomialRangeFunction and its Fx options.
-func NewPolynomialRangeFunctionAndOptions(rangeFunctionProto *policylangv1.PolynomialRangeFunction, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewPolynomialRangeFunctionAndOptions(rangeFunctionProto *policylangv1.PolynomialRangeFunction, componentID runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
 	arith := PolynomialRangeFunction{
-		parameters: rangeFunctionProto.Parameters,
+		parameters:  rangeFunctionProto.Parameters,
+		componentID: componentID,
 	}
 	return &arith, fx.Options(), nil
 }
@@ -75,6 +77,7 @@ func (rangeFunc *PolynomialRangeFunction) Execute(inPortReadings runtime.PortToR
 				return rangeFunc.parameters.GetClampToCustomValues().PostEnd
 			}
 		}
+
 		return output
 	}
 
@@ -95,17 +98,17 @@ func (rangeFunc *PolynomialRangeFunction) Execute(inPortReadings runtime.PortToR
 	} else {
 		// Handling the edge case where startInput and endInput are the same
 		if inputVal <= startInput {
-			t = 0
+			t = 0.0
 		} else {
-			t = 1
+			t = 1.0
 		}
 	}
 
 	// Calculate the polynomial output
-	output := startOutput + math.Pow(t, rangeFunc.parameters.Degree)*(endOutput-startOutput)
+	polyOutput := float64(startOutput) + (math.Pow(t, rangeFunc.parameters.Degree) * (endOutput - startOutput))
 
 	// Handle outside range behavior
-	output = handleOutsideRange(t, output)
+	output := handleOutsideRange(t, polyOutput)
 
 	return returnReading(output)
 }

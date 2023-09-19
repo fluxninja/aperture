@@ -7,36 +7,6 @@ metadata:
 spec:
   circuit:
     components:
-    - flow_control:
-        adaptive_load_scheduler:
-          dry_run: false
-          dry_run_config_key: dry_run
-          in_ports:
-            overload_confirmation:
-              constant_signal:
-                value: 1
-            setpoint:
-              signal_name: SETPOINT
-            signal:
-              signal_name: SIGNAL
-          out_ports:
-            desired_load_multiplier:
-              signal_name: DESIRED_LOAD_MULTIPLIER
-            observed_load_multiplier:
-              signal_name: OBSERVED_LOAD_MULTIPLIER
-          parameters:
-            alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
-            load_multiplier_linear_increment: 0.025
-            load_scheduler:
-              selectors:
-              - control_point: ingress
-                service: search-service.prod.svc.cluster.local
-            max_load_multiplier: 2
     - auto_scale:
         auto_scaler:
           dry_run: false
@@ -77,6 +47,36 @@ spec:
             scale_out_alerter:
               alert_name: Auto-scaler is scaling out
             scale_out_cooldown: 30s
+    - flow_control:
+        aimd_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: AIMD Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              selectors:
+              - control_point: ingress
+                service: search-service.prod.svc.cluster.local
+            max_load_multiplier: 2
     - query:
         promql:
           evaluation_interval: 10s
