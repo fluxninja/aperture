@@ -493,6 +493,9 @@ definitions:
                     The destination of a network activity, such as accepting a TCP connection.
                     In a multi hop network activity, the destination represents the receiver of
                     the last hop.
+            ramp_mode:
+                description: A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+                type: boolean
             request:
                 $ref: '#/definitions/CheckHTTPRequestHttpRequest'
                 description: Represents a network request, such as an HTTP request.
@@ -633,7 +636,8 @@ definitions:
             - REJECT_REASON_NONE
             - REJECT_REASON_RATE_LIMITED
             - REJECT_REASON_NO_TOKENS
-            - REJECT_REASON_REGULATED
+            - REJECT_REASON_NOT_SAMPLED
+            - REJECT_REASON_NO_MATCHING_RAMP
         type: string
     Circuit:
         description: |-
@@ -3711,6 +3715,13 @@ definitions:
                     - When label key is not specified, _Sampler_ acts as a stateless filter.
                       Percentage of flows are selected randomly for rejection.
                 type: string
+            ramp_mode:
+                default: false
+                description: |+
+                    Ramp component can accept flows with `ramp_mode` flag set.
+
+                type: boolean
+                x-go-tag-default: "false"
             selectors:
                 description: |+
                     Selectors for the component.

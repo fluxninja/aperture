@@ -447,3 +447,8 @@ func (rl *rateLimiter) GetRequestCounter(labels map[string]string) prometheus.Co
 	}
 	return counter
 }
+
+// GetRampMode is always false for rateLimiters.
+func (rl *rateLimiter) GetRampMode() bool {
+	return false
+}

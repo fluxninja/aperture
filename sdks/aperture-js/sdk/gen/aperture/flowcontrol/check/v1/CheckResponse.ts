@@ -28,7 +28,8 @@ export const _aperture_flowcontrol_check_v1_CheckResponse_RejectReason = {
   REJECT_REASON_NONE: 0,
   REJECT_REASON_RATE_LIMITED: 1,
   REJECT_REASON_NO_TOKENS: 2,
-  REJECT_REASON_REGULATED: 3,
+  REJECT_REASON_NOT_SAMPLED: 3,
+  REJECT_REASON_NO_MATCHING_RAMP: 4,
 } as const;
 
 export type _aperture_flowcontrol_check_v1_CheckResponse_RejectReason =
@@ -38,8 +39,10 @@ export type _aperture_flowcontrol_check_v1_CheckResponse_RejectReason =
   | 1
   | 'REJECT_REASON_NO_TOKENS'
   | 2
-  | 'REJECT_REASON_REGULATED'
+  | 'REJECT_REASON_NOT_SAMPLED'
   | 3
+  | 'REJECT_REASON_NO_MATCHING_RAMP'
+  | 4
 
 export type _aperture_flowcontrol_check_v1_CheckResponse_RejectReason__Output = typeof _aperture_flowcontrol_check_v1_CheckResponse_RejectReason[keyof typeof _aperture_flowcontrol_check_v1_CheckResponse_RejectReason]
 

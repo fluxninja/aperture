@@ -28,7 +28,7 @@ import (
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, failOpen bool) Flow
+	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, failOpen bool, rampMode bool) Flow
 	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, failOpen bool) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
@@ -126,7 +126,7 @@ func LabelsFromCtx(ctx context.Context) map[string]string {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, failOpen bool) Flow {
+func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, failOpen, rampMode bool) Flow {
 	// if c.timeout is not 0, then create a new context with timeout
 	if c.timeout != 0 {
 		var cancel context.CancelFunc
@@ -141,9 +141,11 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		labels[key] = value
 	}
 
+	// TODO: Set RampMode to rampMode after updating go proto dependency
 	req := &checkproto.CheckRequest{
 		ControlPoint: controlPoint,
 		Labels:       labels,
+		//	RampMode:     rampMode,
 	}
 
 	span := c.getSpan(ctx)

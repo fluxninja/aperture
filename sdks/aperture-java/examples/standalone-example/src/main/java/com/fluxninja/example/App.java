@@ -94,7 +94,7 @@ public class App {
 
         // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a
         // Flow.
-        Flow flow = this.apertureSDK.startFlow(this.featureName, labels);
+        Flow flow = this.apertureSDK.startFlow(this.featureName, labels, false);
 
         // See whether flow was accepted by Aperture Agent.
         try {

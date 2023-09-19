@@ -402,6 +402,9 @@ message Sampler {
 
     // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
     flowcontrol.check.v1.StatusCode denied_response_status_code = 4;
+
+    // Ramp component can accept flows with `ramp_mode` flag set.
+    bool ramp_mode = 5; // @gotags: default:"false"
   }
 
   message Ins {

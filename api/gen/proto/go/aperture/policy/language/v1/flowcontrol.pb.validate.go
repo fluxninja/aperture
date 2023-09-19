@@ -5566,6 +5566,8 @@ func (m *Sampler_Parameters) validate(all bool) error {
 
 	// no validation rules for DeniedResponseStatusCode
 
+	// no validation rules for RampMode
+
 	if len(errors) > 0 {
 		return Sampler_ParametersMultiError(errors)
 	}

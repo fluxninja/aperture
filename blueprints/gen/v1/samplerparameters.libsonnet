@@ -13,6 +13,12 @@
   withLabelKeyMixin(label_key):: {
     label_key+: label_key,
   },
+  withRampMode(ramp_mode):: {
+    ramp_mode: ramp_mode,
+  },
+  withRampModeMixin(ramp_mode):: {
+    ramp_mode+: ramp_mode,
+  },
   withSelectors(selectors):: {
     selectors:
       if std.isArray(selectors)

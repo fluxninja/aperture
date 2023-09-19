@@ -65,6 +65,7 @@ export class ApertureClient {
   async StartFlow(
     controlPoint: string,
     params: FlowParams = {},
+    rampMode: boolean = false,
   ): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       let span = this.tracer.startSpan("Aperture Check");
@@ -101,6 +102,7 @@ export class ApertureClient {
         const request: CheckRequest = {
           controlPoint: controlPoint,
           labels: mergedLabels,
+          rampMode: rampMode,
         };
 
         const grpcParams: grpc.CallOptions = {

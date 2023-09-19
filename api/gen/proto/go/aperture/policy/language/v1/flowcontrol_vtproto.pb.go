@@ -1454,6 +1454,16 @@ func (m *Sampler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RampMode {
+		i--
+		if m.RampMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.DeniedResponseStatusCode != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
 		i--
@@ -3456,6 +3466,9 @@ func (m *Sampler_Parameters) SizeVT() (n int) {
 	}
 	if m.DeniedResponseStatusCode != 0 {
 		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
+	if m.RampMode {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
@@ -7434,6 +7447,26 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RampMode", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.RampMode = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

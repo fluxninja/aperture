@@ -15,6 +15,7 @@ type RequestContext struct {
 	FlowLabels   labels.Labels
 	ControlPoint string
 	Services     []string
+	RampMode     bool
 }
 
 // Engine is an interface for registering fluxmeters and schedulers.

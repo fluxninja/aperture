@@ -99,7 +99,9 @@ public final class Flow {
                     return HttpStatus.SC_TOO_MANY_REQUESTS;
                 case REJECT_REASON_NO_TOKENS:
                     return HttpStatus.SC_SERVICE_UNAVAILABLE;
-                case REJECT_REASON_REGULATED:
+                case REJECT_REASON_NOT_SAMPLED:
+                    return HttpStatus.SC_FORBIDDEN;
+                case REJECT_REASON_NO_MATCHING_RAMP:
                     return HttpStatus.SC_FORBIDDEN;
                 default:
                     return HttpStatus.SC_FORBIDDEN;

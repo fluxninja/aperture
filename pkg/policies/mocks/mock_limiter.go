@@ -82,6 +82,20 @@ func (mr *MockLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLimiter)(nil).GetPolicyName))
 }
 
+// GetRampMode mocks base method.
+func (m *MockLimiter) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockLimiterMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockLimiter)(nil).GetRampMode))
+}
+
 // GetRequestCounter mocks base method.
 func (m *MockLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	m.ctrl.T.Helper()
@@ -185,6 +199,20 @@ func (m *MockRateLimiter) GetPolicyName() string {
 func (mr *MockRateLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockRateLimiter)(nil).GetPolicyName))
+}
+
+// GetRampMode mocks base method.
+func (m *MockRateLimiter) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockRateLimiterMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockRateLimiter)(nil).GetRampMode))
 }
 
 // GetRequestCounter mocks base method.
@@ -322,6 +350,20 @@ func (m *MockScheduler) GetPolicyName() string {
 func (mr *MockSchedulerMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockScheduler)(nil).GetPolicyName))
+}
+
+// GetRampMode mocks base method.
+func (m *MockScheduler) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockSchedulerMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockScheduler)(nil).GetRampMode))
 }
 
 // GetRequestCounter mocks base method.
