@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync/atomic"
 
-	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	etcd "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -14,11 +13,6 @@ import (
 	"go.uber.org/fx"
 )
 
-// Module is a fx module that provides etcd based leader election per agent group.
-func Module() fx.Option {
-	return fx.Provide(ProvideAgentElection)
-}
-
 // ElectionIn holds parameters for ProvideElection.
 type ElectionIn struct {
 	fx.In
@@ -27,12 +21,10 @@ type ElectionIn struct {
 	Session    *etcd.Session
 }
 
-// ProvideAgentElection provides a wrapper around etcd based leader election for agents.
-func ProvideAgentElection(in ElectionIn, agentInfo *agentinfo.AgentInfo) *Election {
-	return ProvideElection("/election/"+agentInfo.GetAgentGroup(), in)
-}
-
 // ProvideElection provides a wrapper around etcd based leader election for arbitrary key.
+//
+// Note: This is not exposed directly by any module – controller and agent have
+// their own leader election fx Options.
 func ProvideElection(key string, in ElectionIn) *Election {
 	ctx, cancel := context.WithCancel(context.Background())
 

@@ -17,8 +17,8 @@ import (
 // assuming they're the only writer for a given prefix.
 //
 // If the previous controller has exited cleanly, we should obtain leadership
-// immediately.  Otherwise (if a pathological case the previous controller is
-// still running or has crashed), we'll wait until its lease expires
+// immediately.  Otherwise (if in a pathological case the previous controller
+// is still running or has crashed), we'll wait until its lease expires
 // (potentially, entering crash loop).
 //
 // Enforcing single controller is done using etcd election, which is backed by
