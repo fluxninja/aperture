@@ -125,6 +125,7 @@
   RateLimiterIns: import 'ratelimiterins.libsonnet',
   RateLimiterParameters: import 'ratelimiterparameters.libsonnet',
   RateLimiterParametersLazySync: import 'ratelimiterparameterslazysync.libsonnet',
+  RateLimiterRequestParameters: import 'ratelimiterrequestparameters.libsonnet',
   Rego: import 'rego.libsonnet',
   RegoLabelProperties: import 'regolabelproperties.libsonnet',
   Resources: import 'resources.libsonnet',

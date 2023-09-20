@@ -7,6 +7,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -68,12 +69,12 @@ func ParseAdaptiveLoadScheduler(
 		overloadDeciderOperator = components.LT.String()
 	}
 
-	alerterLabels := adaptiveLoadScheduler.Parameters.Alerter.Labels
-	if alerterLabels == nil {
-		alerterLabels = make(map[string]string)
+	// Make a copy, because we shouldn't mutate the input proto.
+	alerterParameters := proto.Clone(adaptiveLoadScheduler.Parameters.Alerter).(*policylangv1.Alerter_Parameters)
+	if alerterParameters.Labels == nil {
+		alerterParameters.Labels = make(map[string]string)
 	}
-	alerterLabels["type"] = "load_scheduler"
-	adaptiveLoadScheduler.Parameters.Alerter.Labels = alerterLabels
+	alerterParameters.Labels["type"] = "load_scheduler"
 
 	nestedCircuit := &policylangv1.NestedCircuit{
 		InPortsMap:  nestedInPortsMap,
@@ -415,7 +416,7 @@ func ParseAdaptiveLoadScheduler(
 			{
 				Component: &policylangv1.Component_Alerter{
 					Alerter: &policylangv1.Alerter{
-						Parameters: adaptiveLoadScheduler.Parameters.Alerter,
+						Parameters: alerterParameters,
 						InPorts: &policylangv1.Alerter_Ins{
 							Signal: &policylangv1.InPort{
 								Value: &policylangv1.InPort_SignalName{

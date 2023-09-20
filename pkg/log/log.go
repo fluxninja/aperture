@@ -61,7 +61,7 @@ var global *Logger
 
 // Always create a global logger instance.
 func init() {
-	zerolog.TimeFieldFormat = time.RFC3339
+	zerolog.TimeFieldFormat = time.RFC3339Nano
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 	zerolog.CallerMarshalFunc = func(_ uintptr, file string, line int) string {
 		// short caller format

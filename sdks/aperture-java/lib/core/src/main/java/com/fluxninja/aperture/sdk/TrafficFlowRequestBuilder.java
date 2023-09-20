@@ -61,6 +61,17 @@ public class TrafficFlowRequestBuilder {
     }
 
     /**
+     * Sets the ramp mode of the traffic flow request.
+     *
+     * @param enabled Whether the flow should require a ramp component match.
+     * @return The TrafficFlowRequestBuilder object itself.
+     */
+    public TrafficFlowRequestBuilder setRampMode(Boolean enabled) {
+        checkHTTPRequestBuilder.setRampMode(enabled);
+        return this;
+    }
+
+    /**
      * Sets the HTTP method of the traffic flow request.
      *
      * @param httpMethod The HTTP method to be set.

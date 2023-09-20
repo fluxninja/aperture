@@ -19,7 +19,7 @@ import (
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/discovery"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	agentelection "github.com/fluxninja/aperture/v2/pkg/etcd/election/agent"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
@@ -50,7 +50,7 @@ func main() {
 		autoscale.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
-		election.Module(),
+		agentelection.Module(),
 		rpc.ClientModule,
 		agentfunctions.Module,
 		Module(),

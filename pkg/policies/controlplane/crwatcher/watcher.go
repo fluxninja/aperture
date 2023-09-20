@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -36,7 +35,7 @@ import (
 
 // watcher holds the state of the watcher.
 type watcher struct {
-	waitGroup sync.WaitGroup
+	waitGroup panichandler.WaitGroup
 	notifiers.Trackers
 	policyDynamicConfigTrackers notifiers.Trackers
 	ctx                         context.Context
@@ -66,10 +65,7 @@ func NewWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers) 
 
 // Start starts the watcher go routines and handles Policy Custom resource events from Kubernetes.
 func (w *watcher) Start() error {
-	w.waitGroup.Add(1)
-
-	panichandler.Go(func() {
-		defer w.waitGroup.Done()
+	w.waitGroup.Go(func() {
 		operation := func() error {
 			ctrl.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
 			scheme := runtime.NewScheme()

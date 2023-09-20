@@ -22,12 +22,14 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerIn
   'label'?: (string);
   'workloadIndex'?: (string);
   'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
+  'priority'?: (number | string);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo__Output {
   'label': (string);
   'workloadIndex': (string);
   'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
+  'priority': (number);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_RateLimiterInfo {
@@ -51,11 +53,13 @@ export interface _aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Out
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo {
   'workloadIndex'?: (string);
   'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
+  'priority'?: (number | string);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output {
   'workloadIndex': (string);
   'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
+  'priority': (number);
 }
 
 export interface _aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo {

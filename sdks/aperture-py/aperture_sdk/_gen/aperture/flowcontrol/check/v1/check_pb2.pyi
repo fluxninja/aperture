@@ -126,7 +126,7 @@ NotExtended: StatusCode
 NetworkAuthenticationRequired: StatusCode
 
 class CheckRequest(_message.Message):
-    __slots__ = ["control_point", "labels"]
+    __slots__ = ["control_point", "labels", "ramp_mode"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -136,9 +136,11 @@ class CheckRequest(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
+    RAMP_MODE_FIELD_NUMBER: _ClassVar[int]
     control_point: str
     labels: _containers.ScalarMap[str, str]
-    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    ramp_mode: bool
+    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., ramp_mode: bool = ...) -> None: ...
 
 class CheckResponse(_message.Message):
     __slots__ = ["start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time", "denied_response_status_code"]
@@ -147,11 +149,13 @@ class CheckResponse(_message.Message):
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_RATE_LIMITED: _ClassVar[CheckResponse.RejectReason]
         REJECT_REASON_NO_TOKENS: _ClassVar[CheckResponse.RejectReason]
-        REJECT_REASON_REGULATED: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_NOT_SAMPLED: _ClassVar[CheckResponse.RejectReason]
+        REJECT_REASON_NO_MATCHING_RAMP: _ClassVar[CheckResponse.RejectReason]
     REJECT_REASON_NONE: CheckResponse.RejectReason
     REJECT_REASON_RATE_LIMITED: CheckResponse.RejectReason
     REJECT_REASON_NO_TOKENS: CheckResponse.RejectReason
-    REJECT_REASON_REGULATED: CheckResponse.RejectReason
+    REJECT_REASON_NOT_SAMPLED: CheckResponse.RejectReason
+    REJECT_REASON_NO_MATCHING_RAMP: CheckResponse.RejectReason
     class DecisionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DECISION_TYPE_ACCEPTED: _ClassVar[CheckResponse.DecisionType]
@@ -244,26 +248,30 @@ class LimiterDecision(_message.Message):
         tokens_info: LimiterDecision.TokensInfo
         def __init__(self, label: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
     class SchedulerInfo(_message.Message):
-        __slots__ = ["workload_index", "tokens_info"]
+        __slots__ = ["workload_index", "tokens_info", "priority"]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        PRIORITY_FIELD_NUMBER: _ClassVar[int]
         workload_index: str
         tokens_info: LimiterDecision.TokensInfo
-        def __init__(self, workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
+        priority: float
+        def __init__(self, workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ...) -> None: ...
     class SamplerInfo(_message.Message):
         __slots__ = ["label"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         label: str
         def __init__(self, label: _Optional[str] = ...) -> None: ...
     class QuotaSchedulerInfo(_message.Message):
-        __slots__ = ["label", "workload_index", "tokens_info"]
+        __slots__ = ["label", "workload_index", "tokens_info", "priority"]
         LABEL_FIELD_NUMBER: _ClassVar[int]
         WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
         TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        PRIORITY_FIELD_NUMBER: _ClassVar[int]
         label: str
         workload_index: str
         tokens_info: LimiterDecision.TokensInfo
-        def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ...) -> None: ...
+        priority: float
+        def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ...) -> None: ...
     POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
     COMPONENT_ID_FIELD_NUMBER: _ClassVar[int]

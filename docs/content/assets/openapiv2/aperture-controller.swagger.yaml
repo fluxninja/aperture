@@ -1315,11 +1315,18 @@ definitions:
     GetPolicyResponseStatus:
         default: VALID
         description: |4-
-             - VALID: Policy is valid.
-             - INVALID: Policy is invalid.
+             - VALID: Policy is valid, present in etcd and running in the controller.
+             - INVALID: Policy is present in etcd, but fails to parse.
+             - NOT_LOADED: Policy is present in etcd, but is not (yet) running in the controller.
+             - STALE: Policy is running on the controller, but is not present in etcd.
+             - OUTDATED: Policy is present in etcd and policy with the same name is running in
+            the controller, but these policies differ.
         enum:
             - VALID
             - INVALID
+            - NOT_LOADED
+            - STALE
+            - OUTDATED
         type: string
     GradientController:
         description: |-
@@ -2648,6 +2655,9 @@ definitions:
                 $ref: '#/definitions/RateLimiterParameters'
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
+            request_parameters:
+                $ref: '#/definitions/RateLimiterRequestParameters'
+                title: RequestParameters for the component
             selectors:
                 description: |+
                     Selectors for the component.
@@ -2658,14 +2668,6 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
-            tokens_label_key:
-                description: |-
-                    Flow label key that will be used to override the number of tokens
-                    for this request.
-                    This is an optional parameter and takes highest precedence
-                    when assigning tokens to a request.
-                    The label value must be a valid number.
-                type: string
         required:
             - selectors
         title: Limits the traffic on a control point to specified rate
@@ -2699,9 +2701,6 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
-            denied_response_status_code:
-                $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -2755,6 +2754,20 @@ definitions:
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gt=0
+        type: object
+    RateLimiterRequestParameters:
+        properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
         type: object
     Rego:
         description: |-
@@ -3028,6 +3041,13 @@ definitions:
                     - When label key is not specified, _Sampler_ acts as a stateless filter.
                       Percentage of flows are selected randomly for rejection.
                 type: string
+            ramp_mode:
+                default: false
+                description: |+
+                    Ramp component can accept flows with `ramp_mode` flag set.
+
+                type: boolean
+                x-go-tag-default: "false"
             selectors:
                 description: |+
                     Selectors for the component.
@@ -3121,7 +3141,7 @@ definitions:
                 type: string
             tokens_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default number of tokens for this flow.
+                    * Key for a flow label that can be used to override the default number of tokens for this request.
                     * The value associated with this key must be a valid number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
                 type: string

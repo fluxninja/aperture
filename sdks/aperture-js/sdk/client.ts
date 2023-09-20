@@ -13,6 +13,13 @@ import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
+export interface FlowParams {
+  labels?: Record<string, string>;
+  timeoutMilliseconds?: number;
+  failOpen?: boolean;
+  tryConnect?: boolean;
+}
+
 export class ApertureClient {
   private readonly fcsClient: FlowControlServiceClient;
 
@@ -22,14 +29,12 @@ export class ApertureClient {
 
   private readonly tracer: Tracer;
 
-  // Timeout is duration in milliseconds.
-  private readonly timeoutMilliseconds: number;
-
-  constructor({
-    timeoutMilliseconds = 0,
-    channelCredentials = grpc.credentials.createInsecure(),
-  } = {}) {
-    this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
+  constructor({ channelCredentials = grpc.credentials.createInsecure() } = {}) {
+    this.fcsClient = new fcs.FlowControlService(URL, channelCredentials, {
+      "grpc.keepalive_time_ms": 10000,
+      "grpc.keepalive_timeout_ms": 5000,
+      "grpc.keepalive_permit_without_calls": 1,
+    });
 
     this.exporter = new OTLPTraceExporter({
       url: URL,
@@ -44,8 +49,6 @@ export class ApertureClient {
     this.tracerProvider.addSpanProcessor(new BatchSpanProcessor(this.exporter));
     this.tracerProvider.register();
     this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
-
-    this.timeoutMilliseconds = timeoutMilliseconds;
 
     const kickChannel = () => {
       const state = this.fcsClient.getChannel().getConnectivityState(true);
@@ -62,17 +65,18 @@ export class ApertureClient {
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+  // For FlowParams set defaults - labels = {}, timeoutMilliseconds = 0, failOpen = true using Pick.
   async StartFlow(
-    controlPointArg: string,
-    labels: Record<string, string> = {},
-    failOpen: boolean = true,
+    controlPoint: string,
+    params: FlowParams = {},
+    rampMode: boolean = false,
   ): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       let span = this.tracer.startSpan("Aperture Check");
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(span, startDate, failOpen, response, err));
+        resolve(new Flow(span, startDate, params.failOpen, response, err));
       };
 
       try {
@@ -80,8 +84,9 @@ export class ApertureClient {
         // if not ready, return flow with fail-to-wire semantics
         // if ready, call check
         if (
+          (params.tryConnect === undefined || params.tryConnect == false) &&
           this.fcsClient.getChannel().getConnectivityState(true) !=
-          connectivityState.READY
+            connectivityState.READY
         ) {
           resolveFlow(null, new Error("connection not ready"));
           return;
@@ -96,17 +101,19 @@ export class ApertureClient {
           }
         }
 
-        let mergedLabels = { ...labels, ...labelsBaggage };
+        let mergedLabels = { ...params.labels, ...labelsBaggage };
 
         const request: CheckRequest = {
-          controlPoint: controlPointArg,
+          controlPoint: controlPoint,
           labels: mergedLabels,
+          rampMode: rampMode,
         };
 
         const grpcParams: grpc.CallOptions = {
           deadline:
-            this.timeoutMilliseconds != 0
-              ? new Date(Date.now() + this.timeoutMilliseconds)
+            params.timeoutMilliseconds != undefined &&
+            params.timeoutMilliseconds > 0
+              ? new Date(Date.now() + params.timeoutMilliseconds)
               : undefined,
         };
 

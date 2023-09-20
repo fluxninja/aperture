@@ -49,8 +49,8 @@ func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
 }
 
 func main() {
-	agentHost := getEnvOrDefault("FN_AGENT_HOST", defaultAgentHost)
-	agentPort := getEnvOrDefault("FN_AGENT_PORT", defaultAgentPort)
+	agentHost := getEnvOrDefault("APERTURE_AGENT_HOST", defaultAgentHost)
+	agentPort := getEnvOrDefault("APERTURE_AGENT_PORT", defaultAgentPort)
 
 	ctx := context.Background()
 

@@ -65,6 +65,12 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             },
+            "request_parameters": {
+              "description": "Request Parameters.",
+              "default": {},
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterRequestParameters"
+            },
             "selectors": {
               "description": "Flow selectors to match requests against",
               "default": [

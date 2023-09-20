@@ -36,7 +36,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels)
+		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, false)
 
 		flow := c.StartHTTPFlow(ctx, checkreq, true)
 		if flow.Error() != nil {
