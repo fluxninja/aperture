@@ -58,7 +58,8 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: (sum(postgresql_backends) / sum(postgresql_connection_max))
+          query_string: (sum(postgresql_backends{policy_name="postgres-connections",infra_meter_name="postgresql"}})
+            / sum(postgresql_connection_max{policy_name="postgres-connections",infra_meter_name="postgresql"}))
             * 100
     - variable:
         constant_output:
