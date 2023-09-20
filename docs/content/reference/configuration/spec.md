@@ -28,12 +28,568 @@ Generated File Starts
 
 <!-- vale off -->
 
+### AIADLoadScheduler {#a-i-a-d-load-scheduler}
+
+<!-- vale on -->
+
+_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload
+state. During recovery, it increases the token rate linearly until the system is
+not overloaded.
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting dry run mode through dynamic configuration.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerIns](#a-i-a-d-load-scheduler-ins))
+
+<!-- vale on -->
+
+Input ports for the _AIAD Load Scheduler_.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerOuts](#a-i-a-d-load-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _AIAD Load Scheduler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadSchedulerParameters](#a-i-a-d-load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _AIAD Load Scheduler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerIns {#a-i-a-d-load-scheduler-ins}
+
+<!-- vale on -->
+
+Input ports for the _AIAD Load Scheduler_.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint input to the controller.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerOuts {#a-i-a-d-load-scheduler-outs}
+
+<!-- vale on -->
+
+Output ports for the _AIAD Load Scheduler_.
+
+<dl>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired token rate to the incoming token
+rate.
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal that indicates whether the service is in overload state.
+
+</dd>
+<dt>observed_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted token rate to the incoming
+token rate.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIADLoadSchedulerParameters {#a-i-a-d-load-scheduler-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>alerter</dt>
+<dd>
+
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration parameters for the embedded Alerter.
+
+</dd>
+<dt>load_multiplier_linear_decrement</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.05`)
+
+<!-- vale on -->
+
+Linear decrement to load multiplier every 10 seconds while the system is in the
+overloaded state, up until the `min_load_multiplier` is reached.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerParameters](#load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Load Scheduler_.
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `2`)
+
+<!-- vale on -->
+
+The maximum load multiplier that can be reached during recovery from an overload
+state.
+
+- Helps protect the service from request bursts while the system is still
+  recovering.
+- Once this value is reached, the scheduler enters the pass-through mode,
+  allowing requests to bypass the scheduler and be sent directly to the service.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
+
+</dd>
+<dt>min_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0`)
+
+<!-- vale on -->
+
+The minimum load multiplier that can be reached during an overload state.
+
+</dd>
+<dt>overload_condition</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gt | lt | gte | lte`, **required**, default: `"gt"`)
+
+<!-- vale on -->
+
+Overload condition determines the criteria to determine overload state. The
+default condition is "gt", that is, when the signal is greater than the
+setpoint. The condition must be one of:
+
+<!-- vale off -->
+
+- "gt": greater than
+- "lt": less than
+- "gte": greater than or equal to
+- "lte": less than or equal to
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIMDLoadScheduler {#a-i-m-d-load-scheduler}
+
+<!-- vale on -->
+
+_AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate
+based on the deviation of the signal from the setpoint. It takes a signal and
+setpoint as inputs and reduces token rate proportionally (or any arbitrary
+power) based on deviation of the signal from setpoint. During recovery, it
+increases the token rate linearly until the system is not overloaded.
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting dry run mode through dynamic configuration.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIMDLoadSchedulerIns](#a-i-m-d-load-scheduler-ins))
+
+<!-- vale on -->
+
+Input ports for the _AIMD Load Scheduler_.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIMDLoadSchedulerOuts](#a-i-m-d-load-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _AIMD Load Scheduler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIMDLoadSchedulerParameters](#a-i-m-d-load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _AIMD Load Scheduler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIMDLoadSchedulerIns {#a-i-m-d-load-scheduler-ins}
+
+<!-- vale on -->
+
+Input ports for the _AIMD Load Scheduler_.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>setpoint</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The setpoint input to the controller.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIMDLoadSchedulerOuts {#a-i-m-d-load-scheduler-outs}
+
+<!-- vale on -->
+
+Output ports for the _AIMD Load Scheduler_.
+
+<dl>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired token rate to the incoming token
+rate.
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal that indicates whether the service is in overload state.
+
+</dd>
+<dt>observed_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted token rate to the incoming
+token rate.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### AIMDLoadSchedulerParameters {#a-i-m-d-load-scheduler-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>alerter</dt>
+<dd>
+
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration parameters for the embedded Alerter.
+
+</dd>
+<dt>gradient</dt>
+<dd>
+
+<!-- vale off -->
+
+([GradientControllerParameters](#gradient-controller-parameters))
+
+<!-- vale on -->
+
+Parameters for the Gradient Controller.
+
+</dd>
+<dt>load_multiplier_linear_increment</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `0.025`)
+
+<!-- vale on -->
+
+Linear increment to load multiplier every 10 seconds while the system is not in
+the overloaded state, up until the `max_load_multiplier` is reached.
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerParameters](#load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Load Scheduler_.
+
+</dd>
+<dt>max_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, default: `2`)
+
+<!-- vale on -->
+
+The maximum load multiplier that can be reached during recovery from an overload
+state.
+
+- Helps protect the service from request bursts while the system is still
+  recovering.
+- Once this value is reached, the scheduler enters the pass-through mode,
+  allowing requests to bypass the scheduler and be sent directly to the service.
+- The pass-through mode gets disabled if the system enters the overload state
+  again.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### AdaptiveLoadScheduler {#adaptive-load-scheduler}
 
 <!-- vale on -->
 
 The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
-deviation of the input signal from the setpoint.
+deviation of the input signal from the setpoint. Deprecated: v3.0.0. Use _AIMD
+Load Scheduler_ instead.
 
 <dl>
 <dt>dry_run</dt>
@@ -1588,6 +2144,19 @@ Logical OR.
 PID Controller is a proportional–integral–derivative controller.
 
 </dd>
+<dt>polynomial_range_function</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunction](#polynomial-range-function))
+
+<!-- vale on -->
+
+Polynomial Range Function is a function that maps a signal to a range of values
+following a polynomial function.
+
+</dd>
 <dt>pulse_generator</dt>
 <dd>
 
@@ -2712,10 +3281,33 @@ to features within a service.
 
 <!-- vale on -->
 
-_Adaptive Load Scheduler_ component is based on additive increase and
-multiplicative decrease of token rate. It takes a signal and setpoint as inputs
-and reduces token rate proportionally (or any arbitrary power) based on
-deviation of the signal from setpoint.
+_Adaptive Load Scheduler_ component does additive increase of load multiplier
+during non-overload state. During overload, the load multiplier is throttled
+based on the provided strategy.
+
+</dd>
+<dt>aiad_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIADLoadScheduler](#a-i-a-d-load-scheduler))
+
+<!-- vale on -->
+
+AIAD Load Scheduler.
+
+</dd>
+<dt>aimd_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AIMDLoadScheduler](#a-i-m-d-load-scheduler))
+
+<!-- vale on -->
+
+AIMD Load Scheduler.
 
 </dd>
 <dt>load_ramp</dt>
@@ -2751,6 +3343,18 @@ queue in front of the service using Weighted Fair Queuing.
 ([QuotaScheduler](#quota-scheduler))
 
 <!-- vale on -->
+
+</dd>
+<dt>range_driven_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadScheduler](#range-driven-load-scheduler))
+
+<!-- vale on -->
+
+Range Driven Load Scheduler.
 
 </dd>
 <dt>rate_limiter</dt>
@@ -5951,6 +6555,245 @@ Resources (such as Flux Meters, Classifiers) to setup.
 
 <!-- vale off -->
 
+### PolynomialRangeFunction {#polynomial-range-function}
+
+<!-- vale on -->
+
+Curve Types by Degree:
+
+- Degree 1: Linear
+- Degree 2: Quadratic
+- Degree 3: Cubic
+- and so on.
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionIns](#polynomial-range-function-ins))
+
+<!-- vale on -->
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionOuts](#polynomial-range-function-outs))
+
+<!-- vale on -->
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParameters](#polynomial-range-function-parameters))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionIns {#polynomial-range-function-ins}
+
+<!-- vale on -->
+
+<dl>
+<dt>input</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionOuts {#polynomial-range-function-outs}
+
+<!-- vale on -->
+
+<dl>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The output signal.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParameters {#polynomial-range-function-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>clamp_to_custom_values</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersClampToCustomValues](#polynomial-range-function-parameters-clamp-to-custom-values))
+
+<!-- vale on -->
+
+Clamp to custom values
+
+</dd>
+<dt>clamp_to_datapoint</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Clamp to the nearest data-point
+
+</dd>
+<dt>continue_curve</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Continue polynomial curve
+
+</dd>
+<dt>degree</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+Degree of the polynomial
+
+</dd>
+<dt>end</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersDatapoint](#polynomial-range-function-parameters-datapoint))
+
+<!-- vale on -->
+
+Ending data-point for the range function
+
+</dd>
+<dt>start</dt>
+<dd>
+
+<!-- vale off -->
+
+([PolynomialRangeFunctionParametersDatapoint](#polynomial-range-function-parameters-datapoint))
+
+<!-- vale on -->
+
+Starting data-point for the range function
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParametersClampToCustomValues {#polynomial-range-function-parameters-clamp-to-custom-values}
+
+<!-- vale on -->
+
+<dl>
+<dt>post_end</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+<dt>pre_start</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### PolynomialRangeFunctionParametersDatapoint {#polynomial-range-function-parameters-datapoint}
+
+<!-- vale on -->
+
+<dl>
+<dt>input</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+<dt>output</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### PromQL {#prom-q-l}
 
 <!-- vale on -->
@@ -6219,6 +7062,276 @@ Schedules the traffic based on token-bucket based quotas.
 
 <!-- vale off -->
 
+### RangeDrivenLoadScheduler {#range-driven-load-scheduler}
+
+<!-- vale on -->
+
+_Range Load Scheduler_ uses the
+[polynomial range function](#polynomial-range-function) to throttle the token
+rate based on the range of the signal.
+
+<dl>
+<dt>dry_run</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool)
+
+<!-- vale on -->
+
+Decides whether to run the load scheduler in dry-run mode. In dry run mode the
+scheduler acts as pass through to all flow and does not queue flows. It is
+useful for observing the behavior of load scheduler without disrupting any real
+traffic.
+
+</dd>
+<dt>dry_run_config_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Configuration key for setting dry run mode through dynamic configuration.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadSchedulerIns](#range-driven-load-scheduler-ins))
+
+<!-- vale on -->
+
+Input ports for the _Range Load Scheduler_.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadSchedulerOuts](#range-driven-load-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _Range Load Scheduler_.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadSchedulerParameters](#range-driven-load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Range Load Scheduler_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RangeDrivenLoadSchedulerDatapoint {#range-driven-load-scheduler-datapoint}
+
+<!-- vale on -->
+
+<dl>
+<dt>load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, minimum: `0`, maximum: `1`)
+
+<!-- vale on -->
+
+</dd>
+<dt>signal_value</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RangeDrivenLoadSchedulerIns {#range-driven-load-scheduler-ins}
+
+<!-- vale on -->
+
+Input ports for the _Range Load Scheduler_.
+
+<dl>
+<dt>overload_confirmation</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The `overload_confirmation` port provides additional criteria to determine
+overload state which results in _Flow_ throttling at the service.
+
+</dd>
+<dt>signal</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+The input signal to the controller.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RangeDrivenLoadSchedulerOuts {#range-driven-load-scheduler-outs}
+
+<!-- vale on -->
+
+Output ports for the _Range Load Scheduler_.
+
+<dl>
+<dt>desired_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Desired Load multiplier is the ratio of desired token rate to the incoming token
+rate.
+
+</dd>
+<dt>is_overload</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+A Boolean signal that indicates whether the service is in overload state.
+
+</dd>
+<dt>observed_load_multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+Observed Load multiplier is the ratio of accepted token rate to the incoming
+token rate.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RangeDrivenLoadSchedulerParameters {#range-driven-load-scheduler-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>alerter</dt>
+<dd>
+
+<!-- vale off -->
+
+([AlerterParameters](#alerter-parameters))
+
+<!-- vale on -->
+
+Configuration parameters for the embedded Alerter.
+
+</dd>
+<dt>degree</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, **required**)
+
+<!-- vale on -->
+
+Degree determines shape of the throttling curve. degree=1: linear degree=2:
+quadratic degree=3: cubic
+
+</dd>
+<dt>high_throttle_threshold</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint))
+
+<!-- vale on -->
+
+Ending data-point of the throttling range
+
+</dd>
+<dt>load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([LoadSchedulerParameters](#load-scheduler-parameters))
+
+<!-- vale on -->
+
+Parameters for the _Load Scheduler_.
+
+</dd>
+<dt>low_throttle_threshold</dt>
+<dd>
+
+<!-- vale off -->
+
+([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint))
+
+<!-- vale on -->
+
+Starting data-point of the throttling range
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### RateLimiter {#rate-limiter}
 
 <!-- vale on -->
@@ -6259,6 +7372,18 @@ Input ports for the RateLimiter component
 Parameters for the RateLimiter component
 
 </dd>
+<dt>request_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterRequestParameters](#rate-limiter-request-parameters))
+
+<!-- vale on -->
+
+RequestParameters for the component
+
+</dd>
 <dt>selectors</dt>
 <dd>
 
@@ -6293,7 +7418,8 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Capacity of the bucket.
+Capacity of the bucket to allow for bursty traffic. The bucket is given a chance
+to empty out before the filling starts.
 
 </dd>
 <dt>fill_amount</dt>
@@ -6342,19 +7468,6 @@ PassThrough port determines whether all requests
 
 Continuous fill determines whether the token bucket should be filled
 continuously or only on discrete intervals.
-
-</dd>
-<dt>denied_response_status_code</dt>
-<dd>
-
-<!-- vale off -->
-
-([StatusCode](#status-code))
-
-<!-- vale on -->
-
-This field allows you to override the default HTTP status code
-(`429 Too Many Requests`) that is returned when a request is denied.
 
 </dd>
 <dt>interval</dt>
@@ -6423,20 +7536,6 @@ duration value must be suffixed with an "s" to indicate 'seconds.' For example,
 a value of "10s" would signify a duration of 10 seconds.
 
 </dd>
-<dt>tokens_label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Flow label key that will be used to override the number of tokens for this
-request. This is an optional parameter and takes highest precedence when
-assigning tokens to a request. The label value must be a valid uint64 number.
-
-</dd>
 </dl>
 
 ---
@@ -6470,6 +7569,44 @@ Enables lazy sync
 <!-- vale on -->
 
 Number of times to lazy sync within the `interval`.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RateLimiterRequestParameters {#rate-limiter-request-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`429 Too Many Requests`) that is returned when a request is denied.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid number.
 
 </dd>
 </dl>
@@ -7008,6 +8145,18 @@ The flow label key for identifying sessions.
   Percentage of flows are selected randomly for rejection.
 
 </dd>
+<dt>ramp_mode</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Ramp component can accept flows with `ramp_mode` flag set.
+
+</dd>
 <dt>selectors</dt>
 <dd>
 
@@ -7213,7 +8362,7 @@ This field allows you to override the default HTTP status code
 (`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
-<dt>priorities_label_key</dt>
+<dt>priority_label_key</dt>
 <dd>
 
 <!-- vale off -->
@@ -7224,8 +8373,8 @@ This field allows you to override the default HTTP status code
 
 - Key for a flow label that can be used to override the default priority for
   this flow.
-- The value associated with this key must be a valid uint64 number. Higher
-  numbers means higher priority.
+- The value associated with this key must be a valid number. Higher numbers
+  means higher priority.
 - If this parameter is not provided, the priority for the flow will be
   determined by the matched workload's priority.
 
@@ -7240,8 +8389,8 @@ This field allows you to override the default HTTP status code
 <!-- vale on -->
 
 - Key for a flow label that can be used to override the default number of tokens
-  for this flow.
-- The value associated with this key must be a valid uint64 number.
+  for this request.
+- The value associated with this key must be a valid number.
 - If this parameter is not provided, the number of tokens for the flow will be
   determined by the matched workload's token count.
 
@@ -7394,7 +8543,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(int64, minimum: `0`, default: `1`)
+(float64, minimum: `0`, default: `1`)
 
 <!-- vale on -->
 

@@ -45,7 +45,9 @@ The created instance can then be used to start a flow:
     // business logic produces labels
     labels.put("key", "value");
 
-    Flow flow = apertureSDK.startFlow("featureName", labels);
+    Boolean rampMode = false;
+
+    Flow flow = apertureSDK.startFlow("featureName", labels, rampMode);
     if (flow.shouldRun()) {
         // do actual work
     } else {

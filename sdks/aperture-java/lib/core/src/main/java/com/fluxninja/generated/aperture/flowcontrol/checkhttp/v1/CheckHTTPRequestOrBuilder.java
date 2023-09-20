@@ -121,4 +121,14 @@ public interface CheckHTTPRequestOrBuilder extends
    */
   com.google.protobuf.ByteString
       getControlPointBytes();
+
+  /**
+   * <pre>
+   * A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+   * </pre>
+   *
+   * <code>bool ramp_mode = 5 [json_name = "rampMode"];</code>
+   * @return The rampMode.
+   */
+  boolean getRampMode();
 }

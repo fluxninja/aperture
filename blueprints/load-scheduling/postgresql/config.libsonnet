@@ -1,12 +1,7 @@
-local promqlDefaults = import '../promql/config.libsonnet';
+local commonConfig = import '../common-aiad/config-defaults.libsonnet';
 
-promqlDefaults {
+commonConfig {
   policy+: {
-    /**
-    * @param (policy.promql_query: string) PromQL query to detect PostgreSQL overload.
-    */
-    promql_query: '(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100',
-
     /**
     * @param (policy.postgresql: postgresql) Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.
     * @schema (postgresql.username: string) Username of the PostgreSQL.

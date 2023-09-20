@@ -40,7 +40,6 @@ type FxIn struct {
 	KubernetesClient   k8s.K8sClient      `optional:"true"`
 	Trackers           notifiers.Trackers `name:"kubernetes_control_points"`
 	Election           *election.Election
-	ElectionTrackers   notifiers.Trackers `name:"etcd_election"`
 	Config             autoscalek8sconfig.AutoScaleKubernetesConfig
 	PrometheusRegistry *prometheus.Registry
 	AgentInfo          *agentinfo.AgentInfo
@@ -52,7 +51,7 @@ func provideAutoScaleControlPoints(in FxIn) (AutoScaleControlPoints, error) {
 		log.Error().Msg("Kubernetes client is not available, skipping Kubernetes AutoScaler creation and control point discovery")
 		return nil, nil
 	}
-	pn, err := newPodNotifier(in.PrometheusRegistry, in.ElectionTrackers, in.Lifecycle, in.AgentInfo.GetAgentGroup())
+	pn, err := newPodNotifier(in.PrometheusRegistry, in.Election, in.Lifecycle, in.AgentInfo.GetAgentGroup())
 	if err != nil {
 		return nil, err
 	}

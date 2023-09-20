@@ -8,22 +8,21 @@ policy:
   # Required: True
   policy_name: __REQUIRED_FIELD__
   service_protection_core:
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Parameters for AIMD throttling strategy.
+    # Type: aperture.spec.v1.AIADLoadSchedulerParameters
     # Required: True
-    adaptive_load_scheduler:
+    aiad_load_scheduler:
       alerter:
-        alert_name: "Load Throttling Event"
-      gradient:
-        max_gradient: 1
-        min_gradient: 0.1
-        slope: -1
+        alert_name: "AIAD Load Throttling Event"
+      load_multiplier_linear_decrement: 0.05
       load_multiplier_linear_increment: 0.025
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
             service: __REQUIRED_FIELD__
       max_load_multiplier: 2
+      min_load_multiplier: 0
+      overload_condition: "gt"
   # PromQL query.
   # Type: string
   # Required: True

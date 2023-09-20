@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -315,15 +316,21 @@ func (rl *rateLimiter) GetSelectors() []*policylangv1.Selector {
 }
 
 // Decide runs the limiter.
-func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
+func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 
 	tokens := float64(1)
 	// get tokens from labels
-	if rl.lbProto.Parameters.TokensLabelKey != "" {
-		if val, ok := labels.Get(rl.lbProto.Parameters.TokensLabelKey); ok {
-			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
-				tokens = parsedTokens
+	rParams := rl.lbProto.GetRequestParameters()
+	var deniedResponseStatusCode flowcontrolv1.StatusCode
+	if rParams != nil {
+		deniedResponseStatusCode = rParams.GetDeniedResponseStatusCode()
+		tokensLabelKey := rParams.GetTokensLabelKey()
+		if tokensLabelKey != "" {
+			if val, ok := labels.Get(tokensLabelKey); ok {
+				if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
+					tokens = parsedTokens
+				}
 			}
 		}
 	}
@@ -339,31 +346,31 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) iface.L
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 	}
 
-	return iface.LimiterDecision{
-		LimiterDecision: &flowcontrolv1.LimiterDecision{
-			PolicyName:               rl.GetPolicyName(),
-			PolicyHash:               rl.GetPolicyHash(),
-			ComponentId:              rl.GetComponentId(),
-			Dropped:                  !ok,
-			DeniedResponseStatusCode: rl.lbProto.GetParameters().GetDeniedResponseStatusCode(),
-			Reason:                   reason,
-			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
-				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
-					Label:          label,
-					Remaining:      remaining,
-					Current:        current,
-					TokensConsumed: tokensConsumed,
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:               rl.GetPolicyName(),
+		PolicyHash:               rl.GetPolicyHash(),
+		ComponentId:              rl.GetComponentId(),
+		Dropped:                  !ok,
+		DeniedResponseStatusCode: deniedResponseStatusCode,
+		Reason:                   reason,
+		WaitTime:                 durationpb.New(waitTime),
+		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
+			RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
+				Label: label,
+				TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+					Remaining: remaining,
+					Current:   current,
+					Consumed:  tokensConsumed,
 				},
 			},
 		},
-		WaitTime: waitTime,
 	}
 }
 
 // Revert returns the tokens to the limiter.
 func (rl *rateLimiter) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
-		tokens := rateLimiterDecision.RateLimiterInfo.TokensConsumed
+		tokens := rateLimiterDecision.RateLimiterInfo.TokensInfo.Consumed
 		if tokens > 0 {
 			rl.TakeIfAvailable(ctx, labels, -tokens)
 		}
@@ -439,4 +446,9 @@ func (rl *rateLimiter) GetRequestCounter(labels map[string]string) prometheus.Co
 		return nil
 	}
 	return counter
+}
+
+// GetRampMode is always false for rateLimiters.
+func (rl *rateLimiter) GetRampMode() bool {
+	return false
 }

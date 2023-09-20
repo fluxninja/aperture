@@ -6,7 +6,7 @@ policy:
   # Required: True
   policy_name: weighted-service-protection
   service_protection_core:
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.

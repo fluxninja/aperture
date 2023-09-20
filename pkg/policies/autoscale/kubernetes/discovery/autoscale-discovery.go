@@ -3,7 +3,6 @@ package discovery
 import (
 	"context"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -36,7 +35,7 @@ func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClie
 
 // controlPointDiscovery is a struct that helps with Kubernetes control point discovery.
 type controlPointDiscovery struct {
-	waitGroup         sync.WaitGroup
+	waitGroup         panichandler.WaitGroup
 	ctx               context.Context
 	cancel            context.CancelFunc
 	controlPointStore AutoScaleControlPointStore
@@ -49,11 +48,7 @@ type controlPointDiscovery struct {
 func (cpd *controlPointDiscovery) start() {
 	cpd.ctx, cpd.cancel = context.WithCancel(context.Background())
 
-	cpd.waitGroup.Add(1)
-
-	panichandler.Go(func() {
-		defer cpd.waitGroup.Done()
-
+	cpd.waitGroup.Go(func() {
 		operation := func() error {
 			// Proceed only if we are the leader
 			// FIXME this goroutine leaks if we never become a leader

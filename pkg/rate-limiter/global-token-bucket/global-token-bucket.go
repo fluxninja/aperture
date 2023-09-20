@@ -120,10 +120,6 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 		return true, 0, 0, 0
 	}
 
-	if gtb.GetBucketCapacity() == 0 {
-		return false, 0, 0, 0
-	}
-
 	if isMarginExceeded(ctx) {
 		return false, 0, 0, 0
 	}
@@ -169,10 +165,6 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
-	}
-
-	if gtb.GetBucketCapacity() == 0 {
-		return false, 0, 0, 0
 	}
 
 	deadline := time.Time{}
@@ -230,8 +222,9 @@ func (gtb *GlobalTokenBucket) Return(ctx context.Context, label string, n float6
 
 // Per-label tracking in distributed cache.
 type tokenBucketState struct {
-	LastFill  time.Time
-	Available float64
+	StartFillAt time.Time // To prevent more tokens than fillRate in a time window while using burst capacity
+	LastFill    time.Time
+	Available   float64
 }
 
 type takeNRequest struct {
@@ -275,13 +268,29 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		AvailableAt: now,
 	}
 
+	// if we are first time drawing from the bucket, set the start fill time
+	if state.Available == gtb.bucketCapacity {
+		if gtb.fillAmount != 0 {
+			// calculate start fill time based on the time it takes to fill the bucket
+			state.StartFillAt = now.Add(time.Duration(gtb.bucketCapacity / gtb.fillAmount * float64(gtb.interval)))
+			state.LastFill = state.StartFillAt
+		}
+	}
+
 	state.Available -= arg.Want
 
 	if arg.Want > 0 {
 		if state.Available < 0 {
 			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
-				waitTime := time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
+				var waitTime time.Duration
+				if gtb.continuousFill {
+					waitTime = time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
+				} else {
+					// calculate how many fills we need
+					fills := int(-state.Available/gtb.fillAmount) + 1
+					waitTime = time.Duration(fills) * gtb.interval
+				}
 				availableAt := now.Add(waitTime)
 				result.AvailableAt = availableAt
 				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
@@ -333,7 +342,8 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 		state.Available = gtb.bucketCapacity
 	}
 
-	if gtb.fillAmount != 0 {
+	// do not fill the bucket until the start fill time
+	if state.StartFillAt.IsZero() || now.After(state.StartFillAt) {
 		// Calculate the time passed since the last fill
 		sinceLastFill := now.Sub(state.LastFill)
 		fillAmount := 0.0

@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
@@ -13,7 +12,7 @@ var (
 	// Controller is the controller connection object.
 	Controller utils.ControllerConn
 
-	client       cmdv1.ControllerClient
+	client       utils.PolicyClient
 	controllerNs string
 )
 
@@ -40,7 +39,7 @@ Use this command to apply the Aperture Policies.`,
 
 		controllerNs = utils.GetControllerNs()
 
-		client, err = Controller.Client()
+		client, err = Controller.PolicyClient()
 		if err != nil {
 			return fmt.Errorf("failed to get controller client: %w", err)
 		}

@@ -20,7 +20,7 @@ To achieve this functionality, the _Load Ramp_ utilizes input ports named
 `forward`, `backward`, and `reset` to control its behavior. These input signals
 drive the internal logic of the component. Additionally, the _Load Ramp_
 internally leverages the [_Sampler_](#sampler) component, providing it with an
-`accept_percentage` signal.
+`accept_percentage` signal and setting its `ramp_mode` flag.
 
 ## Sampler
 
@@ -53,6 +53,7 @@ components:
           selectors:
             - control_point: ingress
               service: user-service.default.svc.cluster.local
+          ramp_mode: true
 ```
 
 ### Stateless Filter {#stateless-filter}
@@ -88,6 +89,13 @@ which parts of a service are affected by the _Sampler_.
 The _Sampler_ component takes an accept-percentage input signal, based on which
 it decides the percentage of flows to accept, allowing for a fine-grained
 control.
+
+### Ramp Mode {#ramp-mode}
+
+Flows with `ramp_mode` flag set require at least one ramp component to accept
+them, resulting in flow rejection if Aperture Agent is disconnected or policy is
+not loaded. When _Sampler_'s `ramp_mode` flag is set, the _Sampler_ becomes such
+a ramp component and can accept ramp mode flows.
 
 [sampler]: /reference/configuration/spec.md#sampler
 [control-point]: /concepts/control-point.md

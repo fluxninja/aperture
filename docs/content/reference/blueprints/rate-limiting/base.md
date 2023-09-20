@@ -128,6 +128,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
 
 <!-- vale off -->
 
+<a id="policy-rate-limiter-request-parameters"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.request_parameters'
+    description='Request Parameters.'
+    type='Object (aperture.spec.v1.RateLimiterRequestParameters)'
+    reference='../../configuration/spec#rate-limiter-request-parameters'
+    value='{}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-rate-limiter-selectors"></a>
 
 <ParameterDescription

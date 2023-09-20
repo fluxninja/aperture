@@ -17,8 +17,8 @@ JavaScript SDK</a> can be used to manually set feature control points within a
 JavaScript service.
 
 To do so, first create an instance of ApertureClient. Agent host and port will
-be read from environment variables `FN_AGENT_HOST` and `FN_AGENT_PORT`,
-defaulting to localhost:8089.
+be read from environment variables `APERTURE_AGENT_HOST` and
+`APERTURE_AGENT_PORT`, defaulting to localhost:8089.
 
 ```javascript
 export const apertureClient = new ApertureClient();
@@ -29,9 +29,10 @@ The created instance can then be used to start a flow:
 ```javascript
 // do some business logic to collect labels
 var labelsMap = new Map().set("key", "value");
+var rampMode = false;
 
 apertureClient
-  .StartFlow("feature-name", labelsMap)
+  .StartFlow("feature-name", labelsMap, rampMode)
   .then((flow) => {
     if (flow.ShouldRun()) {
       // Do actual work

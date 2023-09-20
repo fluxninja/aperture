@@ -61,7 +61,7 @@ var global *Logger
 
 // Always create a global logger instance.
 func init() {
-	zerolog.TimeFieldFormat = time.RFC3339
+	zerolog.TimeFieldFormat = time.RFC3339Nano
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 	zerolog.CallerMarshalFunc = func(_ uintptr, file string, line int) string {
 		// short caller format
@@ -133,7 +133,10 @@ func WaitFlush() {
 
 // GetPrettyConsoleWriter returns a pretty console writer.
 func GetPrettyConsoleWriter() io.Writer {
-	output := zerolog.NewConsoleWriter()
+	output := zerolog.NewConsoleWriter(
+		func(w *zerolog.ConsoleWriter) {
+			w.Out = os.Stderr
+		})
 	return output
 }
 

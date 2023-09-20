@@ -7,7 +7,7 @@ import (
 )
 
 type tokenCounts struct {
-	tokens uint64
+	tokens float64
 }
 
 // WindowedCounter is a token bucket with a windowed counter.
@@ -39,7 +39,7 @@ func NewWindowedCounter(clk clockwork.Clock, totalSlots uint8, slotDuration time
 
 // CalculateTokenRate returns the calculated token rate in the current window.
 func (counter *WindowedCounter) CalculateTokenRate() float64 {
-	var total uint64
+	var total float64
 	// calculate total (ignoring the currentSlot)
 	for i := uint8(0); i < counter.totalSlots; i++ {
 		if i != counter.currentSlot {

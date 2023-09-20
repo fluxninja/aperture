@@ -4,20 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
@@ -54,21 +52,9 @@ aperturectl apply policy --dir=policies`,
 		if file != "" {
 			return applyPolicy(file)
 		} else if dir != "" {
-			policies, err := getPolicies(dir)
+			policies, model, err := utils.GetPolicyTUIModel(dir, selectAll)
 			if err != nil {
 				return err
-			}
-
-			model := tui.InitialCheckboxModel(policies, "Which policies to apply?")
-			if !selectAll {
-				p := tea.NewProgram(model)
-				if _, err := p.Run(); err != nil {
-					return err
-				}
-			} else {
-				for i := range policies {
-					model.Selected[i] = struct{}{}
-				}
 			}
 
 			for policyIndex := range model.Selected {
@@ -84,71 +70,9 @@ aperturectl apply policy --dir=policies`,
 	},
 }
 
-// getPolicies applies all policies in a directory to the cluster.
-func getPolicies(policyDir string) ([]string, error) {
-	policies := []string{}
-	// walk the directory and apply all policies
-	return policies, filepath.Walk(policyDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if filepath.Ext(info.Name()) == ".yaml" {
-			_, _, err := getPolicy(path)
-			if err != nil {
-				return err
-			}
-			policies = append(policies, path)
-		}
-		return nil
-	})
-}
-
-func getPolicy(policyFile string) (*languagev1.Policy, string, error) {
-	policyFileBase := filepath.Base(policyFile)
-	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
-
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, policyName, err
-	}
-	_, policy, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
-	if err != nil {
-		policyCR, err := getPolicyCR(policyFile)
-		if err != nil {
-			return nil, policyName, err
-		}
-
-		policy = &languagev1.Policy{}
-		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
-		if err != nil {
-			return nil, policyName, err
-		}
-
-		policyName = policyCR.Name
-		return policy, policyName, nil
-	}
-
-	return policy, policyName, nil
-}
-
-func getPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, err
-	}
-
-	policyCR := &policyv1alpha1.Policy{}
-	err = yaml.Unmarshal(policyBytes, policyCR)
-	if err != nil {
-		return nil, err
-	}
-
-	return policyCR, nil
-}
-
 // applyPolicy applies a policy to the cluster.
 func applyPolicy(policyFile string) error {
-	policy, policyName, err := getPolicy(policyFile)
+	policy, policyName, err := utils.GetPolicy(policyFile)
 	if err != nil {
 		return err
 	}
@@ -198,12 +122,12 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 					return updatePolicyUsingAPIErr
 				}
 			} else if apierrors.IsAlreadyExists(err) {
-				var update bool
-				update, checkForUpdateErr := checkForUpdate(name)
+				var shouldUpdate bool
+				shouldUpdate, checkForUpdateErr := checkForUpdate(name)
 				if checkForUpdateErr != nil {
 					return fmt.Errorf("failed to check for update: %w", checkForUpdateErr)
 				}
-				if !update {
+				if !shouldUpdate {
 					log.Info().Str("policy", name).Str("namespace", deployment.GetNamespace()).Msg("Skipping update of Policy")
 					return nil
 				}
@@ -235,14 +159,14 @@ func updatePolicyUsingAPI(name string, policy *languagev1.Policy) (bool, error) 
 	}
 	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
-		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
-			var update bool
-			update, err = checkForUpdate(name)
+		if status.Code(err) == codes.AlreadyExists {
+			var shouldUpdate bool
+			shouldUpdate, err = checkForUpdate(name)
 			if err != nil {
 				return false, fmt.Errorf("failed to check for update: %w", err)
 			}
 
-			if !update {
+			if !shouldUpdate {
 				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
 				return false, nil
 			}

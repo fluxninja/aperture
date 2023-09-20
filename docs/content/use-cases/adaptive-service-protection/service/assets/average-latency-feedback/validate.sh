@@ -13,8 +13,8 @@ generate_from_values \
 	tmp
 
 # copy the generated policy and graph to this (assets) directory so that they can be used in the docs
-cp tmp/policies/basic-service-protection-cr.yaml policy.yaml
-cp tmp/graphs/basic-service-protection-cr.mmd graph.mmd
+cp tmp/policies/workload-prioritization-cr.yaml policy.yaml
+cp tmp/graphs/workload-prioritization-cr.mmd graph.mmd
 
 # git add the generated policy and graph
 "$git_root"/scripts/git_add_safely.sh policy.yaml graph.mmd

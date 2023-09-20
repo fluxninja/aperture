@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -12,14 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
-	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
-	"github.com/fluxninja/aperture/v2/pkg/metrics"
-	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
-
-	"google.golang.org/grpc/credentials"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -27,13 +20,19 @@ import (
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	tracev1 "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolhttpv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/fluxninja/aperture/v2/cmd/sdk-validator/validator"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
+	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/checkhttp"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/envoy"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -47,7 +46,7 @@ var (
 func init() {
 	logLevel, logLevelSet := os.LookupEnv("LOG_LEVEL")
 	if !logLevelSet {
-		logLevel = log.DebugLevel.String()
+		logLevel = log.TraceLevel.String()
 	}
 	logger = log.NewLogger(log.GetPrettyConsoleWriter(), logLevel)
 	log.SetGlobalLogger(logger)
@@ -271,6 +270,7 @@ func runDockerContainer(image string, port string) (string, error) {
 		}
 		if containerJSON.State != nil {
 			if containerJSON.State.Status == "exited" {
+				printContainerLogs(resp.ID)
 				log.Fatal().Msg("Container exited")
 			}
 			if containerJSON.State.Health != nil {
@@ -282,12 +282,28 @@ func runDockerContainer(image string, port string) (string, error) {
 	}
 }
 
+func printContainerLogs(id string) {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return
+	}
+	// print all container logs
+	out, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	if err != nil {
+		return
+	}
+	_, _ = io.Copy(os.Stdout, out)
+}
+
 func stopDockerContainer(id string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
+
+	printContainerLogs(id)
 
 	err = cli.ContainerStop(ctx, id, container.StopOptions{})
 	if err != nil {
@@ -320,11 +336,11 @@ func confirmConnectedAndStartTraffic(url string, requests int) int {
 
 func startTraffic(url string, requests int) int {
 	rejected := 0
-	superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
-	if err != nil {
-		log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
-	}
 	for i := 0; i < requests; i++ {
+		superReq, err := http.NewRequest(http.MethodGet, url+"/super", nil)
+		if err != nil {
+			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to create http request")
+		}
 		res, err := http.DefaultClient.Do(superReq)
 		if err != nil {
 			log.Error().Err(err).Str("url", superReq.URL.String()).Msg("Failed to make http request")
@@ -332,7 +348,8 @@ func startTraffic(url string, requests int) int {
 		if res.Body != nil {
 			res.Body.Close()
 		}
-		if (res.StatusCode > 400 && res.StatusCode < 500) || (res.StatusCode > 500 && res.StatusCode < 600) {
+		if res.StatusCode >= 400 {
+			log.Trace().Int("status code", res.StatusCode).Msg("Request rejected")
 			rejected += 1
 		}
 	}

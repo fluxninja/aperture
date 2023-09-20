@@ -30,6 +30,7 @@ var (
 	wfqHeapRequestsGauge            prometheus.Gauge
 	wfqAcceptedTokensCounter        prometheus.Counter
 	wfqIncomingTokensCounter        prometheus.Counter
+	requestInQueueDurationSummary  prometheus.Summary
 	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
@@ -65,6 +66,11 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
+	requestInQueueDurationSummary = prometheus.NewSummary(prometheus.SummaryOpts{
+		Name: metrics.RequestInQueueDurationMetricName,
+		Help: "A summary that tracks the duration of requests in queue",
+	})
+	_ = prometheusRegistry.Register(requestInQueueDurationSummary)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
 		Help: "A gauge that tracks the load multiplier",
@@ -95,8 +101,8 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 }
 
 type flowTracker struct {
-	fairnessLabel string // what label it needs
-	tokens        uint64 // how many tokens it needs
+	fairnessLabel string  // what label it needs
+	tokens        float64 // how many tokens it needs
 	priority      float64
 	timeout       time.Duration
 	requestRate   uint64
@@ -108,7 +114,7 @@ type flowTracker struct {
 func (flow *flowTracker) String() string {
 	return fmt.Sprintf("FlowTracker<"+
 		"Flow<FairnessLabel: %s "+
-		"| RequestTokens: %d "+
+		"| RequestTokens: %0.2f "+
 		"| Priority: %f "+
 		"| Timeout: %v "+
 		"| RequestRate: %d "+
@@ -184,7 +190,7 @@ func runRequest(sched Scheduler, wg *sync.WaitGroup, flow *flowTracker) {
 	defer wg.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
 	defer cancel()
-	ok := sched.Schedule(ctx, flow.makeRequest())
+	ok, _, _ := sched.Schedule(ctx, flow.makeRequest())
 	if ok {
 		atomic.AddUint64(&flow.acceptedRequests, 1)
 	}
@@ -208,10 +214,10 @@ func printPrettyFlowTracker(t *testing.T, flows flowTrackers) {
 }
 
 // calculate tokenRate for flowTrackers
-func tokenRate(flows flowTrackers) uint64 {
-	var totalTokenRate uint64
+func tokenRate(flows flowTrackers) float64 {
+	var totalTokenRate float64
 	for _, flow := range flows {
-		totalTokenRate += flow.requestRate * (flow.tokens)
+		totalTokenRate += float64(flow.requestRate) * (flow.tokens)
 	}
 	return totalTokenRate
 }
@@ -240,10 +246,11 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 	manager := NewBasicTokenBucket(c, 0, metrics)
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqHeapRequestsGauge,
-		IncomingTokensCounter: wfqIncomingTokensCounter,
-		AcceptedTokensCounter: wfqAcceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqHeapRequestsGauge,
+		IncomingTokensCounter:         wfqIncomingTokensCounter,
+		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -254,7 +261,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			_, _, _ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
 			cancel()
 		}
 	})
@@ -279,10 +286,11 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	})
 
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqHeapRequestsGauge,
-		IncomingTokensCounter: wfqIncomingTokensCounter,
-		AcceptedTokensCounter: wfqAcceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqHeapRequestsGauge,
+		IncomingTokensCounter:         wfqIncomingTokensCounter,
+		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -291,7 +299,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	for c.Now().Before(startTime.Add(bootstrapTime)) {
 		for _, flow := range flows {
 			ctx, cancel := context.WithTimeout(context.Background(), flow.timeout)
-			_ = sched.Schedule(ctx, flow.makeRequest())
+			_, _, _ = sched.Schedule(ctx, flow.makeRequest())
 			cancel()
 		}
 	}
@@ -306,17 +314,17 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		i := 0
 		for pb.Next() {
 			ctx, cancel := context.WithTimeout(context.Background(), flows[i%len(flows)].timeout)
-			_ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
+			_, _, _ = sched.Schedule(ctx, flows[i%len(flows)].makeRequest())
 			cancel()
 		}
 	})
 }
 
-func totalSentTokens(flows flowTrackers) []uint64 {
-	var total uint64
-	totalTokens := make([]uint64, len(flows))
+func totalSentTokens(flows flowTrackers) []float64 {
+	var total float64
+	totalTokens := make([]float64, len(flows))
 	for i, flow := range flows {
-		totalTokens[i] = flow.totalRequests * flow.tokens
+		totalTokens[i] = float64(flow.totalRequests) * flow.tokens
 		total += totalTokens[i]
 	}
 	return totalTokens
@@ -325,7 +333,7 @@ func totalSentTokens(flows flowTrackers) []uint64 {
 func calculateFillRate(flows flowTrackers, lm float64) float64 {
 	fillRate := float64(0)
 	for _, flow := range flows {
-		fillRate += float64(flow.tokens * flow.requestRate)
+		fillRate += flow.tokens * float64(flow.requestRate)
 	}
 	return fillRate * lm
 }
@@ -341,10 +349,11 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	_, tbMetrics := getMetrics()
 	basicBucket := NewBasicTokenBucket(c, fillRate, tbMetrics)
 	metrics := &WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqHeapRequestsGauge,
-		IncomingTokensCounter: wfqIncomingTokensCounter,
-		AcceptedTokensCounter: wfqAcceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqHeapRequestsGauge,
+		IncomingTokensCounter:         wfqIncomingTokensCounter,
+		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
@@ -355,16 +364,6 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 	flowRunTime := time.Second * 10
 
 	sumPriority := float64(0)
-	priorities := []uint64{}
-	for _, flow := range flows {
-		// if minInvPrio > (math.MaxUint8 - flow.priority) {
-		// 	minInvPrio = math.MaxUint8 - flow.priority
-		// }
-		// if minPrio > flow.priority {
-		// 	minPrio = flow.priority
-		// }
-		priorities = append(priorities, uint64(flow.priority))
-	}
 	adjustedPriority := make([]float64, len(flows))
 	for i, flow := range flows {
 		adjustedPriority[i] = 1 / flow.priority
@@ -388,13 +387,13 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		runFlows(sched, &wg, flows, flowRunTime, c)
 		wg.Wait()
 
-		totalTokens := make([]uint64, len(flows))
-		acceptedTokenSum := uint64(0)
-		acceptedTokens := make([]uint64, len(flows))
+		totalTokens := make([]float64, len(flows))
+		acceptedTokenSum := float64(0)
+		acceptedTokens := make([]float64, len(flows))
 		for i, flow := range flows {
-			acceptedTokens[i] = flow.acceptedRequests * flow.tokens
+			acceptedTokens[i] = float64(flow.acceptedRequests) * flow.tokens
 			acceptedTokenSum += acceptedTokens[i]
-			totalTokens[i] = flow.totalRequests * flow.tokens
+			totalTokens[i] = float64(flow.totalRequests) * flow.tokens
 		}
 		t.Logf("Tokens sent per flow: %v\n", totalTokens)
 		t.Logf("Total accepted tokens per flow after run are: %v\n", acceptedTokens)
@@ -407,7 +406,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 				if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
 					ratio := float64(acceptedTokens[i]) / float64(estimatedTokens[i])
 					if (ratio < 1) && math.Abs(1-ratio) > _testTolerance {
-						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %d, allocatedTokens: %d\n", _testTolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
+						t.Logf("Test failed because of more than %f percent unfairness %f: acceptedTokens: %0.2f, allocatedTokens: %d\n", _testTolerance*100, math.Abs(1-ratio), acceptedTokens[i], estimatedTokens[i])
 						t.Fail()
 					}
 				}
@@ -562,11 +561,11 @@ func TestFairnessWithinPriority(t *testing.T) {
 	baseOfBasicBucketTest(t, flows, calculateFillRate(flows, 0.5), 1)
 
 	for i := 0; i < len(flows); i += 2 {
-		tokensA := flows[i].acceptedRequests * flows[i].tokens
-		tokensB := flows[i+1].acceptedRequests * flows[i+1].tokens
+		tokensA := float64(flows[i].acceptedRequests) * flows[i].tokens
+		tokensB := float64(flows[i+1].acceptedRequests) * flows[i+1].tokens
 		// check fairness within priority levels
 		if math.Abs(1-float64(tokensA)/float64(tokensB)) > _testTolerance {
-			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %d, %d", _testTolerance*100, tokensA, tokensB)
+			t.Logf("Fairness within priority levels is not within %f percent. Accepted tokens: %0.2f, %0.2f", _testTolerance*100, tokensA, tokensB)
 			t.Fail()
 		}
 	}
@@ -593,10 +592,11 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		},
 	}
 	schedMetrics := &WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqHeapRequestsGauge,
-		IncomingTokensCounter: wfqIncomingTokensCounter,
-		AcceptedTokensCounter: wfqAcceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqHeapRequestsGauge,
+		IncomingTokensCounter:         wfqIncomingTokensCounter,
+		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 
 	c := clockwork.NewFakeClock()
@@ -628,15 +628,15 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		runFlows(sched, &wg, flows, flowRunTime, c)
 		wg.Wait()
 
-		totalAcceptedTokens := uint64(0)
-		totalSentToken := uint64(0)
+		totalAcceptedTokens := float64(0)
+		totalSentToken := float64(0)
 		for _, flow := range flows {
-			totalAcceptedTokens += (flow.acceptedRequests * flow.tokens)
-			totalSentToken += (flow.totalRequests * flow.tokens)
+			totalAcceptedTokens += float64(flow.acceptedRequests) * flow.tokens
+			totalSentToken += float64(flow.totalRequests) * flow.tokens
 		}
-		t.Logf("Total tokens sent: %d", totalSentToken)
-		t.Logf("Total tokens accepted: %d", totalAcceptedTokens)
-		totalSentToken = uint64(float64(totalSentToken) * lm)
+		t.Logf("Total tokens sent: %0.2f", totalSentToken)
+		t.Logf("Total tokens accepted: %0.2f", totalAcceptedTokens)
+		totalSentToken = float64(totalSentToken) * lm
 		ratio := float64(totalAcceptedTokens) / float64(totalSentToken)
 
 		if math.Abs(ratio-1) > _testTolerance {

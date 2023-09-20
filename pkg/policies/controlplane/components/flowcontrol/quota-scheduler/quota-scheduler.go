@@ -59,7 +59,6 @@ func NewQuotaSchedulerAndOptions(
 	var configEtcdPaths, decisionEtcdPaths []string
 
 	for _, agentGroup := range agentGroups {
-
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
 		configEtcdPath := path.Join(paths.QuotaSchedulerConfigPath, etcdKey)
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
