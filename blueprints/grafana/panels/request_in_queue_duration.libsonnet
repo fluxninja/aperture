@@ -8,7 +8,7 @@ function(cfg) {
                                           cfg.dashboard.datasource.name,
                                           '(sum by (component_id) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__rate_interval])))/(sum by (component_id) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__rate_interval])))',
                                           stringFilters,
-                                          'Latency',
+                                          'Wait Time',
                                           'ms'),
 
   panel: workloadLatency.panel,

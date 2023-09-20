@@ -151,19 +151,19 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
-func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime float64) (bool, float64, float64) {
+func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
 	if accepted {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
-	sched.metrics.RequestInQueueDurationSummary.Observe((float64(sched.clk.Now().UnixNano()) - startTime) / 1e6)
+	sched.metrics.RequestInQueueDurationSummary.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
 	return accepted, remaining, current
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool, float64, float64) {
-	startTime := float64(sched.clk.Now().UnixNano())
+	startTime := time.Now()
 	if request.Tokens == 0 {
 		return sched.updateMetricsAndReturn(true, 0, 0, request, startTime)
 	}

@@ -30,7 +30,7 @@ var (
 	wfqHeapRequestsGauge            prometheus.Gauge
 	wfqAcceptedTokensCounter        prometheus.Counter
 	wfqIncomingTokensCounter        prometheus.Counter
-	requestInQueueDurationSummmary  prometheus.Summary
+	requestInQueueDurationSummary  prometheus.Summary
 	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
@@ -66,11 +66,11 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
-	requestInQueueDurationSummmary = prometheus.NewSummary(prometheus.SummaryOpts{
+	requestInQueueDurationSummary = prometheus.NewSummary(prometheus.SummaryOpts{
 		Name: metrics.RequestInQueueDurationMetricName,
 		Help: "A summary that tracks the duration of requests in queue",
 	})
-	_ = prometheusRegistry.Register(requestInQueueDurationSummmary)
+	_ = prometheusRegistry.Register(requestInQueueDurationSummary)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
 		Help: "A gauge that tracks the load multiplier",
@@ -250,7 +250,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
-		RequestInQueueDurationSummary: requestInQueueDurationSummmary,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -290,7 +290,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
-		RequestInQueueDurationSummary: requestInQueueDurationSummmary,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics)
 
@@ -353,7 +353,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
-		RequestInQueueDurationSummary: requestInQueueDurationSummmary,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics)
 	var wg sync.WaitGroup
@@ -596,7 +596,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
-		RequestInQueueDurationSummary: requestInQueueDurationSummmary,
+		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 
 	c := clockwork.NewFakeClock()
