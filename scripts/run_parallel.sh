@@ -1,7 +1,7 @@
 #!/bin/bash
 
 declare -a pids=()
-declare -A pid_to_cmd
+declare -a cmds=()
 any_failed=0
 
 run_command() {
@@ -10,20 +10,22 @@ run_command() {
 	eval "$cmd" &
 	local pid=$!
 	pids+=("$pid")
-	pid_to_cmd["$pid"]=$cmd
+	cmds+=("$cmd")
 }
 
 for cmd in "$@"; do
 	run_command "$cmd"
 done
 
+index=0
 for pid in "${pids[@]}"; do
 	wait "$pid"
 	exit_code=$?
 	if [ "$exit_code" -ne 0 ]; then
-		echo "Command failed: ${pid_to_cmd[$pid]}"
+		echo "Command failed: ${cmds[$index]}"
 		any_failed=1
 	fi
+	((index++))
 done
 
 if [ "$any_failed" -eq 1 ]; then
