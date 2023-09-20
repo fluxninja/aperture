@@ -83,6 +83,11 @@ const (
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
+	// Check flow metrics.
+
+	// RequestInQueueDurationMetricName - metric used for grouping durations for requests in queue of Scheduler.
+	RequestInQueueDurationMetricName = "request_in_queue_duration_ms"
+
 	// OTel metrics.
 
 	// RollupMetricName - logs rollup histogram.
