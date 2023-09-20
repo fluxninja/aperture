@@ -1,5 +1,4 @@
 local creator = import 'creator.libsonnet';
-local pgsql = import 'pgsql_dashboard.libsonnet';
 local signals = import 'signals_dashboard.libsonnet';
 
 function(policyJSON, cfg) {
@@ -13,16 +12,9 @@ function(policyJSON, cfg) {
       title: 'Aperture Signals - %s' % policyName,
     },
   }).dashboard,
-  local pgsqlDashboard = pgsql({
-    policy+: {
-      policy_name: policyName,
-    },
-    dashboard+: {
-      title: 'pgsql- %s' % policyName,
-    },
-  }).dashboard,
+  local additionalDashboard = creator(policyJSON, cfg).additionalDashboard,
 
   mainDashboard: mainDashboard,
   signalsDashboard: signalsDashboard,
-  pgsqlDashboard: pgsqlDashboard,
+  additionalDashboard: additionalDashboard,
 }

@@ -16,7 +16,8 @@ function(policyFile, cfg) {
     else std.parseYaml(policyFile),
   local componentsJSON =
     if std.objectHas(policyJSON, 'spec')
-    then policyJSON.spec.circuit.components
+    then
+      policyJSON.spec.circuit.components
     else policyJSON.node.component.components,
 
   // Flow Control Panels
@@ -35,6 +36,17 @@ function(policyFile, cfg) {
     for component in flowControlComponents
   ])),
 
+  local infraMeters = policyJSON.spec.resources.infra_meters,
+
+  local receiverName = std.objectFields(infraMeters)[0],
+  local receiverConfig = infraMeters[receiverName].receivers[receiverName],
+
+  local receiverPanels = std.flattenArrays([
+    if std.objectHas(panelLibrary, std.toString(receiverName))
+    then unwrap(std.toString(receiverName), receiverConfig, config).panel
+    else [],
+  ]),
+
   // Other first-level Panels
   local otherPanels = std.flattenArrays(std.filter(function(x) x != null, [
     if std.objectHas(panelLibrary, std.toString(componentName))
@@ -47,5 +59,9 @@ function(policyFile, cfg) {
   local panels = flowControlPanels + otherPanels,
   local final = dashboard.baseDashboard
                 + g.dashboard.withPanels(panels),
+
+  local receiverDashboard = dashboard.baseDashboard
+                            + g.dashboard.withPanels(receiverPanels),
   dashboard: final,
+  additionalDashboard: receiverDashboard,
 }
