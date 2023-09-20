@@ -6,7 +6,7 @@ run:
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
-  go: "1.20"
+  go: "1.21"
 linters-settings:
   goimports:
     local-prefixes: github.com/fluxninja

@@ -410,10 +410,10 @@ commands:
       - restore_cache:
           name: Restore ASDF cache
           keys:
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{
               checksum "go.mod" }}-{{ checksum "~/installed-tools" }}
-            - aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            - aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
               parameters.cache_name >>-
       - run:
           name: Copy tool-versions in HOME dir
@@ -438,7 +438,7 @@ commands:
       - save_cache:
           name: Save ASDF cache
           key:
-            aperture-asdf-cache-v11-{{ checksum "~/month" }}-<<
+            aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "go.mod" }}-{{ checksum "~/installed-tools" }}
           paths:
