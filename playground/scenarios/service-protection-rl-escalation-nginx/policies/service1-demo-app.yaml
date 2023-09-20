@@ -69,7 +69,7 @@ policy:
                 from: request.http.headers.user-type
 
   service_protection_core:
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
@@ -98,9 +98,6 @@ policy:
                 match_labels:
                   http.request.header.user_type: subscriber
               name: subscriber
-      # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-      # Type: float64
-      load_multiplier_linear_increment: 0.025
 
   latency_baseliner:
     latency_tolerance_multiplier: 1.1

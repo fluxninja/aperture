@@ -63,9 +63,12 @@ func secretForAgentAPIKey(instance *agentv1alpha1.Agent, scheme *runtime.Scheme)
 
 // CreateSecretForAgent calls the Kubernetes API to create the provided Agent Secret resource.
 func CreateSecretForAgent(
-	client client.Client, recorder record.EventRecorder, secret *corev1.Secret, ctx context.Context, instance *agentv1alpha1.Agent) (
-	controllerutil.OperationResult, error,
-) {
+	client client.Client,
+	recorder record.EventRecorder,
+	secret *corev1.Secret,
+	ctx context.Context,
+	instance *agentv1alpha1.Agent,
+) (controllerutil.OperationResult, error) {
 	res, err := controllerutil.CreateOrUpdate(ctx, client, secret, controllers.SecretMutate(secret, secret.Data, secret.OwnerReferences))
 	if err != nil {
 		if errors.IsConflict(err) {

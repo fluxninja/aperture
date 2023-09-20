@@ -344,6 +344,9 @@ message Component {
     // PID Controller is a proportional–integral–derivative controller.
     PIDController pid_controller = 29;
 
+    // Polynomial Range Function is a function that maps a signal to a range of values following a polynomial function.
+    PolynomialRangeFunction polynomial_range_function = 30;
+
     // Query components that are query databases such as Prometheus.
     Query query = 100;
 

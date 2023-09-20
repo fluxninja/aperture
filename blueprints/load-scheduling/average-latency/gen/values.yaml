@@ -8,12 +8,12 @@ policy:
   # Required: True
   policy_name: __REQUIRED_FIELD__
   service_protection_core:
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+    # Parameters for AIMD throttling strategy.
+    # Type: aperture.spec.v1.AIMDLoadSchedulerParameters
     # Required: True
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       alerter:
-        alert_name: "Load Throttling Event"
+        alert_name: "AIMD Load Throttling Event"
       gradient:
         max_gradient: 1
         min_gradient: 0.1

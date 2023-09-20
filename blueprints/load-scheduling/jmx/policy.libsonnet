@@ -6,7 +6,13 @@ local jmxUtils = import './utils.libsonnet';
 local config = blueprint.config;
 
 function(cfg, params={}, metadata={}) {
-  local c = std.mergePatch(config, cfg),
+  local updated_cfg = cfg {
+    policy+: {
+      promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
+      setpoint: 20,
+    },
+  },
+  local c = std.mergePatch(config, updated_cfg),
   local promqlPolicy = promqlFn(c, params, metadata),
 
   policyResource: promqlPolicy.policyResource {

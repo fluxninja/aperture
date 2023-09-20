@@ -1,8 +1,258 @@
 consumes:
     - application/json
 definitions:
+    AIADLoadScheduler:
+        description: |-
+            _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+            During recovery, it increases the token rate linearly until the system is not overloaded.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/AIADLoadSchedulerIns'
+                description: Input ports for the _AIAD Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/AIADLoadSchedulerOuts'
+                description: Output ports for the _AIAD Load Scheduler_.
+            parameters:
+                $ref: '#/definitions/AIADLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _AIAD Load Scheduler_.
+
+                x-go-tag-validate: required
+        type: object
+    AIADLoadSchedulerIns:
+        description: Input ports for the _AIAD Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The setpoint input to the controller.
+
+                x-go-tag-validate: required
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        type: object
+    AIADLoadSchedulerOuts:
+        description: Output ports for the _AIAD Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    AIADLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            load_multiplier_linear_decrement:
+                default: 0.05
+                description: |+
+                    Linear decrement to load multiplier every 10 seconds while the system is
+                    in the overloaded state, up until the `min_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.05"
+                x-go-tag-validate: gte=0
+            load_multiplier_linear_increment:
+                default: 0.025
+                description: |+
+                    Linear increment to load multiplier every 10 seconds while the system is
+                    not in the overloaded state, up until the `max_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.025"
+                x-go-tag-validate: gte=0
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            max_load_multiplier:
+                default: 2
+                description: |+
+                    The maximum load multiplier that can be reached during recovery from an overload state.
+                    - Helps protect the service from request bursts while the system is still recovering.
+                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "2.0"
+                x-go-tag-validate: gte=0
+            min_load_multiplier:
+                default: 0
+                description: |+
+                    The minimum load multiplier that can be reached during an overload state.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.0"
+                x-go-tag-validate: gte=0
+            overload_condition:
+                default: gt
+                enum:
+                    - gt
+                    - lt
+                    - gte
+                    - lte
+                title: |-
+                    Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+                    <!-- vale off -->
+                    - "gt": greater than
+                    - "lt": less than
+                    - "gte": greater than or equal to
+                    - "lte": less than or equal to
+                    <!-- vale on -->
+                type: string
+                x-go-tag-default: gt
+                x-go-tag-validate: required,oneof=gt lt gte lte
+                x-oneof: gt | lt | gte | lte
+        required:
+            - overload_condition
+        type: object
+    AIMDLoadScheduler:
+        description: |-
+            _AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
+            It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+            During recovery, it increases the token rate linearly until the system is not overloaded.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/AIMDLoadSchedulerIns'
+                description: Input ports for the _AIMD Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/AIMDLoadSchedulerOuts'
+                description: Output ports for the _AIMD Load Scheduler_.
+            parameters:
+                $ref: '#/definitions/AIMDLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _AIMD Load Scheduler_.
+
+                x-go-tag-validate: required
+        type: object
+    AIMDLoadSchedulerIns:
+        description: Input ports for the _AIMD Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The setpoint input to the controller.
+
+                x-go-tag-validate: required
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        type: object
+    AIMDLoadSchedulerOuts:
+        description: Output ports for the _AIMD Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    AIMDLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            gradient:
+                $ref: '#/definitions/GradientControllerParameters'
+                description: |+
+                    Parameters for the Gradient Controller.
+
+                x-go-tag-validate: required
+            load_multiplier_linear_increment:
+                default: 0.025
+                description: |+
+                    Linear increment to load multiplier every 10 seconds while the system is
+                    not in the overloaded state, up until the `max_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.025"
+                x-go-tag-validate: gte=0
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            max_load_multiplier:
+                default: 2
+                description: |+
+                    The maximum load multiplier that can be reached during recovery from an overload state.
+                    - Helps protect the service from request bursts while the system is still recovering.
+                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
+
+                exclusiveMinimum: true
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "2.0"
+                x-go-tag-validate: gt=0
+        type: object
     AdaptiveLoadScheduler:
-        description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+        description: |-
+            The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+            Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
         properties:
             dry_run:
                 description: |-
@@ -879,6 +1129,9 @@ definitions:
             pid_controller:
                 $ref: '#/definitions/PIDController'
                 description: PID Controller is a proportional–integral–derivative controller.
+            polynomial_range_function:
+                $ref: '#/definitions/PolynomialRangeFunction'
+                description: Polynomial Range Function is a function that maps a signal to a range of values following a polynomial function.
             pulse_generator:
                 $ref: '#/definitions/PulseGenerator'
                 description: Generates 0 and 1 in turns.
@@ -1391,7 +1644,13 @@ definitions:
         properties:
             adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
-                description: _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+                description: _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+            aiad_load_scheduler:
+                $ref: '#/definitions/AIADLoadScheduler'
+                description: AIAD Load Scheduler.
+            aimd_load_scheduler:
+                $ref: '#/definitions/AIMDLoadScheduler'
+                description: AIMD Load Scheduler.
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
@@ -1400,6 +1659,9 @@ definitions:
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
             quota_scheduler:
                 $ref: '#/definitions/QuotaScheduler'
+            range_driven_load_scheduler:
+                $ref: '#/definitions/RangeDrivenLoadScheduler'
+                description: Range Driven Load Scheduler.
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
                 description: _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
@@ -3086,6 +3348,74 @@ definitions:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
         type: object
+    PolynomialRangeFunction:
+        description: |-
+            Curve Types by Degree:
+            - Degree 1: Linear
+            - Degree 2: Quadratic
+            - Degree 3: Cubic
+            - and so on.
+        properties:
+            in_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionIns'
+            out_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionOuts'
+            parameters:
+                $ref: '#/definitions/PolynomialRangeFunctionParameters'
+                x-go-tag-validate: required
+        type: object
+    PolynomialRangeFunctionIns:
+        properties:
+            input:
+                $ref: '#/definitions/InPort'
+                description: The input signal.
+        type: object
+    PolynomialRangeFunctionOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: The output signal.
+        type: object
+    PolynomialRangeFunctionParameters:
+        properties:
+            clamp_to_custom_values:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersClampToCustomValues'
+                title: Clamp to custom values
+            clamp_to_datapoint:
+                title: Clamp to the nearest data-point
+                type: boolean
+            continue_curve:
+                title: Continue polynomial curve
+                type: boolean
+            degree:
+                format: double
+                title: Degree of the polynomial
+                type: number
+            end:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Ending data-point for the range function
+            start:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Starting data-point for the range function
+        type: object
+    PolynomialRangeFunctionParametersClampToCustomValues:
+        properties:
+            post_end:
+                format: double
+                type: number
+            pre_start:
+                format: double
+                type: number
+        type: object
+    PolynomialRangeFunctionParametersDatapoint:
+        properties:
+            input:
+                format: double
+                type: number
+            output:
+                format: double
+                type: number
+        type: object
     PreviewFlowLabelsControllerResponse:
         properties:
             response:
@@ -3249,6 +3579,104 @@ definitions:
                 x-go-tag-validate: required,gt=0,dive
         required:
             - selectors
+        type: object
+    RangeDrivenLoadScheduler:
+        description: _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerIns'
+                description: Input ports for the _Range Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerOuts'
+                description: Output ports for the _Range Load Scheduler_.
+            parameters:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Range Load Scheduler_.
+
+                x-go-tag-validate: required
+        type: object
+    RangeDrivenLoadSchedulerDatapoint:
+        properties:
+            load_multiplier:
+                format: double
+                maximum: 1
+                minimum: 0
+                type: number
+                x-go-tag-validate: gte=0,lte=1
+            signal_value:
+                format: double
+                type: number
+        type: object
+    RangeDrivenLoadSchedulerIns:
+        description: Input ports for the _Range Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        type: object
+    RangeDrivenLoadSchedulerOuts:
+        description: Output ports for the _Range Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    RangeDrivenLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            degree:
+                format: double
+                title: |-
+                    Degree determines shape of the throttling curve.
+                    degree=1: linear
+                    degree=2: quadratic
+                    degree=3: cubic
+                type: number
+                x-go-tag-validate: required
+            high_throttle_threshold:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
+                title: Ending data-point of the throttling range
+                x-go-tag-validate: required
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            low_throttle_threshold:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
+                title: Starting data-point of the throttling range
+                x-go-tag-validate: required
+        required:
+            - degree
         type: object
     RateLimiter:
         description: |-

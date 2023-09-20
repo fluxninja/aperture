@@ -8,7 +8,7 @@ spec:
   circuit:
     components:
     - flow_control:
-        adaptive_load_scheduler:
+        aimd_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
@@ -26,7 +26,7 @@ spec:
               signal_name: OBSERVED_LOAD_MULTIPLIER
           parameters:
             alerter:
-              alert_name: Load Throttling Event
+              alert_name: AIMD Load Throttling Event
             gradient:
               max_gradient: 1
               min_gradient: 0.1

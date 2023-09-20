@@ -96,6 +96,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	case *policylangv1.Component_NestedCircuit:
 		return NewNestedCircuitAndOptions(config.NestedCircuit, componentID, policyReadAPI)
+	case *policylangv1.Component_PolynomialRangeFunction:
+		ctor = mkCtor(config.PolynomialRangeFunction, components.NewPolynomialRangeFunctionAndOptions)
 	case *policylangv1.Component_Query:
 		query := componentProto.GetQuery()
 		switch queryConfig := query.Component.(type) {
@@ -124,7 +126,6 @@ func NewComponentAndOptions(
 				log.Error().Err(err).Msg("unknown flow control type")
 				return Tree{}, nil, nil, err
 			}
-
 		default:
 			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}

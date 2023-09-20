@@ -8,8 +8,8 @@
           "subdir": ""
         }
       },
-      "version": "7cc2479f21b09a32a86f7128524919f27e90b26b",
-      "sum": "Q8UbL16Hro5GMONfbW5UyrupHTzmOWSK8PZ0xa6OvHM="
+      "version": "bd08bf5f0ffc156bd755b916367bceb7fbe3de03",
+      "sum": "ZYc3KrgzQIciDlQ786i2iHeqEZqjnB8KlPiX6w8Mp38="
     },
     {
       "source": {
@@ -78,7 +78,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "c0abc546c782a095a22c277d36f871bb94ffc944",
+      "version": "df12ee6a2559c1eaec8ff94a190162939beec698",
       "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
@@ -88,8 +88,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "7c865ec0606f2b68c0f6b2721f101e6a99cd2593",
-      "sum": "zjjufxN4yAIevldYEERiZEp27vK0BJKj1VvZcVtWiOo="
+      "version": "cc9df63eaca56f39e8e4e1ce192141333257b08d",
+      "sum": "f6smzUo/9K2+iOLpDEbKPiU+W1eWjpIQo6drXu6kJ7U="
     },
     {
       "source": {

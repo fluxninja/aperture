@@ -1,12 +1,7 @@
-local promqlDefaults = import '../promql/config.libsonnet';
+local serviceProtectionDefaults = import '../common-aiad/config-defaults.libsonnet';
 
-promqlDefaults {
+serviceProtectionDefaults {
   policy+: {
-    /**
-    * @param (policy.promql_query: string) PromQL query to detect ElasticSearch overload.
-    */
-    promql_query: 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))',
-
     /**
     * @param (policy.elasticsearch: elasticsearch) Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
     * @schema (elasticsearch.username: string) Username of the Elasticsearch.

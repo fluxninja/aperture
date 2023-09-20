@@ -4251,6 +4251,195 @@ var _ interface {
 	ErrorName() string
 } = PIDControllerValidationError{}
 
+// Validate checks the field values on PolynomialRangeFunction with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PolynomialRangeFunction with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunctionMultiError, or nil if none found.
+func (m *PolynomialRangeFunction) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunctionValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunctionValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetParameters()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunctionValidationError{
+					field:  "Parameters",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunctionValidationError{
+				field:  "Parameters",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunctionMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunctionMultiError is an error wrapping multiple validation
+// errors returned by PolynomialRangeFunction.ValidateAll() if the designated
+// constraints aren't met.
+type PolynomialRangeFunctionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunctionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunctionMultiError) AllErrors() []error { return m }
+
+// PolynomialRangeFunctionValidationError is the validation error returned by
+// PolynomialRangeFunction.Validate if the designated constraints aren't met.
+type PolynomialRangeFunctionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunctionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunctionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunctionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PolynomialRangeFunctionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunctionValidationError) ErrorName() string {
+	return "PolynomialRangeFunctionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunctionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunctionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunctionValidationError{}
+
 // Validate checks the field values on GradientController_Parameters with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -11676,3 +11865,735 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PIDController_OutsValidationError{}
+
+// Validate checks the field values on PolynomialRangeFunction_Parameters with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *PolynomialRangeFunction_Parameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PolynomialRangeFunction_Parameters
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunction_ParametersMultiError, or nil if none found.
+func (m *PolynomialRangeFunction_Parameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Parameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetStart()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+					field:  "Start",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+					field:  "Start",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStart()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunction_ParametersValidationError{
+				field:  "Start",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetEnd()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+					field:  "End",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+					field:  "End",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEnd()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunction_ParametersValidationError{
+				field:  "End",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Degree
+
+	switch v := m.OutsideRange.(type) {
+	case *PolynomialRangeFunction_Parameters_ClampToDatapoint:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for ClampToDatapoint
+	case *PolynomialRangeFunction_Parameters_ClampToCustomValues_:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClampToCustomValues()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+						field:  "ClampToCustomValues",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, PolynomialRangeFunction_ParametersValidationError{
+						field:  "ClampToCustomValues",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClampToCustomValues()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PolynomialRangeFunction_ParametersValidationError{
+					field:  "ClampToCustomValues",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *PolynomialRangeFunction_Parameters_ContinueCurve:
+		if v == nil {
+			err := PolynomialRangeFunction_ParametersValidationError{
+				field:  "OutsideRange",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for ContinueCurve
+	default:
+		_ = v // ensures v is used
+	}
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_ParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_ParametersMultiError is an error wrapping multiple
+// validation errors returned by
+// PolynomialRangeFunction_Parameters.ValidateAll() if the designated
+// constraints aren't met.
+type PolynomialRangeFunction_ParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_ParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_ParametersMultiError) AllErrors() []error { return m }
+
+// PolynomialRangeFunction_ParametersValidationError is the validation error
+// returned by PolynomialRangeFunction_Parameters.Validate if the designated
+// constraints aren't met.
+type PolynomialRangeFunction_ParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_ParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_ParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_ParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_ParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_ParametersValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_ParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_ParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Parameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_ParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_ParametersValidationError{}
+
+// Validate checks the field values on PolynomialRangeFunction_Ins with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction_Ins) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PolynomialRangeFunction_Ins with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunction_InsMultiError, or nil if none found.
+func (m *PolynomialRangeFunction_Ins) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Ins) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_InsValidationError{
+					field:  "Input",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_InsValidationError{
+					field:  "Input",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunction_InsValidationError{
+				field:  "Input",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_InsMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_InsMultiError is an error wrapping multiple
+// validation errors returned by PolynomialRangeFunction_Ins.ValidateAll() if
+// the designated constraints aren't met.
+type PolynomialRangeFunction_InsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_InsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_InsMultiError) AllErrors() []error { return m }
+
+// PolynomialRangeFunction_InsValidationError is the validation error returned
+// by PolynomialRangeFunction_Ins.Validate if the designated constraints
+// aren't met.
+type PolynomialRangeFunction_InsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_InsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_InsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_InsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_InsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_InsValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_InsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_InsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Ins.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_InsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_InsValidationError{}
+
+// Validate checks the field values on PolynomialRangeFunction_Outs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PolynomialRangeFunction_Outs with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunction_OutsMultiError, or nil if none found.
+func (m *PolynomialRangeFunction_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetOutput()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PolynomialRangeFunction_OutsValidationError{
+					field:  "Output",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutput()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolynomialRangeFunction_OutsValidationError{
+				field:  "Output",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_OutsMultiError is an error wrapping multiple
+// validation errors returned by PolynomialRangeFunction_Outs.ValidateAll() if
+// the designated constraints aren't met.
+type PolynomialRangeFunction_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_OutsMultiError) AllErrors() []error { return m }
+
+// PolynomialRangeFunction_OutsValidationError is the validation error returned
+// by PolynomialRangeFunction_Outs.Validate if the designated constraints
+// aren't met.
+type PolynomialRangeFunction_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_OutsValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_OutsValidationError{}
+
+// Validate checks the field values on
+// PolynomialRangeFunction_Parameters_Datapoint with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction_Parameters_Datapoint) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// PolynomialRangeFunction_Parameters_Datapoint with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// PolynomialRangeFunction_Parameters_DatapointMultiError, or nil if none found.
+func (m *PolynomialRangeFunction_Parameters_Datapoint) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Parameters_Datapoint) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Input
+
+	// no validation rules for Output
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_Parameters_DatapointMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_Parameters_DatapointMultiError is an error wrapping
+// multiple validation errors returned by
+// PolynomialRangeFunction_Parameters_Datapoint.ValidateAll() if the
+// designated constraints aren't met.
+type PolynomialRangeFunction_Parameters_DatapointMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_Parameters_DatapointMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_Parameters_DatapointMultiError) AllErrors() []error { return m }
+
+// PolynomialRangeFunction_Parameters_DatapointValidationError is the
+// validation error returned by
+// PolynomialRangeFunction_Parameters_Datapoint.Validate if the designated
+// constraints aren't met.
+type PolynomialRangeFunction_Parameters_DatapointValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_Parameters_DatapointValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_Parameters_DatapointValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Parameters_Datapoint.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_Parameters_DatapointValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_Parameters_DatapointValidationError{}
+
+// Validate checks the field values on
+// PolynomialRangeFunction_Parameters_ClampToCustomValues with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// PolynomialRangeFunction_Parameters_ClampToCustomValues with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError, or nil if
+// none found.
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PolynomialRangeFunction_Parameters_ClampToCustomValues) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PreStart
+
+	// no validation rules for PostEnd
+
+	if len(errors) > 0 {
+		return PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError(errors)
+	}
+
+	return nil
+}
+
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError is an error
+// wrapping multiple validation errors returned by
+// PolynomialRangeFunction_Parameters_ClampToCustomValues.ValidateAll() if the
+// designated constraints aren't met.
+type PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PolynomialRangeFunction_Parameters_ClampToCustomValuesMultiError) AllErrors() []error {
+	return m
+}
+
+// PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError is the
+// validation error returned by
+// PolynomialRangeFunction_Parameters_ClampToCustomValues.Validate if the
+// designated constraints aren't met.
+type PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) ErrorName() string {
+	return "PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPolynomialRangeFunction_Parameters_ClampToCustomValues.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PolynomialRangeFunction_Parameters_ClampToCustomValuesValidationError{}
