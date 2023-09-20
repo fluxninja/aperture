@@ -16,6 +16,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	googletoken "github.com/fluxninja/aperture/v2/pkg/google"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -183,20 +184,25 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 }
 
 func (factory *PolicyFactory) trackPolicy(wrapperMessage *policysyncv1.PolicyWrapper, lifecycle fx.Lifecycle) {
+	policyName := wrapperMessage.GetCommonAttributes().GetPolicyName()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			factory.lock.Lock()
 			defer factory.lock.Unlock()
-			factory.policyTracker[wrapperMessage.GetCommonAttributes().GetPolicyName()] = wrapperMessage
+			factory.policyTracker[policyName] = wrapperMessage
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			factory.lock.Lock()
 			defer factory.lock.Unlock()
-			delete(factory.policyTracker, wrapperMessage.GetCommonAttributes().GetPolicyName())
+			delete(factory.policyTracker, policyName)
 			return nil
 		},
 	})
+	lifecycle.Append(fx.StartStopHook(
+		func() { log.Info().Str("policy", policyName).Msg("Policy loaded to controller") },
+		func() { log.Info().Str("policy", policyName).Msg("Unloading policy from controller") },
+	))
 }
 
 // GetPolicyWrappers returns all policy wrappers.

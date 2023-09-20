@@ -21,7 +21,6 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
@@ -31,7 +30,6 @@ import (
 type PolicyService struct {
 	policylangv1.UnimplementedPolicyServiceServer
 	policyFactory *PolicyFactory
-	etcdWriter    *etcdwriter.Writer
 	etcdClient    *etcdclient.Client
 }
 
@@ -50,19 +48,6 @@ func RegisterPolicyService(in RegisterPolicyServiceIn) *PolicyService {
 		policyFactory: in.PolicyFactory,
 		etcdClient:    in.ETCDClient,
 	}
-
-	in.Lifecycle.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			svc.etcdWriter = etcdwriter.NewWriter(&in.ETCDClient.KVWrapper)
-			return nil
-		},
-		OnStop: func(context.Context) error {
-			if svc.etcdWriter != nil {
-				return svc.etcdWriter.Close()
-			}
-			return nil
-		},
-	})
 
 	policylangv1.RegisterPolicyServiceServer(in.Server, svc)
 	return svc
@@ -262,6 +247,13 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	if err != nil {
 		return nil, err
 	}
+
+	if len(etcdPolicy.Kvs) > 0 {
+		log.Info().Str("policy", req.PolicyName).Msg("Policy updated in etcd")
+	} else {
+		log.Info().Str("policy", req.PolicyName).Msg("Policy created in etcd")
+	}
+
 	return new(emptypb.Empty), nil
 }
 
@@ -285,8 +277,11 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 		return nil, fmt.Errorf("failed to marshal dynamic config '%s': '%s'", req.PolicyName, err)
 	}
 
-	// FIXME use a transaction so that it's not possible to post dynamic config to non-existed policy.
-	_, err = s.etcdClient.Client.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
+	// FIXME use a transaction so that it's not possible to post dynamic config
+	// to non-existing policy.
+	// Note: Right now we allow setting dynamic config for k8s-managed policy.
+	// Do we want to continue supporting that?
+	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
 	if err != nil {
 		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
 	}
@@ -296,8 +291,22 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
-	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIConfigPath, policy.Name))
-	s.etcdWriter.Delete(path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
+	resp, err := s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIConfigPath, policy.Name))
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Deleted > 0 {
+		log.Info().Str("policy", policy.Name).Msg("Policy removed from etcd")
+	}
+	// FIXME: If Deleted==0 we should return NotFound, but first we need to ensure
+	// that the delete activity in cloud handles such status correctly.
+
+	_, err = s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
+	if err != nil {
+		return nil, err
+	}
+
 	return &emptypb.Empty{}, nil
 }
 
