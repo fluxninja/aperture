@@ -48,6 +48,8 @@ var (
 	SamplerConfigPath = path.Join(ConfigPrefix, "sampler")
 	// SamplerDecisionsPath is decision path in etcd for sampler decisions.
 	SamplerDecisionsPath = path.Join(DecisionsPrefix, "sampler")
+	// RPC registration path prefix
+	RPCRegistrationPathPrefix = path.Join("/rpc/agents/registration")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.
@@ -78,4 +80,14 @@ func InfraMeterKey(agentGroupName, policyName, infraMeterName string) string {
 // ClassifierKey returns the identifier for a Classifier in etcd.
 func ClassifierKey(agentGroupName, policyName string, classifierIndex int) string {
 	return PolicyPrefix(agentGroupName, policyName) + "-classifier_index-" + strconv.Itoa(classifierIndex)
+}
+
+// RPC requests in etcd
+func RPCRequestsPath(agentName string) string {
+	return path.Join("/rpc/agents/requests", agentName)
+}
+
+// RPC requests in etcd
+func RPCResponsesPath(agentName string) string {
+	return path.Join("/rpc/agents/responses", agentName)
 }

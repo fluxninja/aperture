@@ -7,14 +7,22 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 
 	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+)
+
+const (
+	rpcEtcWatcher = "rpc-etcd-watcher"
 )
 
 // ServerModule are components needed for server-side of rpc.
 var ServerModule = fx.Options(
 	fx.Provide(NewClients),
-	fx.Provide(NewStreamServer),
-	fx.Invoke(RegisterStreamServer),
+	etcdwatcher.Constructor{
+		Name: rpcEtcWatcher,
+	}.Annotate(),
+	fx.Provide(NewEtcdServer),
+	fx.Invoke(RegisterEtcdServer),
 )
 
 // ClientModule are components needed for client-side of rpc

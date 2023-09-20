@@ -5,10 +5,18 @@ import (
 
 	afconfig "github.com/fluxninja/aperture/v2/pkg/agent-functions/config"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	etcd "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/rpc"
+)
+
+const (
+	rpcEtcdWatcher = "rpc-etcd-watcher"
 )
 
 // Module provides rpc client for agent functions.
@@ -22,6 +30,9 @@ var Module = fx.Options(
 		NewFlowControlControlPointsHandler,
 		ProvidePreviewHandler,
 	),
+	etcdwatcher.Constructor{
+		Name: rpcEtcdWatcher,
+	}.Annotate(),
 	fx.Invoke(
 		RegisterClient,
 		RegisterControlPointsHandler,
@@ -35,6 +46,8 @@ type RegisterClientIn struct {
 	Lc           fx.Lifecycle
 	Unmarshaller config.Unmarshaller
 	Handlers     *rpc.HandlerRegistry
+	EtcdWatcher  notifiers.Watcher
+	EtcdClient   *etcdclient.Client
 	ConnBuilder  grpcclient.ClientConnectionBuilder `name:"agent-functions"`
 }
 
@@ -45,8 +58,10 @@ func RegisterClient(in RegisterClientIn) error {
 		return err
 	}
 
+	etcdWriter := *etcd.NewWriter(&in.EtcdClient.KVWrapper)
+
 	for _, addr := range config.Endpoints {
-		rpc.RegisterStreamClient(info.UUID, in.Lc, in.Handlers, in.ConnBuilder.Build(), addr)
+		rpc.RegisterEtcdClient(info.UUID, in.Lc, in.Handlers, in.EtcdWatcher, etcdWriter, addr)
 		log.Info().Msgf("Rpc client started, server: %s", addr)
 	}
 
