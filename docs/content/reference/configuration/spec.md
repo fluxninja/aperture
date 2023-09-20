@@ -307,10 +307,13 @@ Overload condition determines the criteria to determine overload state. The
 default condition is "gt", that is, when the signal is greater than the
 setpoint. The condition must be one of:
 
+<!-- vale on -->
+
 - "gt": greater than
 - "lt": less than
 - "gte": greater than or equal to
 - "lte": less than or equal to
+<!-- vale off -->
 
 </dd>
 </dl>

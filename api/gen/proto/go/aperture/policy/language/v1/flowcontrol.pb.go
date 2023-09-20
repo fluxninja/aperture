@@ -3477,10 +3477,12 @@ type AIADLoadScheduler_Parameters struct {
 	// not in the overloaded state, up until the `max_load_multiplier` is reached.
 	LoadMultiplierLinearIncrement float64 `protobuf:"fixed64,5,opt,name=load_multiplier_linear_increment,json=loadMultiplierLinearIncrement,proto3" json:"load_multiplier_linear_increment,omitempty" default:"0.025" validate:"gte=0"` // @gotags: default:"0.025" validate:"gte=0"
 	// Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+	// <!-- vale on -->
 	// - "gt": greater than
 	// - "lt": less than
 	// - "gte": greater than or equal to
 	// - "lte": less than or equal to
+	// <!-- vale off -->
 	OverloadCondition string `protobuf:"bytes,6,opt,name=overload_condition,json=overloadCondition,proto3" json:"overload_condition,omitempty" default:"gt" validate:"required,oneof=gt lt gte lte"` // @gotags: default:"gt" validate:"required,oneof=gt lt gte lte"
 	// Configuration parameters for the embedded Alerter.
 	Alerter *Alerter_Parameters `protobuf:"bytes,7,opt,name=alerter,proto3" json:"alerter,omitempty" validate:"required"` // @gotags: validate:"required"

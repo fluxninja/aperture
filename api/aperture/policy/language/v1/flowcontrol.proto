@@ -497,10 +497,12 @@ message AIADLoadScheduler {
     double load_multiplier_linear_increment = 5; // @gotags: default:"0.025" validate:"gte=0"
 
     // Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+    // <!-- vale on -->
     // - "gt": greater than
     // - "lt": less than
     // - "gte": greater than or equal to
     // - "lte": less than or equal to
+    // <!-- vale off -->
     string overload_condition = 6; // @gotags: default:"gt" validate:"required,oneof=gt lt gte lte"
 
     // Configuration parameters for the embedded Alerter.
