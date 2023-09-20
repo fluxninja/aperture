@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"errors"
 	"path"
 	"strconv"
 	"sync"
@@ -24,15 +25,14 @@ import (
 
 // EtcdClient is a client part of "etcd" transport
 type EtcdClient struct {
-	clientName        string
-	handlers          *HandlerRegistry
-	dispatcher        *Dispatcher
-	coordinatorClient rpcv1.CoordinatorClient
-	etcdWatcher       notifiers.Watcher
-	etcdWriter        etcd.Writer
-	ctx               context.Context
-	cancel            context.CancelFunc
-	wg                sync.WaitGroup
+	clientName  string
+	handlers    *HandlerRegistry
+	dispatcher  *Dispatcher
+	etcdWatcher notifiers.Watcher
+	etcdWriter  etcd.Writer
+	ctx         context.Context
+	cancel      context.CancelFunc
+	wg          sync.WaitGroup
 }
 
 // RegisterEtcdClient is an FX helper to connect new EtcdClient to a given addr.
@@ -54,6 +54,9 @@ func RegisterEtcdClient(
 				etcdWatcher,
 				etcdWriter,
 			)
+			if client == nil {
+				return errors.New("failed to create new EtcdClient")
+			}
 			helloMsg := &rpcv1.ClientToServer{
 				Msg: &rpcv1.ClientToServer_Hello_{
 					Hello: &rpcv1.ClientToServer_Hello{
@@ -71,9 +74,8 @@ func RegisterEtcdClient(
 			client.etcdWriter.Write(path.Join(paths.RPCRegistrationPathPrefix, client.clientName), marshalledHello)
 
 			client.dispatcher = client.handlers.StartDispatcher()
-			defer client.dispatcher.Stop()
-
 			client.Start()
+			defer client.dispatcher.Stop()
 
 			return nil
 		},
@@ -99,7 +101,7 @@ func NewEtcdClient(
 	}
 }
 
-// Start starts the StreamClient.
+// Start starts the etcd based rpc client
 func (c *EtcdClient) Start() {
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 	c.wg.Add(1)
@@ -283,7 +285,7 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 
 				s.etcdWriter.Write(path.Join(paths.RPCRequestsPath(hello.Hello.Name), strconv.FormatUint(serverToClient.GetRequest().Id, 10)), marshalledReq)
 
-			case err := <-clientDisconnected:
+			case err = <-clientDisconnected:
 				log.Bug().Err(err)
 				return
 			}
@@ -304,6 +306,7 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 	}
 }
 
+// Start starts the etcd based rpc server
 func (s *EtcdServer) Start() error {
 	notifier, err := notifiers.NewUnmarshalPrefixNotifier(
 		paths.RPCRegistrationPathPrefix,
@@ -314,7 +317,9 @@ func (s *EtcdServer) Start() error {
 		return err
 	}
 
-	s.etcdWatcher.AddPrefixNotifier(notifier)
+	if err = s.etcdWatcher.AddPrefixNotifier(notifier); err != nil {
+		return err
+	}
 
 	return nil
 }
