@@ -36,7 +36,10 @@ function(policyFile, cfg) {
     for component in flowControlComponents
   ])),
 
-  local infraMeters = policyJSON.spec.resources.infra_meters,
+  local infraMeters =
+    if std.objectHas(policyJSON.spec.resources, 'infra_meters')
+    then policyJSON.spec.resources.infra_meters
+    else {},
 
   local receiverName = std.objectFields(infraMeters)[0],
   local receiverConfig = infraMeters[receiverName].receivers[receiverName],
