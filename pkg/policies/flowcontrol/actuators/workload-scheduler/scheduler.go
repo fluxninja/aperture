@@ -46,6 +46,8 @@ type Factory struct {
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
 
+	requestInQueueDurationSummaryVec *prometheus.SummaryVec
+
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
 }
@@ -90,6 +92,10 @@ func newFactory(
 		},
 		MetricLabelKeys,
 	)
+	wsFactory.requestInQueueDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.RequestInQueueDurationMetricName,
+		Help: "Duration of requests scheduled in Queue",
+	}, MetricLabelKeys)
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -141,6 +147,10 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(wsFactory.requestInQueueDurationSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 
 			return merr
 		},
@@ -169,6 +179,10 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadCounterVec) {
 				err := fmt.Errorf("failed to unregister workload_counter metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.requestInQueueDurationSummaryVec) {
+				err := fmt.Errorf("failed to unregister request_in_queue_duration_ms metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -230,11 +244,17 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, err
 	}
 
+	flowDurationSummmary, err := wsFactory.requestInQueueDurationSummaryVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, fmt.Errorf("%w: failed to get flow duration summary", err)
+	}
+
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqRequestsGauge,
-		IncomingTokensCounter: incomingTokensCounter,
-		AcceptedTokensCounter: acceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqRequestsGauge,
+		IncomingTokensCounter:         incomingTokensCounter,
+		AcceptedTokensCounter:         acceptedTokensCounter,
+		RequestInQueueDurationSummary: flowDurationSummmary,
 	}
 
 	return &SchedulerMetrics{
@@ -272,6 +292,10 @@ func (metrics *SchedulerMetrics) Delete() error {
 	deletedCount = metrics.wsFactory.workloadCounterVec.DeletePartialMatch(metrics.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
+	}
+	deletedCount = metrics.wsFactory.requestInQueueDurationSummaryVec.DeletePartialMatch(metrics.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete request_in_queue_duration_ms summary from its metric vector. No traffic to generate metrics?")
 	}
 	return merr
 }
