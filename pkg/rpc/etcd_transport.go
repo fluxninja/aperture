@@ -9,7 +9,6 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"go.uber.org/fx"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -46,14 +45,12 @@ func RegisterEtcdClient(
 	addr string,
 ) {
 	var client *EtcdClient
-	var conn *grpc.ClientConn
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 
 			client = NewEtcdClient(
 				clientName,
 				handlers,
-				rpcv1.NewCoordinatorClient(conn),
 				etcdWatcher,
 				etcdWriter,
 			)
@@ -82,7 +79,6 @@ func RegisterEtcdClient(
 		},
 		OnStop: func(ctx context.Context) error {
 			client.Stop()
-			conn.Close()
 			return nil
 		},
 	})
@@ -92,16 +88,14 @@ func RegisterEtcdClient(
 func NewEtcdClient(
 	name string,
 	handlers *HandlerRegistry,
-	client rpcv1.CoordinatorClient,
 	etcdWatcher notifiers.Watcher,
 	etcdWriter etcd.Writer,
 ) *EtcdClient {
 	return &EtcdClient{
-		clientName:        name,
-		handlers:          handlers,
-		coordinatorClient: client,
-		etcdWatcher:       etcdWatcher,
-		etcdWriter:        etcdWriter,
+		clientName:  name,
+		handlers:    handlers,
+		etcdWatcher: etcdWatcher,
+		etcdWriter:  etcdWriter,
 	}
 }
 
@@ -194,7 +188,7 @@ type EtcdServer struct {
 	etcdWriter  etcd.Writer
 }
 
-// RegisterEtcdClient is an FX helper to connect new EtcdClient to a given addr.
+// RegisterEtcdServer is an FX helper to connect new EtcdClient to a given addr.
 func RegisterEtcdServer(
 	lc fx.Lifecycle,
 	etcdWatcher notifiers.Watcher,
@@ -257,7 +251,7 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 		}
 
 		var msg rpcv1.ClientToServer
-		err := unmarshaller.Unmarshal(&msg)
+		err = unmarshaller.Unmarshal(&msg)
 		if err != nil {
 			return
 		}
