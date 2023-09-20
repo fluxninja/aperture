@@ -21,7 +21,10 @@ function generate_policies() {
 	scenario_dir=$(dirname "$scenario")
 	rm -rf "$scenario_dir"/**/*-cr.yaml
 	metadata_file="$scenario_dir"/metadata.json
-	readarray -t policies < <(jq --compact-output '.aperture_policies[]' "$metadata_file")
+	declare -a policies
+	while IFS= read -r policy; do
+		policies+=("$policy")
+	done < <(jq --compact-output '.aperture_policies[]' "$metadata_file")
 	for policy in "${policies[@]}"; do
 		policy_name=$(jq --raw-output '.policy_name' <<<"$policy")
 		blueprint_name=$(jq --raw-output '.blueprint_name' <<<"$policy")
