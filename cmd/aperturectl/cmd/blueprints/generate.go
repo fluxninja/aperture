@@ -150,7 +150,7 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 
 		// change log.Error() to log.Info() for jsonnet trace output
 		// Note use this with std.trace in jsonnet code to get the trace output
-		log.Info().Msgf("bundle.jsonnet trace output: %s", buf.String())
+		log.Info().Msgf("Jsonnet generation trace: %s", buf.String())
 
 		var bundle map[string]interface{}
 		err = json.Unmarshal([]byte(bundleStr), &bundle)

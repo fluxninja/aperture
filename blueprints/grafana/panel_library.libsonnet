@@ -26,21 +26,4 @@
   quota_scheduler: import './panels/grouped/quota_scheduler.libsonnet',
   postgresql: import './panels/grouped/pgsql.libsonnet',
 
-  // Stat Panels
-  active_connections: import './pgsql/active_connections.libsonnet',
-  cache_hit_idx: import './pgsql/cache_hit_idx.libsonnet',
-  cache_hit_table: import './pgsql/cache_hit_table.libsonnet',
-  db_count: import './pgsql/db_count.libsonnet',
-  db_size: import './pgsql/db_size.libsonnet',
-  max_connections: import './pgsql/max_connections.libsonnet',
-  table_count: import './pgsql/table_count.libsonnet',
-  table_size: import './pgsql/table_size.libsonnet',
-
-  // Time Series and Bar Gauge Panels
-  checkpoint_comparison: import './pgsql/checkpoint_comparison.libsonnet',
-  commits_vs_rollbacks: import './pgsql/commits_vs_rollbacks.libsonnet',
-  heap_vs_index: import './pgsql/heap_vs_index.libsonnet',
-  operations: import './pgsql/operations.libsonnet',
-  top_tables_disk: import './pgsql/top_tables_disk.libsonnet',
-  top_tables_rows: import './pgsql/top_tables_rows.libsonnet',
 }

@@ -37,18 +37,30 @@ function(policyFile, cfg) {
   ])),
 
   local infraMeters =
-    if std.objectHas(policyJSON.spec.resources, 'infra_meters')
+    if std.objectHas(policyJSON, 'spec') &&
+       std.objectHas(policyJSON.spec, 'resources') &&
+       std.objectHas(policyJSON.spec.resources, 'infra_meters')
     then policyJSON.spec.resources.infra_meters
     else {},
 
-  local receiverName = std.objectFields(infraMeters)[0],
-  local receiverConfig = infraMeters[receiverName].receivers[receiverName],
+  local receiverNames = [
+    name
+    for name in std.objectFields(infraMeters)
+    if std.objectHas(infraMeters[name], 'receivers') &&
+       std.objectHas(infraMeters[name].receivers, name)
+  ],
 
-  local receiverPanels = std.flattenArrays([
-    if std.objectHas(panelLibrary, std.toString(receiverName))
-    then unwrap(std.toString(receiverName), receiverConfig, config).panel
-    else [],
-  ]),
+  local receiverDashboards = {
+    [receiverName]: dashboard.baseDashboard + g.dashboard.withPanels(
+      std.flattenArrays([
+        if std.objectHas(panelLibrary, receiverName)
+        then unwrap(std.toString(receiverName), {}, config).panel
+        else [],
+      ])
+    )
+    for receiverName in receiverNames
+  },
+
 
   // Other first-level Panels
   local otherPanels = std.flattenArrays(std.filter(function(x) x != null, [
@@ -63,8 +75,6 @@ function(policyFile, cfg) {
   local final = dashboard.baseDashboard
                 + g.dashboard.withPanels(panels),
 
-  local receiverDashboard = dashboard.baseDashboard
-                            + g.dashboard.withPanels(receiverPanels),
   dashboard: final,
-  additionalDashboard: receiverDashboard,
+  receiverDashboards: receiverDashboards,
 }

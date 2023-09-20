@@ -36,6 +36,11 @@ function(params, metadata={}) {
   local p = policy(config_with_postgresql_infra_meter, metadataWrapper),
   local d = creator(p.policyResource, config_with_postgresql_infra_meter),
 
+  local postgresDashboard =
+    if std.objectHas(d.receiverDashboards, 'postgresql')
+    then { [std.format('pgsql-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.receiverDashboards.postgresql }
+    else {},
+
   policies: {
     [std.format('%s-cr.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
@@ -43,6 +48,5 @@ function(params, metadata={}) {
   dashboards: {
     [std.format('%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.mainDashboard,
     [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.signalsDashboard,
-    [std.format('pgsql-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: d.additionalDashboard,
-  },
+  } + postgresDashboard,
 }

@@ -16,6 +16,6 @@ function(cfg, title) {
     + g.query.prometheus.withLegendFormat('Rollbacks'),
   ],
 
-  local totalCommits = timeSeriesPanel(title, cfg.dashboard.datasource.name, '', stringFilters, h=8, w=10, targets=targets),
-  panel: totalCommits.panel,
+  local commitVsRollback = timeSeriesPanel(title, cfg.dashboard.datasource.name, '', stringFilters, h=8, w=10, targets=targets),
+  panel: commitVsRollback.panel,
 }

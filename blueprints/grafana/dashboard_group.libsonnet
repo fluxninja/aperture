@@ -12,9 +12,9 @@ function(policyJSON, cfg) {
       title: 'Aperture Signals - %s' % policyName,
     },
   }).dashboard,
-  local additionalDashboard = creator(policyJSON, cfg).additionalDashboard,
+  local receiverDashboards = creator(policyJSON, cfg).receiverDashboards,
 
   mainDashboard: mainDashboard,
   signalsDashboard: signalsDashboard,
-  additionalDashboard: additionalDashboard,
+  receiverDashboards: receiverDashboards,
 }
