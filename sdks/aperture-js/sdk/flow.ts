@@ -8,10 +8,11 @@ import {
   SOURCE_LABEL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
-import {
-  CheckResponse__Output,
-  _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
-} from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { CheckResponse } from "./gen/check_pb.js";
+//import {
+//  CheckResponse__Output,
+//  _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
+//} from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 
@@ -32,7 +33,7 @@ export class Flow {
     private span: Span,
     startDate: number,
     private failOpen: boolean = true,
-    private checkResponse: CheckResponse__Output | null = null,
+    private checkResponse: CheckResponse | null = null,
     private error: Error | null = null,
   ) {
     span.setAttribute(SOURCE_LABEL, "sdk");
@@ -43,8 +44,8 @@ export class Flow {
   ShouldRun() {
     if (
       (this.failOpen && this.checkResponse === null) ||
-      this.checkResponse?.decisionType ===
-        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+      this.checkResponse?.getDecisionType() ===
+        CheckResponse.DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -79,7 +80,7 @@ export class Flow {
       // Issue: https://github.com/protobufjs/protobuf.js/issues/893
       // PR: https://github.com/protobufjs/protobuf.js/pull/1258
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
-      const localCheckResponse = this.checkResponse as any;
+/*       const localCheckResponse = this.checkResponse as any;
       localCheckResponse.start = this.protoTimestampToJSON(
         this.checkResponse.start,
       );
@@ -106,6 +107,11 @@ export class Flow {
         CHECK_RESPONSE_LABEL,
         JSON.stringify(localCheckResponse),
       );
+      */
+      const serializedCheckResp = this.checkResponse.serializeBinary();
+      this.span.setAttribute(
+        CHECK_RESPONSE_LABEL,
+        Array.from(serializedCheckResp));
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
@@ -115,7 +121,7 @@ export class Flow {
     this.span.end();
   }
 
-  private protoTimestampToJSON(
+/*   private protoTimestampToJSON(
     timestamp: _google_protobuf_Timestamp__Output | null,
   ) {
     if (timestamp) {
@@ -133,5 +139,5 @@ export class Flow {
       return `${duration.seconds}.${duration.nanos}s`;
     }
     return duration;
-  }
+  } */
 }

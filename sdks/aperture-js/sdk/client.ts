@@ -5,13 +5,16 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
-import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import { CheckRequest, CheckResponse } from "./gen/check_pb.js";
+import { FlowControlServiceClient } from "./gen/check_grpc_pb.js";
+
+//import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
+//import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+//import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
 import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
 import { Flow } from "./flow.js";
-import { fcs } from "./utils.js";
+//import { fcs } from "./utils.js";
 
 export interface FlowParams {
   labels?: Record<string, string>;
@@ -30,7 +33,7 @@ export class ApertureClient {
   private readonly tracer: Tracer;
 
   constructor({ channelCredentials = grpc.credentials.createInsecure() } = {}) {
-    this.fcsClient = new fcs.FlowControlService(URL, channelCredentials, {
+    this.fcsClient = new FlowControlServiceClient(URL, channelCredentials, {
       "grpc.keepalive_time_ms": 10000,
       "grpc.keepalive_timeout_ms": 5000,
       "grpc.keepalive_permit_without_calls": 1,
@@ -103,11 +106,11 @@ export class ApertureClient {
 
         let mergedLabels = { ...params.labels, ...labelsBaggage };
 
-        const request: CheckRequest = {
-          controlPoint: controlPoint,
-          labels: mergedLabels,
-          rampMode: rampMode,
-        };
+        let request = new CheckRequest().setControlPoint(controlPoint).setRampMode(rampMode);
+        for (const labelKey in mergedLabels) {
+          const labelValue = mergedLabels[labelKey];
+          request.getLabelsMap().set(labelKey, labelValue);
+        }
 
         const grpcParams: grpc.CallOptions = {
           deadline:
@@ -117,15 +120,16 @@ export class ApertureClient {
               : undefined,
         };
 
-        const cb: grpc.requestCallback<CheckResponse__Output> = (
+        const cb: grpc.requestCallback<CheckResponse> = (
           err: any,
           response: any,
         ) => {
           resolveFlow(err ? null : response, err);
           return;
         };
+        const metadata = new grpc.Metadata();
 
-        this.fcsClient.Check(request, grpcParams, cb);
+        this.fcsClient.check(request, metadata, grpcParams, cb);
       } catch (err: any) {
         resolveFlow(null, err);
       }
