@@ -37,37 +37,6 @@ function(policyFile, cfg) {
     for component in flowControlComponents
   ])),
 
-  /* local infraMeters =
-    if std.objectHas(policyJSON, 'spec') &&
-      std.objectHas(policyJSON.spec, 'resources') &&
-      std.objectHas(policyJSON.spec.resources, 'infra_meters')
-    then std.trace(std.toString(policyJSON), {}) + policyJSON.spec.resources.infra_meters
-    else {},
-
-  local receiverNames = [
-    receiver
-    for meter in std.objectFields(infraMeters)
-    for receiver in std.objectFields(infraMeters[meter].receivers)
-    if std.objectHas(infraMeters[meter].receivers, receiver)
-  ],
-
-  local receiverToMeterMap = {
-    [receiver]: meter
-    for meter in std.objectFields(infraMeters)
-    for receiver in std.objectFields(infraMeters[meter].receivers)
-  },
-
-  local receiverDashboards = {
-    [receiver]: dashboard.baseDashboard + g.dashboard.withPanels(
-      std.flattenArrays([
-        if std.objectHas(panelLibrary, receiver)
-        then std.trace(std.toString(config), []) + unwrap(receiver, {}, config + { ice_cream: receiverToMeterMap[receiver] }).panel
-      else []
-    ])
-  )
-    for receiver in receiverNames
-  },*/
-
   // Other first-level Panels
   local otherPanels = std.flattenArrays(std.filter(function(x) x != null, [
     if std.objectHas(panelLibrary, std.toString(componentName))
@@ -82,5 +51,4 @@ function(policyFile, cfg) {
                 + g.dashboard.withPanels(panels),
 
   dashboard: final,
-  // receiverDashboards: receiverDashboards,
 }
