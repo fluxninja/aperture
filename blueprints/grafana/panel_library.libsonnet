@@ -19,7 +19,10 @@
   quota_checks: import './panels/quota_checks.libsonnet',
 
   // Grouped panels
-  adaptive_load_scheduler: import './panels/grouped/adaptive_load_scheduler.libsonnet',
+  adaptive_load_scheduler: import './panels/grouped/load_scheduler.libsonnet',
+  aimd_load_scheduler: import './panels/grouped/load_scheduler.libsonnet',
+  range_driven_load_scheduler: import './panels/grouped/load_scheduler.libsonnet',
+  aiad_load_scheduler: import './panels/grouped/load_scheduler.libsonnet',
   auto_scale: import './panels/grouped/auto_scale.libsonnet',
   signals: import './panels/grouped/signals.libsonnet',
   load_ramp: import './panels/grouped/load_ramp.libsonnet',
