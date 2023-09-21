@@ -1,12 +1,12 @@
 local utils = import '../../utils/policy_utils.libsonnet';
 local statPanel = import '../../utils/stat_panel.libsonnet';
 
-function(cfg) {
-  local stringFilters = utils.dictToPrometheusFilter(cfg.dashboard.extra_filters { policy_name: cfg.policy.policy_name }),
+function(policyName, infraMeterName, datasource, extraFilters) {
+  local stringFilters = utils.dictToPrometheusFilter(extraFilters { policy_name: policyName }),
 
   local activeConn = statPanel('Active Connections %',
-                               cfg.dashboard.datasource.name,
-                               'sum(postgresql_backends{%(filters)s,infra_meter_name="postgresql"}) / sum(postgresql_connection_max{%(filters)s,infra_meter_name="postgresql"}) * 100',
+                               datasource.name,
+                               'sum(postgresql_backends{%(filters)s,infra_meter_name="%(infra_meter)s"}) / sum(postgresql_connection_max{%(filters)s,infra_meter_name="%(infra_meter)s"}) * 100' % { filters: stringFilters, infra_meter: infraMeterName },
                                stringFilters),
   panel: activeConn.panel,
 }

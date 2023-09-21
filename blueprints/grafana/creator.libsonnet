@@ -1,5 +1,6 @@
 local base = import './utils/base_dashboard.libsonnet';
 local defaultConfig = import './utils/default_config.libsonnet';
+local unwrapInfraMeter = import './utils/unwrap_infra_meter_panels.libsonnet';
 local unwrap = import './utils/unwrap_panels.libsonnet';
 local panelLibrary = import 'panel_library.libsonnet';
 
@@ -36,31 +37,36 @@ function(policyFile, cfg) {
     for component in flowControlComponents
   ])),
 
-  local infraMeters =
+  /* local infraMeters =
     if std.objectHas(policyJSON, 'spec') &&
-       std.objectHas(policyJSON.spec, 'resources') &&
-       std.objectHas(policyJSON.spec.resources, 'infra_meters')
-    then policyJSON.spec.resources.infra_meters
+      std.objectHas(policyJSON.spec, 'resources') &&
+      std.objectHas(policyJSON.spec.resources, 'infra_meters')
+    then std.trace(std.toString(policyJSON), {}) + policyJSON.spec.resources.infra_meters
     else {},
 
   local receiverNames = [
-    name
-    for name in std.objectFields(infraMeters)
-    if std.objectHas(infraMeters[name], 'receivers') &&
-       std.objectHas(infraMeters[name].receivers, name)
+    receiver
+    for meter in std.objectFields(infraMeters)
+    for receiver in std.objectFields(infraMeters[meter].receivers)
+    if std.objectHas(infraMeters[meter].receivers, receiver)
   ],
 
-  local receiverDashboards = {
-    [receiverName]: dashboard.baseDashboard + g.dashboard.withPanels(
-      std.flattenArrays([
-        if std.objectHas(panelLibrary, receiverName)
-        then unwrap(std.toString(receiverName), {}, config).panel
-        else [],
-      ])
-    )
-    for receiverName in receiverNames
+  local receiverToMeterMap = {
+    [receiver]: meter
+    for meter in std.objectFields(infraMeters)
+    for receiver in std.objectFields(infraMeters[meter].receivers)
   },
 
+  local receiverDashboards = {
+    [receiver]: dashboard.baseDashboard + g.dashboard.withPanels(
+      std.flattenArrays([
+        if std.objectHas(panelLibrary, receiver)
+        then std.trace(std.toString(config), []) + unwrap(receiver, {}, config + { ice_cream: receiverToMeterMap[receiver] }).panel
+      else []
+    ])
+  )
+    for receiver in receiverNames
+  },*/
 
   // Other first-level Panels
   local otherPanels = std.flattenArrays(std.filter(function(x) x != null, [
@@ -76,5 +82,5 @@ function(policyFile, cfg) {
                 + g.dashboard.withPanels(panels),
 
   dashboard: final,
-  receiverDashboards: receiverDashboards,
+  // receiverDashboards: receiverDashboards,
 }
