@@ -100,7 +100,7 @@ have a Prometheus instance running, you can skip these steps.
    docker volume create prometheus-data
    ```
 
-2. Create a file named `prometheus.yml` for passing the configuration to the
+2. Create a file named `prometheus.yaml` for passing the configuration to the
    Prometheus:
 
    ```yaml
@@ -248,7 +248,7 @@ have a Prometheus instance running, you can skip these steps.
          prometheus-init:
            condition: service_completed_successfully
        volumes:
-         - prometheus.yaml:/etc/config/prometheus.yaml:ro
+         - ./prometheus.yaml:/etc/config/prometheus.yaml:ro
          - prometheus-data:/data:rw
        networks:
          - aperture
@@ -258,7 +258,7 @@ have a Prometheus instance running, you can skip these steps.
        ports:
          - 8080:8080
        volumes:
-         - controller.yaml:/etc/aperture/aperture-controller/config/aperture-controller.yaml:ro
+         - ./controller.yaml:/etc/aperture/aperture-controller/config/aperture-controller.yaml:ro
        networks:
          - aperture
        restart: on-failure
@@ -297,6 +297,13 @@ have a Prometheus instance running, you can skip these steps.
    do echo "aperture-control is starting"; sleep 1; done && \
    echo "aperture-controller is now healty!"'
    ```
+
+## Installation of Aperture Agent
+
+Once the Aperture Controller is installed, you can create a
+[configuration file for the Aperture Agent](/self-hosting/agent.md#configuration)
+and install it using the
+[Aperture Agent installation guide](/get-started/installation/agent/agent.md).
 
 ## Uninstall
 
