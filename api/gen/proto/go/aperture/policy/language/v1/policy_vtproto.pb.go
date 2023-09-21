@@ -1241,6 +1241,27 @@ func (m *Component_PidController) MarshalToSizedBufferVT(dAtA []byte) (int, erro
 	}
 	return len(dAtA) - i, nil
 }
+func (m *Component_PolynomialRangeFunction) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *Component_PolynomialRangeFunction) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.PolynomialRangeFunction != nil {
+		size, err := m.PolynomialRangeFunction.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf2
+	}
+	return len(dAtA) - i, nil
+}
 func (m *Component_Query) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
@@ -1961,6 +1982,18 @@ func (m *Component_PidController) SizeVT() (n int) {
 	_ = l
 	if m.PidController != nil {
 		l = m.PidController.SizeVT()
+		n += 2 + l + sov(uint64(l))
+	}
+	return n
+}
+func (m *Component_PolynomialRangeFunction) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PolynomialRangeFunction != nil {
+		l = m.PolynomialRangeFunction.SizeVT()
 		n += 2 + l + sov(uint64(l))
 	}
 	return n
@@ -4760,6 +4793,47 @@ func (m *Component) UnmarshalVT(dAtA []byte) error {
 					return err
 				}
 				m.Component = &Component_PidController{PidController: v}
+			}
+			iNdEx = postIndex
+		case 30:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolynomialRangeFunction", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if oneof, ok := m.Component.(*Component_PolynomialRangeFunction); ok {
+				if err := oneof.PolynomialRangeFunction.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+			} else {
+				v := &PolynomialRangeFunction{}
+				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+					return err
+				}
+				m.Component = &Component_PolynomialRangeFunction{PolynomialRangeFunction: v}
 			}
 			iNdEx = postIndex
 		case 100:

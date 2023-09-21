@@ -32,7 +32,7 @@ message FlowControl {
     // _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
     LoadScheduler load_scheduler = 7;
 
-    // _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+    // _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
     // Sampler is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -40,6 +40,15 @@ message FlowControl {
 
     // _Load Ramp_ smoothly regulates the flow of requests over specified steps.
     LoadRamp load_ramp = 10;
+
+    // AIMD Load Scheduler.
+    AIMDLoadScheduler aimd_load_scheduler = 11;
+
+    // Range Driven Load Scheduler.
+    RangeDrivenLoadScheduler range_driven_load_scheduler = 12;
+
+    // AIAD Load Scheduler.
+    AIADLoadScheduler aiad_load_scheduler = 13;
 
     // Extends flow control with private components.
     google.protobuf.Any private = 1000;
@@ -316,7 +325,209 @@ message Scheduler {
   flowcontrol.check.v1.StatusCode denied_response_status_code = 9;
 }
 
+// _AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
+// It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+// During recovery, it increases the token rate linearly until the system is not overloaded.
+message AIMDLoadScheduler {
+  // Input ports for the _AIMD Load Scheduler_.
+  message Ins {
+    // The input signal to the controller.
+    InPort signal = 1; // @gotags: validate:"required"
+    // The setpoint input to the controller.
+    InPort setpoint = 2; // @gotags: validate:"required"
+    // The `overload_confirmation` port provides additional criteria to determine overload state which
+    // results in _Flow_ throttling at the service.
+    InPort overload_confirmation = 3;
+  }
+
+  // Output ports for the _AIMD Load Scheduler_.
+  message Outs {
+    // A Boolean signal that indicates whether the service is in overload state.
+    OutPort is_overload = 1;
+    // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+    OutPort observed_load_multiplier = 3;
+  }
+
+  message Parameters {
+    // Parameters for the _Load Scheduler_.
+    LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
+
+    // Parameters for the Gradient Controller.
+    GradientController.Parameters gradient = 2; // @gotags: validate:"required"
+
+    // The maximum load multiplier that can be reached during recovery from an overload state.
+    // - Helps protect the service from request bursts while the system is still recovering.
+    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+    // - The pass-through mode gets disabled if the system enters the overload state again.
+    double max_load_multiplier = 3; // @gotags: default:"2.0" validate:"gt=0"
+
+    // Linear increment to load multiplier every 10 seconds while the system is
+    // not in the overloaded state, up until the `max_load_multiplier` is reached.
+    double load_multiplier_linear_increment = 4; // @gotags: default:"0.025" validate:"gte=0"
+
+    // Configuration parameters for the embedded Alerter.
+    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
+  }
+
+  // Input ports for the _AIMD Load Scheduler_.
+  Ins in_ports = 1;
+
+  // Output ports for the _AIMD Load Scheduler_.
+  Outs out_ports = 2;
+
+  // Parameters for the _AIMD Load Scheduler_.
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+  // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+  bool dry_run = 4;
+
+  // Configuration key for setting dry run mode through dynamic configuration.
+  string dry_run_config_key = 5;
+}
+
+// _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
+message RangeDrivenLoadScheduler {
+  // Input ports for the _Range Load Scheduler_.
+  message Ins {
+    // The input signal to the controller.
+    InPort signal = 1; // @gotags: validate:"required"
+    // The `overload_confirmation` port provides additional criteria to determine overload state which
+    // results in _Flow_ throttling at the service.
+    InPort overload_confirmation = 3;
+  }
+
+  // Output ports for the _Range Load Scheduler_.
+  message Outs {
+    // A Boolean signal that indicates whether the service is in overload state.
+    OutPort is_overload = 1;
+    // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+    OutPort observed_load_multiplier = 3;
+  }
+
+  message Datapoint {
+    double signal_value = 1;
+    double load_multiplier = 2; // @gotags: validate:"gte=0,lte=1"
+  }
+
+  message Parameters {
+    // Parameters for the _Load Scheduler_.
+    LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
+
+    // Starting data-point of the throttling range
+    Datapoint low_throttle_threshold = 2; // @gotags: validate:"required"
+
+    // Ending data-point of the throttling range
+    Datapoint high_throttle_threshold = 3; // @gotags: validate:"required"
+
+    // Degree determines shape of the throttling curve.
+    // degree=1: linear
+    // degree=2: quadratic
+    // degree=3: cubic
+    double degree = 4; // @gotags: validate:"required"
+
+    // Configuration parameters for the embedded Alerter.
+    Alerter.Parameters alerter = 5; // @gotags: validate:"required"
+  }
+
+  // Input ports for the _Range Load Scheduler_.
+  Ins in_ports = 1;
+
+  // Output ports for the _Range Load Scheduler_.
+  Outs out_ports = 2;
+
+  // Parameters for the _Range Load Scheduler_.
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+  // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+  bool dry_run = 4;
+
+  // Configuration key for setting dry run mode through dynamic configuration.
+  string dry_run_config_key = 5;
+}
+
+// _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+// During recovery, it increases the token rate linearly until the system is not overloaded.
+message AIADLoadScheduler {
+  // Input ports for the _AIAD Load Scheduler_.
+  message Ins {
+    // The input signal to the controller.
+    InPort signal = 1; // @gotags: validate:"required"
+    // The setpoint input to the controller.
+    InPort setpoint = 2; // @gotags: validate:"required"
+    // The `overload_confirmation` port provides additional criteria to determine overload state which
+    // results in _Flow_ throttling at the service.
+    InPort overload_confirmation = 3;
+  }
+
+  // Output ports for the _AIAD Load Scheduler_.
+  message Outs {
+    // A Boolean signal that indicates whether the service is in overload state.
+    OutPort is_overload = 1;
+    // Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+    OutPort desired_load_multiplier = 2;
+    // Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+    OutPort observed_load_multiplier = 3;
+  }
+
+  message Parameters {
+    // Parameters for the _Load Scheduler_.
+    LoadScheduler.Parameters load_scheduler = 1; // @gotags: validate:"required"
+
+    // The minimum load multiplier that can be reached during an overload state.
+    double min_load_multiplier = 2; // @gotags: default:"0.0" validate:"gte=0"
+
+    // Linear decrement to load multiplier every 10 seconds while the system is
+    // in the overloaded state, up until the `min_load_multiplier` is reached.
+    double load_multiplier_linear_decrement = 3; // @gotags: default:"0.05" validate:"gte=0"
+
+    // The maximum load multiplier that can be reached during recovery from an overload state.
+    // - Helps protect the service from request bursts while the system is still recovering.
+    // - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+    // - The pass-through mode gets disabled if the system enters the overload state again.
+    double max_load_multiplier = 4; // @gotags: default:"2.0" validate:"gte=0"
+
+    // Linear increment to load multiplier every 10 seconds while the system is
+    // not in the overloaded state, up until the `max_load_multiplier` is reached.
+    double load_multiplier_linear_increment = 5; // @gotags: default:"0.025" validate:"gte=0"
+
+    // Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+    // <!-- vale off -->
+    // - "gt": greater than
+    // - "lt": less than
+    // - "gte": greater than or equal to
+    // - "lte": less than or equal to
+    // <!-- vale on -->
+    string overload_condition = 6; // @gotags: default:"gt" validate:"required,oneof=gt lt gte lte"
+
+    // Configuration parameters for the embedded Alerter.
+    Alerter.Parameters alerter = 7; // @gotags: validate:"required"
+  }
+
+  // Input ports for the _AIAD Load Scheduler_.
+  Ins in_ports = 1;
+
+  // Output ports for the _AIAD Load Scheduler_.
+  Outs out_ports = 2;
+
+  // Parameters for the _AIAD Load Scheduler_.
+  Parameters parameters = 3; // @gotags: validate:"required"
+
+  // Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+  // It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+  bool dry_run = 4;
+
+  // Configuration key for setting dry run mode through dynamic configuration.
+  string dry_run_config_key = 5;
+}
+
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+// Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
 message AdaptiveLoadScheduler {
   // Parameters for the _Adaptive Load Scheduler_ component.
   message Parameters {

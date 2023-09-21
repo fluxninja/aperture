@@ -2,7 +2,6 @@
 
 policy:
   policy_name: postgres-connections
-  setpoint: 20
   resources:
     flow_control:
       classifiers:
@@ -25,8 +24,10 @@ policy:
     tls:
       insecure: true
   service_protection_core:
-    dry_run: false
-    adaptive_load_scheduler:
+    aiad_load_scheduler:
+      load_multiplier_linear_decrement: 0.2
+      load_multiplier_linear_increment: 0.05
+      overload_condition: gt
       load_scheduler:
         workload_latency_based_tokens: true
         selectors:
@@ -47,3 +48,4 @@ policy:
               parameters:
                 priority: 250.0
               name: "subscriber"
+    dry_run: false

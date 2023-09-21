@@ -7,56 +7,6 @@ metadata:
 spec:
   circuit:
     components:
-    - flow_control:
-        adaptive_load_scheduler:
-          dry_run: false
-          dry_run_config_key: dry_run
-          in_ports:
-            overload_confirmation:
-              constant_signal:
-                value: 1
-            setpoint:
-              signal_name: SETPOINT
-            signal:
-              signal_name: SIGNAL
-          out_ports:
-            desired_load_multiplier:
-              signal_name: DESIRED_LOAD_MULTIPLIER
-            observed_load_multiplier:
-              signal_name: OBSERVED_LOAD_MULTIPLIER
-          parameters:
-            alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
-            load_multiplier_linear_increment: 0.025
-            load_scheduler:
-              scheduler:
-                denied_response_status_code: BadRequest
-                workloads:
-                - label_matcher:
-                    match_labels:
-                      user_type: guest
-                  name: guest
-                  parameters:
-                    priority: 50
-                - label_matcher:
-                    match_labels:
-                      http.request.header.user_type: subscriber
-                  name: subscriber
-                  parameters:
-                    priority: 200
-              selectors:
-              - agent_group: default
-                control_point: service1-demo-app
-                label_matcher:
-                  match_labels:
-                    http.target: /service1/request
-                service: kong-server.demoapp.svc.cluster.local
-              workload_latency_based_tokens: true
-            max_load_multiplier: 2
     - decider:
         in_ports:
           lhs:
@@ -100,6 +50,56 @@ spec:
             label_matcher:
               match_labels:
                 http.request.header.user_type: crawler
+    - flow_control:
+        aimd_load_scheduler:
+          dry_run: false
+          dry_run_config_key: dry_run
+          in_ports:
+            overload_confirmation:
+              constant_signal:
+                value: 1
+            setpoint:
+              signal_name: SETPOINT
+            signal:
+              signal_name: SIGNAL
+          out_ports:
+            desired_load_multiplier:
+              signal_name: DESIRED_LOAD_MULTIPLIER
+            observed_load_multiplier:
+              signal_name: OBSERVED_LOAD_MULTIPLIER
+          parameters:
+            alerter:
+              alert_name: AIMD Load Throttling Event
+            gradient:
+              max_gradient: 1
+              min_gradient: 0.1
+              slope: -1
+            load_multiplier_linear_increment: 0.025
+            load_scheduler:
+              scheduler:
+                denied_response_status_code: BadRequest
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      user_type: guest
+                  name: guest
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: subscriber
+                  name: subscriber
+                  parameters:
+                    priority: 200
+              selectors:
+              - agent_group: default
+                control_point: service1-demo-app
+                label_matcher:
+                  match_labels:
+                    http.target: /service1/request
+                service: kong-server.demoapp.svc.cluster.local
+              workload_latency_based_tokens: true
+            max_load_multiplier: 2
     - query:
         promql:
           evaluation_interval: 10s

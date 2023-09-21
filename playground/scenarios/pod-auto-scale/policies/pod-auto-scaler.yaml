@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=file:../../../../blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
 #
 # Generated values file for auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
