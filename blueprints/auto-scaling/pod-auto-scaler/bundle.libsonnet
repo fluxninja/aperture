@@ -96,11 +96,12 @@ function(params, metadata={}) {
   local p = policy(updated_cfg, metadataWrapper),
   local d = creator(p.policyResource, updated_cfg),
 
+  dashboards: {
+    [std.format('%s.json', updated_cfg.policy.policy_name)]: d.dashboard,
+  } + d.receiverDashboards,
+
   policies: {
     [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
-  },
-  dashboards: {
-    [std.format('%s.json', updated_cfg.policy.policy_name)]: d.dashboard,
   },
 }

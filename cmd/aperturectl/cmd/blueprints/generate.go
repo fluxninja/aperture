@@ -1,6 +1,7 @@
 package blueprints
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -112,7 +113,12 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 			}
 		}
 
+		buf := bytes.Buffer{}
+
 		vm := jsonnet.MakeVM()
+
+		vm.SetTraceOut(&buf)
+
 		vm.Importer(&jsonnet.FileImporter{
 			JPaths: []string{blueprintsURIRoot},
 		})
@@ -141,6 +147,10 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 		if err != nil {
 			return err
 		}
+
+		// change log.Error() to log.Info() for jsonnet trace output
+		// Note use this with std.trace in jsonnet code to get the trace output
+		log.Info().Msgf("Jsonnet generation trace: %s", buf.String())
 
 		var bundle map[string]interface{}
 		err = json.Unmarshal([]byte(bundleStr), &bundle)

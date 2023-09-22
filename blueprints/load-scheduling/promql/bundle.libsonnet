@@ -25,5 +25,5 @@ function(params, metadata={}) {
   dashboards: {
     [std.format('%s.json', updated_cfg.policy.policy_name)]: d.mainDashboard,
     [std.format('signals-%s.json', updated_cfg.policy.policy_name)]: d.signalsDashboard,
-  },
+  } + d.receiverDashboards,
 }

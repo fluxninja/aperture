@@ -18,7 +18,7 @@ function(params, metadata={}) {
   dashboards: {
     [std.format('%s.json', c.policy.policy_name)]: d.mainDashboard,
     [std.format('signals-%s.json', c.policy.policy_name)]: d.signalsDashboard,
-  },
+  } + d.receiverDashboards,
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
