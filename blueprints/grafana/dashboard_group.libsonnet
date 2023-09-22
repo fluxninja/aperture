@@ -6,7 +6,7 @@ function(policyJSON, cfg) {
   local policyName = cfg.policy.policy_name,
   local dashboards = creator(policyJSON, cfg),
   local mainDashboard = dashboards.dashboard,
-  local receiverDashboards = infraMeterDashboard(policyJSON, cfg).receiverDashboards,
+  local receiverDashboards = dashboards.receiverDashboards,
 
   local signalsDashboard = signals({
     policy+: {
