@@ -26,6 +26,7 @@ function(dashboardMixin) {
         inputName: 'datasource',
         datasourceName: 'controller-prometheus',
       }),
+
       dashboard.new('%s-dashboard' % policyName) +
       dashboard.metadata.withNamespace('aperture-controller') +
       dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
@@ -34,5 +35,15 @@ function(dashboardMixin) {
         inputName: 'DS_CONTROLLER-PROMETHEUS',
         datasourceName: 'controller-prometheus',
       }),
+
+      dashboard.new('%s-receiver' % policyName) +
+      dashboard.metadata.withNamespace('aperture-controller') +
+      dashboard.metadata.withLabels({ 'fluxninja.com/grafana-instance': 'aperture-grafana' }) +
+      dashboard.spec.withJson(std.manifestJsonEx(dashboardMixin, indent='  ')) +
+      dashboard.spec.withDatasources({
+        inputName: 'DS_CONTROLLER-PROMETHEUS',
+        datasourceName: 'controller-prometheus',
+      }),
+
     ],
 }

@@ -27,4 +27,5 @@
   signals: import './panels/grouped/signals.libsonnet',
   load_ramp: import './panels/grouped/load_ramp.libsonnet',
   quota_scheduler: import './panels/grouped/quota_scheduler.libsonnet',
+
 }
