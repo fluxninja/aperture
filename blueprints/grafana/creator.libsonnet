@@ -58,15 +58,13 @@ function(policyFile, cfg) {
     else {},
 
   local receiverDashboards = {
-    [infraMeter]: {
-      [receiver]:
-        dashboard.baseDashboard + g.dashboard.withPanels(
-          unwrapInfraMeter(receiver, policyName, infraMeter, cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
-        )
-      for receiver in std.objectFields(infraMeters[infraMeter].receivers)
-      if std.objectHas(infraMeters[infraMeter], 'receivers')
-    }
+    [infraMeter + '_' + receiver + '.json']:
+      dashboard.baseDashboard + g.dashboard.withPanels(
+        unwrapInfraMeter(receiver, policyName, infraMeters[infraMeter], cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
+      )
     for infraMeter in std.objectFields(infraMeters)
+    if std.objectHas(infraMeters[infraMeter], 'receivers')
+    for receiver in std.objectFields(infraMeters[infraMeter].receivers)
   },
 
 
