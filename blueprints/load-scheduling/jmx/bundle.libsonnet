@@ -25,7 +25,6 @@ function(params, metadata={}) {
       },
     },
   },
-
   local p = policy(config_with_jmx_infra_meter, params, metadataWrapper),
   local d = creator(p.policyResource, config_with_jmx_infra_meter),
 

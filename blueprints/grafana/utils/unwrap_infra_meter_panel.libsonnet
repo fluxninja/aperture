@@ -8,10 +8,13 @@ function(receiverName, policyName, infraMeter, datasource, extraFilters) {
   // If the receiverKey exists in the infraMeterPanelLibrary, generate panels, otherwise return an empty array
   local generatedPanels = if std.objectHas(infraMeterPanelLibrary, receiverKey)
   then infraMeterPanelLibrary[receiverKey](policyName, infraMeter, datasource, extraFilters)
-  else { panel: [] },  // Return an object with an empty 'panel' key if receiverKey does not exist
+  else { panel: [] },
 
   panel:
-    if std.objectHas(generatedPanels, 'panels')
-    then generatedPanels.panels
-    else [generatedPanels.panel],
+    if std.objectHas(generatedPanels, 'panels') then
+      generatedPanels.panels
+    else if std.isArray(generatedPanels.panel) then
+      generatedPanels.panel
+    else
+      [generatedPanels.panel],
 }
