@@ -2,7 +2,7 @@ local promqlPolicyFn = import '../promql/policy.libsonnet';
 
 function(cfg, metadata={}) {
   local policyName = cfg.policy.policy_name,
-  local promqlQuery = '(sum(postgresql_backends{policy_name="%(policy_name)s",infra_meter_name="postgresql"}}) / sum(postgresql_connection_max{policy_name="%(policy_name)s",infra_meter_name="postgresql"})) * 100' % { policy_name: policyName },
+  local promqlQuery = '(sum(postgresql_backends{policy_name="%(policy_name)s",infra_meter_name="postgresql"}) / sum(postgresql_connection_max{policy_name="%(policy_name)s",infra_meter_name="postgresql"})) * 100' % { policy_name: policyName },
 
   local updated_cfg = cfg {
     policy+: {
