@@ -17,12 +17,10 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Overview
 
-The response times of a service start to deteriorate when the service's
-underlying concurrency limit is surpassed. Consequently, a degradation in
-response latency can serve as a reliable signal for identifying service
-overload. This policy is designed to detect overload situations based on latency
-deterioration. During overload, the request rate is throttled so that latency
-gets restored back to an acceptable range.
+Degradation in response latency can serve as a reliable signal for identifying
+service overload. This policy is designed to detect overload situations based on
+latency deterioration. During overload, the request rate is throttled so that
+latency gets restored back to an acceptable range.
 
 ## Configuration
 

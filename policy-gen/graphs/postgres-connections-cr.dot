@@ -1,0 +1,37 @@
+digraph  {
+	subgraph cluster_s1 {
+		label="AIADLoadScheduler[root.0]";margin="50.0";
+		n5[label="desired_load_multiplier"];
+		n6[label="observed_load_multiplier"];
+		n2[label="overload_confirmation"];
+		n3[label="setpoint"];
+		n4[label="signal"];
+		n4->n6[style="invis"];
+		{rank=same; n2;n3;n4;};
+		{rank=same; n5;n6;};
+		
+	}
+	subgraph cluster_s7 {
+		label="FakeConstant[root.0_overload_confirmation_FakeConstant]";margin="50.0";
+		n8[label="out"];
+		{rank=same; n8;};
+		
+	}
+	subgraph cluster_s9 {
+		label="PromQL[root.1]";margin="50.0";
+		n10[label="output"];
+		{rank=same; n10;};
+		
+	}
+	subgraph cluster_s11 {
+		label="Variable[root.2]";margin="50.0";
+		n12[label="output"];
+		{rank=same; n12;};
+		
+	}
+	rankdir="LR";splines="ortho";
+	n8->n2;
+	n10->n4[label="SIGNAL"];
+	n12->n3[label="SETPOINT"];
+	
+}

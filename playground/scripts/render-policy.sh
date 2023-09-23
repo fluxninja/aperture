@@ -47,11 +47,10 @@ else
 	"${aperturectl}" blueprints generate --name "${blueprint_name}" --uri "${blueprints_uri}" \
 		--values-file "${values_file}" --output-dir "${_GEN_DIR}" --overwrite >&2
 
-	rendered_policy="${_GEN_DIR}/policies/${policy_name}-cr.yaml"
-	if [ ! -f "${rendered_policy}" ]; then
-		echo >&2 "Could not find policy file: ${rendered_policy}"
+	gen_dir="${_GEN_DIR}"
+	if [ ! -d "${gen_dir}" ]; then
+		echo >&2 "Could not find gen directory: ${gen_dir}"
 		exit 1
 	fi
-	head -n 1 "${rendered_policy}" | grep -q '^#' && $SED -i '1d' "${rendered_policy}"
-	cat "${rendered_policy}"
+	echo "${gen_dir}"
 fi

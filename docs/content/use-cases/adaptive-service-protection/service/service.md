@@ -13,4 +13,8 @@ keywords:
 import DocCardList from '@theme/DocCardList';
 ```
 
+Response times of a service start to deteriorate when the service's underlying
+concurrency limit is surpassed. Following are use-cases for protecting services
+from overload based on various signals.
+
 <DocCardList />

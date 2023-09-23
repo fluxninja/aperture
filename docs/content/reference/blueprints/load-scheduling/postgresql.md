@@ -8,14 +8,9 @@ sidebar_label: Load Scheduling for PostgreSQL
 
 ## Introduction
 
-This policy detects traffic overloads and cascading failure build-up on
-PostgreSQL by checking the real-time percentage of PostgreSQL connections
-against the maximum number of connections.
-
-It also uses the CPU utilization ratio of the PostgreSQL pod to confirm traffic
-overloads and cascading failure build-up. The CPU utilization ratio is the
-percentage of CPU used by the PostgreSQL pod divided by the total CPU available
-to the pod.
+This policy detects traffic overloads and connection build-up on PostgreSQL by
+checking the real-time percentage of PostgreSQL connections against the maximum
+number of connections.
 
 All the PostgreSQL related metrics are collected by the
 [PostgreSQL OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/postgresqlreceiver)

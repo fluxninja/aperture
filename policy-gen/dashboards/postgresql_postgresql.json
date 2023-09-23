@@ -1,0 +1,804 @@
+{
+    "panels": [
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": {
+                    "filter_regex": "",
+                    "name": "$datasource"
+                }
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 0,
+                "y": 0
+            },
+            "id": 1,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": {
+                            "filter_regex": "",
+                            "name": "$datasource"
+                        }
+                    },
+                    "expr": "count(postgresql_database_count{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"})",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "PGSQL Instances",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 6,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_db_size_bytes{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}) / 1024 / 1024 / 1024",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "PGSQL Instances Size (GB)",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 12,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_table_count{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"})",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Number of tables",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 18,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_table_size_bytes{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}) / 1024 / 1024",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Tables Size (MB) ",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 0,
+                "y": 5
+            },
+            "id": 5,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"heap_hit\"}) / (sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"heap_hit\"}) + sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"heap_read\"}))",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Table cache hit rate %",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 6,
+                "y": 5
+            },
+            "id": 6,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"idx_hit\"}) / (sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"idx_hit\"}) + sum(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"idx_read\"}))",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Index cache hit rate %",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 12,
+                "y": 5
+            },
+            "id": 7,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(postgresql_backends{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}) / sum(postgresql_connection_max{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}) * 100",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Active Connections %",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 18,
+                "y": 5
+            },
+            "id": 8,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "postgresql_connection_max{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"} / postgresql_database_count",
+                    "intervalFactor": 1,
+                    "legendFormat": "{{ instance }} - {{ policy_name }}",
+                    "range": true
+                }
+            ],
+            "title": "Max Connections",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "axisLabel": "",
+                        "fillOpacity": 10
+                    },
+                    "unit": ""
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 0,
+                "y": 20
+            },
+            "id": 9,
+            "interval": "30s",
+            "options": {
+                "legend": {
+                    "placement": "right"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "rate(postgresql_commits_total{policy_name=\"postgres-connections\", infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}[$__rate_interval])",
+                    "intervalFactor": 1,
+                    "legendFormat": "Commits"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "rate(postgresql_rollbacks_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}[$__rate_interval])",
+                    "intervalFactor": 1,
+                    "legendFormat": "Rollbacks"
+                }
+            ],
+            "title": "Commits vs Rollbacks",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "axisLabel": "",
+                        "fillOpacity": 10
+                    },
+                    "unit": ""
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 12,
+                "y": 20
+            },
+            "id": 10,
+            "interval": "30s",
+            "options": {
+                "legend": {
+                    "placement": "right"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum by (operation) (rate(postgresql_operations_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",operation=\"ins\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Insert"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum by (operation) (rate(postgresql_operations_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",operation=\"del\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Delete"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum by (operation) (rate(postgresql_operations_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",operation=\"upd\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Update"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum by (operation) (rate(postgresql_operations_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",operation=\"hot_upd\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Hot Update"
+                }
+            ],
+            "title": "Operations",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "axisLabel": "",
+                        "fillOpacity": 10
+                    },
+                    "unit": ""
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 0,
+                "y": 30
+            },
+            "id": 11,
+            "interval": "30s",
+            "options": {
+                "legend": {
+                    "placement": "right"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(rate(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"heap_read\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Heap Read"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(rate(postgresql_blocks_read_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",source=\"idx_read\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Index Read"
+                }
+            ],
+            "title": "Heap Read vs Index Read",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {
+                        "axisLabel": "",
+                        "fillOpacity": 10
+                    },
+                    "unit": ""
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 12,
+                "y": 30
+            },
+            "id": 12,
+            "interval": "30s",
+            "options": {
+                "legend": {
+                    "placement": "right"
+                }
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(rate(postgresql_bgwriter_checkpoint_count_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",type=\"requested\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Requested"
+                },
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "sum(rate(postgresql_bgwriter_checkpoint_count_total{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",type=\"scheduled\"}[$__rate_interval]))",
+                    "intervalFactor": 1,
+                    "legendFormat": "Scheduled"
+                }
+            ],
+            "title": "Checkpoint Scheduled vs Requested",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 0,
+                "y": 40
+            },
+            "id": 13,
+            "options": {
+                "displayMode": "gradient",
+                "orientation": "horizontal",
+                "valueMode": "text"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "topk(5, sum by (postgresql_table_name,postgresql_database_name) (postgresql_rows{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\",state=\"live\"}))",
+                    "format": "time_series",
+                    "instant": false,
+                    "intervalFactor": 1,
+                    "legendFormat": null,
+                    "range": true
+                }
+            ],
+            "title": "Tables with most live rows",
+            "type": "bargauge"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "$datasource"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                }
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 12,
+                "y": 40
+            },
+            "id": 14,
+            "options": {
+                "displayMode": "gradient",
+                "orientation": "horizontal",
+                "valueMode": "text"
+            },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "$datasource"
+                    },
+                    "expr": "topk(5, sum by (postgresql_table_name,postgresql_database_name) (postgresql_table_size_bytes{policy_name=\"postgres-connections\",infra_meter_name=\"{\"agent_group\": \"default\", \"per_agent_group\": true, \"receivers\": {\"postgresql\": {\"collection_interval\": \"1s\", \"databases\": [\"postgres\"], \"endpoint\": \"postgresql.postgresql.svc.cluster.local:5432\", \"password\": \"secretpassword\", \"tls\": {\"insecure\": true}, \"username\": \"postgres\"}}}\"}))",
+                    "format": "time_series",
+                    "instant": false,
+                    "intervalFactor": 1,
+                    "legendFormat": null,
+                    "range": true
+                }
+            ],
+            "title": "Tables with most disk usage",
+            "type": "bargauge"
+        }
+    ],
+    "refresh": "15s",
+    "schemaVersion": 36,
+    "templating": {
+        "list": [
+            {
+                "includeAll": false,
+                "label": "Data Source",
+                "multi": false,
+                "name": "datasource",
+                "query": "prometheus",
+                "type": "datasource"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-15m",
+        "to": "now"
+    },
+    "timezone": "browser",
+    "title": "Aperture Service Protection for PostgreSQL"
+}

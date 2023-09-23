@@ -1,4 +1,3 @@
-local infraMeterPanelLibrary = import './infra_meter_panel_library.libsonnet';
 local base = import './utils/base_dashboard.libsonnet';
 local defaultConfig = import './utils/default_config.libsonnet';
 local unwrapInfraMeter = import './utils/unwrap_infra_meter_panel.libsonnet';
@@ -68,10 +67,8 @@ function(policyFile, cfg) {
     for receiver in std.objectFields(infraMeters[infraMeter].receivers)
   },
 
-
   local panels = flowControlPanels + otherPanels,
-  local final = dashboard.baseDashboard
-                + g.dashboard.withPanels(panels),
+  local final = dashboard.baseDashboard + g.dashboard.withPanels(panels),
 
   dashboard: final,
   receiverDashboards: receiverDashboards,

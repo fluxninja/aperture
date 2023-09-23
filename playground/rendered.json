@@ -1,0 +1,393 @@
+{
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Decisions", "fillOpacity": 10 },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "y": 10 },
+      "id": 1,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "sum by(decision_type) (rate(workload_requests_total{policy_name=\"postgres-connections\"}[$__rate_interval]))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Quota Checks",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Decisions", "fillOpacity": 10 },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "y": 20 },
+      "id": 2,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name=\"postgres-connections\",decision_type=\"DECISION_TYPE_ACCEPTED\"}[$__rate_interval]))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Workload Decisions (accepted)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Decisions", "fillOpacity": 10 },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "y": 30 },
+      "id": 3,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "sum by(workload_index, decision_type) (rate(workload_requests_total{policy_name=\"postgres-connections\",decision_type=\"DECISION_TYPE_REJECTED\"}[$__rate_interval]))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Workload Decisions (rejected)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Latency", "fillOpacity": 10 },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "y": 40 },
+      "id": 4,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "(sum by (workload_index) (increase(workload_latency_ms_sum{policy_name=\"postgres-connections\"}[$__rate_interval])))/(sum by (workload_index) (increase(workload_latency_ms_count{policy_name=\"postgres-connections\"}[$__rate_interval])))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Workload Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Wait Time", "fillOpacity": 10 },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "y": 50 },
+      "id": 5,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "(sum by (component_id) (increase(request_in_queue_duration_ms_sum{policy_name=\"postgres-connections\"}[$__rate_interval])))/(sum by (component_id) (increase(request_in_queue_duration_ms_count{policy_name=\"postgres-connections\"}[$__rate_interval])))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Request in Queue Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Token Rate", "fillOpacity": 10 },
+          "unit": ""
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "y": 60 },
+      "id": 6,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "sum(rate(incoming_tokens_total{policy_name=\"postgres-connections\"}[$__rate_interval]))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Incoming Token Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "Token Rate", "fillOpacity": 10 },
+          "unit": ""
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 60 },
+      "id": 7,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "sum(rate(accepted_tokens_total{policy_name=\"postgres-connections\"}[$__rate_interval]))",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Accepted Token Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "y": 70 },
+      "id": 8,
+      "options": { "displayMode": "gradient", "orientation": "horizontal" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(wfq_flows_total{policy_name=\"postgres-connections\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 1,
+          "legendFormat": null,
+          "range": true
+        }
+      ],
+      "title": "WFQ Scheduler Flows",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 70 },
+      "id": 9,
+      "options": { "displayMode": "gradient", "orientation": "horizontal" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(wfq_requests_total{policy_name=\"postgres-connections\"})",
+          "format": "time_series",
+          "instant": false,
+          "intervalFactor": 1,
+          "legendFormat": null,
+          "range": true
+        }
+      ],
+      "title": "WFQ Scheduler Heap Requests",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "y": 100 },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(token_bucket_lm_ratio{policy_name=\"postgres-connections\"})",
+          "intervalFactor": 1,
+          "legendFormat": "{{ instance }} - {{ policy_name }}",
+          "range": true
+        }
+      ],
+      "title": "Average Load Multiplier",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 100 },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(token_bucket_capacity_total{policy_name=\"postgres-connections\"})",
+          "intervalFactor": 1,
+          "legendFormat": "{{ instance }} - {{ policy_name }}",
+          "range": true
+        }
+      ],
+      "title": "Token Bucket Capacity",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 100 },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(token_bucket_fill_rate{policy_name=\"postgres-connections\"})",
+          "intervalFactor": 1,
+          "legendFormat": "{{ instance }} - {{ policy_name }}",
+          "range": true
+        }
+      ],
+      "title": "Token Bucket FillRate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 100 },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "avg(token_bucket_available_tokens_total{policy_name=\"postgres-connections\"})",
+          "intervalFactor": 1,
+          "legendFormat": "{{ instance }} - {{ policy_name }}",
+          "range": true
+        }
+      ],
+      "title": "Token Bucket Available Tokens",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "axisLabel": "", "fillOpacity": 10 },
+          "unit": ""
+        }
+      },
+      "gridPos": { "h": 10, "w": 24 },
+      "id": 14,
+      "interval": "30s",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "$datasource" },
+          "expr": "(sum(postgresql_backends{policy_name=\"postgres-connections\",infra_meter_name=\"postgresql\"}) / sum(postgresql_connection_max{policy_name=\"postgres-connections\",infra_meter_name=\"postgresql\"})) * 100",
+          "intervalFactor": 1
+        }
+      ],
+      "title": "Query for SIGNAL",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 36,
+  "templating": {
+    "list": [
+      {
+        "includeAll": false,
+        "label": "Data Source",
+        "multi": false,
+        "name": "datasource",
+        "query": "prometheus",
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-15m", "to": "now" },
+  "timezone": "browser",
+  "title": "Aperture Service Protection for PostgreSQL"
+}
