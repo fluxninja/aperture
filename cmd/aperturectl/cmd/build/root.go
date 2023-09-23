@@ -1,12 +1,16 @@
 package build
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
@@ -38,6 +42,7 @@ var (
 	apertureVersion string
 
 	skipPull bool
+	lock     *flock.Flock
 )
 
 func init() {
@@ -53,7 +58,7 @@ var BuildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Builds the agent and controller binaries",
 	Long:  "Builds the agent and controller binaries",
-	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 		// get aperture repository and save it to aperturectl root directory
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -79,9 +84,22 @@ var BuildCmd = &cobra.Command{
 			}
 			apertureURI = fmt.Sprintf("%s@%s", defaultApertureRepo, apertureVersion)
 		} else {
-			apertureURI, err = filepath.Abs(apertureURI)
-			if err != nil {
-				return err
+			// uri can be a file or url
+			// first detect if it's a local path
+			if _, err = os.Stat(apertureURI); err == nil {
+				// path exists
+				apertureURI, err = filepath.Abs(apertureURI)
+				if err != nil {
+					return err
+				}
+			} else {
+				// try to parse as url
+				var apertureURL *url.URL
+				apertureURL, err = url.Parse(apertureURI)
+				if err != nil {
+					return err
+				}
+				apertureURI = apertureURL.String()
 			}
 		}
 
@@ -93,8 +111,18 @@ var BuildCmd = &cobra.Command{
 			return err
 		}
 
+		// get a file lock on the builderURIRoot
+		lock = flock.New(filepath.Join(builderURIRoot, "lock"))
+		locked, err := lock.TryLockContext(context.Background(), time.Millisecond*100)
+		if err != nil {
+			return err
+		}
+		if !locked {
+			return errors.New("could not get lock on: " + builderURIRoot)
+		}
+
 		// pull the latest blueprints based on skipPull and whether cmd is remove
-		if !skipPull && cmd.Use != "remove" {
+		if !skipPull {
 			err = utils.PullSource(builderURIRoot, apertureURI)
 			if err != nil {
 				return err
@@ -110,5 +138,12 @@ var BuildCmd = &cobra.Command{
 			return err
 		}
 		return nil
+	},
+	PersistentPostRunE: func(_ *cobra.Command, _ []string) error {
+		if lock == nil {
+			return nil
+		}
+		// release the lock
+		return lock.Unlock()
 	},
 }

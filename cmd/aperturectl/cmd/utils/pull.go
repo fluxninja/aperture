@@ -21,12 +21,6 @@ const (
 )
 
 func PullSource(dir, uri string) error {
-	err := WriterLock(dir)
-	if err != nil {
-		return err
-	}
-	defer Unlock(dir)
-
 	spec := specv1.New()
 	contents, err := json.MarshalIndent(spec, "", "  ")
 	if err != nil {

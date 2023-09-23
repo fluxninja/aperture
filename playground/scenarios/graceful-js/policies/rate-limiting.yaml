@@ -2,6 +2,8 @@
 # Generated values file for rate-limiting/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/rate-limiting
+blueprint: rate-limiting/base
+uri: ../../../../blueprints
 policy:
   policy_name: rate-limiting
   rate_limiter:

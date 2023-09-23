@@ -1,6 +1,8 @@
 # Generated values file for load-scheduling/postgresql blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/postgresql
+blueprint: load-scheduling/postgresql
+uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
   # Name of the policy.

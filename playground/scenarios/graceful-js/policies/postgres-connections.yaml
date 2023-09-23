@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/postgresql/gen/definitions.json
 
+blueprint: load-scheduling/postgresql
+uri: ../../../../blueprints
 policy:
   policy_name: postgres-connections
   resources:
