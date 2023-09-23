@@ -5,8 +5,7 @@
     {
       "blueprint_name": "load-scheduling/average-latency",
       "policy_name": "service-protection",
-      "values_file": "policies/service-protection.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/service-protection.yaml"
     }
   ],
   "images": [

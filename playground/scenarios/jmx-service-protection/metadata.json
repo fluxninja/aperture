@@ -5,8 +5,7 @@
     {
       "blueprint_name": "load-scheduling/jmx",
       "policy_name": "jmx-service-protection",
-      "values_file": "policies/jmx-service-protection.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/jmx-service-protection.yaml"
     }
   ],
   "images": [

@@ -621,47 +621,13 @@ def render_aperturectl(policies, namespace, cloud_extension):
         blueprint_name = policy["blueprint_name"]
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
-        gen_dir = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
+        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
                                   blueprint_name, policy_name, values_file, api_key, endpoint, agent_group, action], quiet=True)
 
-        if gen_dir:
-            # find all yaml files in the generated directory
-            for file in listdir(str(gen_dir) + "/policies"):
-                if file.endswith("cr.yaml"):
-                    rendered = local(
-                        quiet=True,
-                        command=[
-                            "cat",
-                            os.path.join(gen_dir + "/policies", file)
-                        ]
-                    )
-                    if namespace:
-                        rendered = namespace_inject(rendered, namespace)
-                    wrapped_k8s_yaml(rendered)
-            
-            for file in listdir(str(gen_dir) + "/dashboards"):
-                if file.endswith("json"):
-                    rendered = local(
-                        quiet=True,
-                        command=[
-                            "cat",
-                            os.path.join(gen_dir + "/dashboards", file)
-                        ]
-                    )
-                    wrap_dashboard_json(rendered, file)
-
-
-def wrap_dashboard_json(json, file):
-    ds = {
-        "renderer": "jsonnet",
-        "namespace": APERTURE_CONTROLLER_NS,
-        "labels": "ApertureController",
-        "needs": ["aperture-grafana"],
-        "manifests_path": os.path.join(GIT_ROOT, "playground", "resources", "grafana-dashboard", "main.jsonnet"),
-        "jsonnet_args": ["-J", PLAYGROUND_ROOT + "/tanka/vendor",
-                            "--ext-str", "APERTURE_DASHBOARD=%s" % json],
-    }
-    DEP_TREE[APERTURE_CONTROLLER_NS]["scenario-dashboard-%s" % file] = ds
+        if rendered:
+            if namespace:
+                rendered = namespace_inject(rendered, namespace)
+            wrapped_k8s_yaml(rendered)
 
 
 def print_available_resources(dep_tree):
@@ -954,8 +920,6 @@ def process_aperture_scenario(scenario_path):
     for policy in aperture_policies:
         if "values_file" in policy:
             policy["values_file"] = scenario_path + "/" + policy["values_file"]
-        if "dashboard_mixin_dir" in policy:
-            policy["dashboard_mixin_dir"] = scenario_path + "/" + policy["dashboard_mixin_dir"]
 
     if aperture_policies:
         policies = {
