@@ -189,14 +189,6 @@ func buildRunE(service string) func(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		// get lock file
-		err = utils.WriterLock(builderURIRoot)
-		if err != nil {
-			log.Error().Err(err).Msg("failed to get lock file")
-			return err
-		}
-		defer utils.Unlock(builderURIRoot)
-
 		// for each extension module:
 		// add replace directives to the final go.mod
 		// generate code that calls the extension module's PlatformOptions(), AgentOptions(), ControllerOptions() functions

@@ -1,6 +1,8 @@
 # Generated values file for load-scheduling/elasticsearch blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/elasticsearch
+blueprint: load-scheduling/elasticsearch
+uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
   # Name of the policy.

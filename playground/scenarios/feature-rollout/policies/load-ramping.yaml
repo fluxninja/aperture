@@ -6,6 +6,8 @@
 # Parameters for the load ramp policy.
 # Type: load-ramping/base:schema:rollout_policy
 # Required: True
+blueprint: load-ramping/base
+uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string

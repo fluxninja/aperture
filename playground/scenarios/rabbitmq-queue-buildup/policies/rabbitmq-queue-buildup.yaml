@@ -1,4 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/promql/gen/definitions.json
+
+blueprint: load-scheduling/promql
+uri: ../../../../blueprints
 policy:
   policy_name: "service1-demoapp-rabbitmq-queue-buildup"
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'

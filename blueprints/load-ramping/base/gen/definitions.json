@@ -3,8 +3,19 @@
   "type": "object",
   "title": "load-ramping/base blueprint",
   "additionalProperties": false,
-  "required": ["policy"],
+  "required": ["blueprint", "uri", "policy"],
   "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "load-ramping/base",
+      "enum": ["load-ramping/base"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
     "policy": {
       "type": "object",
       "additionalProperties": false,

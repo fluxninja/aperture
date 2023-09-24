@@ -485,10 +485,21 @@ title: "{{ blueprint_name }} blueprint"
 additionalProperties: false
 {% if nested_parameters.required_children %}
 required:
+- blueprint
+- uri
 {% for child_name in nested_parameters.required_children %}- {{ child_name }}
 {% endfor %}
 {% endif %}
 properties:
+  blueprint:
+    description: "Blueprint name"
+    type: string
+    default: "{{ blueprint_name }}"
+    enum: ["{{ blueprint_name }}"]
+  uri:
+    description: "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest."
+    default: "github.com/fluxninja/aperture/blueprints@latest"
+    type: string
 {% for child_name, child_node in nested_parameters.children.items() %}
   {{ render_properties(child_node, '@param') | indent(2) }}
 {% endfor %}
@@ -498,14 +509,12 @@ $defs:
 {% endfor %}
 """
 
-JSON_SCHEMA_DEFINITIONS_TPL = """
-
-"""
-
 YAML_TPL = """
 # Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/{{ blueprint_name }}
+blueprint: {{ blueprint_name }}
+uri: github.com/fluxninja/aperture/blueprints@latest
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- if not value.items() %}
@@ -705,7 +714,7 @@ def render_sample_config_yaml(
     parameters: Blueprint,
 ):
     # flatten_config removes the nodes which are not required
-    def flatten_config(node: ParameterNode) -> ParameterNode:
+    def flatten_config(node: ParameterNode) -> ParameterNode | None:
         flattened = None
         if node.parameter.param_type == "intermediate_node":
             for child_name, child_node in node.children.items():

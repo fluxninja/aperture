@@ -1,6 +1,8 @@
 # Generated values file for load-ramping/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-ramping/base
+blueprint: load-ramping/base
+uri: github.com/fluxninja/aperture/blueprints@latest
 
 # Specify certain label values to be always accepted by the _Sampler_ regardless of accept percentage. This configuration can be updated at the runtime without shutting down the policy.
 # Type: []string

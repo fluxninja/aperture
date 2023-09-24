@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/elasticsearch/gen/definitions.json
+blueprint: load-scheduling/elasticsearch
+uri: ../../../../blueprints
 policy:
   policy_name: "service1-demoapp-elasticsearch-overload"
   service_protection_core:

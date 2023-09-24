@@ -27,12 +27,12 @@ Use this command to list the Aperture Blueprints which are already pulled and av
 aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		err := utils.ReaderLock(blueprintsURIRoot)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := pullCmd.RunE(cmd, args)
 		if err != nil {
 			return err
 		}
-		defer utils.Unlock(blueprintsURIRoot)
+
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
@@ -69,6 +69,9 @@ aperturectl blueprints list --all`,
 		}
 
 		return nil
+	},
+	PostRunE: func(cmd *cobra.Command, args []string) error {
+		return pullCmd.PostRunE(cmd, args)
 	},
 }
 

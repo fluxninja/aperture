@@ -3,6 +3,8 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-ramping/base
 
+blueprint: load-ramping/base
+uri: ../../../../../../blueprints
 policy:
   drivers:
     average_latency_drivers:
