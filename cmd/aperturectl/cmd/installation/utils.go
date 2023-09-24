@@ -44,7 +44,6 @@ var (
 	kubeConfig     string
 	kubeRestConfig *rest.Config
 	version        string
-	latestVersion  string
 	namespace      string
 	dryRun         bool
 	kubeClient     client.Client
@@ -53,7 +52,7 @@ var (
 )
 
 const (
-	apertureLatestVersion  = "latest"
+	latestTag              = "latest"
 	defaultNS              = "default"
 	controller             = "controller"
 	agent                  = "agent"

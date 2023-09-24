@@ -29,8 +29,8 @@ import (
 // ldflags to be added to the final binary that set version and other build-time variables
 
 const (
-	defaultApertureRepo    = "github.com/fluxninja/aperture"
-	defaultApertureVersion = "latest"
+	defaultApertureRepo = "github.com/fluxninja/aperture"
+	latestTag           = "latest"
 )
 
 var (
@@ -46,7 +46,7 @@ var (
 )
 
 func init() {
-	BuildCmd.PersistentFlags().StringVar(&apertureVersion, "version", defaultApertureVersion, "Version of Aperture, e.g. latest. This field should not be provided when the URI is provided")
+	BuildCmd.PersistentFlags().StringVar(&apertureVersion, "version", "", "Version of Aperture, e.g. latest. This field should not be provided when the URI is provided")
 	BuildCmd.PersistentFlags().StringVar(&apertureURI, "uri", "", "URI of Aperture repository, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture@latest. This field should not be provided when the Version is provided.")
 	BuildCmd.PersistentFlags().BoolVar(&skipPull, "skip-pull", false, "Skip pulling the repository update.")
 	BuildCmd.AddCommand(agentCmd)
@@ -70,17 +70,14 @@ var BuildCmd = &cobra.Command{
 			return err
 		}
 		// either the URI or version is set, not both
-		if apertureURI != "" && apertureVersion != defaultApertureVersion {
+		if apertureURI != "" && apertureVersion != "" {
 			return errors.New("either the URI or version should be set, not both")
 		}
 
 		// set the URI
 		if apertureURI == "" {
-			if apertureVersion == defaultApertureVersion {
-				apertureVersion, err = utils.ResolveLatestVersion()
-				if err != nil {
-					return err
-				}
+			if apertureVersion == "" {
+				apertureVersion = latestTag
 			}
 			apertureURI = fmt.Sprintf("%s@%s", defaultApertureRepo, apertureVersion)
 		} else {

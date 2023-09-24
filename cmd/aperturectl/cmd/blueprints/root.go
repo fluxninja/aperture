@@ -6,6 +6,7 @@ import (
 
 const (
 	defaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
+	latestTag             = "latest"
 )
 
 var (

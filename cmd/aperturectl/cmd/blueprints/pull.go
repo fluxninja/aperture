@@ -46,10 +46,7 @@ aperturectl blueprints pull --version latest`,
 		// set the URI
 		if blueprintsURI == "" {
 			if blueprintsVersion == "" {
-				blueprintsVersion, err = utils.ResolveLatestVersion()
-				if err != nil {
-					return err
-				}
+				blueprintsVersion = latestTag
 			}
 			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
 		} else {
