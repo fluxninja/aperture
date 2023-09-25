@@ -112,7 +112,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.'
     type='Object (postgresql)'
     reference='#postgresql'
-    value='{"agent_group": "default", "collection_interval": "10s", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
+    value='{"agent_group": "default", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -483,20 +483,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='string'
     reference=''
     value='"default"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="postgresql-collection-interval"></a>
-
-<ParameterDescription
-    name='collection_interval'
-    description='This receiver collects metrics on an interval.'
-    type='string'
-    reference=''
-    value='"10s"'
 />
 
 <!-- vale on -->

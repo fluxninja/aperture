@@ -14,9 +14,7 @@ function(params, metadata={}) {
     policy+: {
       promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"%(k8s_pod_name)s"})' % { k8s_pod_name: c.policy.jmx.k8s_pod_name },
       setpoint: c.policy.service_protection_core.setpoint,
-      service_protection_core+: {
-        overload_condition: 'gt',
-      },
+      overload_condition: 'gt',
     },
   },
 

@@ -16,9 +16,7 @@ function(params, metadata={}) {
     policy+: {
       promql_query: promqlQuery,
       setpoint: c.policy.service_protection_core.setpoint,
-      service_protection_core+: {
-        overload_condition: 'gt',
-      },
+      overload_condition: 'gt',
     },
   },
 
@@ -32,7 +30,7 @@ function(params, metadata={}) {
             agent_group: if std.objectHas(updated_cfg.policy.postgresql, 'agent_group') then updated_cfg.policy.postgresql.agent_group else 'default',
             per_agent_group: true,
             receivers: {
-              postgresql: std.prune(updated_cfg.policy.postgresql { agent_group: null }),
+              postgresql: std.prune(updated_cfg.policy.postgresql { agent_group: null, collection_interval: '10s' }),
             },
           },
         },

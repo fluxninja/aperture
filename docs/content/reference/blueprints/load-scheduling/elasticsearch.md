@@ -472,20 +472,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="elasticsearch-collection-interval"></a>
-
-<ParameterDescription
-    name='collection_interval'
-    description='This receiver collects metrics on an interval.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="elasticsearch-endpoint"></a>
 
 <ParameterDescription

@@ -11,7 +11,6 @@ serviceProtectionDefaults {
     * @schema (elasticsearch.nodes: []string) Node filters that define which nodes are scraped for node-level and cluster-level metrics.
     * @schema (elasticsearch.indices: []string) Index filters that define which indices are scraped for index-level metrics.
     * @schema (elasticsearch.skip_cluster_metrics: bool) If true, cluster-level metrics will not be scraped.
-    * @schema (elasticsearch.collection_interval: string) This receiver collects metrics on an interval.
     * @schema (elasticsearch.initial_delay: string) Defines how long this receiver waits before starting.
     */
     elasticsearch: {

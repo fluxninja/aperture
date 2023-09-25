@@ -23,7 +23,8 @@
         "policy_name",
         "service_protection_core",
         "promql_query",
-        "setpoint"
+        "setpoint",
+        "overload_condition"
       ],
       "properties": {
         "components": {
@@ -53,7 +54,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler", "overload_condition"],
+          "required": ["aiad_load_scheduler"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -96,11 +97,6 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
-            },
-            "overload_condition": {
-              "description": "Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "string"
             }
           }
         },
@@ -114,6 +110,11 @@
           "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
+        },
+        "overload_condition": {
+          "description": "Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
         }
       }
     },

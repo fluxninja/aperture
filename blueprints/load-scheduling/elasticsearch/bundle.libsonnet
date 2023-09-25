@@ -13,9 +13,7 @@ function(params, metadata={}) {
     policy+: {
       promql_query: 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))',
       setpoint: c.policy.service_protection_core.setpoint,
-      service_protection_core+: {
-        overload_condition: 'gt',
-      },
+      overload_condition: 'gt',
     },
   },
 
@@ -31,6 +29,7 @@ function(params, metadata={}) {
             receivers: {
               elasticsearch: std.prune(updated_cfg.policy.elasticsearch {
                 agent_group: null,
+                collection_interval: '10s',
                 metrics+: {
                   'elasticsearch.node.operations.current': {
                     enabled: true,

@@ -5,9 +5,7 @@ local config = import './config.libsonnet';
 function(cfg, params={}, metadata={}) {
   local updatedConfig = config + cfg + {
     policy+: {
-      service_protection_core+: {
-        overload_condition: 'gt',
-      },
+      overload_condition: 'gt',
     },
   },
 

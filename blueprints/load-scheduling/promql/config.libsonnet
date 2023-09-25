@@ -11,11 +11,9 @@ serviceProtectionDefaults {
     */
     setpoint: '__REQUIRED_FIELD__',
     /**
-    * @param (policy.service_protection_core.overload_condition: string)Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.
+    * @param (policy.overload_condition: string)Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.
     */
-    service_protection_core+: {
-      overload_condition: '__REQUIRED_FIELD__',
-    },
+    overload_condition: '__REQUIRED_FIELD__',
   },
 
   dashboard+: {

@@ -247,10 +247,6 @@
           "default": "default",
           "type": "string"
         },
-        "collection_interval": {
-          "description": "This receiver collects metrics on an interval.",
-          "type": "string"
-        },
         "endpoint": {
           "description": "Endpoint of the Elasticsearch.",
           "default": "__REQUIRED_FIELD__",
