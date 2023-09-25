@@ -105,34 +105,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query to detect PostgreSQL overload.'
-    type='string'
-    reference=''
-    value='"(sum(postgresql_backends{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"}) / sum(postgresql_connection_max{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"})) * 100"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-setpoint"></a>
-
-<ParameterDescription
-    name='policy.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-postgresql"></a>
 
 <ParameterDescription
@@ -209,13 +181,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-condition"></a>
+<a id="policy-service-protection-core-setpoint"></a>
 
-<ParameterDescription name='policy.service_protection_core.overload_condition'
-description='Overload condition determines the criteria to determine overload
-state. The default condition is 'gt', that is, when the signal is greater than
-the setpoint. The condition must be one of: gt, lt, gte, lte.' type='string'
-reference='' value='"**REQUIRED_FIELD**"' />
+<ParameterDescription
+    name='policy.service_protection_core.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 

@@ -170,7 +170,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 description='Overload condition determines the criteria to determine overload
 state. The default condition is 'gt', that is, when the signal is greater than
 the setpoint. The condition must be one of: gt, lt, gte, lte.' type='string'
-reference='' value='"**REQUIRED_FIELD**"' />
+reference='' value='"gt"' />
 
 <!-- vale on -->
 

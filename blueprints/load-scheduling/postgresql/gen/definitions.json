@@ -19,12 +19,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "setpoint",
-        "postgresql"
-      ],
+      "required": ["policy_name", "service_protection_core", "postgresql"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -53,7 +48,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler", "overload_condition"],
+          "required": ["aiad_load_scheduler", "setpoint"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -97,23 +92,13 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
             },
-            "overload_condition": {
-              "description": "Overload condition determines the criteria to determine overload state. The default condition is 'gt', that is, when the signal is greater than the setpoint. The condition must be one of: gt, lt, gte, lte.",
+            "setpoint": {
+              "description": "Setpoint.",
               "default": "__REQUIRED_FIELD__",
-              "type": "string"
+              "type": "number",
+              "format": "double"
             }
           }
-        },
-        "promql_query": {
-          "description": "PromQL query to detect PostgreSQL overload.",
-          "default": "(sum(postgresql_backends{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"}) / sum(postgresql_connection_max{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"})) * 100",
-          "type": "string"
-        },
-        "setpoint": {
-          "description": "Setpoint.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "number",
-          "format": "double"
         },
         "postgresql": {
           "description": "Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.",

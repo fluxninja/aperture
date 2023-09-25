@@ -162,6 +162,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale on -->
 
+<!-- vale off -->
+
+<a id="policy-service-protection-core-setpoint"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
 ---
 
 <!-- vale off -->

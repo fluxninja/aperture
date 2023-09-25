@@ -20,6 +20,13 @@ serviceProtectionDefaults {
       endpoint: '__REQUIRED_FIELD__',
       agent_group: 'default',
     },
+
+    /**
+    * @param (policy.service_protection_core.setpoint: float64) Setpoint.
+    */
+    service_protection_core+: {
+      setpoint: '__REQUIRED_FIELD__',
+    },
   },
 
   dashboard+: {

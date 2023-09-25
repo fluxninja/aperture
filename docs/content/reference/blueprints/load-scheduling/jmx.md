@@ -136,6 +136,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-service-protection-core-setpoint"></a>
+
+<ParameterDescription
+    name='policy.service_protection_core.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### policy.jmx {#policy-jmx}
 
 <!-- vale on -->
@@ -164,6 +178,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Integer (int32)'
     reference=''
     value='8087'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-jmx-k8s-pod-name"></a>
+
+<ParameterDescription
+    name='policy.jmx.k8s_pod_name'
+    description='Name of the Kubernetes pod for which JMX metrics are scraped.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

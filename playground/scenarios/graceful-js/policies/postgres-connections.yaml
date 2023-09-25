@@ -4,7 +4,6 @@ blueprint: load-scheduling/postgresql
 uri: ../../../../blueprints
 policy:
   policy_name: postgres-connections
-  setpoint: 40
   resources:
     flow_control:
       classifiers:
@@ -26,7 +25,7 @@ policy:
     tls:
       insecure: true
   service_protection_core:
-    overload_condition: gt
+    setpoint: 40
     aiad_load_scheduler:
       load_multiplier_linear_decrement: 0.2
       load_multiplier_linear_increment: 0.05

@@ -9,7 +9,18 @@ function(params, metadata={}) {
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
 
-  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
+  local policyName = c.policy.policy_name,
+  local promqlQuery = '(sum(postgresql_backends{policy_name="%(policy_name)s",infra_meter_name="postgresql"}) / sum(postgresql_connection_max{policy_name="%(policy_name)s",infra_meter_name="postgresql"})) * 100' % { policy_name: policyName },
+
+  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
+    policy+: {
+      promql_query: promqlQuery,
+      setpoint: c.policy.service_protection_core.setpoint,
+      service_protection_core+: {
+        overload_condition: 'gt',
+      },
+    },
+  },
 
   local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
   assert !std.objectHas(infraMeters, 'postgresql') : 'An infra meter with name postgresql already exists. Please choose a different name.',
