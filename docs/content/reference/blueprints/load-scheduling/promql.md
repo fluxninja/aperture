@@ -102,6 +102,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-overload-condition"></a>
+
+<ParameterDescription
+    name='policy.overload_condition'
+    description='Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 ##### policy.service_protection_core {#policy-service-protection-core}
 
 <!-- vale on -->
@@ -157,7 +171,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for AIMD throttling strategy.'
     type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0, "overload_condition": "gt"}'
+    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0}'
 />
 
 <!-- vale on -->

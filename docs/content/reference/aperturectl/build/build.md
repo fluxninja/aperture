@@ -22,7 +22,7 @@ Builds the agent and controller binaries
   -h, --help             help for build
       --skip-pull        Skip pulling the repository update.
       --uri string       URI of Aperture repository, could be a local path or a remote git repository, e.g. github.com/fluxninja/aperture@latest. This field should not be provided when the Version is provided.
-      --version string   Version of Aperture, e.g. latest. This field should not be provided when the URI is provided (default "latest")
+      --version string   Version of Aperture, e.g. latest. This field should not be provided when the URI is provided
 ```
 
 ### SEE ALSO

@@ -2063,6 +2063,8 @@ func (m *AIADLoadScheduler) validate(all bool) error {
 
 	// no validation rules for DryRunConfigKey
 
+	// no validation rules for OverloadCondition
+
 	if len(errors) > 0 {
 		return AIADLoadSchedulerMultiError(errors)
 	}
@@ -7325,8 +7327,6 @@ func (m *AIADLoadScheduler_Parameters) validate(all bool) error {
 	// no validation rules for MaxLoadMultiplier
 
 	// no validation rules for LoadMultiplierLinearIncrement
-
-	// no validation rules for OverloadCondition
 
 	if all {
 		switch v := interface{}(m.GetAlerter()).(type) {

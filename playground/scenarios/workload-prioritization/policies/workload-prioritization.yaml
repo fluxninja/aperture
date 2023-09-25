@@ -2,6 +2,8 @@
 # Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
+blueprint: load-scheduling/average-latency
+uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string

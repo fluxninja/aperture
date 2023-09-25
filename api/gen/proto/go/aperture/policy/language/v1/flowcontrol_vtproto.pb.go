@@ -1967,13 +1967,6 @@ func (m *AIADLoadScheduler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x3a
 	}
-	if len(m.OverloadCondition) > 0 {
-		i -= len(m.OverloadCondition)
-		copy(dAtA[i:], m.OverloadCondition)
-		i = encodeVarint(dAtA, i, uint64(len(m.OverloadCondition)))
-		i--
-		dAtA[i] = 0x32
-	}
 	if m.LoadMultiplierLinearIncrement != 0 {
 		i -= 8
 		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.LoadMultiplierLinearIncrement))))
@@ -2040,6 +2033,13 @@ func (m *AIADLoadScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.OverloadCondition) > 0 {
+		i -= len(m.OverloadCondition)
+		copy(dAtA[i:], m.OverloadCondition)
+		i = encodeVarint(dAtA, i, uint64(len(m.OverloadCondition)))
+		i--
+		dAtA[i] = 0x32
 	}
 	if len(m.DryRunConfigKey) > 0 {
 		i -= len(m.DryRunConfigKey)
@@ -4612,10 +4612,6 @@ func (m *AIADLoadScheduler_Parameters) SizeVT() (n int) {
 	if m.LoadMultiplierLinearIncrement != 0 {
 		n += 9
 	}
-	l = len(m.OverloadCondition)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
-	}
 	if m.Alerter != nil {
 		l = m.Alerter.SizeVT()
 		n += 1 + l + sov(uint64(l))
@@ -4646,6 +4642,10 @@ func (m *AIADLoadScheduler) SizeVT() (n int) {
 		n += 2
 	}
 	l = len(m.DryRunConfigKey)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	l = len(m.OverloadCondition)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -9961,38 +9961,6 @@ func (m *AIADLoadScheduler_Parameters) UnmarshalVT(dAtA []byte) error {
 			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.LoadMultiplierLinearIncrement = float64(math.Float64frombits(v))
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OverloadCondition", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OverloadCondition = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Alerter", wireType)
@@ -10239,6 +10207,38 @@ func (m *AIADLoadScheduler) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.DryRunConfigKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OverloadCondition", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OverloadCondition = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

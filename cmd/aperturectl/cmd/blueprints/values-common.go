@@ -20,7 +20,6 @@ func createValuesFile(blueprintName string, valuesFile string, dynamicConfig boo
 	}
 
 	blueprintDir := filepath.Join(blueprintsDir, blueprintName)
-	log.Info().Msgf("blueprintDir: %s", blueprintDir)
 	// Show a warning if the blueprint is deprecated
 	ok, message := utils.IsBlueprintDeprecated(blueprintDir)
 	if ok {
@@ -67,10 +66,40 @@ func createValuesFile(blueprintName string, valuesFile string, dynamicConfig boo
 	// prepend YAML modeline to the file
 	if !noYAMLModeline {
 		var schemaURL string
+		prefix := fmt.Sprintf("file:%s", blueprintGenDir)
+
+		if strings.Contains(blueprintsURI, "github.com") {
+			// Splitting at '@' to get the tag
+			parts := strings.Split(blueprintsURI, "@")
+			if len(parts) == 2 {
+
+				tag := parts[1]
+
+				// Removing github.com and tag
+				trimmedURI := parts[0][len("github.com/"):]
+
+				// Get org and repo
+				orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
+				org := orgRepoParts[0]
+				repoAndPath := orgRepoParts[1]
+
+				// Split repo and path
+				repoPathParts := strings.SplitN(repoAndPath, "/", 2)
+				repo := repoPathParts[0]
+				path := ""
+				if len(repoPathParts) > 1 {
+					path = repoPathParts[1]
+				}
+
+				// Construct the raw GitHub URL
+				prefix = fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s/%s/gen", org, repo, tag, path, blueprintName)
+			}
+		}
+
 		if !dynamicConfig {
-			schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintGenDir, "definitions.json"))
+			schemaURL = fmt.Sprintf("%s/definitions.json", prefix)
 		} else {
-			schemaURL = fmt.Sprintf("file:%s", filepath.Join(blueprintGenDir, "dynamic-config-definitions.json"))
+			schemaURL = fmt.Sprintf("%s/dynamic-config-definitions.json", prefix)
 		}
 		_, err = out.WriteString("# yaml-language-server: $schema=" + schemaURL + "\n")
 		if err != nil {
@@ -97,7 +126,5 @@ func createValuesFile(blueprintName string, valuesFile string, dynamicConfig boo
 	if err != nil {
 		return fmt.Errorf("error opening file with editor: %s", err)
 	}
-
-	log.Info().Msgf("values file for the blueprint %s is available at: %s", blueprintName, valuesFile)
 	return nil
 }

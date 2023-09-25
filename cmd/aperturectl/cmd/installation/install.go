@@ -17,7 +17,7 @@ import (
 func init() {
 	InstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
 	InstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
-	InstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
+	InstallCmd.PersistentFlags().StringVar(&version, "version", latestTag, "Version of the Aperture")
 	InstallCmd.PersistentFlags().StringVar(&namespace, "namespace", defaultNS, "Namespace in which the component will be installed. Defaults to 'default' namespace")
 	InstallCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "If set to true, only the manifests will be generated and no installation will be performed")
 
@@ -60,13 +60,8 @@ Use this command to install Aperture Controller and Agent on your Kubernetes clu
 			}
 		}
 
-		latestVersion, err = utils.ResolveLatestVersion()
-		if err != nil {
-			return err
-		}
-
-		if version == "" || version == apertureLatestVersion {
-			version = latestVersion
+		if version == "" {
+			version = latestTag
 		}
 
 		return nil
