@@ -31,7 +31,7 @@ export class Flow {
   constructor(
     private span: Span,
     startDate: number,
-    private failOpen: boolean = true,
+    private rampMode: boolean = false,
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {
@@ -42,7 +42,7 @@ export class Flow {
 
   ShouldRun() {
     if (
-      (this.failOpen && this.checkResponse === null) ||
+      (!this.rampMode && this.checkResponse === null) ||
       this.checkResponse?.decisionType ===
         _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
