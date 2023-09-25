@@ -48,7 +48,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler"],
+          "required": ["aiad_load_scheduler", "setpoint"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -87,18 +87,23 @@
                   ]
                 },
                 "max_load_multiplier": 2,
-                "min_load_multiplier": 0,
-                "overload_condition": "gt"
+                "min_load_multiplier": 0
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
+            },
+            "setpoint": {
+              "description": "Setpoint.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
             }
           }
         },
         "jmx": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["app_namespace"],
+          "required": ["app_namespace", "k8s_pod_name"],
           "properties": {
             "app_namespace": {
               "description": "Namespace of the application for which JMX metrics are scraped.",
@@ -110,6 +115,11 @@
               "default": 8087,
               "type": "integer",
               "format": "int32"
+            },
+            "k8s_pod_name": {
+              "description": "Name of the Kubernetes pod for which JMX metrics are scraped.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
             }
           }
         }

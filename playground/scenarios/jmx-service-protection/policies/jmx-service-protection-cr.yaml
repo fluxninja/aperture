@@ -66,6 +66,7 @@ spec:
               signal_name: DESIRED_LOAD_MULTIPLIER
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
+          overload_condition: gt
           parameters:
             alerter:
               alert_name: AIAD Load Throttling Event
@@ -91,7 +92,6 @@ spec:
               workload_latency_based_tokens: true
             max_load_multiplier: 2
             min_load_multiplier: 0
-            overload_condition: gt
     - query:
         promql:
           evaluation_interval: 10s

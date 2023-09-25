@@ -9,7 +9,13 @@ function(params, metadata={}) {
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
 
-  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
+  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
+    policy+: {
+      promql_query: 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))',
+      setpoint: c.policy.service_protection_core.setpoint,
+      overload_condition: 'gt',
+    },
+  },
 
   local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
   assert !std.objectHas(infraMeters, 'elasticsearch') : 'An infra meter with name elasticsearch already exists. Please choose a different name.',
@@ -23,6 +29,7 @@ function(params, metadata={}) {
             receivers: {
               elasticsearch: std.prune(updated_cfg.policy.elasticsearch {
                 agent_group: null,
+                collection_interval: '10s',
                 metrics+: {
                   'elasticsearch.node.operations.current': {
                     enabled: true,

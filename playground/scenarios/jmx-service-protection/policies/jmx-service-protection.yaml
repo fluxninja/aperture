@@ -70,13 +70,13 @@ policy:
                 from: request.http.headers.user-type
 
   service_protection_core:
+    setpoint: 20
     dry_run: false
     aiad_load_scheduler:
       load_multiplier_linear_decrement: 0.05
       load_multiplier_linear_increment: 0.025
       max_load_multiplier: 2
       min_load_multiplier: 0
-      overload_condition: gt
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
@@ -103,3 +103,4 @@ policy:
 
   jmx:
     app_namespace: "demoapp"
+    k8s_pod_name: "service3-demo-app-.*"

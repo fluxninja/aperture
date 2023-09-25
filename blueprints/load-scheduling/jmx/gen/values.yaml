@@ -24,9 +24,16 @@ policy:
             service: __REQUIRED_FIELD__
       max_load_multiplier: 2
       min_load_multiplier: 0
-      overload_condition: "gt"
+    # Setpoint.
+    # Type: float64
+    # Required: True
+    setpoint: __REQUIRED_FIELD__
   jmx:
     # Namespace of the application for which JMX metrics are scraped.
     # Type: string
     # Required: True
     app_namespace: __REQUIRED_FIELD__
+    # Name of the Kubernetes pod for which JMX metrics are scraped.
+    # Type: string
+    # Required: True
+    k8s_pod_name: __REQUIRED_FIELD__
