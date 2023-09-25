@@ -166,11 +166,13 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <a id="policy-service-protection-core-overload-condition"></a>
 
-<ParameterDescription name='policy.service_protection_core.overload_condition'
-description='Overload condition determines the criteria to determine overload
-state. The default condition is 'gt', that is, when the signal is greater than
-the setpoint. The condition must be one of: gt, lt, gte, lte.' type='string'
-reference='' value='"gt"' />
+<ParameterDescription
+    name='policy.service_protection_core.overload_condition'
+    description='Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.'
+    type='string'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
 
 <!-- vale on -->
 

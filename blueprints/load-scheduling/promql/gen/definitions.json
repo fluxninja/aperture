@@ -53,7 +53,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler"],
+          "required": ["aiad_load_scheduler", "overload_condition"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -98,8 +98,8 @@
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
             },
             "overload_condition": {
-              "description": "Overload condition determines the criteria to determine overload state. The default condition is 'gt', that is, when the signal is greater than the setpoint. The condition must be one of: gt, lt, gte, lte.",
-              "default": "gt",
+              "description": "Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.",
+              "default": "__REQUIRED_FIELD__",
               "type": "string"
             }
           }

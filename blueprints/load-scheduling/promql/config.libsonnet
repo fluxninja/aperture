@@ -11,10 +11,10 @@ serviceProtectionDefaults {
     */
     setpoint: '__REQUIRED_FIELD__',
     /**
-    * @param (policy.service_protection_core.overload_condition: string)Overload condition determines the criteria to determine overload state. The default condition is 'gt', that is, when the signal is greater than the setpoint. The condition must be one of: gt, lt, gte, lte.
+    * @param (policy.service_protection_core.overload_condition: string)Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.
     */
     service_protection_core+: {
-      overload_condition: 'gt',
+      overload_condition: '__REQUIRED_FIELD__',
     },
   },
 
