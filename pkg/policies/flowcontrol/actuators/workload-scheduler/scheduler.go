@@ -403,7 +403,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		matchedWorkloadIndex = s.defaultWorkload.proto.Name
 	}
 
-	fairnessLabel := "workload:" + matchedWorkloadIndex
+	fairnessLabel := matchedWorkloadIndex
 
 	tokens := float64(1)
 	// Precedence order:
