@@ -127,7 +127,6 @@ class ApertureClient:
         control_point: str,
         explicit_labels: Optional[Dict[str, str]] = None,
         on_reject: Optional[Callable] = None,
-        fail_open: bool = True,
         ramp_mode: bool = False,
     ) -> Callable[[TWrappedFunction], TWrappedFunction]:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
