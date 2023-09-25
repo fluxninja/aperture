@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -161,7 +160,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 
 func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
 	metricsLabels := make(prometheus.Labels, len(sched.metricsLabels)+1)
-	metricsLabels[metrics.WorkloadIndexLabel] = strings.TrimPrefix(request.FairnessLabel, "workload:")
+	metricsLabels[metrics.WorkloadIndexLabel] = request.FairnessLabel
 	for k, v := range sched.metricsLabels {
 		metricsLabels[k] = v
 	}
