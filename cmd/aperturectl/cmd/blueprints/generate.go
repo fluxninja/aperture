@@ -46,25 +46,17 @@ var generateCmd = &cobra.Command{
 	Long: `
 Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
-	Example: `aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml
+	Example: `aperturectl blueprints generate --values-file=rate-limiting.yaml
 
-aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-limiting.yaml --apply`,
+aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := utils.ReaderLock(blueprintsURIRoot)
-		if err != nil {
-			return err
-		}
-		defer utils.Unlock(blueprintsURIRoot)
-
-		if blueprintName == "" {
-			return fmt.Errorf("--name must be provided")
-		}
+		var err error
 
 		if valuesFile == "" {
 			return fmt.Errorf("--values-file must be provided")
 		}
 
-		log.Info().Msgf("Generating Aperture Policy resources for blueprint: %s", blueprintName)
+		log.Info().Msgf("Generating policy resources for blueprint: %s", blueprintName)
 		// if outputDir is not provided and applyPolicy is false, return error
 		if outputDir == "" && !applyPolicy {
 			return fmt.Errorf("--output-dir must be provided")
@@ -75,6 +67,40 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 			return err
 		}
 		valuesFile, err = filepath.Abs(valuesFile)
+		if err != nil {
+			return err
+		}
+
+		var valuesBytes []byte
+		valuesBytes, err = os.ReadFile(valuesFile)
+		if err != nil {
+			return err
+		}
+
+		// decode values as yaml and retrieve blueprint and uri fields
+		var values map[string]interface{}
+		err = yaml.Unmarshal(valuesBytes, &values)
+		if err != nil {
+			return err
+		}
+
+		var ok bool
+		if blueprintName == "" {
+			blueprintName, ok = values["blueprint"].(string)
+			if !ok {
+				return fmt.Errorf("values file does not contain blueprint name field")
+			}
+		}
+
+		if blueprintsURI == "" {
+			blueprintsURI, ok = values["uri"].(string)
+			if !ok {
+				return fmt.Errorf("values file does not contain uri field")
+			}
+		}
+
+		// pull
+		err = pullCmd.RunE(cmd, args)
 		if err != nil {
 			return err
 		}
@@ -95,11 +121,6 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 		}
 
 		if !noValidate {
-			var valuesBytes []byte
-			valuesBytes, err = os.ReadFile(valuesFile)
-			if err != nil {
-				return err
-			}
 			if strings.Contains(string(valuesBytes), "__REQUIRED_FIELD__") {
 				return fmt.Errorf("values file contains '__REQUIRED_FIELD__' placeholder value")
 			}
@@ -197,6 +218,9 @@ aperturectl blueprints generate --name=rate-limiting/base --values-file=rate-lim
 		}
 
 		return nil
+	},
+	PostRunE: func(cmd *cobra.Command, args []string) error {
+		return pullCmd.PostRunE(cmd, args)
 	},
 }
 

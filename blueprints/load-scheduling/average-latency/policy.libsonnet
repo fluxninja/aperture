@@ -3,7 +3,11 @@ local commonPolicyFn = import '../common-aimd/policy.libsonnet';
 local config = import './config.libsonnet';
 
 function(cfg, params={}, metadata={}) {
-  local updatedConfig = config + cfg,
+  local updatedConfig = config + cfg + {
+    policy+: {
+      overload_condition: 'gt',
+    },
+  },
 
   local commonPolicy = commonPolicyFn(cfg, params, metadata),
 

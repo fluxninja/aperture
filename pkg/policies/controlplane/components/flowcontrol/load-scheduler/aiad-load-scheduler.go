@@ -68,7 +68,7 @@ func ParseAIADLoadScheduler(
 	nestedCircuit.InPortsMap = nestedInPortsMap
 	nestedCircuit.OutPortsMap = nestedOutPortsMap
 
-	overloadDeciderOperator := aiadLoadScheduler.Parameters.OverloadCondition
+	overloadDeciderOperator := aiadLoadScheduler.OverloadCondition
 
 	nestedCircuit.Components = append(nestedCircuit.Components,
 		&policylangv1.Component{
