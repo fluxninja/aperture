@@ -61,7 +61,7 @@ function(policyFile, cfg) {
   local receiverDashboards = {
     [infraMeter + '_' + receiver + '.json']:
       dashboard.baseDashboard + g.dashboard.withPanels(
-        unwrapInfraMeter(receiver, policyName, infraMeters[infraMeter], cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
+        unwrapInfraMeter(receiver, policyName, infraMeter, cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
       )
     for infraMeter in std.objectFields(infraMeters)
     if std.objectHas(infraMeters[infraMeter], 'receivers')
