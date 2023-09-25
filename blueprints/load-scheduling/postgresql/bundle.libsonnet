@@ -46,7 +46,7 @@ function(params, metadata={}) {
     [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
   },
   dashboards: {
-    [std.format('%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.mainDashboard,
+    [std.format('policy-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.mainDashboard,
     [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.signalsDashboard,
   } + dg.receiverDashboards,
 }

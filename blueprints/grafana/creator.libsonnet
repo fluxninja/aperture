@@ -10,6 +10,7 @@ function(policyFile, cfg) {
   local config = defaultConfig + cfg,
   local dashboard = base(config),
   local policyName = cfg.policy.policy_name,
+  local receiverDashboard = base(config { dashboard+: { title: 'Receiver Dashboard - %s' % policyName } }),
 
   local policyJSON =
     if std.isObject(policyFile)
@@ -58,9 +59,9 @@ function(policyFile, cfg) {
     else {},
 
   local receiverDashboards = {
-    [infraMeter + '_' + receiver + '.json']:
-      dashboard.baseDashboard + g.dashboard.withPanels(
-        unwrapInfraMeter(receiver, policyName, infraMeters[infraMeter], cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
+    ['receiver' + '-' + policyName + '-' + infraMeter + '-' + receiver + '.json']:
+      receiverDashboard.baseDashboard + g.dashboard.withPanels(
+        unwrapInfraMeter(receiver, policyName, infraMeter, cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
       )
     for infraMeter in std.objectFields(infraMeters)
     if std.objectHas(infraMeters[infraMeter], 'receivers')

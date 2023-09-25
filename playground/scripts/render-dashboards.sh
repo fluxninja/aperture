@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-base_dir=$1
-aperturectl=$2
-blueprints_uri=$3
-blueprint_name=$4
-values_file=$5
+aperturectl=$1
+blueprints_uri=$2
+blueprint_name=$3
+values_file=$4
 
-_GEN_DIR="${base_dir}/_gen"
-trap 'rm -rf -- "$_GEN_DIR"' EXIT
+# delete the temp dir
+_GEN_DIR="/tmp/aperture/_gen"
+rm -rf -- "$_GEN_DIR"
 
 "${aperturectl}" blueprints generate --name "${blueprint_name}" --uri "${blueprints_uri}" \
 	--values-file "${values_file}" --output-dir "${_GEN_DIR}" >&2
@@ -20,4 +20,7 @@ if [ ! -d "${dashboard_dir}" ]; then
 	exit 1
 fi
 
-echo "${dashboard_dir}"
+# get the list of dashboards as a absolute path
+dashboards=$(find "${dashboard_dir}" -type f -name '*.json' -print0 | xargs -0)
+
+echo "${dashboards}"
