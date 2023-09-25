@@ -241,6 +241,9 @@ public final class ApertureSDKBuilder {
         FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
                 FlowControlServiceHTTPGrpc.newBlockingStub(channel);
 
+        Thread channelKickerThread = new Thread(new ChannelKicker(channel));
+        channelKickerThread.start();
+
         OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
         if (caCertContents != null) {
             spanExporterBuilder.setTrustedCertificates(caCertContents);
@@ -264,5 +267,21 @@ public final class ApertureSDKBuilder {
                 flowTimeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
+    }
+}
+
+final class ChannelKicker implements Runnable {
+    private final ManagedChannel channel;
+
+    ChannelKicker(ManagedChannel channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public void run() {
+        ConnectivityState connState = channel.getState(true);
+        if (connState != ConnectivityState.SHUTDOWN) {
+            channel.notifyWhenStateChanged(connState, this);
+        }
     }
 }
