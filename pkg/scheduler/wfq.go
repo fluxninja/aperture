@@ -6,8 +6,13 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
+
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
@@ -123,6 +128,8 @@ type WFQScheduler struct {
 	manager        TokenManager
 	// metrics
 	metrics *WFQMetrics
+	// metrics labels
+	metricsLabels prometheus.Labels
 	// flows
 	flows    map[string]*flowInfo
 	requests requestHeap
@@ -134,7 +141,7 @@ type WFQScheduler struct {
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
-func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQMetrics) Scheduler {
+func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQMetrics, metricsLabels prometheus.Labels) Scheduler {
 	sched := new(WFQScheduler)
 	sched.queueOpen = false
 	sched.generation = 0
@@ -143,6 +150,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
+	sched.metricsLabels = metricsLabels
 
 	if metrics != nil {
 		sched.metrics = metrics
@@ -151,12 +159,26 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
+func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
+	metricsLabels := make(prometheus.Labels, len(sched.metricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = strings.TrimPrefix(request.FairnessLabel, "workload:")
+	for k, v := range sched.metricsLabels {
+		metricsLabels[k] = v
+	}
+	requestInQueueMetricsObserver, err := sched.metrics.RequestInQueueDurationSummary.GetMetricWith(metricsLabels)
+	if err == nil {
+		requestInQueueMetricsObserver.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
+	} else {
+		log.Error().Err(err).Msg("Failed to get request in queue duration summary")
+	}
+}
+
 func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
 	if accepted {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
-	sched.metrics.RequestInQueueDurationSummary.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
+	sched.updateRequestInQueueMetrics(accepted, request, startTime)
 	return accepted, remaining, current
 }
 
@@ -468,5 +490,5 @@ type WFQMetrics struct {
 	HeapRequestsGauge             prometheus.Gauge
 	IncomingTokensCounter         prometheus.Counter
 	AcceptedTokensCounter         prometheus.Counter
-	RequestInQueueDurationSummary prometheus.Observer
+	RequestInQueueDurationSummary *prometheus.SummaryVec
 }
