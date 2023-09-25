@@ -6,8 +6,7 @@
     {
       "blueprint_name": "auto-scaling/pod-auto-scaler",
       "policy_name": "pod-auto-scaler",
-      "values_file": "policies/pod-auto-scaler.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/pod-auto-scaler.yaml"
     }
   ],
   "images": [
