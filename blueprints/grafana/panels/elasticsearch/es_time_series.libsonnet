@@ -15,57 +15,57 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Breakers (limit vs estimated)
   local breakerQueries = [
-    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_breaker_memory_limit_bytes{%(filters)s,infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_breaker_memory_limit_bytes{%(filters)s,infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Average Limit'),
-    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_breaker_memory_estimated_bytes{%(filters)s,infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_breaker_memory_estimated_bytes{%(filters)s,infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Average Estimated'),
 
   ],
 
-  local breakersComparison = timeSeriesPanel('Breakers Average Limit vs Estimated', datasource.name, '', stringFilters, targets=breakerQueries),
+  local breakersComparison = timeSeriesPanel('Breakers Average Limit vs Estimated', datasource.name, '', stringFilters, 'Gigabytes', targets=breakerQueries),
 
   // Breakers Tripped
   local breakerTrippedQueries = [
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="fielddata",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Field Data Tripped'),
+    + g.query.prometheus.withLegendFormat('Field Data'),
 
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="parent",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Parent Tripped'),
+    + g.query.prometheus.withLegendFormat('Parent'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="in_flight_requests",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="inflight_requests",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('In-flight Requests Tripped'),
+    + g.query.prometheus.withLegendFormat('In-flight Requests'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="accounting",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="eql_sequence",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Accounting Tripped'),
+    + g.query.prometheus.withLegendFormat('EQL Sequence'),
 
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="model_inference",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Model Inference Tripped'),
+    + g.query.prometheus.withLegendFormat('Model Inference'),
 
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="request",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Request Tripped'),
+    + g.query.prometheus.withLegendFormat('Request'),
   ],
 
-  local breakersTripped = timeSeriesPanel('Breakers Tripped', datasource.name, '', stringFilters, targets=breakerTrippedQueries),
+  local breakersTripped = timeSeriesPanel('Breakers Tripped', datasource.name, '', stringFilters, 'Short', targets=breakerTrippedQueries),
 
   // Indexing Pressure Metrics
   local indexingPressureQueries = [
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="coordinating", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Coordinating Indexing Pressure'),
+    + g.query.prometheus.withLegendFormat('Coordinating'),
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="primary", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Primary Indexing Pressure'),
+    + g.query.prometheus.withLegendFormat('Primary'),
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="replica", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Replica Indexing Pressure'),
+    + g.query.prometheus.withLegendFormat('Replica'),
   ],
 
   local indexingPressure = timeSeriesPanel('Indexing Pressure', datasource.name, '', stringFilters, 'bytes', targets=indexingPressureQueries),
@@ -74,14 +74,14 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   local indexingRejectionsQueries = [
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_indexing_pressure_memory_primary_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Primary Rejections Rate'),
+    + g.query.prometheus.withLegendFormat('Primary'),
 
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_indexing_pressure_memory_replica_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Replica Rejections Rate'),
+    + g.query.prometheus.withLegendFormat('Replica'),
   ],
 
-  local indexingRejections = timeSeriesPanel('Indexing Rejection Rate', datasource.name, '', stringFilters, 'rejections per second', targets=indexingRejectionsQueries),
+  local indexingRejections = timeSeriesPanel('Indexing Rejection Rate', datasource.name, '', stringFilters, 'rejections', targets=indexingRejectionsQueries),
 
   // Operations (query, get, merge, fetch, flush, refresh, scroll, suggest, delete, warmer)
   local operationsQueries = [
@@ -141,6 +141,32 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local docsData = timeSeriesPanel('Documents State', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
 
+  // Total Docs
+  local totalDocsQuery = [
+    g.query.prometheus.new(datasource.name, 'increase(elasticsearch_node_ingest_documents_total{ %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Total Docs'),
+  ],
+
+  local totalDocs = timeSeriesPanel('Total Ingested Documents', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
+
+  // Current Docs
+  local currentDocsQuery = [
+    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_ingest_documents_current{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Current Docs'),
+  ],
+
+  local currentDocs = timeSeriesPanel('Current Ingested Documents', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
+
+  local translogOperationsQuery = [
+    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_translog_operations_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Translog Operations'),
+  ],
+
+  local translogOperations = timeSeriesPanel('Translog Operations', datasource.name, '', stringFilters, 'short', targets=translogOperationsQuery),
+
   // Active Threads for All Thread Pools
   local activeThreadsQueries = [
     g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_thread_pool_threads{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
@@ -181,71 +207,71 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Tasks Queued for All Thread Pools
   local tasksQueuedQueries = [
-    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_thread_pool_tasks_queued{%(filters)s})' % { filters: stringFilters })
+    g.query.prometheus.new(datasource.name, 'avg(elasticsearch_node_thread_pool_tasks_queued{%(filters)s})' % { filters: stringFilters })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('{{threadpool}} Tasks Queued'),
   ],
-  local tasksQueued = timeSeriesPanel('Tasks Queued', datasource.name, '', stringFilters, 'short', targets=tasksQueuedQueries),
+  local tasksQueued = timeSeriesPanel('Average Tasks Queued', datasource.name, '', stringFilters, 'short', targets=tasksQueuedQueries),
 
   // Tasks Throughput for All Thread Pools
   local tasksThroughputQueries = [
-    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_tasks_finished_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
+    g.query.prometheus.new(datasource.name, 'avg(rate(elasticsearch_node_thread_pool_tasks_finished_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('{{threadpool}} Tasks Throughput'),
   ],
-  local tasksThroughput = timeSeriesPanel('Tasks Throughput', datasource.name, '', stringFilters, 'ops', targets=tasksThroughputQueries),
+  local tasksThroughput = timeSeriesPanel('Average Tasks Throughput', datasource.name, '', stringFilters, 'ops', targets=tasksThroughputQueries),
 
   // GC Collections (young and old)
   local youngGcCollectionsQuery = g.query.prometheus.new(datasource.name, 'rate(jvm_gc_collections_count_total{name="young",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
                                   + g.query.prometheus.withIntervalFactor(1)
                                   + g.query.prometheus.withLegendFormat('Young GC Collections'),
 
-  local youngGcCollections = timeSeriesPanel('Young GC Collections', datasource.name, '', stringFilters, 'GC Collections', 'cps', targets=[youngGcCollectionsQuery]),
+  local youngGcCollections = timeSeriesPanel('Young GC Collections', datasource.name, '', stringFilters, 'cps', targets=[youngGcCollectionsQuery]),
 
   local oldGcCollectionsQuery = g.query.prometheus.new(datasource.name, 'rate(jvm_gc_collections_count_total{name="old",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
                                 + g.query.prometheus.withIntervalFactor(1)
                                 + g.query.prometheus.withLegendFormat('Old GC Collections'),
 
-  local oldGcCollections = timeSeriesPanel('Old GC Collections', datasource.name, '', stringFilters, 'GC Collections', 'cps', targets=[oldGcCollectionsQuery]),
+  local oldGcCollections = timeSeriesPanel('Old GC Collections', datasource.name, '', stringFilters, 'cps', targets=[oldGcCollectionsQuery]),
 
   // GC Collections Elapsed (young and old)
   local youngGcCollectionsElapsedQuery = g.query.prometheus.new(datasource.name, 'rate(jvm_gc_collections_elapsed_milliseconds_total{name="young",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
                                          + g.query.prometheus.withIntervalFactor(1)
                                          + g.query.prometheus.withLegendFormat('Young GC Collections Elapsed'),
 
-  local youngGcCollectionsElapsed = timeSeriesPanel('Young GC Collections Elapsed', datasource.name, '', stringFilters, 'GC Collections Elapsed', 'msps', targets=[youngGcCollectionsElapsedQuery]),
+  local youngGcCollectionsElapsed = timeSeriesPanel('Young GC Collections Elapsed', datasource.name, '', stringFilters, 'msps', targets=[youngGcCollectionsElapsedQuery]),
 
   local oldGcCollectionsElapsedQuery = g.query.prometheus.new(datasource.name, 'rate(jvm_gc_collections_elapsed_milliseconds_total{name="old",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
                                        + g.query.prometheus.withIntervalFactor(1)
                                        + g.query.prometheus.withLegendFormat('Old GC Collections Elapsed'),
 
-  local oldGcCollectionsElapsed = timeSeriesPanel('Old GC Collections Elapsed', datasource.name, '', stringFilters, 'GC Collections Elapsed', 'msps', targets=[oldGcCollectionsElapsedQuery]),
+  local oldGcCollectionsElapsed = timeSeriesPanel('Old GC Collections Elapsed', datasource.name, '', stringFilters, 'msps', targets=[oldGcCollectionsElapsedQuery]),
 
 
   // JVM Usage
   local jvmQueries = [
-    g.query.prometheus.new(datasource.name, 'avg(jvm_memory_heap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, '(jvm_memory_heap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Avg Heap Used Bytes'),
+    + g.query.prometheus.withLegendFormat('Heap Used'),
 
-    g.query.prometheus.new(datasource.name, 'jvm_memory_heap_max_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, '(jvm_memory_heap_max_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
-    + g.query.prometheus.withLegendFormat('Max Heap'),
+    + g.query.prometheus.withLegendFormat('Heap Max'),
   ],
 
-  local jvmMemoryUsage = timeSeriesPanel('JVM Memory Usage', datasource.name, '', stringFilters, 'bytes', targets=jvmQueries),
+  local jvmMemoryUsage = timeSeriesPanel('JVM Memory Usage', datasource.name, '', stringFilters, 'Gigabytes', targets=jvmQueries),
   // JVM Non-Heap Memory (Used and Committed)
   local nonHeapQueries = [
-    g.query.prometheus.new(datasource.name, 'jvm_memory_nonheap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, '(jvm_memory_nonheap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Non-Heap Used'),
 
-    g.query.prometheus.new(datasource.name, 'jvm_memory_nonheap_committed_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, '(jvm_memory_nonheap_committed_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Non-Heap Committed'),
   ],
 
-  local jvmNonHeap = timeSeriesPanel('JVM Non-Heap Memory Usage', datasource.name, '', stringFilters, 'bytes', targets=nonHeapQueries),
+  local jvmNonHeap = timeSeriesPanel('JVM Non-Heap Memory Usage', datasource.name, '', stringFilters, 'Gigabytes', targets=nonHeapQueries),
 
   cpuUsage: cpuUsage.panel,
   jvmMemoryUsage: jvmMemoryUsage.panel,
@@ -265,4 +291,7 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   tasksQueued: tasksQueued.panel,
   tasksThroughput: tasksThroughput.panel,
   avgDiskUsage: avgDiskUsage.panel,
+  totalDocs: totalDocs.panel,
+  currentDocs: currentDocs.panel,
+  translogOperations: translogOperations.panel,
 }

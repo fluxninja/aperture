@@ -6,12 +6,12 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local nodes = statPanel('Nodes',
                           datasource.name,
-                          'elasticsearch_cluster_nodes{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName },
+                          'sum(elasticsearch_cluster_nodes{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName },
                           stringFilters),
 
   local dataNodes = statPanel('Data Nodes',
                               datasource.name,
-                              'elasticsearch_cluster_data_nodes{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName },
+                              'sum(elasticsearch_cluster_data_nodes{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName },
                               stringFilters),
 
   local activeShards = statPanel('Active Shards',

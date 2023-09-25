@@ -111,58 +111,69 @@ function(policyName, infraMeterName, datasource, extraFilters) {
     + g.panel.text.gridPos.withY(45)
     + g.panel.text.gridPos.withH(3)
     + g.panel.text.gridPos.withW(24),
-    timeSeries.operationsData
+    timeSeries.totalDocs
     + g.panel.timeSeries.gridPos.withX(0)
     + g.panel.timeSeries.gridPos.withY(50)
+    + g.panel.timeSeries.gridPos.withW(12),
+    timeSeries.currentDocs
+    + g.panel.timeSeries.gridPos.withX(12)
+    + g.panel.timeSeries.gridPos.withY(50)
+    + g.panel.timeSeries.gridPos.withW(12),
+    timeSeries.operationsData
+    + g.panel.timeSeries.gridPos.withX(0)
+    + g.panel.timeSeries.gridPos.withY(60)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.docsData
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(50)
+    + g.panel.timeSeries.gridPos.withY(60)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.activeThreads
     + g.panel.timeSeries.gridPos.withX(0)
-    + g.panel.timeSeries.gridPos.withY(60)
-    + g.panel.timeSeries.gridPos.withW(8),
+    + g.panel.timeSeries.gridPos.withY(70)
+    + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.httpConnections
-    + g.panel.timeSeries.gridPos.withX(8)
-    + g.panel.timeSeries.gridPos.withY(60)
-    + g.panel.timeSeries.gridPos.withW(8),
+    + g.panel.timeSeries.gridPos.withX(12)
+    + g.panel.timeSeries.gridPos.withY(70)
+    + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.avgDiskUsage
-    + g.panel.timeSeries.gridPos.withX(16)
-    + g.panel.timeSeries.gridPos.withY(60)
-    + g.panel.timeSeries.gridPos.withW(8),
+    + g.panel.timeSeries.gridPos.withX(0)
+    + g.panel.timeSeries.gridPos.withY(80)
+    + g.panel.timeSeries.gridPos.withW(12),
+    timeSeries.translogOperations
+    + g.panel.timeSeries.gridPos.withX(12)
+    + g.panel.timeSeries.gridPos.withY(80)
+    + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.tasksQueued
     + g.panel.timeSeries.gridPos.withX(0)
-    + g.panel.timeSeries.gridPos.withY(70)
+    + g.panel.timeSeries.gridPos.withY(90)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.tasksThroughput
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(70)
+    + g.panel.timeSeries.gridPos.withY(90)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.youngGcCollections
     + g.panel.timeSeries.gridPos.withX(0)
-    + g.panel.timeSeries.gridPos.withY(80)
+    + g.panel.timeSeries.gridPos.withY(100)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.youngGcCollectionsElapsed
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(80)
+    + g.panel.timeSeries.gridPos.withY(100)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.oldGcCollections
     + g.panel.timeSeries.gridPos.withX(0)
-    + g.panel.timeSeries.gridPos.withY(90)
+    + g.panel.timeSeries.gridPos.withY(110)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.oldGcCollectionsElapsed
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(90)
+    + g.panel.timeSeries.gridPos.withY(110)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.jvmMemoryUsage
     + g.panel.timeSeries.gridPos.withX(0)
-    + g.panel.timeSeries.gridPos.withY(100)
+    + g.panel.timeSeries.gridPos.withY(120)
     + g.panel.timeSeries.gridPos.withW(12),
     timeSeries.jvmNonHeap
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(100)
+    + g.panel.timeSeries.gridPos.withY(120)
     + g.panel.timeSeries.gridPos.withW(12),
-
   ],
 }
