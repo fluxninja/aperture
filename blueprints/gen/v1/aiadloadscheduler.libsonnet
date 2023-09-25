@@ -29,6 +29,12 @@ local aiadloadschedulerouts = import './aiadloadschedulerouts.libsonnet';
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
   },
+  withOverloadCondition(overload_condition):: {
+    overload_condition: overload_condition,
+  },
+  withOverloadConditionMixin(overload_condition):: {
+    overload_condition+: overload_condition,
+  },
   withParameters(parameters):: {
     parameters: parameters,
   },

@@ -88,6 +88,28 @@ Input ports for the _AIAD Load Scheduler_.
 Output ports for the _AIAD Load Scheduler_.
 
 </dd>
+<dt>overload_condition</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gt | lt | gte | lte`, **required**, default: `"gt"`)
+
+<!-- vale on -->
+
+Overload condition determines the criteria to determine overload state. The
+default condition is "gt", that is, when the signal is greater than the
+setpoint. The condition must be one of:
+
+<!-- vale off -->
+
+- "gt": greater than
+- "lt": less than
+- "gte": greater than or equal to
+- "lte": less than or equal to
+<!-- vale on -->
+
+</dd>
 <dt>parameters</dt>
 <dd>
 
@@ -292,28 +314,6 @@ state.
 <!-- vale on -->
 
 The minimum load multiplier that can be reached during an overload state.
-
-</dd>
-<dt>overload_condition</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, one of: `gt | lt | gte | lte`, **required**, default: `"gt"`)
-
-<!-- vale on -->
-
-Overload condition determines the criteria to determine overload state. The
-default condition is "gt", that is, when the signal is greater than the
-setpoint. The condition must be one of:
-
-<!-- vale off -->
-
-- "gt": greater than
-- "lt": less than
-- "gte": greater than or equal to
-- "lte": less than or equal to
-<!-- vale on -->
 
 </dd>
 </dl>

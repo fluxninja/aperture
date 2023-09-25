@@ -3,8 +3,19 @@
   "type": "object",
   "title": "auto-scaling/pod-auto-scaler blueprint",
   "additionalProperties": false,
-  "required": ["policy"],
+  "required": ["blueprint", "uri", "policy"],
   "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "auto-scaling/pod-auto-scaler",
+      "enum": ["auto-scaling/pod-auto-scaler"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
     "policy": {
       "type": "object",
       "additionalProperties": false,

@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/postgresql/gen/definitions.json
 
+blueprint: load-scheduling/postgresql
+uri: ../../../../blueprints
 policy:
   policy_name: postgres-connections
   resources:
@@ -20,16 +22,14 @@ policy:
     password: secretpassword
     databases:
       - "postgres"
-    collection_interval: 1s
     tls:
       insecure: true
   service_protection_core:
+    setpoint: 40
     aiad_load_scheduler:
       load_multiplier_linear_decrement: 0.2
       load_multiplier_linear_increment: 0.05
-      overload_condition: gt
       load_scheduler:
-        workload_latency_based_tokens: true
         selectors:
           - agent_group: default
             control_point: ingress

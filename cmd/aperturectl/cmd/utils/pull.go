@@ -21,41 +21,6 @@ const (
 )
 
 func PullSource(dir, uri string) error {
-	err := WriterLock(dir)
-	if err != nil {
-		return err
-	}
-	defer Unlock(dir)
-
-	spec := specv1.New()
-	contents, err := json.MarshalIndent(spec, "", "  ")
-	if err != nil {
-		return err
-	}
-	spec.LegacyImports = false
-	contents = append(contents, []byte("\n")...)
-
-	filename := filepath.Join(dir, jsonnetfile.File)
-	err = os.WriteFile(filename, contents, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	jbLockFileBytes, err := os.ReadFile(filepath.Join(dir, jsonnetfile.LockFile))
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	lockFile, err := jsonnetfile.Unmarshal(jbLockFileBytes)
-	if err != nil {
-		return err
-	}
-
-	err = os.MkdirAll(filepath.Join(dir, ".tmp"), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
 	d := deps.Parse("", uri)
 	if d == nil {
 		return errors.New("unable to parse URI: " + uri)
@@ -77,6 +42,25 @@ func PullSource(dir, uri string) error {
 		return errors.New("unable to parse URI: " + uri)
 	}
 
+	spec := specv1.New()
+	spec.LegacyImports = false
+	spec.Dependencies[d.Name()] = *d
+
+	jbLockFileBytes, err := os.ReadFile(filepath.Join(dir, jsonnetfile.LockFile))
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
+	lockFile, err := jsonnetfile.Unmarshal(jbLockFileBytes)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(filepath.Join(dir, ".tmp"), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	err = os.WriteFile(filepath.Join(dir, sourceFilename), []byte(source), os.ModePerm)
 	if err != nil {
 		return err
@@ -90,34 +74,17 @@ func PullSource(dir, uri string) error {
 		return err
 	}
 
-	if !depEqual(spec.Dependencies[d.Name()], *d) {
-		spec.Dependencies[d.Name()] = *d
-		delete(lockFile.Dependencies, d.Name())
-	}
-
 	locked, err := pkg.Ensure(spec, dir, lockFile.Dependencies)
 	if err != nil {
 		return err
 	}
 
-	err = writeChangedJsonnetFile(contents, &spec, filename)
-	if err != nil {
-		return err
-	}
 	err = writeChangedJsonnetFile(jbLockFileBytes, &specv1.JsonnetFile{Dependencies: locked}, filepath.Join(dir, jsonnetfile.LockFile))
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func depEqual(d1, d2 deps.Dependency) bool {
-	name := d1.Name() == d2.Name()
-	version := d1.Version == d2.Version
-	source := reflect.DeepEqual(d1.Source, d2.Source)
-
-	return name && version && source
 }
 
 func writeChangedJsonnetFile(originalBytes []byte, modified *specv1.JsonnetFile, path string) error {

@@ -1,6 +1,8 @@
 # Generated values file for auto-scaling/pod-auto-scaler blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler
+blueprint: auto-scaling/pod-auto-scaler
+uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
   # Name of the policy.

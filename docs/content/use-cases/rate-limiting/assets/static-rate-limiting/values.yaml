@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=../../../../../../blueprints/rate-limiting/base/gen/definitions.json
+blueprint: rate-limiting/base
+uri: ../../../../../../blueprints
 policy:
   policy_name: "static-rate-limiting"
   rate_limiter:

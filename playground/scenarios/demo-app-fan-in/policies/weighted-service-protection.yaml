@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/average-latency/gen/definitions.json
 # Generated values file for load-scheduling/average-latency blueprint.
+blueprint: load-scheduling/average-latency
+uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string
