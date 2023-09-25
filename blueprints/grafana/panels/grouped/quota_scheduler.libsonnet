@@ -1,9 +1,9 @@
 local accepted_token_rate = import '../accepted_token_rate.libsonnet';
 local incoming_token_rate = import '../incoming_token_rate.libsonnet';
-local quota_checks = import '../quota_checks.libsonnet';
 local request_in_queue_duration = import '../request_in_queue_duration.libsonnet';
 local wfq_scheduler_flows = import '../wfq_scheduler_flows.libsonnet';
 local wfq_scheduler_heap_requests = import '../wfq_scheduler_heap_requests.libsonnet';
+local workload_decisions = import '../workload_decisions.libsonnet';
 local workload_accepted = import '../workload_decisions_accepted.libsonnet';
 local workload_rejected = import '../workload_decisions_rejected.libsonnet';
 local workload_latency = import '../workload_latency.libsonnet';
@@ -12,7 +12,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonn
 
 function(cfg) {
   panels: [
-    quota_checks(cfg).panel
+    workload_decisions(cfg).panel
     + g.panel.timeSeries.gridPos.withY(10),
     workload_accepted(cfg).panel
     + g.panel.timeSeries.gridPos.withY(20),
