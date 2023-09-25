@@ -105,6 +105,34 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-promql-query"></a>
+
+<ParameterDescription
+    name='policy.promql_query'
+    description='PromQL query to detect PostgreSQL overload.'
+    type='string'
+    reference=''
+    value='"(sum(postgresql_backends{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"}) / sum(postgresql_connection_max{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"})) * 100"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-setpoint"></a>
+
+<ParameterDescription
+    name='policy.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-postgresql"></a>
 
 <ParameterDescription
@@ -112,7 +140,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.'
     type='Object (postgresql)'
     reference='#postgresql'
-    value='{"agent_group": "default", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
+    value='{"agent_group": "default", "collection_interval": "10s", "endpoint": "__REQUIRED_FIELD__", "password": "__REQUIRED_FIELD__", "username": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -482,7 +510,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='This receiver collects metrics on an interval.'
     type='string'
     reference=''
-    value='null'
+    value='"10s"'
 />
 
 <!-- vale on -->

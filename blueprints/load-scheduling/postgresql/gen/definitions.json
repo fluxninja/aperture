@@ -19,7 +19,12 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name", "service_protection_core", "postgresql"],
+      "required": [
+        "policy_name",
+        "service_protection_core",
+        "setpoint",
+        "postgresql"
+      ],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -95,10 +100,22 @@
             }
           }
         },
+        "promql_query": {
+          "description": "PromQL query to detect PostgreSQL overload.",
+          "default": "(sum(postgresql_backends{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"}) / sum(postgresql_connection_max{policy_name=\"%(policy_name)s\",infra_meter_name=\"postgresql\"})) * 100",
+          "type": "string"
+        },
+        "setpoint": {
+          "description": "Setpoint.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        },
         "postgresql": {
           "description": "Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.",
           "default": {
             "agent_group": "default",
+            "collection_interval": "10s",
             "endpoint": "__REQUIRED_FIELD__",
             "password": "__REQUIRED_FIELD__",
             "username": "__REQUIRED_FIELD__"
@@ -244,6 +261,7 @@
         },
         "collection_interval": {
           "description": "This receiver collects metrics on an interval.",
+          "default": "10s",
           "type": "string"
         },
         "databases": {

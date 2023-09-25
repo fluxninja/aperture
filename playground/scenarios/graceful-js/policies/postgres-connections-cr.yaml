@@ -48,7 +48,6 @@ spec:
               - agent_group: default
                 control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
-              workload_latency_based_tokens: true
             max_load_multiplier: 2
             min_load_multiplier: 0
             overload_condition: gt
@@ -85,7 +84,7 @@ spec:
         per_agent_group: true
         receivers:
           postgresql:
-            collection_interval: 1s
+            collection_interval: 10s
             databases:
             - postgres
             endpoint: postgresql.postgresql.svc.cluster.local:5432
