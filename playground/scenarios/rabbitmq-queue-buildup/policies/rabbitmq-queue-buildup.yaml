@@ -7,12 +7,12 @@ policy:
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
   setpoint: 1000
   service_protection_core:
+    overload_condition: gt
     aiad_load_scheduler:
       load_multiplier_linear_decrement: 0.05
       load_multiplier_linear_increment: 0.025
       max_load_multiplier: 2
       min_load_multiplier: 0
-      overload_condition: gt
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.

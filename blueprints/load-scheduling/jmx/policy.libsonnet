@@ -10,6 +10,9 @@ function(cfg, params={}, metadata={}) {
     policy+: {
       promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})',
       setpoint: 20,
+      service_protection_core+: {
+        overload_condition: 'gt',
+      },
     },
   },
   local c = std.mergePatch(config, updated_cfg),

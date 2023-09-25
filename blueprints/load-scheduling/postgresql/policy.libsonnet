@@ -7,6 +7,9 @@ function(cfg, metadata={}) {
   local updated_cfg = cfg {
     policy+: {
       promql_query: promqlQuery,
+      service_protection_core+: {
+        overload_condition: 'gt',
+      },
     },
   },
   local promqlPolicy = promqlPolicyFn(updated_cfg, metadata),

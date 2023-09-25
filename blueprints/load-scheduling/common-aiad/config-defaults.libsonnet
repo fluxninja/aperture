@@ -8,7 +8,6 @@ local aiad_load_scheduler = {
   max_load_multiplier: 2.0,
   load_multiplier_linear_increment: 0.025,
   load_multiplier_linear_decrement: 0.05,
-  overload_condition: 'gt',
   alerter: {
     alert_name: 'AIAD Load Throttling Event',
   },
