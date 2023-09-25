@@ -48,7 +48,7 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler"],
+          "required": ["aiad_load_scheduler", "setpoint"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -87,11 +87,16 @@
                   ]
                 },
                 "max_load_multiplier": 2,
-                "min_load_multiplier": 0,
-                "overload_condition": "gt"
+                "min_load_multiplier": 0
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
+            },
+            "setpoint": {
+              "description": "Setpoint.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
             }
           }
         },
@@ -240,10 +245,6 @@
         "agent_group": {
           "description": "Name of the Aperture Agent group.",
           "default": "default",
-          "type": "string"
-        },
-        "collection_interval": {
-          "description": "This receiver collects metrics on an interval.",
           "type": "string"
         },
         "endpoint": {

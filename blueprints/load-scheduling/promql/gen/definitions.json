@@ -23,7 +23,8 @@
         "policy_name",
         "service_protection_core",
         "promql_query",
-        "setpoint"
+        "setpoint",
+        "overload_condition"
       ],
       "properties": {
         "components": {
@@ -92,8 +93,7 @@
                   ]
                 },
                 "max_load_multiplier": 2,
-                "min_load_multiplier": 0,
-                "overload_condition": "gt"
+                "min_load_multiplier": 0
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
@@ -110,6 +110,11 @@
           "default": "__REQUIRED_FIELD__",
           "type": "number",
           "format": "double"
+        },
+        "overload_condition": {
+          "description": "Overload condition determines the criteria to determine overload state. The condition must be one of: gt, lt, gte, lte.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
         }
       }
     },
