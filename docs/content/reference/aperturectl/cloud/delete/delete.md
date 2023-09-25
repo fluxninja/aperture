@@ -26,6 +26,7 @@ Use this command to delete the Aperture Policies from Aperture Cloud.
       --insecure            Allow connection to controller running without TLS
       --policy string       Name of the Policy to delete
       --skip-verify         Skip TLS certificate verification while connecting to controller
+      --token string        Aperture Cloud JWT token to be used when using Cloud Controller
 ```
 
 ### SEE ALSO

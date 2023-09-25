@@ -25,6 +25,7 @@ Use this command to apply the Aperture Policies to the Cloud Controller.
   -h, --help                help for apply
       --insecure            Allow connection to controller running without TLS
       --skip-verify         Skip TLS certificate verification while connecting to controller
+      --token string        Aperture Cloud JWT token to be used when using Cloud Controller
 ```
 
 ### SEE ALSO

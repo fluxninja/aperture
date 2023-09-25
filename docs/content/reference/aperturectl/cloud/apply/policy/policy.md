@@ -46,6 +46,7 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
       --controller string   Address of Aperture Cloud Controller
       --insecure            Allow connection to controller running without TLS
       --skip-verify         Skip TLS certificate verification while connecting to controller
+      --token string        Aperture Cloud JWT token to be used when using Cloud Controller
 ```
 
 ### SEE ALSO

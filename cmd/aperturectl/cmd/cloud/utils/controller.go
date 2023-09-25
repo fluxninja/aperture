@@ -26,6 +26,7 @@ type ControllerConfig struct {
 	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
 	URL    string `toml:"url"`
 	APIKey string `toml:"api_key"`
+	Token  string `toml:"token"`
 }
 
 // Config is the config file structure for Aperture.
@@ -41,6 +42,7 @@ type ControllerConn struct {
 	allowInsecure  bool
 	skipVerify     bool
 	apiKey         string
+	token          string
 	config         string
 
 	forwarderStopChan chan struct{}
@@ -74,6 +76,12 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"Aperture Cloud API Key to be used when using Cloud Controller",
 	)
 	flags.StringVar(
+		&c.token,
+		"token",
+		"",
+		"Aperture Cloud JWT token to be used when using Cloud Controller",
+	)
+	flags.StringVar(
 		&c.config,
 		"config",
 		"",
@@ -99,7 +107,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		}
 	}
 
-	if c.config != "" && (c.controllerAddr == "" || c.apiKey == "") {
+	if c.config != "" && (c.controllerAddr == "" || c.apiKey == "" || c.token == "") {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
@@ -121,12 +129,16 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", c.config)
 		}
 
-		if config.Controller.APIKey == "" && c.apiKey == "" {
-			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
+		if config.Controller.Token == "" && c.token == "" && config.Controller.APIKey == "" && c.apiKey == "" {
+			return fmt.Errorf("invalid config file '%s'. Either 'controller.token' or 'controller.api_key' is required", c.config)
 		}
 
 		if c.controllerAddr == "" {
 			c.controllerAddr = config.Controller.URL
+		}
+
+		if c.token == "" {
+			c.token = config.Controller.Token
 		}
 
 		if c.apiKey == "" {
@@ -207,10 +219,17 @@ func (c *ControllerConn) cloudControllerInterceptor(
 	invoker grpc.UnaryInvoker,
 	opts ...grpc.CallOption,
 ) error {
-	if c.apiKey == "" {
+	if c.apiKey == "" && c.token == "" {
 		return invoker(ctx, method, req, reply, cc, opts...)
 	}
-	md := metadata.Pairs("apikey", c.apiKey)
+	var md metadata.MD
+
+	if c.token != "" {
+		fmt.Println("Using token" + c.token)
+		md = metadata.Pairs("Authorization", fmt.Sprintf("Bearer %s", c.token), "projectName", "Project-A")
+	} else {
+		md = metadata.Pairs("apikey", c.apiKey)
+	}
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	return invoker(ctx, method, req, reply, cc, opts...)
 }
