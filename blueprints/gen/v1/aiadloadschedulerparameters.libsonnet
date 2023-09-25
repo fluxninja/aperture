@@ -37,10 +37,4 @@
   withMinLoadMultiplierMixin(min_load_multiplier):: {
     min_load_multiplier+: min_load_multiplier,
   },
-  withOverloadCondition(overload_condition):: {
-    overload_condition: overload_condition,
-  },
-  withOverloadConditionMixin(overload_condition):: {
-    overload_condition+: overload_condition,
-  },
 }

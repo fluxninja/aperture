@@ -496,15 +496,6 @@ message AIADLoadScheduler {
     // not in the overloaded state, up until the `max_load_multiplier` is reached.
     double load_multiplier_linear_increment = 5; // @gotags: default:"0.025" validate:"gte=0"
 
-    // Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
-    // <!-- vale off -->
-    // - "gt": greater than
-    // - "lt": less than
-    // - "gte": greater than or equal to
-    // - "lte": less than or equal to
-    // <!-- vale on -->
-    string overload_condition = 6; // @gotags: default:"gt" validate:"required,oneof=gt lt gte lte"
-
     // Configuration parameters for the embedded Alerter.
     Alerter.Parameters alerter = 7; // @gotags: validate:"required"
   }
@@ -524,6 +515,15 @@ message AIADLoadScheduler {
 
   // Configuration key for setting dry run mode through dynamic configuration.
   string dry_run_config_key = 5;
+
+  // Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+  // <!-- vale off -->
+  // - "gt": greater than
+  // - "lt": less than
+  // - "gte": greater than or equal to
+  // - "lte": less than or equal to
+  // <!-- vale on -->
+  string overload_condition = 6; // @gotags: default:"gt" validate:"required,oneof=gt lt gte lte"
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.

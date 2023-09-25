@@ -30,17 +30,23 @@ var (
 	wfqHeapRequestsGauge            prometheus.Gauge
 	wfqAcceptedTokensCounter        prometheus.Counter
 	wfqIncomingTokensCounter        prometheus.Counter
-	requestInQueueDurationSummary  prometheus.Summary
+	requestInQueueDurationSummary   *prometheus.SummaryVec
 	tokenBucketLMGauge              prometheus.Gauge
 	tokenBucketFillRateGauge        prometheus.Gauge
 	tokenBucketBucketCapacityGauge  prometheus.Gauge
 	tokenBucketAvailableTokensGauge prometheus.Gauge
+
+	labels = prometheus.Labels{
+		metrics.PolicyNameLabel:  "test-policy",
+		metrics.PolicyHashLabel:  "test-hash",
+		metrics.ComponentIDLabel: "test-component",
+	}
 )
 
 func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 	prometheusRegistry = prometheus.NewRegistry()
 
-	constLabels := make(prometheus.Labels)
+	constLabels := labels
 
 	wfqFlowsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:        metrics.WFQFlowsMetricName,
@@ -66,10 +72,16 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
-	requestInQueueDurationSummary = prometheus.NewSummary(prometheus.SummaryOpts{
+	requestInQueueDurationSummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.RequestInQueueDurationMetricName,
 		Help: "A summary that tracks the duration of requests in queue",
-	})
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	},
+	)
 	_ = prometheusRegistry.Register(requestInQueueDurationSummary)
 	tokenBucketLMGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: metrics.TokenBucketLMMetricName,
@@ -200,28 +212,6 @@ func (flow *flowTracker) makeRequest() *Request {
 	return NewRequest(flow.fairnessLabel, flow.tokens, flow.priority)
 }
 
-func printPrettyFlowTracker(t *testing.T, flows flowTrackers) {
-	var totalRequests uint64
-	var totalAccepted uint64
-
-	for _, flow := range flows {
-		totalRequests += flow.totalRequests
-		totalAccepted += flow.acceptedRequests
-	}
-
-	t.Logf("\n\n\nSummary Statistics:\n")
-	t.Logf("totalRequests: %d | totalAccepted: %d | successRate: %.02f\n", totalRequests, totalAccepted, float64(totalAccepted)/float64(totalRequests)*100)
-}
-
-// calculate tokenRate for flowTrackers
-func tokenRate(flows flowTrackers) float64 {
-	var totalTokenRate float64
-	for _, flow := range flows {
-		totalTokenRate += float64(flow.requestRate) * (flow.tokens)
-	}
-	return totalTokenRate
-}
-
 // Wait for some time
 func Time(duration string) {
 	sleep, err := time.ParseDuration(duration)
@@ -252,7 +242,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
-	sched := NewWFQScheduler(c, manager, schedMetrics)
+	sched := NewWFQScheduler(c, manager, schedMetrics, labels)
 
 	b.Logf("iterations: %d", b.N)
 
@@ -292,7 +282,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
-	sched := NewWFQScheduler(c, manager, schedMetrics)
+	sched := NewWFQScheduler(c, manager, schedMetrics, labels)
 
 	// bootstrap bucket
 	bootstrapTime := time.Second * 1
@@ -320,16 +310,6 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 	})
 }
 
-func totalSentTokens(flows flowTrackers) []float64 {
-	var total float64
-	totalTokens := make([]float64, len(flows))
-	for i, flow := range flows {
-		totalTokens[i] = float64(flow.totalRequests) * flow.tokens
-		total += totalTokens[i]
-	}
-	return totalTokens
-}
-
 func calculateFillRate(flows flowTrackers, lm float64) float64 {
 	fillRate := float64(0)
 	for _, flow := range flows {
@@ -355,7 +335,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
-	sched := NewWFQScheduler(c, basicBucket, metrics)
+	sched := NewWFQScheduler(c, basicBucket, metrics, labels)
 	var wg sync.WaitGroup
 	var acceptedTokenRatio float64
 
@@ -605,7 +585,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 	lmGauge, tbMetrics := getMetrics()
 	loadMultiplierBucket := NewLoadMultiplierTokenBucket(c, _testSlotCount, _testSlotDuration, lmGauge, tbMetrics)
 	loadMultiplierBucket.SetContinuousTracking(true)
-	sched := NewWFQScheduler(c, loadMultiplierBucket, schedMetrics)
+	sched := NewWFQScheduler(c, loadMultiplierBucket, schedMetrics, labels)
 
 	trainAndDeplete := func() {
 		// Running Train and deplete the bucket

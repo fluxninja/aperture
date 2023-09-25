@@ -95,7 +95,13 @@ func newFactory(
 	wsFactory.requestInQueueDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.RequestInQueueDurationMetricName,
 		Help: "Duration of requests scheduled in Queue",
-	}, MetricLabelKeys)
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	},
+	)
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -244,17 +250,12 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, err
 	}
 
-	flowDurationSummmary, err := wsFactory.requestInQueueDurationSummaryVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get flow duration summary", err)
-	}
-
 	wfqMetrics := &scheduler.WFQMetrics{
 		FlowsGauge:                    wfqFlowsGauge,
 		HeapRequestsGauge:             wfqRequestsGauge,
 		IncomingTokensCounter:         incomingTokensCounter,
 		AcceptedTokensCounter:         acceptedTokensCounter,
-		RequestInQueueDurationSummary: flowDurationSummmary,
+		RequestInQueueDurationSummary: wsFactory.requestInQueueDurationSummaryVec,
 	}
 
 	return &SchedulerMetrics{
@@ -362,7 +363,7 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	// setup scheduler
-	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics)
+	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics, schedulerMetrics.metricLabels)
 
 	return ws, nil
 }

@@ -20,12 +20,33 @@ definitions:
             out_ports:
                 $ref: '#/definitions/AIADLoadSchedulerOuts'
                 description: Output ports for the _AIAD Load Scheduler_.
+            overload_condition:
+                default: gt
+                enum:
+                    - gt
+                    - lt
+                    - gte
+                    - lte
+                title: |-
+                    Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+                    <!-- vale off -->
+                    - "gt": greater than
+                    - "lt": less than
+                    - "gte": greater than or equal to
+                    - "lte": less than or equal to
+                    <!-- vale on -->
+                type: string
+                x-go-tag-default: gt
+                x-go-tag-validate: required,oneof=gt lt gte lte
+                x-oneof: gt | lt | gte | lte
             parameters:
                 $ref: '#/definitions/AIADLoadSchedulerParameters'
                 description: |+
                     Parameters for the _AIAD Load Scheduler_.
 
                 x-go-tag-validate: required
+        required:
+            - overload_condition
         type: object
     AIADLoadSchedulerIns:
         description: Input ports for the _AIAD Load Scheduler_.
@@ -120,27 +141,6 @@ definitions:
                 type: number
                 x-go-tag-default: "0.0"
                 x-go-tag-validate: gte=0
-            overload_condition:
-                default: gt
-                enum:
-                    - gt
-                    - lt
-                    - gte
-                    - lte
-                title: |-
-                    Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
-                    <!-- vale off -->
-                    - "gt": greater than
-                    - "lt": less than
-                    - "gte": greater than or equal to
-                    - "lte": less than or equal to
-                    <!-- vale on -->
-                type: string
-                x-go-tag-default: gt
-                x-go-tag-validate: required,oneof=gt lt gte lte
-                x-oneof: gt | lt | gte | lte
-        required:
-            - overload_condition
         type: object
     AIMDLoadScheduler:
         description: |-
