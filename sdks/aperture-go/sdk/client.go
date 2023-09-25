@@ -141,11 +141,10 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		labels[key] = value
 	}
 
-	// TODO: Set RampMode to rampMode after updating go proto dependency
 	req := &checkproto.CheckRequest{
 		ControlPoint: controlPoint,
 		Labels:       labels,
-		//	RampMode:     rampMode,
+		RampMode:     rampMode,
 	}
 
 	span := c.getSpan(ctx)
