@@ -10,7 +10,13 @@ function(params, metadata={}) {
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
 
-  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
+  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
+    policy+: {
+      promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"%(k8s_pod_name)s"})' % { k8s_pod_name: c.policy.jmx.k8s_pod_name },
+      setpoint: c.policy.service_protection_core.setpoint,
+      overload_condition: 'gt',
+    },
+  },
 
   local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
   assert !std.objectHas(infraMeters, 'jmx_inframeter') : 'An infra meter with name jmx_inframeter already exists. Please choose a different name.',

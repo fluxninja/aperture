@@ -14,6 +14,7 @@ function(cfg, params={}, metadata={}) {
       local aiad = updatedConfig.policy.service_protection_core.aiad_load_scheduler;
 
       spec.v1.AIADLoadScheduler.new()
+      + spec.v1.AIADLoadScheduler.withOverloadCondition(updatedConfig.policy.overload_condition)
       + spec.v1.AIADLoadScheduler.withInPorts({
         signal: spec.v1.Port.withSignalName('SIGNAL'),
         setpoint: spec.v1.Port.withSignalName('SETPOINT'),
