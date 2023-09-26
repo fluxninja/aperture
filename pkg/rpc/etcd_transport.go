@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path"
 	"strconv"
 	"sync"
@@ -200,10 +201,26 @@ func RegisterEtcdServer(
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 
+			log.Info().Msg("controller etcd transport starting")
+
 			server := &EtcdServer{
 				clients:     clients,
 				etcdWatcher: etcdWatcher,
 			}
+
+			// watcher, err := etcdwatcher.NewWatcher(etcdClient, paths.RPCRegistrationPathPrefix)
+			// if err != nil {
+			// 	log.Error().Err(err).Msg("failed to create etcd watcher")
+			// 	return nil
+			// }
+			// unmarshalNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
+			// 	server.etcdPrefixWatcherCallback,
+			// 	config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller)
+			// if err != nil {
+			// 	log.Error().Err(err).Msg("failed to create unmarshal notifier")
+			// 	return nil
+			// }
+			// notifiers.WatcherLifecycle(lc, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
 			if err := server.Start(); err != nil {
 				log.Bug().Err(err)
 			}
@@ -229,11 +246,12 @@ func NewEtcdServer(clients *Clients, etcdWatcher notifiers.Watcher, etcdWriter e
 }
 
 func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshaller config.Unmarshaller) {
+	log.Info().Msg(fmt.Sprintf("event received %s >> %s >> %v", event.Type, event.Key, event.Value))
 	if event.Type == notifiers.Remove {
 		return
 	}
 
-	var helloMsg *rpcv1.ClientToServer
+	helloMsg := &rpcv1.ClientToServer{}
 	err := unmarshaller.Unmarshal(&helloMsg)
 	if err != nil {
 		return
@@ -245,7 +263,7 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 	}
 
 	requests, responses := s.clients.Join(hello.Hello.Name, hello.Hello.NextId)
-	defer close(responses)
+	// defer close(responses)
 
 	callback := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		if event.Type == notifiers.Remove {
@@ -269,27 +287,6 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 		default:
 			log.Bug().Msg("unknown client to server message")
 		}
-
-		for {
-			select {
-			case serverToClient, ok := <-requests:
-				if !ok {
-					return
-				}
-
-				marshalledReq, err := proto.Marshal(serverToClient)
-				if err != nil {
-					log.Bug().Err(err)
-					return
-				}
-
-				s.etcdWriter.Write(path.Join(paths.RPCRequestsPath(hello.Hello.Name), strconv.FormatUint(serverToClient.GetRequest().Id, 10)), marshalledReq)
-
-			case err = <-clientDisconnected:
-				log.Bug().Err(err)
-				return
-			}
-		}
 	}
 
 	keyNotifier, err := notifiers.NewUnmarshalKeyNotifier(
@@ -304,14 +301,35 @@ func (s *EtcdServer) etcdPrefixWatcherCallback(event notifiers.Event, unmarshall
 	if err := s.etcdWatcher.AddKeyNotifier(keyNotifier); err != nil {
 		return
 	}
+
+	for {
+		select {
+		case serverToClient, ok := <-requests:
+			if !ok {
+				return
+			}
+
+			marshalledReq, err := proto.Marshal(serverToClient)
+			if err != nil {
+				log.Bug().Err(err)
+				return
+			}
+
+			s.etcdWriter.Write(path.Join(paths.RPCRequestsPath(hello.Hello.Name), strconv.FormatUint(serverToClient.GetRequest().Id, 10)), marshalledReq)
+
+			// case err = <-clientDisconnected:
+			// 	log.Bug().Err(err)
+			// return
+		}
+	}
 }
 
 // Start starts the etcd based rpc server
 func (s *EtcdServer) Start() error {
 	notifier, err := notifiers.NewUnmarshalPrefixNotifier(
-		paths.RPCRegistrationPathPrefix,
+		"",
 		s.etcdPrefixWatcherCallback,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		config.NewProtobufUnmarshaller,
 	)
 	if err != nil {
 		return err
@@ -321,5 +339,5 @@ func (s *EtcdServer) Start() error {
 		return err
 	}
 
-	return nil
+	return s.etcdWatcher.Start()
 }

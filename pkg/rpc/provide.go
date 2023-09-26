@@ -9,6 +9,7 @@ import (
 	rpcv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/rpc/v1"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
 const (
@@ -19,7 +20,8 @@ const (
 var ServerModule = fx.Options(
 	fx.Provide(NewClients),
 	etcdwatcher.Constructor{
-		Name: rpcEtcWatcher,
+		Name:     rpcEtcWatcher,
+		EtcdPath: paths.RPCRegistrationPathPrefix,
 	}.Annotate(),
 	fx.Provide(NewEtcdServer),
 	fx.Invoke(RegisterEtcdServer),
