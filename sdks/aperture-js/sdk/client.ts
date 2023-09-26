@@ -86,13 +86,19 @@ export class ApertureClient {
         // check connection state
         // if not ready, return flow with fail-to-wire semantics
         // if ready, call check
-        if (
-          (params.tryConnect === undefined || params.tryConnect == false) &&
-          this.fcsClient.getChannel().getConnectivityState(true) !=
-            connectivityState.READY
-        ) {
-          resolveFlow(null, serializeError(new Error("connection not ready")));
-          return;
+        if (params.tryConnect === undefined || params.tryConnect == false) {
+          const state = this.fcsClient.getChannel().getConnectivityState(true);
+          if (state != connectivityState.READY) {
+            resolveFlow(
+              null,
+              serializeError(
+                new Error(
+                  `connection with Aperture Agent is not established, state: ${state}`,
+                ),
+              ),
+            );
+            return;
+          }
         }
 
         let labelsBaggage = {} as Record<string, string>;
