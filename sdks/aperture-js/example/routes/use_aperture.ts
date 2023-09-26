@@ -17,6 +17,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
     .StartFlow("awesome-feature", {
       labels: labels,
       timeoutMilliseconds: 300000,
+      rampMode: false,
     })
     .then((flow) => {
       // See whether flow was accepted by Aperture Agent.
