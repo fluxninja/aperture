@@ -18,7 +18,7 @@ public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
     private String controlPointName;
-    private boolean failOpen;
+    private boolean rampMode;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -40,7 +40,7 @@ public class ApertureFilter implements Filter {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             try {
@@ -83,7 +83,7 @@ public class ApertureFilter implements Filter {
                     Boolean.parseBoolean(
                             filterConfig.getInitParameter("ignored_paths_match_regex"));
 
-            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
 
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);

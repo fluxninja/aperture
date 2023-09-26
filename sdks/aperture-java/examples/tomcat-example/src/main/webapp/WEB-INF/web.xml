@@ -55,8 +55,8 @@
             <param-value>awesome_feature</param-value>
         </init-param>
         <init-param>
-            <param-name>enable_fail_open</param-name>
-            <param-value>true</param-value>
+            <param-name>enable_ramp_mode</param-name>
+            <param-value>false</param-value>
         </init-param>
     </filter>
     <filter-mapping>
