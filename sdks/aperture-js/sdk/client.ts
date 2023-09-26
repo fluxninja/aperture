@@ -5,6 +5,7 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { serializeError } from "serialize-error";
 import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
@@ -90,13 +91,7 @@ export class ApertureClient {
           this.fcsClient.getChannel().getConnectivityState(true) !=
             connectivityState.READY
         ) {
-          const err = new Error("connection not ready");
-          const serializableError = {
-            message: err.message,
-            name: err.name,
-            stack: err.stack,
-          };
-          resolveFlow(null, serializableError);
+          resolveFlow(null, serializeError(new Error("connection not ready")));
           return;
         }
 
