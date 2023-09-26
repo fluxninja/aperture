@@ -31,8 +31,8 @@ export class ApertureClient {
 
   constructor({ channelCredentials = grpc.credentials.createInsecure() } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials, {
-      "grpc.keepalive_time_ms": 10000,
-      "grpc.keepalive_timeout_ms": 5000,
+      "grpc.keepalive_time_ms": 3000,
+      "grpc.keepalive_timeout_ms": 1000,
       "grpc.keepalive_permit_without_calls": 1,
     });
 
@@ -90,7 +90,13 @@ export class ApertureClient {
           this.fcsClient.getChannel().getConnectivityState(true) !=
             connectivityState.READY
         ) {
-          resolveFlow(null, new Error("connection not ready"));
+          const err = new Error("connection not ready");
+          const serializableError = {
+            message: err.message,
+            name: err.name,
+            stack: err.stack,
+          };
+          resolveFlow(null, serializableError);
           return;
         }
 
