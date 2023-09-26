@@ -612,10 +612,9 @@ def render_dashboards(policies):
         blueprint_name = policy["blueprint_name"]
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
-        dashboard_mixin_dir = policy["dashboard_mixin_dir"]
-        rendered = local(command=["./scripts/render-dashboard.sh", base_dir, aperturectl_bin, blueprints_uri,
-                                    blueprint_name, policy_name, values_file], quiet=True)
-        dashboards[policy_name] = {"path": dashboard_mixin_dir, "content": rendered}
+        dashboard_dir = local(command=["./scripts/render-dashboards.sh", aperturectl_bin, blueprints_uri,
+                                    blueprint_name, values_file], quiet=True)
+        dashboards[policy_name] = str(dashboard_dir).replace("\\n", "").strip().split(" ")
 
     return dashboards
 
@@ -938,8 +937,6 @@ def process_aperture_scenario(scenario_path):
     for policy in aperture_policies:
         if "values_file" in policy:
             policy["values_file"] = scenario_path + "/" + policy["values_file"]
-        if "dashboard_mixin_dir" in policy:
-            policy["dashboard_mixin_dir"] = scenario_path + "/" + policy["dashboard_mixin_dir"]
 
     if aperture_policies:
         policies = {
@@ -962,18 +959,23 @@ def process_aperture_scenario(scenario_path):
         DEP_TREE[APERTURE_DEMOAPP_NS]["scenario-policies"] = policies
         DEP_TREE[APERTURE_DEMO_UI_NS]["scenario-policies"] = policies
 
-        for policy_name, dashboard in render_dashboards(aperture_policies).items():
-            ds = {
-                "renderer": "jsonnet",
-                "namespace": APERTURE_CONTROLLER_NS,
-                "labels": "ApertureController",
-                "needs": ["aperture-grafana"],
-                "manifests_path": os.path.join(dashboard["path"], "main.jsonnet"),
-                "jsonnet_args": ["-J", PLAYGROUND_ROOT + "/tanka/vendor",
-                                 "--ext-str", "APERTURE_DASHBOARD=%s" % dashboard["content"],
-                                 "--ext-str", "POLICY_NAME=%s" % policy_name],
-            }
-            DEP_TREE[APERTURE_CONTROLLER_NS]["scenario-dashboard-%s" % policy_name] = ds
+        for policy_name, dashboard_dir in render_dashboards(aperture_policies).items():
+            for dashboard_file in dashboard_dir:
+                if not dashboard_file.endswith(".json"):
+                    continue
+                dashboard_name = os.path.basename(dashboard_file).replace(".json", "")
+                resource_name = "scenario-dashboard-{}-{}".format(policy_name, dashboard_name)
+                ds = {
+                    "renderer": "jsonnet",
+                    "namespace": APERTURE_CONTROLLER_NS,
+                    "labels": "ApertureController",
+                    "needs": ["aperture-grafana"],
+                    "manifests_path": os.path.join(GIT_ROOT, "playground", "resources", "grafana-dashboard", 'main.libsonnet'),
+                    "jsonnet_args": ["-J", PLAYGROUND_ROOT + "/tanka/vendor",
+                                     "--ext-str", "APERTURE_DASHBOARD=%s" % read_file(dashboard_file),
+                                     "--ext-str", "DASHBOARD_NAME=%s" % dashboard_name],
+                }
+                DEP_TREE[APERTURE_CONTROLLER_NS][resource_name] = ds
 
 
     # Load k6 configuration and process it for inclusion into a yaml file

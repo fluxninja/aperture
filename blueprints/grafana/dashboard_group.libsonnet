@@ -1,5 +1,4 @@
 local creator = import 'creator.libsonnet';
-local infraMeterDashboard = import 'infra_meter_creator.libsonnet';
 local signals = import 'signals_dashboard.libsonnet';
 
 function(policyJSON, cfg) {

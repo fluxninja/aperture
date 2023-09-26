@@ -30,15 +30,15 @@ func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto
 }
 
 // GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string) grpc.UnaryServerInterceptor {
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string, rampMode bool) grpc.UnaryServerInterceptor {
 	if explicitLabels == nil {
 		explicitLabels = make(map[string]string)
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, false)
+		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, rampMode)
 
-		flow := c.StartHTTPFlow(ctx, checkreq, true)
+		flow := c.StartHTTPFlow(ctx, checkreq, rampMode)
 		if flow.Error() != nil {
 			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}

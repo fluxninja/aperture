@@ -18,10 +18,11 @@ type httpMiddleware struct {
 	controlPoint string
 	labels       map[string]string
 	ignoredPaths *[]regexp.Regexp
+	rampMode     bool
 }
 
 // NewHTTPMiddleware creates a new HTTPMiddleware struct.
-func NewHTTPMiddleware(client aperture.Client, controlPoint string, labels map[string]string, ignoredPaths *[]regexp.Regexp) HTTPMiddleware {
+func NewHTTPMiddleware(client aperture.Client, controlPoint string, labels map[string]string, ignoredPaths *[]regexp.Regexp, rampMode bool) HTTPMiddleware {
 	if labels == nil {
 		labels = make(map[string]string)
 	}
@@ -30,6 +31,7 @@ func NewHTTPMiddleware(client aperture.Client, controlPoint string, labels map[s
 		controlPoint: controlPoint,
 		labels:       labels,
 		ignoredPaths: ignoredPaths,
+		rampMode:     rampMode,
 	}
 }
 
@@ -46,9 +48,9 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels, false)
+		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels, m.rampMode)
 
-		flow := m.client.StartHTTPFlow(r.Context(), req, true)
+		flow := m.client.StartHTTPFlow(r.Context(), req, m.rampMode)
 		if flow.Error() != nil {
 			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}

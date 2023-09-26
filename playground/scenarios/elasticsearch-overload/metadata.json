@@ -6,8 +6,7 @@
     {
       "blueprint_name": "load-scheduling/elasticsearch",
       "policy_name": "service1-demoapp-elasticsearch-overload",
-      "values_file": "policies/elasticsearch-overload.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/elasticsearch-overload.yaml"
     }
   ],
   "images": [
