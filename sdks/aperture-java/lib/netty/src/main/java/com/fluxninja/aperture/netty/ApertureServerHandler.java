@@ -15,7 +15,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private boolean failOpen = true;
+    private boolean rampMode = false;
 
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
         if (controlPointName == null || controlPointName.trim().isEmpty()) {
@@ -28,7 +28,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         this.controlPointName = controlPointName;
     }
 
-    public ApertureServerHandler(ApertureSDK sdk, String controlPointName, boolean failOpen) {
+    public ApertureServerHandler(ApertureSDK sdk, String controlPointName, boolean rampMode) {
         if (controlPointName == null || controlPointName.trim().isEmpty()) {
             throw new IllegalArgumentException("Control Point name must not be null or empty");
         }
@@ -37,7 +37,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         }
         this.apertureSDK = sdk;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             try {
