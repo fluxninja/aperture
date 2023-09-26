@@ -5,8 +5,7 @@
     {
       "blueprint_name": "rate-limiting/base",
       "policy_name": "graphql-rate-limiting",
-      "values_file": "policies/graphql-rate-limiting.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/graphql-rate-limiting.yaml"
     }
   ],
   "images": [

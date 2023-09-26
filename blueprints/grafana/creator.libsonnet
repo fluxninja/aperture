@@ -1,4 +1,3 @@
-local infraMeterPanelLibrary = import './infra_meter_panel_library.libsonnet';
 local base = import './utils/base_dashboard.libsonnet';
 local defaultConfig = import './utils/default_config.libsonnet';
 local unwrapInfraMeter = import './utils/unwrap_infra_meter_panel.libsonnet';
@@ -11,6 +10,7 @@ function(policyFile, cfg) {
   local config = defaultConfig + cfg,
   local dashboard = base(config),
   local policyName = cfg.policy.policy_name,
+  local receiverDashboard = base(config { dashboard+: { title: 'Receiver Dashboard - %s' % policyName } }),
 
   local policyJSON =
     if std.isObject(policyFile)
@@ -59,19 +59,17 @@ function(policyFile, cfg) {
     else {},
 
   local receiverDashboards = {
-    [infraMeter + '_' + receiver + '.json']:
-      dashboard.baseDashboard + g.dashboard.withPanels(
-        unwrapInfraMeter(receiver, policyName, infraMeters[infraMeter], cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
+    ['receiver' + '-' + policyName + '-' + infraMeter + '-' + receiver + '.json']:
+      receiverDashboard.baseDashboard + g.dashboard.withPanels(
+        unwrapInfraMeter(receiver, policyName, infraMeter, cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
       )
     for infraMeter in std.objectFields(infraMeters)
     if std.objectHas(infraMeters[infraMeter], 'receivers')
     for receiver in std.objectFields(infraMeters[infraMeter].receivers)
   },
 
-
   local panels = flowControlPanels + otherPanels,
-  local final = dashboard.baseDashboard
-                + g.dashboard.withPanels(panels),
+  local final = dashboard.baseDashboard + g.dashboard.withPanels(panels),
 
   dashboard: final,
   receiverDashboards: receiverDashboards,
