@@ -1,46 +1,34 @@
-# yaml-language-server: $schema=../../../../../blueprints/rate-limiting/base/gen/definitions.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/rate-limiting/base/gen/definitions.json
 # Generated values file for rate-limiting/base blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/rate-limiting
-
+# https://docs.fluxninja.com/reference/blueprints/rate-limiting/base
 blueprint: rate-limiting/base
-uri: ../../../../../blueprints
+uri: github.com/fluxninja/aperture/blueprints@latest
+
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: rate-limiting
-  # List of additional circuit components.
-  # Type: []aperture.spec.v1.Component
-  components: []
-  # Additional resources.
-  # Type: aperture.spec.v1.Resources
-  resources:
-    flow_control:
-      classifiers: []
   rate_limiter:
     # Bucket capacity.
     # Type: float64
     # Required: True
     bucket_capacity: 40
-    # Leak amount.
+    # Fill amount.
     # Type: float64
     # Required: True
     fill_amount: 2
+    # Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    # Required: True
+    parameters:
+      interval: 1s
+      label_key: "http.request.header.user_type"
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
+    # Required: True
     selectors:
       - agent_group: default
         service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
-    # Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
-    parameters:
-      # Flow label to use for rate limiting.
-      # Type: string
-      # Required: True
-      label_key: http.request.header.user_type
-      # Leak interval e.g. "1s".
-      # Type: string
-      # Required: True
-      interval: 1s

@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/structpb"
 	appsv1 "k8s.io/api/apps/v1"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -94,7 +93,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 				Name:      policyName,
 			}, policy)
 			if err != nil {
-				if apimeta.IsNoMatchError(err) {
+				if utils.IsNoMatchError(err) {
 					err = applyDynamicConfigUsingAPI(dynamicConfigYAML)
 					if err != nil {
 						return err

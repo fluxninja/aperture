@@ -68,12 +68,22 @@ release name. If your setup is different, adjust these endpoints accordingly.
 fluxninja:
   enable_cloud_controller: false
   endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
+  api_key: API_KEY
 etcd:
   endpoints: ["http://etcd:2379"]
 prometheus:
   address: "http://prometheus:80"
 agent_functions:
   endpoints: ["aperture-controller:8080"]
+otel:
+  disable_kubernetes_scraper: true
+  disable_kubelet_scraper: true
+auto_scale:
+  kubernetes:
+    enabled: false
+service_discovery:
+  kubernetes:
+    enabled: false
 ```
 
 You might need to adjust the endpoints, depending on your exact setup.

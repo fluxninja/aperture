@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -115,7 +114,7 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 		}
 		err = kubeClient.Create(context.Background(), policyCR)
 		if err != nil {
-			if apimeta.IsNoMatchError(err) {
+			if utils.IsNoMatchError(err) {
 				var isUpdated bool
 				isUpdated, updatePolicyUsingAPIErr := updatePolicyUsingAPI(name, policy)
 				if !isUpdated {
