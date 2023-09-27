@@ -12,8 +12,8 @@ generate_from_values \
 	tmp
 
 # copy the generated policy and graph to this (assets) directory so that they can be used in the docs
-cp tmp/policies/load-based-auto-scale-cr.yaml policy.yaml
-cp tmp/graphs/load-based-auto-scale-cr.mmd graph.mmd
+cp tmp/policies/cpu-usage-based-auto-scale-cr.yaml policy.yaml
+cp tmp/graphs/cpu-usage-based-auto-scale-cr.mmd graph.mmd
 
 # git add the generated policy and graph
 "$git_root"/scripts/git_add_safely.sh policy.yaml graph.mmd

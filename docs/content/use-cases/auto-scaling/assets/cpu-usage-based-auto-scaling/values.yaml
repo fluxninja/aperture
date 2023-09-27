@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../../../../../../blueprints/auto-scaling/pod-auto-scaler/gen/definitions.json
+# Generated values file for auto-scaling/pod-auto-scaler blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/auto-scaling/pod-auto-scaler
+
+blueprint: auto-scaling/pod-auto-scaler
+uri: ../../../../../../blueprints
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: cpu-usage-based-auto-scale
+  # Scaling backend for the policy.
+  # Type: aperture.spec.v1.AutoScalerScalingBackend
+  # Required: True
+  scaling_backend:
+    kubernetes_replicas:
+      max_replicas: "10"
+      min_replicas: "1"
+      kubernetes_object_selector:
+        agent_group: default
+        api_version: apps/v1
+        kind: Deployment
+        name: search-service
+        namespace: prod
+  # Parameters that define the scaling behavior.
+  # Type: aperture.spec.v1.AutoScalerScalingParameters
+  scaling_parameters:
+    scale_in_alerter:
+      alert_name: "Auto-scaler is scaling in"
+    scale_in_cooldown: "40s"
+    scale_out_alerter:
+      alert_name: "Auto-scaler is scaling out"
+    scale_out_cooldown: "30s"
+  # Driver to do scaling of the resource based on the CPU usage.
+  # Type: scaling_driver
+  pod_cpu:
+    scale_in:
+      enabled: true
+      threshold: 0.3
+    scale_out:
+      enabled: true
+      threshold: 0.5
