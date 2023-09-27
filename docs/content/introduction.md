@@ -70,13 +70,6 @@ Aperture provides a variety of advanced load management features:
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs.
-- 🔀
-  [**Load-based Auto Scaling**](/use-cases/auto-scaling/load-based-auto-scaling.md):
-  Eliminate the need for costly over-provisioning and enhance efficiency with
-  Aperture's load-based auto-scaling. Aperture's policies are expressed as
-  circuit graphs that continuously track deviations from service-level
-  objectives and calculate recovery or escalation actions. Auto-scaling can be
-  implemented as an escalation that triggers based on load throttling signal.
 - ⏱️ [**Distributed Rate-Limiting**](/use-cases/rate-limiting/rate-limiting.md):
   Safeguard APIs from potential abuse with Aperture's high-performance,
   distributed rate limiter. This feature enforces per-key limits based on

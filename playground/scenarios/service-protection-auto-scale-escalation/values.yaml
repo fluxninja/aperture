@@ -1,9 +1,3 @@
-demoapp:
-  simplesrv:
-    cpuLoadPercentage: 75
-  resources:
-    limits:
-      cpu: 500m
 agent:
   agent:
     config:

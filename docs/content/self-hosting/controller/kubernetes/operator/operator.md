@@ -54,14 +54,14 @@ Kubernetes Objects which will be created by the following steps are listed
 1. Run the following `install` command:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install controller aperture/aperture-controller`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -90,14 +90,14 @@ Kubernetes Objects which will be created by the following steps are listed
    Controller.
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install controller aperture/aperture-controller -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -124,14 +124,14 @@ Kubernetes Objects which will be created by the following steps are listed
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install controller aperture/aperture-controller -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -146,14 +146,14 @@ Kubernetes Objects which will be created by the following steps are listed
    `default`, use the `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install controller aperture/aperture-controller -f values.yaml --namespace aperture-controller --create-namespace`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -170,14 +170,14 @@ Kubernetes Objects which will be created by the following steps are listed
       ```
 
       <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-      </CodeBlock>
-      </TabItem>
       <TabItem value="Helm" label="Helm">
       <CodeBlock language="bash">
       {`helm install controller aperture/aperture-controller -f values.yaml`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
       </CodeBlock>
       </TabItem>
       </Tabs>
@@ -222,11 +222,6 @@ Aperture Controller into your cluster.
    command:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml | kubectl apply -f -`}
@@ -239,17 +234,17 @@ Aperture Controller into your cluster.
    {`helm upgrade controller aperture/aperture-controller -f values.yaml`}
    </CodeBlock>
    </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
    </Tabs>
 
 2. If you have deployed the Aperture Controller into a namespace other than
    `default`, use the `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks controller aperture/aperture-controller -f values.yaml --namespace aperture-controller | kubectl apply -f -`}
@@ -260,6 +255,11 @@ Aperture Controller into your cluster.
 
    <CodeBlock language="bash">
    {`helm upgrade controller aperture/aperture-controller -f values.yaml --namespace aperture-controller`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install controller --version ${apertureVersion} --values-file values.yaml --namespace aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -286,14 +286,14 @@ following the below steps:
 1. Uninstall the Aperture Controller:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall controller --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall controller`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall controller --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -310,14 +310,14 @@ following the below steps:
    2. Delete the Aperture Controller to uninstall the Aperture Operator:
 
       <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl uninstall controller`}
-      </CodeBlock>
-      </TabItem>
       <TabItem value="Helm" label="Helm">
       <CodeBlock language="bash">
       {`helm uninstall controller`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl uninstall controller`}
       </CodeBlock>
       </TabItem>
       </Tabs>
@@ -326,15 +326,15 @@ following the below steps:
    execute the below commands:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall controller --namespace aperture-controller`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall controller --namespace aperture-controller
    kubectl delete namespace aperture-controller`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall controller --namespace aperture-controller`}
    </CodeBlock>
    </TabItem>
    </Tabs>

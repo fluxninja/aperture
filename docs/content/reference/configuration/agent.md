@@ -900,7 +900,7 @@ AutoScaleKubernetesConfig is the configuration for the flow preview service.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 

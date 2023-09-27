@@ -59,16 +59,7 @@ The injector is configured with the following logic:
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
-
-   :::info Refer
-
-   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
-   see all the available command line arguments.
-
-   :::
-
-2. [Helm](https://helm.sh/docs/intro/install/)
+1. [Helm](https://helm.sh/docs/intro/install/)
 
    1. Once the Helm CLI is installed, add the
       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
@@ -78,6 +69,15 @@ Install the tool of your choice using the following links:
       helm repo add aperture https://fluxninja.github.io/aperture/
       helm repo update
       ```
+
+2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+
+   :::info Refer
+
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
+
+   :::
 
 ## Installation {#agent-sidecar-installation}
 
@@ -130,14 +130,14 @@ Kubernetes Objects which will be created by following steps are listed
    :::
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -170,14 +170,14 @@ Kubernetes Objects which will be created by following steps are listed
    namespaces and add more if required.
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -208,14 +208,14 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -230,14 +230,14 @@ Kubernetes Objects which will be created by following steps are listed
    `default`, use the `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml --namespace aperture-agent --create-namespace`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -254,14 +254,14 @@ Kubernetes Objects which will be created by following steps are listed
       ```
 
       <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-      </CodeBlock>
-      </TabItem>
       <TabItem value="Helm" label="Helm">
       <CodeBlock language="bash">
       {`helm install agent aperture/aperture-agent -f values.yaml`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
       </CodeBlock>
       </TabItem>
       </Tabs>
@@ -328,11 +328,6 @@ Aperture Agent into your cluster.
    command:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
@@ -345,17 +340,17 @@ Aperture Agent into your cluster.
    {`helm upgrade agent aperture/aperture-agent -f values.yaml`}
    </CodeBlock>
    </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
    </Tabs>
 
 2. If you have deployed the Aperture Agent into a namespace other than
    `default`, use the `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template --include-crds --no-hooks agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
@@ -366,6 +361,11 @@ Aperture Agent into your cluster.
 
    <CodeBlock language="bash">
    {`helm upgrade agent aperture/aperture-agent -f values.yaml --namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -462,14 +462,14 @@ following these steps:
 1. Delete the Aperture Agent chart:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall agent --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -486,14 +486,14 @@ following these steps:
    2. Delete the Aperture Agent to uninstall the Aperture Operator:
 
       <Tabs groupId="setup" queryString>
-      <TabItem value="aperturectl" label="aperturectl">
-      <CodeBlock language="bash">
-      {`aperturectl uninstall agent --version ${apertureVersion}`}
-      </CodeBlock>
-      </TabItem>
       <TabItem value="Helm" label="Helm">
       <CodeBlock language="bash">
       {`helm uninstall agent`}
+      </CodeBlock>
+      </TabItem>
+      <TabItem value="aperturectl" label="aperturectl">
+      <CodeBlock language="bash">
+      {`aperturectl uninstall agent --version ${apertureVersion}`}
       </CodeBlock>
       </TabItem>
       </Tabs>
@@ -502,15 +502,15 @@ following these steps:
    execute the following commands:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall agent --namespace aperture-agent
    kubectl delete namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --namespace aperture-agent --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
