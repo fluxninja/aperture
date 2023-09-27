@@ -3,19 +3,15 @@ package apply
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/types/known/structpb"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
@@ -41,15 +37,8 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 	SilenceErrors: true,
 	Example:       `aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(_ *cobra.Command, _ []string) error {
-		if policyName == "" {
-			return errors.New("policy name is required")
-		}
-		if dynamicConfigFile == "" {
-			return errors.New("dynamic config file is required")
-		}
-		// read the dynamic config file
 		var err error
-		dynamicConfigBytes, err = os.ReadFile(dynamicConfigFile)
+		dynamicConfigBytes, err = utils.GetDynamicConfigBytes(policyName, dynamicConfigFile)
 		if err != nil {
 			return err
 		}
@@ -94,7 +83,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			}, policy)
 			if err != nil {
 				if utils.IsNoMatchError(err) {
-					err = applyDynamicConfigUsingAPI(dynamicConfigYAML)
+					err = utils.ApplyDynamicConfigUsingAPI(client, dynamicConfigYAML, policyName)
 					if err != nil {
 						return err
 					}
@@ -109,7 +98,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 				}
 			}
 		} else {
-			err = applyDynamicConfigUsingAPI(dynamicConfigYAML)
+			err = utils.ApplyDynamicConfigUsingAPI(client, dynamicConfigYAML, policyName)
 			if err != nil {
 				return err
 			}
@@ -119,24 +108,4 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 
 		return nil
 	},
-}
-
-// applyDynamicConfig applies the DynamicConfig to the Policy using API.
-func applyDynamicConfigUsingAPI(dynamicConfigYAML map[string]interface{}) error {
-	var dynamicConfigStruct *structpb.Struct
-	var err error
-	dynamicConfigStruct, err = structpb.NewStruct(dynamicConfigYAML)
-	if err != nil {
-		return fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
-	}
-	request := languagev1.PostDynamicConfigRequest{
-		PolicyName:    policyName,
-		DynamicConfig: dynamicConfigStruct,
-	}
-	_, err = client.PostDynamicConfig(context.Background(), &request)
-	if err != nil {
-		return fmt.Errorf("failed to update DynamicConfig: %w", err)
-	}
-
-	return nil
 }

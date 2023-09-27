@@ -8,13 +8,8 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
 )
 
-var (
-	// Controller is the controller connection object.
-	Controller utils.ControllerConn
-
-	client       utils.CloudPolicyClient
-	controllerNs string
-)
+// Controller is the controller connection object.
+var Controller utils.ControllerConn
 
 func init() {
 	Controller.InitFlags(ApplyCmd.PersistentFlags())
@@ -30,15 +25,9 @@ var ApplyCmd = &cobra.Command{
 Use this command to apply the Aperture Policies to the Cloud Controller.`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-		err = Controller.PreRunE(cmd, args)
+		err := Controller.PreRunE(cmd, args)
 		if err != nil {
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
-		}
-
-		client, err = Controller.CloudPolicyClient()
-		if err != nil {
-			return fmt.Errorf("failed to get cloud controller client: %w", err)
 		}
 
 		return nil

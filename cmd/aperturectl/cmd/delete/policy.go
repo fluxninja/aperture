@@ -10,7 +10,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
@@ -60,7 +59,7 @@ func deletePolicy() error {
 			}
 
 			if utils.IsNoMatchError(err) {
-				err = deletePolicyUsingAPI()
+				err = utils.DeletePolicyUsingAPI(client, policyName)
 			}
 
 			if err != nil {
@@ -68,25 +67,12 @@ func deletePolicy() error {
 			}
 		}
 	} else {
-		err := deletePolicyUsingAPI()
+		err := utils.DeletePolicyUsingAPI(client, policyName)
 		if err != nil {
 			return fmt.Errorf("failed to delete policy: %w", err)
 		}
 	}
 
 	log.Info().Str("policy", policyName).Msg("Deleted Policy successfully")
-	return nil
-}
-
-// deletePolicyUsingAPI deletes the policy using the API.
-func deletePolicyUsingAPI() error {
-	policyRequest := languagev1.DeletePolicyRequest{
-		Name: policyName,
-	}
-	_, err := client.DeletePolicy(context.Background(), &policyRequest)
-	if err != nil {
-		return fmt.Errorf("failed to delete policy '%s' using API: %w", policyName, err)
-	}
-
 	return nil
 }

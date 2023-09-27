@@ -6,11 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
+	cloudutils "github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (
-	controller utils.ControllerConn
+	controller cloudutils.ControllerConn
 	client     utils.CloudPolicyClient
 	policyName string
 )
