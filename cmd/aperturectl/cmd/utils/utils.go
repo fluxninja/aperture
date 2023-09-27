@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -305,4 +307,8 @@ func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*ap
 	}
 
 	return &deployment.Items[0], nil
+}
+
+func IsNoMatchError(err error) bool {
+	return apimeta.IsNoMatchError(err) || strings.Contains(err.Error(), "failed to get API group resources")
 }

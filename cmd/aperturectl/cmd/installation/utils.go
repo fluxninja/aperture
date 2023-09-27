@@ -24,7 +24,6 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -35,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
@@ -181,7 +181,7 @@ func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructu
 	for attempt < 5 {
 		attempt++
 		err = applyObjectToKubernetes(unstructuredObject)
-		if err == nil || (!apimeta.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
+		if err == nil || (!utils.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
 			return err
 		}
 		time.Sleep(time.Second * time.Duration(attempt))

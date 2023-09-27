@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -60,7 +59,7 @@ func deletePolicy() error {
 				return nil
 			}
 
-			if apimeta.IsNoMatchError(err) {
+			if utils.IsNoMatchError(err) {
 				err = deletePolicyUsingAPI()
 			}
 
