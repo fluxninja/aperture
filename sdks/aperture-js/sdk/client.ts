@@ -32,8 +32,8 @@ export class ApertureClient {
 
   constructor({ channelCredentials = grpc.credentials.createInsecure() } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials, {
-      "grpc.keepalive_time_ms": 3000,
-      "grpc.keepalive_timeout_ms": 1000,
+      "grpc.keepalive_time_ms": 10000,
+      "grpc.keepalive_timeout_ms": 5000,
       "grpc.keepalive_permit_without_calls": 1,
     });
 
@@ -86,13 +86,22 @@ export class ApertureClient {
         // check connection state
         // if not ready, return flow with fail-to-wire semantics
         // if ready, call check
-        if (
-          (params.tryConnect === undefined || params.tryConnect == false) &&
-          this.fcsClient.getChannel().getConnectivityState(true) !=
-            connectivityState.READY
-        ) {
-          resolveFlow(null, serializeError(new Error("connection not ready")));
-          return;
+        if (params.tryConnect === undefined || params.tryConnect == false) {
+          const state = this.fcsClient.getChannel().getConnectivityState(true);
+          if (
+            state != connectivityState.READY &&
+            state != connectivityState.IDLE
+          ) {
+            resolveFlow(
+              null,
+              serializeError(
+                new Error(
+                  `connection with Aperture Agent is not established, state: ${state}`,
+                ),
+              ),
+            );
+            return;
+          }
         }
 
         let labelsBaggage = {} as Record<string, string>;
