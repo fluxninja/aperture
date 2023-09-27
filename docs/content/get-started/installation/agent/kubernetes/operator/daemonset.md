@@ -36,16 +36,7 @@ where it will get deployed on all the nodes of the cluster.
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
-
-   :::info Refer
-
-   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
-   see all the available command line arguments.
-
-   :::
-
-2. [Helm](https://helm.sh/docs/intro/install/)
+1. [Helm](https://helm.sh/docs/intro/install/)
 
    1. Once the Helm CLI is installed, add the
       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
@@ -55,6 +46,15 @@ Install the tool of your choice using the following links:
       helm repo add aperture https://fluxninja.github.io/aperture/
       helm repo update
       ```
+
+2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+
+   :::info Refer
+
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
+
+   :::
 
 <!-- vale off -->
 
