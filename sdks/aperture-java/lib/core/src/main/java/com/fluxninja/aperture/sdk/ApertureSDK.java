@@ -127,7 +127,7 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new Flow(res, span, false);
+        return new Flow(res, span, false, rampMode);
     }
 
     /**
@@ -168,7 +168,7 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new TrafficFlow(res, span, false);
+        return new TrafficFlow(res, span, false, req.getCheckHTTPRequest().getRampMode());
     }
 
     private boolean isIgnored(String path) {

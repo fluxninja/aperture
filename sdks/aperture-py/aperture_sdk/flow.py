@@ -35,15 +35,12 @@ class Flow(AbstractContextManager):
         self._check_response = check_response
         self._status_code = FlowStatus.OK
         self._ended = False
-        self._fail_open = True
+        self._ramp_mode = False
 
     def should_run(self) -> bool:
         return self.decision == FlowDecision.Accepted or (
-            self._fail_open and self.decision == FlowDecision.Unreachable
+            (not self._ramp_mode) and self.decision == FlowDecision.Unreachable
         )
-
-    def disable_fail_open(self) -> None:
-        self._fail_open = False
 
     @property
     def decision(self) -> FlowDecision:

@@ -5,6 +5,7 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { serializeError } from "serialize-error";
 import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
@@ -16,7 +17,7 @@ import { fcs } from "./utils.js";
 export interface FlowParams {
   labels?: Record<string, string>;
   timeoutMilliseconds?: number;
-  failOpen?: boolean;
+  rampMode?: boolean;
   tryConnect?: boolean;
 }
 
@@ -65,31 +66,42 @@ export class ApertureClient {
   // Return value is a Flow.
   // The call returns immediately in case connection with Aperture Agent is not established.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-  // For FlowParams set defaults - labels = {}, timeoutMilliseconds = 0, failOpen = true using Pick.
+  // For FlowParams set defaults - labels = {}, timeoutMilliseconds = 0, rampMode = false using Pick.
   async StartFlow(
     controlPoint: string,
     params: FlowParams = {},
-    rampMode: boolean = false,
   ): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
+      if (params.rampMode === undefined) {
+        params.rampMode = false;
+      }
       let span = this.tracer.startSpan("Aperture Check");
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(span, startDate, params.failOpen, response, err));
+        resolve(new Flow(span, startDate, params.rampMode, response, err));
       };
 
       try {
         // check connection state
         // if not ready, return flow with fail-to-wire semantics
         // if ready, call check
-        if (
-          (params.tryConnect === undefined || params.tryConnect == false) &&
-          this.fcsClient.getChannel().getConnectivityState(true) !=
-            connectivityState.READY
-        ) {
-          resolveFlow(null, new Error("connection not ready"));
-          return;
+        if (params.tryConnect === undefined || params.tryConnect == false) {
+          const state = this.fcsClient.getChannel().getConnectivityState(true);
+          if (
+            state != connectivityState.READY &&
+            state != connectivityState.IDLE
+          ) {
+            resolveFlow(
+              null,
+              serializeError(
+                new Error(
+                  `connection with Aperture Agent is not established, state: ${state}`,
+                ),
+              ),
+            );
+            return;
+          }
         }
 
         let labelsBaggage = {} as Record<string, string>;
@@ -106,7 +118,7 @@ export class ApertureClient {
         const request: CheckRequest = {
           controlPoint: controlPoint,
           labels: mergedLabels,
-          rampMode: rampMode,
+          rampMode: params.rampMode,
         };
 
         const grpcParams: grpc.CallOptions = {

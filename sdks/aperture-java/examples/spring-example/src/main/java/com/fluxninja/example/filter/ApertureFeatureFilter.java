@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
-    private boolean failOpen;
+    private boolean rampMode;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -26,7 +26,7 @@ public class ApertureFeatureFilter implements Filter {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels, false);
+        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels, this.rampMode);
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -57,7 +57,7 @@ public class ApertureFeatureFilter implements Filter {
             agentPort = filterConfig.getInitParameter("agent_port");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
-            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }

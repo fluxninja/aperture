@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private final boolean failOpen;
+    private final boolean rampMode;
 
     public static Function<? super RpcClient, ApertureRPCClient> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +24,11 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     }
 
     public static Function<? super RpcClient, ApertureRPCClient> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
         ApertureRPCClientBuilder builder = new ApertureRPCClientBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableFailOpen(failOpen);
+                .setEnableRampMode(rampMode);
         return builder::build;
     }
 
@@ -36,11 +36,11 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
             RpcClient delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean failOpen) {
+            boolean rampMode) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && this.rampMode));
 
         if (flowAccepted) {
             RpcResponse res;

@@ -7,7 +7,7 @@ import com.linecorp.armeria.client.HttpClient;
 public class ApertureHTTPClientBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
-    private boolean enableFailOpen = true;
+    private boolean enableRampMode = false;
 
     /**
      * Sets the Aperture SDK used by this service.
@@ -32,15 +32,14 @@ public class ApertureHTTPClientBuilder {
     }
 
     /**
-     * Sets the fail-open behavior for the client when the Aperture Agent is unreachable. If set to
-     * true, all traffic will pass through; if set to false, all traffic will be blocked.
+     * Marks started flows as ramp mode, requiring at least one ramp component to accept it. Marked
+     * flows will fail if the policy is not loaded or Agent is unreachable.
      *
-     * @param enableFailOpen whether all traffic should be accepted when Aperture Agent is
-     *     unreachable
+     * @param enableRampMode whether all started flows should be started in ramp mode
      * @return the builder object.
      */
-    public ApertureHTTPClientBuilder setEnableFailOpen(boolean enableFailOpen) {
-        this.enableFailOpen = enableFailOpen;
+    public ApertureHTTPClientBuilder setEnableRampMode(boolean enableRampMode) {
+        this.enableRampMode = enableRampMode;
         return this;
     }
 
@@ -51,6 +50,6 @@ public class ApertureHTTPClientBuilder {
         if (this.apertureSDK == null) {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
-        return new ApertureHTTPClient(delegate, apertureSDK, controlPointName, enableFailOpen);
+        return new ApertureHTTPClient(delegate, apertureSDK, controlPointName, enableRampMode);
     }
 }
