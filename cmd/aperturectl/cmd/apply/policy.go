@@ -135,7 +135,7 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 					return updatePolicyCRErr
 				}
 			} else {
-				return fmt.Errorf("failed to apply policy in Kubernetes - Test: %T", err)
+				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 			}
 		}
 
