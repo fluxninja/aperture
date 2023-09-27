@@ -321,10 +321,16 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 
 	tokens := float64(1)
 	// get tokens from labels
-	if rl.lbProto.TokensLabelKey != "" {
-		if val, ok := labels.Get(rl.lbProto.TokensLabelKey); ok {
-			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
-				tokens = parsedTokens
+	rParams := rl.lbProto.GetRequestParameters()
+	var deniedResponseStatusCode flowcontrolv1.StatusCode
+	if rParams != nil {
+		deniedResponseStatusCode = rParams.GetDeniedResponseStatusCode()
+		tokensLabelKey := rParams.GetTokensLabelKey()
+		if tokensLabelKey != "" {
+			if val, ok := labels.Get(tokensLabelKey); ok {
+				if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
+					tokens = parsedTokens
+				}
 			}
 		}
 	}
@@ -345,7 +351,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 		PolicyHash:               rl.GetPolicyHash(),
 		ComponentId:              rl.GetComponentId(),
 		Dropped:                  !ok,
-		DeniedResponseStatusCode: rl.lbProto.GetParameters().GetDeniedResponseStatusCode(),
+		DeniedResponseStatusCode: deniedResponseStatusCode,
 		Reason:                   reason,
 		WaitTime:                 durationpb.New(waitTime),
 		Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
@@ -440,4 +446,9 @@ func (rl *rateLimiter) GetRequestCounter(labels map[string]string) prometheus.Co
 		return nil
 	}
 	return counter
+}
+
+// GetRampMode is always false for rateLimiters.
+func (rl *rateLimiter) GetRampMode() bool {
+	return false
 }

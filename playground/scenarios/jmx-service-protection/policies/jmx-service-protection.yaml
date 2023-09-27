@@ -2,6 +2,9 @@
 # Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
+
+blueprint: load-scheduling/jmx
+uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string
@@ -67,7 +70,13 @@ policy:
                 from: request.http.headers.user-type
 
   service_protection_core:
-    adaptive_load_scheduler:
+    setpoint: 20
+    dry_run: false
+    aiad_load_scheduler:
+      load_multiplier_linear_decrement: 0.05
+      load_multiplier_linear_increment: 0.025
+      max_load_multiplier: 2
+      min_load_multiplier: 0
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
@@ -91,9 +100,7 @@ policy:
               label_matcher:
                 match_labels:
                   user_type: subscriber
-      # Linear increment to load multiplier in each execution tick (0.5s) when the system is not in overloaded state.
-      # Type: float64
-      load_multiplier_linear_increment: 0.025
 
   jmx:
     app_namespace: "demoapp"
+    k8s_pod_name: "service3-demo-app-.*"

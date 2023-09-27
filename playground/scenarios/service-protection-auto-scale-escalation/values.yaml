@@ -1,0 +1,6 @@
+agent:
+  agent:
+    config:
+      auto_scale:
+        kubernetes:
+          enabled: true

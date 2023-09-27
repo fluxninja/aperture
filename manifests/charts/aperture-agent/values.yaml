@@ -572,3 +572,8 @@ agent:
     ##
     prometheus:
       address: ~
+    ## @param agent.config.auto_scale.kubernetes.enabled Specifies whether to enable auto-scaling feature of Aperture Agent.
+    ##
+    auto_scale:
+      kubernetes:
+        enabled: false

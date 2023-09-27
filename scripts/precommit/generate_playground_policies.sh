@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
-curr_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-func_dir="../"
-# shellcheck source=/dev/null
-source "$curr_dir/$func_dir/limit_jobs.sh"
 
 FIND="find"
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -25,7 +22,10 @@ function generate_policies() {
 	scenario_dir=$(dirname "$scenario")
 	rm -rf "$scenario_dir"/**/*-cr.yaml
 	metadata_file="$scenario_dir"/metadata.json
-	readarray -t policies < <(jq --compact-output '.aperture_policies[]' "$metadata_file")
+	declare -a policies
+	while IFS= read -r policy; do
+		policies+=("$policy")
+	done < <(jq --compact-output '.aperture_policies[]' "$metadata_file")
 	for policy in "${policies[@]}"; do
 		policy_name=$(jq --raw-output '.policy_name' <<<"$policy")
 		blueprint_name=$(jq --raw-output '.blueprint_name' <<<"$policy")
@@ -39,12 +39,12 @@ function generate_policies() {
 
 export -f generate_policies
 
-while IFS= read -r -d '' file
-do
-    limit_jobs 8 generate_policies "$file"
+declare -a cmds=()
+while IFS= read -r -d '' file; do
+	cmds+=("generate_policies '$file'")
 done < <($FIND playground -type f -name metadata.json -print0)
 
-wait  # Wait for all background jobs to complete
-
+# Run the policy generation commands in parallel
+"$gitroot"/scripts/run_parallel.sh "${cmds[@]}"
 
 popd >/dev/null

@@ -173,6 +173,17 @@ java.lang.String defaultValue) {
     return map.get(key);
   }
 
+  public static final int RAMP_MODE_FIELD_NUMBER = 3;
+  private boolean rampMode_ = false;
+  /**
+   * <code>bool ramp_mode = 3 [json_name = "rampMode"];</code>
+   * @return The rampMode.
+   */
+  @java.lang.Override
+  public boolean getRampMode() {
+    return rampMode_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -196,6 +207,9 @@ java.lang.String defaultValue) {
         internalGetLabels(),
         LabelsDefaultEntryHolder.defaultEntry,
         2);
+    if (rampMode_ != false) {
+      output.writeBool(3, rampMode_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -218,6 +232,10 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, labels__);
     }
+    if (rampMode_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(3, rampMode_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -237,6 +255,8 @@ java.lang.String defaultValue) {
         .equals(other.getControlPoint())) return false;
     if (!internalGetLabels().equals(
         other.internalGetLabels())) return false;
+    if (getRampMode()
+        != other.getRampMode()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -254,6 +274,9 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + LABELS_FIELD_NUMBER;
       hash = (53 * hash) + internalGetLabels().hashCode();
     }
+    hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getRampMode());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -413,6 +436,7 @@ java.lang.String defaultValue) {
       bitField0_ = 0;
       controlPoint_ = "";
       internalGetMutableLabels().clear();
+      rampMode_ = false;
       return this;
     }
 
@@ -452,6 +476,9 @@ java.lang.String defaultValue) {
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.labels_ = internalGetLabels();
         result.labels_.makeImmutable();
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.rampMode_ = rampMode_;
       }
     }
 
@@ -507,6 +534,9 @@ java.lang.String defaultValue) {
       internalGetMutableLabels().mergeFrom(
           other.internalGetLabels());
       bitField0_ |= 0x00000002;
+      if (other.getRampMode() != false) {
+        setRampMode(other.getRampMode());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -547,6 +577,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000002;
               break;
             } // case 18
+            case 24: {
+              rampMode_ = input.readBool();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -760,6 +795,38 @@ java.lang.String defaultValue) {
       internalGetMutableLabels().getMutableMap()
           .putAll(values);
       bitField0_ |= 0x00000002;
+      return this;
+    }
+
+    private boolean rampMode_ ;
+    /**
+     * <code>bool ramp_mode = 3 [json_name = "rampMode"];</code>
+     * @return The rampMode.
+     */
+    @java.lang.Override
+    public boolean getRampMode() {
+      return rampMode_;
+    }
+    /**
+     * <code>bool ramp_mode = 3 [json_name = "rampMode"];</code>
+     * @param value The rampMode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setRampMode(boolean value) {
+
+      rampMode_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool ramp_mode = 3 [json_name = "rampMode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearRampMode() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      rampMode_ = false;
+      onChanged();
       return this;
     }
     @java.lang.Override

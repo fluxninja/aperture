@@ -25,27 +25,26 @@ import (
 
 var _ = Describe("Metrics Processor", func() {
 	var (
-		pr                 *prometheus.Registry
-		cpCache            *cache.Cache[selectors.TypedControlPointID]
-		cfg                *Config
-		processor          *metricsProcessor
-		engine             *mocks.MockEngine
-		clasEngine         *mocks.MockClassificationEngine
-		scheduler          *mocks.MockScheduler
-		rateLimiter        *mocks.MockRateLimiter
-		classifier         *mocks.MockClassifier
-		summaryVec         *prometheus.SummaryVec
-		counterVec         *prometheus.CounterVec
-		durationSummaryVec *prometheus.SummaryVec
-		rateCounter        prometheus.Counter
-		classifierCounter  prometheus.Counter
-		baseCheckResp      *flowcontrolv1.CheckResponse
-		labelsFoo1         map[string]string
-		labelsFizz1        map[string]string
-		labelsFizz2        map[string]string
-		expectedLabels     map[string]interface{}
-		expectedMetrics    string
-		source             string
+		pr                *prometheus.Registry
+		cpCache           *cache.Cache[selectors.TypedControlPointID]
+		cfg               *Config
+		processor         *metricsProcessor
+		engine            *mocks.MockEngine
+		clasEngine        *mocks.MockClassificationEngine
+		scheduler         *mocks.MockScheduler
+		rateLimiter       *mocks.MockRateLimiter
+		classifier        *mocks.MockClassifier
+		summaryVec        *prometheus.SummaryVec
+		counterVec        *prometheus.CounterVec
+		rateCounter       prometheus.Counter
+		classifierCounter prometheus.Counter
+		baseCheckResp     *flowcontrolv1.CheckResponse
+		labelsFoo1        map[string]string
+		labelsFizz1       map[string]string
+		labelsFizz2       map[string]string
+		expectedLabels    map[string]interface{}
+		expectedMetrics   string
+		source            string
 	)
 
 	BeforeEach(func() {
@@ -74,13 +73,6 @@ var _ = Describe("Metrics Processor", func() {
 		})
 		counterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: m.WorkloadCounterMetricName,
-			Help: "dummy",
-		}, []string{
-			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIDLabel,
-			m.WorkloadIndexLabel, m.DecisionTypeLabel,
-		})
-		durationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-			Name: m.FlowControlDecisionsMetricName,
 			Help: "dummy",
 		}, []string{
 			m.PolicyNameLabel, m.PolicyHashLabel, m.ComponentIDLabel,
@@ -173,12 +165,6 @@ var _ = Describe("Metrics Processor", func() {
 				err = testutil.CollectAndCompare(rateCounter, expected2, m.RateLimiterCounterTotalMetricName)
 				Expect(err).NotTo(HaveOccurred())
 			}
-
-			if strings.Contains(expectedMetrics, m.FlowControlDecisionsMetricName) {
-				expected3 := strings.NewReader(expectedMetrics)
-				err = testutil.CollectAndCompare(durationSummaryVec, expected3, m.FlowControlDecisionsMetricName)
-				Expect(err).NotTo(HaveOccurred())
-			}
 		}
 
 		By("adding proper labels")
@@ -267,10 +253,6 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 		Expect(err).NotTo(HaveOccurred())
 		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
 
-		durationSummary, err := durationSummaryVec.GetMetricWith(labelsFoo1WithReject)
-		Expect(err).NotTo(HaveOccurred())
-		scheduler.EXPECT().GetFlowDurationSummary(labelsFoo1WithReject).Return(durationSummary).Times(1)
-
 		labels := map[string]string{
 			m.PolicyNameLabel:     "foo",
 			m.PolicyHashLabel:     "foo-hash",
@@ -307,10 +289,6 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 		counter, err := counterVec.GetMetricWith(labelsFoo1WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counter).Times(1)
-
-		durationSummary, err := durationSummaryVec.GetMetricWith(labelsFoo1WithReject)
-		Expect(err).NotTo(HaveOccurred())
-		scheduler.EXPECT().GetFlowDurationSummary(labelsFoo1WithReject).Return(durationSummary).Times(1)
 	})
 
 	It("Processes logs for two policies - ingress", func() {
@@ -372,10 +350,6 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 		Expect(err).NotTo(HaveOccurred())
 		scheduler.EXPECT().GetRequestCounter(labelsFoo1WithRejectAndDropped).Return(counterFoo).Times(1)
 
-		durationSummary, err := durationSummaryVec.GetMetricWith(labelsFoo1WithReject)
-		Expect(err).NotTo(HaveOccurred())
-		scheduler.EXPECT().GetFlowDurationSummary(labelsFoo1WithReject).Return(durationSummary).Times(1)
-
 		labelsFizz1WithReject := insertRejectLabel(labelsFizz1)
 		labelsFizz1WithRejectAndDropped := insertDroppedLabel(labelsFizz1WithReject, true)
 
@@ -383,20 +357,12 @@ rate_limiter_counter_total{component_id="2",policy_hash="foo-hash",policy_name="
 		Expect(err).NotTo(HaveOccurred())
 		scheduler.EXPECT().GetRequestCounter(labelsFizz1WithRejectAndDropped).Return(counterFizz1).Times(1)
 
-		durationSummary1, err := durationSummaryVec.GetMetricWith(labelsFizz1WithReject)
-		Expect(err).NotTo(HaveOccurred())
-		scheduler.EXPECT().GetFlowDurationSummary(labelsFizz1WithReject).Return(durationSummary1).Times(1)
-
 		labelsFizz2WithReject := insertRejectLabel(labelsFizz2)
 		labelsFizz2WithRejectAndDropped := insertDroppedLabel(labelsFizz2WithReject, false)
 
 		counterFizz2, err := counterVec.GetMetricWith(labelsFizz2WithReject)
 		Expect(err).NotTo(HaveOccurred())
 		scheduler.EXPECT().GetRequestCounter(labelsFizz2WithRejectAndDropped).Return(counterFizz2).Times(1)
-
-		durationSummary2, err := durationSummaryVec.GetMetricWith(labelsFizz2WithReject)
-		Expect(err).NotTo(HaveOccurred())
-		scheduler.EXPECT().GetFlowDurationSummary(labelsFizz2WithReject).Return(durationSummary2).Times(1)
 	})
 })
 

@@ -16,7 +16,7 @@ import (
 
 func init() {
 	UnInstallCmd.PersistentFlags().StringVar(&kubeConfig, "kube-config", "", "Path to the Kubernetes cluster config. Defaults to '~/.kube/config'")
-	UnInstallCmd.PersistentFlags().StringVar(&version, "version", apertureLatestVersion, "Version of the Aperture")
+	UnInstallCmd.PersistentFlags().StringVar(&version, "version", latestTag, "Version of the Aperture")
 	UnInstallCmd.PersistentFlags().StringVar(&valuesFile, "values-file", "", "Values YAML file containing parameters to customize the installation")
 	UnInstallCmd.PersistentFlags().StringVar(&namespace, "namespace", defaultNS, "Namespace from which the component will be uninstalled. Defaults to 'default' namespace")
 	UnInstallCmd.PersistentFlags().IntVar(&timeout, "timeout", 300, "Timeout of waiting for uninstallation hooks completion")
@@ -52,13 +52,8 @@ Use this command to uninstall Aperture Controller and Agent from your Kubernetes
 			return fmt.Errorf("failed to create Kubernetes client: %w", err)
 		}
 
-		latestVersion, err = utils.ResolveLatestVersion()
-		if err != nil {
-			return err
-		}
-
-		if version == "" || version == apertureLatestVersion {
-			version = latestVersion
+		if version == "" {
+			version = latestTag
 		}
 		return nil
 	},

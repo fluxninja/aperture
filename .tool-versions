@@ -20,3 +20,4 @@ tilt 0.32.3
 go-jsonnet 0.20.0
 circleci 0.1.26343
 java corretto-19.0.2.7.1
+jq 1.16

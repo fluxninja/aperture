@@ -3,17 +3,23 @@
   "type": "object",
   "title": "load-scheduling/postgresql blueprint",
   "additionalProperties": false,
-  "required": ["policy"],
+  "required": ["blueprint", "uri", "policy"],
   "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "load-scheduling/postgresql",
+      "enum": ["load-scheduling/postgresql"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "setpoint",
-        "postgresql"
-      ],
+      "required": ["policy_name", "service_protection_core", "postgresql"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -42,33 +48,8 @@
         "service_protection_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["adaptive_load_scheduler"],
+          "required": ["aiad_load_scheduler", "setpoint"],
           "properties": {
-            "adaptive_load_scheduler": {
-              "description": "Parameters for Adaptive Load Scheduler.",
-              "default": {
-                "alerter": {
-                  "alert_name": "Load Throttling Event"
-                },
-                "gradient": {
-                  "max_gradient": 1,
-                  "min_gradient": 0.1,
-                  "slope": -1
-                },
-                "load_multiplier_linear_increment": 0.025,
-                "load_scheduler": {
-                  "selectors": [
-                    {
-                      "control_point": "__REQUIRED_FIELD__",
-                      "service": "__REQUIRED_FIELD__"
-                    }
-                  ]
-                },
-                "max_load_multiplier": 2
-              },
-              "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AdaptiveLoadSchedulerParameters"
-            },
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
               "default": false,
@@ -88,19 +69,36 @@
                 "type": "object",
                 "$ref": "#/$defs/overload_confirmation"
               }
+            },
+            "aiad_load_scheduler": {
+              "description": "Parameters for AIMD throttling strategy.",
+              "default": {
+                "alerter": {
+                  "alert_name": "AIAD Load Throttling Event"
+                },
+                "load_multiplier_linear_decrement": 0.05,
+                "load_multiplier_linear_increment": 0.025,
+                "load_scheduler": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__",
+                      "service": "__REQUIRED_FIELD__"
+                    }
+                  ]
+                },
+                "max_load_multiplier": 2,
+                "min_load_multiplier": 0
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
+            },
+            "setpoint": {
+              "description": "Setpoint.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
             }
           }
-        },
-        "promql_query": {
-          "description": "PromQL query to detect PostgreSQL overload.",
-          "default": "(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100",
-          "type": "string"
-        },
-        "setpoint": {
-          "description": "Setpoint.",
-          "default": "__REQUIRED_FIELD__",
-          "type": "number",
-          "format": "double"
         },
         "postgresql": {
           "description": "Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.",
@@ -247,10 +245,6 @@
         "agent_group": {
           "description": "Name of the Aperture Agent group.",
           "default": "default",
-          "type": "string"
-        },
-        "collection_interval": {
-          "description": "This receiver collects metrics on an interval.",
           "type": "string"
         },
         "databases": {

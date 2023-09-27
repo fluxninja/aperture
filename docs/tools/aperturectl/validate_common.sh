@@ -11,19 +11,11 @@ fi
 
 # function takes URI, name, values-file as input
 function generate_compare() {
-	local name=$1
-	local values_file=$2
-	local yaml1=$3
-	local yaml2=$4
+	local values_file=$1
+	local yaml1=$2
+	local yaml2=$3
 
-	"$aperturectl" blueprints generate \
-		--uri "$git_root"/blueprints \
-		--name "$name" \
-		--values-file "$values_file" \
-		--output-dir "tmp" \
-		--no-yaml-modeline \
-		--skip-pull \
-		--overwrite
+	generate_from_values "$values_file" tmp
 
 	# make sure yaml1 and yaml2 exist
 	if [ ! -f "$yaml1" ]; then
@@ -49,13 +41,10 @@ function generate_compare() {
 
 # function generate_from_values takes name, values_file and output_dir as input and rendes the blueprint
 function generate_from_values() {
-	local name=$1
-	local values_file=$2
-	local output_dir=$3
+	local values_file=$1
+	local output_dir=$2
 
 	"$aperturectl" blueprints generate \
-		--uri "$git_root"/blueprints \
-		--name "$name" \
 		--values-file "$values_file" \
 		--output-dir "$output_dir" \
 		--no-yaml-modeline \

@@ -46,10 +46,10 @@ type Factory struct {
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
 
+	requestInQueueDurationSummaryVec *prometheus.SummaryVec
+
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
-
-	flowDurationSummaryVec *prometheus.SummaryVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -92,6 +92,16 @@ func newFactory(
 		},
 		MetricLabelKeys,
 	)
+	wsFactory.requestInQueueDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.RequestInQueueDurationMetricName,
+		Help: "Duration of requests scheduled in Queue",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	},
+	)
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -113,17 +123,6 @@ func newFactory(
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
-	})
-
-	wsFactory.flowDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name: metrics.FlowDurationMetricName,
-		Help: "Duration of flow",
-	}, []string{
-		metrics.PolicyNameLabel,
-		metrics.PolicyHashLabel,
-		metrics.ComponentIDLabel,
-		metrics.DecisionTypeLabel,
-		metrics.WorkloadIndexLabel,
 	})
 
 	lifecycle.Append(fx.Hook{
@@ -154,7 +153,7 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = prometheusRegistry.Register(wsFactory.flowDurationSummaryVec)
+			err = prometheusRegistry.Register(wsFactory.requestInQueueDurationSummaryVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -188,8 +187,8 @@ func newFactory(
 				err := fmt.Errorf("failed to unregister workload_counter metric")
 				merr = multierr.Append(merr, err)
 			}
-			if !prometheusRegistry.Unregister(wsFactory.flowDurationSummaryVec) {
-				err := fmt.Errorf("failed to unregister flow_duration_ms metric")
+			if !prometheusRegistry.Unregister(wsFactory.requestInQueueDurationSummaryVec) {
+				err := fmt.Errorf("failed to unregister request_in_queue_duration_ms metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -222,17 +221,6 @@ func (wsFactory *Factory) GetRequestCounter(labels map[string]string) prometheus
 	return counter
 }
 
-// GetFlowDurationSummary returns a flow duration summary for a given workload.
-func (wsFactory *Factory) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	summary, err := wsFactory.flowDurationSummaryVec.GetMetricWith(labels)
-	if err != nil {
-		log.Warn().Err(err).Msg("Getting flow duration summary")
-		return nil
-	}
-
-	return summary
-}
-
 // SchedulerMetrics is a struct that holds all metrics for Scheduler.
 type SchedulerMetrics struct {
 	wfqMetrics   *scheduler.WFQMetrics
@@ -263,10 +251,11 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqRequestsGauge,
-		IncomingTokensCounter: incomingTokensCounter,
-		AcceptedTokensCounter: acceptedTokensCounter,
+		FlowsGauge:                    wfqFlowsGauge,
+		HeapRequestsGauge:             wfqRequestsGauge,
+		IncomingTokensCounter:         incomingTokensCounter,
+		AcceptedTokensCounter:         acceptedTokensCounter,
+		RequestInQueueDurationSummary: wsFactory.requestInQueueDurationSummaryVec,
 	}
 
 	return &SchedulerMetrics{
@@ -305,11 +294,10 @@ func (metrics *SchedulerMetrics) Delete() error {
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 	}
-	deletedCount = metrics.wsFactory.flowDurationSummaryVec.DeletePartialMatch(metrics.metricLabels)
+	deletedCount = metrics.wsFactory.requestInQueueDurationSummaryVec.DeletePartialMatch(metrics.metricLabels)
 	if deletedCount == 0 {
-		log.Warn().Msg("Could not delete flow_duration_ms summary from its metric vector. No traffic to generate metrics?")
+		log.Warn().Msg("Could not delete request_in_queue_duration_ms summary from its metric vector. No traffic to generate metrics?")
 	}
-
 	return merr
 }
 
@@ -375,7 +363,7 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	// setup scheduler
-	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics)
+	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics, schedulerMetrics.metricLabels)
 
 	return ws, nil
 }
@@ -385,6 +373,7 @@ func (wsFactory *Factory) NewScheduler(
 func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
+	var priority float64
 	var matchedWorkloadIndex string
 	// match labels against ws.workloadMultiMatcher
 	mmr := s.workloadMultiMatcher.Match(labels)
@@ -398,6 +387,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
+		priority = matchedWorkload.priority
 		invPriority = 1 / matchedWorkload.priority
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
 		if matchedWorkload.proto.GetName() != "" {
@@ -407,12 +397,13 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		}
 	} else {
 		// no match, return default workload
+		priority = s.defaultWorkload.priority
 		invPriority = 1 / s.defaultWorkload.priority
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
 		matchedWorkloadIndex = s.defaultWorkload.proto.Name
 	}
 
-	fairnessLabel := "workload:" + matchedWorkloadIndex
+	fairnessLabel := matchedWorkloadIndex
 
 	tokens := float64(1)
 	// Precedence order:
@@ -438,7 +429,10 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 	if s.proto.PriorityLabelKey != "" {
 		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
-				invPriority = 1 / parsedPriority
+				if parsedPriority > 0 {
+					priority = parsedPriority
+					invPriority = 1 / parsedPriority
+				}
 			}
 		}
 	}
@@ -506,6 +500,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 					Remaining: remaining,
 					Current:   current,
 				},
+				Priority: priority,
 			},
 		},
 	}
@@ -531,9 +526,9 @@ func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Count
 	return s.metrics.wsFactory.GetRequestCounter(labels)
 }
 
-// GetFlowDurationSummary returns flow duration summary for specific workload.
-func (s *Scheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	return s.metrics.wsFactory.GetFlowDurationSummary(labels)
+// GetRampMode is always false for Schedulers.
+func (s *Scheduler) GetRampMode() bool {
+	return false
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.

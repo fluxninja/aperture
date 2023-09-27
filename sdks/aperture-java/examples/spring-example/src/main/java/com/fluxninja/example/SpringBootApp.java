@@ -10,23 +10,23 @@ public class SpringBootApp {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_HOST = "localhost";
     public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_FAIL_OPEN = "true";
+    public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_GRPC_TIMEOUT_MS = "1000";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
+        String agentHost = System.getenv("APERTURE_AGENT_HOST");
         if (agentHost == null) {
             agentHost = DEFAULT_AGENT_HOST;
         }
-        System.setProperty("FN_AGENT_HOST", agentHost);
-        String agentPort = System.getenv("FN_AGENT_PORT");
+        System.setProperty("APERTURE_AGENT_HOST", agentHost);
+        String agentPort = System.getenv("APERTURE_AGENT_PORT");
         if (agentPort == null) {
             agentPort = DEFAULT_AGENT_PORT;
         }
-        System.setProperty("FN_AGENT_PORT", agentPort);
+        System.setProperty("APERTURE_AGENT_PORT", agentPort);
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
@@ -37,11 +37,11 @@ public class SpringBootApp {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
         System.setProperty("FN_CONTROL_POINT_NAME", controlPointName);
-        String failOpen = System.getenv("FN_ENABLE_FAIL_OPEN");
-        if (failOpen == null) {
-            failOpen = DEFAULT_FAIL_OPEN;
+        String rampMode = System.getenv("FN_ENABLE_RAMP_MODE");
+        if (rampMode == null) {
+            rampMode = DEFAULT_RAMP_MODE;
         }
-        System.setProperty("FN_ENABLE_FAIL_OPEN", failOpen);
+        System.setProperty("FN_ENABLE_RAMP_MODE", rampMode);
         String grpcTimeoutMs = System.getenv("FN_GRPC_TIMEOUT_MS");
         if (grpcTimeoutMs == null) {
             grpcTimeoutMs = DEFAULT_GRPC_TIMEOUT_MS;

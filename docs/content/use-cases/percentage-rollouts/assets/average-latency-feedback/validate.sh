@@ -8,13 +8,12 @@ git_root=$(git rev-parse --show-toplevel)
 source "$git_root"/docs/tools/aperturectl/validate_common.sh
 
 generate_from_values \
-	load-ramping/base \
 	values.yaml \
 	tmp
 
 # copy the generated policy and graph to this (assets) directory so that they can be used in the docs
-cp tmp/policies/feature-rollout-cr.yaml policy.yaml
-cp tmp/graphs/feature-rollout-cr.mmd graph.mmd
+cp tmp/policies/load-ramping-cr.yaml policy.yaml
+cp tmp/graphs/load-ramping-cr.mmd graph.mmd
 
 # git add the generated policy and graph
 "$git_root"/scripts/git_add_safely.sh policy.yaml graph.mmd

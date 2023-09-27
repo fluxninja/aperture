@@ -6,8 +6,7 @@
     {
       "blueprint_name": "rate-limiting/base",
       "policy_name": "rate-limiting",
-      "values_file": "policies/rate-limiting.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/rate-limiting.yaml"
     }
   ],
   "images": [

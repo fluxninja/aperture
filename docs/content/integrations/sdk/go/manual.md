@@ -46,8 +46,10 @@ The created instance can then be used to start a flow:
         "key": "value",
     }
 
+    rampMode := false
+
     // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-    flow, err := a.apertureClient.StartFlow(ctx, "featureName", labels)
+    flow, err := a.apertureClient.StartFlow(ctx, "featureName", labels, rampMode)
     if err != nil {
         log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
     }

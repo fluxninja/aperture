@@ -82,6 +82,20 @@ func (mr *MockLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockLimiter)(nil).GetPolicyName))
 }
 
+// GetRampMode mocks base method.
+func (m *MockLimiter) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockLimiterMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockLimiter)(nil).GetRampMode))
+}
+
 // GetRequestCounter mocks base method.
 func (m *MockLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	m.ctrl.T.Helper()
@@ -187,6 +201,20 @@ func (mr *MockRateLimiterMockRecorder) GetPolicyName() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockRateLimiter)(nil).GetPolicyName))
 }
 
+// GetRampMode mocks base method.
+func (m *MockRateLimiter) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockRateLimiterMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockRateLimiter)(nil).GetRampMode))
+}
+
 // GetRequestCounter mocks base method.
 func (m *MockRateLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	m.ctrl.T.Helper()
@@ -282,20 +310,6 @@ func (mr *MockSchedulerMockRecorder) Decide(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decide", reflect.TypeOf((*MockScheduler)(nil).Decide), arg0, arg1)
 }
 
-// GetFlowDurationSummary mocks base method.
-func (m *MockScheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFlowDurationSummary", labels)
-	ret0, _ := ret[0].(prometheus.Observer)
-	return ret0
-}
-
-// GetFlowDurationSummary indicates an expected call of GetFlowDurationSummary.
-func (mr *MockSchedulerMockRecorder) GetFlowDurationSummary(labels interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFlowDurationSummary", reflect.TypeOf((*MockScheduler)(nil).GetFlowDurationSummary), labels)
-}
-
 // GetLatencyObserver mocks base method.
 func (m *MockScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
 	m.ctrl.T.Helper()
@@ -336,6 +350,20 @@ func (m *MockScheduler) GetPolicyName() string {
 func (mr *MockSchedulerMockRecorder) GetPolicyName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPolicyName", reflect.TypeOf((*MockScheduler)(nil).GetPolicyName))
+}
+
+// GetRampMode mocks base method.
+func (m *MockScheduler) GetRampMode() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRampMode")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetRampMode indicates an expected call of GetRampMode.
+func (mr *MockSchedulerMockRecorder) GetRampMode() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRampMode", reflect.TypeOf((*MockScheduler)(nil).GetRampMode))
 }
 
 // GetRequestCounter mocks base method.

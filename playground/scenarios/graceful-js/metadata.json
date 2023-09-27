@@ -6,8 +6,7 @@
     {
       "blueprint_name": "load-scheduling/postgresql",
       "policy_name": "postgres-connections",
-      "values_file": "policies/postgres-connections.yaml",
-      "dashboard_mixin_dir": "dashboards/"
+      "values_file": "policies/postgres-connections.yaml"
     }
   ],
   "images": [

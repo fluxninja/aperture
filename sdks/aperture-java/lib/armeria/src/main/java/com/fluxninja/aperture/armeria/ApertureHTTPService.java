@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class ApertureHTTPService extends SimpleDecoratingHttpService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private final boolean failOpen;
+    private final boolean rampMode;
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +24,11 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     }
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
         ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableFailOpen(failOpen);
+                .setEnableRampMode(rampMode);
         return builder::build;
     }
 
@@ -36,11 +36,11 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             HttpService delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean failOpen) {
+            boolean rampMode) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             HttpResponse res;

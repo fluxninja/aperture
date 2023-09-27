@@ -8,7 +8,7 @@ spec:
   circuit:
     components:
     - flow_control:
-        adaptive_load_scheduler:
+        aiad_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
@@ -24,14 +24,12 @@ spec:
               signal_name: DESIRED_LOAD_MULTIPLIER
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
+          overload_condition: gt
           parameters:
             alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
-            load_multiplier_linear_increment: 0.025
+              alert_name: AIAD Load Throttling Event
+            load_multiplier_linear_decrement: 0.2
+            load_multiplier_linear_increment: 0.05
             load_scheduler:
               scheduler:
                 workloads:
@@ -51,19 +49,20 @@ spec:
               - agent_group: default
                 control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
-              workload_latency_based_tokens: true
             max_load_multiplier: 2
+            min_load_multiplier: 0
     - query:
         promql:
           evaluation_interval: 10s
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: (sum(postgresql_backends) / sum(postgresql_connection_max))
+          query_string: (sum(postgresql_backends{policy_name="postgres-connections",infra_meter_name="postgresql"})
+            / sum(postgresql_connection_max{policy_name="postgres-connections",infra_meter_name="postgresql"}))
             * 100
     - variable:
         constant_output:
-          value: 20
+          value: 40
         out_ports:
           output:
             signal_name: SETPOINT
@@ -85,7 +84,7 @@ spec:
         per_agent_group: true
         receivers:
           postgresql:
-            collection_interval: 1s
+            collection_interval: 10s
             databases:
             - postgres
             endpoint: postgresql.postgresql.svc.cluster.local:5432

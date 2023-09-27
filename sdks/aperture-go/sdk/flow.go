@@ -21,41 +21,34 @@ type Flow interface {
 	CheckResponse() *checkproto.CheckResponse
 }
 
-// TODO: set fail open?
-
 type flow struct {
 	span          trace.Span
 	err           error
 	checkResponse *checkproto.CheckResponse
 	statusCode    FlowStatus
 	ended         bool
-	failOpen      bool
+	rampMode      bool
 }
 
 // newFlow creates a new flow with default field values.
-func newFlow(span trace.Span, failOpen bool) *flow {
+func newFlow(span trace.Span, rampMode bool) *flow {
 	return &flow{
 		span:          span,
 		checkResponse: nil,
 		statusCode:    OK,
 		ended:         false,
-		failOpen:      failOpen,
+		rampMode:      rampMode,
 	}
 }
 
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
-// By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
+// By default, fail-open behavior is enabled. Set rampMode to disable it.
 func (f *flow) ShouldRun() bool {
-	if (f.failOpen && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkproto.CheckResponse_DECISION_TYPE_ACCEPTED) {
+	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkproto.CheckResponse_DECISION_TYPE_ACCEPTED) {
 		return true
 	} else {
 		return false
 	}
-}
-
-// DisableFailOpen disables fail-open behavior for the flow.
-func (f *flow) DisableFailOpen() {
-	f.failOpen = false
 }
 
 // CheckResponse returns the response from the server.

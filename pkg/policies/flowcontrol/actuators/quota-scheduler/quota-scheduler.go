@@ -373,13 +373,14 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 			PolicyHash:               qs.GetPolicyHash(),
 			ComponentId:              qs.GetComponentId(),
 			Dropped:                  dropped,
-			DeniedResponseStatusCode: qs.proto.GetRateLimiter().GetDeniedResponseStatusCode(),
+			DeniedResponseStatusCode: qs.proto.GetScheduler().GetDeniedResponseStatusCode(),
 			Reason:                   reason,
 			Details: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_{
 				QuotaSchedulerInfo: &flowcontrolv1.LimiterDecision_QuotaSchedulerInfo{
 					Label:         label,
 					WorkloadIndex: schedulerInfo.WorkloadIndex,
 					TokensInfo:    schedulerInfo.TokensInfo,
+					Priority:      schedulerInfo.Priority,
 				},
 			},
 		}
@@ -505,7 +506,7 @@ func (qs *quotaScheduler) GetRequestCounter(labels map[string]string) prometheus
 	return qs.qsFactory.wsFactory.GetRequestCounter(labels)
 }
 
-// GetFlowDurationSummary returns the flow duration summary.
-func (qs *quotaScheduler) GetFlowDurationSummary(labels map[string]string) prometheus.Observer {
-	return qs.qsFactory.wsFactory.GetFlowDurationSummary(labels)
+// GetRampMode is always false for quotaSchedulers.
+func (qs *quotaScheduler) GetRampMode() bool {
+	return false
 }

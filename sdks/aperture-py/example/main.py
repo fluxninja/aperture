@@ -11,8 +11,8 @@ from quart import Quart
 defaultAgentHost = "localhost"
 defaultAgentPort = "8089"
 
-agentHost = os.getenv("FN_AGENT_HOST", defaultAgentHost)
-agentPort = os.getenv("FN_AGENT_PORT", defaultAgentPort)
+agentHost = os.getenv("APERTURE_AGENT_HOST", defaultAgentHost)
+agentPort = os.getenv("APERTURE_AGENT_PORT", defaultAgentPort)
 
 app = Quart(__name__)
 aperture_client = ApertureClient.new_client(

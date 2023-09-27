@@ -9,6 +9,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fluxninja/aperture/v2/pkg/log"
+
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+
 	"github.com/jonboulle/clockwork"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -123,6 +127,8 @@ type WFQScheduler struct {
 	manager        TokenManager
 	// metrics
 	metrics *WFQMetrics
+	// metrics labels
+	metricsLabels prometheus.Labels
 	// flows
 	flows    map[string]*flowInfo
 	requests requestHeap
@@ -134,7 +140,7 @@ type WFQScheduler struct {
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
-func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQMetrics) Scheduler {
+func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQMetrics, metricsLabels prometheus.Labels) Scheduler {
 	sched := new(WFQScheduler)
 	sched.queueOpen = false
 	sched.generation = 0
@@ -143,6 +149,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
+	sched.metricsLabels = metricsLabels
 
 	if metrics != nil {
 		sched.metrics = metrics
@@ -151,19 +158,35 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	return sched
 }
 
-func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request) (bool, float64, float64) {
+func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
+	metricsLabels := make(prometheus.Labels, len(sched.metricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = request.FairnessLabel
+	for k, v := range sched.metricsLabels {
+		metricsLabels[k] = v
+	}
+	requestInQueueMetricsObserver, err := sched.metrics.RequestInQueueDurationSummary.GetMetricWith(metricsLabels)
+	if err == nil {
+		requestInQueueMetricsObserver.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
+	} else {
+		log.Error().Err(err).Msg("Failed to get request in queue duration summary")
+	}
+}
+
+func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
 	if accepted {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
+	sched.updateRequestInQueueMetrics(accepted, request, startTime)
 	return accepted, remaining, current
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool, float64, float64) {
+	startTime := time.Now()
 	if request.Tokens == 0 {
-		return sched.updateMetricsAndReturn(true, 0, 0, request)
+		return sched.updateMetricsAndReturn(true, 0, 0, request, startTime)
 	}
 
 	sched.lock.Lock()
@@ -172,7 +195,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 	sched.lock.Unlock()
 
 	if sched.manager.PreprocessRequest(ctx, request) {
-		return sched.updateMetricsAndReturn(true, 0, 0, request)
+		return sched.updateMetricsAndReturn(true, 0, 0, request, startTime)
 	}
 
 	// try to schedule right now
@@ -180,7 +203,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 		accepted, _, remaining, current := sched.manager.TakeIfAvailable(ctx, request.Tokens)
 		if accepted {
 			// we got the tokens, no need to queue
-			return sched.updateMetricsAndReturn(true, remaining, current, request)
+			return sched.updateMetricsAndReturn(true, remaining, current, request, startTime)
 		}
 	}
 
@@ -191,10 +214,10 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 	select {
 	case <-qRequest.ready:
 		accepted, remaining, current := sched.scheduleRequest(ctx, request, qRequest)
-		return sched.updateMetricsAndReturn(accepted, remaining, current, request)
+		return sched.updateMetricsAndReturn(accepted, remaining, current, request, startTime)
 	case <-ctx.Done():
 		sched.cancelRequest(qRequest)
-		return sched.updateMetricsAndReturn(false, 0, 0, request)
+		return sched.updateMetricsAndReturn(false, 0, 0, request, startTime)
 	}
 }
 
@@ -462,8 +485,9 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge            prometheus.Gauge
-	HeapRequestsGauge     prometheus.Gauge
-	IncomingTokensCounter prometheus.Counter
-	AcceptedTokensCounter prometheus.Counter
+	FlowsGauge                    prometheus.Gauge
+	HeapRequestsGauge             prometheus.Gauge
+	IncomingTokensCounter         prometheus.Counter
+	AcceptedTokensCounter         prometheus.Counter
+	RequestInQueueDurationSummary *prometheus.SummaryVec
 }

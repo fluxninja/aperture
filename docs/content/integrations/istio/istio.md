@@ -298,25 +298,25 @@ More information about the extracted values can be found on
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
-
-   :::info Refer
-
-   [aperturectl install istioconfig](/reference/aperturectl/install/istioconfig/istioconfig.md)
-   to see all the available command line arguments.
-
-   :::
-
-2. [Helm](https://helm.sh/docs/intro/install/)
+1. [Helm](https://helm.sh/docs/intro/install/)
 
    1. Once the Helm CLI is installed, add the
-      [Aperture istioconfig Helm Repository](https://artifacthub.io/packages/helm/aperture/istioconfig)
-      in your environment for installation:
+      [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
+      repository in your environment for install or upgrade:
 
       ```bash
       helm repo add aperture https://fluxninja.github.io/aperture/
       helm repo update
       ```
+
+2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+
+   :::info Refer
+
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
+
+   :::
 
 ## Installation
 
@@ -341,14 +341,14 @@ into your cluster.
    :::
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -367,14 +367,14 @@ into your cluster.
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -393,14 +393,14 @@ into your cluster.
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -415,14 +415,14 @@ into your cluster.
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm upgrade --install aperture-envoy-filter aperture/istioconfig --namespace ISTIOD_NAMESPACE_HERE -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install istioconfig --version ${apertureVersion} --namespace ISTIOD_NAMESPACE_HERE --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -449,14 +449,14 @@ following steps:
 1. Uninstall the Aperture istioconfig:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall istioconfig`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall aperture-envoy-filter`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall istioconfig`}
    </CodeBlock>
    </TabItem>
    </Tabs>

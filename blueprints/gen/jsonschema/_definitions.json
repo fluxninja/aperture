@@ -1,7 +1,244 @@
 {
   "definitions": {
+    "AIADLoadScheduler": {
+      "description": "_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
+      "properties": {
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean"
+        },
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
+          "type": "string"
+        },
+        "in_ports": {
+          "$ref": "#/definitions/AIADLoadSchedulerIns",
+          "description": "Input ports for the _AIAD Load Scheduler_."
+        },
+        "out_ports": {
+          "$ref": "#/definitions/AIADLoadSchedulerOuts",
+          "description": "Output ports for the _AIAD Load Scheduler_."
+        },
+        "overload_condition": {
+          "default": "gt",
+          "enum": ["gt", "lt", "gte", "lte"],
+          "title": "Overload condition determines the criteria to determine overload state. The default condition is \"gt\", that is, when the signal is greater than the setpoint. The condition must be one of:\n<!-- vale off -->\n- \"gt\": greater than\n- \"lt\": less than\n- \"gte\": greater than or equal to\n- \"lte\": less than or equal to\n<!-- vale on -->",
+          "type": "string",
+          "x-go-tag-default": "gt",
+          "x-go-tag-validate": "required,oneof=gt lt gte lte",
+          "x-oneof": "gt | lt | gte | lte"
+        },
+        "parameters": {
+          "$ref": "#/definitions/AIADLoadSchedulerParameters",
+          "description": "Parameters for the _AIAD Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "required": ["overload_condition"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIADLoadSchedulerIns": {
+      "description": "Input ports for the _AIAD Load Scheduler_.",
+      "properties": {
+        "overload_confirmation": {
+          "$ref": "#/definitions/InPort",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
+        },
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "description": "The setpoint input to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIADLoadSchedulerOuts": {
+      "description": "Output ports for the _AIAD Load Scheduler_.",
+      "properties": {
+        "desired_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate."
+        },
+        "is_overload": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal that indicates whether the service is in overload state."
+        },
+        "observed_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIADLoadSchedulerParameters": {
+      "properties": {
+        "alerter": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration parameters for the embedded Alerter.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "load_multiplier_linear_decrement": {
+          "default": 0.05,
+          "description": "Linear decrement to load multiplier every 10 seconds while the system is\nin the overloaded state, up until the `min_load_multiplier` is reached.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0.05",
+          "x-go-tag-validate": "gte=0"
+        },
+        "load_multiplier_linear_increment": {
+          "default": 0.025,
+          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0.025",
+          "x-go-tag-validate": "gte=0"
+        },
+        "load_scheduler": {
+          "$ref": "#/definitions/LoadSchedulerParameters",
+          "description": "Parameters for the _Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "max_load_multiplier": {
+          "default": 2,
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "2.0",
+          "x-go-tag-validate": "gte=0"
+        },
+        "min_load_multiplier": {
+          "default": 0,
+          "description": "The minimum load multiplier that can be reached during an overload state.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0.0",
+          "x-go-tag-validate": "gte=0"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIMDLoadScheduler": {
+      "description": "_AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.\nIt takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
+      "properties": {
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean"
+        },
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
+          "type": "string"
+        },
+        "in_ports": {
+          "$ref": "#/definitions/AIMDLoadSchedulerIns",
+          "description": "Input ports for the _AIMD Load Scheduler_."
+        },
+        "out_ports": {
+          "$ref": "#/definitions/AIMDLoadSchedulerOuts",
+          "description": "Output ports for the _AIMD Load Scheduler_."
+        },
+        "parameters": {
+          "$ref": "#/definitions/AIMDLoadSchedulerParameters",
+          "description": "Parameters for the _AIMD Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIMDLoadSchedulerIns": {
+      "description": "Input ports for the _AIMD Load Scheduler_.",
+      "properties": {
+        "overload_confirmation": {
+          "$ref": "#/definitions/InPort",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
+        },
+        "setpoint": {
+          "$ref": "#/definitions/InPort",
+          "description": "The setpoint input to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIMDLoadSchedulerOuts": {
+      "description": "Output ports for the _AIMD Load Scheduler_.",
+      "properties": {
+        "desired_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate."
+        },
+        "is_overload": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal that indicates whether the service is in overload state."
+        },
+        "observed_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "AIMDLoadSchedulerParameters": {
+      "properties": {
+        "alerter": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration parameters for the embedded Alerter.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "gradient": {
+          "$ref": "#/definitions/GradientControllerParameters",
+          "description": "Parameters for the Gradient Controller.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "load_multiplier_linear_increment": {
+          "default": 0.025,
+          "description": "Linear increment to load multiplier every 10 seconds while the system is\nnot in the overloaded state, up until the `max_load_multiplier` is reached.\n\n",
+          "format": "double",
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-default": "0.025",
+          "x-go-tag-validate": "gte=0"
+        },
+        "load_scheduler": {
+          "$ref": "#/definitions/LoadSchedulerParameters",
+          "description": "Parameters for the _Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "max_load_multiplier": {
+          "default": 2,
+          "description": "The maximum load multiplier that can be reached during recovery from an overload state.\n- Helps protect the service from request bursts while the system is still recovering.\n- Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.\n- The pass-through mode gets disabled if the system enters the overload state again.\n\n",
+          "exclusiveMinimum": 0,
+          "format": "double",
+          "type": "number",
+          "x-go-tag-default": "2.0",
+          "x-go-tag-validate": "gt=0"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
     "AdaptiveLoadScheduler": {
-      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -618,6 +855,10 @@
           "$ref": "#/definitions/PIDController",
           "description": "PID Controller is a proportional\u2013integral\u2013derivative controller."
         },
+        "polynomial_range_function": {
+          "$ref": "#/definitions/PolynomialRangeFunction",
+          "description": "Polynomial Range Function is a function that maps a signal to a range of values following a polynomial function."
+        },
         "pulse_generator": {
           "$ref": "#/definitions/PulseGenerator",
           "description": "Generates 0 and 1 in turns."
@@ -1063,7 +1304,15 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint."
+          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy."
+        },
+        "aiad_load_scheduler": {
+          "$ref": "#/definitions/AIADLoadScheduler",
+          "description": "AIAD Load Scheduler."
+        },
+        "aimd_load_scheduler": {
+          "$ref": "#/definitions/AIMDLoadScheduler",
+          "description": "AIMD Load Scheduler."
         },
         "load_ramp": {
           "$ref": "#/definitions/LoadRamp",
@@ -1075,6 +1324,10 @@
         },
         "quota_scheduler": {
           "$ref": "#/definitions/QuotaScheduler"
+        },
+        "range_driven_load_scheduler": {
+          "$ref": "#/definitions/RangeDrivenLoadScheduler",
+          "description": "Range Driven Load Scheduler."
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiter",
@@ -2401,6 +2654,102 @@
       "type": "object",
       "additionalProperties": false
     },
+    "PolynomialRangeFunction": {
+      "description": "Curve Types by Degree:\n- Degree 1: Linear\n- Degree 2: Quadratic\n- Degree 3: Cubic\n- and so on.",
+      "properties": {
+        "in_ports": {
+          "$ref": "#/definitions/PolynomialRangeFunctionIns"
+        },
+        "out_ports": {
+          "$ref": "#/definitions/PolynomialRangeFunctionOuts"
+        },
+        "parameters": {
+          "$ref": "#/definitions/PolynomialRangeFunctionParameters",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PolynomialRangeFunctionIns": {
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PolynomialRangeFunctionOuts": {
+      "properties": {
+        "output": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The output signal."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PolynomialRangeFunctionParameters": {
+      "properties": {
+        "clamp_to_custom_values": {
+          "$ref": "#/definitions/PolynomialRangeFunctionParametersClampToCustomValues",
+          "title": "Clamp to custom values"
+        },
+        "clamp_to_datapoint": {
+          "title": "Clamp to the nearest data-point",
+          "type": "boolean"
+        },
+        "continue_curve": {
+          "title": "Continue polynomial curve",
+          "type": "boolean"
+        },
+        "degree": {
+          "format": "double",
+          "title": "Degree of the polynomial",
+          "type": "number"
+        },
+        "end": {
+          "$ref": "#/definitions/PolynomialRangeFunctionParametersDatapoint",
+          "title": "Ending data-point for the range function"
+        },
+        "start": {
+          "$ref": "#/definitions/PolynomialRangeFunctionParametersDatapoint",
+          "title": "Starting data-point for the range function"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PolynomialRangeFunctionParametersClampToCustomValues": {
+      "properties": {
+        "post_end": {
+          "format": "double",
+          "type": "number"
+        },
+        "pre_start": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "PolynomialRangeFunctionParametersDatapoint": {
+      "properties": {
+        "input": {
+          "format": "double",
+          "type": "number"
+        },
+        "output": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
     "PromQL": {
       "properties": {
         "evaluation_interval": {
@@ -2505,6 +2854,119 @@
       "type": "object",
       "additionalProperties": false
     },
+    "RangeDrivenLoadScheduler": {
+      "description": "_Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.",
+      "properties": {
+        "dry_run": {
+          "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
+          "type": "boolean"
+        },
+        "dry_run_config_key": {
+          "description": "Configuration key for setting dry run mode through dynamic configuration.",
+          "type": "string"
+        },
+        "in_ports": {
+          "$ref": "#/definitions/RangeDrivenLoadSchedulerIns",
+          "description": "Input ports for the _Range Load Scheduler_."
+        },
+        "out_ports": {
+          "$ref": "#/definitions/RangeDrivenLoadSchedulerOuts",
+          "description": "Output ports for the _Range Load Scheduler_."
+        },
+        "parameters": {
+          "$ref": "#/definitions/RangeDrivenLoadSchedulerParameters",
+          "description": "Parameters for the _Range Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RangeDrivenLoadSchedulerDatapoint": {
+      "properties": {
+        "load_multiplier": {
+          "format": "double",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number",
+          "x-go-tag-validate": "gte=0,lte=1"
+        },
+        "signal_value": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RangeDrivenLoadSchedulerIns": {
+      "description": "Input ports for the _Range Load Scheduler_.",
+      "properties": {
+        "overload_confirmation": {
+          "$ref": "#/definitions/InPort",
+          "description": "The `overload_confirmation` port provides additional criteria to determine overload state which\nresults in _Flow_ throttling at the service."
+        },
+        "signal": {
+          "$ref": "#/definitions/InPort",
+          "description": "The input signal to the controller.\n\n",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RangeDrivenLoadSchedulerOuts": {
+      "description": "Output ports for the _Range Load Scheduler_.",
+      "properties": {
+        "desired_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Desired Load multiplier is the ratio of desired token rate to the incoming token rate."
+        },
+        "is_overload": {
+          "$ref": "#/definitions/OutPort",
+          "description": "A Boolean signal that indicates whether the service is in overload state."
+        },
+        "observed_load_multiplier": {
+          "$ref": "#/definitions/OutPort",
+          "description": "Observed Load multiplier is the ratio of accepted token rate to the incoming token rate."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RangeDrivenLoadSchedulerParameters": {
+      "properties": {
+        "alerter": {
+          "$ref": "#/definitions/AlerterParameters",
+          "description": "Configuration parameters for the embedded Alerter.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "degree": {
+          "format": "double",
+          "title": "Degree determines shape of the throttling curve.\ndegree=1: linear\ndegree=2: quadratic\ndegree=3: cubic",
+          "type": "number",
+          "x-go-tag-validate": "required"
+        },
+        "high_throttle_threshold": {
+          "$ref": "#/definitions/RangeDrivenLoadSchedulerDatapoint",
+          "title": "Ending data-point of the throttling range",
+          "x-go-tag-validate": "required"
+        },
+        "load_scheduler": {
+          "$ref": "#/definitions/LoadSchedulerParameters",
+          "description": "Parameters for the _Load Scheduler_.\n\n",
+          "x-go-tag-validate": "required"
+        },
+        "low_throttle_threshold": {
+          "$ref": "#/definitions/RangeDrivenLoadSchedulerDatapoint",
+          "title": "Starting data-point of the throttling range",
+          "x-go-tag-validate": "required"
+        }
+      },
+      "required": ["degree"],
+      "type": "object",
+      "additionalProperties": false
+    },
     "RateLimiter": {
       "description": ":::info\n\nSee also [_Rate Limiter_ overview](/concepts/rate-limiter.md).\n\n:::\n\nRateLimiting is done on per-label-value (`label_key`) basis and it uses the _Token Bucket Algorithm_.",
       "properties": {
@@ -2518,6 +2980,10 @@
           "title": "Parameters for the RateLimiter component",
           "x-go-tag-validate": "required"
         },
+        "request_parameters": {
+          "$ref": "#/definitions/RateLimiterRequestParameters",
+          "title": "RequestParameters for the component"
+        },
         "selectors": {
           "description": "Selectors for the component.\n\n",
           "items": {
@@ -2527,10 +2993,6 @@
           "minItems": 1,
           "type": "array",
           "x-go-tag-validate": "required,gt=0,dive"
-        },
-        "tokens_label_key": {
-          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid number.",
-          "type": "string"
         }
       },
       "required": ["selectors"],
@@ -2542,7 +3004,7 @@
       "properties": {
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Capacity of the bucket.\n\n",
+          "description": "Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.\n\n",
           "x-go-tag-validate": "required"
         },
         "fill_amount": {
@@ -2566,10 +3028,6 @@
           "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
           "type": "boolean",
           "x-go-tag-default": "true"
-        },
-        "denied_response_status_code": {
-          "$ref": "#/definitions/StatusCode",
-          "description": "This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied."
         },
         "interval": {
           "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
@@ -2611,6 +3069,20 @@
           "type": "integer",
           "x-go-tag-default": "4",
           "x-go-tag-validate": "gt=0"
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "RateLimiterRequestParameters": {
+      "properties": {
+        "denied_response_status_code": {
+          "$ref": "#/definitions/StatusCode",
+          "description": "This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied."
+        },
+        "tokens_label_key": {
+          "description": "Flow label key that will be used to override the number of tokens\nfor this request.\nThis is an optional parameter and takes highest precedence\nwhen assigning tokens to a request.\nThe label value must be a valid number.",
+          "type": "string"
         }
       },
       "type": "object",
@@ -2801,6 +3273,12 @@
           "description": "The flow label key for identifying sessions.\n- When label key is specified, _Sampler_ acts as a sticky filter.\n  The series of flows with the same value of label key get the same\n  decision provided that the `accept_percentage` is same or higher.\n- When label key is not specified, _Sampler_ acts as a stateless filter.\n  Percentage of flows are selected randomly for rejection.",
           "type": "string"
         },
+        "ramp_mode": {
+          "default": false,
+          "description": "Ramp component can accept flows with `ramp_mode` flag set.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "false"
+        },
         "selectors": {
           "description": "Selectors for the component.\n\n",
           "items": {
@@ -2891,7 +3369,7 @@
           "type": "string"
         },
         "tokens_label_key": {
-          "description": "* Key for a flow label that can be used to override the default number of tokens for this flow.\n* The value associated with this key must be a valid number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.",
+          "description": "* Key for a flow label that can be used to override the default number of tokens for this request.\n* The value associated with this key must be a valid number.\n* If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.",
           "type": "string"
         },
         "workloads": {

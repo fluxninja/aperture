@@ -8,15 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/ghodss/yaml"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -205,48 +202,6 @@ func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 	return kubeRestConfig, nil
 }
 
-// ResolveLatestVersion returns the latest release version of Aperture.
-func ResolveLatestVersion() (string, error) {
-	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
-		Name: "origin",
-		URLs: []string{apertureRepo},
-	})
-
-	refs, err := remote.List(&git.ListOptions{})
-	if err != nil {
-		return "", err
-	}
-
-	var latestRelease *semver.Version
-
-	tagsRefPrefix := "refs/tags/v"
-
-	for _, ref := range refs {
-		reference := ref.Name().String()
-		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
-			version := strings.TrimPrefix(reference, tagsRefPrefix)
-
-			release, err := semver.NewVersion(version)
-			if err != nil {
-				return "", err
-			}
-
-			if release.Prerelease() != "" {
-				continue
-			}
-
-			if latestRelease == nil || release.GreaterThan(latestRelease) {
-				latestRelease = release
-			}
-		}
-	}
-
-	if latestRelease == nil {
-		return "", errors.New("unable to resolve release tags to find latest release")
-	}
-	return fmt.Sprintf("v%s", latestRelease.String()), nil
-}
-
 // ValidateWithJSONSchema validates the given document (YAML) against the given JSON schema.
 func ValidateWithJSONSchema(rootSchema string, schemas []string, documentFile string) error {
 	// load schema
@@ -352,4 +307,8 @@ func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*ap
 	}
 
 	return &deployment.Items[0], nil
+}
+
+func IsNoMatchError(err error) bool {
+	return apimeta.IsNoMatchError(err) || strings.Contains(err.Error(), "failed to get API group resources")
 }

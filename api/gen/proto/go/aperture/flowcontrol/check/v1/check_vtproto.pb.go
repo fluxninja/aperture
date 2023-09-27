@@ -54,6 +54,16 @@ func (m *CheckRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RampMode {
+		i--
+		if m.RampMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.Labels) > 0 {
 		for k := range m.Labels {
 			v := m.Labels[k]
@@ -465,6 +475,12 @@ func (m *LimiterDecision_SchedulerInfo) MarshalToSizedBufferVT(dAtA []byte) (int
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Priority != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Priority))))
+		i--
+		dAtA[i] = 0x19
+	}
 	if m.TokensInfo != nil {
 		size, err := m.TokensInfo.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -554,6 +570,12 @@ func (m *LimiterDecision_QuotaSchedulerInfo) MarshalToSizedBufferVT(dAtA []byte)
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Priority != 0 {
+		i -= 8
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Priority))))
+		i--
+		dAtA[i] = 0x21
 	}
 	if m.TokensInfo != nil {
 		size, err := m.TokensInfo.MarshalToSizedBufferVT(dAtA[:i])
@@ -897,6 +919,9 @@ func (m *CheckRequest) SizeVT() (n int) {
 			n += mapEntrySize + 1 + sov(uint64(mapEntrySize))
 		}
 	}
+	if m.RampMode {
+		n += 2
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1067,6 +1092,9 @@ func (m *LimiterDecision_SchedulerInfo) SizeVT() (n int) {
 		l = m.TokensInfo.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
+	if m.Priority != 0 {
+		n += 9
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1102,6 +1130,9 @@ func (m *LimiterDecision_QuotaSchedulerInfo) SizeVT() (n int) {
 	if m.TokensInfo != nil {
 		l = m.TokensInfo.SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.Priority != 0 {
+		n += 9
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1407,6 +1438,26 @@ func (m *CheckRequest) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RampMode", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.RampMode = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -2468,6 +2519,17 @@ func (m *LimiterDecision_SchedulerInfo) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Priority = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -2702,6 +2764,17 @@ func (m *LimiterDecision_QuotaSchedulerInfo) UnmarshalVT(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Priority = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

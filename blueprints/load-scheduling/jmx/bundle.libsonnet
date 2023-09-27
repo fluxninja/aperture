@@ -7,14 +7,16 @@ local policy = blueprint.policy;
 local config = blueprint.config;
 
 function(params, metadata={}) {
-  // make sure param object contains fields that are in config
-  local extra_keys = std.setDiff(std.objectFields(params), std.objectFields(config)),
-  assert std.length(extra_keys) == 0 : 'Unknown keys in params: ' + extra_keys,
-
   local c = std.mergePatch(config, params),
   local metadataWrapper = metadata { values: std.toString(params) },
 
-  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg,
+  local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
+    policy+: {
+      promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"%(k8s_pod_name)s"})' % { k8s_pod_name: c.policy.jmx.k8s_pod_name },
+      setpoint: c.policy.service_protection_core.setpoint,
+      overload_condition: 'gt',
+    },
+  },
 
   local infraMeters = if std.objectHas(c.policy.resources, 'infra_meters') then c.policy.resources.infra_meters else {},
   assert !std.objectHas(infraMeters, 'jmx_inframeter') : 'An infra meter with name jmx_inframeter already exists. Please choose a different name.',
@@ -25,7 +27,6 @@ function(params, metadata={}) {
       },
     },
   },
-
   local p = policy(config_with_jmx_infra_meter, params, metadataWrapper),
   local d = creator(p.policyResource, config_with_jmx_infra_meter),
 
@@ -36,5 +37,5 @@ function(params, metadata={}) {
   dashboards: {
     [std.format('%s.json', config_with_jmx_infra_meter.policy.policy_name)]: d.mainDashboard,
     [std.format('signals-%s.json', config_with_jmx_infra_meter.policy.policy_name)]: d.signalsDashboard,
-  },
+  } + d.receiverDashboards,
 }

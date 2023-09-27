@@ -8,7 +8,7 @@ spec:
   circuit:
     components:
     - flow_control:
-        adaptive_load_scheduler:
+        aiad_load_scheduler:
           dry_run: false
           dry_run_config_key: dry_run
           in_ports:
@@ -24,13 +24,11 @@ spec:
               signal_name: DESIRED_LOAD_MULTIPLIER
             observed_load_multiplier:
               signal_name: OBSERVED_LOAD_MULTIPLIER
+          overload_condition: gt
           parameters:
             alerter:
-              alert_name: Load Throttling Event
-            gradient:
-              max_gradient: 1
-              min_gradient: 0.1
-              slope: -1
+              alert_name: AIAD Load Throttling Event
+            load_multiplier_linear_decrement: 0.05
             load_multiplier_linear_increment: 0.025
             load_scheduler:
               selectors:
@@ -39,6 +37,7 @@ spec:
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
             max_load_multiplier: 2
+            min_load_multiplier: 0
     - query:
         promql:
           evaluation_interval: 10s
@@ -62,6 +61,7 @@ spec:
         per_agent_group: false
         receivers:
           elasticsearch:
+            collection_interval: 10s
             endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200
             metrics:
               elasticsearch.node.operations.completed:

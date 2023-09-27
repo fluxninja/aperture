@@ -49,8 +49,8 @@ func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
 }
 
 func main() {
-	agentHost := getEnvOrDefault("FN_AGENT_HOST", defaultAgentHost)
-	agentPort := getEnvOrDefault("FN_AGENT_PORT", defaultAgentPort)
+	agentHost := getEnvOrDefault("APERTURE_AGENT_HOST", defaultAgentHost)
+	agentPort := getEnvOrDefault("APERTURE_AGENT_PORT", defaultAgentPort)
 
 	ctx := context.Background()
 
@@ -87,7 +87,7 @@ func main() {
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil).Handle)
+	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false).Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)

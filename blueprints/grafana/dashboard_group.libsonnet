@@ -3,7 +3,10 @@ local signals = import 'signals_dashboard.libsonnet';
 
 function(policyJSON, cfg) {
   local policyName = cfg.policy.policy_name,
-  local mainDashboard = creator(policyJSON, cfg).dashboard,
+  local dashboards = creator(policyJSON, cfg),
+  local mainDashboard = dashboards.dashboard,
+  local receiverDashboards = dashboards.receiverDashboards,
+
   local signalsDashboard = signals({
     policy+: {
       policy_name: policyName,
@@ -15,4 +18,5 @@ function(policyJSON, cfg) {
 
   mainDashboard: mainDashboard,
   signalsDashboard: signalsDashboard,
+  receiverDashboards: receiverDashboards,
 }

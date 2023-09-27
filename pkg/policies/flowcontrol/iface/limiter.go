@@ -34,6 +34,7 @@ type Limiter interface {
 	Revert(context.Context, labels.Labels, *flowcontrolv1.LimiterDecision)
 	GetLimiterID() LimiterID
 	GetRequestCounter(labels map[string]string) prometheus.Counter
+	GetRampMode() bool
 }
 
 // RateLimiter interface.
@@ -46,5 +47,4 @@ type RateLimiter interface {
 type Scheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
-	GetFlowDurationSummary(labels map[string]string) prometheus.Observer
 }

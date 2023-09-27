@@ -46,7 +46,7 @@ flow_control:
     enabled: true
 auto_scale:
   kubernetes:
-    enabled: true
+    enabled: false
 fluxninja:
   api_key: ""
   client:

@@ -133,6 +133,12 @@
   withPidControllerMixin(pid_controller):: {
     pid_controller+: pid_controller,
   },
+  withPolynomialRangeFunction(polynomial_range_function):: {
+    polynomial_range_function: polynomial_range_function,
+  },
+  withPolynomialRangeFunctionMixin(polynomial_range_function):: {
+    polynomial_range_function+: polynomial_range_function,
+  },
   withPulseGenerator(pulse_generator):: {
     pulse_generator: pulse_generator,
   },

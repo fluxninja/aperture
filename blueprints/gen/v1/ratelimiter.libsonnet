@@ -15,6 +15,12 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withParametersMixin(parameters):: {
     parameters+: parameters,
   },
+  withRequestParameters(request_parameters):: {
+    request_parameters: request_parameters,
+  },
+  withRequestParametersMixin(request_parameters):: {
+    request_parameters+: request_parameters,
+  },
   withSelectors(selectors):: {
     selectors:
       if std.isArray(selectors)
@@ -23,11 +29,5 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   },
   withSelectorsMixin(selectors):: {
     selectors+: selectors,
-  },
-  withTokensLabelKey(tokens_label_key):: {
-    tokens_label_key: tokens_label_key,
-  },
-  withTokensLabelKeyMixin(tokens_label_key):: {
-    tokens_label_key+: tokens_label_key,
   },
 }

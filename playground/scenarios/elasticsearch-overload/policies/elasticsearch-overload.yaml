@@ -1,9 +1,15 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/elasticsearch/gen/definitions.json
+blueprint: load-scheduling/elasticsearch
+uri: ../../../../blueprints
 policy:
   policy_name: "service1-demoapp-elasticsearch-overload"
   service_protection_core:
-    dry_run: false
-    adaptive_load_scheduler:
+    setpoint: 250
+    aiad_load_scheduler:
+      load_multiplier_linear_decrement: 0.05
+      load_multiplier_linear_increment: 0.025
+      max_load_multiplier: 2
+      min_load_multiplier: 0
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
@@ -13,7 +19,7 @@ policy:
           - agent_group: default
             control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
-  setpoint: 250
+    dry_run: false
   elasticsearch:
     agent_group: default
     endpoint: http://elasticsearch.elasticsearch.svc.cluster.local:9200

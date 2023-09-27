@@ -3,8 +3,8 @@ module github.com/fluxninja/aperture-go/v2
 go 1.20
 
 require (
-	buf.build/gen/go/fluxninja/aperture/grpc/go v1.3.0-20230911085626-48dd42096c62.1
-	buf.build/gen/go/fluxninja/aperture/protocolbuffers/go v1.31.0-20230911085626-48dd42096c62.1
+	buf.build/gen/go/fluxninja/aperture/grpc/go v1.3.0-20230922113103-98fe61af5f4b.1
+	buf.build/gen/go/fluxninja/aperture/protocolbuffers/go v1.31.0-20230922113103-98fe61af5f4b.1
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/stdr v1.2.2
 	github.com/gorilla/mux v1.8.0
