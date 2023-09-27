@@ -88,7 +88,10 @@ export class ApertureClient {
         // if ready, call check
         if (params.tryConnect === undefined || params.tryConnect == false) {
           const state = this.fcsClient.getChannel().getConnectivityState(true);
-          if (state != connectivityState.READY) {
+          if (
+            state != connectivityState.READY &&
+            state != connectivityState.IDLE
+          ) {
             resolveFlow(
               null,
               serializeError(
