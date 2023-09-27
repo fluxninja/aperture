@@ -92,10 +92,10 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 			}
 		}
 
-		if blueprintsURI == "" {
+		if blueprintsVersion == "" && blueprintsURI == "" {
 			blueprintsURI, ok = values["uri"].(string)
 			if !ok {
-				return fmt.Errorf("values file does not contain uri field")
+				return fmt.Errorf("neither --version flag is set nor values file contains uri field")
 			}
 		}
 
