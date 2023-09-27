@@ -32,8 +32,8 @@ export class ApertureClient {
 
   constructor({ channelCredentials = grpc.credentials.createInsecure() } = {}) {
     this.fcsClient = new fcs.FlowControlService(URL, channelCredentials, {
-      "grpc.keepalive_time_ms": 3000,
-      "grpc.keepalive_timeout_ms": 1000,
+      "grpc.keepalive_time_ms": 10000,
+      "grpc.keepalive_timeout_ms": 5000,
       "grpc.keepalive_permit_without_calls": 1,
     });
 
