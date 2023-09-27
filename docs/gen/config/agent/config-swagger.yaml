@@ -166,11 +166,11 @@ definitions:
     AutoScaleKubernetesConfig:
         properties:
             enabled:
-                default: true
+                default: false
                 description: Enables the Kubernetes auto-scale capability.
                 type: boolean
                 x-go-name: Enabled
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
                 x-go-tag-json: enabled
         title: AutoScaleKubernetesConfig is the configuration for the flow preview service.
         type: object
