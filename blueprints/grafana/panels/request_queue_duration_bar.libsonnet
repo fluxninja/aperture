@@ -1,17 +1,22 @@
-local barGaugePanel = import '../utils/bar_gauge_panel.libsonnet';
+local barChartPanel = import '../utils/bar_chart_panel.libsonnet';
 local utils = import '../utils/policy_utils.libsonnet';
 
 function(cfg) {
   local stringFilters = utils.dictToPrometheusFilter(cfg.dashboard.extra_filters { policy_name: cfg.policy.policy_name }),
 
-  local legendFormat = '{{workload_index}}',
-
-  local requestsDuration = barGaugePanel('Requests Duration',
+  local requestsDuration = barChartPanel('Requests Duration',
                                          cfg.dashboard.datasource.name,
-                                         '(sum by (workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__rate_interval])))/(sum by (workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__rate_interval])))',
+                                         'topk(10, (sum by(workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__range])) ) / (sum by(workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__range])) ))',
                                          stringFilters,
-                                         legendFormat,
-                                         values=true),
+                                         legendFormat='workload_index',
+                                         queryFormat='table',
+                                         instantQuery=true,
+                                         range=false,
+                                         labelSpacing=100,
+                                         axisGridshow=false,
+                                         axisPlacement='hidden',
+                                         mode='multi',
+                                         sort='asc'),
 
   panel: requestsDuration.panel,
 }
