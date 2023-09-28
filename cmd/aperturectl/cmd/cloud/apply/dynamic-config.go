@@ -30,7 +30,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
-	Example:       `aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml`,
+	Example:       `aperturectl cloud apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		// read the dynamic config file
 		var err error

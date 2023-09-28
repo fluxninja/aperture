@@ -23,7 +23,7 @@ aperturectl cloud flow-control control-points [flags]
 ### Examples
 
 ```
-aperturectl flow-control control-points
+aperturectl cloud flow-control control-points
 ```
 
 ### Options

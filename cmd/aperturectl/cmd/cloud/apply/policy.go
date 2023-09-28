@@ -34,9 +34,9 @@ var ApplyPolicyCmd = &cobra.Command{
 	Short:         "Apply Aperture Policy to the Aperture Cloud Controller",
 	Long:          `Use this command to apply the Aperture Policy to the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example: `aperturectl cloud apply policy --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key API_KEY
+	Example: `aperturectl cloud apply policy --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 
-aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key API_KEY`,
+aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 		client, err = Controller.CloudPolicyClient()

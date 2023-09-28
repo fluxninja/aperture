@@ -18,11 +18,11 @@ var EntitiesCmd = &cobra.Command{
 	Short:         "List AutoScale control points",
 	Long:          `List AutoScale control points`,
 	SilenceErrors: true,
-	Example: `aperturectl discovery entities
+	Example: `aperturectl cloud discovery entities
 
-aperturectl discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+aperturectl cloud discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
 
-aperturectl discovery entities --find-by=“ip=10.244.1.24”`,
+aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {

@@ -23,11 +23,11 @@ aperturectl cloud discovery entities [flags]
 ### Examples
 
 ```
-aperturectl discovery entities
+aperturectl cloud discovery entities
 
-aperturectl discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
+aperturectl cloud discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
 
-aperturectl discovery entities --find-by=“ip=10.244.1.24”
+aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”
 ```
 
 ### Options
