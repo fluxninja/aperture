@@ -11,8 +11,8 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
-// ParseEntiites parses the entities from the cluster.
-func ParseEntiites(client IntrospectionClient, findBy string) error {
+// ParseEntities parses the entities from the cluster.
+func ParseEntities(client IntrospectionClient, findBy string) error {
 	toPrint := ""
 
 	if findBy != "" {

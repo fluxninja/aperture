@@ -29,6 +29,6 @@ aperturectl discovery entities --find-by=“ip=10.244.1.24”`,
 			return err
 		}
 
-		return utils.ParseEntiites(client, findBy)
+		return utils.ParseEntities(client, findBy)
 	},
 }

@@ -19,14 +19,6 @@ var agentsCmd = &cobra.Command{
 	SilenceErrors:     true,
 	PersistentPreRunE: controller.PreRunE,
 	PersistentPostRun: controller.PostRun,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		err := controller.PreRunE(cmd, args)
-		if err != nil {
-			return fmt.Errorf("failed to run controller pre-run: %w", err)
-		}
-
-		return nil
-	},
 	RunE: func(*cobra.Command, []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {
