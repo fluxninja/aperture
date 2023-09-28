@@ -233,7 +233,6 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	}
 
 	policyBytes, err := req.Policy.MarshalJSON()
-	log.Error().Msgf("TEST: policyBytes: %s", string(policyBytes))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to marshal policy: %s", err)
 	}

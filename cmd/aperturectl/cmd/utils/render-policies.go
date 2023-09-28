@@ -2,7 +2,6 @@ package utils
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -75,7 +74,6 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		return nil, policyName, err
 	}
 	_, policy, err := CompilePolicy(filepath.Base(policyFile), policyBytes)
-	fmt.Printf("%+v\n", policy)
 	if err != nil {
 		policyCR, err := GetPolicyCR(policyFile)
 		if err != nil {
@@ -83,12 +81,10 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		}
 
 		policy = &languagev1.Policy{}
-		fmt.Println(string(policyCR.Spec.Raw))
 		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
 		if err != nil {
 			return nil, policyName, err
 		}
-		fmt.Printf("%+v\n", policy)
 
 		policyName = policyCR.Name
 		return policy, policyName, nil

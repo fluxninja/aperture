@@ -138,13 +138,11 @@ func setupPoliciesNotifier(
 				return key, nil, unmarshalErr
 			}
 
-			log.Error().Msgf("TEST: Policy in weapper %+v", policyMessage.Policy)
 			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr
 			}
-			log.Error().Msgf("TEST: Policy weapper %+v", wrapper)
 			wrapper.Source = source
 			var marshalWrapErr error
 			jsonDat, marshalWrapErr := json.Marshal(wrapper)
@@ -153,14 +151,11 @@ func setupPoliciesNotifier(
 				return key, nil, marshalWrapErr
 			}
 			// convert to yaml
-			log.Error().Msgf("TEST: Policy json %+v", string(jsonDat))
 			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr
 			}
-
-			log.Error().Msgf("TEST: Policy yaml %+v", string(dat))
 		}
 		return key, dat, nil
 	}
