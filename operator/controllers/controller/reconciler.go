@@ -464,7 +464,7 @@ func (r *ControllerReconciler) manageResources(ctx context.Context, log logr.Log
 	}
 
 	if !r.MultipleControllers {
-		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = true
+		instance.Spec.ConfigSpec.Policies.CRWatcher.Enabled = false
 		if err := r.reconcileClusterRole(ctx, instance); err != nil {
 			return err
 		}

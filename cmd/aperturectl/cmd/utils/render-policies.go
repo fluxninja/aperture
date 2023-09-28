@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -9,6 +10,7 @@ import (
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/ghodss/yaml"
 )
@@ -73,6 +75,7 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		return nil, policyName, err
 	}
 	_, policy, err := CompilePolicy(filepath.Base(policyFile), policyBytes)
+	fmt.Printf("%+v\n", policy)
 	if err != nil {
 		policyCR, err := GetPolicyCR(policyFile)
 		if err != nil {
@@ -80,10 +83,12 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		}
 
 		policy = &languagev1.Policy{}
-		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
+		fmt.Println(string(policyCR.Spec.Raw))
+		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
 		if err != nil {
 			return nil, policyName, err
 		}
+		fmt.Printf("%+v\n", policy)
 
 		policyName = policyCR.Name
 		return policy, policyName, nil

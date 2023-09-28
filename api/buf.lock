@@ -9,8 +9,8 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 8bb8431a8d814edf832f5ef4f4f461e2
-    digest: shake256:5848427a5289fd245796bd69079eb8896a0b8d9acc7a4d71a6cdcb258a376b01b0ecc532e9a4f4bd6f084c7100cdc596e77b0e98df6ba22213ba1fa7980f2c83
+    commit: 6adbcd1de31a40368f50a58347e3028c
+    digest: shake256:388f5c1312b3dc0a9eb6f15313961875edea73769ceff7c633f4b2e52840322d3136fee529e9f65d2a6981b96b0a5a48a83bd2f68d000333974b5ade51b28ec5
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
@@ -24,8 +24,8 @@ deps:
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway
-    commit: f460f71081c14a80b66cc72526e0b322
-    digest: shake256:122def85e91fc3ef4ab351680060b8f70e9d09a7ae6d1412aeb2bddfeee5c4d3fc8819da33fef56192cec0a817ac0c3e6d49bb2acf02eb5c9e9131739a60ddfc
+    commit: 048ae6ff94ca4476b3225904b1078fad
+    digest: shake256:e5250bf2d999516c02206d757502b902e406f35c099d0e869dc3e4f923f6870fe0805a9974c27df0695462937eae90cd4d9db90bb9a03489412560baa74a87b6
   - remote: buf.build
     owner: opencensus
     repository: opencensus

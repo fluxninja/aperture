@@ -273,7 +273,11 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		if gtb.fillAmount != 0 {
 			// calculate start fill time based on the time it takes to fill the bucket
 			state.StartFillAt = now.Add(time.Duration(gtb.bucketCapacity / gtb.fillAmount * float64(gtb.interval)))
-			state.LastFill = state.StartFillAt
+			if gtb.continuousFill {
+				state.LastFill = state.StartFillAt
+			} else {
+				state.LastFill = state.StartFillAt.Add(-gtb.interval)
+			}
 		}
 	}
 
@@ -342,20 +346,25 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 		state.Available = gtb.bucketCapacity
 	}
 
+	log.Error().Msgf("TEST: StartFillAt: %v, Diff: %v, Available: %v", state.StartFillAt, now.After(state.StartFillAt), state.Available)
 	// do not fill the bucket until the start fill time
 	if state.StartFillAt.IsZero() || now.After(state.StartFillAt) {
 		// Calculate the time passed since the last fill
 		sinceLastFill := now.Sub(state.LastFill)
 		fillAmount := 0.0
 		if gtb.continuousFill {
+			log.Error().Msgf("TEST: Checking continuous fill before, sinceLastFill: %v, interval: %v, fillAmount: %v, LastFill: %v", sinceLastFill, gtb.interval, fillAmount, state.LastFill)
 			fillAmount = gtb.fillAmount * float64(sinceLastFill) / float64(gtb.interval)
 			state.LastFill = now
+			log.Error().Msgf("TEST: Checking continuous fill after, sinceLastFill: %v, interval: %v", state.LastFill, fillAmount)
 		} else if sinceLastFill >= gtb.interval {
 			fills := int(sinceLastFill / gtb.interval)
+			log.Error().Msgf("TEST: Checking sinceLastFill: %v, interval: %v, fillAmount: %v, LastFill: %v, fills: %v", sinceLastFill, gtb.interval, fillAmount, state.LastFill, fills)
 			if fills > 0 {
 				fillAmount = gtb.fillAmount * float64(fills)
 				state.LastFill = state.LastFill.Add(time.Duration(fills) * gtb.interval)
 			}
+			log.Error().Msgf("TEST: Checking after sinceLastFill: %v, interval: %v, fillAmount: %v, LastFill: %v, fills: %v", sinceLastFill, gtb.interval, fillAmount, state.LastFill, fills)
 		}
 		// Fill the calculated amount
 		state.Available += fillAmount
