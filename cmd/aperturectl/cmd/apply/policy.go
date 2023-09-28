@@ -2,6 +2,7 @@ package apply
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -80,7 +81,7 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
-	policyBytes, err := policy.MarshalJSON()
+	policyBytes, err := json.Marshal(policy)
 	if err != nil {
 		return err
 	}
