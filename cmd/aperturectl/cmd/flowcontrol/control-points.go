@@ -1,15 +1,8 @@
 package flowcontrol
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"text/tabwriter"
-
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/slices"
-
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
 // ControlPointsCmd is the command to list control points.
@@ -25,39 +18,6 @@ var ControlPointsCmd = &cobra.Command{
 			return err
 		}
 
-		resp, err := client.ListFlowControlPoints(
-			context.Background(),
-			&cmdv1.ListFlowControlPointsRequest{},
-		)
-		if err != nil {
-			return err
-		}
-
-		if resp.ErrorsCount != 0 {
-			fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
-		}
-
-		slices.SortFunc(resp.GlobalFlowControlPoints, func(a, b *cmdv1.GlobalFlowControlPoint) bool {
-			if a.AgentGroup != b.AgentGroup {
-				return a.AgentGroup < b.AgentGroup
-			}
-			if a.FlowControlPoint.Service != b.FlowControlPoint.Service {
-				return a.FlowControlPoint.Service < b.FlowControlPoint.Service
-			}
-			return a.FlowControlPoint.ControlPoint < b.FlowControlPoint.ControlPoint
-		})
-
-		tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
-		fmt.Fprintln(tabwriter, "AGENT GROUP\tSERVICE\tNAME\tTYPE")
-		for _, cp := range resp.GlobalFlowControlPoints {
-			fmt.Fprintf(tabwriter, "%s\t%s\t%s\t%s\n",
-				cp.AgentGroup,
-				cp.FlowControlPoint.Service,
-				cp.FlowControlPoint.ControlPoint,
-				cp.FlowControlPoint.Type)
-		}
-		tabwriter.Flush()
-
-		return nil
+		return utils.ParseControlPoints(client)
 	},
 }

@@ -19,13 +19,14 @@ Use this command to delete the Aperture Policies from Aperture Cloud.
 ### Options
 
 ```
-      --api-key string      Aperture Cloud API Key to be used when using Cloud Controller
-      --config string       Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
-      --controller string   Address of Aperture Cloud Controller
-  -h, --help                help for delete
-      --insecure            Allow connection to controller running without TLS
-      --policy string       Name of the Policy to delete
-      --skip-verify         Skip TLS certificate verification while connecting to controller
+      --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
+      --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string     Address of Aperture Cloud Controller
+  -h, --help                  help for delete
+      --insecure              Allow connection to controller running without TLS
+      --policy string         Name of the Policy to delete
+      --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
+      --skip-verify           Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

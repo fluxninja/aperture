@@ -41,8 +41,6 @@ aperturectl apply policy --dir=policies
 ### Options inherited from parent commands
 
 ```
-      --api-key string         Aperture Cloud API Key to be used when using Cloud Controller
-      --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS

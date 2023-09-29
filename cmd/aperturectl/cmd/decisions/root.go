@@ -1,14 +1,11 @@
 package decisions
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
@@ -47,26 +44,8 @@ var DecisionsCmd = &cobra.Command{
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
 
-		if !all {
-			if decisionType == "" {
-				return errors.New("decision type is required or use --all to get all decisions")
-			} else {
-				var found bool
-				for _, v := range decisionTypes {
-					if v == decisionType {
-						found = true
-						break
-					}
-				}
-				if !found {
-					return errors.New("invalid decision type, use one of the valid types (" + strings.Join(decisionTypes, ", ") + ") or use --all to get all decisions")
-				}
-			}
-		} else {
-			decisionType = ""
-		}
-
-		return nil
+		decisionType, err = utils.DecisionsPreRun(all, decisionType)
+		return err
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := controller.PolicyClient()
@@ -74,25 +53,7 @@ var DecisionsCmd = &cobra.Command{
 			return err
 		}
 
-		getDecisionsReq := &languagev1.GetDecisionsRequest{
-			DecisionType: decisionType,
-		}
-		if all {
-			getDecisionsReq = nil
-		}
-		decisionsResp, err := client.GetDecisions(
-			context.Background(),
-			getDecisionsReq,
-		)
-		if err != nil {
-			return err
-		}
-
-		for k, v := range decisionsResp.Decisions {
-			cmd.Printf("%s:\n%s\n\n", k, v)
-		}
-
-		return nil
+		return utils.ParseDecisions(cmd, client, all, decisionType)
 	},
 	PersistentPostRun: controller.PostRun,
 }

@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
-
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func init() {
@@ -25,15 +22,6 @@ var agentsCmd = &cobra.Command{
 			return err
 		}
 
-		agents, err := client.ListAgents(context.Background(), &emptypb.Empty{})
-		if err != nil {
-			return err
-		}
-
-		for _, agent := range agents.Agents {
-			fmt.Println(agent)
-		}
-
-		return nil
+		return utils.ListAgents(client)
 	},
 }

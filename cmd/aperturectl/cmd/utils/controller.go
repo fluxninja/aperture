@@ -9,17 +9,13 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strings"
 
-	toml "github.com/BurntSushi/toml"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -34,19 +30,6 @@ import (
 
 var controllerNs string
 
-// ControllerConfig is the config file structure for Aperture Cloud Controller.
-type ControllerConfig struct {
-	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
-	URL    string `toml:"url"`
-	APIKey string `toml:"api_key"`
-}
-
-// Config is the config file structure for Aperture.
-type Config struct {
-	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
-	Controller *ControllerConfig `toml:"controller"`
-}
-
 // ControllerConn manages flags for connecting to controller – either via
 // address or kubeconfig.
 type ControllerConn struct {
@@ -58,8 +41,6 @@ type ControllerConn struct {
 	skipVerify     bool
 	kubeConfigPath string
 	kubeConfig     *rest.Config
-	apiKey         string
-	config         string
 
 	forwarderStopChan chan struct{}
 	conn              *grpc.ClientConn
@@ -103,40 +84,12 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"",
 		"Namespace in which the Aperture Controller is running",
 	)
-	flags.StringVar(
-		&c.apiKey,
-		"api-key",
-		"",
-		"Aperture Cloud API Key to be used when using Cloud Controller",
-	)
-	flags.StringVar(
-		&c.config,
-		"config",
-		"",
-		"Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG",
-	)
 }
 
 // PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
-	// Fetching config from environment variable
-	if c.config == "" {
-		c.config = os.Getenv(configEnv)
-	}
-
-	// Fetching config from default location
-	if c.config == "" {
-		homeDir, err := os.UserHomeDir()
-		if err == nil {
-			c.config = filepath.Join(homeDir, ".aperturectl", "config")
-			if _, err := os.Stat(c.config); err != nil {
-				c.config = ""
-			}
-		}
-	}
-
-	if c.controllerAddr == "" && !c.kube && c.config == "" {
-		log.Info().Msg("Neither --controller nor --kube nor --config flag is set. Assuming --kube=true.")
+	if c.controllerAddr == "" && !c.kube {
+		log.Info().Msg("Neither --controller nor --kube flag is set. Assuming --kube=true.")
 		c.kube = true
 	}
 
@@ -154,39 +107,6 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
-	} else if c.config != "" && (c.controllerAddr == "" || c.apiKey == "") {
-		var err error
-		c.config, err = filepath.Abs(c.config)
-		if err != nil {
-			return fmt.Errorf("failed to resolve config file '%s' path: %w", c.config, err)
-		}
-
-		log.Info().Msgf("Using config file '%s'", c.config)
-		config := &Config{}
-		_, err = toml.DecodeFile(c.config, config)
-		if err != nil {
-			return fmt.Errorf("failed to read config file '%s': %w", c.config, err)
-		}
-
-		if config.Controller == nil {
-			return fmt.Errorf("invalid config file '%s'. Missing key 'controller'", c.config)
-		}
-
-		if config.Controller.URL == "" {
-			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", c.config)
-		}
-
-		if config.Controller.APIKey == "" {
-			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
-		}
-
-		if c.controllerAddr == "" {
-			c.controllerAddr = config.Controller.URL
-		}
-
-		if c.apiKey == "" {
-			c.apiKey = config.Controller.APIKey
-		}
 	}
 
 	return nil
@@ -194,21 +114,16 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 
 // client returns Controller IntrospectionClient, connecting to controller if not yet connected.
 func (c *ControllerConn) IntrospectionClient() (IntrospectionClient, error) {
-	if !c.kube && c.apiKey != "" {
-		return nil, errors.New("this subcommand cannot be used with the Cloud Controller")
-	}
 	return c.client()
 }
 
 // client returns Controller PolicyClient, connecting to controller if not yet connected.
 func (c *ControllerConn) PolicyClient() (PolicyClient, error) {
-	// PolicyClient has no restrictions.
 	return c.client()
 }
 
 // client returns Controller StatusClient, connecting to controller if not yet connected.
 func (c *ControllerConn) StatusClient() (StatusClient, error) {
-	// StatusClient has no restrictions.
 	return c.client()
 }
 
@@ -268,7 +183,7 @@ func (c *ControllerConn) client() (cmdv1.ControllerClient, error) {
 	}
 
 	var err error
-	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred), grpc.WithUnaryInterceptor(c.cloudControllerInterceptor))
+	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred))
 	if err != nil {
 		return nil, err
 	}
@@ -387,21 +302,4 @@ func (c *ControllerConn) GetKubeRestConfig() *rest.Config {
 // GetControllerNs returns namespace in which the Aperture Controller is running.
 func GetControllerNs() string {
 	return controllerNs
-}
-
-func (c *ControllerConn) cloudControllerInterceptor(
-	ctx context.Context,
-	method string,
-	req interface{},
-	reply interface{},
-	cc *grpc.ClientConn,
-	invoker grpc.UnaryInvoker,
-	opts ...grpc.CallOption,
-) error {
-	if c.apiKey == "" {
-		return invoker(ctx, method, req, reply, cc, opts...)
-	}
-	md := metadata.Pairs("apikey", c.apiKey)
-	ctx = metadata.NewOutgoingContext(ctx, md)
-	return invoker(ctx, method, req, reply, cc, opts...)
 }

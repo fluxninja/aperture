@@ -45,3 +45,9 @@ type PolicyClient interface {
 type StatusClient interface {
 	GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error)
 }
+
+// CloudPolicyClient is a subset of cloudv1.CloudControllerClient that covers APIs related to policies.
+type CloudPolicyClient interface {
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
