@@ -505,6 +505,6 @@ var json = jsoniter.Config{
 	// Disallow alternative casing.
 	CaseSensitive: true,
 
-	// Error on typos.
-	DisallowUnknownFields: true,
+	// we want to allow unknown fields to improve backwards compatibility
+	DisallowUnknownFields: false,
 }.Froze()
