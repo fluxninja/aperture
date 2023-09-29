@@ -274,7 +274,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	// if we are first time drawing from the bucket, set the start fill time
 	if !gtb.disableDelayedFilling && state.Available == gtb.bucketCapacity {
-		state.StartFillAt = now.Add(gtb.getWaitTime(gtb.bucketCapacity))
+		state.StartFillAt = now.Add(gtb.timeToFill(now, now, gtb.bucketCapacity))
 		if gtb.continuousFill {
 			state.LastFill = state.StartFillAt
 		} else {
@@ -288,9 +288,8 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		if state.Available < 0 {
 			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
-				availableAt := now.Add(gtb.getWaitTime(-state.Available))
-				result.AvailableAt = availableAt
-				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
+				result.AvailableAt = gtb.getAvailableAt(now, state)
+				if arg.CanWait && !arg.Deadline.IsZero() && result.AvailableAt.After(arg.Deadline) {
 					result.Ok = false
 				}
 			}
@@ -364,18 +363,39 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 	return &state, nil
 }
 
-// getWaitTime calculates the wait time for the given number of tokens.
-func (gtb *GlobalTokenBucket) getWaitTime(tokens float64) time.Duration {
+// timeToFill calculates the wait time for the given number of tokens.
+func (gtb *GlobalTokenBucket) timeToFill(now time.Time, lastFill time.Time, tokens float64) time.Duration {
 	if gtb.fillAmount != 0 {
 		if gtb.continuousFill {
 			return time.Duration(tokens / gtb.fillAmount * float64(gtb.interval))
 		} else {
 			// calculate how many fills we need
+			// and fill time based on lastFill
 			fills := math.Ceil(tokens / gtb.fillAmount)
-			return time.Duration(fills) * gtb.interval
+			// if last fill was in the past
+			// and time since last fill is less than interval
+			timeToNextFill := time.Duration(0)
+			if now.After(lastFill) && now.Sub(lastFill) < gtb.interval {
+				timeToNextFill = gtb.interval - now.Sub(lastFill)
+				fills--
+			}
+			return time.Duration(fills)*gtb.interval + timeToNextFill
 		}
 	}
 	return 0
+}
+
+// getAvailableAt calculates the time at which the given number of tokens will be available.
+func (gtb *GlobalTokenBucket) getAvailableAt(now time.Time, state *tokenBucketState) time.Time {
+	if state.Available >= 0 {
+		return now
+	}
+	timeToFill := gtb.timeToFill(now, state.LastFill, -state.Available)
+	if now.Before(state.StartFillAt) {
+		return state.StartFillAt.Add(timeToFill)
+	} else {
+		return now.Add(timeToFill)
+	}
 }
 
 // SetPassThrough sets the pass through flag.
