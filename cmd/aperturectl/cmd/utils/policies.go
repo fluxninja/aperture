@@ -74,18 +74,20 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
+	var err error
 	policyBytes, err := os.ReadFile(policyFile)
 	if err != nil {
 		return nil, policyName, err
 	}
-	_, policy, err := CompilePolicy(filepath.Base(policyFile), policyBytes)
-	if err != nil {
-		policyCR, err := GetPolicyCR(policyFile)
-		if err != nil {
-			return nil, policyName, err
-		}
 
-		policy = &languagev1.Policy{}
+	var policyCR *policyv1alpha1.Policy
+	policy := &languagev1.Policy{}
+
+	policyCR, err = GetPolicyCR(policyFile)
+	if err != nil {
+		_, policy, err = CompilePolicy(filepath.Base(policyFile), policyBytes)
+		return policy, policyName, err
+	} else {
 		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
 		if err != nil {
 			return nil, policyName, err
@@ -94,8 +96,6 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		policyName = policyCR.Name
 		return policy, policyName, nil
 	}
-
-	return policy, policyName, nil
 }
 
 func GetPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
@@ -108,6 +108,10 @@ func GetPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
 	err = yaml.Unmarshal(policyBytes, policyCR)
 	if err != nil {
 		return nil, err
+	}
+
+	if policyCR.Name == "" {
+		return nil, fmt.Errorf("policy name is missing in the policy file")
 	}
 
 	return policyCR, nil
