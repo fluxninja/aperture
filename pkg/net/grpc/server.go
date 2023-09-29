@@ -183,7 +183,7 @@ func (constructor ServerConstructor) provideServer(
 		OnStop: func(context.Context) error {
 			listener := listener.GetListener()
 			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
-			server.GracefulStop()
+			server.Stop()
 			return nil
 		},
 	})

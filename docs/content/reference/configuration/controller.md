@@ -859,7 +859,7 @@ List of etcd server endpoints
 
 <!-- vale off -->
 
-(string, default: `"60s"`)
+(string, default: `"10s"`)
 
 <!-- vale on -->
 
