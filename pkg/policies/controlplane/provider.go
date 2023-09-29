@@ -128,7 +128,7 @@ func setupPoliciesNotifier(
 		switch etype {
 		case notifiers.Write:
 			policyMessage := &languagev1.Policy{}
-			unmarshalErr := config.UnmarshalProto(bytes, policyMessage)
+			unmarshalErr := proto.Unmarshal(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr

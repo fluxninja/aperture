@@ -18,7 +18,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
@@ -112,8 +111,8 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 //
 // localPolicy can be nil.
 func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
-	var remotePolicy policylangv1.Policy
-	err := config.UnmarshalProto(remoteBytes, &remotePolicy)
+	remotePolicy := &policylangv1.Policy{}
+	err := proto.Unmarshal(remoteBytes, remotePolicy)
 	if err != nil {
 		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
@@ -130,13 +129,13 @@ func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapp
 
 	if localPolicy == nil {
 		return &policylangv1.GetPolicyResponse{
-			Policy: &remotePolicy,
+			Policy: remotePolicy,
 			Status: policylangv1.GetPolicyResponse_NOT_LOADED,
 			Reason: "not loaded into controller",
 		}
 	}
 
-	remoteHash, err := hashPolicy(&remotePolicy)
+	remoteHash, err := hashPolicy(remotePolicy)
 	if err != nil {
 		return &policylangv1.GetPolicyResponse{
 			Policy: localPolicy.Policy,
@@ -191,8 +190,8 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	var oldPolicy *policylangv1.Policy
-	err = config.UnmarshalProto(etcdPolicy.Kvs[0].Value, oldPolicy)
+	oldPolicy := &policylangv1.Policy{}
+	err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
 	if err != nil {
 		return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
 	}
