@@ -274,7 +274,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	// if we are first time drawing from the bucket, set the start fill time
 	if !gtb.disableDelayedFilling && state.Available == gtb.bucketCapacity {
-		state.StartFillAt = now.Add(gtb.timeToFill(now, now, gtb.bucketCapacity))
+		state.StartFillAt = now.Add(gtb.timeToFill(gtb.bucketCapacity))
 		if gtb.continuousFill {
 			state.LastFill = state.StartFillAt
 		} else {
@@ -363,23 +363,15 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 	return &state, nil
 }
 
-// timeToFill calculates the wait time for the given number of tokens.
-func (gtb *GlobalTokenBucket) timeToFill(now time.Time, lastFill time.Time, tokens float64) time.Duration {
+// timeToFill calculates the wait time for the given number of tokens based on the fill rate.
+func (gtb *GlobalTokenBucket) timeToFill(tokens float64) time.Duration {
 	if gtb.fillAmount != 0 {
 		if gtb.continuousFill {
 			return time.Duration(tokens / gtb.fillAmount * float64(gtb.interval))
 		} else {
 			// calculate how many fills we need
-			// and fill time based on lastFill
 			fills := math.Ceil(tokens / gtb.fillAmount)
-			// if last fill was in the past
-			// and time since last fill is less than interval
-			timeToNextFill := time.Duration(0)
-			if now.After(lastFill) && now.Sub(lastFill) < gtb.interval {
-				timeToNextFill = gtb.interval - now.Sub(lastFill)
-				fills--
-			}
-			return time.Duration(fills)*gtb.interval + timeToNextFill
+			return time.Duration(fills) * gtb.interval //+ timeToNextFill
 		}
 	}
 	return 0
@@ -390,11 +382,19 @@ func (gtb *GlobalTokenBucket) getAvailableAt(now time.Time, state *tokenBucketSt
 	if state.Available >= 0 {
 		return now
 	}
-	timeToFill := gtb.timeToFill(now, state.LastFill, -state.Available)
+	timeToFill := gtb.timeToFill(-state.Available)
 	if now.Before(state.StartFillAt) {
 		return state.StartFillAt.Add(timeToFill)
 	} else {
-		return now.Add(timeToFill)
+		// this code assumes that other parts of the code are correct, such as
+		// LastFill is not in the future if now is after StartFillAt
+		// And timeSinceLastFill is not greater than interval
+		timeSinceLastFill := now.Sub(state.LastFill)
+		if timeSinceLastFill > gtb.interval {
+			log.Autosample().Errorf("time since last fill is greater than interval: %v", timeSinceLastFill)
+			timeSinceLastFill = time.Duration(0)
+		}
+		return now.Add(timeToFill - timeSinceLastFill)
 	}
 }
 
