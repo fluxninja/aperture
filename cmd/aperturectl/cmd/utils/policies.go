@@ -83,7 +83,7 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	var policyCR *policyv1alpha1.Policy
 	policy := &languagev1.Policy{}
 
-	policyCR, err = GetPolicyCR(policyFile)
+	policyCR, err = GetPolicyCR(policyBytes)
 	if err != nil {
 		_, policy, err = CompilePolicy(filepath.Base(policyFile), policyBytes)
 		return policy, policyName, err
@@ -98,14 +98,9 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	}
 }
 
-func GetPolicyCR(policyFile string) (*policyv1alpha1.Policy, error) {
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, err
-	}
-
+func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 	policyCR := &policyv1alpha1.Policy{}
-	err = yaml.Unmarshal(policyBytes, policyCR)
+	err := yaml.Unmarshal(policyBytes, policyCR)
 	if err != nil {
 		return nil, err
 	}
