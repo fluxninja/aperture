@@ -15,6 +15,7 @@ func init() {
 	Controller.InitFlags(ApplyCmd.PersistentFlags())
 
 	ApplyCmd.AddCommand(ApplyPolicyCmd)
+	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
 }
 
 // ApplyCmd is the command to apply a policy to the Cloud Controller.

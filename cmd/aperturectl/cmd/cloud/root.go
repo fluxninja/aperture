@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/autoscale"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/decisions"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/flowcontrol"
@@ -18,6 +20,8 @@ var (
 
 func init() {
 	CloudCmd.AddCommand(apply.ApplyCmd)
+	CloudCmd.AddCommand(autoscale.AutoScaleCmd)
+	CloudCmd.AddCommand(decisions.DecisionsCmd)
 	CloudCmd.AddCommand(delete.DeleteCmd)
 	CloudCmd.AddCommand(agentsCmd)
 	CloudCmd.AddCommand(status.StatusCmd)

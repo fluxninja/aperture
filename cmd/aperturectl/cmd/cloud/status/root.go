@@ -5,10 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	cloudutils "github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
-var controller utils.ControllerConn
+var controller cloudutils.ControllerConn
 
 func init() {
 	controller.InitFlags(StatusCmd.PersistentFlags())
