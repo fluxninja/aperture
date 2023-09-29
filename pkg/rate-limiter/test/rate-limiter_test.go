@@ -135,12 +135,7 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, in
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, fills float64, tolerance float64) {
 	for _, f := range fr.flows {
-		// calculate expected requests taking into account the burst capacity in the limiter
 		actualRequestsExpected := int32(math.Min(float64(f.limit)*(fills), float64(f.totalRequests)))
-		if actualRequestsExpected != f.totalRequests {
-			// add burst capacity
-			actualRequestsExpected += int32(f.limit)
-		}
 		t.Logf("flow (%s) @ %d requests/sec: \n fills=%f, totalRequests=%d, limit=%f, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
@@ -235,7 +230,7 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 		interval:  time.Second * 1,
 		flows:     flows,
 		duration:  time.Second * 10,
-		tolerance: 0.1,
+		tolerance: 0.02,
 	})
 }
 
@@ -254,7 +249,7 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 		interval:  time.Second * 1,
 		flows:     flows,
 		duration:  time.Second * 10,
-		tolerance: 0.1,
+		tolerance: 0.02,
 	})
 }
 
@@ -275,6 +270,6 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		duration:              time.Second * 10,
 		enableLazySyncLimiter: true,
 		numSyncs:              10,
-		tolerance:             0.2,
+		tolerance:             0.1,
 	})
 }
