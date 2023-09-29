@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null) {
+function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null, values=false) {
   local barGaugePanel =
     g.panel.barGauge.new(title)
     + g.panel.barGauge.datasource.withType('prometheus')
@@ -15,6 +15,7 @@ function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null) {
     ])
     + g.panel.barGauge.options.withDisplayMode('gradient')
     + g.panel.barGauge.options.withOrientation('horizontal')
+    + g.panel.barGauge.options.reduceOptions.withValues(values)
     + g.panel.barGauge.standardOptions.color.withMode('thresholds')
     + g.panel.barGauge.standardOptions.thresholds.withMode('absolute')
     + g.panel.barGauge.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
