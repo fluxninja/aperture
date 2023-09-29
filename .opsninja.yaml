@@ -40,6 +40,16 @@ applications:
       dockerfile: cmd/aperture-controller/Dockerfile
     deployment:
       manifests/charts/aperture-controller/.+: charts/aperture/aperture-controller/
+  cloud-controller:
+    image:
+      name: aperture-controller
+      docker_context: cmd/aperture-controller
+      dockerfile: cmd/aperture-controller/Dockerfile
+    argo_manifests:
+      - app_path: apps/app-of-apps/cloud/organization-operator.yaml
+        image_prefix: NINJA_AGENT_CONTROLLER_
+      - app_path: apps/app-of-apps/cloud/temporal-worker.yaml
+        image_prefix: NINJA_AGENT_CONTROLLER_
   demo-app:
     image:
       name: demo-app

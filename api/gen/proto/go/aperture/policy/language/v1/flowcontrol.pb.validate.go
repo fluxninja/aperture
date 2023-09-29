@@ -4428,6 +4428,8 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableDelayedFilling
+
 	if len(errors) > 0 {
 		return RateLimiter_ParametersMultiError(errors)
 	}

@@ -1,7 +1,7 @@
 local promqlPolicyFn = import '../promql/policy.libsonnet';
 
-function(cfg, metadata={}) {
-  local promqlPolicy = promqlPolicyFn(cfg, metadata),
+function(cfg) {
+  local promqlPolicy = promqlPolicyFn(cfg),
 
   policyResource: promqlPolicy.policyResource {
     spec+: promqlPolicy.policyDef,

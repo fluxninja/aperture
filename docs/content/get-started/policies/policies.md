@@ -103,8 +103,7 @@ Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
---values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
 ```
 
 The following directory structure will be generated:

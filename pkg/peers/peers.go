@@ -2,7 +2,6 @@ package peers
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"io/fs"
 	"net"
@@ -14,7 +13,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
-	"sigs.k8s.io/yaml"
 
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -185,7 +183,7 @@ func NewPeerDiscovery(
 
 	pd.peerNotifier, err = notifiers.NewUnmarshalPrefixNotifier("",
 		pd.updatePeer,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		config.NewProtobufUnmarshaller,
 	)
 	if err != nil {
 		return nil, err
@@ -212,19 +210,12 @@ func (pd *PeerDiscovery) RegisterSelf(ctx context.Context, advertiseAddr string)
 }
 
 func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
-	bjson, err := json.Marshal(pd.peers.SelfPeer)
+	bytes, err := proto.Marshal(pd.peers.SelfPeer)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to marshal peer info")
 		return err
 	}
-	// convert to yaml
-	b, err := yaml.JSONToYAML(bjson)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to convert json to yaml")
-		return err
-	}
-	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(b))
-
+	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(bytes))
 	return err
 }
 
@@ -362,7 +353,7 @@ func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.U
 	log.Debug().Str("event", event.String()).Msg("Updating peer")
 	if event.Type == notifiers.Write {
 		var peer peersv1.Peer
-		if err := unmarshaller.UnmarshalKey("", &peer); err != nil {
+		if err := unmarshaller.Unmarshal(&peer); err != nil {
 			log.Error().Err(err).Msg("failed to unmarshal peer info")
 			return
 		}

@@ -5,8 +5,8 @@ local jmxUtils = import './utils.libsonnet';
 
 local config = blueprint.config;
 
-function(cfg, params={}, metadata={}) {
-  local promqlPolicy = promqlFn(cfg, params, metadata),
+function(cfg, params={}) {
+  local promqlPolicy = promqlFn(cfg, params),
 
   policyResource: promqlPolicy.policyResource {
     spec+: promqlPolicy.policyDef,

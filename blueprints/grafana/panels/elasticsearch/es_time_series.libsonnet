@@ -28,27 +28,27 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Breakers Tripped
   local breakerTrippedQueries = [
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="fielddata",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="fielddata",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Field Data'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="parent",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="parent",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Parent'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="inflight_requests",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="inflight_requests",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('In-flight Requests'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="eql_sequence",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="eql_sequence",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('EQL Sequence'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="model_inference",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="model_inference",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Model Inference'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_breaker_tripped_total{name="request",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_breaker_tripped_total{name="request",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Request'),
   ],
@@ -57,13 +57,13 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Indexing Pressure Metrics
   local indexingPressureQueries = [
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="coordinating", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_memory_indexing_pressure_bytes{stage="coordinating", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Coordinating'),
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="primary", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_memory_indexing_pressure_bytes{stage="primary", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Primary'),
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_memory_indexing_pressure_bytes{stage="replica", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_memory_indexing_pressure_bytes{stage="replica", %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Replica'),
   ],
@@ -72,11 +72,11 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Indexing Rejection Rate Metrics
   local indexingRejectionsQueries = [
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_indexing_pressure_memory_primary_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_indexing_pressure_memory_primary_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Primary'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_indexing_pressure_memory_replica_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_indexing_pressure_memory_replica_rejections_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Replica'),
   ],
@@ -85,43 +85,43 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Operations (query, get, merge, fetch, flush, refresh, scroll, suggest, delete, warmer)
   local operationsQueries = [
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="query"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="query"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Query'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="get"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="get"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Get'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="merge"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="merge"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Merge'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="fetch"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="fetch"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Fetch'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="flush"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="flush"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Flush'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="refresh"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="refresh"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Refresh'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="scroll"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="scroll"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Scroll'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="suggest"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="suggest"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Suggest'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="delete"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="delete"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Delete'),
 
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="warmer"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_operations_completed_total{%(filters)s, infra_meter_name="%(infra_meter)s", operation="warmer"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Warmer'),
   ],
@@ -130,11 +130,11 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Documents State (active and deleted)
   local DocsQueries = [
-    g.query.prometheus.new(datasource.name, 'elasticsearch_node_documents{state="active", %(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_documents{state="active", %(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Active Docs'),
 
-    g.query.prometheus.new(datasource.name, 'elasticsearch_node_documents{state="deleted", %(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_documents{state="deleted", %(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Deleted Docs'),
   ],
@@ -143,21 +143,21 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // Total Docs
   local totalDocsQuery = [
-    g.query.prometheus.new(datasource.name, 'increase(elasticsearch_node_ingest_documents_total{ %(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(increase(elasticsearch_node_ingest_documents_total{ %(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Total Docs'),
   ],
 
-  local totalDocs = timeSeriesPanel('Total Ingested Documents', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
+  local totalDocs = timeSeriesPanel('Total Ingested Documents', datasource.name, '', stringFilters, 'short', targets=totalDocsQuery),
 
   // Current Docs
   local currentDocsQuery = [
-    g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_ingest_documents_current{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(increase(elasticsearch_node_ingest_documents_current{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Current Docs'),
   ],
 
-  local currentDocs = timeSeriesPanel('Current Ingested Documents', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
+  local currentDocs = timeSeriesPanel('Current Ingested Documents', datasource.name, '', stringFilters, 'short', targets=currentDocsQuery),
 
   local translogOperationsQuery = [
     g.query.prometheus.new(datasource.name, 'rate(elasticsearch_node_translog_operations_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval])' % { filters: stringFilters, infra_meter: infraMeterName })
@@ -175,7 +175,7 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   ],
   local activeThreads = timeSeriesPanel('Active Threads', datasource.name, '', stringFilters, 'short', targets=activeThreadsQueries),
 
-  local httpConnectionsQuery = g.query.prometheus.new(datasource.name, 'elasticsearch_node_http_connections{%(filters)s, infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName })
+  local httpConnectionsQuery = g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_http_connections{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
                                + g.query.prometheus.withIntervalFactor(1)
                                + g.query.prometheus.withLegendFormat('HTTP Connections'),
 
@@ -250,11 +250,11 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   // JVM Usage
   local jvmQueries = [
-    g.query.prometheus.new(datasource.name, '(jvm_memory_heap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(jvm_memory_heap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Heap Used'),
 
-    g.query.prometheus.new(datasource.name, '(jvm_memory_heap_max_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(jvm_memory_heap_max_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Heap Max'),
   ],
@@ -262,11 +262,11 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   local jvmMemoryUsage = timeSeriesPanel('JVM Memory Usage', datasource.name, '', stringFilters, 'Gigabytes', targets=jvmQueries),
   // JVM Non-Heap Memory (Used and Committed)
   local nonHeapQueries = [
-    g.query.prometheus.new(datasource.name, '(jvm_memory_nonheap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(jvm_memory_nonheap_used_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Non-Heap Used'),
 
-    g.query.prometheus.new(datasource.name, '(jvm_memory_nonheap_committed_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
+    g.query.prometheus.new(datasource.name, 'sum(jvm_memory_nonheap_committed_bytes{%(filters)s, infra_meter_name="%(infra_meter)s"}) / 1024 / 1024 / 1024' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Non-Heap Committed'),
   ],

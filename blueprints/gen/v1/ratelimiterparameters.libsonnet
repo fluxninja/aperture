@@ -7,6 +7,12 @@
   withContinuousFillMixin(continuous_fill):: {
     continuous_fill+: continuous_fill,
   },
+  withDisableDelayedFilling(disable_delayed_filling):: {
+    disable_delayed_filling: disable_delayed_filling,
+  },
+  withDisableDelayedFillingMixin(disable_delayed_filling):: {
+    disable_delayed_filling+: disable_delayed_filling,
+  },
   withInterval(interval):: {
     interval: interval,
   },

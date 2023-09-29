@@ -1,14 +1,11 @@
 package status
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
 
-	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
 var controller utils.ControllerConn
@@ -39,25 +36,7 @@ var StatusCmd = &cobra.Command{
 			return err
 		}
 
-		getStatusReq := &statusv1.GroupStatusRequest{
-			Path: "",
-		}
-		statusResp, err := client.GetStatus(
-			context.Background(),
-			getStatusReq,
-		)
-		if err != nil {
-			return err
-		}
-
-		result, err := status.ParseGroupStatus(make(map[string]string), "", statusResp)
-		if err != nil {
-			return err
-		}
-		for k, v := range result {
-			fmt.Printf("%s: %s\n", k, v)
-		}
-		return nil
+		return utils.ParseStatus(client)
 	},
 	PersistentPostRun: controller.PostRun,
 }

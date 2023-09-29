@@ -2,14 +2,14 @@ local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common-aimd/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg + {
     policy+: {
       overload_condition: 'gt',
     },
   },
 
-  local commonPolicy = commonPolicyFn(cfg, params, metadata),
+  local commonPolicy = commonPolicyFn(cfg, params),
 
   local createQuery = function(policy_name, interval) 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: policy_name, interval: interval },
 

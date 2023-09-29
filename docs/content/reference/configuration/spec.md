@@ -7418,8 +7418,7 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Capacity of the bucket to allow for bursty traffic. The bucket is given a chance
-to empty out before the filling starts.
+Capacity of the bucket to allow for bursty traffic.
 
 </dd>
 <dt>fill_amount</dt>
@@ -7468,6 +7467,23 @@ PassThrough port determines whether all requests
 
 Continuous fill determines whether the token bucket should be filled
 continuously or only on discrete intervals.
+
+</dd>
+<dt>disable_delayed_filling</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Disable delayed filling of the token bucket. If set to true, the token bucket
+will start filling immediately after the first request is received. This can
+potentially lead to more requests being accepted than the specified rate limit
+during the first interval. When set to false, the token bucket will be given a
+chance to empty out before the filling starts. The delay is equal to the time it
+takes to fill the bucket.
 
 </dd>
 <dt>interval</dt>

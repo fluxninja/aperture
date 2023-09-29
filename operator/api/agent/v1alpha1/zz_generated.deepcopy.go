@@ -64,7 +64,7 @@ func (in *AgentConfigSpec) DeepCopyInto(out *AgentConfigSpec) {
 	out.PeerDiscovery = in.PeerDiscovery
 	out.FlowControl = in.FlowControl
 	out.AutoScale = in.AutoScale
-	in.ServiceDiscoverySpec.DeepCopyInto(&out.ServiceDiscoverySpec)
+	out.ServiceDiscoverySpec = in.ServiceDiscoverySpec
 	in.OTel.DeepCopyInto(&out.OTel)
 	in.AgentFunctions.DeepCopyInto(&out.AgentFunctions)
 }
