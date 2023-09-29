@@ -3,13 +3,13 @@ package crwatcher
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,7 +30,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 )
 
 // watcher holds the state of the watcher.
@@ -215,10 +214,7 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 		return unmarshalErr
 	}
 
-	policyMessage := &iface.PolicyMessage{
-		Policy: policySpec,
-	}
-	bytes, err := json.Marshal(policyMessage)
+	bytes, err := proto.Marshal(policySpec)
 	if err != nil {
 		return err
 	}

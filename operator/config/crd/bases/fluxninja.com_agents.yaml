@@ -1806,43 +1806,8 @@ spec:
                           enabled:
                             type: boolean
                         type: object
-                      static:
-                        description: StaticDiscoveryConfig for pre-determined list
-                          of services.
-                        properties:
-                          entities:
-                            items:
-                              description: Entity represents a pod, VM, and so on.
-                              properties:
-                                ip_address:
-                                  description: IP address of the entity.
-                                  type: string
-                                name:
-                                  description: Name of the entity. For example, pod
-                                    name.
-                                  type: string
-                                namespace:
-                                  description: Namespace of the entity. For example,
-                                    pod namespace.
-                                  type: string
-                                node_name:
-                                  description: Node name of the entity. For example,
-                                    hostname.
-                                  type: string
-                                services:
-                                  description: Services of the entity.
-                                  items:
-                                    type: string
-                                  type: array
-                                uid:
-                                  description: Unique identifier of the entity.
-                                  type: string
-                              type: object
-                            type: array
-                        type: object
                     required:
                     - kubernetes
-                    - static
                     type: object
                   token_source:
                     description: Google Token Source configuration

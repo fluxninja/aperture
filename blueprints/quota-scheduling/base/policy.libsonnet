@@ -9,7 +9,7 @@ local flowControl = spec.v1.FlowControl;
 local quotaScheduler = spec.v1.QuotaScheduler;
 local port = spec.v1.Port;
 
-function(cfg, metadata={}) {
+function(cfg) {
   local params = config + cfg,
   local policyDef =
     policy.new()

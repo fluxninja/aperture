@@ -576,9 +576,9 @@ type Policy struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Defines the control-loop logic of the policy.
-	Circuit *Circuit `protobuf:"bytes,1,opt,name=circuit,proto3" json:"circuit,omitempty"`
+	Circuit *Circuit `protobuf:"bytes,1,opt,name=circuit,proto3" json:"circuit,omitempty" validate:"required_without=Resources"` // @gotags: validate:"required_without=Resources"
 	// Resources (such as Flux Meters, Classifiers) to setup.
-	Resources *Resources `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty"`
+	Resources *Resources `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty" validate:"required_without=Circuit"` // @gotags: validate:"required_without=Circuit"
 }
 
 func (x *Policy) Reset() {

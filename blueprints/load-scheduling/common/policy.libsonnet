@@ -3,7 +3,7 @@ local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {

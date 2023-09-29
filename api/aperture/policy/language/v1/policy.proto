@@ -150,9 +150,9 @@ message Policies {
 // Policy specification contains a circuit that defines the controller logic and resources that need to be setup.
 message Policy {
   // Defines the control-loop logic of the policy.
-  Circuit circuit = 1;
+  Circuit circuit = 1; // @gotags: validate:"required_without=Resources"
   // Resources (such as Flux Meters, Classifiers) to setup.
-  Resources resources = 2;
+  Resources resources = 2; // @gotags: validate:"required_without=Circuit"
 }
 
 // Circuit is graph of inter-connected signal processing components.

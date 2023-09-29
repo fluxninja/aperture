@@ -4,11 +4,10 @@ local blueprint = import './rate-limiting.libsonnet';
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
+function(params) {
   local c = std.mergePatch(config, params),
 
-  local metadataWrapper = metadata { values: std.toString(params) },
-  local p = policy(c, metadataWrapper),
+  local p = policy(c),
   local d = creator(p.policyResource, c),
 
   dashboards: {
@@ -17,6 +16,6 @@ function(params, metadata={}) {
   } + d.receiverDashboards,
   policies: {
     [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef,
   },
 }

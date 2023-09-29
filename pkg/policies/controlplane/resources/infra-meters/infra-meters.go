@@ -2,7 +2,6 @@ package inframeters
 
 import (
 	"context"
-	"encoding/json"
 	"path"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -12,6 +11,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/proto"
 )
 
 type infraMeterConfigSync struct {
@@ -61,7 +61,7 @@ func (configSync *infraMeterConfigSync) doSync(scopedKV *etcdclient.SessionScope
 			}
 
 			// Marshal the infra meter using json marshaler.
-			dat, err := json.Marshal(wrapper)
+			dat, err := proto.Marshal(wrapper)
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to marshal infra meter config")

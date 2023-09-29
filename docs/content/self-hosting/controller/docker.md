@@ -294,7 +294,7 @@ have a Prometheus instance running, you can skip these steps.
    --network aperture curlimages/curl \
    sh -c \
    'while [[ \"$(curl -s -o /dev/null -w %{http_code} aperture-controller:8080/v1/status/system/readiness)\" != \"200\" ]]; \
-   do echo "aperture-control is starting"; sleep 1; done && \
+   do echo "aperture-controller is starting"; sleep 1; done && \
    echo "aperture-controller is now healty!"'
    ```
 

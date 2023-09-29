@@ -11,13 +11,13 @@ following as `~/.aperturectl/config`:
 ```toml
 [controller]
 url = "ORGANIZATION_NAME.app.fluxninja.com:443"
-api_key = "API_KEY"
+api_key = "PERSONAL_API_KEY"
 ```
 
 Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-`API_KEY` with the API key linked to the project. If an API key has not been
-created, generate a new one through the Aperture Cloud UI. Refer to [API
-Keys][api-keys] for additional information.
+`PERSONAL_API_KEY` with the Personal API key linked to the user. If a Personal
+API key has not been created, generate a new one through the Aperture Cloud UI.
+Refer to [Personal API Keys][api-keys] for additional information.
 
 :::info
 
@@ -35,4 +35,4 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 [self-hosted]: /self-hosting/self-hosting.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
-[api-keys]: /get-started/aperture-cloud/api-keys.md
+[api-keys]: /get-started/aperture-cloud/personal-api-keys.md

@@ -2,11 +2,10 @@ package controlplane
 
 import (
 	"context"
-	"encoding/json"
 
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"sigs.k8s.io/yaml"
+	"google.golang.org/protobuf/proto"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -17,7 +16,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
@@ -129,28 +127,26 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &iface.PolicyMessage{
-				Policy: &languagev1.Policy{},
-			}
-			unmarshalErr := json.Unmarshal(bytes, policyMessage)
+			policyMessage := &languagev1.Policy{}
+			unmarshalErr := proto.Unmarshal(bytes, policyMessage)
 			if unmarshalErr != nil {
-				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
-				return key, nil, unmarshalErr
+				// Deprecated: v3.0.0. Older way of string policy on etcd.
+				// Remove this code in v3.0.0.
+				unmarshalErr = config.UnmarshalJSON(bytes, policyMessage)
+				if unmarshalErr != nil {
+					log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+					return key, nil, unmarshalErr
+				}
 			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key))
+
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr
 			}
 			wrapper.Source = source
 			var marshalWrapErr error
-			jsonDat, marshalWrapErr := json.Marshal(wrapper)
-			if marshalWrapErr != nil {
-				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
-				return key, nil, marshalWrapErr
-			}
-			// convert to yaml
-			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
+			dat, marshalWrapErr = proto.Marshal(wrapper)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr

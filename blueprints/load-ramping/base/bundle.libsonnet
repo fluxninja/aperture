@@ -5,9 +5,8 @@ local blueprint = import './load-ramping.libsonnet';
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
+function(params) {
   local c = std.mergePatch(config, params),
-  local metadataWrapper = metadata { values: std.toString(params) },
 
   local prepare_driver = function(metrics_name, criteria_name) {
     driver: {
@@ -67,12 +66,12 @@ function(params, metadata={}) {
     },
   },
 
-  local p = policy(updated_cfg, metadataWrapper),
+  local p = policy(updated_cfg),
   local d = creator(p.policyResource, updated_cfg),
 
   policies: {
     [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef,
   },
   dashboards: {
     [std.format('%s.json', updated_cfg.policy.policy_name)]: d.mainDashboard,

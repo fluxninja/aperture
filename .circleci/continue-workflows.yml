@@ -1081,7 +1081,8 @@ jobs:
         description: Name of the playground scenario to apply
       controller-endpoint:
         type: string
-        description: The endpoint of the controller to which the policy should be applied
+        description:
+          The endpoint of the controller to which the policy should be applied
     executor: go-cimg-executor
     steps:
       - checkout
@@ -1094,7 +1095,7 @@ jobs:
           working_directory: .
           command: |
             go run ./cmd/aperturectl/main.go cloud apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
-            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
+            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} --project-name latest-dev -f -s
       - save_cache:
           name: Save go cache
           key: aperture-v2-go-cache-upload-policies
@@ -1230,7 +1231,7 @@ workflows:
           requires:
             - image-build-aperture-controller
           environment-path: environments/latest/
-          component: aperture-controller
+          component: cloud-controller
           update: images
 
       - go-test-coverage:
