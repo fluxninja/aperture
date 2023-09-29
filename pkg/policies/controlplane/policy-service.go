@@ -2,7 +2,6 @@ package controlplane
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -19,7 +18,6 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
@@ -113,12 +111,8 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 //
 // localPolicy can be nil.
 func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
-	// FIXME: Policies should be unmarshaled via config.UnmarshalJSON, not
-	// directly via json.Unmarshal, as it doesn't handle the defaults
-	// correctly.  json.Unmarshal is used here to match the hashing logic in
-	// wrapPolicy in provider.go.
-	var remotePolicy policylangv1.Policy
-	err := json.Unmarshal(remoteBytes, &remotePolicy)
+	remotePolicy := &policylangv1.Policy{}
+	err := proto.Unmarshal(remoteBytes, remotePolicy)
 	if err != nil {
 		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
@@ -135,13 +129,13 @@ func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapp
 
 	if localPolicy == nil {
 		return &policylangv1.GetPolicyResponse{
-			Policy: &remotePolicy,
+			Policy: remotePolicy,
 			Status: policylangv1.GetPolicyResponse_NOT_LOADED,
 			Reason: "not loaded into controller",
 		}
 	}
 
-	remoteHash, err := hashPolicy(&remotePolicy)
+	remoteHash, err := hashPolicy(remotePolicy)
 	if err != nil {
 		return &policylangv1.GetPolicyResponse{
 			Policy: localPolicy.Policy,
@@ -196,15 +190,15 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	oldPolicy := &policylangv1.Policy{}
+	err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+	}
+
 	if len(req.GetUpdateMask().GetPaths()) > 0 {
 		if len(etcdPolicy.Kvs) == 0 {
 			return nil, status.Error(codes.NotFound, "cannot patch, no such policy")
-		}
-
-		var oldPolicy policylangv1.Policy
-		err = config.UnmarshalYAML(etcdPolicy.Kvs[0].Value, &oldPolicy)
-		if err != nil {
-			return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
 		}
 
 		if len(req.UpdateMask.Paths) == 1 && req.UpdateMask.Paths[0] == "all" {
@@ -214,13 +208,13 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 			// FIXME Do we need field masks at all? Looks like they're only
 			// used to pass a "force" flag from aperturectl.
 		} else {
-			utils.ApplyFieldMask(&oldPolicy, req.Policy, req.UpdateMask)
-			req.Policy = &oldPolicy
+			utils.ApplyFieldMask(oldPolicy, req.Policy, req.UpdateMask)
+			req.Policy = oldPolicy
 		}
 	} else if len(etcdPolicy.Kvs) > 0 {
 		// We want to prevent accidentally overwriting valid policy, that's why
 		// it's only possible when PATCH (update mask) is specified.
-		_, _, err = ValidateAndCompile(ctx, "dummy-name", etcdPolicy.Kvs[0].Value)
+		_, _, err = ValidateAndCompileProto(ctx, "dummy-name", oldPolicy)
 		if err == nil {
 			// Note: Older aperturectl versions and Aperture Cloud rely on
 			// exact string of error message!
@@ -232,14 +226,14 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		// Otherwise, we know policy is invalid and thus we allow overwriting it.
 	}
 
-	policyBytes, err := req.Policy.MarshalJSON()
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "failed to marshal policy: %s", err)
-	}
-
-	_, _, err = ValidateAndCompile(ctx, req.PolicyName, policyBytes)
+	_, _, err = ValidateAndCompileProto(ctx, req.PolicyName, req.Policy)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile policy: %s", err)
+	}
+
+	policyBytes, err := proto.Marshal(req.Policy)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to marshal policy: %s", err)
 	}
 
 	// FIXME compare original mod revision to make sure the policy we're patching hasn't changed meanwhile

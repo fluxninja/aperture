@@ -3,7 +3,6 @@ package controlplane
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -314,17 +312,12 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 
 // hashPolicy returns hash of the policy.
 func hashPolicy(policy *policylangv1.Policy) (string, error) {
-	jsonDat, marshalErr := json.Marshal(policy)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policy)
-		return "", marshalErr
+	dat, err := proto.Marshal(policy)
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to marshal proto message %+v", policy)
+		return "", err
 	}
-	// convert dat to yaml format
-	dat, marshalErr := yaml.JSONToYAML(jsonDat)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
-		return "", marshalErr
-	}
+
 	log.Trace().Msgf("Policy message: %s", string(dat))
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {

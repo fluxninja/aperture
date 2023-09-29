@@ -121,7 +121,7 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, policy, err := controlplane.ValidateAndCompile(ctx, name, policyBytes)
+	circuit, policy, err := controlplane.ValidateAndCompileYAML(ctx, name, policyBytes)
 	if err != nil {
 		return nil, nil, err
 	}

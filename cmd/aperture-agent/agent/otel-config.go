@@ -65,7 +65,7 @@ func provideAgent(
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
 		im := &policysyncv1.InfraMeterWrapper{}
-		if err = unmarshaller.UnmarshalKey("", im); err != nil {
+		if err = unmarshaller.Unmarshal(im); err != nil {
 			log.Error().Err(err).Msg("unmarshalling infra meter")
 			return
 		}
@@ -103,7 +103,8 @@ func provideAgent(
 	}
 	unmarshalNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
 		handleInfraMeterUpdate,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller)
+		config.NewProtobufUnmarshaller,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("creating unmarshal notifier: %w", err)
 	}
