@@ -191,9 +191,11 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	}
 
 	oldPolicy := &policylangv1.Policy{}
-	err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
-	if err != nil {
-		return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+	if len(etcdPolicy.Kvs) > 0 {
+		err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
+		if err != nil {
+			return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+		}
 	}
 
 	if len(req.GetUpdateMask().GetPaths()) > 0 {
