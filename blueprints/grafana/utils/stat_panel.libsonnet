@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=6, w=6) {
+function(title, dsName, query, strFilters, h=6, w=6, panelColor='green', graphMode='none') {
   local statPanel =
     g.panel.stat.new(title)
     + g.panel.stat.datasource.withType('prometheus')
@@ -13,9 +13,9 @@ function(title, dsName, query, strFilters, h=6, w=6) {
     ])
     + g.panel.stat.standardOptions.color.withMode('thresholds')
     + g.panel.stat.standardOptions.thresholds.withMode('absolute')
-    + g.panel.stat.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
+    + g.panel.stat.standardOptions.thresholds.withSteps([{ color: panelColor, value: null }])
     + g.panel.stat.options.withColorMode('value')
-    + g.panel.stat.options.withGraphMode('none')
+    + g.panel.stat.options.withGraphMode(graphMode)
     + g.panel.stat.options.withJustifyMode('center')
     + g.panel.stat.options.withOrientation('horizontal')
     + g.panel.stat.options.withTextMode('auto')
