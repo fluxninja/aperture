@@ -2,6 +2,7 @@ package globaltokenbucket
 
 import (
 	"context"
+	"math"
 	"sync"
 	"time"
 
@@ -270,14 +271,11 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 
 	// if we are first time drawing from the bucket, set the start fill time
 	if state.Available == gtb.bucketCapacity {
-		if gtb.fillAmount != 0 {
-			// calculate start fill time based on the time it takes to fill the bucket
-			state.StartFillAt = now.Add(time.Duration(gtb.bucketCapacity / gtb.fillAmount * float64(gtb.interval)))
-			if gtb.continuousFill {
-				state.LastFill = state.StartFillAt
-			} else {
-				state.LastFill = state.StartFillAt.Add(-gtb.interval)
-			}
+		state.StartFillAt = now.Add(gtb.getWaitTime(gtb.bucketCapacity))
+		if gtb.continuousFill {
+			state.LastFill = state.StartFillAt
+		} else {
+			state.LastFill = state.StartFillAt.Add(-gtb.interval)
 		}
 	}
 
@@ -287,15 +285,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		if state.Available < 0 {
 			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
-				var waitTime time.Duration
-				if gtb.continuousFill {
-					waitTime = time.Duration(-state.Available / gtb.fillAmount * float64(gtb.interval))
-				} else {
-					// calculate how many fills we need
-					fills := int(-state.Available/gtb.fillAmount) + 1
-					waitTime = time.Duration(fills) * gtb.interval
-				}
-				availableAt := now.Add(waitTime)
+				availableAt := now.Add(gtb.getWaitTime(-state.Available))
 				result.AvailableAt = availableAt
 				if arg.CanWait && !arg.Deadline.IsZero() && availableAt.After(arg.Deadline) {
 					result.Ok = false
@@ -369,6 +359,20 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 		}
 	}
 	return &state, nil
+}
+
+// getWaitTime calculates the wait time for the given number of tokens.
+func (gtb *GlobalTokenBucket) getWaitTime(tokens float64) time.Duration {
+	if gtb.fillAmount != 0 {
+		if gtb.continuousFill {
+			return time.Duration(tokens / gtb.fillAmount * float64(gtb.interval))
+		} else {
+			// calculate how many fills we need
+			fills := math.Ceil(tokens / gtb.fillAmount)
+			return time.Duration(fills) * gtb.interval
+		}
+	}
+	return 0
 }
 
 // SetPassThrough sets the pass through flag.
