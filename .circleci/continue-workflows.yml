@@ -1081,7 +1081,8 @@ jobs:
         description: Name of the playground scenario to apply
       controller-endpoint:
         type: string
-        description: The endpoint of the controller to which the policy should be applied
+        description:
+          The endpoint of the controller to which the policy should be applied
     executor: go-cimg-executor
     steps:
       - checkout
@@ -1230,7 +1231,7 @@ workflows:
           requires:
             - image-build-aperture-controller
           environment-path: environments/latest/
-          component: aperture-controller
+          component: cloud-controller
           update: images
 
       - go-test-coverage:
