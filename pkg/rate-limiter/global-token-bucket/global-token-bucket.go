@@ -371,7 +371,7 @@ func (gtb *GlobalTokenBucket) timeToFill(tokens float64) time.Duration {
 		} else {
 			// calculate how many fills we need
 			fills := math.Ceil(tokens / gtb.fillAmount)
-			return time.Duration(fills) * gtb.interval //+ timeToNextFill
+			return time.Duration(fills) * gtb.interval
 		}
 	}
 	return 0
