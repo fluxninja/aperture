@@ -69,7 +69,7 @@ func (v *PolicySpecValidator) ValidateSpec(
 	name string,
 	yamlSrc []byte,
 ) (bool, string, error) {
-	_, _, err := ValidateAndCompile(ctx, name, yamlSrc)
+	_, _, err := ValidateAndCompileYAML(ctx, name, yamlSrc)
 	if err != nil {
 		// there is no need to handle validator errors. just return validation result.
 		return false, err.Error(), nil
@@ -77,8 +77,8 @@ func (v *PolicySpecValidator) ValidateSpec(
 	return true, "", nil
 }
 
-// ValidateAndCompile checks the validity of a single Policy and compiles it.
-func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
+// ValidateAndCompileYAML checks the validity of a single Policy and compiles it.
+func ValidateAndCompileYAML(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
 	if len(yamlSrc) == 0 {
 		return nil, nil, errors.New("empty policy")
 	}
@@ -88,7 +88,11 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 	if err != nil {
 		return nil, nil, err
 	}
+	return ValidateAndCompileProto(ctx, name, policy)
+}
 
+// ValidateAndCompileProto checks the validity of a single Policy and compiles it.
+func ValidateAndCompileProto(ctx context.Context, name string, policy *policiesv1.Policy) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
