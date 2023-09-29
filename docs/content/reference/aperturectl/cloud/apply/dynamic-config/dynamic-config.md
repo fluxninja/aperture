@@ -1,33 +1,37 @@
 ---
-sidebar_label: Preview
+sidebar_label: Dynamic-Config
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_flow-control_preview
+  - aperturectl_cloud_apply_dynamic-config
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud flow-control preview
+## aperturectl cloud apply dynamic-config
 
-Preview control points
+Apply Aperture DynamicConfig to a Policy
 
 ### Synopsis
 
-Preview samples of flow labels or HTTP requests on control points
+Use this command to apply the Aperture DynamicConfig to a Policy.
 
 ```
-aperturectl cloud flow-control preview [--http] CONTROL_POINT [flags]
+aperturectl cloud apply dynamic-config [flags]
+```
+
+### Examples
+
+```
+aperturectl cloud apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml
 ```
 
 ### Options
 
 ```
-      --agent-group string   Agent group (default "default")
-  -h, --help                 help for preview
-      --http                 Preview HTTP requests instead of flow labels
-      --samples int          Number of samples to collect (default 10)
-      --service string       Service FQDN (default "any")
+      --file string     Path to the dynamic config file
+  -h, --help            help for dynamic-config
+      --policy string   Name of the Policy to apply the DynamicConfig to
 ```
 
 ### Options inherited from parent commands
@@ -43,4 +47,4 @@ aperturectl cloud flow-control preview [--http] CONTROL_POINT [flags]
 
 ### SEE ALSO
 
-- [aperturectl cloud flow-control](/reference/aperturectl/cloud/flow-control/flow-control.md) - Flow Control integrations
+- [aperturectl cloud apply](/reference/aperturectl/cloud/apply/apply.md) - Apply Aperture Policies to the Cloud Controller

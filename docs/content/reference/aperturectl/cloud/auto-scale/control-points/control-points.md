@@ -1,28 +1,43 @@
 ---
-sidebar_label: Apply
+sidebar_label: Control-Points
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_apply
+  - aperturectl_cloud_auto-scale_control-points
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud apply
+## aperturectl cloud auto-scale control-points
 
-Apply Aperture Policies to the Cloud Controller
+List AutoScale control points
 
 ### Synopsis
 
-Use this command to apply the Aperture Policies to the Cloud Controller.
+List AutoScale control points
+
+```
+aperturectl cloud auto-scale control-points [flags]
+```
+
+### Examples
+
+```
+aperturectl cloud auto-scale control-points
+```
 
 ### Options
+
+```
+  -h, --help   help for control-points
+```
+
+### Options inherited from parent commands
 
 ```
       --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
       --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string     Address of Aperture Cloud Controller
-  -h, --help                  help for apply
       --insecure              Allow connection to controller running without TLS
       --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
       --skip-verify           Skip TLS certificate verification while connecting to controller
@@ -30,6 +45,4 @@ Use this command to apply the Aperture Policies to the Cloud Controller.
 
 ### SEE ALSO
 
-- [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
-- [aperturectl cloud apply dynamic-config](/reference/aperturectl/cloud/apply/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy
-- [aperturectl cloud apply policy](/reference/aperturectl/cloud/apply/policy/policy.md) - Apply Aperture Policy to the Aperture Cloud Controller
+- [aperturectl cloud auto-scale](/reference/aperturectl/cloud/auto-scale/auto-scale.md) - AutoScale integrations

@@ -1095,7 +1095,7 @@ jobs:
           working_directory: .
           command: |
             go run ./cmd/aperturectl/main.go cloud apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
-            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
+            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} --project-name latest-dev -f -s
       - save_cache:
           name: Save go cache
           key: aperture-v2-go-cache-upload-policies

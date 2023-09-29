@@ -8,12 +8,14 @@ import (
 
 var (
 	agentGroup    string
+	service       string
 	isHTTPPreview bool
 	numSamples    int
 )
 
 func init() {
 	PreviewCmd.Flags().StringVar(&agentGroup, "agent-group", "default", "Agent group")
+	PreviewCmd.Flags().StringVar(&service, "service", "any", "Service FQDN")
 	PreviewCmd.Flags().IntVar(&numSamples, "samples", 10, "Number of samples to collect")
 	PreviewCmd.Flags().BoolVar(
 		&isHTTPPreview,
@@ -25,11 +27,11 @@ func init() {
 
 // PreviewCmd is the command to preview control points.
 var PreviewCmd = &cobra.Command{
-	Use:           "preview [--http] SERVICE CONTROL_POINT",
+	Use:           "preview [--http] CONTROL_POINT",
 	Short:         "Preview control points",
 	Long:          `Preview samples of flow labels or HTTP requests on control points`,
 	SilenceErrors: true,
-	Args:          cobra.ExactArgs(2),
+	Args:          cobra.ExactArgs(1),
 	RunE: func(_ *cobra.Command, args []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {
@@ -40,8 +42,8 @@ var PreviewCmd = &cobra.Command{
 			AgentGroup:    agentGroup,
 			IsHTTPPreview: isHTTPPreview,
 			NumSamples:    numSamples,
-			Service:       args[0],
-			ControlPoint:  args[1],
+			Service:       service,
+			ControlPoint:  args[0],
 		}
 
 		return utils.ParsePreview(client, input)

@@ -39,7 +39,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return err
 		}
 
-		client, err = Controller.PolicyClient()
+		dynamicClient, err = Controller.PolicyClient()
 		if err != nil {
 			return fmt.Errorf("failed to get cloud controller client: %w", err)
 		}

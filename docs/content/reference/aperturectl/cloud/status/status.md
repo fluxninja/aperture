@@ -31,13 +31,13 @@ aperturectl cloud status [flags]
 ### Options
 
 ```
-      --controller string      Address of Aperture Controller
-      --controller-ns string   Namespace in which the Aperture Controller is running
-  -h, --help                   help for status
-      --insecure               Allow connection to controller running without TLS
-      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
-      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
-      --skip-verify            Skip TLS certificate verification while connecting to controller
+      --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
+      --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string     Address of Aperture Cloud Controller
+  -h, --help                  help for status
+      --insecure              Allow connection to controller running without TLS
+      --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
+      --skip-verify           Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

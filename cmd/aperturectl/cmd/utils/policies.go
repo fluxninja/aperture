@@ -57,7 +57,8 @@ func GetPolicies(policyDir string) ([]string, error) {
 		if filepath.Ext(info.Name()) == ".yaml" {
 			_, policyName, err := GetPolicy(path)
 			if err != nil {
-				return err
+				log.Info().Str("file", path).Msg("Invalid policy found. Skipping...")
+				return nil
 			}
 			if _, ok := policyMap[policyName]; !ok {
 				policyMap[policyName] = path
