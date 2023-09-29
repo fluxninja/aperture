@@ -25,17 +25,11 @@ system can be utilized. The Aperture repository contains several
 [blueprints][blueprints] that can generate [policies][policies], and [Grafana
 dashboards][grafana]. These blueprints serve as starting points for creating new
 policies, or can be used as-is by providing the required parameters or
-customizations. The [use-cases](/use-cases/use-cases.md) section showcases
-practical examples of blueprints in action.
+customizations. The [guides](/guides/guides.md) section showcases practical
+examples of blueprints in action.
 
 To manage blueprints and generate policies, use the
 [aperturectl](/reference/aperturectl/aperturectl.md) CLI.
-
-For advanced users interested in designing new policies, explore the example
-circuit created in the
-[detecting overload](../../use-cases/alerting/detecting-overload.md) use-case.
-This example serves as a valuable reference for understanding the process of
-creating custom policies in Aperture.
 
 <Zoom>
 
@@ -160,7 +154,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Operator](/self-hosting/controller/kubernetes/operator/operator.md),
+[Kubernetes using Operator](/get-started/self-hosting/controller/kubernetes/operator/operator.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -179,7 +173,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Namespace-scoped](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
+[Kubernetes using Namespace-scoped](/get-started/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -198,8 +192,8 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Docker](/self-hosting/controller/docker.md), you can apply the policy using the
-following command:
+[Docker](/get-started/self-hosting/controller/docker.md), you can apply the
+policy using the following command:
 
 ```mdx-code-block
 <CodeBlock language="bash">aperturectl apply policy --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>

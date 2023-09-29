@@ -1,208 +1,165 @@
 ---
-title: Rate Limiting Framework
-sidebar_position: 1
+title: Rate Limiting
+sidebar_position: 3
 keywords:
   - guides
   - rate limiting
-  - rate limiting framework
-  - service protection
-  - abuse prevention
-  - fair access
-  - enforcing quotas
 ---
 
-This guide provides a fresh framework for implementing rate limiting in your
-services using Aperture. It covers the following topics:
+```mdx-code-block
+import Zoom from 'react-medium-image-zoom';
+import {apertureVersion} from '../apertureVersion.js';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
 
-- [Introduction](#introduction)
-- [A Framework for Rate Limiting](#a-framework-for-rate-limiting)
-  - [Per-user limits](#per-user-limits)
-    - [Per-user static limits](#per-user-static-limits)
-    - [Per-user adaptive limits](#per-user-adaptive-limits)
-  - [Global service limits](#global-service-limits)
-    - [Static service limits](#static-service-limits)
-    - [Adaptive service limits](#adaptive-service-limits)
-- [Summary](#summary)
+## Overview
 
-## Introduction {#introduction}
+Rate limiting is a critical strategy for managing the load on an API. By
+imposing restrictions on the number of requests a unique consumer can make
+within a specific time frame, rate limiting prevents a small set of users from
+monopolizing the majority of resources on a service, ensuring fair access for
+all API consumers.
 
-Rate limiting is usually an effective technique to manage load at a service.
+Aperture implements this strategy through its high-performance, distributed rate
+limiter. This system enforces per-key limits based on fine-grained labels,
+thereby offering precise control over API usage. For each unique key, Aperture
+maintains a token bucket of a specified bucket capacity and fill rate. The fill
+rate dictates the sustained requests per second (RPS) permitted for a key, while
+transient overages over the fill rate are accommodated for brief periods, as
+determined by the bucket capacity.
 
-However, it is often misunderstood and misapplied. Often teams apply a blanket
-rate limit per-user in hopes of protecting against service overloads. While
-per-user rate limits provide a mechanism to prevent abuse, they do not safeguard
-against service overloads. This is where the rate limiting framework comes in,
-helping you understand the different types of rate limits and which blueprints
-to use for implementing them using Aperture.
+This intricate system of rate-limiting plays a pivotal role in maintaining the
+integrity of a service. It effectively safeguards against excessive usage that
+could potentially result in API abuse, while simultaneously ensuring optimal
+performance and resource allocation.
 
-## A framework for rate limiting {#a-framework-for-rate-limiting}
+<Zoom>
 
-Rate limiting is more than just setting caps on user requests. It's a strategic
-approach to prevent abuse, ensure fairness, and avert overloads, especially at
-the service level.
+```mermaid
+{@include: ./assets/rate-limiting/rate-limiting.mmd}
+```
 
-Below is a 2×2 framework that presents a concise overview of four distinct
-rate-limiting strategies. A combination of these strategies can be implemented
-based on the service's requirements:
+</Zoom>
 
-|                          | Static           | Adaptive           |
-| ------------------------ | ---------------- | ------------------ |
-| **Per-user limit**       | Fair access      | Abuse prevention   |
-| **Global service limit** | Enforcing quotas | Service protection |
+The diagram depicts the distribution of tokens across Agents through a global
+token bucket. Each incoming request prompts the Agents to decrement tokens from
+the bucket. If the bucket has run out of tokens, indicating that the rate limit
+has been reached, the incoming request is rejected. Conversely, if tokens are
+available in the bucket, the request is accepted. The token bucket is
+continually replenished at a predefined fill rate, up to the maximum number of
+tokens specified by the bucket capacity.
 
-### Per-user limits {#per-user-limits}
+:::note
 
-Per-user rate limiting is a technique that restricts the number of requests sent
-by an end-user or device within a time period. These limits help curb abuse and
-ensure fair access across users. They also act as a security measure to prevent
-unchecked API access. Typically, a `429 Too Many Requests` HTTP response is
-returned when a user exceeds their rate limit.
+The following policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint.
 
-Such limits are implemented by tracking request counts at the user level and
-using algorithms such as:
+:::
 
-- **Token Bucket**: Requests consume tokens from the bucket, which refills at a
-  consistent rate. If the bucket runs out of tokens, the request is rejected.
-  This method can accommodate brief surges in request rates that exceed the
-  bucket's refill rate.
-- **Leaky Bucket**: Incoming requests are queued in the bucket. Tokens are
-  steadily drained (or "leaked") at a fixed rate as the server processes
-  requests. If the bucket reaches capacity, new requests are rejected. Unlike
-  the token bucket, this approach ensures the request rate never surpasses the
-  leak rate, preventing sudden bursts.
-- **Fixed Window**: Limits the total requests within specific time intervals.
-- **Sliding Window**: Allows a certain number of requests over a continuously
-  shifting time frame, providing more fluid control compared to the fixed window
-  technique.
+## Configuration
 
-These algorithms can be implemented either locally (for instance, on an API
-Gateway) or globally, using a service like Redis to maintain state on a per-user
-basis. While the local implementations are lower latency, they don't scale for
-larger applications as they require the traffic to go through a single choke
-point as compared to the global implementation. However, the global algorithms
-are hard to implement because the underlying technologies such as Redis
-themselves become a bottleneck at high traffic rates. Sophisticated approaches
-for global rate limiting typically involve distributing the state across
-multiple instances by sharding the per-user rate limiting keys to handle scale.
+This policy is based on the
+[Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint. It
+applies a rate limiter to the **`ingress`** control point on the service
+**`catalog-service.prod.svc.cluster.local`** and identifies unique users by
+referencing the **`user_id`** header present in the HTTP traffic. Provided by
+the Envoy proxy, this header can be located under the label key
+**`http.request.header.user_id`** (see [Flow Labels](/concepts/flow-label.md)
+for more information).
 
-Aperture offers an advanced and scalable approach to global rate limiting
-through the
-[Rate Limiting Policy Blueprint](/reference/blueprints/rate-limiting/base.md),
-eliminating the necessity for manual complex logic implementation.
+Each user is allowed **`2`** requests every **`1s`** (1 second) period. A burst
+of up to **`40`** requests is allowed. This means that the user can send up to
+**`40`** requests in the first second, and then **`2`** requests every second
+after that. The bucket gets replenished at the rate of **`2`** requests per
+second (the fill rate).
 
-#### Per-user static limits {#per-user-static-limits}
+The below `values.yaml` file can be generated by following the steps in the
+[Installation](#installation) section.
 
-[Static rate limiting](/use-cases/rate-limiting/static-rate-limiting.md) is like
-the speed limit on a highway – a set pace that everyone has to follow.
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl values.yaml">
+```
 
-![Per-User Rate Limits](./assets/per-user-limits.svg)
+```yaml
+{@include: ./assets/rate-limiting/values.yaml}
+```
 
-Most APIs providers implement static rate limits which are well-known and
-publicly shared, setting the basic expectations for the end-user in terms of
-fair use of the service. With the help of
-**[Rate Limiting Policy Blueprint](/reference/blueprints/rate-limiting/base.md)**
-per-user static limits can be implemented easily.
+```mdx-code-block
+</TabItem>
+</Tabs>
 
-The use-cases of per-user static limits include:
+```
 
-- **[Fair access](/use-cases/rate-limiting/static-rate-limiting.md)**: A single
-  bad actor can degrade performance for all users by overusing resources if no
-  limit is in place. A static limit ensures fair usage per-user.
-- **Throttling data scrapers:** With the rapid adoption of generative AI,
-  training data is increasingly becoming the most sought-after commodity.
-  However, some aggressive scrapers from AI companies can impact normal users.
-  Rate limiting can be applied to keep them in check.
-- **Blocking misbehaving scripts**: User scripts might inadvertently send a
-  flood of requests. In such cases, per-user static limits serve as a safeguard
-  against such abuse.
+<details><summary>Generated Policy</summary>
+<p>
 
-#### Per-user adaptive limits {#per-user-adaptive-limits}
+```yaml
+{@include: ./assets/rate-limiting/policy.yaml}
+```
 
-While static limits provide a basic form of fair access and security, there are
-scenarios where adaptive rate limiting is beneficial, either in response to
-specific user behaviors or under particular circumstances for certain user
-tiers.
+</p>
+</details>
 
-Use-cases of adaptive rate limits per-user include:
+:::info
 
-- **Reputation-based abuse prevention**: Adjusting the rate limit according to a
-  user's reputation can be effective. A user frequently surpassing rate limits
-  might face a temporary reduction in their allowable rate as a preventive
-  measure. For instance, GitHub implements secondary rate limits for users that
-  perform actions too quickly.
+[Circuit Diagram](./assets/rate-limiting/graph.mmd.svg) for this policy.
 
-### Global service limits {#global-service-limits}
+:::
 
-These rate limits regulate the overall load on a service to prevent overloads or
-conform to service quota agreements. They are usually set at the service level
-and are not tied to a specific user. State-of-the-art techniques can also
-prioritize requests based on attributes such as service criticality,
-user-tiering, and so on.
+## Installation
 
-Such limiters are either implemented by using a token bucket algorithm for the
-entire service or by probabilistically shedding a fraction of requests entering
-a service.
+Generate a values file specific to the policy. This can be achieved using the
+command provided below.
 
-#### Static service limits {#static-service-limits}
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
+```
 
-[Static limits are useful](/use-cases/managing-quotas/inter-service-rate-limiting.md)
-when enforcing an agreed-upon quota. With the help of
-**[Quota Scheduler Blueprint](/reference/blueprints/quota-scheduling/base.md)**
-static service limits can be implemented easily.
+Adjust the values to match the application requirements. Use the following
+command to generate the policy.
 
-Use-cases of static rate limits include:
+```mdx-code-block
+<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
+```
 
-- **Enforcing capacity limits:** If a service has undergone testing and is known
-  to support a specific load, this predefined limit can be enforced to keep the
-  load within the operational boundary.
-- **[Inter-service limits:](/use-cases/managing-quotas/inter-service-rate-limiting.md)**
-  In microservices architecture, each client service could have different quotas
-  allocated based on their criticality while accessing a shared service.
-- **Client-side rate limits**: When interfacing with an external API, or a
-  shared resource, that has a rate limit, it is important for well-behaved
-  clients to comply with the limit to prevent getting penalized due to abuse.
+Apply the policy using the `aperturectl` CLI or `kubectl`.
 
-#### Adaptive service limits {#adaptive-service-limits}
+```mdx-code-block
+<Tabs>
+<TabItem value="aperturectl" label="aperturectl">
+```
 
-[Adaptive service limits](/use-cases/adaptive-service-protection/adaptive-service-protection.md)
-regulate the overall load on a service based on service health signals such as
-database connections, queue sizes, response latency, error rates and so on to
-protect the service against overloads. With the help of
-**[Load Scheduling Blueprint](/reference/blueprints/load-scheduling/load-scheduling.md)**
-adaptive service limits can be implemented easily.
+Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
+on a Kubernetes cluster in the namespace where the Aperture Controller is
+installed.
 
-![Adaptive Service Limits](./assets/adaptive-service-limits.svg)
+```mdx-code-block
+<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/static-rate-limiting.yaml --kube </CodeBlock>
+```
 
-Use-cases of adaptive service limits include:
+```mdx-code-block
+</TabItem>
+<TabItem value="kubectl" label="kubectl">
+```
 
-- **System stability:** An overload in one part of the system often snowballs
-  into an application-wide outage. Adaptive service limits act as a protective
-  barrier that stabilizes the application by eliminating the characteristic
-  self-reinforcing feedback loops that lead to
-  [cascading failures](https://www.usenix.org/publications/loginonline/metastable-failures-wild).
-- **Adaptive waiting rooms:** Certain web-services such as online ticket
-  booking, online shopping and so on can experience a sudden surge in traffic.
-  In such cases, adaptive service limits can be used to throttle requests and
-  redirect them to a waiting room. This ensures that the service remains
-  responsive and prevents it from crashing due to overload.
-- **Performance management of heavy APIs:** Heavy APIs such as queries to
-  analytical databases and generative AI can pose challenges, especially when
-  they're overwhelmed with requests. This can lead to reduced throughput, noisy
-  neighbor problems in multi-tenant environments, or even cascading failures in
-  some cases. Adaptive service limits can be used to protect such APIs from
-  overload and ensure that they remain responsive.
-- **Fault tolerance:** Even with rigorous testing and adherence to best
-  practices, unforeseen failures can occur in production. For instance, failures
-  in a few read replicas can increase load on healthy instances,
-  [leading to an outage](https://github.blog/2021-12-01-github-availability-report-november-2021/#november-27-2040-utc-lasting-2-hours-and-50-minutes).
-  In such scenarios, adaptive service limits can help achieve graceful
-  degradation.
+Apply the policy YAML generated (Kubernetes Custom Resource) using the above
+example with `kubectl`.
 
-Checkout Aperture implemented use cases of adaptive service limits
-[here](/use-cases/adaptive-service-protection/adaptive-service-protection.md).
+```bash
+kubectl apply -f policy-gen/configuration/static-rate-limiting-cr.yaml -n aperture-controller
+```
 
-## Summary {#summary}
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
-Rate limiting is integral to maintaining system performance and fairness. By
-leveraging [Aperture's Blueprints](/reference/blueprints/blueprints.md), you can
-efficiently implement a rate-limiting strategy tailored to your service's needs.
+### Policy in Action
+
+When the policy is applied at a service, no more than 2 requests per second
+period (after an initial burst of 40 requests) are accepted for a user.
+
+![Static Rate Limiting](./assets/rate-limiting/dashboard.png)

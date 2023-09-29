@@ -7,7 +7,7 @@ policy:
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
   setpoint: 1000
   overload_condition: gt
-  service_protection_core:
+  load_scheduling_core:
     aiad_load_scheduler:
       load_multiplier_linear_decrement: 0.05
       load_multiplier_linear_increment: 0.025

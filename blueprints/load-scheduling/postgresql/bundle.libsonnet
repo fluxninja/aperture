@@ -14,7 +14,7 @@ function(params) {
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: promqlQuery,
-      setpoint: c.policy.service_protection_core.setpoint,
+      setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
   },

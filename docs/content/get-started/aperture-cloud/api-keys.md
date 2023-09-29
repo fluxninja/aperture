@@ -31,4 +31,4 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 
 [sign-up]: /get-started/aperture-cloud/sign-up.md
 [Agents]: /get-started/installation/agent/agent.md
-[Controllers]: /self-hosting/controller/controller.md
+[Controllers]: /get-started/self-hosting/controller/controller.md

@@ -10,7 +10,7 @@ policy:
   # Type: string
   # Required: True
   policy_name: load-based-auto-scale
-  service_protection_core:
+  load_scheduling_core:
     aimd_load_scheduler:
       load_scheduler:
         workload_latency_based_tokens: true
