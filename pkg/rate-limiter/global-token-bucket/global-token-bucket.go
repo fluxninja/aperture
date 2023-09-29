@@ -23,16 +23,16 @@ const (
 
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
-	dMap                  olric.DMap
-	dc                    *distcache.DistCache
-	name                  string
-	bucketCapacity        float64
-	fillAmount            float64
-	interval              time.Duration
-	mu                    sync.RWMutex
-	continuousFill        bool
-	disableDelayedFilling bool
-	passThrough           bool
+	dMap             olric.DMap
+	dc               *distcache.DistCache
+	name             string
+	bucketCapacity   float64
+	fillAmount       float64
+	interval         time.Duration
+	mu               sync.RWMutex
+	continuousFill   bool
+	delayInitialFill bool
+	passThrough      bool
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -41,15 +41,15 @@ func NewGlobalTokenBucket(dc *distcache.DistCache,
 	interval time.Duration,
 	maxIdleDuration time.Duration,
 	continuousFill bool,
-	disableDelayedFilling bool,
+	delayInitialFill bool,
 ) (*GlobalTokenBucket, error) {
 	gtb := &GlobalTokenBucket{
-		name:                  name,
-		interval:              interval,
-		passThrough:           true,
-		continuousFill:        continuousFill,
-		disableDelayedFilling: disableDelayedFilling,
-		dc:                    dc,
+		name:             name,
+		interval:         interval,
+		passThrough:      true,
+		continuousFill:   continuousFill,
+		delayInitialFill: delayInitialFill,
+		dc:               dc,
 	}
 
 	dmapConfig := config.DMap{
@@ -273,7 +273,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	}
 
 	// if we are first time drawing from the bucket, set the start fill time
-	if !gtb.disableDelayedFilling && state.Available == gtb.bucketCapacity {
+	if gtb.delayInitialFill && state.Available == gtb.bucketCapacity {
 		state.StartFillAt = now.Add(gtb.getWaitTime(gtb.bucketCapacity))
 		if gtb.continuousFill {
 			state.LastFill = state.StartFillAt

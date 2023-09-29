@@ -21,7 +21,7 @@ import (
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", interval, time.Hour, true, false)
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", interval, time.Hour, true, true)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err

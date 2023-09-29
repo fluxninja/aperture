@@ -3055,20 +3055,20 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
-            disable_delayed_filling:
-                default: false
+            delay_initial_fill:
+                default: true
                 description: |+
-                    Disable delayed filling of the token bucket.
-                    If set to true, the token bucket will start filling immediately
+                    Delays the initial filling of the token bucket.
+                    If set to false, the token bucket will start filling immediately
                     after the first request is received. This can potentially lead to
                     more requests being accepted than the specified rate limit during
                     the first interval.
-                    When set to false, the token bucket will be given a chance to
+                    When set to true, the token bucket will be given a chance to
                     empty out before the filling starts. The delay is equal to the
                     time it takes to fill the bucket.
 
                 type: boolean
-                x-go-tag-default: "false"
+                x-go-tag-default: "true"
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
