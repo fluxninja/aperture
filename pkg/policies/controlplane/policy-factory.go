@@ -113,7 +113,7 @@ func providePolicyFactory(
 	fxDriver, err := notifiers.NewFxDriver(
 		policiesStatusRegistry,
 		prometheusRegistry,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		config.NewProtobufUnmarshaller,
 		optionsFunc,
 	)
 	if err != nil {

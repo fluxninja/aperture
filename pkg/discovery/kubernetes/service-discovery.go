@@ -2,13 +2,13 @@ package kubernetes
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"strings"
 
 	"github.com/sourcegraph/conc/stream"
+	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -206,7 +206,7 @@ func (kd *serviceDiscovery) removeEndpointAddress(address v1.EndpointAddress, na
 			return notifiers.Remove, nil
 		}
 		entity := &entitiesv1.Entity{}
-		err := json.Unmarshal(oldValue, entity)
+		err := proto.Unmarshal(oldValue, entity)
 		if err != nil {
 			log.Error().Err(err).Msg("Could not unmarshal entity")
 			return notifiers.Remove, nil
@@ -215,7 +215,7 @@ func (kd *serviceDiscovery) removeEndpointAddress(address v1.EndpointAddress, na
 		if shouldRemove(entity) {
 			return notifiers.Remove, nil
 		}
-		bytes, err := json.Marshal(entity)
+		bytes, err := proto.Marshal(entity)
 		if err != nil {
 			log.Error().Err(err).Msg("Could not marshal entity")
 			return notifiers.Remove, nil
@@ -237,12 +237,12 @@ func (kd *serviceDiscovery) removeEndpoints(endpoints *v1.Endpoints) {
 // updateEntity updates the entity in the tracker.
 func (kd *serviceDiscovery) updateEntity(pod *entitiesv1.Entity) error {
 	updateFunc := func(oldValue []byte) (notifiers.EventType, []byte) {
-		var entity *entitiesv1.Entity
+		entity := &entitiesv1.Entity{}
 		if oldValue == nil {
 			// create new entity
 			entity = pod
 		} else {
-			err := json.Unmarshal(oldValue, &entity)
+			err := proto.Unmarshal(oldValue, entity)
 			if err != nil {
 				log.Error().Msgf("Error unmarshaling entity: %v", err)
 				return notifiers.Write, oldValue
@@ -253,7 +253,7 @@ func (kd *serviceDiscovery) updateEntity(pod *entitiesv1.Entity) error {
 				}
 			}
 		}
-		value, err := json.Marshal(entity)
+		value, err := proto.Marshal(entity)
 		if err != nil {
 			log.Error().Msgf("Error marshaling entity: %v", err)
 			return notifiers.Write, oldValue

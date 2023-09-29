@@ -21,6 +21,15 @@ type ProtobufUnmarshaller struct {
 // Make sure ProtobufUnmarshaller implements Unmarshaller.
 var _ Unmarshaller = &ProtobufUnmarshaller{}
 
+// UnmarshalProto unmarshals previously set protobuf-encoded bytes into output.
+func UnmarshalProto(bytes []byte, output interface{}) error {
+	unmarshaler, err := NewProtobufUnmarshaller(bytes)
+	if err != nil {
+		return err
+	}
+	return unmarshaler.Unmarshal(output)
+}
+
 // UnmarshalKey is not supported by ProtobufUnmarshaler.
 func (u *ProtobufUnmarshaller) UnmarshalKey(key string, output interface{}) error {
 	panic("unimplemented")
