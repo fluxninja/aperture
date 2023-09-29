@@ -11,7 +11,7 @@ import (
 func (msg *InPort) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -19,7 +19,7 @@ func (msg *InPort) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *InPort) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -27,7 +27,7 @@ func (msg *InPort) UnmarshalJSON(b []byte) error {
 func (msg *OutPort) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -35,7 +35,7 @@ func (msg *OutPort) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *OutPort) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -43,7 +43,7 @@ func (msg *OutPort) UnmarshalJSON(b []byte) error {
 func (msg *ConstantSignal) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -51,6 +51,6 @@ func (msg *ConstantSignal) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ConstantSignal) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }

@@ -11,7 +11,7 @@ import (
 func (msg *InfraMeterWrapper) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -19,6 +19,6 @@ func (msg *InfraMeterWrapper) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *InfraMeterWrapper) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }

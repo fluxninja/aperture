@@ -52,8 +52,8 @@ plugins:
     opt:
       - paths=source_relative
       - orig_name=true
-      # keep this value false as we marshal the config messages to make wrappers
-      - emit_defaults=false
+      - emit_defaults=true
+      - allow_unknown=true
   - plugin: buf.build/bufbuild/validate-go
     out: gen/proto/go
     opt:

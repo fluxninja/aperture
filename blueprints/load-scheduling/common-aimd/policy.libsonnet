@@ -2,7 +2,7 @@ local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
   local commonPolicy = commonPolicyFn(updatedConfig),
 

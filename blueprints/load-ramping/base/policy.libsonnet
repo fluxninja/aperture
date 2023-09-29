@@ -3,7 +3,7 @@ local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, metadata={}) {
+function(cfg) {
   local params = config + cfg,
 
   local policyName = params.policy.policy_name,

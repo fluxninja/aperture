@@ -23,7 +23,6 @@ import (
 	alertmgrconfig "github.com/fluxninja/aperture/v2/pkg/alert-manager/config"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
-	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
 	googletoken "github.com/fluxninja/aperture/v2/pkg/google/config"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
@@ -402,9 +401,6 @@ type BundledExtensionsSpec struct {
 type ServiceDiscoverySpec struct {
 	// KubernetesDiscoveryConfig for Kubernetes service discovery.
 	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`
-
-	// StaticDiscoveryConfig for pre-determined list of services.
-	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
 }
 
 // ControllerClientCertConfig defines configuration for client certificate for Controller.

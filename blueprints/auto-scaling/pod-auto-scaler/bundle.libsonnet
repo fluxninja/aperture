@@ -5,9 +5,8 @@ local blueprint = import './pod-auto-scaler.libsonnet';
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
+function(params) {
   local c = std.mergePatch(config, params),
-  local metadataWrapper = metadata { values: std.toString(params) },
 
   local prepare_controller = function(metrics_name, gradient_slope, threshold, alert_name) {
     controller: [{
@@ -89,7 +88,7 @@ function(params, metadata={}) {
     },
   },
 
-  local p = policy(updated_cfg, metadataWrapper),
+  local p = policy(updated_cfg),
   local d = creator(p.policyResource, updated_cfg),
 
   dashboards: {
@@ -98,6 +97,6 @@ function(params, metadata={}) {
 
   policies: {
     [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef,
   },
 }

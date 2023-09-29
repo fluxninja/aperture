@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"go.uber.org/fx"
-	"gopkg.in/yaml.v3"
 
 	policiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -84,20 +83,8 @@ func ValidateAndCompile(ctx context.Context, name string, yamlSrc []byte) (*circ
 		return nil, nil, errors.New("empty policy")
 	}
 
-	var yamlRaw map[string]any
-	err := yaml.Unmarshal(yamlSrc, &yamlRaw)
-	if err != nil {
-		return nil, nil, err
-	}
-	// TODO: this is a hack to make unmarshal work. We should configure unmarshaller to not fail on unknown fields.
-	delete(yamlRaw, "metadata")
-	yamlSrc, err = yaml.Marshal(yamlRaw)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	policy := &policiesv1.Policy{}
-	err = config.UnmarshalYAML(yamlSrc, policy)
+	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
 		return nil, nil, err
 	}

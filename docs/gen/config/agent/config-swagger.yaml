@@ -428,52 +428,6 @@ definitions:
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/config
-    Entity:
-        properties:
-            ip_address:
-                description: IP address of the entity.
-                pattern: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-                type: string
-                x-go-name: IPAddress
-                x-go-tag-json: ip_address,omitempty
-                x-go-tag-validate: required,ip
-                x-pattern-rules: ip
-            name:
-                description: Name of the entity. For example, pod name.
-                type: string
-                x-go-name: Name
-                x-go-tag-json: name,omitempty
-            namespace:
-                description: Namespace of the entity. For example, pod namespace.
-                type: string
-                x-go-name: Namespace
-                x-go-tag-json: namespace,omitempty
-            node_name:
-                description: Node name of the entity. For example, hostname.
-                type: string
-                x-go-name: NodeName
-                x-go-tag-json: node_name,omitempty
-            services:
-                description: Services of the entity.
-                items:
-                    type: string
-                minItems: 1
-                type: array
-                x-go-name: Services
-                x-go-tag-json: services,omitempty
-                x-go-tag-validate: gt=0
-            uid:
-                description: Unique identifier of the entity.
-                type: string
-                x-go-name: UID
-                x-go-tag-json: uid,omitempty
-                x-go-tag-validate: required
-        required:
-            - ip_address
-            - uid
-        title: Entity represents a pod, VM, and so on.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/discovery/static/config
     EtcdConfig:
         properties:
             endpoints:
@@ -1437,17 +1391,6 @@ definitions:
         title: ServerTLSConfig holds configuration for setting up server TLS support.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
-    StaticDiscoveryConfig:
-        properties:
-            entities:
-                items:
-                    $ref: '#/definitions/Entity'
-                type: array
-                x-go-name: Entities
-                x-go-tag-json: entities,omitempty
-        title: StaticDiscoveryConfig for pre-determined list of services.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/discovery/static/config
     WatchdogConfig:
         properties:
             cgroup:
@@ -1720,10 +1663,6 @@ paths:
         post:
             operationId: ServiceDiscovery
             parameters:
-                - in: body
-                  name: static
-                  schema:
-                    $ref: '#/definitions/StaticDiscoveryConfig'
                 - in: body
                   name: kubernetes
                   schema:

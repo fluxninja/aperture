@@ -4,10 +4,6 @@ package discovery
 // ---
 // x-fn-config-env: true
 // parameters:
-// - name: static
-//   in: body
-//   schema:
-//     "$ref": "#/definitions/StaticDiscoveryConfig"
 // - name: kubernetes
 //   in: body
 //   schema:

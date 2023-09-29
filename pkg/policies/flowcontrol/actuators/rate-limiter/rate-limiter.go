@@ -247,6 +247,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				rl.lbProto.Parameters.GetInterval().AsDuration(),
 				rl.lbProto.Parameters.GetMaxIdleTime().AsDuration(),
 				rl.lbProto.Parameters.GetContinuousFill(),
+				rl.lbProto.Parameters.GetDisableDelayedFilling(),
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")

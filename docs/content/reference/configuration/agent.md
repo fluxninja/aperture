@@ -632,18 +632,6 @@ prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 <!-- vale off -->
 
-<!-- vale off -->
-
-<dt>static</dt>
-<dd>
-
-([StaticDiscoveryConfig](#static-discovery-config)) Environment variable prefix:
-`APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
-
-</dd>
-
-<!-- vale off -->
-
 </dl>
 
 ---
@@ -1294,91 +1282,6 @@ ReplicaCount is 1 by default.
 
 SyncReplication enables synchronous replication. By default the replication is
 asynchronous.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### Entity {#entity}
-
-<!-- vale on -->
-
-Entity represents a pod, VM, and so on.
-
-<dl>
-<dt>ip_address</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, format: `ip`, **required**)
-
-<!-- vale on -->
-
-IP address of the entity.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Name of the entity. For example, pod name.
-
-</dd>
-<dt>namespace</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Namespace of the entity. For example, pod namespace.
-
-</dd>
-<dt>node_name</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Node name of the entity. For example, hostname.
-
-</dd>
-<dt>services</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-Services of the entity.
-
-</dd>
-<dt>uid</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Unique identifier of the entity.
 
 </dd>
 </dl>
@@ -2969,29 +2872,6 @@ Enabled TLS
 <!-- vale on -->
 
 Server Key file path
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### StaticDiscoveryConfig {#static-discovery-config}
-
-<!-- vale on -->
-
-StaticDiscoveryConfig for pre-determined list of services.
-
-<dl>
-<dt>entities</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Entity](#entity))
-
-<!-- vale on -->
 
 </dd>
 </dl>
