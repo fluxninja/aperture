@@ -271,12 +271,12 @@ definitions:
                 x-go-tag-json: endpoints,omitempty
                 x-go-tag-validate: omitempty,dive,hostname_port|url|fqdn,omitempty
             lease_ttl:
-                default: 60s
+                default: 10s
                 description: Lease time-to-live
                 format: string
                 type: string
                 x-go-name: LeaseTTL
-                x-go-tag-default: 60s
+                x-go-tag-default: 10s
                 x-go-tag-json: lease_ttl
                 x-go-tag-validate: gte=1s
             log_level:
