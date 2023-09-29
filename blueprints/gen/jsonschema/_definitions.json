@@ -2644,11 +2644,13 @@
       "properties": {
         "circuit": {
           "$ref": "#/definitions/Circuit",
-          "description": "Defines the control-loop logic of the policy."
+          "description": "Defines the control-loop logic of the policy.\n\n",
+          "x-go-tag-validate": "required_without=Resources"
         },
         "resources": {
           "$ref": "#/definitions/Resources",
-          "description": "Resources (such as Flux Meters, Classifiers) to setup."
+          "description": "Resources (such as Flux Meters, Classifiers) to setup.\n\n",
+          "x-go-tag-validate": "required_without=Circuit"
         }
       },
       "type": "object",
