@@ -3004,7 +3004,7 @@
       "properties": {
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.\n\n",
+          "description": "Capacity of the bucket to allow for bursty traffic.\n\n",
           "x-go-tag-validate": "required"
         },
         "fill_amount": {
@@ -3028,6 +3028,12 @@
           "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
           "type": "boolean",
           "x-go-tag-default": "true"
+        },
+        "disable_delayed_filling": {
+          "default": false,
+          "description": "Disable delayed filling of the token bucket.\nIf set to true, the token bucket will start filling immediately\nafter the first request is received. This can potentially lead to\nmore requests being accepted than the specified rate limit during\nthe first interval.\nWhen set to false, the token bucket will be given a chance to\nempty out before the filling starts. The delay is equal to the\ntime it takes to fill the bucket.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "false"
         },
         "interval": {
           "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
