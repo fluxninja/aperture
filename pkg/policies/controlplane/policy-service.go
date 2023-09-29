@@ -18,6 +18,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
@@ -194,7 +195,12 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 	if len(etcdPolicy.Kvs) > 0 {
 		err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
 		if err != nil {
-			return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+			// Deprecated: v3.0.0. Older way of string policy on etcd.
+			// Remove this code in v3.0.0.
+			err = config.UnmarshalJSON(etcdPolicy.Kvs[0].Value, oldPolicy)
+			if err != nil {
+				return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
+			}
 		}
 	}
 

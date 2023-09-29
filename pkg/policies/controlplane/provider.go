@@ -130,8 +130,13 @@ func setupPoliciesNotifier(
 			policyMessage := &languagev1.Policy{}
 			unmarshalErr := proto.Unmarshal(bytes, policyMessage)
 			if unmarshalErr != nil {
-				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
-				return key, nil, unmarshalErr
+				// Deprecated: v3.0.0. Older way of string policy on etcd.
+				// Remove this code in v3.0.0.
+				unmarshalErr = config.UnmarshalJSON(bytes, policyMessage)
+				if unmarshalErr != nil {
+					log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+					return key, nil, unmarshalErr
+				}
 			}
 
 			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
