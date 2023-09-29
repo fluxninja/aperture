@@ -2,10 +2,10 @@ local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common-aiad/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
 
-  local commonPolicy = commonPolicyFn(cfg, params, metadata),
+  local commonPolicy = commonPolicyFn(cfg, params),
 
   // Add new components to commonPolicy
   local policyDef = commonPolicy.policyDef {

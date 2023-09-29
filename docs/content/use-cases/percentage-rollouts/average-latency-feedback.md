@@ -96,8 +96,7 @@ Adjust the values to match the application requirements. Use the following
 command to generate the policy.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=load-ramping/base
---values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
 ```
 
 Apply the policy using the `aperturectl` CLI or `kubectl`.

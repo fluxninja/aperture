@@ -17,7 +17,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
@@ -129,15 +128,14 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &iface.PolicyMessage{
-				Policy: &languagev1.Policy{},
-			}
-			unmarshalErr := json.Unmarshal(bytes, policyMessage)
+			policyMessage := &languagev1.Policy{}
+			unmarshalErr := config.UnmarshalJSON(bytes, policyMessage)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key))
+
+			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))
 			if wrapErr != nil {
 				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
 				return key, nil, wrapErr

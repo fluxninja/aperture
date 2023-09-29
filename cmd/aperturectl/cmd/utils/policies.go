@@ -12,6 +12,7 @@ import (
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/ghodss/yaml"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -85,7 +86,7 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 		}
 
 		policy = &languagev1.Policy{}
-		err = yaml.Unmarshal(policyCR.Spec.Raw, policy)
+		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
 		if err != nil {
 			return nil, policyName, err
 		}
