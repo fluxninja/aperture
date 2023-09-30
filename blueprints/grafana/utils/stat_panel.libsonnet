@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=6, w=6, panelColor='green', graphMode='none') {
+function(title, dsName, query, strFilters, h=6, w=6, instantQuery=false, range=true, panelColor='green', graphMode='none') {
   local statPanel =
     g.panel.stat.new(title)
     + g.panel.stat.datasource.withType('prometheus')
@@ -9,7 +9,8 @@ function(title, dsName, query, strFilters, h=6, w=6, panelColor='green', graphMo
       g.query.prometheus.new(dsName, query % { filters: strFilters })
       + g.query.prometheus.withIntervalFactor(1)
       + g.query.prometheus.withLegendFormat('{{ instance }} - {{ policy_name }}')
-      + g.query.prometheus.withRange(true),
+      + g.query.prometheus.withInstant(instantQuery)
+      + g.query.prometheus.withRange(range),
     ])
     + g.panel.stat.standardOptions.color.withMode('thresholds')
     + g.panel.stat.standardOptions.thresholds.withMode('absolute')
