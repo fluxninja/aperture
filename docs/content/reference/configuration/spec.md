@@ -7474,7 +7474,7 @@ continuously or only on discrete intervals.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 

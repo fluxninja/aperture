@@ -121,7 +121,7 @@ message RateLimiter {
     // When set to true, the token bucket will be given a chance to
     // empty out before the filling starts. The delay is equal to the
     // time it takes to fill the bucket.
-    bool delay_initial_fill = 7; // @gotags: default:"true"
+    bool delay_initial_fill = 7; // @gotags: default:"false"
   }
 
   message RequestParameters {
