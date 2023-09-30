@@ -182,6 +182,11 @@ func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64)
 		return false, 0, 0, 0
 	}
 
+	// if we are asking for more tokens than the bucket capacity, return false
+	if n > gtb.bucketCapacity {
+		return false, 0, 0, 0
+	}
+
 	req := takeNRequest{
 		Want:     n,
 		CanWait:  true,

@@ -63,8 +63,8 @@ const (
 	aperturectl            = "aperturectl"
 )
 
-// getTemplets loads CRDs, hooks and manifests from the Helm chart.
-func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
+// getTemplates loads CRDs, hooks and manifests from the Helm chart.
+func getTemplates(chartName, releaseName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
 	chartURL := fmt.Sprintf("https://fluxninja.github.io/aperture/%s-%s.tgz", chartName, version)
 
 	resp, err := http.Get(chartURL) //nolint
@@ -293,7 +293,7 @@ func prepareUnstructuredObject(manifest string) (*unstructured.Unstructured, err
 
 // handleInstall handles installation for given chart using given release name.
 func handleInstall(chartName, releaseName string) error {
-	crds, _, manifests, err := getTemplets(chartName, releaseName, releaseutil.InstallOrder)
+	crds, _, manifests, err := getTemplates(chartName, releaseName, releaseutil.InstallOrder)
 	if err != nil {
 		return err
 	}
@@ -338,7 +338,7 @@ func handleInstall(chartName, releaseName string) error {
 
 // handleUnInstall handles uninstallation for given chart using given release name.
 func handleUnInstall(chartName, releaseName string) error {
-	crds, hooks, manifests, err := getTemplets(chartName, releaseName, releaseutil.UninstallOrder)
+	crds, hooks, manifests, err := getTemplates(chartName, releaseName, releaseutil.UninstallOrder)
 	if err != nil {
 		return err
 	}
