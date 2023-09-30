@@ -113,15 +113,15 @@ message RateLimiter {
     // Configuration of lazy-syncing behavior of rate limiter
     LazySync lazy_sync = 6;
 
-    // Disable delayed filling of the token bucket.
-    // If set to true, the token bucket will start filling immediately
+    // Delays the initial filling of the token bucket.
+    // If set to false, the token bucket will start filling immediately
     // after the first request is received. This can potentially lead to
     // more requests being accepted than the specified rate limit during
     // the first interval.
-    // When set to false, the token bucket will be given a chance to
+    // When set to true, the token bucket will be given a chance to
     // empty out before the filling starts. The delay is equal to the
     // time it takes to fill the bucket.
-    bool disable_delayed_filling = 7; // @gotags: default:"false"
+    bool delay_initial_fill = 7; // @gotags: default:"true"
   }
 
   message RequestParameters {
