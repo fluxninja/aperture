@@ -116,10 +116,7 @@ func (gtb *GlobalTokenBucket) Close() error {
 	return nil
 }
 
-// TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
-// If an error occurred it returns true, 0, 0 and 0 (fail open).
-// It also may return the wait time at which the tokens will be available.
-func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label string, n float64, canWait bool, deadline time.Time) (bool, time.Duration, float64, float64) {
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
 	}
@@ -129,10 +126,10 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 	}
 
 	req := takeNRequest{
-		Want:    n,
-		CanWait: false,
+		Want:     n,
+		CanWait:  canWait,
+		Deadline: deadline,
 	}
-	// encode request
 	reqBytes, err := utils.MarshalGob(req)
 	if err != nil {
 		log.Autosample().Errorf("error encoding request: %v", err)
@@ -146,7 +143,6 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 	}
 
 	var resp takeNResponse
-
 	err = utils.UnmarshalGob(resultBytes, &resp)
 	if err != nil {
 		log.Autosample().Errorf("error decoding response: %v", err)
@@ -164,63 +160,23 @@ func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string,
 	return resp.Ok, waitTime, resp.Remaining, resp.Current
 }
 
+// TakeIfAvailable increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
+// If an error occurred it returns true, 0, 0 and 0 (fail open).
+// It also may return the wait time at which the tokens will be available.
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
+	return gtb.executeTakeRequest(ctx, label, n, false, time.Time{})
+}
+
 // Take increments value in label by n and returns whether n events should be allowed along with the remaining value (limit - new n) after increment and the current count for the label.
 // It also returns the wait time at which the tokens will be available.
 func (gtb *GlobalTokenBucket) Take(ctx context.Context, label string, n float64) (bool, time.Duration, float64, float64) {
-	if gtb.GetPassThrough() {
-		return true, 0, 0, 0
-	}
-
 	deadline := time.Time{}
-
 	d, ok := ctx.Deadline()
 	if ok {
 		deadline = d
 	}
 
-	if isMarginExceeded(ctx) {
-		return false, 0, 0, 0
-	}
-
-	// if we are asking for more tokens than the bucket capacity, return false
-	if n > gtb.bucketCapacity {
-		return false, 0, 0, 0
-	}
-
-	req := takeNRequest{
-		Want:     n,
-		CanWait:  true,
-		Deadline: deadline,
-	}
-	// encode request
-	reqBytes, err := utils.MarshalGob(req)
-	if err != nil {
-		log.Autosample().Errorf("error encoding request: %v", err)
-		return true, 0, 0, 0
-	}
-
-	resultBytes, err := gtb.dMap.Function(ctx, label, TakeNFunction, reqBytes)
-	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtb.dMap.Name()).Float64("tokens", n).Msg("error taking from token bucket")
-		return true, 0, 0, 0
-	}
-
-	var resp takeNResponse
-
-	err = utils.UnmarshalGob(resultBytes, &resp)
-	if err != nil {
-		log.Autosample().Errorf("error decoding response: %v", err)
-		return true, 0, 0, 0
-	}
-	var waitTime time.Duration
-	if !resp.AvailableAt.IsZero() {
-		waitTime = time.Until(resp.AvailableAt)
-		if waitTime < 0 {
-			waitTime = 0
-		}
-	}
-
-	return resp.Ok, waitTime, resp.Remaining, resp.Current
+	return gtb.executeTakeRequest(ctx, label, n, true, deadline)
 }
 
 // Return returns n tokens to the bucket.
