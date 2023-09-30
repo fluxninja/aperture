@@ -116,7 +116,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 			if err != nil {
 				return err
 			}
-			err = pd.RegisterSelf(ctx, advertiseAddr)
+			err = pd.registerSelf(ctx, advertiseAddr)
 			if err != nil {
 				return err
 			}
@@ -124,7 +124,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, e error
-			e = pd.DeregisterSelf(ctx)
+			e = pd.deregisterSelf(ctx)
 			if e != nil {
 				merr = multierr.Combine(merr, e)
 			}
@@ -142,7 +142,8 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	lock            sync.RWMutex
+	peersLock       sync.RWMutex
+	servicesLock    sync.RWMutex
 	peers           *peersv1.Peers
 	client          *etcdclient.Client
 	sessionScopedKV *etcdclient.SessionScopedKV
@@ -192,11 +193,8 @@ func NewPeerDiscovery(
 	return pd, nil
 }
 
-// RegisterSelf registers self to etcd.
-func (pd *PeerDiscovery) RegisterSelf(ctx context.Context, advertiseAddr string) error {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
-
+// registerSelf registers self to etcd.
+func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string) error {
 	hostname := info.Hostname
 
 	pd.peers.SelfPeer.Address = advertiseAddr
@@ -219,20 +217,14 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 	return err
 }
 
-// DeregisterSelf deregisters self from etcd.
-func (pd *PeerDiscovery) DeregisterSelf(ctx context.Context) error {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
-
+// deregisterSelf deregisters self from etcd.
+func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
 	_, err := pd.client.KV.Delete(clientv3.WithRequireLeader(ctx), pd.selfKey)
 	return err
 }
 
 // Start starts peer discovery.
 func (pd *PeerDiscovery) Start() error {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
-
 	if err := pd.etcdWatcher.Start(); err != nil {
 		log.Error().Err(err).Msg("failed to start etcd watcher")
 		return err
@@ -248,9 +240,6 @@ func (pd *PeerDiscovery) Start() error {
 
 // Stop stops peer discovery.
 func (pd *PeerDiscovery) Stop() error {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
-
 	var merr, err error
 	err = pd.etcdWatcher.RemovePrefixNotifier(pd.peerNotifier)
 	if err != nil {
@@ -269,16 +258,16 @@ func (pd *PeerDiscovery) Stop() error {
 
 // GetPeers returns all the peer info that are added to PeerDiscovery.
 func (pd *PeerDiscovery) GetPeers() *peersv1.Peers {
-	pd.lock.RLock()
-	defer pd.lock.RUnlock()
+	pd.peersLock.RLock()
+	defer pd.peersLock.RUnlock()
 
 	return proto.Clone(pd.peers).(*peersv1.Peers)
 }
 
 // RegisterService accepts a name, full address (host:port) and adds to the list of services in PeerDiscovery.
 func (pd *PeerDiscovery) RegisterService(name string, address string) {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
+	pd.servicesLock.Lock()
+	defer pd.servicesLock.Unlock()
 
 	pd.peers.SelfPeer.Services[name] = address
 	err := pd.uploadSelfPeer(context.TODO())
@@ -289,8 +278,8 @@ func (pd *PeerDiscovery) RegisterService(name string, address string) {
 
 // DeregisterService accepts a name and removes the service from the list of services in PeerDiscovery.
 func (pd *PeerDiscovery) DeregisterService(name string) {
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
+	pd.servicesLock.Lock()
+	defer pd.servicesLock.Unlock()
 
 	delete(pd.peers.SelfPeer.Services, name)
 	err := pd.uploadSelfPeer(context.TODO())
@@ -302,16 +291,16 @@ func (pd *PeerDiscovery) DeregisterService(name string) {
 // addPeer adds a peer info to the PeerDiscovery peers map.
 func (pd *PeerDiscovery) addPeer(peer *peersv1.Peer) {
 	defer pd.watchers.OnPeerAdded(peer)
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
+	pd.peersLock.Lock()
+	defer pd.peersLock.Unlock()
 
 	pd.peers.Peers[peer.Address] = peer
 }
 
 // GetPeer returns the peer info in the PeerDiscovery with the given address.
 func (pd *PeerDiscovery) GetPeer(address string) (*peersv1.Peer, error) {
-	pd.lock.RLock()
-	defer pd.lock.RUnlock()
+	pd.peersLock.RLock()
+	defer pd.peersLock.RUnlock()
 
 	peer, ok := pd.peers.Peers[address]
 	if !ok {
@@ -323,8 +312,8 @@ func (pd *PeerDiscovery) GetPeer(address string) (*peersv1.Peer, error) {
 
 // GetPeerKeys returns all the peer keys that are added to PeerDiscovery.
 func (pd *PeerDiscovery) GetPeerKeys() []string {
-	pd.lock.RLock()
-	defer pd.lock.RUnlock()
+	pd.peersLock.RLock()
+	defer pd.peersLock.RUnlock()
 
 	keys := make([]string, 0)
 	for key := range pd.peers.Peers {
@@ -342,8 +331,8 @@ func (pd *PeerDiscovery) removePeer(address string) {
 		}
 	}()
 
-	pd.lock.Lock()
-	defer pd.lock.Unlock()
+	pd.peersLock.Lock()
+	defer pd.peersLock.Unlock()
 
 	peer = pd.peers.Peers[address]
 	delete(pd.peers.Peers, address)
