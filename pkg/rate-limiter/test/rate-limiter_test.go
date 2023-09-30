@@ -134,6 +134,7 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, co
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
+	t.Logf("duration: %v", duration)
 	// if delayedFilling is enabled, then subtract the time it takes to fill the bucket
 	// from the duration
 	if !config.disableDelayedFilling {
@@ -277,7 +278,7 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 				bucketCapacity:        30,
 				interval:              time.Second * 1,
 				flows:                 flows,
-				duration:              time.Second * 10,
+				duration:              time.Second*10 - time.Millisecond*100,
 				tolerance:             0.02,
 				continuousFill:        c.continuousFill,
 				disableDelayedFilling: c.disableDelayedFilling,
@@ -305,7 +306,7 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 				bucketCapacity:        30,
 				interval:              time.Second * 1,
 				flows:                 flows,
-				duration:              time.Second * 10,
+				duration:              time.Second*10 - time.Millisecond*100,
 				tolerance:             0.02,
 				continuousFill:        c.continuousFill,
 				disableDelayedFilling: c.disableDelayedFilling,
@@ -329,7 +330,7 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		bucketCapacity:        30,
 		interval:              time.Second * 1,
 		flows:                 flows,
-		duration:              time.Second * 10,
+		duration:              time.Second*10 - time.Millisecond*100,
 		enableLazySyncLimiter: true,
 		numSyncs:              10,
 		tolerance:             0.1,
