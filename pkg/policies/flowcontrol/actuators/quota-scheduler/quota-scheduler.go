@@ -262,7 +262,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 				qs.proto.RateLimiter.GetInterval().AsDuration(),
 				qs.proto.RateLimiter.GetMaxIdleTime().AsDuration(),
 				qs.proto.RateLimiter.GetContinuousFill(),
-				qs.proto.RateLimiter.GetDisableDelayedFilling(),
+				qs.proto.RateLimiter.GetDelayInitialFill(),
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")

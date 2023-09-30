@@ -7,11 +7,11 @@
   withContinuousFillMixin(continuous_fill):: {
     continuous_fill+: continuous_fill,
   },
-  withDisableDelayedFilling(disable_delayed_filling):: {
-    disable_delayed_filling: disable_delayed_filling,
+  withDelayInitialFill(delay_initial_fill):: {
+    delay_initial_fill: delay_initial_fill,
   },
-  withDisableDelayedFillingMixin(disable_delayed_filling):: {
-    disable_delayed_filling+: disable_delayed_filling,
+  withDelayInitialFillMixin(delay_initial_fill):: {
+    delay_initial_fill+: delay_initial_fill,
   },
   withInterval(interval):: {
     interval: interval,

@@ -21,7 +21,7 @@ import (
 )
 
 func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testConfig) (ratelimiter.RateLimiter, error) {
-	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", config.interval, time.Hour, config.continuousFill, config.disableDelayedFilling)
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", config.interval, time.Hour, config.continuousFill, config.delayInitialFill)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
@@ -137,7 +137,7 @@ func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config t
 	t.Logf("duration: %v", duration)
 	// if delayedFilling is enabled, then subtract the time it takes to fill the bucket
 	// from the duration
-	if !config.disableDelayedFilling {
+	if config.delayInitialFill {
 		if config.continuousFill {
 			timeToFillBucket := time.Duration(config.bucketCapacity/config.fillAmount) * config.interval
 			duration -= timeToFillBucket
@@ -203,7 +203,7 @@ type testConfig struct {
 	numSyncs              uint32
 	enableLazySyncLimiter bool
 	continuousFill        bool
-	disableDelayedFilling bool
+	delayInitialFill      bool
 }
 
 // baseOfLimiterTest is the base test for all limiter tests.
@@ -250,11 +250,11 @@ func baseOfLimiterTest(config testConfig) {
 }
 
 type combination struct {
-	continuousFill        bool
-	disableDelayedFilling bool
+	continuousFill   bool
+	delayInitialFill bool
 }
 
-// vary combinations of continuousFill and disableDelayedFilling
+// vary combinations of continuousFill and delayInitialFill
 var combinations = []combination{
 	{true, true},
 	{true, false},
@@ -266,22 +266,22 @@ var combinations = []combination{
 func TestOlricLimiterWithBasicLimit(t *testing.T) {
 	for _, c := range combinations {
 		c := c // capture range variable
-		t.Run(fmt.Sprintf("continuousFill=%v,disableDelayedFilling=%v", c.continuousFill, c.disableDelayedFilling), func(t *testing.T) {
+		t.Run(fmt.Sprintf("continuousFill=%v,delayInitialFill=%v", c.continuousFill, c.delayInitialFill), func(t *testing.T) {
 			t.Parallel() // run subtests in parallel
 			flows := []*flow{
 				{requestlabel: "user-0", requestRate: 50},
 			}
 			baseOfLimiterTest(testConfig{
-				t:                     t,
-				numOlrics:             1,
-				fillAmount:            10,
-				bucketCapacity:        30,
-				interval:              time.Second * 1,
-				flows:                 flows,
-				duration:              time.Second*10 - time.Millisecond*100,
-				tolerance:             0.02,
-				continuousFill:        c.continuousFill,
-				disableDelayedFilling: c.disableDelayedFilling,
+				t:                t,
+				numOlrics:        1,
+				fillAmount:       10,
+				bucketCapacity:   30,
+				interval:         time.Second * 1,
+				flows:            flows,
+				duration:         time.Second*10 - time.Millisecond*100,
+				tolerance:        0.02,
+				continuousFill:   c.continuousFill,
+				delayInitialFill: c.delayInitialFill,
 			})
 		})
 	}
@@ -291,7 +291,7 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 func TestOlricClusterMultiLimiter(t *testing.T) {
 	for _, c := range combinations {
 		c := c // capture range variable
-		t.Run(fmt.Sprintf("continuousFill=%v,disableDelayedFilling=%v", c.continuousFill, c.disableDelayedFilling), func(t *testing.T) {
+		t.Run(fmt.Sprintf("continuousFill=%v,delayInitialFill=%v", c.continuousFill, c.delayInitialFill), func(t *testing.T) {
 			t.Parallel() // marks each subtest to run in parallel
 			flows := []*flow{
 				{requestlabel: "user-0", requestRate: 200},
@@ -300,16 +300,16 @@ func TestOlricClusterMultiLimiter(t *testing.T) {
 				{requestlabel: "user-3", requestRate: 90},
 			}
 			baseOfLimiterTest(testConfig{
-				t:                     t,
-				numOlrics:             6,
-				fillAmount:            10,
-				bucketCapacity:        30,
-				interval:              time.Second * 1,
-				flows:                 flows,
-				duration:              time.Second*10 - time.Millisecond*100,
-				tolerance:             0.02,
-				continuousFill:        c.continuousFill,
-				disableDelayedFilling: c.disableDelayedFilling,
+				t:                t,
+				numOlrics:        6,
+				fillAmount:       10,
+				bucketCapacity:   30,
+				interval:         time.Second * 1,
+				flows:            flows,
+				duration:         time.Second*10 - time.Millisecond*100,
+				tolerance:        0.02,
+				continuousFill:   c.continuousFill,
+				delayInitialFill: c.delayInitialFill,
 			})
 		})
 	}
@@ -335,6 +335,6 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 		numSyncs:              10,
 		tolerance:             0.1,
 		continuousFill:        true,
-		disableDelayedFilling: false,
+		delayInitialFill:      true,
 	})
 }
