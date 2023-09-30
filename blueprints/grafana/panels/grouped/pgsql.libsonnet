@@ -53,36 +53,36 @@ function(policyName, infraMeterName, datasource, extraFilters) {
     time.commitVsRollback
     + g.panel.timeSeries.gridPos.withX(0)
     + g.panel.timeSeries.gridPos.withY(20)
-    + g.panel.timeSeries.gridPos.withH(6)
     + g.panel.timeSeries.gridPos.withW(12)
     + g.panel.timeSeries.options.legend.withPlacement('right'),
     time.operations
     + g.panel.timeSeries.gridPos.withX(12)
     + g.panel.timeSeries.gridPos.withY(20)
-    + g.panel.timeSeries.gridPos.withH(6)
     + g.panel.timeSeries.gridPos.withW(12)
     + g.panel.timeSeries.options.legend.withPlacement('right'),
     time.blockReads
     + g.panel.timeSeries.gridPos.withX(0)
     + g.panel.timeSeries.gridPos.withY(30)
-    + g.panel.timeSeries.gridPos.withH(6)
     + g.panel.timeSeries.gridPos.withW(12)
     + g.panel.timeSeries.options.legend.withPlacement('right'),
     time.checkpointComparison
     + g.panel.timeSeries.gridPos.withX(12)
     + g.panel.timeSeries.gridPos.withY(30)
-    + g.panel.timeSeries.gridPos.withH(6)
     + g.panel.timeSeries.gridPos.withW(12)
+    + g.panel.timeSeries.options.legend.withPlacement('right'),
+    time.bufferWrites
+    + g.panel.timeSeries.gridPos.withX(0)
+    + g.panel.timeSeries.gridPos.withY(40)
     + g.panel.timeSeries.options.legend.withPlacement('right'),
     bar.topLiveRowsTables
     + g.panel.barGauge.gridPos.withX(0)
-    + g.panel.barGauge.gridPos.withY(40)
+    + g.panel.barGauge.gridPos.withY(50)
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.options.withValueMode('text'),
     bar.topDiskUsageTables
     + g.panel.barGauge.gridPos.withX(12)
-    + g.panel.barGauge.gridPos.withY(40)
+    + g.panel.barGauge.gridPos.withY(50)
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.options.withValueMode('text'),
