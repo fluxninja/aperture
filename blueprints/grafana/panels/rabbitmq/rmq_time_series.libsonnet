@@ -25,7 +25,6 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local unacknowledged = timeSeriesPanel('Messages Unacknowledged By Consumers', datasource.name, '', stringFilters, 'Count', targets=[unacknowledgedQuery]),
 
-  local queuesGrowth = timeSeriesPanel('Queues Growth', datasource.name, '', stringFilters, 'Messages/Second', targets=[queuesGrowthQuery]),
 
   local readyQueryPerVhost = g.query.prometheus.new(datasource, 'sum by(rabbitmq_vhost_name) (rabbitmq_message_current{%(filters)s, state="ready"})' % { filters: stringFilters })
                              + g.query.prometheus.withIntervalFactor(1)
@@ -48,6 +47,8 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   local queuesGrowthQuery = g.query.prometheus.new(datasource, 'sum by (rabbitmq_queue_name) (rate(rabbitmq_message_published_total{%(filters)s}[$__rate_interval])) - sum by (rabbitmq_queue_name) (rate(rabbitmq_message_acknowledged_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
                             + g.query.prometheus.withIntervalFactor(1)
                             + g.query.prometheus.withLegendFormat('{{rabbitmq_queue_name}}'),
+
+  local queuesGrowth = timeSeriesPanel('Queues Growth', datasource.name, '', stringFilters, 'Messages/Second', targets=[queuesGrowthQuery]),
 
   local publishedQuery = g.query.prometheus.new(datasource, 'sum(rate(rabbitmq_message_published_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
                          + g.query.prometheus.withIntervalFactor(1)
