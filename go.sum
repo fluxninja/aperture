@@ -1474,8 +1474,8 @@ github.com/onsi/gomega v1.26.0/go.mod h1:r+zV744Re+DiYCIPRlYOTxn0YkOLcAnW8k1xXdM
 github.com/onsi/gomega v1.27.1/go.mod h1:aHX5xOykVYzWOV4WqQy0sy8BQptgukenXpCXfadcIAw=
 github.com/onsi/gomega v1.27.3/go.mod h1:5vG284IBtfDAmDyrK+eGyZmUgUlmi+Wngqo557cZ6Gw=
 github.com/onsi/gomega v1.27.4/go.mod h1:riYq/GJKh8hhoM01HN6Vmuy93AarCXCBGpvFDK3q3fQ=
-github.com/onsi/gomega v1.27.10 h1:naR28SdDFlqrG6kScpT8VWpu1xWY5nJRCF3XaYyBjhI=
-github.com/onsi/gomega v1.27.10/go.mod h1:RsS8tutOdbdgzbPtzzATp12yT7kM5I5aElG3evPbQ0M=
+github.com/onsi/gomega v1.28.0 h1:i2rg/p9n/UqIDAMFUJ6qIUUMcsqOuUHgbpbu235Vr1c=
+github.com/onsi/gomega v1.28.0/go.mod h1:A1H2JE76sI14WIP57LMKj7FVfCHx3g3BcZVjJG8bjX8=
 github.com/open-policy-agent/opa v0.56.0 h1:FUSb6MyckjuffOMshEG8P+HGnckxkJ8ENZJHEzAddhk=
 github.com/open-policy-agent/opa v0.56.0/go.mod h1:un01L10fkolr00KJMDSqGb2FXCjVyVQOybLtHOfSEfY=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0 h1:YccZy2FGXswLjcZrAJuz2v4kA+rmRpMFa6O5wm9SnXM=
