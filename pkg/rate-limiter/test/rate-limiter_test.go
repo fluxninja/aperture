@@ -20,14 +20,14 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, limit float64, interval time.Duration) (ratelimiter.RateLimiter, error) {
-	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", interval, time.Hour, true, false)
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testConfig) (ratelimiter.RateLimiter, error) {
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", config.interval, time.Hour, config.continuousFill, config.delayInitialFill)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
 	}
-	limiter.SetBucketCapacity(limit)
-	limiter.SetFillAmount(limit)
+	limiter.SetBucketCapacity(config.bucketCapacity)
+	limiter.SetFillAmount(config.fillAmount)
 	limiter.SetPassThrough(false)
 
 	t.Logf("Successfully created new Limiter")
@@ -102,12 +102,12 @@ func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
 }
 
 // createOlricLimiters creates a set of Olric limiters.
-func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, limit float64, interval time.Duration) []ratelimiter.RateLimiter {
+func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, config testConfig) []ratelimiter.RateLimiter {
 	cl.Lock.Lock()
 	defer cl.Lock.Unlock()
 	var limiters []ratelimiter.RateLimiter
 	for _, distCache := range cl.Members {
-		limiter, err := newTestLimiter(t, distCache, limit, interval)
+		limiter, err := newTestLimiter(t, distCache, config)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
 			t.FailNow()
@@ -118,11 +118,11 @@ func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, limit
 }
 
 // createLazySyncLimiters creates a set of lazy-sync-limiters.
-func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, interval time.Duration, numSyncs uint32) []ratelimiter.RateLimiter {
+func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, config testConfig) []ratelimiter.RateLimiter {
 	var lazySyncLimiters []ratelimiter.RateLimiter
 	for _, limiter := range limiters {
 		jobGroup := createJobGroup(limiter)
-		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, interval, numSyncs, jobGroup)
+		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, config.interval, config.numSyncs, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
 			t.FailNow()
@@ -133,25 +133,49 @@ func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, in
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
-func checkResults(t *testing.T, fr *flowRunner, fills float64, tolerance float64) {
-	for _, f := range fr.flows {
-		// calculate expected requests taking into account the burst capacity in the limiter
-		actualRequestsExpected := int32(math.Min(float64(f.limit)*(fills), float64(f.totalRequests)))
-		if actualRequestsExpected != f.totalRequests {
-			// add burst capacity
-			actualRequestsExpected += int32(f.limit)
+func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
+	t.Logf("duration: %v", duration)
+	// if delayedFilling is enabled, then subtract the time it takes to fill the bucket
+	// from the duration
+	if config.delayInitialFill {
+		if config.continuousFill {
+			timeToFillBucket := time.Duration(config.bucketCapacity/config.fillAmount) * config.interval
+			duration -= timeToFillBucket
+		} else {
+			// find fills needed to fill the bucket
+			fills := math.Ceil(config.bucketCapacity/config.fillAmount) - 1
+			timeToFillBucket := time.Duration(fills) * config.interval
+			duration -= timeToFillBucket
 		}
-		t.Logf("flow (%s) @ %d requests/sec: \n fills=%f, totalRequests=%d, limit=%f, acceptedRequests=%d, acceptedRequestsExpected=%d",
+	}
+
+	availableAmount := config.bucketCapacity
+	if config.continuousFill {
+		// assume continuous filling of limit amount per interval
+		// take into account end and start times
+		availableAmount += float64(duration) / float64(config.interval) * config.fillAmount
+	} else {
+		// assume filling at the end of each interval
+		// find out exact number of fills (integer) that happened
+		// take into account end and start times
+		fills := math.Floor(float64(duration) / float64(config.interval))
+		availableAmount += float64(fills) * config.fillAmount
+	}
+
+	for _, f := range fr.flows {
+		acceptedRequestsExpected := int32(math.Min(availableAmount, float64(f.totalRequests)))
+
+		t.Logf("flow (%s) @ %d requests/sec: \n fillAmount=%f, totalRequests=%d, limit=%f, acceptedRequests=%d, acceptedRequestsExpected=%d",
 			f.requestlabel,
 			f.requestRate,
-			fills,
+			availableAmount,
 			f.totalRequests,
 			f.limit,
 			f.acceptedRequests,
-			actualRequestsExpected)
-		acceptedReqRatio := float64(f.acceptedRequests) / float64(actualRequestsExpected)
-		if math.Abs(1-acceptedReqRatio) > tolerance {
-			t.Logf("Accepted request ratio is %f, which is outside the tolerance of %f", acceptedReqRatio, tolerance)
+			acceptedRequestsExpected)
+		acceptedReqRatio := float64(f.acceptedRequests) / float64(acceptedRequestsExpected)
+		if math.Abs(1-acceptedReqRatio) > config.tolerance {
+			t.Logf("Accepted request ratio is %f, which is outside the tolerance of %f", acceptedReqRatio, config.tolerance)
 			t.Fail()
 		}
 	}
@@ -171,12 +195,15 @@ type testConfig struct {
 	t                     *testing.T
 	flows                 []*flow
 	numOlrics             int
-	limit                 float64
+	fillAmount            float64
+	bucketCapacity        float64
 	interval              time.Duration
 	tolerance             float64
 	duration              time.Duration
 	numSyncs              uint32
 	enableLazySyncLimiter bool
+	continuousFill        bool
+	delayInitialFill      bool
 }
 
 // baseOfLimiterTest is the base test for all limiter tests.
@@ -191,17 +218,17 @@ func baseOfLimiterTest(config testConfig) {
 		t.FailNow()
 	}
 
-	limiters := createOlricLimiters(t, cl, config.limit, config.interval)
+	limiters := createOlricLimiters(t, cl, config)
 
 	if config.enableLazySyncLimiter {
-		limiters = createLazySyncLimiters(t, limiters, config.interval, config.numSyncs)
+		limiters = createLazySyncLimiters(t, limiters, config)
 	}
 
 	t.Log("Starting flows...")
 
 	fr = &flowRunner{
 		wg:       sync.WaitGroup{},
-		limit:    config.limit,
+		limit:    config.fillAmount,
 		limiters: limiters,
 		flows:    config.flows,
 		duration: config.duration,
@@ -210,10 +237,9 @@ func baseOfLimiterTest(config testConfig) {
 	start := time.Now()
 	fr.runFlows(t)
 	end := time.Now()
+	duration := end.Sub(start)
 
-	fills := float64(end.Sub(start)) / float64(config.interval)
-
-	checkResults(t, fr, fills, config.tolerance)
+	checkResults(t, fr, duration, config)
 
 	if config.enableLazySyncLimiter {
 		closeLimiters(t, lazySyncLimiters)
@@ -223,39 +249,70 @@ func baseOfLimiterTest(config testConfig) {
 	distcache.CloseTestDistCacheCluster(t, cl)
 }
 
+type combination struct {
+	continuousFill   bool
+	delayInitialFill bool
+}
+
+// vary combinations of continuousFill and delayInitialFill
+var combinations = []combination{
+	{true, true},
+	{true, false},
+	{false, true},
+	{false, false},
+}
+
 // TestOlricLimiterWithBasicLimit tests the basic limit functionality of the limiter and if it accepts the limit of requests sent within interval.
 func TestOlricLimiterWithBasicLimit(t *testing.T) {
-	flows := []*flow{
-		{requestlabel: "user-0", requestRate: 50},
+	for _, c := range combinations {
+		c := c // capture range variable
+		t.Run(fmt.Sprintf("continuousFill=%v,delayInitialFill=%v", c.continuousFill, c.delayInitialFill), func(t *testing.T) {
+			t.Parallel() // run subtests in parallel
+			flows := []*flow{
+				{requestlabel: "user-0", requestRate: 50},
+			}
+			baseOfLimiterTest(testConfig{
+				t:                t,
+				numOlrics:        1,
+				fillAmount:       10,
+				bucketCapacity:   30,
+				interval:         time.Second * 1,
+				flows:            flows,
+				duration:         time.Second*10 - time.Millisecond*100,
+				tolerance:        0.02,
+				continuousFill:   c.continuousFill,
+				delayInitialFill: c.delayInitialFill,
+			})
+		})
 	}
-	baseOfLimiterTest(testConfig{
-		t:         t,
-		numOlrics: 1,
-		limit:     10,
-		interval:  time.Second * 1,
-		flows:     flows,
-		duration:  time.Second * 10,
-		tolerance: 0.1,
-	})
 }
 
 // TestOlricClusterMultiLimiter tests the behavior of a cluster of OlricLimiter and if it accepts the limit of requests sent within a given interval.
 func TestOlricClusterMultiLimiter(t *testing.T) {
-	flows := []*flow{
-		{requestlabel: "user-0", requestRate: 200},
-		{requestlabel: "user-1", requestRate: 30},
-		{requestlabel: "user-2", requestRate: 50},
-		{requestlabel: "user-3", requestRate: 90},
+	for _, c := range combinations {
+		c := c // capture range variable
+		t.Run(fmt.Sprintf("continuousFill=%v,delayInitialFill=%v", c.continuousFill, c.delayInitialFill), func(t *testing.T) {
+			t.Parallel() // marks each subtest to run in parallel
+			flows := []*flow{
+				{requestlabel: "user-0", requestRate: 200},
+				{requestlabel: "user-1", requestRate: 30},
+				{requestlabel: "user-2", requestRate: 50},
+				{requestlabel: "user-3", requestRate: 90},
+			}
+			baseOfLimiterTest(testConfig{
+				t:                t,
+				numOlrics:        6,
+				fillAmount:       10,
+				bucketCapacity:   30,
+				interval:         time.Second * 1,
+				flows:            flows,
+				duration:         time.Second*10 - time.Millisecond*100,
+				tolerance:        0.02,
+				continuousFill:   c.continuousFill,
+				delayInitialFill: c.delayInitialFill,
+			})
+		})
 	}
-	baseOfLimiterTest(testConfig{
-		t:         t,
-		numOlrics: 6,
-		limit:     10,
-		interval:  time.Second * 1,
-		flows:     flows,
-		duration:  time.Second * 10,
-		tolerance: 0.1,
-	})
 }
 
 // TestLazySyncClusterLimiter tests the lazy sync limiter which has a non-deterministic behavior and results may vary for each run.
@@ -269,12 +326,15 @@ func TestLazySyncClusterLimiter(t *testing.T) {
 	baseOfLimiterTest(testConfig{
 		t:                     t,
 		numOlrics:             3,
-		limit:                 10,
+		fillAmount:            10,
+		bucketCapacity:        30,
 		interval:              time.Second * 1,
 		flows:                 flows,
-		duration:              time.Second * 10,
+		duration:              time.Second*10 - time.Millisecond*100,
 		enableLazySyncLimiter: true,
 		numSyncs:              10,
-		tolerance:             0.2,
+		tolerance:             0.1,
+		continuousFill:        true,
+		delayInitialFill:      true,
 	})
 }

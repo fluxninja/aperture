@@ -3031,9 +3031,9 @@
           "type": "boolean",
           "x-go-tag-default": "true"
         },
-        "disable_delayed_filling": {
+        "delay_initial_fill": {
           "default": false,
-          "description": "Disable delayed filling of the token bucket.\nIf set to true, the token bucket will start filling immediately\nafter the first request is received. This can potentially lead to\nmore requests being accepted than the specified rate limit during\nthe first interval.\nWhen set to false, the token bucket will be given a chance to\nempty out before the filling starts. The delay is equal to the\ntime it takes to fill the bucket.\n\n",
+          "description": "Delays the initial filling of the token bucket.\nIf set to false, the token bucket will start filling immediately\nafter the first request is received. This can potentially lead to\nmore requests being accepted than the specified rate limit during\nthe first interval.\nWhen set to true, the token bucket will be given a chance to\nempty out before the filling starts. The delay is equal to the\ntime it takes to fill the bucket.\n\n",
           "type": "boolean",
           "x-go-tag-default": "false"
         },
