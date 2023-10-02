@@ -5,7 +5,7 @@ import http from "k6/http";
 
 export let vuStages = [
   { duration: "1s", target: 5 },
-  { duration: "3m", target: 5 },
+  { duration: "5m", target: 5 },
   { duration: "1s", target: 40 },
   { duration: "5m", target: 40 },
 ];
