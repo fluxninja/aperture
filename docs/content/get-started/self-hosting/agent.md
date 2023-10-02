@@ -17,7 +17,7 @@ guide][install-agent].
 Below are the configuration options that are specific to the self-hosted
 Aperture Controller.
 
-## Configuration
+## Configuration {#configuration}
 
 When using the self-hosted Aperture Controller instead of the Aperture Cloud
 Controller, you need to turn off the `enable_cloud_controller` flag and
