@@ -25,34 +25,22 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-// Fx tag to match etcd watcher name.
-var (
-	policiesEtcdWatcherFxTag              = "policies-driver"
-	policiesDynamicConfigEtcdWatcherFxTag = "policies-dynamic-config-driver"
-)
-
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesEtcdWatcherFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
-		etcdwatcher.Constructor{Name: policiesDynamicConfigEtcdWatcherFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Provide(
 			fx.Annotate(
 				providePolicyFactory,
 				fx.ParamTags(
-					config.NameTag(policiesEtcdWatcherFxTag),
-					config.NameTag(policiesDynamicConfigEtcdWatcherFxTag),
 					iface.FxOptionsFuncTag,
 					alerts.AlertsFxTag,
 				),
 			),
-		),
-		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
-		fx.Provide(
 			fx.Annotate(
 				RegisterPolicyService,
 			),
 		),
+		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
 		prom.Module(),
 		googletoken.Module(),
 		policyModule(),
@@ -61,21 +49,19 @@ func policyFactoryModule() fx.Option {
 
 // PolicyFactory factory for policies.
 type PolicyFactory struct {
-	lock                             sync.RWMutex
+	alerterIface                     alerts.Alerter
+	registry                         status.Registry
+	policiesDynamicConfigEtcdWatcher notifiers.Watcher
 	circuitJobGroup                  *jobs.JobGroup
 	etcdClient                       *etcdclient.Client
 	sessionScopedKV                  *etcdclient.SessionScopedKV
 	prometheusEnforcer               *prom.PrometheusEnforcer
-	alerterIface                     alerts.Alerter
-	registry                         status.Registry
-	policiesDynamicConfigEtcdWatcher notifiers.Watcher
 	policyTracker                    map[string]*policysyncv1.PolicyWrapper // keyed by wrapper.CommonAttributes.PolicyName
+	lock                             sync.RWMutex
 }
 
 // Main fx app.
 func providePolicyFactory(
-	policiesEtcdWatcher notifiers.Watcher,
-	policiesDynamicConfigEtcdWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
@@ -92,6 +78,16 @@ func providePolicyFactory(
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to create job group")
 		return nil, err
+	}
+
+	policiesDynamicConfigEtcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, paths.PoliciesDynamicConfigPath)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create policies dynamic config watcher")
+	}
+
+	policiesConfigEtcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, paths.PoliciesConfigPath)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create policies config watcher")
 	}
 
 	factory := &PolicyFactory{
@@ -120,6 +116,9 @@ func providePolicyFactory(
 		return nil, err
 	}
 
+	notifiers.WatcherLifecycle(lifecycle, policiesDynamicConfigEtcdWatcher, []notifiers.PrefixNotifier{})
+	notifiers.WatcherLifecycle(lifecycle, policiesConfigEtcdWatcher, []notifiers.PrefixNotifier{fxDriver})
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			err := factory.circuitJobGroup.Start()
@@ -138,7 +137,6 @@ func providePolicyFactory(
 		},
 	})
 
-	notifiers.NotifierLifecycle(lifecycle, policiesEtcdWatcher, fxDriver)
 	return factory, nil
 }
 

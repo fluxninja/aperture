@@ -17,10 +17,10 @@ import (
 
 var circuitBackgroundJobGroupTag = iface.PoliciesRoot + "circuit_background_jobs"
 
-// BackgroundSchedulerModule returns fx options for PromQL in the main app.
+// BackgroundSchedulerModule returns fx options for Background Jobs in the main app.
 func BackgroundSchedulerModule() fx.Option {
 	return fx.Options(
-		jobs.JobGroupConstructor{Name: circuitBackgroundJobGroupTag, Key: iface.PoliciesRoot + ".promql_jobs_scheduler"}.Annotate(),
+		jobs.JobGroupConstructor{Name: circuitBackgroundJobGroupTag, Key: iface.PoliciesRoot + ".background_jobs_scheduler"}.Annotate(),
 		fx.Provide(fx.Annotate(
 			provideFxOptionsFunc,
 			fx.ParamTags(config.NameTag(circuitBackgroundJobGroupTag)),
@@ -29,9 +29,9 @@ func BackgroundSchedulerModule() fx.Option {
 	)
 }
 
-func provideFxOptionsFunc(promQLJobGroup *jobs.JobGroup) notifiers.FxOptionsFunc {
+func provideFxOptionsFunc(backgroundJobGroup *jobs.JobGroup) notifiers.FxOptionsFunc {
 	return func(key notifiers.Key, _ config.Unmarshaller, _ status.Registry) (fx.Option, error) {
-		return fx.Supply(fx.Annotated{Name: circuitBackgroundJobGroupTag, Target: promQLJobGroup}), nil
+		return fx.Supply(fx.Annotated{Name: circuitBackgroundJobGroupTag, Target: backgroundJobGroup}), nil
 	}
 }
 
