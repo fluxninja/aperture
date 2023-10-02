@@ -41,9 +41,9 @@ function(cfg) {
     + g.panel.timeSeries.gridPos.withY(60)
     + g.panel.timeSeries.gridPos.withW(12),
     request_queue_duration_bar(cfg).panel
-    + g.panel.barChart.gridPos.withX(12)
-    + g.panel.barChart.gridPos.withY(60)
-    + g.panel.barChart.gridPos.withW(12),
+    + g.panel.barGauge.gridPos.withX(12)
+    + g.panel.barGauge.gridPos.withY(60)
+    + g.panel.barGauge.gridPos.withW(12),
     incoming_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withY(70),
     accepted_token_rate(cfg).panel
