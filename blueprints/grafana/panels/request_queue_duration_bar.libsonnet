@@ -1,4 +1,3 @@
-local barChartPanel = import '../utils/bar_chart_panel.libsonnet';
 local barGaugePanel = import '../utils/bar_gauge_panel.libsonnet';
 local utils = import '../utils/policy_utils.libsonnet';
 
