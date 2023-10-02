@@ -83,12 +83,8 @@ Aperture provides a variety of advanced load management features:
 
 Load management, at its core, consists of a control loop that observes,
 analyzes, and actuates workloads to ensure the stability and reliability of
-cloud-native applications.
-
-This control loop is pivotal in both flow control and auto-scaling use cases. In
-flow control, the loop manages workloads to maintain the system within its
-capacity. In auto-scaling scenarios, the control loop adjusts resource
-allocation in response to demand and performance fluctuations.
+cloud-native applications. This control loop is pivotal in flow control use
+cases where it manages workloads to maintain the system within its capacity.
 
 During the observation phase, an in-built telemetry system continuously monitors
 service performance and request attributes, allowing the Agent and Controller to
