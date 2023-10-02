@@ -22,7 +22,7 @@ policy:
             user_type:
               extractor:
                 from: request.http.headers.user-type
-  service_protection_core:
+  load_scheduling_core:
     aimd_load_scheduler:
       load_scheduler:
         workload_latency_based_tokens: true

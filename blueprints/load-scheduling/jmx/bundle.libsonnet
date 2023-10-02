@@ -12,7 +12,7 @@ function(params) {
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"%(k8s_pod_name)s"})' % { k8s_pod_name: c.policy.jmx.k8s_pod_name },
-      setpoint: c.policy.service_protection_core.setpoint,
+      setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
   },

@@ -20,14 +20,6 @@ component that is used within this blueprint.
 
 :::
 
-:::info
-
-See the use-case
-[Percentage Rollout with Average Latency Feedback](/use-cases/percentage-rollouts/average-latency-feedback.md)
-to see this blueprint in use.
-
-:::
-
 <!-- Configuration Marker -->
 
 ```mdx-code-block

@@ -8,14 +8,9 @@ sidebar_label: Load Scheduling for PostgreSQL
 
 ## Introduction
 
-This policy detects traffic overloads and cascading failure build-up on
-PostgreSQL by checking the real-time percentage of PostgreSQL connections
-against the maximum number of connections.
-
-It also uses the CPU utilization ratio of the PostgreSQL pod to confirm traffic
-overloads and cascading failure build-up. The CPU utilization ratio is the
-percentage of CPU used by the PostgreSQL pod divided by the total CPU available
-to the pod.
+This policy detects traffic overloads and connection build-up on PostgreSQL by
+checking the real-time percentage of PostgreSQL connections against the maximum
+number of connections.
 
 All the PostgreSQL related metrics are collected by the
 [PostgreSQL OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/postgresqlreceiver)
@@ -24,10 +19,10 @@ overload confirmation, the
 [list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/postgresqlreceiver/metadata.yaml)
 can be used to configure the policy.
 
-A gradient controller calculates a proportional response to limit the accepted
-token rate. The token rate is reduced by a multiplicative factor when the
-service is overloaded, and increased by an additive factor while the service is
-no longer overloaded.
+An AIAD controller calculates a proportional response to limit the accepted
+token rate. The token rate is reduced by an additive factor when the service is
+overloaded, and increased by an additive factor while the service is no longer
+overloaded.
 
 :::info
 
@@ -119,16 +114,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-##### policy.service_protection_core {#policy-service-protection-core}
+##### policy.load_scheduling_core {#policy-load-scheduling-core}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-dry-run"></a>
+<a id="policy-load-scheduling-core-dry-run"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.dry_run'
+    name='policy.load_scheduling_core.dry_run'
     description='Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.'
     type='Boolean'
     reference=''
@@ -139,10 +134,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-kubelet-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.kubelet_overload_confirmations'
+    name='policy.load_scheduling_core.kubelet_overload_confirmations'
     description='Overload confirmation signals from kubelet.'
     type='Object (kubelet_overload_confirmations)'
     reference='#kubelet-overload-confirmations'
@@ -153,10 +148,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.overload_confirmations'
+    name='policy.load_scheduling_core.overload_confirmations'
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
@@ -167,10 +162,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-aiad-load-scheduler"></a>
+<a id="policy-load-scheduling-core-aiad-load-scheduler"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.aiad_load_scheduler'
+    name='policy.load_scheduling_core.aiad_load_scheduler'
     description='Parameters for AIMD throttling strategy.'
     type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
@@ -181,10 +176,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-setpoint"></a>
+<a id="policy-load-scheduling-core-setpoint"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.setpoint'
+    name='policy.load_scheduling_core.setpoint'
     description='Setpoint.'
     type='Number (double)'
     reference=''

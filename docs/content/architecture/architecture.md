@@ -51,7 +51,7 @@ sent down to Aperture Agents.
 Aperture Cloud [provides a per-project Aperture
 Controller][aperture-cloud-controller]. It is programmed using declarative
 policies. Policies can be applied by configuring a [pre-defined
-blueprint][use-cases]. It's also possible to build a policy [from scratch from
+blueprint][guides]. It's also possible to build a policy [from scratch from
 policy components][policy].
 
 ## Aperture Agents
@@ -98,12 +98,12 @@ Aperture][architecture-self-hosted].
 :::
 
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
-[architecture-self-hosted]: /self-hosting/architecture.md
-[use-cases]: /use-cases/use-cases.md
+[architecture-self-hosted]: /get-started/self-hosting/architecture.md
+[guides]: /guides/guides.md
 [policy]: /concepts/advanced/policy.md
 [integrations]: /integrations/integrations.md
 [sdks]: /integrations/sdk/sdk.md
 [metrics]: /integrations/metrics/metrics.md
 [install-agents]: /get-started/installation/agent/agent.md
-[self-hosting]: /self-hosting/self-hosting.md
+[self-hosting]: /get-started/self-hosting/self-hosting.md
 [promql-syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/
