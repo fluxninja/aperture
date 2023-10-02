@@ -9,7 +9,7 @@ policy:
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  service_protection_core:
+  load_scheduling_core:
     # Parameters for AIMD throttling strategy.
     # Type: aperture.spec.v1.AIMDLoadSchedulerParameters
     # Required: True

@@ -48,7 +48,7 @@ Flows are annotated with _Flow Labels_ based on four sources:
 - Request labels
 - Baggage
 - Classifiers
-- Aperture SDKs.
+- Aperture SDKs
 
 ### Request labels
 

@@ -22,10 +22,12 @@ Supported technologies:
 | Armeria   | 1.15+              |
 | Netty     | 4.1+               |
 
-<div class="alert alert--primary">
-  The latest version of the Aperture Instrumentation Agent archive file can be <strong><a href="https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent">downloaded here</a></strong>.
-</div>
-<p>&nbsp;</p>
+:::info
+
+The latest version of the Aperture Instrumentation Agent `.jar` file can be
+found [here][aperture-javaagent].
+
+:::
 
 ## Running the java agent
 
@@ -94,3 +96,6 @@ aperture.agent.port=12345
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/health,/connected
 ```
+
+[aperture-javaagent]:
+  https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent

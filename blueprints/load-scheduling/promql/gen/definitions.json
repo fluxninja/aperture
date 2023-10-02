@@ -21,7 +21,7 @@
       "additionalProperties": false,
       "required": [
         "policy_name",
-        "service_protection_core",
+        "load_scheduling_core",
         "promql_query",
         "setpoint",
         "overload_condition"
@@ -51,7 +51,7 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "service_protection_core": {
+        "load_scheduling_core": {
           "type": "object",
           "additionalProperties": false,
           "required": ["aiad_load_scheduler"],

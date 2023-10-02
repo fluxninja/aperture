@@ -44,10 +44,8 @@ component that is used within this blueprint.
 
 :::info
 
-See the use-cases
-[Adaptive Service Protection with Average Latency Feedback](/use-cases/adaptive-service-protection/average-latency-feedback.md)
-and
-[Workload Prioritization](/use-cases/adaptive-service-protection/workload-prioritization.md)
+See the use-case
+[Adaptive Service Protection with Average Latency Feedback](/guides/service-load-management/service-load-management.md)
 to see this blueprint in use.
 
 :::
@@ -120,16 +118,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-##### policy.service_protection_core {#policy-service-protection-core}
+##### policy.load_scheduling_core {#policy-load-scheduling-core}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-dry-run"></a>
+<a id="policy-load-scheduling-core-dry-run"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.dry_run'
+    name='policy.load_scheduling_core.dry_run'
     description='Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.'
     type='Boolean'
     reference=''
@@ -140,10 +138,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-kubelet-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.kubelet_overload_confirmations'
+    name='policy.load_scheduling_core.kubelet_overload_confirmations'
     description='Overload confirmation signals from kubelet.'
     type='Object (kubelet_overload_confirmations)'
     reference='#kubelet-overload-confirmations'
@@ -154,10 +152,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.overload_confirmations'
+    name='policy.load_scheduling_core.overload_confirmations'
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
@@ -168,10 +166,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-aimd-load-scheduler"></a>
+<a id="policy-load-scheduling-core-aimd-load-scheduler"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.aimd_load_scheduler'
+    name='policy.load_scheduling_core.aimd_load_scheduler'
     description='Parameters for AIMD throttling strategy.'
     type='Object (aperture.spec.v1.AIMDLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-m-d-load-scheduler-parameters'

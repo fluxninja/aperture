@@ -33,6 +33,6 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 :::
 
-[self-hosted]: /self-hosting/self-hosting.md
+[self-hosted]: /get-started/self-hosting/self-hosting.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
 [api-keys]: /get-started/aperture-cloud/personal-api-keys.md

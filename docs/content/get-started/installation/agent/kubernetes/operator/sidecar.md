@@ -557,5 +557,5 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[self-hosting-agent]: /self-hosting/agent.md#configuration
+[self-hosting-agent]: /get-started/self-hosting/agent.md#configuration
 [api-keys]: /get-started/aperture-cloud/api-keys.md

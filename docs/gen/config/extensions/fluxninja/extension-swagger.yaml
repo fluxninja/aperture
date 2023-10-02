@@ -119,7 +119,7 @@ definitions:
                     Aperture Cloud Controller, for example configures remote etcd endpoint and disables
                     local Prometheus OTel pipelines.
 
-                    Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
+                    Disable this flag only if using [Self-Hosted](/get-started/self-hosting/self-hosting.md) Aperture Controller.
                 type: boolean
                 x-go-name: EnableCloudController
                 x-go-tag-default: "false"

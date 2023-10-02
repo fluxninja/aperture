@@ -19,11 +19,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "service_protection_core",
-        "latency_baseliner"
-      ],
+      "required": ["policy_name", "load_scheduling_core", "latency_baseliner"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -49,7 +45,7 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "service_protection_core": {
+        "load_scheduling_core": {
           "type": "object",
           "additionalProperties": false,
           "required": ["aimd_load_scheduler"],

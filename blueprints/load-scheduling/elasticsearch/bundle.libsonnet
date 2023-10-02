@@ -11,7 +11,7 @@ function(params) {
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))',
-      setpoint: c.policy.service_protection_core.setpoint,
+      setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
   },

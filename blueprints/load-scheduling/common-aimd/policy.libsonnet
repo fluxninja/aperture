@@ -11,7 +11,7 @@ function(cfg, params={}) {
 
   local aimdLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAimdLoadScheduler(
-      local aimd = updatedConfig.policy.service_protection_core.aimd_load_scheduler;
+      local aimd = updatedConfig.policy.load_scheduling_core.aimd_load_scheduler;
 
       spec.v1.AIMDLoadScheduler.new()
       + spec.v1.AIMDLoadScheduler.withInPorts({
@@ -25,7 +25,7 @@ function(cfg, params={}) {
       })
       + spec.v1.AIMDLoadScheduler.withParameters(aimd)
       + spec.v1.AIMDLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AIMDLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
+      + spec.v1.AIMDLoadScheduler.withDryRun(updatedConfig.policy.load_scheduling_core.dry_run)
     ),
   ),
 

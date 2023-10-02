@@ -1016,7 +1016,8 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPostrollupConfig defines configuration for OTel batch processor.
+BatchPostrollupConfig defines post-rollup configuration for OTel batch
+processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1066,7 +1067,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPrerollupConfig defines configuration for OTel batch processor.
+BatchPrerollupConfig defines pre-rollup configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1473,8 +1474,8 @@ Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
-Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
-Aperture Controller.
+Disable this flag only if using
+[Self-Hosted](/get-started/self-hosting/self-hosting.md) Aperture Controller.
 
 </dd>
 <dt>endpoint</dt>
