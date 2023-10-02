@@ -127,10 +127,6 @@ To see the policy in action, the traffic is generated such that it starts within
 the PostgreSQL's max connection limit and then goes beyond the capacity after
 some time. Such a traffic pattern is repeated periodically.
 
-The below dashboard demonstrates that when latency spikes due to high traffic at
-`cart-service.prod.svc.cluster.local`, the Controller throttles the rate of
-requests admitted into the service. This approach helps protect the service from
-becoming unresponsive and maintains the current latency within the tolerance
-limit (`1.1`) of historical latency.
+![PostgreSQL Connections Signal](./assets/postgresql/postgresql-dashboards-signal.png)
 
-<!-- ![Basic Service Protection](./assets/average-latency-feedback/dashboard.png) -->
+![PostgreSQL Connections Tokens](./assets/postgresql/postgresql-dashboards-tokens.png)
