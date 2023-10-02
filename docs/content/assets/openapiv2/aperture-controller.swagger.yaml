@@ -3136,7 +3136,7 @@ definitions:
                 type: boolean
                 x-go-tag-default: "true"
             delay_initial_fill:
-                default: true
+                default: false
                 description: |+
                     Delays the initial filling of the token bucket.
                     If set to false, the token bucket will start filling immediately
@@ -3148,7 +3148,7 @@ definitions:
                     time it takes to fill the bucket.
 
                 type: boolean
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket

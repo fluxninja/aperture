@@ -2267,7 +2267,7 @@ type RateLimiter_Parameters struct {
 	// When set to true, the token bucket will be given a chance to
 	// empty out before the filling starts. The delay is equal to the
 	// time it takes to fill the bucket.
-	DelayInitialFill bool `protobuf:"varint,7,opt,name=delay_initial_fill,json=delayInitialFill,proto3" json:"delay_initial_fill,omitempty" default:"true"` // @gotags: default:"true"
+	DelayInitialFill bool `protobuf:"varint,7,opt,name=delay_initial_fill,json=delayInitialFill,proto3" json:"delay_initial_fill,omitempty" default:"false"` // @gotags: default:"false"
 }
 
 func (x *RateLimiter_Parameters) Reset() {
