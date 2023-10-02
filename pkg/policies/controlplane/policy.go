@@ -296,7 +296,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
 func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
-	hash, err := hashPolicy(policyMessage)
+	hash, err := HashPolicy(policyMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -310,8 +310,8 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	}, nil
 }
 
-// hashPolicy returns hash of the policy.
-func hashPolicy(policy *policylangv1.Policy) (string, error) {
+// HashPolicy returns hash of the policy.
+func HashPolicy(policy *policylangv1.Policy) (string, error) {
 	dat, err := proto.Marshal(policy)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to marshal proto message %+v", policy)

@@ -136,7 +136,7 @@ func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapp
 		}
 	}
 
-	remoteHash, err := hashPolicy(remotePolicy)
+	remoteHash, err := HashPolicy(remotePolicy)
 	if err != nil {
 		return &policylangv1.GetPolicyResponse{
 			Policy: localPolicy.Policy,
