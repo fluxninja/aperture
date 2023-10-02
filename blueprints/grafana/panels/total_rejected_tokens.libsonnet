@@ -11,6 +11,7 @@ function(cfg) {
                                    h=10,
                                    w=8,
                                    panelColor='red',
-                                   graphMode='area'),
+                                   graphMode='area',
+                                   unit='short'),
   panel: rejectedTokens.panel,
 }

@@ -12,7 +12,8 @@ function(cfg) {
                                      w=8,
                                      panelColor='red',
                                      graphMode='area',
-                                     noValue='No rejected requests'),
+                                     noValue='No rejected requests',
+                                     unit='short'),
 
   panel: rejectedRequests.panel,
 }
