@@ -13,6 +13,7 @@ function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null, instan
       + g.query.prometheus.withInstant(instantQuery)
       + g.query.prometheus.withRange(range),
     ])
+    + g.panel.barGauge.queryOptions.withInterval('30s')
     + g.panel.barGauge.options.withDisplayMode('gradient')
     + g.panel.barGauge.options.withOrientation('horizontal')
     + g.panel.barGauge.standardOptions.withMin(min)

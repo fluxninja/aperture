@@ -6,7 +6,7 @@ function(cfg) {
 
   local preemptionRequest = barGaugePanel('Average preemption per request by Workload',
                                           cfg.dashboard.datasource.name,
-                                          '( sum by (workload_index) (rate(workload_preempted_tokens_sum[$__rate_interval])) - sum by (workload_index) (rate(workload_delayed_tokens_sum[$__rate_interval])) ) / ( sum by (workload_index) (rate(workload_preempted_tokens_count[$__rate_interval])) + sum by (workload_index) (rate(workload_delayed_tokens_count[$__rate_interval])) )',
+                                          '( sum by (workload_index) (rate(workload_preempted_tokens_sum{%(filters)s}[$__range])) - sum by (workload_index) (rate(workload_delayed_tokens_sum{%(filters)s}[$__range])) ) / ( sum by (workload_index) (rate(workload_preempted_tokens_count{%(filters)s}[$__range])) + sum by (workload_index) (rate(workload_delayed_tokens_count{%(filters)s}[$__range])) + sum by (workload_index) (rate(workload_on_time_total{%(filters)s}[$__range])) )',
                                           stringFilters,
                                           unit='short',
                                           instantQuery=true,

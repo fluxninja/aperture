@@ -12,6 +12,7 @@ function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null, queryF
       + g.query.prometheus.withInstant(instantQuery)
       + g.query.prometheus.withRange(range),
     ])
+    + g.panel.barGauge.queryOptions.withInterval('30s')
     + g.panel.barChart.options.withOrientation('horizontal')
     + g.panel.barChart.options.withXTickLabelSpacing(labelSpacing)
     + g.panel.barChart.options.withColorByField(legendFormat)
