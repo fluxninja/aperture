@@ -727,7 +727,7 @@ type Resources struct {
 
 	// TelemetryCollector configures OpenTelemetry collector integration.
 	// Deprecated: v3.0.0. Use `infra_meters` instead.
-	TelemetryCollectors []*TelemetryCollector `protobuf:"bytes,1,rep,name=telemetry_collectors,json=telemetryCollectors,proto3" json:"telemetry_collectors,omitempty"`
+	TelemetryCollectors []*TelemetryCollector `protobuf:"bytes,1,rep,name=telemetry_collectors,json=telemetryCollectors,proto3" json:"telemetry_collectors,omitempty" validate:"deprecated"` // @gotags: validate:"deprecated"
 	// _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
 	// receive and process telemetry at the agents and send metrics to the configured Prometheus.
 	// Key in this map refers to OTel pipeline name. Prefixing pipeline name with `metrics/`
@@ -1206,7 +1206,7 @@ type Component_Integrator struct {
 type Component_Differentiator struct {
 	// Differentiator calculates rate of change per tick.
 	// Deprecated: v3.0.0. Use `PIDController` instead.
-	Differentiator *Differentiator `protobuf:"bytes,17,opt,name=differentiator,proto3,oneof"`
+	Differentiator *Differentiator `protobuf:"bytes,17,opt,name=differentiator,proto3,oneof" validate:"deprecated"` // @gotags: validate:"deprecated"
 }
 
 type Component_And struct {
