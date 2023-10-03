@@ -223,7 +223,6 @@ server:
 service_discovery:
   kubernetes:
     enabled: true
-  static: {}
 token_source:
   enabled: false
 watchdog:

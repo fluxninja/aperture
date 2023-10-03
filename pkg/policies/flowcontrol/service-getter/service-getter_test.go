@@ -54,14 +54,14 @@ func TestServiceGetter(t *testing.T) {
 	t.Run("ServicesFromSocketAddress with invalid IP address", func(t *testing.T) {
 		addr := &corev3.SocketAddress{Address: "invalid"}
 		services := sg.ServicesFromSocketAddress(addr)
-		assert.Equal(t, []string{"UNKNOWN"}, services)
+		assert.Equal(t, []string(nil), services)
 	})
 
 	t.Run("ServicesFromSocketAddress with valid IP address but no entity", func(t *testing.T) {
 		ip := "192.168.1.3"
 		addr := &corev3.SocketAddress{Address: ip}
 		services := sg.ServicesFromSocketAddress(addr)
-		assert.Equal(t, []string{"UNKNOWN"}, services)
+		assert.Equal(t, []string(nil), services)
 	})
 
 	t.Run("ServicesFromSocketAddress with valid IP address and entity", func(t *testing.T) {

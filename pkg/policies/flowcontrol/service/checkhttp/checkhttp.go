@@ -107,18 +107,12 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	sourceAddress := req.GetSource().GetAddress()
-	sourceSvcs := h.serviceGetter.ServicesFromAddress(sourceAddress)
-	if sourceSvcs == nil {
-		sourceSvcs = []string{"UNKNOWN"}
-	}
-	sourceSvcsStr := strings.Join(sourceSvcs, ",")
-	destinationAddress := req.GetDestination().GetAddress()
-	destinationSvcs := h.serviceGetter.ServicesFromAddress(destinationAddress)
-	if destinationSvcs == nil {
-		sourceSvcs = []string{"UNKNOWN"}
-	}
-	destinationSvcsStr := strings.Join(destinationSvcs, ",")
+	sourceSvcs, sourceSvcsStr := h.serviceGetter.ParseServicesFromString(req.GetSource().GetAddress())
+	log.Error().Msgf("sourceSvcs: %v", sourceSvcs)
+	log.Error().Msgf("sourceSvcsStr: %v", sourceSvcsStr)
+	destinationSvcs, destinationSvcsStr := h.serviceGetter.ParseServicesFromString(req.GetDestination().GetAddress())
+	log.Error().Msgf("destinationSvcs: %v", destinationSvcs)
+	log.Error().Msgf("destinationSvcsStr: %v", destinationSvcsStr)
 
 	// make flowlabels from source and destination services
 	sdFlowLabels := make(flowlabel.FlowLabels, 2)
