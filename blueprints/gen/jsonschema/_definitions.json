@@ -793,7 +793,8 @@
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
-          "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead."
+          "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead.\n\n",
+          "x-go-tag-validate": "deprecated"
         },
         "ema": {
           "$ref": "#/definitions/EMA",
@@ -1304,7 +1305,8 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy."
+          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.\n\n",
+          "x-go-tag-validate": "deprecated"
         },
         "aiad_load_scheduler": {
           "$ref": "#/definitions/AIADLoadScheduler",
@@ -3146,12 +3148,14 @@
           "type": "object"
         },
         "telemetry_collectors": {
-          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v3.0.0. Use `infra_meters` instead.",
+          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v3.0.0. Use `infra_meters` instead.\n\n",
           "items": {
             "$ref": "#/definitions/TelemetryCollector",
             "type": "object"
           },
-          "type": "array"
+          "type": "array",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated"
         }
       },
       "title": "Resources that need to be setup for the policy to function",
