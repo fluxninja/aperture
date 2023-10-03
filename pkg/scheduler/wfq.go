@@ -154,7 +154,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
 	sched.metricsLabels = metricsLabels
-	preemptionMetrics := &preemptionMetrics{}
+	preemptionMetrics := &preemptionMetrics{metricsLabels: metricsLabels}
 	sched.preemptionMetrics = preemptionMetrics
 
 	if metrics != nil {
@@ -167,11 +167,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 }
 
 func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
-	metricsLabels := make(prometheus.Labels, len(sched.metricsLabels)+1)
-	metricsLabels[metrics.WorkloadIndexLabel] = request.FairnessLabel
-	for k, v := range sched.metricsLabels {
-		metricsLabels[k] = v
-	}
+	metricsLabels := appendWorkloadLabel(sched.metricsLabels, request.FairnessLabel)
 	requestInQueueMetricsObserver, err := sched.metrics.RequestInQueueDurationSummary.GetMetricWith(metricsLabels)
 	if err == nil {
 		requestInQueueMetricsObserver.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
@@ -506,6 +502,7 @@ type preemptionMetrics struct {
 	workloadDelayedTokensSummary   *prometheus.SummaryVec
 	tokensInQueue                  float64
 	tokensAllowed                  float64
+	metricsLabels                  prometheus.Labels
 }
 
 // Maintain token counters used for calculating preemption and delay metrics.
@@ -513,7 +510,7 @@ type preemptionMetrics struct {
 func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queuedRequest) {
 	qRequest.tokensInQueue = pMetrics.tokensInQueue
 	qRequest.tokensAllowed = pMetrics.tokensAllowed
-	pMetrics.tokensInQueue += float64(request.Tokens)
+	pMetrics.tokensInQueue += request.Tokens
 }
 
 // Update metrics for preemption and delay
@@ -523,8 +520,7 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 		if summary == nil {
 			return
 		}
-		metricsLabels := make(prometheus.Labels, 1)
-		metricsLabels[metrics.WorkloadIndexLabel] = request.FairnessLabel
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
 		observer, err := summary.GetMetricWith(metricsLabels)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to get workload preempted tokens summary")
@@ -537,7 +533,7 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 		// Update metrics
 		realIncrement := pMetrics.tokensAllowed - qRequest.tokensAllowed
 		expectedIncrement := qRequest.tokensInQueue
-		bump := realIncrement - expectedIncrement
+		bump := expectedIncrement - realIncrement
 		if bump > 0 && pMetrics.workloadPreemptedTokensSummary != nil {
 			publishMetric(pMetrics.workloadPreemptedTokensSummary, bump)
 		}
@@ -550,7 +546,17 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 	}
 
 	// Update tokens in the queue for calculating preemption and delay metrics
-	pMetrics.tokensInQueue -= qRequest.tokensInQueue
+	pMetrics.tokensInQueue -= request.Tokens
+}
+
+func appendWorkloadLabel(baseMetricsLabels prometheus.Labels, workloadLabel string) prometheus.Labels {
+	metricsLabels := make(prometheus.Labels, len(baseMetricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = workloadLabel
+	for k, v := range baseMetricsLabels {
+		metricsLabels[k] = v
+	}
+
+	return metricsLabels
 }
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
