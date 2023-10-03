@@ -305,17 +305,6 @@ func (m *UpsertPolicyRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetPolicy() == nil {
-		err := UpsertPolicyRequestValidationError{
-			field:  "Policy",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetPolicy()).(type) {
 		case interface{ ValidateAll() error }:
@@ -373,6 +362,8 @@ func (m *UpsertPolicyRequest) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for PolicyString
 
 	if len(errors) > 0 {
 		return UpsertPolicyRequestMultiError(errors)

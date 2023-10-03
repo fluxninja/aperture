@@ -235,7 +235,8 @@ type FlowControl_LoadScheduler struct {
 
 type FlowControl_AdaptiveLoadScheduler struct {
 	// _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
-	AdaptiveLoadScheduler *AdaptiveLoadScheduler `protobuf:"bytes,8,opt,name=adaptive_load_scheduler,json=adaptiveLoadScheduler,proto3,oneof"`
+	// Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+	AdaptiveLoadScheduler *AdaptiveLoadScheduler `protobuf:"bytes,8,opt,name=adaptive_load_scheduler,json=adaptiveLoadScheduler,proto3,oneof" validate:"deprecated"` // @gotags: validate:"deprecated"
 }
 
 type FlowControl_Sampler struct {

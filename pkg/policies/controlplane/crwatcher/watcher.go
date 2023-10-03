@@ -9,7 +9,6 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"go.uber.org/zap/zapcore"
-	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -23,7 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -207,14 +206,14 @@ func (w *watcher) updateStatus(ctx context.Context, instance *policyv1alpha1.Pol
 
 // reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	policySpec := &languagev1.Policy{}
+	policySpec := &policylangv1.Policy{}
 	unmarshalErr := config.UnmarshalYAML(instance.Spec.Raw, policySpec)
 	if unmarshalErr != nil {
 		log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 		return unmarshalErr
 	}
 
-	bytes, err := proto.Marshal(policySpec)
+	bytes, err := policySpec.MarshalJSON()
 	if err != nil {
 		return err
 	}

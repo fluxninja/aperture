@@ -103,9 +103,10 @@ message GetPolicyResponse {
 // PostPolicyRequest is a request to create or update Policy.
 message UpsertPolicyRequest {
   string policy_name = 1 [(validate.rules).string.min_len = 1];
-  Policy policy = 2 [(validate.rules).message.required = true];
+  Policy policy = 2;
   // The paths to update.
   google.protobuf.FieldMask update_mask = 3;
+  string policy_string = 4;
 }
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
@@ -202,7 +203,7 @@ message Circuit {
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
   // Deprecated: v3.0.0. Use `infra_meters` instead.
-  repeated TelemetryCollector telemetry_collectors = 1;
+  repeated TelemetryCollector telemetry_collectors = 1; // @gotags: validate:"deprecated"
 
   // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
   // receive and process telemetry at the agents and send metrics to the configured Prometheus.
@@ -309,7 +310,7 @@ message Component {
 
     // Differentiator calculates rate of change per tick.
     // Deprecated: v3.0.0. Use `PIDController` instead.
-    Differentiator differentiator = 17;
+    Differentiator differentiator = 17; // @gotags: validate:"deprecated"
 
     // Logical AND.
     And and = 19;
