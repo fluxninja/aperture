@@ -12,7 +12,6 @@ function(title, dsName, query, strFilters, h=6, w=6, instantQuery=false, range=t
       + g.query.prometheus.withInstant(instantQuery)
       + g.query.prometheus.withRange(range),
     ])
-    + g.panel.barGauge.queryOptions.withInterval('30s')
     + g.panel.stat.standardOptions.withNoValue(noValue)
     + g.panel.stat.standardOptions.withUnit(unit)
     + g.panel.stat.standardOptions.color.withMode('thresholds')
