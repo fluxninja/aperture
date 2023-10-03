@@ -202,7 +202,7 @@ message Circuit {
 message Resources {
   // TelemetryCollector configures OpenTelemetry collector integration.
   // Deprecated: v3.0.0. Use `infra_meters` instead.
-  repeated TelemetryCollector telemetry_collectors = 1;
+  repeated TelemetryCollector telemetry_collectors = 1; // @gotags: validate:"deprecated"
 
   // _Infra Meters_ configure custom metrics OpenTelemetry collector pipelines, which will
   // receive and process telemetry at the agents and send metrics to the configured Prometheus.
@@ -309,7 +309,7 @@ message Component {
 
     // Differentiator calculates rate of change per tick.
     // Deprecated: v3.0.0. Use `PIDController` instead.
-    Differentiator differentiator = 17;
+    Differentiator differentiator = 17; // @gotags: validate:"deprecated"
 
     // Logical AND.
     And and = 19;
