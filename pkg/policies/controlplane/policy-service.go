@@ -193,12 +193,12 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 
 	oldPolicy := &policylangv1.Policy{}
 	if len(etcdPolicy.Kvs) > 0 {
-		err = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
-		if err != nil {
+		uerr := config.UnmarshalJSON(etcdPolicy.Kvs[0].Value, oldPolicy)
+		if uerr != nil {
 			// Deprecated: v3.0.0. Older way of string policy on etcd.
 			// Remove this code in v3.0.0.
-			err = config.UnmarshalJSON(etcdPolicy.Kvs[0].Value, oldPolicy)
-			if err != nil {
+			uerr = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
+			if uerr != nil {
 				return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
 			}
 		}

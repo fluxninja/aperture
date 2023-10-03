@@ -13,7 +13,7 @@ import (
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -73,7 +73,7 @@ func GetPolicies(policyDir string) ([]string, error) {
 }
 
 // GetPolicy returns the policy from the policy file.
-func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
+func GetPolicy(policyFile string) (*policylangv1.Policy, string, error) {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
@@ -84,7 +84,7 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	}
 
 	var policyCR *policyv1alpha1.Policy
-	policy := &languagev1.Policy{}
+	policy := &policylangv1.Policy{}
 
 	policyCR, err = GetPolicyCR(policyBytes)
 	if err != nil {
@@ -117,13 +117,13 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 }
 
 // UpdatePolicyUsingAPI updates the policy using the API.
-func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policy *languagev1.Policy, force bool) (bool, error) {
+func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policy *policylangv1.Policy, force bool) (bool, error) {
 	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return false, err
 	}
 
-	request := languagev1.UpsertPolicyRequest{
+	request := policylangv1.UpsertPolicyRequest{
 		PolicyName:   name,
 		PolicyString: string(policyBytes),
 	}
@@ -172,7 +172,7 @@ func CheckForUpdate(name string, force bool) (bool, error) {
 
 // DeletePolicyUsingAPI deletes the policy using the API.
 func DeletePolicyUsingAPI(client CloudPolicyClient, policyName string) error {
-	policyRequest := languagev1.DeletePolicyRequest{
+	policyRequest := policylangv1.DeletePolicyRequest{
 		Name: policyName,
 	}
 	_, err := client.DeletePolicy(context.Background(), &policyRequest)
@@ -192,7 +192,7 @@ func ListPolicies(client PolicyClient) error {
 
 	for name, body := range policies.GetPolicies().Policies {
 		fmt.Printf("%v:\n", name)
-		if body.GetStatus() != languagev1.GetPolicyResponse_VALID {
+		if body.GetStatus() != policylangv1.GetPolicyResponse_VALID {
 			fmt.Println("\tStatus:", body.GetStatus())
 			reason := strings.ReplaceAll(body.GetReason(), "\n", "\n\n\t\t")
 			reason = strings.ReplaceAll(reason, " Error", "\n\t\tError")

@@ -13,7 +13,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
@@ -75,7 +75,7 @@ func applyPolicy(policyFile string) error {
 	return createAndApplyPolicy(policyName, policy)
 }
 
-func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
+func createAndApplyPolicy(name string, policy *policylangv1.Policy) error {
 	policyBytes, err := json.Marshal(policy)
 	if err != nil {
 		return err
