@@ -108,11 +108,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 	}
 
 	sourceSvcs, sourceSvcsStr := h.serviceGetter.ParseServicesFromString(req.GetSource().GetAddress())
-	log.Error().Msgf("sourceSvcs: %v", sourceSvcs)
-	log.Error().Msgf("sourceSvcsStr: %v", sourceSvcsStr)
 	destinationSvcs, destinationSvcsStr := h.serviceGetter.ParseServicesFromString(req.GetDestination().GetAddress())
-	log.Error().Msgf("destinationSvcs: %v", destinationSvcs)
-	log.Error().Msgf("destinationSvcsStr: %v", destinationSvcsStr)
 
 	// make flowlabels from source and destination services
 	sdFlowLabels := make(flowlabel.FlowLabels, 2)

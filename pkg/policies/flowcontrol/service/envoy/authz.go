@@ -128,11 +128,7 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	}
 
 	sourceSvcs, sourceSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetSource().GetAddress().GetSocketAddress())
-	log.Error().Msgf("sourceSvcs: %v", sourceSvcs)
-	log.Error().Msgf("sourceSvcsStr: %v", sourceSvcsStr)
 	destinationSvcs, destinationSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetDestination().GetAddress().GetSocketAddress())
-	log.Error().Msgf("destinationSvcs: %v", destinationSvcs)
-	log.Error().Msgf("destinationSvcsStr: %v", destinationSvcsStr)
 
 	// make flowlabels from source and destination services
 	sdFlowLabels := make(flowlabel.FlowLabels, 2)
