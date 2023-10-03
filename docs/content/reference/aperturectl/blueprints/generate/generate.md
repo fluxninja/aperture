@@ -40,14 +40,14 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply
       --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
-      --name string            Name of the Aperture Blueprint to generate Aperture Policy resources for
       --no-validation          Do not validate values.yaml file
       --no-yaml-modeline       Do not add YAML language server modeline to generated YAML files
       --output-dir string      Directory path where the generated Policy resources will be stored. If not provided, will use current directory
       --overwrite              Overwrite existing output directory
-  -s, --select-all             Apply all the generated Policies
+      --select-all             Select all blueprints
       --skip-verify            Skip TLS certificate verification while connecting to controller
-      --values-file string     Path to the values file for Blueprint's input
+      --values-dir string      Directory path to the values file(s)
+      --values-file string     Path to the values file
 ```
 
 ### Options inherited from parent commands

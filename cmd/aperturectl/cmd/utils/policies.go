@@ -19,8 +19,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// GetPolicyTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
-func GetPolicyTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBoxModel, error) {
+// GetPoliciesTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
+func GetPoliciesTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBoxModel, error) {
 	policies, err := GetPolicies(policyDir)
 	if err != nil {
 		return nil, nil, err
@@ -54,7 +54,7 @@ func GetPolicies(policyDir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if filepath.Ext(info.Name()) == ".yaml" {
+		if filepath.Ext(info.Name()) == ".yaml" || filepath.Ext(info.Name()) == ".yml" {
 			_, policyName, err := GetPolicy(path)
 			if err != nil {
 				log.Info().Str("file", path).Msg("Invalid policy found. Skipping...")
