@@ -50,7 +50,7 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
 		if file != "" {
 			return applyPolicy(file)
 		} else if dir != "" {
-			policies, model, err := utils.GetPolicyTUIModel(dir, selectAll)
+			policies, model, err := utils.GetPoliciesTUIModel(dir, selectAll)
 			if err != nil {
 				return err
 			}

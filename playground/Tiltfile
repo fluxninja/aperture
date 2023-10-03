@@ -609,11 +609,9 @@ def render_dashboards(policies):
     dashboards = {}
     base_dir = os.path.join(GIT_ROOT, "playground")
     for policy in policies:
-        blueprint_name = policy["blueprint_name"]
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
-        dashboard_dir = local(command=["./scripts/render-dashboards.sh", aperturectl_bin, blueprints_uri,
-                                    blueprint_name, values_file], quiet=True)
+        dashboard_dir = local(command=["./scripts/render-dashboards.sh", aperturectl_bin, blueprints_uri, values_file], quiet=True)
         dashboards[policy_name] = str(dashboard_dir).replace("\\n", "").strip().split(" ")
 
     return dashboards
@@ -635,11 +633,9 @@ def render_aperturectl(policies, namespace, cloud_extension):
     blueprints_uri = os.path.join(GIT_ROOT, "blueprints")
     base_dir = os.path.join(GIT_ROOT, "playground")
     for policy in policies:
-        blueprint_name = policy["blueprint_name"]
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
-        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri,
-                                  blueprint_name, policy_name, values_file, api_key, endpoint, agent_group, action], quiet=True)
+        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri, policy_name, values_file, api_key, endpoint, agent_group, action], quiet=True)
 
         if rendered:
             if namespace:

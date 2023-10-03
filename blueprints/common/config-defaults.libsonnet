@@ -1,5 +1,4 @@
 local selectors_defaults = [{
-  service: '__REQUIRED_FIELD__',
   control_point: '__REQUIRED_FIELD__',
 }];
 

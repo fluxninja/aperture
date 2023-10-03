@@ -149,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     description='Flow selectors to match requests against'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../configuration/spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+    value='[{"control_point": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->

@@ -29,4 +29,3 @@ policy:
     # Required: True
     selectors:
       - control_point: __REQUIRED_FIELD__
-        service: __REQUIRED_FIELD__

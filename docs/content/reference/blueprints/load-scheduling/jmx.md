@@ -129,7 +129,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for AIMD throttling strategy.'
     type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0}'
+    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0}'
 />
 
 <!-- vale on -->

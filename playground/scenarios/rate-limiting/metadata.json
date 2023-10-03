@@ -4,7 +4,6 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "rate-limiting/base",
       "policy_name": "rate-limiting",
       "values_file": "policies/rate-limiting.yaml"
     }
