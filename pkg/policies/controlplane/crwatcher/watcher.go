@@ -9,7 +9,6 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"go.uber.org/zap/zapcore"
-	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -214,7 +213,7 @@ func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.
 		return unmarshalErr
 	}
 
-	bytes, err := proto.Marshal(policySpec)
+	bytes, err := policySpec.MarshalJSON()
 	if err != nil {
 		return err
 	}
