@@ -3283,7 +3283,8 @@ to features within a service.
 
 _Adaptive Load Scheduler_ component does additive increase of load multiplier
 during non-overload state. During overload, the load multiplier is throttled
-based on the provided strategy.
+based on the provided strategy. Deprecated: v3.0.0. Use _AIMD Load Scheduler_
+instead.
 
 </dd>
 <dt>aiad_load_scheduler</dt>
@@ -7819,7 +7820,7 @@ of the agent(s).
 
 <!-- vale off -->
 
-([[]TelemetryCollector](#telemetry-collector))
+([[]TelemetryCollector](#telemetry-collector), **DEPRECATED**)
 
 <!-- vale on -->
 

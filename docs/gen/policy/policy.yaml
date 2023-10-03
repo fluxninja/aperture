@@ -858,9 +858,11 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: |-
+                description: |+
                     Differentiator calculates rate of change per tick.
                     Deprecated: v3.0.0. Use `PIDController` instead.
+
+                x-go-tag-validate: deprecated
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -1341,7 +1343,11 @@ definitions:
         properties:
             adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
-                description: _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                description: |+
+                    _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                    Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+
+                x-go-tag-validate: deprecated
             aiad_load_scheduler:
                 $ref: '#/definitions/AIADLoadScheduler'
                 description: AIAD Load Scheduler.
@@ -3269,13 +3275,16 @@ definitions:
                     :::
                 type: object
             telemetry_collectors:
-                description: |-
+                description: |+
                     TelemetryCollector configures OpenTelemetry collector integration.
                     Deprecated: v3.0.0. Use `infra_meters` instead.
+
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
                 type: array
+                x-deprecated: true
+                x-go-tag-validate: deprecated
         title: Resources that need to be setup for the policy to function
         type: object
     Rule:
