@@ -161,6 +161,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 		sched.metrics = metrics
 		preemptionMetrics.workloadPreemptedTokensSummary = metrics.WorkloadPreemptedTokensSummary
 		preemptionMetrics.workloadDelayedTokensSummary = metrics.WorkloadDelayedTokensSummary
+		preemptionMetrics.workloadOnTimeCounter = metrics.WorkloadOnTimeCounter
 	}
 
 	return sched
@@ -500,9 +501,10 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 type preemptionMetrics struct {
 	workloadPreemptedTokensSummary *prometheus.SummaryVec
 	workloadDelayedTokensSummary   *prometheus.SummaryVec
+	workloadOnTimeCounter          *prometheus.CounterVec
+	metricsLabels                  prometheus.Labels
 	tokensInQueue                  float64
 	tokensAllowed                  float64
-	metricsLabels                  prometheus.Labels
 }
 
 // Maintain token counters used for calculating preemption and delay metrics.
@@ -516,7 +518,7 @@ func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queu
 // Update metrics for preemption and delay
 // WARNING: Unsafe and should be called with scheduler lock.
 func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queuedRequest, allowed bool) {
-	publishMetric := func(summary *prometheus.SummaryVec, value float64) {
+	publishSummary := func(summary *prometheus.SummaryVec, value float64) {
 		if summary == nil {
 			return
 		}
@@ -529,16 +531,29 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 		observer.Observe(value)
 	}
 
+	publishCounter := func(counterVec *prometheus.CounterVec, value float64) {
+		if counterVec == nil {
+			return
+		}
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		counter, err := counterVec.GetMetricWith(metricsLabels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get workload on time counter")
+		}
+		counter.Add(value)
+	}
+
 	if allowed {
 		// Update metrics
 		realIncrement := pMetrics.tokensAllowed - qRequest.tokensAllowed
 		expectedIncrement := qRequest.tokensInQueue
 		bump := expectedIncrement - realIncrement
-		if bump > 0 && pMetrics.workloadPreemptedTokensSummary != nil {
-			publishMetric(pMetrics.workloadPreemptedTokensSummary, bump)
-		}
-		if bump < 0 && pMetrics.workloadDelayedTokensSummary != nil {
-			publishMetric(pMetrics.workloadDelayedTokensSummary, -bump)
+		if bump == 0 && pMetrics.workloadOnTimeCounter != nil {
+			publishCounter(pMetrics.workloadOnTimeCounter, 1)
+		} else if bump > 0 && pMetrics.workloadPreemptedTokensSummary != nil {
+			publishSummary(pMetrics.workloadPreemptedTokensSummary, bump)
+		} else if bump < 0 && pMetrics.workloadDelayedTokensSummary != nil {
+			publishSummary(pMetrics.workloadDelayedTokensSummary, -bump)
 		}
 
 		// Update count for tokens accepted
@@ -568,4 +583,5 @@ type WFQMetrics struct {
 	RequestInQueueDurationSummary  *prometheus.SummaryVec
 	WorkloadPreemptedTokensSummary *prometheus.SummaryVec
 	WorkloadDelayedTokensSummary   *prometheus.SummaryVec
+	WorkloadOnTimeCounter          *prometheus.CounterVec
 }

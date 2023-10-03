@@ -53,6 +53,7 @@ type Factory struct {
 
 	workloadPreemptedTokensSummaryVec *prometheus.SummaryVec
 	workloadDelayedTokensSummaryVec   *prometheus.SummaryVec
+	workloadOnTimeCounterVec          *prometheus.CounterVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -147,6 +148,16 @@ func newFactory(
 		metrics.WorkloadIndexLabel,
 	})
 
+	wsFactory.workloadOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.WorkloadOnTimeMetricName,
+		Help: "Counter of workload requests that were on time",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var merr error
@@ -184,6 +195,10 @@ func newFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = prometheusRegistry.Register(wsFactory.workloadDelayedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadOnTimeCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -227,6 +242,10 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadDelayedTokensSummaryVec) {
 				err := fmt.Errorf("failed to unregister workload_delayed_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadOnTimeCounterVec) {
+				err := fmt.Errorf("failed to unregister workload_on_time_total metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -296,6 +315,7 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		RequestInQueueDurationSummary:  wsFactory.requestInQueueDurationSummaryVec,
 		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
 		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
+		WorkloadOnTimeCounter:          wsFactory.workloadOnTimeCounterVec,
 	}
 
 	return &SchedulerMetrics{

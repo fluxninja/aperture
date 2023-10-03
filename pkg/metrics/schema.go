@@ -60,6 +60,8 @@ const (
 	WorkloadPreemptedTokensMetricName = "workload_preempted_tokens"
 	// WorkloadDelayedTokensMetricName - metric used for counting tokens delayed per request.
 	WorkloadDelayedTokensMetricName = "workload_delayed_tokens"
+	// WorkloadOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed.
+	WorkloadOnTimeMetricName = "workload_on_time_total"
 
 	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
