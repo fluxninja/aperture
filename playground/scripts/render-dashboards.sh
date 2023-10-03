@@ -3,14 +3,13 @@ set -euo pipefail
 
 aperturectl=$1
 blueprints_uri=$2
-blueprint_name=$3
-values_file=$4
+values_file=$3
 
 # delete the temp dir
 _GEN_DIR="/tmp/aperture/_gen"
 rm -rf -- "$_GEN_DIR"
 
-"${aperturectl}" blueprints generate --name "${blueprint_name}" --uri "${blueprints_uri}" \
+"${aperturectl}" blueprints generate --uri "${blueprints_uri}" \
 	--values-file "${values_file}" --output-dir "${_GEN_DIR}" >&2
 
 dashboard_dir="${_GEN_DIR}/dashboards"

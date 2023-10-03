@@ -3,7 +3,6 @@
   "tkenv": "playground/tanka/apps/java-demo-app",
   "aperture_policies": [
     {
-      "blueprint_name": "load-scheduling/jmx",
       "policy_name": "jmx-service-protection",
       "values_file": "policies/jmx-service-protection.yaml"
     }

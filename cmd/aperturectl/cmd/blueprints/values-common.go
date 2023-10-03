@@ -68,32 +68,9 @@ func createValuesFile(blueprintName string, valuesFile string, dynamicConfig boo
 		var schemaURL string
 		prefix := fmt.Sprintf("file:%s", blueprintGenDir)
 
-		if strings.Contains(blueprintsURI, "github.com") {
-			// Splitting at '@' to get the tag
-			parts := strings.Split(blueprintsURI, "@")
-			if len(parts) == 2 {
-
-				tag := parts[1]
-
-				// Removing github.com and tag
-				trimmedURI := parts[0][len("github.com/"):]
-
-				// Get org and repo
-				orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
-				org := orgRepoParts[0]
-				repoAndPath := orgRepoParts[1]
-
-				// Split repo and path
-				repoPathParts := strings.SplitN(repoAndPath, "/", 2)
-				repo := repoPathParts[0]
-				path := ""
-				if len(repoPathParts) > 1 {
-					path = repoPathParts[1]
-				}
-
-				// Construct the raw GitHub URL
-				prefix = fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s/%s/gen", org, repo, tag, path, blueprintName)
-			}
+		contentURL := utils.URIToRawContentURL(blueprintsURI)
+		if contentURL != "" {
+			prefix = fmt.Sprintf("%s/%s/gen", contentURL, blueprintName)
 		}
 
 		if !dynamicConfig {

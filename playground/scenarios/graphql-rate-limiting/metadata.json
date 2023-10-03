@@ -3,7 +3,6 @@
   "tkenv": "playground/tanka/apps/graphql-example-1",
   "aperture_policies": [
     {
-      "blueprint_name": "rate-limiting/base",
       "policy_name": "graphql-rate-limiting",
       "values_file": "policies/graphql-rate-limiting.yaml"
     }

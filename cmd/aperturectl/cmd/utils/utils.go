@@ -312,3 +312,38 @@ func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*ap
 func IsNoMatchError(err error) bool {
 	return apimeta.IsNoMatchError(err) || strings.Contains(err.Error(), "failed to get API group resources")
 }
+
+// URIToRawContentURL converts a URI to a raw content URL, mainly for GitHub right now.
+func URIToRawContentURL(uri string) string {
+	if strings.Contains(uri, "github.com") {
+		// Splitting at '@' to get the tag
+		parts := strings.Split(uri, "@")
+		if len(parts) == 2 {
+
+			tag := parts[1]
+
+			// Removing github.com and tag
+			trimmedURI := parts[0][len("github.com/"):]
+
+			// Get org and repo
+			orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
+			if len(orgRepoParts) < 2 {
+				return ""
+			}
+			org := orgRepoParts[0]
+			repoAndPath := orgRepoParts[1]
+
+			// Split repo and path
+			repoPathParts := strings.SplitN(repoAndPath, "/", 2)
+			repo := repoPathParts[0]
+			path := ""
+			if len(repoPathParts) > 1 {
+				path = repoPathParts[1]
+			}
+
+			// Construct the raw GitHub URL
+			return fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s", org, repo, tag, path)
+		}
+	}
+	return ""
+}
