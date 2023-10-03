@@ -8,7 +8,7 @@ function(cfg) {
                                           cfg.dashboard.datasource.name,
                                           '( sum by (workload_index) (rate(workload_preempted_tokens_sum[$__rate_interval])) - sum by (workload_index) (rate(workload_delayed_tokens_sum[$__rate_interval])) ) / ( sum by (workload_index) (rate(workload_preempted_tokens_count[$__rate_interval])) + sum by (workload_index) (rate(workload_delayed_tokens_count[$__rate_interval])) )',
                                           stringFilters,
-                                          unit='percent',
+                                          unit='short',
                                           instantQuery=true,
                                           range=false),
 
