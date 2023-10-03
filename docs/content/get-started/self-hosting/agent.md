@@ -72,7 +72,7 @@ fluxninja:
 etcd:
   endpoints: ["http://etcd:2379"]
 prometheus:
-  address: "http://prometheus:80"
+  address: "http://prometheus:9090"
 agent_functions:
   endpoints: ["aperture-controller:8080"]
 otel:
@@ -84,6 +84,10 @@ auto_scale:
 service_discovery:
   kubernetes:
     enabled: false
+log:
+  level: info
+  pretty_console: true
+  non_blocking: false
 ```
 
 You might need to adjust the endpoints, depending on your exact setup.
