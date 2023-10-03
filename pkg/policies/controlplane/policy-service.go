@@ -204,6 +204,9 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		}
 	}
 
+	if req.PolicyString == "" {
+		return nil, status.Error(codes.InvalidArgument, "policy string cannot be empty")
+	}
 	newPolicy := &policylangv1.Policy{}
 	err = newPolicy.UnmarshalJSON([]byte(req.PolicyString))
 	if err != nil {
