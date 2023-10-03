@@ -52,7 +52,7 @@ func BackgroundSchedulerModuleForPolicyApp(circuitAPI CircuitSuperAPI) fx.Option
 		jws = append(jws, scheduler)
 
 		// Create backgroundMultiJob for running background jobs in this circuit
-		jobName := fmt.Sprintf("policy-%s", circuitAPI.GetPolicyHash())
+		jobName := fmt.Sprintf("policy-%s-%s", circuitAPI.GetPolicyName(), circuitAPI.GetPolicyHash())
 		backgroundMultiJob := jobs.NewMultiJob(jobGroup.GetStatusRegistry().Child(jobName, circuitAPI.GetPolicyName()), jws, nil)
 		scheduler.multiJob = backgroundMultiJob
 
