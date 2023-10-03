@@ -50,6 +50,10 @@ type Factory struct {
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
+
+	workloadPreemptedTokensSummaryVec *prometheus.SummaryVec
+	workloadDelayedTokensSummaryVec   *prometheus.SummaryVec
+	workloadOnTimeCounterVec          *prometheus.CounterVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -100,8 +104,7 @@ func newFactory(
 		metrics.PolicyHashLabel,
 		metrics.ComponentIDLabel,
 		metrics.WorkloadIndexLabel,
-	},
-	)
+	})
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -123,6 +126,36 @@ func newFactory(
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
+	})
+
+	wsFactory.workloadPreemptedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadPreemptedTokensMetricName,
+		Help: "Number of tokens a request was preempted by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadDelayedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadDelayedTokensMetricName,
+		Help: "Number of tokens a request was delayed by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.WorkloadOnTimeMetricName,
+		Help: "Counter of workload requests that were on time",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
 	})
 
 	lifecycle.Append(fx.Hook{
@@ -154,6 +187,18 @@ func newFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = prometheusRegistry.Register(wsFactory.requestInQueueDurationSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadPreemptedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadDelayedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadOnTimeCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -189,6 +234,18 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.requestInQueueDurationSummaryVec) {
 				err := fmt.Errorf("failed to unregister request_in_queue_duration_ms metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadPreemptedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_preempted_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadDelayedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_delayed_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadOnTimeCounterVec) {
+				err := fmt.Errorf("failed to unregister workload_on_time_total metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -251,11 +308,14 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqRequestsGauge,
-		IncomingTokensCounter:         incomingTokensCounter,
-		AcceptedTokensCounter:         acceptedTokensCounter,
-		RequestInQueueDurationSummary: wsFactory.requestInQueueDurationSummaryVec,
+		FlowsGauge:                     wfqFlowsGauge,
+		HeapRequestsGauge:              wfqRequestsGauge,
+		IncomingTokensCounter:          incomingTokensCounter,
+		AcceptedTokensCounter:          acceptedTokensCounter,
+		RequestInQueueDurationSummary:  wsFactory.requestInQueueDurationSummaryVec,
+		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
+		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
+		WorkloadOnTimeCounter:          wsFactory.workloadOnTimeCounterVec,
 	}
 
 	return &SchedulerMetrics{
