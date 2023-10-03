@@ -204,6 +204,12 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		}
 	}
 
+	newPolicy := &policylangv1.Policy{}
+	err = newPolicy.UnmarshalJSON([]byte(req.PolicyString))
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
+	}
+
 	if len(req.GetUpdateMask().GetPaths()) > 0 {
 		if len(etcdPolicy.Kvs) == 0 {
 			return nil, status.Error(codes.NotFound, "cannot patch, no such policy")
@@ -216,8 +222,8 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 			// FIXME Do we need field masks at all? Looks like they're only
 			// used to pass a "force" flag from aperturectl.
 		} else {
-			utils.ApplyFieldMask(oldPolicy, req.Policy, req.UpdateMask)
-			req.Policy = oldPolicy
+			utils.ApplyFieldMask(oldPolicy, newPolicy, req.UpdateMask)
+			newPolicy = oldPolicy
 		}
 	} else if len(etcdPolicy.Kvs) > 0 {
 		// We want to prevent accidentally overwriting valid policy, that's why
@@ -234,18 +240,13 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		// Otherwise, we know policy is invalid and thus we allow overwriting it.
 	}
 
-	_, _, err = ValidateAndCompileProto(ctx, req.PolicyName, req.Policy)
+	_, _, err = ValidateAndCompileProto(ctx, req.PolicyName, newPolicy)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile policy: %s", err)
 	}
 
-	policyBytes, err := proto.Marshal(req.Policy)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "failed to marshal policy: %s", err)
-	}
-
 	// FIXME compare original mod revision to make sure the policy we're patching hasn't changed meanwhile
-	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(policyBytes))
+	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), req.PolicyString)
 	if err != nil {
 		return nil, err
 	}

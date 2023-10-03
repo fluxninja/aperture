@@ -9,14 +9,15 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/ghodss/yaml"
+	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	"github.com/ghodss/yaml"
-	"google.golang.org/genproto/protobuf/field_mask"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // GetPoliciesTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
@@ -71,6 +72,7 @@ func GetPolicies(policyDir string) ([]string, error) {
 	})
 }
 
+// GetPolicy returns the policy from the policy file.
 func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
@@ -99,6 +101,7 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	}
 }
 
+// GetPolicyCR returns the policy CR from the policy bytes.
 func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 	policyCR := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(policyBytes, policyCR)
@@ -115,11 +118,16 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 
 // UpdatePolicyUsingAPI updates the policy using the API.
 func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policy *languagev1.Policy, force bool) (bool, error) {
-	request := languagev1.UpsertPolicyRequest{
-		PolicyName: name,
-		Policy:     policy,
+	policyBytes, err := policy.MarshalJSON()
+	if err != nil {
+		return false, err
 	}
-	_, err := client.UpsertPolicy(context.Background(), &request)
+
+	request := languagev1.UpsertPolicyRequest{
+		PolicyName:   name,
+		PolicyString: string(policyBytes),
+	}
+	_, err = client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
 		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
 			var update bool

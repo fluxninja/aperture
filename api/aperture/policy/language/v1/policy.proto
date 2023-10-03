@@ -103,9 +103,10 @@ message GetPolicyResponse {
 // PostPolicyRequest is a request to create or update Policy.
 message UpsertPolicyRequest {
   string policy_name = 1 [(validate.rules).string.min_len = 1];
-  Policy policy = 2 [(validate.rules).message.required = true];
+  Policy policy = 2;
   // The paths to update.
   google.protobuf.FieldMask update_mask = 3;
+  string policy_string = 4;
 }
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.

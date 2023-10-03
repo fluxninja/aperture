@@ -5570,6 +5570,8 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
+                        policy_string:
+                            type: string
                         update_mask:
                             description: The paths to update.
                             type: string
@@ -5602,6 +5604,8 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
+                        policy_string:
+                            type: string
                         update_mask:
                             description: The paths to update.
                             type: string
