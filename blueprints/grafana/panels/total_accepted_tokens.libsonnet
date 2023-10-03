@@ -10,7 +10,8 @@ function(cfg) {
                                    stringFilters,
                                    h=10,
                                    w=8,
-                                   graphMode='area'),
+                                   graphMode='area',
+                                   unit='short'),
 
   panel: acceptedTokens.panel,
 }
