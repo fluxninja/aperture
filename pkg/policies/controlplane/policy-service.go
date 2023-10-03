@@ -210,10 +210,10 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
 		}
-		return nil, status.Error(codes.InvalidArgument, "policy string cannot be empty")
 	} else if req.Policy != nil { // Deprecated: v2.20.0. Should stop accepting policy as proto message
-		log.Info().Msg("Using proto in UpsertPolicy is deprecated.")
 		newPolicy = proto.Clone(req.Policy).(*policylangv1.Policy)
+	} else {
+		return nil, status.Error(codes.InvalidArgument, "policy is empty")
 	}
 
 	if len(req.GetUpdateMask().GetPaths()) > 0 {
@@ -251,8 +251,13 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile policy: %s", err)
 	}
 
+	newPolicyString, err := newPolicy.MarshalJSON()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to marshal policy: %s", err)
+	}
+
 	// FIXME compare original mod revision to make sure the policy we're patching hasn't changed meanwhile
-	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), req.PolicyString)
+	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(newPolicyString))
 	if err != nil {
 		return nil, err
 	}
