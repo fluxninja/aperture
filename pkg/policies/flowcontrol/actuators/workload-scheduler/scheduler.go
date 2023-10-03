@@ -358,6 +358,14 @@ func (metrics *SchedulerMetrics) Delete() error {
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete request_in_queue_duration_ms summary from its metric vector. No traffic to generate metrics?")
 	}
+	deletedCount = metrics.wsFactory.workloadPreemptedTokensSummaryVec.DeletePartialMatch(metrics.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_preempted_tokens summary from its metric vector.")
+	}
+	deletedCount = metrics.wsFactory.workloadDelayedTokensSummaryVec.DeletePartialMatch(metrics.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_delayed_tokens summary from its metric vector.")
+	}
 	return merr
 }
 
