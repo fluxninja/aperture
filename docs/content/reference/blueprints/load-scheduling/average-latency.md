@@ -173,7 +173,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Parameters for AIMD throttling strategy.'
     type='Object (aperture.spec.v1.AIMDLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-m-d-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "AIMD Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
+    value='{"alerter": {"alert_name": "AIMD Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
 />
 
 <!-- vale on -->
@@ -193,7 +193,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     description='Flux Meter defines the scope of latency measurements.'
     type='Object (aperture.spec.v1.FluxMeter)'
     reference='../../configuration/spec#flux-meter'
-    value='{"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}'
+    value='{"selectors": [{"control_point": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->

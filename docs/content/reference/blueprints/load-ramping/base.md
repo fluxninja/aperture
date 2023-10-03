@@ -109,7 +109,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.'
     type='Object (aperture.spec.v1.LoadRampParameters)'
     reference='../../configuration/spec#load-ramp-parameters'
-    value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
+    value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->
@@ -515,7 +515,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Identify the service and flows whose latency needs to be measured.'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../configuration/spec#selector'
-    value='[{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]'
+    value='[{"control_point": "__REQUIRED_FIELD__"}]'
 />
 
 <!-- vale on -->
@@ -551,7 +551,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='FluxMeter specifies the flows whose latency needs to be measured and parameters for the histogram metrics.'
     type='Object (aperture.spec.v1.FluxMeter)'
     reference='../../configuration/spec#flux-meter'
-    value='{"selector": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}], "static_buckets": {"buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}'
+    value='{"selector": [{"control_point": "__REQUIRED_FIELD__"}], "static_buckets": {"buckets": [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]}}'
 />
 
 <!-- vale on -->

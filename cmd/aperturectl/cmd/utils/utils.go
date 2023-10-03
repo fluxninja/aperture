@@ -327,6 +327,9 @@ func URIToRawContentURL(uri string) string {
 
 			// Get org and repo
 			orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
+			if len(orgRepoParts) < 2 {
+				return ""
+			}
 			org := orgRepoParts[0]
 			repoAndPath := orgRepoParts[1]
 

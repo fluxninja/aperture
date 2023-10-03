@@ -7,7 +7,6 @@ aperturectl="$git_root"/cmd/aperturectl/aperturectl
 
 "$aperturectl" blueprints generate \
 	--uri "$git_root"/blueprints \
-	--name rate-limiting/base \
 	--values-file values.yaml \
 	--output-dir "tmp" \
 	--skip-pull \
