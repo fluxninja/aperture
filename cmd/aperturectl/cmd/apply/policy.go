@@ -2,7 +2,6 @@ package apply
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -13,7 +12,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
@@ -75,8 +74,8 @@ func applyPolicy(policyFile string) error {
 	return createAndApplyPolicy(policyName, policy)
 }
 
-func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
-	policyBytes, err := json.Marshal(policy)
+func createAndApplyPolicy(name string, policy *policylangv1.Policy) error {
+	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -134,7 +133,6 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 			}
 		}
-
 	} else {
 		isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policy, force)
 		if !isUpdated {

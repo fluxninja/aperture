@@ -7,7 +7,7 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
@@ -43,7 +43,7 @@ const (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			providePolicyValidator,
+			ProvidePolicyValidator,
 			fx.Annotate(
 				provideTrackers,
 				fx.ResultTags(
@@ -127,7 +127,7 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &languagev1.Policy{}
+			policyMessage := &policylangv1.Policy{}
 			unmarshalErr := proto.Unmarshal(bytes, policyMessage)
 			if unmarshalErr != nil {
 				// Deprecated: v3.0.0. Older way of string policy on etcd.
