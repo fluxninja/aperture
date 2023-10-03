@@ -91,6 +91,14 @@ commands:
             asdf reshim
 
 jobs:
+
+  latest-release:
+    executor: python-cimg-executor
+    steps:
+      - run:
+          name: Latest release
+          command: echo "Latest release is << pipeline.git.tag >>"
+
   release-components:
     executor: python-cimg-executor
     steps:
@@ -209,3 +217,10 @@ workflows:
             tags:
               only: /^v.*$/
           configuration_path: .circleci/post-release.yaml
+
+  post-release-latest:
+    when:
+      equal: [latest, << pipeline.git.tag >>]
+    jobs:
+      - latest-release:
+          name: "Latest release"
