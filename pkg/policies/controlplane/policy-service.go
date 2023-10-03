@@ -204,13 +204,16 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		}
 	}
 
-	if req.PolicyString == "" {
-		return nil, status.Error(codes.InvalidArgument, "policy string cannot be empty")
-	}
 	newPolicy := &policylangv1.Policy{}
-	err = newPolicy.UnmarshalJSON([]byte(req.PolicyString))
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
+	if req.PolicyString != "" {
+		err = newPolicy.UnmarshalJSON([]byte(req.PolicyString))
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
+		}
+		return nil, status.Error(codes.InvalidArgument, "policy string cannot be empty")
+	} else if req.Policy != nil { // Deprecated: v2.20.0. Should stop accepting policy as proto message
+		log.Info().Msg("Using proto in UpsertPolicy is deprecated.")
+		newPolicy = proto.Clone(req.Policy).(*policylangv1.Policy)
 	}
 
 	if len(req.GetUpdateMask().GetPaths()) > 0 {

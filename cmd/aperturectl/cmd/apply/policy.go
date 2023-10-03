@@ -2,7 +2,6 @@ package apply
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -76,7 +75,7 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policy *policylangv1.Policy) error {
-	policyBytes, err := json.Marshal(policy)
+	policyBytes, err := policy.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -134,7 +133,6 @@ func createAndApplyPolicy(name string, policy *policylangv1.Policy) error {
 				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 			}
 		}
-
 	} else {
 		isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policy, force)
 		if !isUpdated {
