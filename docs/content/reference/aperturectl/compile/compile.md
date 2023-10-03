@@ -37,6 +37,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
       --dot string       Path to store the dot file
   -h, --help             help for compile
       --mermaid string   Path to store the mermaid file
+      --output string    Path to store intermediate representation file
       --policy string    Path to Aperture Policy file
 ```
 
