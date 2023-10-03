@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	policiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -30,10 +30,10 @@ type FxIn struct {
 	Unmarshaller config.Unmarshaller
 }
 
-// providePolicyValidator provides classification Policy Custom Resource validator
+// ProvidePolicyValidator provides classification Policy Custom Resource validator
 //
 // Note: This validator must be registered to be accessible.
-func providePolicyValidator(in FxIn) (FxOut, error) {
+func ProvidePolicyValidator(in FxIn) (FxOut, error) {
 	var config crwatcher.CRWatcherConfig
 	err := in.Unmarshaller.UnmarshalKey(crwatcher.ConfigKey, &config)
 	if err != nil {
@@ -64,11 +64,7 @@ type PolicySpecValidator struct{}
 //
 // ValidateSpec checks the syntax, validity of extractors, and validity of
 // rego modules (by attempting to compile them).
-func (v *PolicySpecValidator) ValidateSpec(
-	ctx context.Context,
-	name string,
-	yamlSrc []byte,
-) (bool, string, error) {
+func (v *PolicySpecValidator) ValidateSpec(ctx context.Context, name string, yamlSrc []byte) (bool, string, error) {
 	_, _, err := ValidateAndCompileYAML(ctx, name, yamlSrc)
 	if err != nil {
 		// there is no need to handle validator errors. just return validation result.
@@ -78,12 +74,12 @@ func (v *PolicySpecValidator) ValidateSpec(
 }
 
 // ValidateAndCompileYAML checks the validity of a single Policy and compiles it.
-func ValidateAndCompileYAML(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
+func ValidateAndCompileYAML(ctx context.Context, name string, yamlSrc []byte) (*circuitfactory.Circuit, *policylangv1.Policy, error) {
 	if len(yamlSrc) == 0 {
 		return nil, nil, errors.New("empty policy")
 	}
 
-	policy := &policiesv1.Policy{}
+	policy := &policylangv1.Policy{}
 	err := config.UnmarshalYAML(yamlSrc, policy)
 	if err != nil {
 		return nil, nil, err
@@ -92,7 +88,7 @@ func ValidateAndCompileYAML(ctx context.Context, name string, yamlSrc []byte) (*
 }
 
 // ValidateAndCompileProto checks the validity of a single Policy and compiles it.
-func ValidateAndCompileProto(ctx context.Context, name string, policy *policiesv1.Policy) (*circuitfactory.Circuit, *policiesv1.Policy, error) {
+func ValidateAndCompileProto(ctx context.Context, name string, policy *policylangv1.Policy) (*circuitfactory.Circuit, *policylangv1.Policy, error) {
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
 	circuit, err := CompilePolicy(policy, registry)
