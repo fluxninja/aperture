@@ -14,7 +14,7 @@ import (
 //
 // Circuit can also be converted to its graph view.
 type Circuit struct {
-	Tree           *Tree
+	Tree           Tree
 	LeafComponents []*runtime.ConfiguredComponent
 }
 
@@ -50,7 +50,7 @@ func CompileFromProto(
 	}
 
 	return &Circuit{
-		Tree:           &tree,
+		Tree:           tree,
 		LeafComponents: leafComponents,
 	}, option, nil
 }

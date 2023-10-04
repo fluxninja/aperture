@@ -162,8 +162,13 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		}
 	}
 
+	rootTree, rootTreeErr := circuitfactory.RootTree(&policylangv1.Circuit{})
+	if rootTreeErr != nil {
+		return nil, nil, nil, rootTreeErr
+	}
 	compiledCircuit := &circuitfactory.Circuit{
 		LeafComponents: make([]*runtime.ConfiguredComponent, 0),
+		Tree:           rootTree,
 	}
 
 	partialCircuitOption := fx.Options()
