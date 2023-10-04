@@ -206,7 +206,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 
 	newPolicy := &policylangv1.Policy{}
 	if req.PolicyString != "" {
-		err = newPolicy.UnmarshalJSON([]byte(req.PolicyString))
+		err = config.UnmarshalYAML([]byte(req.PolicyString), newPolicy)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
 		}
