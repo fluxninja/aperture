@@ -2,6 +2,9 @@ package blueprints
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/pkg/info"
 )
 
 const (
@@ -40,6 +43,20 @@ func init() {
 var BlueprintsCmd = &cobra.Command{
 	Use:   "blueprints",
 	Short: "Aperture Blueprints",
-	Long: `
-Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
+	Long:  `Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		newer, err := utils.IsCurrentVersionNewer(info.Version)
+		if err != nil {
+			return err
+		}
+		if newer {
+			_ = removeCmd.RunE(cmd, args)
+			_ = removeCmd.PostRunE(cmd, args)
+			return pullCmd.RunE(cmd, args)
+		}
+		return nil
+	},
+	PostRunE: func(cmd *cobra.Command, args []string) error {
+		return pullCmd.PostRunE(cmd, args)
+	},
 }

@@ -23,9 +23,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// Version shows the version of ApertureCtl.
 var (
-	Version = info.Version
+	version = info.Version
 	verbose bool
 
 	controller utils.ControllerConn
@@ -58,9 +57,8 @@ var RootCmd = &cobra.Command{
 	Short:              "aperturectl - CLI tool to interact with Aperture",
 	DisableAutoGenTag:  true,
 	DisableSuggestions: false,
-	Long: `
-aperturectl is a CLI tool which can be used to interact with Aperture seamlessly.`,
-	Version: Version,
+	Long:               `aperturectl is a CLI tool to interact with Aperture.`,
+	Version:            version,
 }
 
 // Execute is the entry point for the CLI. It is called from the main package.
@@ -89,6 +87,12 @@ func Execute() {
 	err := config.RegisterDeprecatedValidator(utils.AllowDeprecated)
 	if err != nil {
 		log.Error().Err(err).Msg("Error registering deprecated validator")
+		os.Exit(1)
+	}
+
+	err = utils.CreateVersionFileIfNotExists(version)
+	if err != nil {
+		log.Error().Err(err).Msg("Error creating version file")
 		os.Exit(1)
 	}
 
