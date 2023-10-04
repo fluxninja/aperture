@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
@@ -70,16 +69,16 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
 
 // applyPolicy applies a policy to the cluster.
 func applyPolicy(policyFile string) error {
-	policy, policyName, err := utils.GetPolicy(policyFile)
+	policyBytes, policyName, err := utils.GetPolicy(policyFile)
 	if err != nil {
 		return err
 	}
 
-	return createAndApplyPolicy(policyName, policy)
+	return createAndApplyPolicy(policyName, policyBytes)
 }
 
-func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
-	isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policy, force)
+func createAndApplyPolicy(name string, policyBytes []byte) error {
+	isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
 	if !isUpdated {
 		return updatePolicyUsingAPIErr
 	}
