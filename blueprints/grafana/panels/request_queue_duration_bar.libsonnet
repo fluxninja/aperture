@@ -6,7 +6,7 @@ function(cfg) {
 
   local requestsDuration = barGaugePanel('Requests in Queue Duration',
                                          cfg.dashboard.datasource.name,
-                                         'topk(10, (sum by(workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__range])) ) / (sum by(workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__range])) ))',
+                                         'topk(10, (sum by(workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__range])) ) / ((sum by(workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__range])) )) != 0)',
                                          stringFilters,
                                          unit='ms',
                                          instantQuery=true,
