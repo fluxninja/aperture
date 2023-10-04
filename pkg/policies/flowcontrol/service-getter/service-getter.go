@@ -3,6 +3,7 @@ package servicegetter
 import (
 	"context"
 	"net"
+	"strings"
 
 	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	"go.uber.org/fx"
@@ -19,6 +20,8 @@ type ServiceGetter interface {
 	ServicesFromContext(ctx context.Context) []string
 	ServicesFromSocketAddress(addr *corev3.SocketAddress) []string
 	ServicesFromAddress(addr string) []string
+	ParseServicesFromString(sourceAddress string) ([]string, string)
+	ParseServicesFromAddress(addr *corev3.SocketAddress) ([]string, string)
 }
 
 // FromEntities creates a new Entities-powered ServiceGetter.
@@ -78,9 +81,6 @@ func (sg *ecServiceGetter) servicesFromContext(ctx context.Context) (svcs []stri
 func (sg *ecServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddress) []string {
 	svcs := sg.ServicesFromAddress(addr.GetAddress())
 	sg.metrics.inc(svcs != nil)
-	if svcs == nil {
-		svcs = []string{"UNKNOWN"}
-	}
 	return svcs
 }
 
@@ -94,6 +94,26 @@ func (sg *ecServiceGetter) ServicesFromAddress(addr string) []string {
 		return nil
 	}
 	return entity.Services()
+}
+
+// ParseServicesFromString returns list of services associated with given IP.
+func (sg *ecServiceGetter) ParseServicesFromString(sourceAddress string) ([]string, string) {
+	svcs := sg.ServicesFromAddress(sourceAddress)
+	if svcs == nil {
+		return []string{""}, "UNKNOWN"
+	}
+
+	return svcs, strings.Join(svcs, ",")
+}
+
+// ParseServicesFromAddress returns list of services associated with given IP.
+func (sg *ecServiceGetter) ParseServicesFromAddress(addr *corev3.SocketAddress) ([]string, string) {
+	svcs := sg.ServicesFromSocketAddress(addr)
+	if svcs == nil {
+		return []string{""}, "UNKNOWN"
+	}
+
+	return svcs, strings.Join(svcs, ",")
 }
 
 var noEntitySampler = log.NewRatelimitingSampler()
@@ -140,4 +160,14 @@ func (sg emptyServiceGetter) ServicesFromSocketAddress(addr *corev3.SocketAddres
 // ServicesFromAddress implements ServiceGetter interface for emptyServiceGetter.
 func (sg emptyServiceGetter) ServicesFromAddress(addr string) []string {
 	return nil
+}
+
+// ParseServicesFromString implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ParseServicesFromString(sourceAddress string) ([]string, string) {
+	return []string{}, "UNKNOWN"
+}
+
+// ParseServicesFromAddress implements ServiceGetter interface for emptyServiceGetter.
+func (sg emptyServiceGetter) ParseServicesFromAddress(addr *corev3.SocketAddress) ([]string, string) {
+	return []string{}, "UNKNOWN"
 }

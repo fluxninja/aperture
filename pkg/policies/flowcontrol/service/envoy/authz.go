@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -128,12 +127,8 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
-	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
-	sourceSvcsStr := strings.Join(sourceSvcs, ",")
-	destinationAddress := req.GetAttributes().GetDestination().GetAddress().GetSocketAddress()
-	destinationSvcs := h.serviceGetter.ServicesFromSocketAddress(destinationAddress)
-	destinationSvcsStr := strings.Join(destinationSvcs, ",")
+	sourceSvcs, sourceSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetSource().GetAddress().GetSocketAddress())
+	destinationSvcs, destinationSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetDestination().GetAddress().GetSocketAddress())
 
 	// make flowlabels from source and destination services
 	sdFlowLabels := make(flowlabel.FlowLabels, 2)
