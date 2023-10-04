@@ -165,6 +165,9 @@ jobs:
 
   update-environment:
     parameters:
+      tag:
+        type: string
+        description: The release tag
       job-root:
         type: string
         default: "/home/circleci"
@@ -224,6 +227,7 @@ jobs:
             ENVIRONMENT_PATH: << parameters.environment-path >>
             SKIP_COMPONENT: << parameters.skip-component >>
             RELEASE_TRAIN: << parameters.release-train >>
+            RELEASE_TAG: << parameters.tag >>
           command: .circleci/scripts/update_environment.sh
       - asdf_save_cache:
           cache_name: update-environment
@@ -352,11 +356,12 @@ workflows:
               ignore: /.+/
             tags:
               only: /^v.*/
-          name: aperture-update-environment-everything
-          environment-path: environments/demo/
+          name: aperture-update-environment-everything-customer-demo
+          environment-path: environments/customer-demo/
           skip-component: demo-app
           update: everything
           release-train: pre-release
+          tag: << pipeline.git.tag >>
 
       - update-environment:
           filters:
@@ -364,17 +369,31 @@ workflows:
               ignore: /.+/
             tags:
               only: /^v.*/
-          name: aperture-update-environment-demoapp
-          environment-path: environments/demo/
+          name: aperture-update-environment-everything-production
+          environment-path: environments/production-fn-cloud/
+          skip-component: demo-app
+          update: everything
+          release-train: final-release
+          tag: << pipeline.git.tag >>
+
+      - update-environment:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^v.*/
+          name: aperture-update-environment-demoapp-customer-demo
+          environment-path: environments/customer-demo/
           component: demo-app
           update: images,deployment-code
+          tag: << pipeline.git.tag >>
 
       - update-brews:
           filters:
-            <<: *release-filters
+            branches:
+              ignore: /.+/
             tags:
               only: /^v.*/
-              ignore: /^.*-rc.*/
           tag: << pipeline.git.tag >>
           deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
 
