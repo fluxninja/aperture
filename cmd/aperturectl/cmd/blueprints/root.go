@@ -50,9 +50,23 @@ var BlueprintsCmd = &cobra.Command{
 			return err
 		}
 		if newer {
-			_ = removeCmd.RunE(cmd, args)
-			_ = removeCmd.PostRunE(cmd, args)
-			return pullCmd.RunE(cmd, args)
+			err = removeCmd.RunE(cmd, args)
+			if err != nil {
+				return err
+			}
+			err = removeCmd.PostRunE(cmd, args)
+			if err != nil {
+				return err
+			}
+			err = pullCmd.RunE(cmd, args)
+			if err != nil {
+				return err
+			}
+			err = pullCmd.PostRunE(cmd, args)
+			if err != nil {
+				return err
+			}
+			return utils.UpdateVersionFile(info.Version)
 		}
 		return nil
 	},
