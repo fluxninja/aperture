@@ -139,10 +139,6 @@ commands:
 jobs:
 
   publish-protobuf-files:
-    parameters:
-      tag:
-        type: string
-        description: What git tag to use when tagging remote repository
     executor: python-cimg-executor
     steps:
       - checkout
@@ -161,7 +157,7 @@ jobs:
           command: |
             fn release publish-aperture-protobuf \
             --path /home/circleci/project/api/ \
-            --tag << parameters.tag >>
+            --tag << pipeline.git.tag >>
       - asdf_save_cache:
           cache_name: release-protobuf
 
@@ -208,26 +204,28 @@ jobs:
       component:
         type: string
         description: the component to build
-      tag:
-        type: string
-        description: The release tag
     executor: ubuntu-18-executor
     environment:
       PACKAGES_DIR: "/tmp/packages"
       GOARCH: <<parameters.goarch>>
       GOOS: <<parameters.goos>>
       COMPONENT: <<parameters.component>>
-      VERSION: <<parameters.tag>>
-      APERTURECTL_BUILD_VERSION: <<parameters.tag>>
     steps:
       - checkout
       - asdf_install:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             golang
-      - run:
+      - run: &set_version
           name: "Set version"
           command: |
+            VERSION = $(echo << pipeline.git.tag >> | cut -d'v' -f2)
+            export VERSION
+            declare -p VERSION >> "${BASH_ENV}"
+      - run:
+          name: "Set build version"
+          command: |
+            APERTURECTL_BUILD_VERSION=${VERSION}
             vless_version="${APERTURECTL_BUILD_VERSION##v}"
             APERTURECTL_BUILD_VERSION=${vless_version}
             APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
@@ -287,9 +285,6 @@ jobs:
 
   update-environment:
     parameters:
-      tag:
-        type: string
-        description: The release tag
       job-root:
         type: string
         default: "/home/circleci"
@@ -349,16 +344,13 @@ jobs:
             ENVIRONMENT_PATH: << parameters.environment-path >>
             SKIP_COMPONENT: << parameters.skip-component >>
             RELEASE_TRAIN: << parameters.release-train >>
-            RELEASE_TAG: << parameters.tag >>
+            RELEASE_TAG: << pipeline.git.tag >>
           command: .circleci/scripts/update_environment.sh
       - asdf_save_cache:
           cache_name: update-environment
 
   update-brews:
     parameters:
-      tag:
-        type: string
-        description: The release tag
       deployment-key:
         type: string
         description:
@@ -367,12 +359,12 @@ jobs:
     environment:
       TAP_REPO: /home/circleci/taps
       APERTURE_REPO: /home/circleci/project
-      VERSION: <<parameters.tag>>
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
             - << parameters.deployment-key >>
+      - run: *set_version
       - run:
           name: "Prepare brews repository"
           command: |
@@ -420,16 +412,11 @@ jobs:
             gh pr create --title "${msg}" --body "" --label "pr-pull"
 
   publish-aperture-lua:
-    parameters:
-      tag:
-        type: string
-        description: What git tag to use when tagging remote repository
     executor: base-cimg-executor
-    environment:
-      VERSION: <<parameters.tag>>
     steps:
       - checkout
       - run: *install-gh-cli
+      - run: *set_version
       - run:
           working_directory: gateways/lua/
           name: Attach package to release
@@ -478,10 +465,6 @@ jobs:
         type: executor
         description: executor to use for this job
         default: base-cimg-executor
-      extra_build_args:
-        type: string
-        description: Extra flags to pass to docker build
-        default: ""
       gcr-registry:
         type: string
         description: Google Container Registry that this image should be pushed into
@@ -508,10 +491,6 @@ jobs:
         type: boolean
         description: Setup and use CircleCI's remote Docker environment
         default: true
-      tag:
-        type: string
-        description: A Docker image tag
-        default: ${CIRCLE_SHA1:0:8}
       target-tag:
         type: string
         description: Additional image tag applied when job runs on main branch
@@ -558,11 +537,11 @@ jobs:
             - setup_remote_docker:
                 docker_layer_caching: true
                 version: <<parameters.remote-docker-version>>
+      - run: *set_version
       - run:
           name: Prepare Version and Update Build args
           command: |
-            VERSION = $(echo <<parameters.tag>> | cut -d'v' -f2)
-            build_args=<<parameters.extra_build_args>>
+            build_args="--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
             build_args+=" --build-arg VERSION=${VERSION} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION}"
             EXTRA_BUILD_ARGS=${build_args}
             export VERSION EXTRA_BUILD_ARGS
@@ -575,26 +554,26 @@ jobs:
           extra_build_args: "${EXTRA_BUILD_ARGS}"
           image: <<parameters.gcr-image>>
           path: <<parameters.path>>
-          tag: <<parameters.tag>>
+          tag: "${VERSION}"
           workspace-root: <<parameters.workspace-root>>
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
-          tag: <<parameters.tag>>
+          tag: "${VERSION}"
       - when:
           condition: <<parameters.push-to-dockerhub>>
           steps:
             - aperture_docker_tag:
                 source-registry: <<parameters.gcr-registry>>
                 source-image: <<parameters.gcr-image>>
-                source-tag: <<parameters.tag>>
+                source-tag: "${VERSION}"
                 dest-registry: <<parameters.dockerhub-registry>>
                 dest-image: <<parameters.dockerhub-image>>
-                dest-tag: <<parameters.tag>>
+                dest-tag: "${VERSION}"
             - run:
                 name: Push images to DockerHub
                 command: |
                   docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:<<parameters.tag>>
+                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION}
 
   publish-aperture-docs:
     executor: python-cimg-executor
@@ -713,7 +692,6 @@ workflows:
             tags:
               only: /^releases/aperture/.*/v.*/
           name: release-aperture-controller
-          extra_build_args: "--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
           dockerhub-image: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
@@ -722,12 +700,10 @@ workflows:
           use-docker-layer-caching: true
           resource-class: large
           push-to-dockerhub: true
-          tag: << pipeline.git.tag >>
 
       - build-push-add-tag:
           filters: *release_aperture_filters
           name: release-aperture-agent
-          extra_build_args: "--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
           dockerhub-image: fluxninja/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
@@ -736,12 +712,10 @@ workflows:
           use-docker-layer-caching: true
           resource-class: large
           push-to-dockerhub: true
-          tag: << pipeline.git.tag >>
 
       - build-push-add-tag:
           filters: *release_aperture_filters
           name: release-aperture-operator
-          extra_build_args: "--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
           dockerhub-image: fluxninja/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
@@ -749,14 +723,12 @@ workflows:
           dockerfile: ./operator/Dockerfile
           use-docker-layer-caching: true
           push-to-dockerhub: true
-          tag: << pipeline.git.tag >>
 
       - publish-aperture-docs:
           filters: *release_aperture_filters
           release-ref: << pipeline.git.tag >>
 
       - publish-protobuf-files:
-          tag: << pipeline.git.tag >>
           filters: *release_aperture_filters
           requires: &release_required
             - "release-aperture-controller"
@@ -771,13 +743,11 @@ workflows:
 
       - publish-packages:
           filters: *release_aperture_filters
-          tag: << pipeline.git.tag >>
           component: agent
           requires: *release_required
 
       - publish-packages:
           filters: *release_aperture_filters
-          tag: << pipeline.git.tag >>
           component: cli
           requires: *release_required
           matrix:
@@ -791,7 +761,6 @@ workflows:
           skip-component: demo-app
           update: everything
           release-train: pre-release
-          tag: << pipeline.git.tag >>
           requires: *release_required
 
       - update-environment:
@@ -800,7 +769,6 @@ workflows:
           skip-component: demo-app
           update: everything
           release-train: final-release
-          tag: << pipeline.git.tag >>
           requires: *release_required
 
       - update-environment:
@@ -809,17 +777,14 @@ workflows:
           environment-path: environments/customer-demo/
           component: demo-app
           update: images,deployment-code
-          tag: << pipeline.git.tag >>
 
       - update-brews:
           requires: *release_required
-          tag: << pipeline.git.tag >>
           deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
 
       - publish-aperture-lua:
           filters: *release_aperture_filters
           name: aperture-publish-lua-module
-          tag: << pipeline.git.tag >>
           requires: *release_required
 
   helm-release:
