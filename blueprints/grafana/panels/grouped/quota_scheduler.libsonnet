@@ -1,5 +1,5 @@
 local accepted_token_rate = import '../accepted_token_rate.libsonnet';
-local avg_preemption_gauge = import '../avg_preemption_gauge.libsonnet';
+local avg_preemption_chart = import '../avg_preemption_chart.libsonnet';
 local avg_preemption_time_series = import '../avg_preemption_time_series.libsonnet';
 local incoming_token_rate = import '../incoming_token_rate.libsonnet';
 local request_in_queue_duration = import '../request_in_queue_duration.libsonnet';
@@ -49,10 +49,10 @@ function(cfg) {
     avg_preemption_time_series(cfg).panel
     + g.panel.timeSeries.gridPos.withY(70)
     + g.panel.timeSeries.gridPos.withW(12),
-    avg_preemption_gauge(cfg).panel
-    + g.panel.barGauge.gridPos.withX(12)
-    + g.panel.barGauge.gridPos.withY(70)
-    + g.panel.barGauge.gridPos.withW(12),
+    avg_preemption_chart(cfg).panel
+    + g.panel.barChart.gridPos.withX(12)
+    + g.panel.barChart.gridPos.withY(70)
+    + g.panel.barChart.gridPos.withW(12),
     incoming_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withY(80),
     accepted_token_rate(cfg).panel
