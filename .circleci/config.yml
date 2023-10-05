@@ -148,6 +148,12 @@ jobs:
             buf
             python
       - opsninja_install
+      - run: &set_version
+          name: "Set version"
+          command: |
+            VERSION=$(echo << pipeline.git.tag >> | cut -d'v' -f2)
+            export VERSION
+            declare -p VERSION >> "${BASH_ENV}"
       - run:
           name: Login to buf.build
           command: |
@@ -157,7 +163,7 @@ jobs:
           command: |
             fn release publish-aperture-protobuf \
             --path /home/circleci/project/api/ \
-            --tag << pipeline.git.tag >>
+            --tag v${VERSION}
       - asdf_save_cache:
           cache_name: release-protobuf
 
@@ -216,12 +222,7 @@ jobs:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             golang
-      - run: &set_version
-          name: "Set version"
-          command: |
-            VERSION=$(echo << pipeline.git.tag >> | cut -d'v' -f2)
-            export VERSION
-            declare -p VERSION >> "${BASH_ENV}"
+      - run: *set_version
       - run:
           name: "Set build version"
           command: |
