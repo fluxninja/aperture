@@ -1,0 +1,43 @@
+name: Release Aperture
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      DEPLOYMENT_KEY_CLOUD_RO:
+        required: true
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Store deployment keys under pre-defined names
+        run: |
+          SSH_KEY_PATH=$HOME/.ssh/id_rsa_$(echo ${{ vars.DEPLOYMENT_KEY_CLOUD_RO_MD5 }} | tr -d ':')
+          [ ! -d $HOME/.ssh/ ] && mkdir $HOME/.ssh/
+          echo "${{ secrets.DEPLOYMENT_KEY_CLOUD_RO }}" | base64 -d > $SSH_KEY_PATH
+          chmod 0600 $SSH_KEY_PATH
+      - name: Install opsninja library
+        run: |
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo ${{ vars.DEPLOYMENT_KEY_CLOUD_RO_MD5 }} | tr -d ':')"
+          export SSH_AUTH_SOCK=""
+          # Bust asdf cache as our opsninja version is always 0.0.0
+          pip uninstall -y opsninja
+          pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+      - name: Prepare for the release
+        env:
+          LOGURU_LEVEL: TRACE
+        run: |
+          fn release release-aperture --version ${{ inputs.version }} --repo-path ./ --message 'Releasing version ${{ inputs.version }}'
