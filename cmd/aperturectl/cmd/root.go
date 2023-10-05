@@ -99,8 +99,7 @@ func Execute() {
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to remove latest blueprints")
 		}
-
-		err = blueprints.PullRunE("", "", false)(nil, nil)
+		err = blueprints.PullRunE(nil, nil)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to pull latest blueprints")
 		} else {
@@ -109,12 +108,11 @@ func Execute() {
 				log.Error().Err(err).Msg("Failed to update version file")
 			}
 		}
+		_ = blueprints.PullPostRunE(nil, nil)
 	}
 
 	if err = RootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("Error executing aperturectl")
 		os.Exit(1)
 	}
-
-	_ = blueprints.PullPostRunE(nil, nil)
 }

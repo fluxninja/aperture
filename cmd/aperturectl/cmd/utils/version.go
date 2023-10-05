@@ -19,7 +19,7 @@ func init() {
 }
 
 // CreateVersionFileIfNotExists creates a version file if it does not exist.
-func CreateVersionFileIfNotExists(version string) error {
+func createVersionFileIfNotExists(version string) error {
 	if _, err := os.Stat(versionFilePath); os.IsNotExist(err) {
 		return UpdateVersionFile(version)
 	}
@@ -31,7 +31,7 @@ func IsCurrentVersionNewer(version string) (bool, error) {
 	versionFile, err := os.Open(versionFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			_ = CreateVersionFileIfNotExists(version)
+			_ = createVersionFileIfNotExists(version)
 			return true, nil
 		}
 		return false, err
