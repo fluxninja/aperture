@@ -219,7 +219,7 @@ jobs:
       - run: &set_version
           name: "Set version"
           command: |
-            VERSION = $(echo << pipeline.git.tag >> | cut -d'v' -f2)
+            VERSION=$(echo << pipeline.git.tag >> | cut -d'v' -f2)
             export VERSION
             declare -p VERSION >> "${BASH_ENV}"
       - run:
@@ -799,7 +799,10 @@ workflows:
 
   post-release-latest:
     when:
-      equal: [latest, << pipeline.git.tag >>]
+      or:
+        - equal: [latest, << pipeline.git.tag >>]
+        - matches:
+            { value: << pipeline.git.tag >>, pattern: "^releases/aperture-.*/v.*" }
     jobs:
       - latest-release:
           name: "Latest release"
