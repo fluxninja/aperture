@@ -151,7 +151,7 @@ jobs:
       - run: &set_version
           name: "Set version"
           command: |
-            VERSION=$(echo << pipeline.git.tag >> | cut -d'v' -f2)
+            VERSION=$(echo << pipeline.git.tag >> | cut -d'/' -f3)
             export VERSION
             declare -p VERSION >> "${BASH_ENV}"
       - run:
@@ -163,7 +163,7 @@ jobs:
           command: |
             fn release publish-aperture-protobuf \
             --path /home/circleci/project/api/ \
-            --tag v${VERSION}
+            --tag "${VERSION}"
       - asdf_save_cache:
           cache_name: release-protobuf
 
@@ -226,7 +226,7 @@ jobs:
       - run:
           name: "Set build version"
           command: |
-            APERTURECTL_BUILD_VERSION=v${VERSION}
+            APERTURECTL_BUILD_VERSION=${VERSION}
             vless_version="${APERTURECTL_BUILD_VERSION##v}"
             APERTURECTL_BUILD_VERSION=${vless_version}
             APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
@@ -273,7 +273,7 @@ jobs:
           name: Attach packages to release
           command: |
             to_upload=( $(ls dist/packages/*) )
-            gh release upload v${VERSION} "${to_upload[@]}" --repo=fluxninja/aperture
+            gh release upload ${VERSION} "${to_upload[@]}" --repo=fluxninja/aperture
 
       - save_cache:
           name: Save go cache
@@ -390,8 +390,8 @@ jobs:
             vless="${VERSION:1}"
             rcless="${vless%%-*}"
             formula_version="${rcless%.*}"
-            branch="update_aperture_v${VERSION}"
-            msg="Update brews for release v${VERSION}"
+            branch="update_aperture_${VERSION}"
+            msg="Update brews for release ${VERSION}"
 
             git checkout -B "${branch}"
             ./scripts/update_brews.py add-version "${formula_version}"
@@ -423,7 +423,7 @@ jobs:
           name: Attach package to release
           command: |
             tar -czvf $HOME/aperture-lua.tar.gz .
-            gh release upload v${VERSION} "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
+            gh release upload ${VERSION} "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
   latest-release:
     executor: python-cimg-executor
@@ -543,7 +543,7 @@ jobs:
           name: Prepare Version and Update Build args
           command: |
             build_args="--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
-            build_args+=" --build-arg VERSION=${VERSION} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION}"
+            build_args+=" --build-arg VERSION=${VERSION:1} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION:1}"
             EXTRA_BUILD_ARGS=${build_args}
             export VERSION EXTRA_BUILD_ARGS
             declare -p VERSION EXTRA_BUILD_ARGS >> "${BASH_ENV}"
@@ -555,26 +555,26 @@ jobs:
           extra_build_args: "${EXTRA_BUILD_ARGS}"
           image: <<parameters.gcr-image>>
           path: <<parameters.path>>
-          tag: "${VERSION}"
+          tag: "${VERSION:1}"
           workspace-root: <<parameters.workspace-root>>
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
-          tag: "${VERSION}"
+          tag: "${VERSION:1}"
       - when:
           condition: <<parameters.push-to-dockerhub>>
           steps:
             - aperture_docker_tag:
                 source-registry: <<parameters.gcr-registry>>
                 source-image: <<parameters.gcr-image>>
-                source-tag: "${VERSION}"
+                source-tag: "${VERSION:1}"
                 dest-registry: <<parameters.dockerhub-registry>>
                 dest-image: <<parameters.dockerhub-image>>
-                dest-tag: "${VERSION}"
+                dest-tag: "${VERSION:1}"
             - run:
                 name: Push images to DockerHub
                 command: |
                   docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION}
+                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION:1}
 
   publish-aperture-docs:
     executor: python-cimg-executor
