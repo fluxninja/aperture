@@ -98,17 +98,12 @@ func Execute() {
 		err = blueprints.RemoveRunE(nil, nil)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to remove latest blueprints")
-		}
-		err = blueprints.PullRunE(nil, nil)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to pull latest blueprints")
 		} else {
 			err = utils.UpdateVersionFile(info.Version)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to update version file")
 			}
 		}
-		_ = blueprints.PullPostRunE(nil, nil)
 	}
 
 	if err = RootCmd.Execute(); err != nil {
