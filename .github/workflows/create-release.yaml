@@ -1,14 +1,15 @@
 name: Release Aperture
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       version:
         required: true
         type: string
-    secrets:
-      DEPLOYMENT_KEY_CLOUD_RO:
-        required: true
+
+concurrency:
+  cancel-in-progress: false
+  group: ${{ github.repository }}-release-aperture-${{ inputs.version }}
 
 jobs:
   create-release:
