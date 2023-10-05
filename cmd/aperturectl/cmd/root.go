@@ -23,9 +23,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// Version shows the version of ApertureCtl.
 var (
-	Version = info.Version
+	version = info.Version
 	verbose bool
 
 	controller utils.ControllerConn
@@ -58,9 +57,8 @@ var RootCmd = &cobra.Command{
 	Short:              "aperturectl - CLI tool to interact with Aperture",
 	DisableAutoGenTag:  true,
 	DisableSuggestions: false,
-	Long: `
-aperturectl is a CLI tool which can be used to interact with Aperture seamlessly.`,
-	Version: Version,
+	Long:               `aperturectl is a CLI tool to interact with Aperture.`,
+	Version:            version,
 }
 
 // Execute is the entry point for the CLI. It is called from the main package.
@@ -92,7 +90,23 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	if err := RootCmd.Execute(); err != nil {
+	newer, err := utils.IsCurrentVersionNewer(info.Version)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to check if current version is newer")
+	}
+	if newer {
+		err = blueprints.RemoveRunE(nil, nil)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to remove latest blueprints")
+		} else {
+			err = utils.UpdateVersionFile(info.Version)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to update version file")
+			}
+		}
+	}
+
+	if err = RootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("Error executing aperturectl")
 		os.Exit(1)
 	}
