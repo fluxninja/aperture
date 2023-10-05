@@ -148,6 +148,12 @@ jobs:
             buf
             python
       - opsninja_install
+      - run: &set_version
+          name: "Set version"
+          command: |
+            VERSION=$(echo << pipeline.git.tag >> | cut -d'/' -f3)
+            export VERSION
+            declare -p VERSION >> "${BASH_ENV}"
       - run:
           name: Login to buf.build
           command: |
@@ -157,7 +163,7 @@ jobs:
           command: |
             fn release publish-aperture-protobuf \
             --path /home/circleci/project/api/ \
-            --tag << pipeline.git.tag >>
+            --tag "${VERSION}"
       - asdf_save_cache:
           cache_name: release-protobuf
 
@@ -216,12 +222,7 @@ jobs:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
           tools: |-
             golang
-      - run: &set_version
-          name: "Set version"
-          command: |
-            VERSION = $(echo << pipeline.git.tag >> | cut -d'v' -f2)
-            export VERSION
-            declare -p VERSION >> "${BASH_ENV}"
+      - run: *set_version
       - run:
           name: "Set build version"
           command: |
@@ -272,7 +273,7 @@ jobs:
           name: Attach packages to release
           command: |
             to_upload=( $(ls dist/packages/*) )
-            gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
+            gh release upload ${VERSION} "${to_upload[@]}" --repo=fluxninja/aperture
 
       - save_cache:
           name: Save go cache
@@ -422,7 +423,7 @@ jobs:
           name: Attach package to release
           command: |
             tar -czvf $HOME/aperture-lua.tar.gz .
-            gh release upload "${VERSION}" "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
+            gh release upload ${VERSION} "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
   latest-release:
     executor: python-cimg-executor
@@ -542,7 +543,7 @@ jobs:
           name: Prepare Version and Update Build args
           command: |
             build_args="--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
-            build_args+=" --build-arg VERSION=${VERSION} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION}"
+            build_args+=" --build-arg VERSION=${VERSION:1} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION:1}"
             EXTRA_BUILD_ARGS=${build_args}
             export VERSION EXTRA_BUILD_ARGS
             declare -p VERSION EXTRA_BUILD_ARGS >> "${BASH_ENV}"
@@ -554,26 +555,26 @@ jobs:
           extra_build_args: "${EXTRA_BUILD_ARGS}"
           image: <<parameters.gcr-image>>
           path: <<parameters.path>>
-          tag: "${VERSION}"
+          tag: "${VERSION:1}"
           workspace-root: <<parameters.workspace-root>>
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
-          tag: "${VERSION}"
+          tag: "${VERSION:1}"
       - when:
           condition: <<parameters.push-to-dockerhub>>
           steps:
             - aperture_docker_tag:
                 source-registry: <<parameters.gcr-registry>>
                 source-image: <<parameters.gcr-image>>
-                source-tag: "${VERSION}"
+                source-tag: "${VERSION:1}"
                 dest-registry: <<parameters.dockerhub-registry>>
                 dest-image: <<parameters.dockerhub-image>>
-                dest-tag: "${VERSION}"
+                dest-tag: "${VERSION:1}"
             - run:
                 name: Push images to DockerHub
                 command: |
                   docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
-                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION}
+                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION:1}
 
   publish-aperture-docs:
     executor: python-cimg-executor
@@ -683,14 +684,14 @@ workflows:
   release-aperture:
     when:
       matches:
-        { value: << pipeline.git.tag >>, pattern: "^releases/aperture/.*/v.*" }
+        { value: << pipeline.git.tag >>, pattern: "^releases/aperture/v.*" }
     jobs:
       - build-push-add-tag:
           filters: &release_aperture_filters
             branches:
               ignore: /.+/
             tags:
-              only: /^releases/aperture/.*/v.*/
+              only: /^releases/aperture/v.*/
           name: release-aperture-controller
           dockerhub-image: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
@@ -756,6 +757,7 @@ workflows:
               goarch: ["amd64", "arm64"]
 
       - update-environment:
+          filters: *release_aperture_filters
           name: aperture-update-environment-everything-customer-demo
           environment-path: environments/customer-demo/
           skip-component: demo-app
@@ -764,6 +766,7 @@ workflows:
           requires: *release_required
 
       - update-environment:
+          filters: *release_aperture_filters
           name: aperture-update-environment-everything-production
           environment-path: environments/production-fn-cloud/
           skip-component: demo-app
@@ -772,6 +775,7 @@ workflows:
           requires: *release_required
 
       - update-environment:
+          filters: *release_aperture_filters
           requires: *release_required
           name: aperture-update-environment-demoapp-customer-demo
           environment-path: environments/customer-demo/
@@ -779,6 +783,7 @@ workflows:
           update: images,deployment-code
 
       - update-brews:
+          filters: *release_aperture_filters
           requires: *release_required
           deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
 
@@ -799,7 +804,12 @@ workflows:
 
   post-release-latest:
     when:
-      equal: [latest, << pipeline.git.tag >>]
+      or:
+        - equal: [latest, << pipeline.git.tag >>]
+        - matches:
+            { value: << pipeline.git.tag >>, pattern: "^releases/aperture-.*/v.*" }
+        - matches:
+            { value: << pipeline.git.tag >>, pattern: "^v.*$" }
     jobs:
       - latest-release:
           name: "Latest release"
