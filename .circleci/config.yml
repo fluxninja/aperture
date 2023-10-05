@@ -10,13 +10,57 @@ executors:
   base-cimg-executor:
     docker:
       - image: cimg/base:2022.07
+  ubuntu-18-executor:
+    docker:
+      - image: cimg/base:2022.12-18.04
 
 orbs:
+  docker: circleci/docker@2.1.1
   path-filtering: circleci/path-filtering@0.1.3
   continuation: circleci/continuation@0.3.1
+  gcp-gcr: circleci/gcp-gcr@0.15.1
 
 # TODO: Sync this with continue-workflows.yml
 commands:
+
+  aperture_docker_tag:
+    description: |
+      Tag source image with destination registry, image and tag
+    parameters:
+      source-registry:
+        type: string
+        description: Source registry of the image to tag
+      source-image:
+        type: string
+        description: Source image name to tag
+      source-tag:
+        type: string
+        description: Source tag to use for the source image
+      dest-registry:
+        type: string
+        description: Destination registry to use for the image
+      dest-image:
+        type: string
+        description: Destination image name to be used
+      dest-tag:
+        type: string
+        description: Destination tag to be used for the image
+      step-name:
+        type: string
+        description: Custom step name, if desired
+        default: Tag docker image
+    steps:
+      - run:
+          command: .circleci/scripts/docker_tag.sh
+          environment:
+            PARAM_SOURCE_REGISTRY: <<parameters.source-registry>>
+            PARAM_SOURCE_IMAGE: <<parameters.source-image>>
+            PARAM_SOURCE_TAG: <<parameters.source-tag>>
+            PARAM_DEST_REGISTRY: <<parameters.dest-registry>>
+            PARAM_DEST_IMAGE: <<parameters.dest-image>>
+            PARAM_DEST_TAG: <<parameters.dest-tag>>
+          name: <<parameters.step-name>>
+
   asdf_install:
     description: "Install tools using ASDF"
     parameters:
@@ -56,6 +100,7 @@ commands:
           environment:
             TOOLS: << parameters.tools >>
           command: .circleci/scripts/asdf_install.sh
+
   asdf_save_cache:
     parameters:
       cache_name:
@@ -71,6 +116,7 @@ commands:
             "go.mod" }}
           paths:
             - ~/.asdf
+
   opsninja_install:
     steps:
       - add_ssh_keys:
@@ -92,29 +138,298 @@ commands:
 
 jobs:
 
+  publish-protobuf-files:
+    executor: python-cimg-executor
+    steps:
+      - checkout
+      - asdf_install:
+          cache_name: release-protobuf
+          tools: |-
+            buf
+            python
+      - opsninja_install
+      - run:
+          name: Login to buf.build
+          command: |
+            echo ${BUF_BUILD_TOKEN} | buf registry login --username ${BUF_BUILD_USERNAME} --token-stdin
+      - run:
+          name: Publish protobuf to buf.build
+          command: |
+            fn release publish-aperture-protobuf \
+            --path /home/circleci/project/api/ \
+            --tag << pipeline.git.tag >>
+      - asdf_save_cache:
+          cache_name: release-protobuf
+
+  publish-aperture-java-release:
+    parameters:
+      path:
+        type: string
+        description: Path to aperture-java
+        default: sdks/aperture-java
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+            - gradle-v1-
+      # See https://discuss.circleci.com/t/gpg-keys-as-environment-variables/28641
+      - run:
+          name: Publish to Sonatype
+          command: |
+            cd <<parameters.path>>
+            GPG_PRIVATE_KEY=$(echo -e ${GPG_PRIVATE_KEY}) ./gradlew assemble publishToSonatype
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-v1-{{ checksum "<<parameters.path>>/build.gradle.kts" }}
+
+  publish-packages:
+    parameters:
+      workspace-name:
+        type: string
+        description:
+          the name of the workspace to which built packages should be added
+        default: packages
+      goarch:
+        type: string
+        description: the GOARCH to use for the build
+        default: amd64
+      goos:
+        type: string
+        description: the GOOS to use for the build
+        default: linux
+      component:
+        type: string
+        description: the component to build
+    executor: ubuntu-18-executor
+    environment:
+      PACKAGES_DIR: "/tmp/packages"
+      GOARCH: <<parameters.goarch>>
+      GOOS: <<parameters.goos>>
+      COMPONENT: <<parameters.component>>
+    steps:
+      - checkout
+      - asdf_install:
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
+          tools: |-
+            golang
+      - run: &set_version
+          name: "Set version"
+          command: |
+            VERSION = $(echo << pipeline.git.tag >> | cut -d'v' -f2)
+            export VERSION
+            declare -p VERSION >> "${BASH_ENV}"
+      - run:
+          name: "Set build version"
+          command: |
+            APERTURECTL_BUILD_VERSION=${VERSION}
+            vless_version="${APERTURECTL_BUILD_VERSION##v}"
+            APERTURECTL_BUILD_VERSION=${vless_version}
+            APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
+
+            export APERTURECTL_BUILD_VERSION
+            export APERTURE_PACKAGE_VERSION
+            declare -p APERTURECTL_BUILD_VERSION >> "${BASH_ENV}"
+            declare -p APERTURE_PACKAGE_VERSION >> "${BASH_ENV}"
+      - restore_cache:
+          name: Restore go cache
+          keys:
+            - aperture-{{ .Environment.COMPONENT }}-packages-go-cache
+      - run:
+          name: "Compile binaries"
+          command: ./.circleci/scripts/compile.sh "${COMPONENT}"
+      - run:
+          name: Install nFPM
+          command: ./.circleci/scripts/install_nfpm.sh
+      - run:
+          name: Package
+          command: ./.circleci/scripts/nfpm_package.sh
+      - when:
+          condition:
+            equal: [cli, << parameters.component >>]
+          steps:
+            - run:
+                name: Create tarball file for Given OS
+                command: ./.circleci/scripts/create_tarball_file.sh
+            - run:
+                name: Create binaries for different OS
+                command: |
+                  mv "$HOME"/project/dist/aperturectl "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}"
+                  cp -rf "$HOME"/project/dist/aperturectl-"${APERTURECTL_BUILD_VERSION#v}"-"${GOOS}"-"${GOARCH}" "$HOME"/project/dist/packages/
+      - run: &install-gh-cli
+          name: Install GH cli
+          command: |
+            type -p curl >/dev/null || sudo apt install curl -y
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && sudo apt update \
+            && sudo apt install gh -y
+      - run:
+          name: Attach packages to release
+          command: |
+            to_upload=( $(ls dist/packages/*) )
+            gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
+
+      - save_cache:
+          name: Save go cache
+          key: aperture-{{ .Environment.COMPONENT }}-packages-go-cache
+          paths:
+            - ../.cache/go-build
+          when: on_success
+      - asdf_save_cache:
+          cache_name: aperture-{{ .Environment.COMPONENT }}-packages
+
+  update-environment:
+    parameters:
+      job-root:
+        type: string
+        default: "/home/circleci"
+        description:
+          The root folder of the job where all repositories will be cloned to
+      manifests-repo:
+        type: string
+        default: git@github.com:fluxninja/argo-manifests.git
+        description: ArgoCD manifests repository to update
+      manifests-branch:
+        type: string
+        default: tests
+        description: Branch to use when pushing deployment changes
+      environment-path:
+        type: string
+        description: Path to the environment to update
+      component:
+        type: string
+        default: ""
+        description:
+          Application component to update image and deployment code for
+      skip-component:
+        type: string
+        default: ""
+        description:
+          Application component to skip to update image and deployment code for
+      update:
+        type: string
+        default: everything
+        description:
+          Whether to update 'images', 'deployment-code' or 'everything'
+      release-train:
+        type: string
+        default: latest
+        description: What images to use for updating components
+    executor: python-cimg-executor
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "f9:49:04:10:b1:77:16:b0:0e:c0:ba:21:0e:9d:fd:40" # argo-manifests R/W
+            - "2a:af:6f:d5:b9:d4:dd:95:df:18:47:e9:0b:4a:c7:82" # deployment R/W
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8" #cloud keys
+      - checkout
+      - gcp-gcr/gcr-auth
+      - asdf_install:
+          cache_name: update-environment
+          tools: python
+      - opsninja_install
+      - run:
+          name: Update application in the deployment
+          environment:
+            JOB_ROOT: << parameters.job-root >>
+            UPDATE: << parameters.update >>
+            MANIFESTS_BRANCH: << parameters.manifests-branch >>
+            MANIFESTS_REPO: << parameters.manifests-repo >>
+            COMPONENT: << parameters.component >>
+            ENVIRONMENT_PATH: << parameters.environment-path >>
+            SKIP_COMPONENT: << parameters.skip-component >>
+            RELEASE_TRAIN: << parameters.release-train >>
+            RELEASE_TAG: << pipeline.git.tag >>
+          command: .circleci/scripts/update_environment.sh
+      - asdf_save_cache:
+          cache_name: update-environment
+
+  update-brews:
+    parameters:
+      deployment-key:
+        type: string
+        description:
+          Deployment key to use when interacting with remote repository
+    executor: python-cimg-executor
+    environment:
+      TAP_REPO: /home/circleci/taps
+      APERTURE_REPO: /home/circleci/project
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - << parameters.deployment-key >>
+      - run: *set_version
+      - run:
+          name: "Prepare brews repository"
+          command: |
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_${DEPLOYMENT_KEY//:/}"
+            export SSH_AUTH_SOCK=""
+            declare -p GIT_SSH_COMMAND SSH_AUTH_SOCK >> "${BASH_ENV}"
+
+            git config --global user.name "CircleCI-Gitbot"
+            git config --global user.email "circleci-gitbot@fluxninja.com"
+
+            git clone --depth=1 git@github.com:fluxninja/homebrew-aperture.git "${TAP_REPO}"
+          environment:
+            DEPLOYMENT_KEY: << parameters.deployment-key >>
+      - run: *install-gh-cli
+      - run:
+          name: "Update brew repository"
+          command: |
+            cd "${TAP_REPO}"
+
+            vless="${VERSION:1}"
+            rcless="${vless%%-*}"
+            formula_version="${rcless%.*}"
+            branch="update_aperture_${VERSION}"
+            msg="Update brews for release ${VERSION}"
+
+            git checkout -B "${branch}"
+            ./scripts/update_brews.py add-version "${formula_version}"
+            ./scripts/update_brews.py delete
+            ./scripts/update_brews.py update
+
+            git status
+            git diff
+
+            git add .
+            git commit -m "${msg}"
+
+            # Because we use shallow clone above, the new branch won't be tracked
+            # and gh cli will stop to ask what to do.
+            # Instead we can change git configuration to tell it to track all remote branches
+            git remote set-branches origin '*'
+            # Push and create PR
+            git push --set-upstream origin "${branch}"
+            gh pr create --title "${msg}" --body "" --label "pr-pull"
+
+  publish-aperture-lua:
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run: *install-gh-cli
+      - run: *set_version
+      - run:
+          working_directory: gateways/lua/
+          name: Attach package to release
+          command: |
+            tar -czvf $HOME/aperture-lua.tar.gz .
+            gh release upload "${VERSION}" "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
+
   latest-release:
     executor: python-cimg-executor
     steps:
       - run:
           name: Latest release
           command: echo "Latest release is << pipeline.git.tag >>"
-
-  release-components:
-    executor: python-cimg-executor
-    steps:
-      - checkout
-      - asdf_install:
-          cache_name: release
-          tools: |-
-            python
-            gcloud
-      - opsninja_install
-      - run:
-          name: Schedule release jobs
-          working_directory: ops/apps/opsninja
-          command: fn circleci trigger-release --tag << pipeline.git.tag >>
-      - asdf_save_cache:
-          cache_name: release
 
   helm-release:
     executor: base-cimg-executor
@@ -130,6 +445,188 @@ jobs:
             export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${APERTURE_RW_KEY_FINGERPRINT}" | tr -d ':')"
             export SSH_AUTH_SOCK=""
             .circleci/scripts/helm_release.sh
+
+  build-push-add-tag:
+    parameters:
+      attach-workspace:
+        type: boolean
+        description: Boolean for whether or not to attach to an existing workspace
+        default: false
+      docker-context:
+        type: string
+        description:
+          Path to the directory containing your build context, defaults to .
+        default: .
+      dockerfile:
+        type: string
+        description: Name of dockerfile to use, defaults to Dockerfile
+        default: Dockerfile
+      executor:
+        type: executor
+        description: executor to use for this job
+        default: base-cimg-executor
+      gcr-registry:
+        type: string
+        description: Google Container Registry that this image should be pushed into
+      gcr-image:
+        type: string
+        description: A name for your Docker image
+      dockerhub-image:
+        type: string
+        description: Dockerhub image name
+        default: ""
+      dockerhub-registry:
+        type: string
+        description: Dockerhub registry
+        default: docker.io
+      path:
+        type: string
+        description: Path to the directory containing your Dockerfile, defaults to .
+        default: .
+      remote-docker-version:
+        type: string
+        description: Specify the remote docker version
+        default: 20.10.18
+      setup-remote-docker:
+        type: boolean
+        description: Setup and use CircleCI's remote Docker environment
+        default: true
+      target-tag:
+        type: string
+        description: Additional image tag applied when job runs on main branch
+        default: latest
+      use-docker-layer-caching:
+        type: boolean
+        description: Setup docker layer caching for optimized build
+        default: false
+      workspace-root:
+        type: string
+        description: >
+          Workspace root path that is either an absolute path or a path relative to
+          the working directory. Defaults to '.' (the working directory)
+        default: .
+      push-to-dockerhub:
+        type: boolean
+        description:
+          Boolean for whether or not to push images to DockerHub
+        default: false
+      resource-class:
+        type: string
+        default: small
+        description: Resource class for executor.
+    executor: <<parameters.executor>>
+    resource_class: <<parameters.resource-class>>
+    environment:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "7c:fd:54:04:73:74:42:c0:ea:e5:5a:2c:d1:ee:db:69"
+      - run:
+          name: Create public ssh keys for their private counterparts
+          command: |
+            if [ -d "$HOME/.ssh/" ]; then
+              for private_key in ~/.ssh/id_rsa_*; do
+                ssh-keygen -y -f "${private_key}" > "${private_key}.pub"
+              done
+            fi
+      - checkout
+      - when:
+          condition: <<parameters.setup-remote-docker>>
+          steps:
+            - setup_remote_docker:
+                docker_layer_caching: true
+                version: <<parameters.remote-docker-version>>
+      - run: *set_version
+      - run:
+          name: Prepare Version and Update Build args
+          command: |
+            build_args="--build-arg=APERTURECTL_BUILD_GIT_COMMIT_HASH=<<pipeline.git.revision>> --build-arg=APERTURECTL_BUILD_GIT_BRANCH=<<pipeline.git.tag>>"
+            build_args+=" --build-arg VERSION=${VERSION} --build-arg=APERTURECTL_BUILD_VERSION=${VERSION}"
+            EXTRA_BUILD_ARGS=${build_args}
+            export VERSION EXTRA_BUILD_ARGS
+            declare -p VERSION EXTRA_BUILD_ARGS >> "${BASH_ENV}"
+      - gcp-gcr/gcr-auth
+      - gcp-gcr/build-image:
+          attach-workspace: <<parameters.attach-workspace>>
+          docker-context: <<parameters.docker-context>>
+          dockerfile: <<parameters.dockerfile>>
+          extra_build_args: "${EXTRA_BUILD_ARGS}"
+          image: <<parameters.gcr-image>>
+          path: <<parameters.path>>
+          tag: "${VERSION}"
+          workspace-root: <<parameters.workspace-root>>
+      - gcp-gcr/push-image:
+          image: <<parameters.gcr-image>>
+          tag: "${VERSION}"
+      - when:
+          condition: <<parameters.push-to-dockerhub>>
+          steps:
+            - aperture_docker_tag:
+                source-registry: <<parameters.gcr-registry>>
+                source-image: <<parameters.gcr-image>>
+                source-tag: "${VERSION}"
+                dest-registry: <<parameters.dockerhub-registry>>
+                dest-image: <<parameters.dockerhub-image>>
+                dest-tag: "${VERSION}"
+            - run:
+                name: Push images to DockerHub
+                command: |
+                  docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                  docker push <<parameters.dockerhub-registry>>/<<parameters.dockerhub-image>>:${VERSION}
+
+  publish-aperture-docs:
+    executor: python-cimg-executor
+    parameters:
+      release-ref:
+        type: string
+        default: main
+        description: What release tag or branch to copy documentation from
+      dry-run:
+        type: boolean
+        default: false
+        description: Whether to push changes to the deployment repository
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "3e:fe:fa:a1:5f:64:4e:44:4b:3f:f1:90:5a:6b:84:79"
+            - "2e:ea:3a:1e:2c:59:2d:40:aa:6a:a8:f5:1d:e2:91:f0"
+            - "10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
+      - asdf_install:
+          cache_name: aperture-docs
+      - run:
+          name: Install opsninja and its dependencies
+          command: |
+            # We need R/O access to cloud repository to be able to fetch opsninja library
+            # FIXME: make "releases" of opsninja library somehow, even as a separate repository
+            # to limit exposure.
+            export CLOUD_RO_KEY_FINGERPRINT="10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8"
+            export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_$(echo "${CLOUD_RO_KEY_FINGERPRINT}" | tr -d ':')"
+            export SSH_AUTH_SOCK=""
+            # Bust asdf cache as our opsninja version is always 0.0.0
+            pip uninstall -y opsninja
+            pip install 'git+ssh://git@github.com/fluxninja/cloud@main#egg=opsninja&subdirectory=ops/apps/opsninja/'
+      - run:
+          name: Install yarn
+          command: npm install --global yarn
+      - run:
+          name: Publish documentation updates
+          command: |
+            export LOGURU_LEVEL=TRACE
+            export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
+            args=(
+              --release=<< parameters.release-ref >>
+              --source-repo-path=/home/circleci/project/
+              --docs-root-dir=docs/
+              --no-build-docs
+            )
+            if [[ "<< parameters.dry-run >>" == "true" ]]; then
+              args+=( --dry-run )
+            fi
+            fn release update-aperture-docs "${args[@]}"
+      - asdf_save_cache:
+          cache_name: aperture-docs
 
 workflows:
   version: 2
@@ -183,18 +680,112 @@ workflows:
           <<: *path_filtering_job
           base-revision: main
 
-  release-components:
+  release-aperture:
     when:
       matches:
-        { value: << pipeline.git.tag >>, pattern: "^releases/(?!charts).*$" }
+        { value: << pipeline.git.tag >>, pattern: "^releases/aperture/.*/v.*" }
     jobs:
-      - release-components:
-          # both this and workflow's when is needed
-          filters:
+      - build-push-add-tag:
+          filters: &release_aperture_filters
             branches:
               ignore: /.+/
             tags:
-              only: /^releases\/.*$/
+              only: /^releases/aperture/.*/v.*/
+          name: release-aperture-controller
+          dockerhub-image: fluxninja/aperture-controller
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-controller
+          docker-context: .
+          dockerfile: cmd/aperture-controller/Dockerfile
+          use-docker-layer-caching: true
+          resource-class: large
+          push-to-dockerhub: true
+
+      - build-push-add-tag:
+          filters: *release_aperture_filters
+          name: release-aperture-agent
+          dockerhub-image: fluxninja/aperture-agent
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-agent
+          docker-context: .
+          dockerfile: cmd/aperture-agent/Dockerfile
+          use-docker-layer-caching: true
+          resource-class: large
+          push-to-dockerhub: true
+
+      - build-push-add-tag:
+          filters: *release_aperture_filters
+          name: release-aperture-operator
+          dockerhub-image: fluxninja/aperture-operator
+          gcr-registry: gcr.io/devel-309501
+          gcr-image: cf-fn/aperture-operator
+          docker-context: .
+          dockerfile: ./operator/Dockerfile
+          use-docker-layer-caching: true
+          push-to-dockerhub: true
+
+      - publish-aperture-docs:
+          filters: *release_aperture_filters
+          release-ref: << pipeline.git.tag >>
+
+      - publish-protobuf-files:
+          filters: *release_aperture_filters
+          requires: &release_required
+            - "release-aperture-controller"
+            - "release-aperture-agent"
+            - "release-aperture-operator"
+
+      - publish-aperture-java-release:
+          path: sdks/aperture-java
+          context: sonatype
+          filters: *release_aperture_filters
+          requires: *release_required
+
+      - publish-packages:
+          filters: *release_aperture_filters
+          component: agent
+          requires: *release_required
+
+      - publish-packages:
+          filters: *release_aperture_filters
+          component: cli
+          requires: *release_required
+          matrix:
+            parameters:
+              goos: ["linux", "darwin"]
+              goarch: ["amd64", "arm64"]
+
+      - update-environment:
+          name: aperture-update-environment-everything-customer-demo
+          environment-path: environments/customer-demo/
+          skip-component: demo-app
+          update: everything
+          release-train: pre-release
+          requires: *release_required
+
+      - update-environment:
+          name: aperture-update-environment-everything-production
+          environment-path: environments/production-fn-cloud/
+          skip-component: demo-app
+          update: everything
+          release-train: final-release
+          requires: *release_required
+
+      - update-environment:
+          requires: *release_required
+          name: aperture-update-environment-demoapp-customer-demo
+          environment-path: environments/customer-demo/
+          component: demo-app
+          update: images,deployment-code
+
+      - update-brews:
+          requires: *release_required
+          deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
+
+      - publish-aperture-lua:
+          filters: *release_aperture_filters
+          name: aperture-publish-lua-module
+          requires: *release_required
 
   helm-release:
     when:
@@ -205,18 +796,6 @@ workflows:
           filters:
             tags:
               only: /^releases/charts/.*/v.*/
-
-  post-release:
-    when:
-      matches: { value: << pipeline.git.tag >>, pattern: "^v.*$" }
-    jobs:
-      - continuation/continue:
-          filters:
-            branches:
-              ignore: /.+/
-            tags:
-              only: /^v.*$/
-          configuration_path: .circleci/post-release.yaml
 
   post-release-latest:
     when:
