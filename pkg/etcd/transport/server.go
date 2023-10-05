@@ -64,9 +64,12 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 			resp, err := t.SendRequest(agentName, msg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to send request to agent")
-				resp.Error = err
+				respCh <- &Response{
+					Error: err,
+				}
+			} else {
+				respCh <- resp
 			}
-			respCh <- resp
 		}(agent)
 	}
 

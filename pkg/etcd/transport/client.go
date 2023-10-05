@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path"
 	"strings"
-	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -62,11 +61,8 @@ func RegisterWatcher(lc fx.Lifecycle, t *EtcTransportClient, agentName string) {
 }
 
 func (c *EtcTransportClient) RegisterWatcher(agentName string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-	defer cancel()
-
 	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
-	watchCh := c.etcdClient.Watch(ctx, path, clientv3.WithPrefix())
+	watchCh := c.etcdClient.Watch(context.Background(), path, clientv3.WithPrefix())
 	for watchResp := range watchCh {
 		if watchResp.Err() != nil {
 			log.Error().Err(watchResp.Err()).Msg("failed to watch etcd path")
@@ -81,7 +77,7 @@ func (c *EtcTransportClient) RegisterWatcher(agentName string) {
 					Data:   event.Kv.Value,
 					Client: agentName,
 				}
-				go c.handleRequest(ctx, request)
+				go c.handleRequest(context.Background(), request)
 			}
 		}
 	}
