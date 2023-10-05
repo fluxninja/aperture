@@ -683,14 +683,14 @@ workflows:
   release-aperture:
     when:
       matches:
-        { value: << pipeline.git.tag >>, pattern: "^releases/aperture/.*/v.*" }
+        { value: << pipeline.git.tag >>, pattern: "^releases/aperture/v.*" }
     jobs:
       - build-push-add-tag:
           filters: &release_aperture_filters
             branches:
               ignore: /.+/
             tags:
-              only: /^releases/aperture/.*/v.*/
+              only: /^releases/aperture/v.*/
           name: release-aperture-controller
           dockerhub-image: fluxninja/aperture-controller
           gcr-registry: gcr.io/devel-309501
