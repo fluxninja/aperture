@@ -12,7 +12,7 @@ function(componentsList, policyName, datasource, extraFilters={}) {
   local panels = std.flattenArrays(std.filter(function(x) x != null, [
     if std.objectHas(panelLibrary, c.component_name)
     then
-      unwrap(c, policyName, datasource, extraFilters).panel
+      unwrap(datasource, policyName, c, extraFilters).panel
     for c in components.internal_components
   ])),
 
