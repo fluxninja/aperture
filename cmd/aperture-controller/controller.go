@@ -14,11 +14,15 @@ import (
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
+	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
 	"github.com/fluxninja/aperture/v2/cmd/aperture-controller/controller"
 	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/cmd"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
+	"github.com/fluxninja/aperture/v2/pkg/peers"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/rpc"
@@ -38,10 +42,16 @@ func main() {
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
+		transport.TransportModule,
+		peers.Constructor{}.Module(),
+		fx.Provide(
+			agentinfo.ProvideAgentInfo,
+			agent.ProvidePeersPrefix,
+		),
 		rpc.ServerModule,
-		agents.Module,
 		cmd.Module,
 		Module(),
+		agents.Module,
 	)
 
 	defer log.WaitFlush()
