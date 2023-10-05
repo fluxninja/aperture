@@ -2,14 +2,13 @@ package blueprints
 
 import (
 	"github.com/spf13/cobra"
-
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/v2/pkg/info"
 )
 
 const (
-	defaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
-	latestTag             = "latest"
+	// DefaultBlueprintsRepo is the default repository for blueprints.
+	DefaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
+	// LatestTag is the tag for the latest version of blueprints.
+	LatestTag = "latest"
 )
 
 var (
@@ -44,33 +43,4 @@ var BlueprintsCmd = &cobra.Command{
 	Use:   "blueprints",
 	Short: "Aperture Blueprints",
 	Long:  `Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		newer, err := utils.IsCurrentVersionNewer(info.Version)
-		if err != nil {
-			return err
-		}
-		if newer {
-			err = removeCmd.RunE(cmd, args)
-			if err != nil {
-				return err
-			}
-			err = removeCmd.PostRunE(cmd, args)
-			if err != nil {
-				return err
-			}
-			err = pullCmd.RunE(cmd, args)
-			if err != nil {
-				return err
-			}
-			err = pullCmd.PostRunE(cmd, args)
-			if err != nil {
-				return err
-			}
-			return utils.UpdateVersionFile(info.Version)
-		}
-		return nil
-	},
-	PostRunE: func(cmd *cobra.Command, args []string) error {
-		return pullCmd.PostRunE(cmd, args)
-	},
 }

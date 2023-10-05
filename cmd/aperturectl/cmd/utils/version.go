@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"golang.org/x/mod/semver"
+	"github.com/Masterminds/semver/v3"
 )
 
 var versionFilePath string
@@ -13,9 +13,8 @@ var versionFilePath string
 func init() {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		userHomeDir = "/tmp"
+		userHomeDir = os.TempDir()
 	}
-
 	versionFilePath = filepath.Join(userHomeDir, ".aperturectl", "version")
 }
 
@@ -31,6 +30,10 @@ func CreateVersionFileIfNotExists(version string) error {
 func IsCurrentVersionNewer(version string) (bool, error) {
 	versionFile, err := os.Open(versionFilePath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			_ = CreateVersionFileIfNotExists(version)
+			return true, nil
+		}
 		return false, err
 	}
 	defer versionFile.Close()
@@ -42,7 +45,10 @@ func IsCurrentVersionNewer(version string) (bool, error) {
 		return false, err
 	}
 
-	return semver.Compare(version, versionOnFile.String()) > 0, nil
+	semverVersion, _ := semver.NewVersion(version)
+	semverVersionOnFile, _ := semver.NewVersion(versionOnFile.String())
+
+	return semverVersion.Compare(semverVersionOnFile) > 0, nil
 }
 
 // UpdateVersionFile updates the version file with the current version.

@@ -10,25 +10,34 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/gofrs/flock"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 var lock *flock.Flock
 
 var pullCmd = &cobra.Command{
-	Use:   "pull",
-	Short: "Pull Aperture Blueprints",
-	Long: `
-Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.`,
+	Use:           "pull",
+	Short:         "Pull Aperture Blueprints",
+	Long:          `Use this command to pull the Aperture Blueprints in local system to use for generating Aperture Policies and Grafana Dashboards.`,
 	SilenceErrors: true,
 	SilenceUsage:  true,
 	Example: `aperturectl blueprints pull
 
 aperturectl blueprints pull --version latest`,
-	RunE: func(_ *cobra.Command, _ []string) error {
+	RunE:     PullRunE("", "", false),
+	PostRunE: PullPostRunE,
+}
+
+// PullRunE is the RunE function executed by the pull command.
+func PullRunE(uri string, version string, skip bool) func(cmd *cobra.Command, args []string) error {
+	blueprintsURI = uri
+	blueprintsVersion = version
+	skipPull = skip
+	return func(cmd *cobra.Command, args []string) error {
 		userHomeDir, err := os.UserHomeDir()
 		if err != nil {
 			return err
@@ -46,9 +55,9 @@ aperturectl blueprints pull --version latest`,
 		// set the URI
 		if blueprintsURI == "" {
 			if blueprintsVersion == "" {
-				blueprintsVersion = latestTag
+				blueprintsVersion = LatestTag
 			}
-			blueprintsURI = fmt.Sprintf("%s@%s", defaultBlueprintsRepo, blueprintsVersion)
+			blueprintsURI = fmt.Sprintf("%s@%s", DefaultBlueprintsRepo, blueprintsVersion)
 		} else {
 			// uri can be a file or url
 			// first detect if it's a local path
@@ -94,7 +103,7 @@ aperturectl blueprints pull --version latest`,
 				return err
 			}
 		} else {
-			log.Debug().Msg("skipping pulling blueprints")
+			log.Trace().Msg("Skipping pulling blueprints")
 		}
 
 		blueprintsDir = filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
@@ -104,11 +113,13 @@ aperturectl blueprints pull --version latest`,
 			return err
 		}
 		return nil
-	},
-	PostRunE: func(_ *cobra.Command, _ []string) error {
-		if lock == nil {
-			return nil
-		}
-		return lock.Unlock()
-	},
+	}
+}
+
+// PullPostRunE is the PostRunE function executed by the pull command.
+func PullPostRunE(_ *cobra.Command, _ []string) error {
+	if lock == nil {
+		return nil
+	}
+	return lock.Unlock()
 }

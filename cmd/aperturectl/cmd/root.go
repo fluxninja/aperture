@@ -90,14 +90,31 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	err = utils.CreateVersionFileIfNotExists(version)
+	newer, err := utils.IsCurrentVersionNewer(info.Version)
 	if err != nil {
-		log.Error().Err(err).Msg("Error creating version file")
-		os.Exit(1)
+		log.Error().Err(err).Msg("Failed to check if current version is newer")
+	}
+	if newer {
+		err = blueprints.RemoveRunE(nil, nil)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to remove latest blueprints")
+		}
+
+		err = blueprints.PullRunE("", "", false)(nil, nil)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to pull latest blueprints")
+		} else {
+			err = utils.UpdateVersionFile(info.Version)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to update version file")
+			}
+		}
 	}
 
-	if err := RootCmd.Execute(); err != nil {
+	if err = RootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("Error executing aperturectl")
 		os.Exit(1)
 	}
+
+	_ = blueprints.PullPostRunE(nil, nil)
 }
