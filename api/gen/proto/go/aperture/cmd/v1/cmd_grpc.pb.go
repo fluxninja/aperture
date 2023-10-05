@@ -54,7 +54,7 @@ type ControllerClient interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
-	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
@@ -150,8 +150,8 @@ func (c *controllerClient) PreviewHTTPRequests(ctx context.Context, in *PreviewH
 	return out, nil
 }
 
-func (c *controllerClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *controllerClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error) {
+	out := new(v1.UpsertPolicyResponse)
 	err := c.cc.Invoke(ctx, Controller_UpsertPolicy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ type ControllerServer interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
-	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error)
+	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
@@ -247,7 +247,7 @@ func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *Preview
 func (UnimplementedControllerServer) PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewHTTPRequests not implemented")
 }
-func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertPolicy not implemented")
 }
 func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error) {

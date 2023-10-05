@@ -8,6 +8,6 @@ import "google/protobuf/empty.proto";
 
 // PolicyService describes Policy APIs of the cloud controller from the aperturectl POV
 service PolicyService {
-  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
+  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (aperture.policy.language.v1.UpsertPolicyResponse);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
 }
