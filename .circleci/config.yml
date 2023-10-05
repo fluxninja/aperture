@@ -226,7 +226,7 @@ jobs:
       - run:
           name: "Set build version"
           command: |
-            APERTURECTL_BUILD_VERSION=${VERSION}
+            APERTURECTL_BUILD_VERSION=v${VERSION}
             vless_version="${APERTURECTL_BUILD_VERSION##v}"
             APERTURECTL_BUILD_VERSION=${vless_version}
             APERTURE_PACKAGE_VERSION=${vless_version//[-]/\~}
@@ -273,7 +273,7 @@ jobs:
           name: Attach packages to release
           command: |
             to_upload=( $(ls dist/packages/*) )
-            gh release upload "${VERSION}" "${to_upload[@]}" --repo=fluxninja/aperture
+            gh release upload v${VERSION} "${to_upload[@]}" --repo=fluxninja/aperture
 
       - save_cache:
           name: Save go cache
@@ -390,8 +390,8 @@ jobs:
             vless="${VERSION:1}"
             rcless="${vless%%-*}"
             formula_version="${rcless%.*}"
-            branch="update_aperture_${VERSION}"
-            msg="Update brews for release ${VERSION}"
+            branch="update_aperture_v${VERSION}"
+            msg="Update brews for release v${VERSION}"
 
             git checkout -B "${branch}"
             ./scripts/update_brews.py add-version "${formula_version}"
@@ -423,7 +423,7 @@ jobs:
           name: Attach package to release
           command: |
             tar -czvf $HOME/aperture-lua.tar.gz .
-            gh release upload "${VERSION}" "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
+            gh release upload v${VERSION} "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
   latest-release:
     executor: python-cimg-executor
@@ -757,6 +757,7 @@ workflows:
               goarch: ["amd64", "arm64"]
 
       - update-environment:
+          filters: *release_aperture_filters
           name: aperture-update-environment-everything-customer-demo
           environment-path: environments/customer-demo/
           skip-component: demo-app
@@ -765,6 +766,7 @@ workflows:
           requires: *release_required
 
       - update-environment:
+          filters: *release_aperture_filters
           name: aperture-update-environment-everything-production
           environment-path: environments/production-fn-cloud/
           skip-component: demo-app
@@ -773,6 +775,7 @@ workflows:
           requires: *release_required
 
       - update-environment:
+          filters: *release_aperture_filters
           requires: *release_required
           name: aperture-update-environment-demoapp-customer-demo
           environment-path: environments/customer-demo/
@@ -780,6 +783,7 @@ workflows:
           update: images,deployment-code
 
       - update-brews:
+          filters: *release_aperture_filters
           requires: *release_required
           deployment-key: "a4:df:98:54:5d:18:ba:a1:01:66:88:e2:26:e3:f2:eb"
 
