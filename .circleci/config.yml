@@ -804,6 +804,8 @@ workflows:
         - equal: [latest, << pipeline.git.tag >>]
         - matches:
             { value: << pipeline.git.tag >>, pattern: "^releases/aperture-.*/v.*" }
+        - matches:
+            { value: << pipeline.git.tag >>, pattern: "^v.*$" }
     jobs:
       - latest-release:
           name: "Latest release"
