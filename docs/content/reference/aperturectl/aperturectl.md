@@ -24,7 +24,7 @@ aperturectl - CLI tool to interact with Aperture
 
 ### Synopsis
 
-aperturectl is a CLI tool which can be used to interact with Aperture seamlessly.
+aperturectl is a CLI tool to interact with Aperture.
 
 ### Options
 
