@@ -24,6 +24,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
+      - name: Configure Git Name and Email
+        run: |
+          git config --global user.name "FluxNinja Ops"
+          git config --global user.email ops@fluxninja.com
       - name: Store deployment keys under pre-defined names
         run: |
           SSH_KEY_PATH=$HOME/.ssh/id_rsa_$(echo ${{ vars.DEPLOYMENT_KEY_CLOUD_RO_MD5 }} | tr -d ':')
