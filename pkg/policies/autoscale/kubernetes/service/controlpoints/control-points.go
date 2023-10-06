@@ -33,7 +33,7 @@ func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*cont
 }
 
 // RegisterControlPointsHandler registers ControlPointsHandler in RPC handler registry.
-func RegisterControlPointsHandler(handler *Handler, t *transport.EtcTransportClient) error {
+func RegisterControlPointsHandler(handler *Handler, t *transport.EtcdTransportClient) error {
 	return transport.RegisterFunction(t, handler.ListAutoScaleControlPoints)
 }
 

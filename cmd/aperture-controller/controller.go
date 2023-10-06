@@ -42,7 +42,7 @@ func main() {
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
-		transport.TransportModule,
+		transport.TransportServerModule,
 		peers.Constructor{}.Module(),
 		fx.Provide(
 			agentinfo.ProvideAgentInfo,

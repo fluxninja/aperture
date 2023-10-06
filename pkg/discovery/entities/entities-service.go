@@ -27,7 +27,7 @@ type RegisterEntitiesServiceIn struct {
 	Server              *grpc.Server `name:"default"`
 	Cache               *Entities
 	Registry            *rpc.HandlerRegistry
-	EtcdTransportClient *transport.EtcTransportClient
+	EtcdTransportClient *transport.EtcdTransportClient
 }
 
 // RegisterEntitiesService registers a service for entity cache.

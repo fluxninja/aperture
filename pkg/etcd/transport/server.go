@@ -18,31 +18,37 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
+// ExactMessage is like proto.Message, but known to point to T
 type ExactMessage[T any] interface {
 	proto.Message
 	*T
 }
 
-var TransportModule = fx.Options(
+// TransportServerModule is the server fx provider for etcd transport
+var TransportServerModule = fx.Options(
 	fx.Provide(NewEtcdTransportServer),
 )
 
+// Result is a result from one agent
 type Result[Resp any] struct {
 	Client  string
 	Success Resp
 	Err     error
 }
 
+// EtcdTransportServer is the server side of the etcd transport
 type EtcdTransportServer struct {
 	etcdClient *etcdclient.Client
 }
 
+// Request is the raw request on the etcd transport
 type Request struct {
 	ID     string
 	Client string
 	Data   []byte
 }
 
+// Response is the raw response on the etcd transport
 type Response struct {
 	ID     string
 	Client string
@@ -50,12 +56,14 @@ type Response struct {
 	Error  error
 }
 
+// NewEtcdTransportServer creates a new server on the etcd transport
 func NewEtcdTransportServer(client *etcdclient.Client) *EtcdTransportServer {
 	return &EtcdTransportServer{
 		etcdClient: client,
 	}
 }
 
+// SendRequests allows consumers of the etcd transport to send requests to agents
 func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportServer, agents []string, msg proto.Message) ([]Result[*RespValue], error) {
 	respCh := make(chan *Response, len(agents))
 
@@ -93,6 +101,7 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 	return resps, nil
 }
 
+// SendRequest allows consumers of the etcd transport to send single request to agents
 func SendRequest[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportServer, client string, msg proto.Message) (*RespValue, error) {
 	resp, err := t.SendRequest(client, msg)
 	if err != nil {
@@ -107,6 +116,7 @@ func SendRequest[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportSe
 	return &result, nil
 }
 
+// SendRequest sends a request to etcd, supposed to be consumed by an agent
 func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Response, error) {
 
 	anyreq, err := anypb.New(msg)

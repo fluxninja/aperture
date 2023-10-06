@@ -18,22 +18,28 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
+// TransportClientModule is the client fx provider for etcd transport
 var TransportClientModule = fx.Options(
 	fx.Provide(NewEtcdTransportClient),
 )
 
-type EtcTransportClient struct {
+// EtcdTransportClient is the client side for the etcd transport
+type EtcdTransportClient struct {
 	etcdClient *etcdclient.Client
 	Registry   *HandlerRegistry
 }
 
-func NewEtcdTransportClient(client *etcdclient.Client) *EtcTransportClient {
-	return &EtcTransportClient{
+// NewEtcdTransportClient creates and returns a new etcd transport client module
+func NewEtcdTransportClient(client *etcdclient.Client) *EtcdTransportClient {
+	return &EtcdTransportClient{
 		etcdClient: client,
 		Registry:   NewHandlerRegistry(),
 	}
 }
 
+// HandlerRegistry allow registering handlers and can start a dispatcher.
+//
+// This is intended to be used at at fx provide/invoke stage.
 type HandlerRegistry struct {
 	handlers map[protoreflect.FullName]untypedHandler
 }
@@ -47,7 +53,8 @@ func NewHandlerRegistry() *HandlerRegistry {
 	}
 }
 
-func RegisterWatcher(lc fx.Lifecycle, t *EtcTransportClient, agentName string) {
+// RegisterWatcher allows to register a client on the etcd transport
+func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -60,7 +67,8 @@ func RegisterWatcher(lc fx.Lifecycle, t *EtcTransportClient, agentName string) {
 	})
 }
 
-func (c *EtcTransportClient) RegisterWatcher(agentName string) {
+// RegisterWatcher register an agent on the etcd transport client
+func (c *EtcdTransportClient) RegisterWatcher(agentName string) {
 	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
 	watchCh := c.etcdClient.Watch(context.Background(), path, clientv3.WithPrefix())
 	for watchResp := range watchCh {
@@ -83,7 +91,7 @@ func (c *EtcTransportClient) RegisterWatcher(agentName string) {
 	}
 }
 
-func (c *EtcTransportClient) handleRequest(ctx context.Context, req Request) {
+func (c *EtcdTransportClient) handleRequest(ctx context.Context, req Request) {
 	var msg anypb.Any
 	err := proto.Unmarshal(req.Data, &msg)
 	if err != nil {
@@ -99,7 +107,7 @@ func (c *EtcTransportClient) handleRequest(ctx context.Context, req Request) {
 	c.respond(ctx, response)
 }
 
-func (c *EtcTransportClient) callHandler(ctx context.Context, req *anypb.Any) ([]byte, error) {
+func (c *EtcdTransportClient) callHandler(ctx context.Context, req *anypb.Any) ([]byte, error) {
 	handler, exists := c.Registry.handlers[req.MessageName()]
 	if !exists {
 		return nil, status.Error(
@@ -121,7 +129,7 @@ func (c *EtcTransportClient) callHandler(ctx context.Context, req *anypb.Any) ([
 	return serializedResp, nil
 }
 
-func (c *EtcTransportClient) respond(ctx context.Context, resp Response) {
+func (c *EtcdTransportClient) respond(ctx context.Context, resp Response) {
 
 	path := path.Join(RPCBasePath, RPCResponsePath, resp.Client, resp.ID)
 
@@ -140,7 +148,7 @@ func (c *EtcTransportClient) respond(ctx context.Context, resp Response) {
 // RegisterFunction register a function as a handler in the registry
 // Only one function for a given Req type can be registered.
 func RegisterFunction[Req, Resp proto.Message](
-	t *EtcTransportClient,
+	t *EtcdTransportClient,
 	handler func(context.Context, Req) (Resp, error),
 ) error {
 	var req Req // used only to pull out the message name from descriptor

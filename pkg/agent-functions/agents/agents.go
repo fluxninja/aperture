@@ -102,6 +102,7 @@ func (a Agents) PreviewHTTPRequests(
 	return transport.SendRequest[previewv1.PreviewHTTPRequestsResponse](a.etcdTransport, agent, &cmdv1.PreviewHTTPRequestsRequest{Request: req})
 }
 
+// GetAgents lists the agents registered on etcd under /peers/aperture-agent
 func (a Agents) GetAgents() ([]string, error) {
 
 	re := regexp.MustCompile(`/peers/aperture-agent/[^/]+/`)
