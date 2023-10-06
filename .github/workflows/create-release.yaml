@@ -44,5 +44,6 @@ jobs:
       - name: Prepare for the release
         env:
           LOGURU_LEVEL: TRACE
+          GH_TOKEN: ${{ github.token }}
         run: |
           fn release release-aperture --version ${{ inputs.version }} --repo-path ./ --message 'Releasing version ${{ inputs.version }}'
