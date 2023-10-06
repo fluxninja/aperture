@@ -1,5 +1,5 @@
 ---
-title: Rate Limiting
+title: Per-user Rate Limiting
 sidebar_position: 3
 keywords:
   - guides
