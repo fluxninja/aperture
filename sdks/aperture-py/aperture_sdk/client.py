@@ -74,10 +74,23 @@ class ApertureClient:
             compression=compression,
             timeout=int(grpc_timeout.total_seconds()),
         )
+        grpc_channel_options_dict = {
+            "grpc.keepalive_time_ms": 10000,
+            "grpc.keepalive_timeout_ms": 5000,
+            "grpc.keepalive_permit_without_calls": 1,
+        }
+        grpc_channel_options = [(k, v) for k, v in grpc_channel_options_dict.items()]
         grpc_channel = (
-            grpc.insecure_channel(endpoint, compression=compression)
+            grpc.insecure_channel(
+                endpoint, compression=compression, options=grpc_channel_options
+            )
             if insecure
-            else grpc.secure_channel(endpoint, credentials, compression=compression)
+            else grpc.secure_channel(
+                endpoint,
+                credentials,
+                compression=compression,
+                options=grpc_channel_options,
+            )
         )
         return cls(
             channel=grpc_channel,
