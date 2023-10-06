@@ -65,7 +65,8 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 			if err != nil {
 				log.Error().Err(err).Msg("failed to send request to agent")
 				respCh <- &Response{
-					Error: err,
+					Client: agentName,
+					Error:  err,
 				}
 			} else {
 				respCh <- resp
@@ -152,7 +153,8 @@ func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
 
 	if len(resp.Kvs) > 0 {
 		return &Response{
-			Data: resp.Kvs[0].Value,
+			Client: req.Client,
+			Data:   resp.Kvs[0].Value,
 		}, nil
 	}
 
@@ -170,7 +172,8 @@ func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
 			for _, event := range watchResp.Events {
 				if event.Type == clientv3.EventTypePut {
 					return &Response{
-						Data: event.Kv.Value,
+						Client: req.Client,
+						Data:   event.Kv.Value,
 					}, nil
 				}
 			}
