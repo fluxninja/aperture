@@ -1,5 +1,5 @@
 ---
-title: Flow Control Framework
+title: Rate Limiting Framework
 sidebar_position: 1
 keywords:
   - guides
