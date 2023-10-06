@@ -14,10 +14,10 @@ local range_driven_load_scheduler = {
 
 commonConfig {
   /**
-  * @param (policy.service_protection_core.range_driven_load_scheduler: aperture.spec.v1.RangeDrivenLoadSchedulerParameters) Parameters for Range Throttling Strategy.
+  * @param (policy.load_scheduling_core.range_driven_load_scheduler: aperture.spec.v1.RangeDrivenLoadSchedulerParameters) Parameters for Range Throttling Strategy.
   */
   policy+: {
-    service_protection_core+: {
+    load_scheduling_core+: {
       range_driven_load_scheduler: range_driven_load_scheduler,
     },
   },

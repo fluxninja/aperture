@@ -289,7 +289,7 @@ definitions:
                 x-go-tag-default: 1s
                 x-go-tag-json: timeout
                 x-go-tag-validate: gt=0
-        title: BatchPostrollupConfig defines configuration for OTel batch processor.
+        title: BatchPostrollupConfig defines post-rollup configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/cmd/aperture-agent/config
     BatchPrerollupConfig:
@@ -325,7 +325,7 @@ definitions:
                 x-go-tag-default: 10s
                 x-go-tag-json: timeout
                 x-go-tag-validate: gt=0
-        title: BatchPrerollupConfig defines configuration for OTel batch processor.
+        title: BatchPrerollupConfig defines pre-rollup configuration for OTel batch processor.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/cmd/aperture-agent/config
     ClientConfig:

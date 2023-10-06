@@ -20,13 +20,12 @@ repository.
 
 The `nginxreceiver` extension is available in the default agent image. If you're
 [building][build] your own Aperture Agent, add `integrations/otel/nginxreceiver`
-to the `bundled_extensions` list to make [the receiver][receiver] available.
+to the `bundled_extensions` list to make the [receiver][receiver] available.
 
 :::
 
 You can configure the [OpenTelemetry Collector][opentelemetry-collector] for
-Nginx as part of [Policy resources][policy-resources] while [applying the
-policy][applying-policy]:
+Nginx as part of [Policy resources][policy-resources] while applying the policy:
 
 ```yaml
 policy:
@@ -43,5 +42,4 @@ policy:
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/nginxreceiver
 [opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector
-[applying-policy]: /use-cases/use-cases.md
 [policy-resources]: /reference/configuration/spec.md#resources

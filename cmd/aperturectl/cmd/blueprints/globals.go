@@ -4,7 +4,8 @@ var (
 	blueprintName  string
 	outputDir      string
 	valuesFile     string
-	applyPolicy    bool
+	valuesDir      string
+	applyPolicies  bool
 	all            bool
 	skipPull       bool
 	noYAMLModeline bool

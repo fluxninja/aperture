@@ -50,6 +50,10 @@ type Factory struct {
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
+
+	workloadPreemptedTokensSummaryVec *prometheus.SummaryVec
+	workloadDelayedTokensSummaryVec   *prometheus.SummaryVec
+	workloadOnTimeCounterVec          *prometheus.CounterVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -100,8 +104,7 @@ func newFactory(
 		metrics.PolicyHashLabel,
 		metrics.ComponentIDLabel,
 		metrics.WorkloadIndexLabel,
-	},
-	)
+	})
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -123,6 +126,36 @@ func newFactory(
 		metrics.DecisionTypeLabel,
 		metrics.WorkloadIndexLabel,
 		metrics.LimiterDroppedLabel,
+	})
+
+	wsFactory.workloadPreemptedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadPreemptedTokensMetricName,
+		Help: "Number of tokens a request was preempted by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadDelayedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadDelayedTokensMetricName,
+		Help: "Number of tokens a request was delayed by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.WorkloadOnTimeMetricName,
+		Help: "Counter of workload requests that were on time",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
 	})
 
 	lifecycle.Append(fx.Hook{
@@ -154,6 +187,18 @@ func newFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = prometheusRegistry.Register(wsFactory.requestInQueueDurationSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadPreemptedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadDelayedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadOnTimeCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -189,6 +234,18 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.requestInQueueDurationSummaryVec) {
 				err := fmt.Errorf("failed to unregister request_in_queue_duration_ms metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadPreemptedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_preempted_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadDelayedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_delayed_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadOnTimeCounterVec) {
+				err := fmt.Errorf("failed to unregister workload_on_time_total metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -251,11 +308,14 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:                    wfqFlowsGauge,
-		HeapRequestsGauge:             wfqRequestsGauge,
-		IncomingTokensCounter:         incomingTokensCounter,
-		AcceptedTokensCounter:         acceptedTokensCounter,
-		RequestInQueueDurationSummary: wsFactory.requestInQueueDurationSummaryVec,
+		FlowsGauge:                     wfqFlowsGauge,
+		HeapRequestsGauge:              wfqRequestsGauge,
+		IncomingTokensCounter:          incomingTokensCounter,
+		AcceptedTokensCounter:          acceptedTokensCounter,
+		RequestInQueueDurationSummary:  wsFactory.requestInQueueDurationSummaryVec,
+		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
+		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
+		WorkloadOnTimeCounter:          wsFactory.workloadOnTimeCounterVec,
 	}
 
 	return &SchedulerMetrics{
@@ -266,39 +326,62 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 }
 
 // Delete removes all metrics from metric vectors.
-func (metrics *SchedulerMetrics) Delete() error {
+func (sm *SchedulerMetrics) Delete() error {
 	var merr error
 
 	// Remove metrics from metric vectors
-	deleted := metrics.wsFactory.wfqFlowsGaugeVec.Delete(metrics.metricLabels)
+	deleted := sm.wsFactory.wfqFlowsGaugeVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
 	}
-	deleted = metrics.wsFactory.wfqRequestsGaugeVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.wfqRequestsGaugeVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
 	}
-	deleted = metrics.wsFactory.incomingTokensCounterVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
 	}
-	deleted = metrics.wsFactory.acceptedTokensCounterVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.acceptedTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
 	}
-	deletedCount := metrics.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(metrics.metricLabels)
+	deletedCount := sm.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
 	}
-	deletedCount = metrics.wsFactory.workloadCounterVec.DeletePartialMatch(metrics.metricLabels)
+	deletedCount = sm.wsFactory.workloadCounterVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 	}
-	deletedCount = metrics.wsFactory.requestInQueueDurationSummaryVec.DeletePartialMatch(metrics.metricLabels)
+	deletedCount = sm.wsFactory.requestInQueueDurationSummaryVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete request_in_queue_duration_ms summary from its metric vector. No traffic to generate metrics?")
 	}
+	deletedCount = sm.wsFactory.workloadPreemptedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_preempted_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.workloadDelayedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_delayed_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.workloadOnTimeCounterVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_on_time_total counter from its metric vector.")
+	}
 	return merr
+}
+
+func (sm *SchedulerMetrics) appendWorkloadLabel(workloadLabel string) prometheus.Labels {
+	baseMetricsLabels := sm.metricLabels
+	metricsLabels := make(prometheus.Labels, len(baseMetricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = workloadLabel
+	for k, v := range baseMetricsLabels {
+		metricsLabels[k] = v
+	}
+
+	return metricsLabels
 }
 
 // Scheduler implements load scheduler on the flowcontrol side.
@@ -323,6 +406,27 @@ func (wsFactory *Factory) NewScheduler(
 	tokenManger scheduler.TokenManager,
 	schedulerMetrics *SchedulerMetrics,
 ) (*Scheduler, error) {
+	initPreemptMetrics := func(workloadLabel string) error {
+		if schedulerMetrics == nil {
+			return nil
+		}
+		workloadLabels := schedulerMetrics.appendWorkloadLabel(workloadLabel)
+		var err error
+		_, err = schedulerMetrics.wsFactory.workloadPreemptedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_preempted_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.workloadDelayedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_delayed_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.workloadOnTimeCounterVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_on_time_total counter", err)
+		}
+		return nil
+	}
+
 	mm := multimatcher.New[int, multiMatchResult]()
 	for workloadIndex, workloadProto := range proto.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
@@ -340,6 +444,15 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
+		err = initPreemptMetrics(getWorkloadLabel(workloadIndex, workloadProto))
+		if err != nil {
+			return nil, err
+		}
+	}
+	// default workload
+	err := initPreemptMetrics(metrics.DefaultWorkloadIndex)
+	if err != nil {
+		return nil, err
 	}
 
 	ws := &Scheduler{
@@ -374,7 +487,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
 	var priority float64
-	var matchedWorkloadIndex string
+	var matchedWorkloadLabel string
 	// match labels against ws.workloadMultiMatcher
 	mmr := s.workloadMultiMatcher.Match(labels)
 	// if at least one match, return workload with lowest index
@@ -390,20 +503,16 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		priority = matchedWorkload.priority
 		invPriority = 1 / matchedWorkload.priority
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
-		if matchedWorkload.proto.GetName() != "" {
-			matchedWorkloadIndex = matchedWorkload.proto.GetName()
-		} else {
-			matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
-		}
+		matchedWorkloadLabel = getWorkloadLabel(smallestWorkloadIndex, matchedWorkload.proto)
 	} else {
 		// no match, return default workload
 		priority = s.defaultWorkload.priority
 		invPriority = 1 / s.defaultWorkload.priority
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
-		matchedWorkloadIndex = s.defaultWorkload.proto.Name
+		matchedWorkloadLabel = s.defaultWorkload.proto.Name
 	}
 
-	fairnessLabel := matchedWorkloadIndex
+	fairnessLabel := matchedWorkloadLabel
 
 	tokens := float64(1)
 	// Precedence order:
@@ -414,7 +523,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		tokens = matchedWorkloadParametersProto.GetTokens()
 	}
 
-	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
+	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadLabel); ok {
 		tokens = estimatedTokens
 	}
 
@@ -494,7 +603,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
 		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
 			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
-				WorkloadIndex: matchedWorkloadIndex,
+				WorkloadIndex: matchedWorkloadLabel,
 				TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
 					Consumed:  tokensConsumed,
 					Remaining: remaining,
@@ -616,4 +725,14 @@ func SanitizeSchedulerProto(proto *policylangv1.Scheduler) (*policylangv1.Schedu
 	}
 
 	return proto, nil
+}
+
+func getWorkloadLabel(workloadIndex int, workloadProto *policylangv1.Scheduler_Workload) string {
+	var workloadLabel string
+	if workloadProto.GetName() != "" {
+		workloadLabel = workloadProto.GetName()
+	} else {
+		workloadLabel = strconv.Itoa(workloadIndex)
+	}
+	return workloadLabel
 }

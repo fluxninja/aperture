@@ -40,7 +40,7 @@ for more details.
 
 :::info Sign-up
 
-To sign-up, [click here][sign-up].
+To sign-up to Aperture Cloud, [click here][sign-up].
 
 :::
 
@@ -48,54 +48,43 @@ To sign-up, [click here][sign-up].
 
 Aperture provides a variety of advanced load management features:
 
-- 🛡️
-  [**Adaptive Service Protection**](/use-cases/adaptive-service-protection/adaptive-service-protection.md):
+- 🛡️ [**Adaptive Load Protection**](concepts/scheduler/load-scheduler.md):
   Enhance resource utilization and safeguard against abrupt service overloads
   with an intelligent queue at the entry point of services. This queue
   dynamically adjusts the rate of requests based on live service health, thereby
   mitigating potential service disruptions and ensuring optimal performance
-  under all load conditions.
-- 📊
-  [**Global Quota Management**](/use-cases/managing-quotas/managing-quotas.md):
-  Maintain compliance with external API quotas with a global token bucket and
-  smart request queuing. This feature regulates requests aimed at external
-  services, ensuring that the usage remains within prescribed rate limits and
-  avoids penalties or additional costs.
-- 🎯
-  [**Workload Prioritization**](/use-cases/adaptive-service-protection/workload-prioritization.md):
-  Safeguard crucial user experience pathways and ensure prioritized access to
-  external APIs even during high-load conditions by strategically prioritizing
-  workloads. This is achieved through the use of declarative policies that label
-  and prioritize workload requests, such as API calls. By employing
+  under all load conditions. Refer to the
+  [Service Load Management](guides/service-load-management/service-load-management.md)
+  and
+  [Database Load Management](guides/database-load-management/database-load-management.md)
+  guides for more details.
+- 🎯 [**Workload Prioritization**](concepts/scheduler/scheduler.md): Safeguard
+  crucial user experience pathways and ensure prioritized access to external
+  APIs even during high-load conditions by strategically prioritizing workloads.
+  This is achieved through the use of declarative policies that label and
+  prioritize workload requests, such as API calls. By employing
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
   for scheduling, Aperture ensures a fair distribution of resources that aligns
   with the business value and urgency of requests.
-- ⏱️ [**Distributed Rate-Limiting**](/use-cases/rate-limiting/rate-limiting.md):
-  Safeguard APIs from potential abuse with Aperture's high-performance,
-  distributed rate limiter. This feature enforces per-key limits based on
-  fine-grained labels, ensuring precise control and prevention of excessive
-  usage.
-- 🚀
-  [**Percentage Rollouts**](/use-cases/percentage-rollouts/percentage-rollouts.md):
-  Enable teams to gradually release new features to a subset of users, without
-  impacting the rest of the system. Aperture provides automated load ramping
-  functionality, allowing for a safe and controlled increment of load to new
-  features or API endpoints. This feature continuously monitors for potential
-  performance issues and includes an automatic response mechanism to dial back
-  load in case of a performance regression. This proactive approach minimizes
-  service disruptions and maintains consistent performance, even when rolling
-  out new features.
+- 📊 [**API Quota Management**](concepts/scheduler/quota-scheduler.md): Maintain
+  compliance with external API quotas with a global token bucket and smart
+  request queuing. This feature regulates requests aimed at external services,
+  ensuring that the usage remains within prescribed rate limits and avoids
+  penalties or additional costs. Refer to the
+  [API Quota Management](guides/api-quota-management/api-quota-management.md)
+  guide for more details.
+- ⏱️ [**Distributed Rate-Limiting**](concepts/rate-limiter.md): Safeguard APIs
+  from potential abuse with Aperture's high-performance, distributed rate
+  limiter. This feature enforces per-key limits based on fine-grained labels,
+  ensuring precise control and prevention of excessive usage. Refer to the
+  [Rate Limiting](guides/rate-limiting.md) guide for more details.
 
 ## 🛠️ How it works {#how-it-works}
 
 Load management, at its core, consists of a control loop that observes,
 analyzes, and actuates workloads to ensure the stability and reliability of
-cloud-native applications.
-
-This control loop is pivotal in both flow control and auto-scaling use cases. In
-flow control, the loop manages workloads to maintain the system within its
-capacity. In auto-scaling scenarios, the control loop adjusts resource
-allocation in response to demand and performance fluctuations.
+cloud-native applications. This control loop is pivotal in flow control use
+cases where it manages workloads to maintain the system within its capacity.
 
 During the observation phase, an in-built telemetry system continuously monitors
 service performance and request attributes, allowing the Agent and Controller to
@@ -114,7 +103,7 @@ service-level objectives.
 - [**Setting up your application**](get-started/set-up-application/set-up-application.md)
 - [**Install Aperture**](get-started/installation/installation.md)
 - [**Your first policy**](get-started/policies/policies.md)
-- [**Use cases**](use-cases/use-cases.md)
+- [**Guides**](guides/guides.md)
 
 For an in-depth understanding of how Aperture interacts with applications and
 its various integral components, explore the
@@ -122,7 +111,7 @@ its various integral components, explore the
 
 ## 📖 Learn {#learn}
 
-The [Concepts section](concepts/concepts.md) provides detailed insights into
+The [Concepts](concepts/concepts.md) section provides detailed insights into
 essential elements of Aperture's system and policies, offering a comprehensive
 understanding of their key components.
 
@@ -144,4 +133,4 @@ beneficial.
 [cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [architecture]: /architecture/architecture.md
-[self-hosted]: /self-hosting
+[self-hosted]: /get-started/self-hosting/self-hosting.md

@@ -11,7 +11,8 @@ function(cfg) {
                                   h=10,
                                   w=8,
                                   panelColor='blue',
-                                  graphMode='area'),
+                                  graphMode='area',
+                                  unit='short'),
 
   panel: totalRequests.panel,
 }

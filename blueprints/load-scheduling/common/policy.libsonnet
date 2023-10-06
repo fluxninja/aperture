@@ -57,7 +57,7 @@ function(cfg, params={}) {
 
   local confirmationAccumulator = std.foldl(
     addOverloadConfirmation,
-    (if std.objectHas(updatedConfig.policy.service_protection_core, 'overload_confirmations') then updatedConfig.policy.service_protection_core.overload_confirmations else []),
+    (if std.objectHas(updatedConfig.policy.load_scheduling_core, 'overload_confirmations') then updatedConfig.policy.load_scheduling_core.overload_confirmations else []),
     confirmationAccumulatorInitial
   ),
 

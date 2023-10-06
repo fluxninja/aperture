@@ -1,8 +1,9 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null, queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='auto', mode='single', sort='sort') {
+function(title, dsName, query, strFilters, h=10, w=24, description='', legendFormat='', queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='hidden', unit='short', mode='single', sort='sort') {
   local barChartPanel =
     g.panel.barChart.new(title)
+    + g.panel.barChart.panelOptions.withDescription(description)
     + g.panel.barChart.queryOptions.withDatasource(dsName)
     + g.panel.barChart.queryOptions.withTargets([
       g.query.prometheus.new(dsName, query % { filters: strFilters })
@@ -19,9 +20,8 @@ function(title, dsName, query, strFilters, h=10, w=24, legendFormat=null, queryF
     + g.panel.barChart.options.tooltip.withSort(sort)
     + g.panel.barChart.fieldConfig.defaults.custom.withAxisGridShow(axisGridshow)
     + g.panel.barChart.fieldConfig.defaults.custom.withAxisPlacement(axisPlacement)
-    + g.panel.barChart.standardOptions.color.withMode('thresholds')
-    + g.panel.barChart.standardOptions.thresholds.withMode('absolute')
-    + g.panel.barChart.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
+    + g.panel.barChart.standardOptions.color.withMode('palette-classic')
+    + g.panel.barChart.standardOptions.withUnit(unit)
     + g.panel.barChart.gridPos.withH(h)
     + g.panel.barChart.gridPos.withW(w),
 

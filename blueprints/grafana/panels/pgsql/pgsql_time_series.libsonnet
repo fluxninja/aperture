@@ -68,8 +68,29 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local operations = timeSeriesPanel('Database Operations', datasource.name, 'operations/sec', stringFilters, targets=operationsTargets),
 
+  local bufferWritesTargets = [
+    g.query.prometheus.new(datasource.name, 'sum(rate(postgresql_bgwriter_buffers_writes_total{%(filters)s,source="backend"}[$__rate_interval]))' % { filters: stringFilters })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Backend'),
+
+    g.query.prometheus.new(datasource.name, 'sum(rate(postgresql_bgwriter_buffers_writes_total{%(filters)s,source="backend_fsync"}[$__rate_interval]))' % { filters: stringFilters })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Backend Fsync'),
+
+    g.query.prometheus.new(datasource.name, 'sum(rate(postgresql_bgwriter_buffers_writes_total{%(filters)s,source="bgwriter"}[$__rate_interval]))' % { filters: stringFilters })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Bgwriter'),
+
+    g.query.prometheus.new(datasource.name, 'sum(rate(postgresql_bgwriter_buffers_writes_total{%(filters)s,source="checkpoints"}[$__rate_interval]))' % { filters: stringFilters })
+    + g.query.prometheus.withIntervalFactor(1)
+    + g.query.prometheus.withLegendFormat('Checkpoints'),
+  ],
+
+  local bufferWrites = timeSeriesPanel('Buffer Writes', datasource.name, 'writes/sec', stringFilters, targets=bufferWritesTargets),
+
   checkpointComparison: checkpointComparison.panel,
   commitVsRollback: commitVsRollback.panel,
   blockReads: blockReads.panel,
   operations: operations.panel,
+  bufferWrites: bufferWrites.panel,
 }

@@ -91,8 +91,7 @@
               "label_key": "",
               "selectors": [
                 {
-                  "control_point": "__REQUIRED_FIELD__",
-                  "service": "__REQUIRED_FIELD__"
+                  "control_point": "__REQUIRED_FIELD__"
                 }
               ]
             },
@@ -275,8 +274,7 @@
           "description": "Identify the service and flows whose latency needs to be measured.",
           "default": [
             {
-              "control_point": "__REQUIRED_FIELD__",
-              "service": "__REQUIRED_FIELD__"
+              "control_point": "__REQUIRED_FIELD__"
             }
           ],
           "type": "array",
@@ -303,8 +301,7 @@
           "default": {
             "selector": [
               {
-                "control_point": "__REQUIRED_FIELD__",
-                "service": "__REQUIRED_FIELD__"
+                "control_point": "__REQUIRED_FIELD__"
               }
             ],
             "static_buckets": {

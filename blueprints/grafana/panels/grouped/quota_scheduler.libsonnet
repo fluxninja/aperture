@@ -1,4 +1,6 @@
 local accepted_token_rate = import '../accepted_token_rate.libsonnet';
+local avg_preemption_chart = import '../avg_preemption_chart.libsonnet';
+local avg_preemption_time_series = import '../avg_preemption_time_series.libsonnet';
 local incoming_token_rate = import '../incoming_token_rate.libsonnet';
 local request_in_queue_duration = import '../request_in_queue_duration.libsonnet';
 local request_queue_duration_bar = import '../request_queue_duration_bar.libsonnet';
@@ -41,31 +43,38 @@ function(cfg) {
     + g.panel.timeSeries.gridPos.withY(60)
     + g.panel.timeSeries.gridPos.withW(12),
     request_queue_duration_bar(cfg).panel
+    + g.panel.barGauge.gridPos.withX(12)
+    + g.panel.barGauge.gridPos.withY(60)
+    + g.panel.barGauge.gridPos.withW(12),
+    avg_preemption_time_series(cfg).panel
+    + g.panel.timeSeries.gridPos.withY(70)
+    + g.panel.timeSeries.gridPos.withW(12),
+    avg_preemption_chart(cfg).panel
     + g.panel.barChart.gridPos.withX(12)
-    + g.panel.barChart.gridPos.withY(60)
+    + g.panel.barChart.gridPos.withY(70)
     + g.panel.barChart.gridPos.withW(12),
     incoming_token_rate(cfg).panel
-    + g.panel.timeSeries.gridPos.withY(70),
+    + g.panel.timeSeries.gridPos.withY(80),
     accepted_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(70),
+    + g.panel.timeSeries.gridPos.withY(80),
     total_incoming_tokens(cfg).panel
     + g.panel.stat.gridPos.withX(0)
-    + g.panel.stat.gridPos.withY(80),
+    + g.panel.stat.gridPos.withY(90),
     total_accepted_tokens(cfg).panel
     + g.panel.stat.gridPos.withX(8)
-    + g.panel.stat.gridPos.withY(80),
+    + g.panel.stat.gridPos.withY(90),
     total_rejected_tokens(cfg).panel
     + g.panel.stat.gridPos.withX(16)
-    + g.panel.stat.gridPos.withY(80),
+    + g.panel.stat.gridPos.withY(90),
     wfq_scheduler_flows(cfg).panel
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
-    + g.panel.timeSeries.gridPos.withY(90),
+    + g.panel.timeSeries.gridPos.withY(100),
     wfq_scheduler_heap_requests(cfg).panel
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.gridPos.withX(12)
-    + g.panel.timeSeries.gridPos.withY(90),
+    + g.panel.timeSeries.gridPos.withY(100),
   ],
 }

@@ -9,18 +9,18 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
-	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/v2/pkg/config"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/ghodss/yaml"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
+	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// GetPolicyTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
-func GetPolicyTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBoxModel, error) {
+// GetPoliciesTUIModel prepares the TUI model for selecting policies to apply from the given directory path.
+func GetPoliciesTUIModel(policyDir string, selectAll bool) ([]string, *tui.CheckBoxModel, error) {
 	policies, err := GetPolicies(policyDir)
 	if err != nil {
 		return nil, nil, err
@@ -54,7 +54,7 @@ func GetPolicies(policyDir string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if filepath.Ext(info.Name()) == ".yaml" {
+		if filepath.Ext(info.Name()) == ".yaml" || filepath.Ext(info.Name()) == ".yml" {
 			_, policyName, err := GetPolicy(path)
 			if err != nil {
 				log.Info().Str("file", path).Msg("Invalid policy found. Skipping...")
@@ -71,7 +71,8 @@ func GetPolicies(policyDir string) ([]string, error) {
 	})
 }
 
-func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
+// GetPolicy returns the policy from the policy file.
+func GetPolicy(policyFile string) ([]byte, string, error) {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
@@ -82,23 +83,15 @@ func GetPolicy(policyFile string) (*languagev1.Policy, string, error) {
 	}
 
 	var policyCR *policyv1alpha1.Policy
-	policy := &languagev1.Policy{}
-
 	policyCR, err = GetPolicyCR(policyBytes)
-	if err != nil {
-		_, policy, err = CompilePolicy(filepath.Base(policyFile), policyBytes)
-		return policy, policyName, err
-	} else {
-		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
-		if err != nil {
-			return nil, policyName, err
-		}
-
+	if err == nil {
+		policyBytes = policyCR.Spec.Raw
 		policyName = policyCR.Name
-		return policy, policyName, nil
 	}
+	return policyBytes, policyName, nil
 }
 
+// GetPolicyCR returns the policy CR from the policy bytes.
 func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 	policyCR := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(policyBytes, policyCR)
@@ -114,10 +107,10 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 }
 
 // UpdatePolicyUsingAPI updates the policy using the API.
-func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policy *languagev1.Policy, force bool) (bool, error) {
-	request := languagev1.UpsertPolicyRequest{
-		PolicyName: name,
-		Policy:     policy,
+func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policyBytes []byte, force bool) (bool, error) {
+	request := policylangv1.UpsertPolicyRequest{
+		PolicyName:   name,
+		PolicyString: string(policyBytes),
 	}
 	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
@@ -164,7 +157,7 @@ func CheckForUpdate(name string, force bool) (bool, error) {
 
 // DeletePolicyUsingAPI deletes the policy using the API.
 func DeletePolicyUsingAPI(client CloudPolicyClient, policyName string) error {
-	policyRequest := languagev1.DeletePolicyRequest{
+	policyRequest := policylangv1.DeletePolicyRequest{
 		Name: policyName,
 	}
 	_, err := client.DeletePolicy(context.Background(), &policyRequest)
@@ -184,7 +177,7 @@ func ListPolicies(client PolicyClient) error {
 
 	for name, body := range policies.GetPolicies().Policies {
 		fmt.Printf("%v:\n", name)
-		if body.GetStatus() != languagev1.GetPolicyResponse_VALID {
+		if body.GetStatus() != policylangv1.GetPolicyResponse_VALID {
 			fmt.Println("\tStatus:", body.GetStatus())
 			reason := strings.ReplaceAll(body.GetReason(), "\n", "\n\n\t\t")
 			reason = strings.ReplaceAll(reason, " Error", "\n\t\tError")

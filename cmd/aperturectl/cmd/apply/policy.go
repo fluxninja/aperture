@@ -2,7 +2,6 @@ package apply
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -13,7 +12,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
@@ -47,7 +45,7 @@ aperturectl apply policy --dir=policies`,
 		if file != "" {
 			return applyPolicy(file)
 		} else if dir != "" {
-			policies, model, err := utils.GetPolicyTUIModel(dir, selectAll)
+			policies, model, err := utils.GetPoliciesTUIModel(dir, selectAll)
 			if err != nil {
 				return err
 			}
@@ -67,20 +65,15 @@ aperturectl apply policy --dir=policies`,
 
 // applyPolicy applies a policy to the cluster.
 func applyPolicy(policyFile string) error {
-	policy, policyName, err := utils.GetPolicy(policyFile)
+	policyBytes, policyName, err := utils.GetPolicy(policyFile)
 	if err != nil {
 		return err
 	}
 
-	return createAndApplyPolicy(policyName, policy)
+	return createAndApplyPolicy(policyName, policyBytes)
 }
 
-func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
-	policyBytes, err := json.Marshal(policy)
-	if err != nil {
-		return err
-	}
-
+func createAndApplyPolicy(name string, policyBytes []byte) error {
 	if Controller.IsKube() {
 		policyCR := &policyv1alpha1.Policy{}
 		policyCR.Spec.Raw = policyBytes
@@ -112,7 +105,7 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 		if err != nil {
 			if utils.IsNoMatchError(err) {
 				var isUpdated bool
-				isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policy, force)
+				isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
 				if !isUpdated {
 					return updatePolicyUsingAPIErr
 				}
@@ -134,9 +127,8 @@ func createAndApplyPolicy(name string, policy *languagev1.Policy) error {
 				return fmt.Errorf("failed to apply policy in Kubernetes: %w", err)
 			}
 		}
-
 	} else {
-		isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policy, force)
+		isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
 		if !isUpdated {
 			return updatePolicyUsingAPIErr
 		}

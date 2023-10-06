@@ -19,12 +19,14 @@ import (
 
 // Internal structure for tracking the request in the scheduler queue.
 type queuedRequest struct {
-	fInfo  *flowInfo
-	ready  chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
-	flowID string        // Flow ID
-	vft    float64       // Virtual finish time
-	cost   float64       // Cost of the request (invPriority * tokens)
-	onHeap bool          // Whether the request is on the heap or not
+	fInfo         *flowInfo
+	ready         chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
+	flowID        string        // Flow ID
+	vft           float64       // Virtual finish time
+	cost          float64       // Cost of the request (invPriority * tokens)
+	onHeap        bool          // Whether the request is on the heap or not
+	tokensInQueue float64       // tokens in queue when request was added to queue
+	tokensAllowed float64       // tokens allowed counter when request was added to queue
 }
 
 ////////
@@ -127,6 +129,8 @@ type WFQScheduler struct {
 	manager        TokenManager
 	// metrics
 	metrics *WFQMetrics
+	// preemption metrics
+	preemptionMetrics *preemptionMetrics
 	// metrics labels
 	metricsLabels prometheus.Labels
 	// flows
@@ -150,20 +154,21 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.flows = make(map[string]*flowInfo)
 	sched.manager = tokenManger
 	sched.metricsLabels = metricsLabels
+	preemptionMetrics := &preemptionMetrics{metricsLabels: metricsLabels}
+	sched.preemptionMetrics = preemptionMetrics
 
 	if metrics != nil {
 		sched.metrics = metrics
+		preemptionMetrics.workloadPreemptedTokensSummary = metrics.WorkloadPreemptedTokensSummary
+		preemptionMetrics.workloadDelayedTokensSummary = metrics.WorkloadDelayedTokensSummary
+		preemptionMetrics.workloadOnTimeCounter = metrics.WorkloadOnTimeCounter
 	}
 
 	return sched
 }
 
 func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
-	metricsLabels := make(prometheus.Labels, len(sched.metricsLabels)+1)
-	metricsLabels[metrics.WorkloadIndexLabel] = request.FairnessLabel
-	for k, v := range sched.metricsLabels {
-		metricsLabels[k] = v
-	}
+	metricsLabels := appendWorkloadLabel(sched.metricsLabels, request.FairnessLabel)
 	requestInQueueMetricsObserver, err := sched.metrics.RequestInQueueDurationSummary.GetMetricWith(metricsLabels)
 	if err == nil {
 		requestInQueueMetricsObserver.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
@@ -208,15 +213,18 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 	}
 
 	// Unable to schedule right now, so queue the request
+	// Update count for tokens in the queue here
 	qRequest := sched.queueRequest(ctx, request)
 
 	// scheduler is in overload situation and we have to wait for ready signal and tokens
 	select {
 	case <-qRequest.ready:
 		accepted, remaining, current := sched.scheduleRequest(ctx, request, qRequest)
+		// Update count for tokens in the queue here
 		return sched.updateMetricsAndReturn(accepted, remaining, current, request, startTime)
 	case <-ctx.Done():
-		sched.cancelRequest(qRequest)
+		sched.cancelRequest(request, qRequest)
+		// Update count for tokens in the queue here
 		return sched.updateMetricsAndReturn(false, 0, 0, request, startTime)
 	}
 }
@@ -249,6 +257,8 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 	// Proceed to queueing
 
 	qRequest = getHeapRequest()
+
+	sched.preemptionMetrics.onQueueEntry(request, qRequest)
 
 	flowID := sched.flowID(request.FairnessLabel, request.InvPriority, sched.generation)
 
@@ -333,6 +343,9 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
+	// Update metrics for preemption and delay
+	sched.preemptionMetrics.onQueueExit(request, qRequest, allowed)
+
 	if allowed {
 		// move the flow's VT forward
 		qRequest.fInfo.vt += qRequest.cost
@@ -379,9 +392,11 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 	qRequest.ready <- struct{}{}
 }
 
-func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
+func (sched *WFQScheduler) cancelRequest(request *Request, qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
+
+	sched.preemptionMetrics.onQueueExit(request, qRequest, false)
 
 	select {
 	case <-qRequest.ready:
@@ -483,11 +498,90 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 	return len(sched.requests)
 }
 
+type preemptionMetrics struct {
+	workloadPreemptedTokensSummary *prometheus.SummaryVec
+	workloadDelayedTokensSummary   *prometheus.SummaryVec
+	workloadOnTimeCounter          *prometheus.CounterVec
+	metricsLabels                  prometheus.Labels
+	tokensInQueue                  float64
+	tokensAllowed                  float64
+}
+
+// Maintain token counters used for calculating preemption and delay metrics.
+// WARNING: Unsafe and should be called with scheduler lock.
+func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queuedRequest) {
+	qRequest.tokensInQueue = pMetrics.tokensInQueue
+	qRequest.tokensAllowed = pMetrics.tokensAllowed
+	pMetrics.tokensInQueue += request.Tokens
+}
+
+// Update metrics for preemption and delay
+// WARNING: Unsafe and should be called with scheduler lock.
+func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queuedRequest, allowed bool) {
+	publishSummary := func(summary *prometheus.SummaryVec, value float64) {
+		if summary == nil {
+			return
+		}
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		observer, err := summary.GetMetricWith(metricsLabels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get workload preempted tokens summary")
+			return
+		}
+		observer.Observe(value)
+	}
+
+	publishCounter := func(counterVec *prometheus.CounterVec, value float64) {
+		if counterVec == nil {
+			return
+		}
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		counter, err := counterVec.GetMetricWith(metricsLabels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get workload on time counter")
+		}
+		counter.Add(value)
+	}
+
+	if allowed {
+		// Update metrics
+		realIncrement := pMetrics.tokensAllowed - qRequest.tokensAllowed
+		expectedIncrement := qRequest.tokensInQueue
+		bump := expectedIncrement - realIncrement
+		if bump == 0 && pMetrics.workloadOnTimeCounter != nil {
+			publishCounter(pMetrics.workloadOnTimeCounter, 1)
+		} else if bump > 0 && pMetrics.workloadPreemptedTokensSummary != nil {
+			publishSummary(pMetrics.workloadPreemptedTokensSummary, bump)
+		} else if bump < 0 && pMetrics.workloadDelayedTokensSummary != nil {
+			publishSummary(pMetrics.workloadDelayedTokensSummary, -bump)
+		}
+
+		// Update count for tokens accepted
+		pMetrics.tokensAllowed += request.Tokens
+	}
+
+	// Update tokens in the queue for calculating preemption and delay metrics
+	pMetrics.tokensInQueue -= request.Tokens
+}
+
+func appendWorkloadLabel(baseMetricsLabels prometheus.Labels, workloadLabel string) prometheus.Labels {
+	metricsLabels := make(prometheus.Labels, len(baseMetricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = workloadLabel
+	for k, v := range baseMetricsLabels {
+		metricsLabels[k] = v
+	}
+
+	return metricsLabels
+}
+
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge                    prometheus.Gauge
-	HeapRequestsGauge             prometheus.Gauge
-	IncomingTokensCounter         prometheus.Counter
-	AcceptedTokensCounter         prometheus.Counter
-	RequestInQueueDurationSummary *prometheus.SummaryVec
+	FlowsGauge                     prometheus.Gauge
+	HeapRequestsGauge              prometheus.Gauge
+	IncomingTokensCounter          prometheus.Counter
+	AcceptedTokensCounter          prometheus.Counter
+	RequestInQueueDurationSummary  *prometheus.SummaryVec
+	WorkloadPreemptedTokensSummary *prometheus.SummaryVec
+	WorkloadDelayedTokensSummary   *prometheus.SummaryVec
+	WorkloadOnTimeCounter          *prometheus.CounterVec
 }

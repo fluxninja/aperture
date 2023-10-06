@@ -54,7 +54,8 @@ agent:
 
 :::note
 
-(Relevant to [Self-Hosted Aperture Controller](/self-hosting/self-hosting.md)
+(Relevant to
+[Self-Hosted Aperture Controller](/get-started/self-hosting/self-hosting.md)
 only, ignore this note if using Aperture Cloud Controller).
 
 If you want to install the Aperture Agent using `Helm` or don't want to use the
@@ -291,5 +292,5 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[self-hosting-config]: /self-hosting/agent.md#configuration
+[self-hosting-config]: /get-started/self-hosting/agent.md#configuration
 [api-keys]: /get-started/aperture-cloud/api-keys.md

@@ -26,6 +26,9 @@ applications:
       name: aperture-operator
       docker_context: operator
       dockerfile: operator/Dockerfile
+    argo_manifests:
+      - app_path: apps/app-of-apps/aperture-system/agent.yaml
+        image_prefix: NINJA_APERTURE_OPERATOR_
   aperture-agent:
     image:
       name: aperture-agent
@@ -33,6 +36,9 @@ applications:
       dockerfile: cmd/aperture-agent/Dockerfile
     deployment:
       manifests/charts/aperture-agent/.+: charts/aperture/aperture-agent/
+    argo_manifests:
+      - app_path: apps/app-of-apps/aperture-system/agent.yaml
+        image_prefix: NINJA_APERTURE_AGENT_
   aperture-controller:
     image:
       name: aperture-controller
@@ -40,6 +46,9 @@ applications:
       dockerfile: cmd/aperture-controller/Dockerfile
     deployment:
       manifests/charts/aperture-controller/.+: charts/aperture/aperture-controller/
+    argo_manifests:
+      - app_path: apps/app-of-apps/aperture-system/agent.yaml
+        image_prefix: NINJA_AGENT_CONTROLLER_
   cloud-controller:
     image:
       name: aperture-controller

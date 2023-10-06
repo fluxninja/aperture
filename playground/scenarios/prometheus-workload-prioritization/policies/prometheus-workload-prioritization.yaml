@@ -46,7 +46,7 @@ policy:
               is_demo_app {
                 is_demo_app_request_duration_micro_seconds
               }
-  service_protection_core:
+  load_scheduling_core:
     aimd_load_scheduler:
       # The selectors determine the flows that are protected by this policy.
       # Type: []aperture.spec.v1.Selector

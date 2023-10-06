@@ -9,8 +9,9 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 func init() {

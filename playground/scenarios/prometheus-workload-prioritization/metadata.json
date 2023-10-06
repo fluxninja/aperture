@@ -4,7 +4,6 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "load-scheduling/average-latency",
       "policy_name": "prometheus-workload-prioritization",
       "values_file": "policies/prometheus-workload-prioritization.yaml"
     }

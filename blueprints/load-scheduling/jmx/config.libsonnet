@@ -14,9 +14,9 @@ serviceProtectionDefaults {
     },
 
     /**
-    * @param (policy.service_protection_core.setpoint: float64) Setpoint.
+    * @param (policy.load_scheduling_core.setpoint: float64) Setpoint.
     */
-    service_protection_core+: {
+    load_scheduling_core+: {
       setpoint: '__REQUIRED_FIELD__',
     },
   },

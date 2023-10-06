@@ -69,7 +69,7 @@ policy:
               extractor:
                 from: request.http.headers.user-type
 
-  service_protection_core:
+  load_scheduling_core:
     setpoint: 20
     dry_run: false
     aiad_load_scheduler:

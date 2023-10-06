@@ -11,7 +11,7 @@ function(cfg, params={}) {
 
   local aiadLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAiadLoadScheduler(
-      local aiad = updatedConfig.policy.service_protection_core.aiad_load_scheduler;
+      local aiad = updatedConfig.policy.load_scheduling_core.aiad_load_scheduler;
 
       spec.v1.AIADLoadScheduler.new()
       + spec.v1.AIADLoadScheduler.withOverloadCondition(updatedConfig.policy.overload_condition)
@@ -26,7 +26,7 @@ function(cfg, params={}) {
       })
       + spec.v1.AIADLoadScheduler.withParameters(aiad)
       + spec.v1.AIADLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AIADLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
+      + spec.v1.AIADLoadScheduler.withDryRun(updatedConfig.policy.load_scheduling_core.dry_run)
     ),
   ),
 
