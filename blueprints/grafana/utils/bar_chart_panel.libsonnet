@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, h=10, w=24, description='', legendFormat='', queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='hidden', unit='short', mode='single', sort='sort') {
+function(title, dsName, query, strFilters, h=10, w=24, legendFormat='', queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='hidden', mode='single', sort='sort', unit='short', description='') {
   local barChartPanel =
     g.panel.barChart.new(title)
     + g.panel.barChart.panelOptions.withDescription(description)
