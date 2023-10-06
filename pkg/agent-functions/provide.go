@@ -58,7 +58,7 @@ func RegisterClient(in RegisterClientIn) error {
 	return nil
 }
 
-// RegisterEtcdTransport registers a server on the etcd transport
+// RegisterEtcdTransport registers a server on the etcd transport.
 func RegisterEtcdTransport(in RegisterClientIn) {
 	transport.RegisterWatcher(in.Lc, in.EtcdTransportClient, info.Hostname)
 }

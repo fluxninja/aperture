@@ -18,18 +18,18 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// TransportClientModule is the client fx provider for etcd transport
+// TransportClientModule is the client fx provider for etcd transport.
 var TransportClientModule = fx.Options(
 	fx.Provide(NewEtcdTransportClient),
 )
 
-// EtcdTransportClient is the client side for the etcd transport
+// EtcdTransportClient is the client side for the etcd transport.
 type EtcdTransportClient struct {
 	etcdClient *etcdclient.Client
 	Registry   *HandlerRegistry
 }
 
-// NewEtcdTransportClient creates and returns a new etcd transport client module
+// NewEtcdTransportClient creates and returns a new etcd transport client module.
 func NewEtcdTransportClient(client *etcdclient.Client) *EtcdTransportClient {
 	return &EtcdTransportClient{
 		etcdClient: client,
@@ -53,9 +53,8 @@ func NewHandlerRegistry() *HandlerRegistry {
 	}
 }
 
-// RegisterWatcher allows to register a client on the etcd transport
+// RegisterWatcher allows to register a client on the etcd transport.
 func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) {
-
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go t.RegisterWatcher(agentName)
@@ -67,7 +66,7 @@ func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) 
 	})
 }
 
-// RegisterWatcher register an agent on the etcd transport client
+// RegisterWatcher register an agent on the etcd transport client.
 func (c *EtcdTransportClient) RegisterWatcher(agentName string) {
 	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
 	watchCh := c.etcdClient.Watch(context.Background(), path, clientv3.WithPrefix())
@@ -130,7 +129,6 @@ func (c *EtcdTransportClient) callHandler(ctx context.Context, req *anypb.Any) (
 }
 
 func (c *EtcdTransportClient) respond(ctx context.Context, resp Response) {
-
 	path := path.Join(RPCBasePath, RPCResponsePath, resp.Client, resp.ID)
 
 	lease, err := c.etcdClient.Grant(context.Background(), 30)

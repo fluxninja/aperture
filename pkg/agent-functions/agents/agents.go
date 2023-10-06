@@ -12,7 +12,6 @@ import (
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
-	"github.com/fluxninja/aperture/v2/pkg/peers"
 	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
@@ -24,19 +23,15 @@ var Module = fx.Provide(NewAgents)
 // Agents wraps functions registered in agentfunctions, types should match.
 type Agents struct {
 	*rpc.Clients
-	peers         *peers.PeerDiscovery
 	etcdTransport *transport.EtcdTransportServer
 	etcdClient    *etcdclient.Client
-	// serviceDiscovery *distcache.ServiceDiscovery
 }
 
 // NewAgents wraps Clients with Agent-specific function wrappers.
-func NewAgents(transport *transport.EtcdTransportServer, peersDiscovery *peers.PeerDiscovery, client *etcdclient.Client) Agents {
+func NewAgents(transport *transport.EtcdTransportServer, client *etcdclient.Client) Agents {
 	return Agents{
 		etcdTransport: transport,
-		peers:         peersDiscovery,
 		etcdClient:    client,
-		// serviceDiscovery: serviceDiscovery,
 	}
 }
 
@@ -102,9 +97,8 @@ func (a Agents) PreviewHTTPRequests(
 	return transport.SendRequest[previewv1.PreviewHTTPRequestsResponse](a.etcdTransport, agent, &cmdv1.PreviewHTTPRequestsRequest{Request: req})
 }
 
-// GetAgents lists the agents registered on etcd under /peers/aperture-agent
+// GetAgents lists the agents registered on etcd under /peers/aperture-agent.
 func (a Agents) GetAgents() ([]string, error) {
-
 	re := regexp.MustCompile(`/peers/aperture-agent/[^/]+/`)
 
 	resp, err := a.etcdClient.Client.KV.Get(context.Background(), "/peers/aperture-agent/", clientv3.WithPrefix())
