@@ -53,7 +53,7 @@ type ControllerConn struct {
 	conn              *grpc.ClientConn
 }
 
-// CloudInitFlags sets up flags for Cloud Controller.
+// InitFlags sets up flags for Cloud Controller.
 func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 	flags.StringVar(
 		&c.controllerAddr,
@@ -104,7 +104,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	if c.config == "" {
 		homeDir, err := os.UserHomeDir()
 		if err == nil {
-			c.config = filepath.Join(homeDir, ".aperturectl", "config")
+			c.config = filepath.Join(homeDir, utils.AperturectlRootDir, "config")
 			if _, err := os.Stat(c.config); err != nil {
 				c.config = ""
 			}
@@ -167,18 +167,18 @@ func (c *ControllerConn) CloudPolicyClient() (utils.CloudPolicyClient, error) {
 	return c.policyServiceClient()
 }
 
-// client returns Controller IntrospectionClient, connecting to controller if not yet connected.
+// IntrospectionClient returns Controller IntrospectionClient, connecting to controller if not yet connected.
 func (c *ControllerConn) IntrospectionClient() (utils.IntrospectionClient, error) {
 	return nil, errors.New("this subcommand cannot be used with the Cloud Controller")
 }
 
-// client returns Controller StatusClient, connecting to controller if not yet connected.
+// StatusClient returns Controller StatusClient, connecting to controller if not yet connected.
 func (c *ControllerConn) StatusClient() (utils.StatusClient, error) {
 	// StatusClient has no restrictions.
 	return c.client()
 }
 
-// client returns Controller PolicyClient, connecting to controller if not yet connected.
+// PolicyClient returns Controller PolicyClient, connecting to controller if not yet connected.
 func (c *ControllerConn) PolicyClient() (utils.PolicyClient, error) {
 	// PolicyClient has no restrictions.
 	return c.client()
