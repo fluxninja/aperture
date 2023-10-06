@@ -38,7 +38,7 @@ func PullRunE(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	blueprintsCacheRoot = filepath.Join(userHomeDir, ".aperturectl", "blueprints")
+	blueprintsCacheRoot = filepath.Join(userHomeDir, utils.AperturectlRootDir, "blueprints")
 	err = os.MkdirAll(blueprintsCacheRoot, os.ModePerm)
 	if err != nil {
 		return err
