@@ -20,7 +20,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.11.1
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
-	github.com/getsentry/sentry-go v0.23.0
+	github.com/getsentry/sentry-go v0.24.1
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-openapi/runtime v0.26.0
@@ -32,7 +32,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.17.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/memberlist v0.5.0
 	github.com/integralist/go-findroot v0.0.0-20160518114804-ac90681525dc
@@ -50,9 +50,9 @@ require (
 	github.com/mitchellh/copystructure v1.2.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4
 	github.com/natefinch/atomic v1.0.1
-	github.com/onsi/ginkgo/v2 v2.12.0
-	github.com/onsi/gomega v1.27.10
-	github.com/open-policy-agent/opa v0.56.0
+	github.com/onsi/ginkgo/v2 v2.12.1
+	github.com/onsi/gomega v1.28.0
+	github.com/open-policy-agent/opa v0.57.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.82.0
@@ -152,9 +152,9 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver v0.82.0
 	github.com/prometheus/alertmanager v0.26.0
-	github.com/prometheus/client_golang v1.16.0
+	github.com/prometheus/client_golang v1.17.0
 	github.com/prometheus/common v0.44.0
-	github.com/prometheus/prometheus v0.46.0
+	github.com/prometheus/prometheus v0.47.0
 	github.com/reugn/go-quartz v0.7.0
 	github.com/rs/zerolog v1.30.0
 	github.com/sourcegraph/conc v0.3.0
@@ -193,11 +193,11 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	golang.org/x/net v0.14.0
+	golang.org/x/net v0.15.0
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5
 	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d
-	google.golang.org/grpc v1.57.0
+	google.golang.org/grpc v1.58.2
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
@@ -522,7 +522,7 @@ require (
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/digitalocean/godo v1.99.0 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/docker/docker v24.0.5+incompatible
+	github.com/docker/docker v24.0.6+incompatible
 	github.com/docker/go-connections v0.4.1-0.20210727194412-58542c764a11
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/elastic/go-licenser v0.4.1 // indirect
@@ -605,13 +605,13 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20220216144756-c35f1ee13d7c // indirect
 	github.com/prometheus-community/prom-label-proxy v0.7.0
-	github.com/prometheus/client_model v0.4.0 // indirect
+	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
 	github.com/prometheus/common/sigv4 v0.1.0 // indirect
-	github.com/prometheus/procfs v0.11.0 // indirect
+	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rs/cors v1.9.0 // indirect
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.19 // indirect
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.20 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -639,13 +639,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.17.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/mod v0.12.0
-	golang.org/x/oauth2 v0.11.0
+	golang.org/x/oauth2 v0.12.0
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/term v0.12.0 // indirect
+	golang.org/x/text v0.13.0
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/api v0.134.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
