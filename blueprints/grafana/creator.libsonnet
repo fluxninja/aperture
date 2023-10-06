@@ -22,7 +22,9 @@ function(policyFile, cfg) {
   local componentsJSON =
     if std.objectHas(policyJSON, 'spec')
     then
-      policyJSON.spec.circuit.components
+      if std.objectHas(policyJSON.spec, 'circuit')
+      then policyJSON.spec.circuit.components
+      else {}
     else policyJSON.node.component.components,
 
   // Flow Control Panels
