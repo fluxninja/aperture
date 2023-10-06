@@ -35,6 +35,11 @@ function(config, agent_group='default') {
                   action: 'keep',
                   regex: jmx_regex,
                 },
+                {
+                  source_labels: ['__meta_kubernetes_pod_name'],
+                  action: 'keep',
+                  regex: config.policy.jmx.k8s_pod_regex,
+                },
               ],
             },
           ],

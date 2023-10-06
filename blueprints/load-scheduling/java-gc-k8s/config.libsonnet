@@ -6,11 +6,11 @@ serviceProtectionDefaults {
       /**
       * @param (policy.jmx.jmx_metrics_port: int32) Port number for scraping metrics provided by JMX Promtheus Java Agent.
       * @param (policy.jmx.app_namespace: string) Namespace of the application for which JMX metrics are scraped.
-      * @param (policy.jmx.k8s_pod_name: string) Name of the Kubernetes pod for which JMX metrics are scraped.
+      * @param (policy.jmx.k8s_pod_regex: string) Name of the Kubernetes pod for which JMX metrics are scraped.
       */
       jmx_metrics_port: 8087,
       app_namespace: '__REQUIRED_FIELD__',
-      k8s_pod_name: '__REQUIRED_FIELD__',
+      k8s_pod_regex: '__REQUIRED_FIELD__',
     },
 
     /**
@@ -22,6 +22,6 @@ serviceProtectionDefaults {
   },
 
   dashboard+: {
-    variant_name: 'Protection with JMX Overload Confirmation',
+    variant_name: 'Protection with Java GC Overload Confirmation',
   },
 }

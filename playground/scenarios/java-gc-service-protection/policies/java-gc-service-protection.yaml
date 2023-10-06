@@ -1,15 +1,15 @@
-# yaml-language-server: $schema=../../../../blueprints/load-scheduling/jmx/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/java-gc-k8s/gen/definitions.json
 # Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
 
-blueprint: load-scheduling/jmx
+blueprint: load-scheduling/java-gc-k8s
 uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
-  policy_name: jmx-service-protection
+  policy_name: java-gc-service-protection
   # List of additional circuit components.
   # Type: []aperture.spec.v1.Component
   components:
@@ -103,4 +103,4 @@ policy:
 
   jmx:
     app_namespace: "demoapp"
-    k8s_pod_name: "service3-demo-app-.*"
+    k8s_pod_regex: "service3-demo-app-.*"
