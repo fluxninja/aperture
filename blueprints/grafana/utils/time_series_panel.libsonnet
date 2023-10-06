@@ -1,6 +1,6 @@
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(title, dsName, query, strFilters, axisLabel='', unit='', description='', h=10, w=24, targets=[]) {
+function(title, dsName, query, strFilters, axisLabel='', unit='', h=10, w=24, targets=[], description='') {
   local timeseries =
     g.panel.timeSeries.new(title)
     + g.panel.timeSeries.panelOptions.withDescription(description)
