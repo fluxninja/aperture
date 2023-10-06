@@ -1,5 +1,5 @@
 ---
-title: Flow Control Framework
+title: Rate Limiting Framework
 sidebar_position: 1
 keywords:
   - guides
@@ -92,10 +92,10 @@ eliminating the necessity for manual complex logic implementation.
 
 #### Per-user static limits {#per-user-static-limits}
 
-[Static rate limiting](/guides/rate-limiting.md) is akin to the speed limit on a
-highway – a set pace that everyone has to follow.
+[Static rate limiting](/guides/per-user-rate-limiting.md) is akin to the speed
+limit on a highway – a set pace that everyone has to follow.
 
-![Per-User Rate Limits](./assets/flow-control-framework/per-user-limits.svg)
+![Per-User Rate Limits](./assets/rate-limiting-framework/per-user-limits.svg)
 
 Most APIs providers implement static rate limits which are well-known and
 publicly shared, setting the basic expectations for the end-user in terms of
@@ -171,7 +171,7 @@ protect the service against overloads. With the help of
 **[Load Scheduling Blueprint](/reference/blueprints/load-scheduling/load-scheduling.md)**
 adaptive service limits can be implemented easily.
 
-![Adaptive Service Limits](./assets/flow-control-framework/adaptive-service-limits.svg)
+![Adaptive Service Limits](./assets/rate-limiting-framework/adaptive-service-limits.svg)
 
 Use-cases of adaptive service limits include:
 
