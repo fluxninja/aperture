@@ -92,8 +92,8 @@ eliminating the necessity for manual complex logic implementation.
 
 #### Per-user static limits {#per-user-static-limits}
 
-[Static rate limiting](/guides/rate-limiting.md) is akin to the speed limit on a
-highway – a set pace that everyone has to follow.
+[Static rate limiting](/guides/per-user-rate-limiting.md) is akin to the speed
+limit on a highway – a set pace that everyone has to follow.
 
 ![Per-User Rate Limits](./assets/rate-limiting-framework/per-user-limits.svg)
 

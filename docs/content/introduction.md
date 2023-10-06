@@ -77,7 +77,7 @@ Aperture provides a variety of advanced load management features:
   from potential abuse with Aperture's high-performance, distributed rate
   limiter. This feature enforces per-key limits based on fine-grained labels,
   ensuring precise control and prevention of excessive usage. Refer to the
-  [Rate Limiting](guides/rate-limiting.md) guide for more details.
+  [Rate Limiting](guides/per-user-rate-limiting.md) guide for more details.
 
 ## 🛠️ How it works {#how-it-works}
 
