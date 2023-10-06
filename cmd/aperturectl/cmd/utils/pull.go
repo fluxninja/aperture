@@ -20,6 +20,7 @@ const (
 	relPathFilename = ".relpath"
 )
 
+// PullSource pulls the source of the dependency and updates the lock file.
 func PullSource(dir, uri string) error {
 	d := deps.Parse("", uri)
 	if d == nil {

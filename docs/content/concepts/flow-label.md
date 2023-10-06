@@ -228,7 +228,7 @@ For _Classifier_ created labels, you can disable this behavior by setting
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces
 [control-point]: ./control-point.md
 [otel-conventions]:
-  https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
+  https://github.com/open-telemetry/opentelemetry-specification/blob/v1.25.0/specification/trace/semantic_conventions/http.md
 [aperture-sdks]: /integrations/sdk/sdk.md
 [gateways]: /integrations/gateway/gateway.md
 [istio]: /integrations/istio/istio.md

@@ -16,7 +16,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/tui"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -73,7 +72,7 @@ func GetPolicies(policyDir string) ([]string, error) {
 }
 
 // GetPolicy returns the policy from the policy file.
-func GetPolicy(policyFile string) (*policylangv1.Policy, string, error) {
+func GetPolicy(policyFile string) ([]byte, string, error) {
 	policyFileBase := filepath.Base(policyFile)
 	policyName := policyFileBase[:len(policyFileBase)-len(filepath.Ext(policyFileBase))]
 
@@ -84,21 +83,12 @@ func GetPolicy(policyFile string) (*policylangv1.Policy, string, error) {
 	}
 
 	var policyCR *policyv1alpha1.Policy
-	policy := &policylangv1.Policy{}
-
 	policyCR, err = GetPolicyCR(policyBytes)
-	if err != nil {
-		_, policy, err = CompilePolicy(filepath.Base(policyFile), policyBytes)
-		return policy, policyName, err
-	} else {
-		err = config.UnmarshalYAML(policyCR.Spec.Raw, policy)
-		if err != nil {
-			return nil, policyName, err
-		}
-
+	if err == nil {
+		policyBytes = policyCR.Spec.Raw
 		policyName = policyCR.Name
-		return policy, policyName, nil
 	}
+	return policyBytes, policyName, nil
 }
 
 // GetPolicyCR returns the policy CR from the policy bytes.
@@ -117,17 +107,12 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 }
 
 // UpdatePolicyUsingAPI updates the policy using the API.
-func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policy *policylangv1.Policy, force bool) (bool, error) {
-	policyBytes, err := policy.MarshalJSON()
-	if err != nil {
-		return false, err
-	}
-
+func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policyBytes []byte, force bool) (bool, error) {
 	request := policylangv1.UpsertPolicyRequest{
 		PolicyName:   name,
 		PolicyString: string(policyBytes),
 	}
-	_, err = client.UpsertPolicy(context.Background(), &request)
+	_, err := client.UpsertPolicy(context.Background(), &request)
 	if err != nil {
 		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
 			var update bool

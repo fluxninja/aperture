@@ -6,7 +6,7 @@ function(cfg) {
 
   local workloadLatency = timeSeriesPanel('Request in Queue Duration',
                                           cfg.dashboard.datasource.name,
-                                          '(sum by (workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__rate_interval])))/(sum by (workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__rate_interval])))',
+                                          '(sum by (workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__rate_interval])))/ ((sum by (workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__rate_interval]))) != 0)',
                                           stringFilters,
                                           'Wait Time',
                                           'ms'),

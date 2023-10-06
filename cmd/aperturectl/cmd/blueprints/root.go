@@ -5,8 +5,10 @@ import (
 )
 
 const (
-	defaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
-	latestTag             = "latest"
+	// DefaultBlueprintsRepo is the default repository for blueprints.
+	DefaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
+	// LatestTag is the tag for the latest version of blueprints.
+	LatestTag = "latest"
 )
 
 var (
@@ -40,6 +42,5 @@ func init() {
 var BlueprintsCmd = &cobra.Command{
 	Use:   "blueprints",
 	Short: "Aperture Blueprints",
-	Long: `
-Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
+	Long:  `Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
 }
