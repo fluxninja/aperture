@@ -1,6 +1,6 @@
 ---
 title: Per-user Rate Limiting
-sidebar_position: 3
+sidebar_position: 2
 keywords:
   - guides
   - rate limiting
