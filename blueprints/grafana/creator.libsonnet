@@ -59,7 +59,7 @@ function(policyFile, cfg) {
     else {},
 
   local receiverDashboards = {
-    ['receiver' + '-' + policyName + '-' + infraMeter + '-' + receiver + '.json']:
+    ['receiver' + '-' + policyName + '-' + std.strReplace(infraMeter, '_', '-') + '-' + receiver + '.json']:
       receiverDashboard.baseDashboard + g.dashboard.withPanels(
         unwrapInfraMeter(receiver, policyName, infraMeter, cfg.dashboard.datasource, cfg.dashboard.extra_filters).panel
       )

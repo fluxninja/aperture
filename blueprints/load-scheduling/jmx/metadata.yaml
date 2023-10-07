@@ -1,3 +1,0 @@
-blueprint: Service Protection Policy based on feedback of a JMX metrics queries.
-sources:
-  policy: load-scheduling/jmx/policy.libsonnet

@@ -1,7 +1,7 @@
-# Generated values file for load-scheduling/jmx blueprint
+# Generated values file for load-scheduling/java-gc-k8s blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/load-scheduling/jmx
-blueprint: load-scheduling/jmx
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/java-gc-k8s
+blueprint: load-scheduling/java-gc-k8s
 uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
@@ -35,4 +35,4 @@ policy:
     # Name of the Kubernetes pod for which JMX metrics are scraped.
     # Type: string
     # Required: True
-    k8s_pod_name: __REQUIRED_FIELD__
+    k8s_pod_regex: __REQUIRED_FIELD__

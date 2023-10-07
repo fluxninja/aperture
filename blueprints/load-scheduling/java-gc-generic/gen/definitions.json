@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "load-scheduling/java-gc-generic blueprint",
+  "additionalProperties": false,
+  "required": ["blueprint", "uri", "policy"],
+  "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "load-scheduling/java-gc-generic",
+      "enum": ["load-scheduling/java-gc-generic"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "load_scheduling_core", "jmx"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "load_scheduling_core": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["aiad_load_scheduler", "setpoint"],
+          "properties": {
+            "dry_run": {
+              "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
+              "default": false,
+              "type": "boolean"
+            },
+            "kubelet_overload_confirmations": {
+              "description": "Overload confirmation signals from kubelet.",
+              "default": {},
+              "type": "object",
+              "$ref": "#/$defs/kubelet_overload_confirmations"
+            },
+            "overload_confirmations": {
+              "description": "List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.",
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/$defs/overload_confirmation"
+              }
+            },
+            "aiad_load_scheduler": {
+              "description": "Parameters for AIMD throttling strategy.",
+              "default": {
+                "alerter": {
+                  "alert_name": "AIAD Load Throttling Event"
+                },
+                "load_multiplier_linear_decrement": 0.05,
+                "load_multiplier_linear_increment": 0.025,
+                "load_scheduler": {
+                  "selectors": [
+                    {
+                      "control_point": "__REQUIRED_FIELD__"
+                    }
+                  ]
+                },
+                "max_load_multiplier": 2,
+                "min_load_multiplier": 0
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
+            },
+            "setpoint": {
+              "description": "Setpoint.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            }
+          }
+        },
+        "jmx": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["jmx_host", "jmx_prometheus_port"],
+          "properties": {
+            "jmx_host": {
+              "description": "Hostname for scraping metrics provided by JMX Prometheus Java Agent.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "string"
+            },
+            "jmx_prometheus_port": {
+              "description": "Port number for scraping metrics provided by JMX Prometheus Java Agent.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "extra_filters": {
+          "description": "Additional filters to pass to each query to Grafana datasource.",
+          "default": {},
+          "type": "object",
+          "additionalProperties": true
+        },
+        "refresh_interval": {
+          "description": "Refresh interval for dashboard panels.",
+          "default": "15s",
+          "type": "string"
+        },
+        "time_from": {
+          "description": "From time of dashboard.",
+          "default": "now-15m",
+          "type": "string"
+        },
+        "time_to": {
+          "description": "To time of dashboard.",
+          "default": "now",
+          "type": "string"
+        },
+        "title": {
+          "description": "Name of the main dashboard.",
+          "default": "Aperture Service Protection",
+          "type": "string"
+        },
+        "datasource": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "filter_regex": {
+              "description": "Datasource filter regex.",
+              "default": "",
+              "type": "string"
+            },
+            "name": {
+              "description": "Datasource name.",
+              "default": "$datasource",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "driver_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "threshold"],
+      "properties": {
+        "enabled": {
+          "description": "Enables the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "boolean"
+        },
+        "threshold": {
+          "description": "Threshold for the driver.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "overload_confirmation_driver": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pod_cpu": {
+          "description": "The driver for using CPU usage as overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        },
+        "pod_memory": {
+          "description": "The driver for using memory usage as overload confirmation.",
+          "default": {},
+          "type": "object",
+          "$ref": "#/$defs/driver_criteria"
+        }
+      }
+    },
+    "kubelet_overload_confirmations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria", "infra_context"],
+      "properties": {
+        "criteria": {
+          "description": "Criteria for overload confirmation.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "#/$defs/overload_confirmation_driver"
+        },
+        "infra_context": {
+          "description": "Kubernetes selector for scraping metrics.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/KubernetesObjectSelector"
+        }
+      }
+    },
+    "overload_confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operator": {
+          "description": "The operator for the overload confirmation criteria. oneof: `gt | lt | gte | lte | eq | neq`",
+          "type": "string"
+        },
+        "query_string": {
+          "description": "The Prometheus query to be run. Must return a scalar or a vector with a single element.",
+          "type": "string"
+        },
+        "threshold": {
+          "description": "The threshold for the overload confirmation criteria.",
+          "type": "number",
+          "format": "double"
+        }
+      }
+    }
+  }
+}

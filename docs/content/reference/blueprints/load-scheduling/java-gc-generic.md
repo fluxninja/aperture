@@ -1,9 +1,9 @@
 ---
-title: Load Scheduling Based on JMX Metrics
+title: Load Scheduling based on Java garbage collection times
 keywords:
   - blueprints
 sidebar_position: 3
-sidebar_label: Load Scheduling Based on JMX Metrics
+sidebar_label: Load Scheduling based on Java garbage collection times
 ---
 
 <!-- Configuration Marker -->
@@ -18,7 +18,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/jmx`}>load-scheduling/jmx</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/java-gc-generic`}>load-scheduling/java-gc-generic</a>
 
 <!-- vale on -->
 
@@ -156,11 +156,11 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-jmx-app-namespace"></a>
+<a id="policy-jmx-jmx-host"></a>
 
 <ParameterDescription
-    name='policy.jmx.app_namespace'
-    description='Namespace of the application for which JMX metrics are scraped.'
+    name='policy.jmx.jmx_host'
+    description='Hostname for scraping metrics provided by JMX Prometheus Java Agent.'
     type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -170,26 +170,12 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-jmx-jmx-metrics-port"></a>
+<a id="policy-jmx-jmx-prometheus-port"></a>
 
 <ParameterDescription
-    name='policy.jmx.jmx_metrics_port'
-    description='Port number for scraping metrics provided by JMX Promtheus Java Agent.'
+    name='policy.jmx.jmx_prometheus_port'
+    description='Port number for scraping metrics provided by JMX Prometheus Java Agent.'
     type='Integer (int32)'
-    reference=''
-    value='8087'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-jmx-k8s-pod-name"></a>
-
-<ParameterDescription
-    name='policy.jmx.k8s_pod_name'
-    description='Name of the Kubernetes pod for which JMX metrics are scraped.'
-    type='string'
     reference=''
     value='"__REQUIRED_FIELD__"'
 />
