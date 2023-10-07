@@ -4,7 +4,7 @@ function(config, agent_group='default') {
 
   jmx_inframeter: {
     agent_group: agent_group,
-    per_agent_group: true,
+    per_agent_group: false,
     pipeline: {
       receivers: [
         'prometheus',

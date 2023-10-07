@@ -9,7 +9,7 @@ function(params) {
   local c = std.mergePatch(config, params),
 
   local policyName = c.policy.policy_name,
-  local promqlQuery = 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{policy_name="%(policy_name)s", infra_meter_name="elasticsearch", thread_pool_name="search"}[30s]))' % { policy_name: policyName },
+  local promqlQuery = 'avg(elasticsearch_node_thread_pool_tasks_queued{policy_name="%(policy_name)s", infra_meter_name="elasticsearch", thread_pool_name="search"})' % { policy_name: policyName },
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: promqlQuery,
