@@ -15,13 +15,13 @@
 Agent. It allows flow control functionality on fine-grained features inside
 service code.
 
-Refer [documentation](https://docs.fluxninja.com/integrations/sdk/python/) for
-more details.
+Refer to [documentation](https://docs.fluxninja.com/integrations/sdk/python/)
+for more details.
 
 # ISSUES
 
-Due to issues with installer used by poetry 1.4.0, one should disable modern
-installation method:
+Due to issues with the installer used by poetry 1.4.0, one should disable the
+modern installation method:
 
 ```
 poetry config installer.modern-installation false
