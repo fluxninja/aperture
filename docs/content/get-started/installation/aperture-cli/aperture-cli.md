@@ -38,10 +38,10 @@ chmod +x "\${BIN}/aperturectl"
 
 The Aperture CLI provides a convenient way to interact with Aperture. It can be
 used to generate a policy, apply a policy, list policies, and perform other
-operations such as listing connected agents, building binaries for agents and
-the controller. Its use cases extend beyond the aforementioned operations.
-Detailed documentation is available on the
-[aperturectl](/reference/aperturectl/aperturectl.md) reference page. The
+operations such as listing connected agents, listing flow control points and
+preview samples of flow labels or HTTP requests on control points. Its use cases
+extend beyond the aforementioned operations. Detailed documentation is available
+on the [aperturectl](/reference/aperturectl/aperturectl.md) reference page.
 
 The Aperture CLI, compatible with all major platforms, is accessible as an
 executable program. Binaries for the CLI can be obtained from the GitHub <a
