@@ -113,7 +113,7 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 // localPolicy can be nil.
 func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
 	remotePolicy := &policylangv1.Policy{}
-	err := proto.Unmarshal(remoteBytes, remotePolicy)
+	err := remotePolicy.UnmarshalJSON(remoteBytes)
 	if err != nil {
 		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
@@ -150,11 +150,7 @@ func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapp
 		return &policylangv1.GetPolicyResponse{
 			Policy: localPolicy.Policy,
 			Status: policylangv1.GetPolicyResponse_OUTDATED,
-			Reason: fmt.Sprintf(
-				"policy mismatch, remote hash: %s, local hash %s",
-				remoteHash,
-				localHash,
-			),
+			Reason: fmt.Sprintf("policy mismatch, remote hash: %s, local hash %s", remoteHash, localHash),
 		}
 	}
 
