@@ -295,7 +295,7 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte,
 			return nil, err
 		}
 	} else {
-		log.Info().Msgf("Creating new token bucket state for key %s", key)
+		log.Info().Msgf("Creating new token bucket state for key %s in dmap %s", key, gtb.dMap.Name())
 		state.LastFill = now
 		state.Available = gtb.bucketCapacity
 	}
