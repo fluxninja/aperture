@@ -22,8 +22,12 @@ function(policyFile, cfg) {
   local componentsJSON =
     if std.objectHas(policyJSON, 'spec')
     then
-      policyJSON.spec.circuit.components
-    else policyJSON.node.component.components,
+      if std.objectHas(policyJSON.spec, 'circuit') && std.objectHas(policyJSON.spec.circuit, 'components')
+      then policyJSON.spec.circuit.components
+      else []
+    else if std.objectHas(policyJSON, 'node') && std.objectHas(policyJSON.node, 'component') && std.objectHas(policyJSON.node.component, 'components')
+    then policyJSON.node.component.components
+    else [],
 
   // Flow Control Panels
   local flowControlComponents = std.flattenArrays(std.filter(function(x) x != null, [
