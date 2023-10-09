@@ -3,6 +3,7 @@ package agents
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -100,6 +101,9 @@ func (a Agents) PreviewHTTPRequests(
 // GetAgents lists the agents registered on etcd under /peers/aperture-agent.
 func (a Agents) GetAgents() ([]string, error) {
 	re := regexp.MustCompile(`/peers/aperture-agent/[^/]+/`)
+	if re == nil {
+		return nil, fmt.Errorf("failed to compile regular expression")
+	}
 
 	resp, err := a.etcdClient.Client.KV.Get(context.Background(), "/peers/aperture-agent/", clientv3.WithPrefix())
 	if err != nil {

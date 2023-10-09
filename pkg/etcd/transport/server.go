@@ -2,6 +2,7 @@ package transport
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"time"
@@ -16,6 +17,11 @@ import (
 
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+)
+
+const (
+	leaseDuration       = 30
+	serverWatchDuration = 60
 )
 
 // ExactMessage is like proto.Message, but known to point to T.
@@ -57,10 +63,13 @@ type Response struct {
 }
 
 // NewEtcdTransportServer creates a new server on the etcd transport.
-func NewEtcdTransportServer(client *etcdclient.Client) *EtcdTransportServer {
+func NewEtcdTransportServer(client *etcdclient.Client) (*EtcdTransportServer, error) {
+	if client == nil {
+		return nil, errors.New("provided etc client is nil")
+	}
 	return &EtcdTransportServer{
 		etcdClient: client,
-	}
+	}, nil
 }
 
 // SendRequests allows consumers of the etcd transport to send requests to agents.
@@ -69,6 +78,12 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 
 	for _, agent := range agents {
 		go func(agentName string) {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error().Err(fmt.Errorf("panic recovered: %v", r)).Msg("failed to send request to agent")
+					respCh <- &Response{Error: fmt.Errorf("panic recovered: %v", r)}
+				}
+			}()
 			resp, err := t.SendRequest(agentName, msg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to send request to agent")
@@ -86,7 +101,10 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 	for i := 0; i < len(agents); i++ {
 		resp := <-respCh
 		if resp.Error != nil {
-			return nil, resp.Error
+			resps = append(resps, Result[*RespValue]{
+				Err: resp.Error,
+			})
+			continue
 		}
 		var result RespValue
 		if err := proto.Unmarshal(resp.Data, Resp(&result)); err != nil {
@@ -136,7 +154,7 @@ func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Re
 
 	path := path.Join(RPCBasePath, RPCRequestPath, req.Client, req.ID)
 
-	lease, err := t.etcdClient.Grant(context.Background(), 30)
+	lease, err := t.etcdClient.Grant(context.Background(), leaseDuration)
 	if err != nil {
 		return nil, fmt.Errorf("failed to grant lease: %w", err)
 	}
@@ -150,24 +168,12 @@ func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Re
 }
 
 func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), serverWatchDuration*time.Second)
 	defer cancel()
 
-	responePath := path.Join(RPCBasePath, RPCResponsePath, req.Client, req.ID)
+	responsePath := path.Join(RPCBasePath, RPCResponsePath, req.Client, req.ID)
 
-	resp, err := t.etcdClient.Get(ctx, responePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get response from etcd: %w", err)
-	}
-
-	if len(resp.Kvs) > 0 {
-		return &Response{
-			Client: req.Client,
-			Data:   resp.Kvs[0].Value,
-		}, nil
-	}
-
-	watchCh := t.etcdClient.Watch(ctx, responePath)
+	watchCh := t.etcdClient.Watch(ctx, responsePath)
 	for {
 		select {
 		case watchResp, ok := <-watchCh:
