@@ -42,7 +42,7 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local maxConnections = statPanel('Max Connections',
                                    datasource.name,
-                                   'postgresql_connection_max{%(filters)s,infra_meter_name="%(infra_meter)s"} / postgresql_database_count' % { filters: stringFilters, infra_meter: infraMeterName },
+                                   'postgresql_connection_max{%(filters)s,infra_meter_name="%(infra_meter)s"} / postgresql_database_count{%(filters)s,infra_meter_name="%(infra_meter)s"}' % { filters: stringFilters, infra_meter: infraMeterName },
                                    stringFilters,
                                    instantQuery=true,
                                    range=false,

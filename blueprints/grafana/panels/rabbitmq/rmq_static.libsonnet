@@ -6,36 +6,36 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local ready = statPanel('Ready Messages',
                           datasource.name,
-                          'sum(rabbitmq_message_current{%(filters)s, state="ready"})' % { filters: stringFilters },
+                          'sum(rabbitmq_message_current{%(filters)s, infra_meter_name="%(infra_meter)s", state="ready"})' % { filters: stringFilters, infra_meter: infraMeterName },
                           stringFilters,
                           instantQuery=true,
                           range=false),
 
   local unacknowledged = statPanel('Unacknowledged Messages',
                                    datasource.name,
-                                   'sum(rabbitmq_message_current{%(filters)s, state="unacknowledged"})' % { filters: stringFilters },
+                                   'sum(rabbitmq_message_current{%(filters)s, infra_meter_name="%(infra_meter)s", state="unacknowledged"})' % { filters: stringFilters, infra_meter: infraMeterName },
                                    stringFilters,
                                    instantQuery=true,
                                    panelColor='red',
                                    range=false),
 
-  local incoming = statPanel('Rate of Incoming Messages',
+  local incoming = statPanel('Incoming Messages',
                              datasource.name,
-                             'sum(rate(rabbitmq_message_published_total{%(filters)s}[$__range]))' % { filters: stringFilters },
+                             'sum(rate(rabbitmq_message_published_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName },
                              stringFilters,
                              instantQuery=true,
                              range=false),
 
-  local outgoing = statPanel('Rate of Outgoing Messages',
+  local outgoing = statPanel('Outgoing Messages',
                              datasource.name,
-                             'sum(rate(rabbitmq_message_delivered_total{%(filters)s}[$__range])) + sum(rate(rabbitmq_message_acknowledged_total{%(filters)s}[$__range]))' % { filters: stringFilters },
+                             'sum(rate(rabbitmq_message_delivered_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__range])) + sum(rate(rabbitmq_message_acknowledged_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName },
                              stringFilters,
                              instantQuery=true,
                              range=false),
 
   local consumers = statPanel('Consumers',
                               datasource.name,
-                              'sum(rabbitmq_consumer_count{%(filters)s})' % { filters: stringFilters },
+                              'sum(rabbitmq_consumer_count{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName },
                               stringFilters,
                               instantQuery=true,
                               panelColor='blue',
@@ -43,7 +43,7 @@ function(policyName, infraMeterName, datasource, extraFilters) {
 
   local queues = statPanel('Queues',
                            datasource.name,
-                           'count without(rabbitmq_queue_name) (rabbitmq_message_published_total{%(filters)s})' % { filters: stringFilters },
+                           'count without(rabbitmq_queue_name) (rabbitmq_message_published_total{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName },
                            stringFilters,
                            instantQuery=true,
                            panelColor='blue',
@@ -55,5 +55,4 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   outgoing: outgoing.panel,
   consumers: consumers.panel,
   queues: queues.panel,
-
 }
