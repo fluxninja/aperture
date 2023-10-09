@@ -128,35 +128,23 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 	return circuit, policy, nil
 }
 
-// This will generate a file with intermediate representation of the policy circuit.
-func SaveIntermediateFormat(circuit *circuitfactory.Circuit, file string) error {
+// GetFlatComponentsList returns a fl representation of the circuit graph.
+func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
 	circuitView, err := circuit.CircuitView()
 	if err != nil {
 		errMsg := fmt.Errorf("error transforming circuit to circuit view: %w", err)
-		return errMsg
+		return "", errMsg
 	}
 
 	graph := circuitView.Tree.GetGraph()
 
-	circuitJSON, err := graph.MarshalJSON()
+	flatComponentsList, err := graph.MarshalJSON()
 	if err != nil {
-		errMsg := fmt.Errorf("error marshalling circuit graph: %w", err)
-		return errMsg
+		errMsg := fmt.Errorf("error marshaling circuit graph: %w", err)
+		return "", errMsg
 	}
 
-	f, err := os.Create(file)
-	if err != nil {
-		errMsg := fmt.Errorf("error creating intermediate representation file: %w", err)
-		return errMsg
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(string(circuitJSON))
-	if err != nil {
-		log.Error().Err(err).Msg("error writing to file")
-		return err
-	}
-	return nil
+	return string(flatComponentsList), nil
 }
 
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.

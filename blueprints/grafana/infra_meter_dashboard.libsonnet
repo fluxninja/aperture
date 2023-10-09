@@ -10,14 +10,14 @@ function(policyFile, policyName, datasource, extraFilters={}) {
 
   local infraMeters =
     if std.objectHas(policyJSON, 'spec') &&
-        std.objectHas(policyJSON.spec, 'resources') &&
-        std.objectHas(policyJSON.spec.resources, 'infra_meters') &&
-        std.length(std.objectFields(policyJSON.spec.resources.infra_meters)) > 0
+       std.objectHas(policyJSON.spec, 'resources') &&
+       std.objectHas(policyJSON.spec.resources, 'infra_meters') &&
+       std.length(std.objectFields(policyJSON.spec.resources.infra_meters)) > 0
     then policyJSON.spec.resources.infra_meters
     else {},
 
   local receiverDashboards = {
-    ['receiver' + '-' + policyName + '-' + infraMeter + '-' + receiver + '.json']:
+    ['receiver' + '-' + infraMeter + '-' + receiver]:
       receiverDashboard.baseDashboard + g.dashboard.withPanels(
         unwrapInfraMeter(receiver, policyName, infraMeter, datasource, extraFilters).panel
       )

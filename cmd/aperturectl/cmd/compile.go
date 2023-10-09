@@ -16,7 +16,6 @@ var (
 	cr      string
 	dot     string
 	mermaid string
-	output  string
 	depth   int
 )
 
@@ -25,7 +24,6 @@ func init() {
 	compileCmd.Flags().StringVar(&cr, "cr", "", "Path to Aperture Policy custom resource file")
 	compileCmd.Flags().StringVar(&dot, "dot", "", "Path to store the dot file")
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "Path to store the mermaid file")
-	compileCmd.Flags().StringVar(&output, "output", "", "Path to store intermediate representation file")
 	compileCmd.Flags().IntVar(&depth, "depth", 1, "Maximum depth to expand the graph. Use -1 for maximum possible depth")
 }
 
@@ -82,11 +80,6 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 		// if --mermaid flag is set, write mermaid file
 		if mermaid != "" {
 			if err := utils.GenerateMermaidFile(circuit, mermaid, depth); err != nil {
-				return err
-			}
-		}
-		if output != "" {
-			if err := utils.SaveIntermediateFormat(circuit, output); err != nil {
 				return err
 			}
 		}
