@@ -36,7 +36,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testCon
 
 type flow struct {
 	requestlabel string // what label it needs
-	requestRate  int32
+	requestRate  int
 	limit        float64
 	// counters
 	totalRequests    int32 // total requests made
@@ -51,27 +51,35 @@ type flowRunner struct {
 	limit    float64
 }
 
-// runFlows runs the flows for the given duration.
 func (fr *flowRunner) runFlows(t *testing.T) {
 	for _, f := range fr.flows {
 		f.limit = fr.limit
-
 		fr.wg.Add(1)
+
 		go func(f *flow) {
 			defer fr.wg.Done()
 
 			stopTime := time.Now().Add(fr.duration)
-			// delay between requests (in nanoseconds) = 1,000,000,000 / requestRate
-			requestDelay := time.Duration(1e9 / f.requestRate)
+
+			// Number of concurrent requests
+			concurrentRequests := 5
+			// Adjust the request delay for concurrency
+			requestDelay := time.Duration(1e9 / f.requestRate / concurrentRequests)
 
 			for {
 				// nolint
 				randomLimiterIndex := rand.Intn(len(fr.limiters))
 				limiter := fr.limiters[randomLimiterIndex]
-				atomic.AddInt32(&f.totalRequests, 1)
-				accepted, _, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
-				if accepted {
-					atomic.AddInt32(&f.acceptedRequests, 1)
+
+				// Burst loop for concurrent requests
+				for i := 0; i < concurrentRequests; i++ {
+					go func() {
+						atomic.AddInt32(&f.totalRequests, 1)
+						accepted, _, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
+						if accepted {
+							atomic.AddInt32(&f.acceptedRequests, 1)
+						}
+					}()
 				}
 
 				nextReqTime := time.Now().Add(requestDelay)
@@ -85,6 +93,41 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 	}
 	fr.wg.Wait()
 }
+
+// // runFlows runs the flows for the given duration.
+// func (fr *flowRunner) runFlows(t *testing.T) {
+// 	for _, f := range fr.flows {
+// 		f.limit = fr.limit
+
+// 		fr.wg.Add(1)
+// 		go func(f *flow) {
+// 			defer fr.wg.Done()
+
+// 			stopTime := time.Now().Add(fr.duration)
+// 			// delay between requests (in nanoseconds) = 1,000,000,000 / requestRate
+// 			requestDelay := time.Duration(1e9 / f.requestRate)
+
+// 			for {
+// 				// nolint
+// 				randomLimiterIndex := rand.Intn(len(fr.limiters))
+// 				limiter := fr.limiters[randomLimiterIndex]
+// 				atomic.AddInt32(&f.totalRequests, 1)
+// 				accepted, _, _, _ := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
+// 				if accepted {
+// 					atomic.AddInt32(&f.acceptedRequests, 1)
+// 				}
+
+// 				nextReqTime := time.Now().Add(requestDelay)
+// 				if nextReqTime.Before(stopTime) {
+// 					time.Sleep(requestDelay)
+// 				} else {
+// 					break
+// 				}
+// 			}
+// 		}(f)
+// 	}
+// 	fr.wg.Wait()
+// }
 
 // createJobGroup creates a job group for the given limiter..
 func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
