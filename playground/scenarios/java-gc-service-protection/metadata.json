@@ -3,8 +3,8 @@
   "tkenv": "playground/tanka/apps/java-demo-app",
   "aperture_policies": [
     {
-      "policy_name": "jmx-service-protection",
-      "values_file": "policies/jmx-service-protection.yaml"
+      "policy_name": "java-gc-service-protection",
+      "values_file": "policies/java-gc-service-protection.yaml"
     }
   ],
   "images": [

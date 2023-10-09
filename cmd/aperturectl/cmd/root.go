@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -95,14 +96,24 @@ func Execute() {
 		log.Error().Err(err).Msg("Failed to check if current version is newer")
 	}
 	if newer {
-		err = blueprints.RemoveRunE(nil, nil)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to remove latest blueprints")
-		} else {
-			err = utils.UpdateVersionFile(info.Version)
+		var userHomeDir string
+		userHomeDir, err = os.UserHomeDir()
+		if err == nil {
+			aperturectlRootDir := filepath.Join(userHomeDir, utils.AperturectlRootDir)
+			aperturectlBlueprintsCacheRoot := filepath.Join(aperturectlRootDir, utils.BlueprintsCacheRoot)
+			err = os.RemoveAll(aperturectlBlueprintsCacheRoot)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to update version file")
+				log.Error().Err(err).Msg("Failed to remove latest blueprints")
 			}
+			aperturectlBuilderCacheRoot := filepath.Join(aperturectlRootDir, utils.BuilderCacheRoot)
+			err = os.RemoveAll(aperturectlBuilderCacheRoot)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to remove builder cache")
+			}
+		}
+		err = utils.UpdateVersionFile(info.Version)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to update version file")
 		}
 	}
 

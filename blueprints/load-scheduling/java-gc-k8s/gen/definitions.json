@@ -1,15 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "load-scheduling/jmx blueprint",
+  "title": "load-scheduling/java-gc-k8s blueprint",
   "additionalProperties": false,
   "required": ["blueprint", "uri", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",
       "type": "string",
-      "default": "load-scheduling/jmx",
-      "enum": ["load-scheduling/jmx"]
+      "default": "load-scheduling/java-gc-k8s",
+      "enum": ["load-scheduling/java-gc-k8s"]
     },
     "uri": {
       "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
@@ -102,7 +102,7 @@
         "jmx": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["app_namespace", "k8s_pod_name"],
+          "required": ["app_namespace", "k8s_pod_regex"],
           "properties": {
             "app_namespace": {
               "description": "Namespace of the application for which JMX metrics are scraped.",
@@ -115,7 +115,7 @@
               "type": "integer",
               "format": "int32"
             },
-            "k8s_pod_name": {
+            "k8s_pod_regex": {
               "description": "Name of the Kubernetes pod for which JMX metrics are scraped.",
               "default": "__REQUIRED_FIELD__",
               "type": "string"
