@@ -213,7 +213,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	// Decode currentState from gob encoded currentStateBytes
 	now := time.Now()
 
-	state, err := gtb.fastForwardState(now, stateBytes)
+	state, err := gtb.fastForwardState(now, stateBytes, key)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -285,7 +285,7 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	return newStateBytes, resultBytes, nil
 }
 
-func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte) (*tokenBucketState, error) {
+func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte, key string) (*tokenBucketState, error) {
 	var state tokenBucketState
 
 	if stateBytes != nil {
@@ -295,6 +295,7 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte)
 			return nil, err
 		}
 	} else {
+		log.Info().Msgf("Creating new token bucket state for key %s", key)
 		state.LastFill = now
 		state.Available = gtb.bucketCapacity
 	}
