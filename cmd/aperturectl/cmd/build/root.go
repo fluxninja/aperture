@@ -64,7 +64,7 @@ var BuildCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		builderCacheRoot = filepath.Join(userHomeDir, ".aperturectl", "build")
+		builderCacheRoot = filepath.Join(userHomeDir, utils.AperturectlRootDir, utils.BuilderCacheRoot)
 		err = os.MkdirAll(builderCacheRoot, os.ModePerm)
 		if err != nil {
 			return err

@@ -15,7 +15,7 @@ func init() {
 	if err != nil {
 		userHomeDir = os.TempDir()
 	}
-	versionFilePath = filepath.Join(userHomeDir, ".aperturectl", "version")
+	versionFilePath = filepath.Join(userHomeDir, AperturectlRootDir, "version")
 }
 
 // CreateVersionFileIfNotExists creates a version file if it does not exist.

@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: jmx-service-protection
+  name: java-gc-service-protection
 spec:
   circuit:
     components:
@@ -98,7 +98,8 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"service3-demo-app-.*"})
+          query_string: avg(java_lang_G1_Young_Generation_LastGcInfo_duration{policy_name="java-gc-service-protection",
+            infra_meter_name="jmx_inframeter"})
     - variable:
         constant_output:
           value: 20
@@ -120,7 +121,7 @@ spec:
     infra_meters:
       jmx_inframeter:
         agent_group: default
-        per_agent_group: true
+        per_agent_group: false
         pipeline:
           receivers:
           - prometheus
@@ -143,4 +144,8 @@ spec:
                   regex: (.*?:8087)
                   source_labels:
                   - __address__
+                - action: keep
+                  regex: service3-demo-app-.*
+                  source_labels:
+                  - __meta_kubernetes_pod_name
                 scrape_interval: 10s
