@@ -3,7 +3,7 @@ function(config, agent_group='default') {
 
   jmx_inframeter: {
     agent_group: agent_group,
-    per_agent_group: true,
+    per_agent_group: false,
     pipeline: {
       receivers: [
         'prometheus',
@@ -34,6 +34,11 @@ function(config, agent_group='default') {
                   source_labels: ['__address__'],
                   action: 'keep',
                   regex: jmx_regex,
+                },
+                {
+                  source_labels: ['__meta_kubernetes_pod_name'],
+                  action: 'keep',
+                  regex: config.policy.jmx.k8s_pod_regex,
                 },
               ],
             },

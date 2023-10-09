@@ -1,6 +1,6 @@
 local creator = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../common/utils.libsonnet';
-local blueprint = import './jmx.libsonnet';
+local blueprint = import './java-gc.libsonnet';
 local jmxUtils = import './utils.libsonnet';
 
 local policy = blueprint.policy;
@@ -9,9 +9,11 @@ local config = blueprint.config;
 function(params) {
   local c = std.mergePatch(config, params),
 
+  local policyName = c.policy.policy_name,
+  local promqlQuery = 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{policy_name="%(policy_name)s", infra_meter_name="jmx_inframeter"})' % { policy_name: policyName },
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
-      promql_query: 'avg(java_lang_G1_Young_Generation_LastGcInfo_duration{k8s_pod_name=~"%(k8s_pod_name)s"})' % { k8s_pod_name: c.policy.jmx.k8s_pod_name },
+      promql_query: promqlQuery,
       setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
