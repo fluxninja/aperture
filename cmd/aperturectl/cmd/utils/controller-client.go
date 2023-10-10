@@ -33,7 +33,7 @@ type IntrospectionClient interface {
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
 type PolicyClient interface {
 	ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.GetPoliciesResponse, error)
-	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
@@ -48,6 +48,6 @@ type StatusClient interface {
 
 // CloudPolicyClient is a subset of cloudv1.CloudControllerClient that covers APIs related to policies.
 type CloudPolicyClient interface {
-	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }

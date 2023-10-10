@@ -367,7 +367,7 @@ agentsLoop:
 }
 
 // UpsertPolicy creates/updates policies in the system.
-func (h *Handler) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (h *Handler) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*policylangv1.UpsertPolicyResponse, error) {
 	return h.policyService.UpsertPolicy(ctx, req)
 }
 

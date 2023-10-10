@@ -11,7 +11,6 @@ import "aperture/policy/language/v1/telemetry_collector.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/field_mask.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
@@ -34,7 +33,7 @@ service PolicyService {
   }
 
   // UpsertPolicy creates/updates policy based on the provided request.
-  rpc UpsertPolicy(UpsertPolicyRequest) returns (google.protobuf.Empty) {
+  rpc UpsertPolicy(UpsertPolicyRequest) returns (UpsertPolicyResponse) {
     option (google.api.http) = {
       post: "/v1/policies/{policy_name}"
       body: "*",
@@ -104,9 +103,16 @@ message GetPolicyResponse {
 message UpsertPolicyRequest {
   string policy_name = 1 [(validate.rules).string.min_len = 1];
   Policy policy = 2;
-  // The paths to update.
-  google.protobuf.FieldMask update_mask = 3;
+  reserved 3;
+  reserved "update_mask";
   string policy_string = 4;
+}
+
+// UpsertPolicyResponse is a response to UpsertPolicy
+message UpsertPolicyResponse {
+  // A hash of the policy, as reported in heartbeats (note: the hash might
+  // change after updating controller with new aperture version)
+  string policy_hash = 1;
 }
 
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
