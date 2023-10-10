@@ -1,4 +1,3 @@
-local dashboard_group = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../common/utils.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
@@ -38,14 +37,8 @@ function(params) {
   },
 
   local p = policy(config_with_postgresql_infra_meter),
-  local dg = dashboard_group(p.policyResource, config_with_postgresql_infra_meter),
-
   policies: {
     [std.format('%s-cr.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef,
   },
-  dashboards: {
-    [std.format('policy-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.mainDashboard,
-    [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.signalsDashboard,
-  } + dg.receiverDashboards,
 }

@@ -128,6 +128,25 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 	return circuit, policy, nil
 }
 
+// GetFlatComponentsList returns a fl representation of the circuit graph.
+func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
+	circuitView, err := circuit.CircuitView()
+	if err != nil {
+		errMsg := fmt.Errorf("error transforming circuit to circuit view: %w", err)
+		return "", errMsg
+	}
+
+	graph := circuitView.Tree.GetGraph()
+
+	flatComponentsList, err := graph.MarshalJSON()
+	if err != nil {
+		errMsg := fmt.Errorf("error marshaling circuit graph: %w", err)
+		return "", errMsg
+	}
+
+	return string(flatComponentsList), nil
+}
+
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.
 func FetchPolicyFromCR(crPath string) (string, error) {
 	// extract spec key from CR and save it a temp file
