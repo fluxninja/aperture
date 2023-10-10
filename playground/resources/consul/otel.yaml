@@ -1,0 +1,276 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: aperture-agent
+  namespace: default
+spec:
+  protocol: grpc
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: wavepool-generator
+  namespace: default
+spec:
+  protocol: http
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: service1-demo-app
+  namespace: default
+spec:
+  protocol: http
+  envoyExtensions:
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "ingress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "egress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: service2-demo-app
+  namespace: default
+spec:
+  protocol: http
+  envoyExtensions:
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "ingress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "egress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: service3-demo-app
+  namespace: default
+spec:
+  protocol: http
+  envoyExtensions:
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: inbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "ingress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+  - name: builtin/ext-authz
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        statPrefix: ext_authz
+        timeout: 0.25s
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default
+          initialMetadata:
+          - key: control-point
+            value: "ingress"
+  - name: builtin/otel-access-logging
+    required: true
+    arguments:
+      listenerType: outbound
+      config:
+        attributes:
+          aperture.source: "envoy"
+          aperture.check_response: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:aperture.check_response)%"
+          http.status_code: "%RESPONSE_CODE%"
+          authz_duration: "%DYNAMIC_METADATA(envoy.filters.http.ext_authz:ext_authz_duration)%"
+          BYTES_RECEIVED: "%BYTES_RECEIVED%"
+          BYTES_SENT: "%BYTES_SENT%"
+          DURATION: "%DURATION%"
+          REQUEST_DURATION: "%REQUEST_DURATION%"
+          REQUEST_TX_DURATION: "%REQUEST_TX_DURATION%"
+          RESPONSE_DURATION: "%RESPONSE_DURATION%"
+          RESPONSE_TX_DURATION: "%RESPONSE_TX_DURATION%"
+        body: "%REQ(:METHOD)%"
+        logName: "egress"
+        grpcService:
+          target:
+            service:
+              name: aperture-agent
+              namespace: default

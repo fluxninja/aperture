@@ -1,0 +1,22 @@
+# Contains values that affect multiple components of the chart.
+global:
+
+  # The main enabled/disabled setting.
+  # If true, servers, clients, Consul DNS and the Consul UI will be enabled.
+  enabled: true
+
+  # The prefix used for all resources created in the Helm chart.
+  name: consul
+
+  #image: 'hashicorp/consul-enterprise:1.16.0-rc1-ent'
+  image: 'hashicorpdev/consul:latest'
+
+  imageConsulDataplane: hashicorp/consul-dataplane:1.2.2
+
+# Contains values that configure the Consul UI.
+ui:
+  enabled: true
+
+# Configures and installs the automatic Consul service mesh sidecar injector.
+connectInject:
+  enabled: true

@@ -45,7 +45,7 @@ APERTURE_RABBITMQ_NS = "rabbitmq"
 APERTURE_ELASTICSEARCH_NS = "elasticsearch"
 APERTURE_POSTGRESQL_NS = "postgresql"
 APERTURE_ISTIO_NS = "istio-system"
-DEFAULT_TEST_SCENARIO = "scenarios/java-service-protection"
+DEFAULT_TEST_SCENARIO = "scenarios/service-protection-rl-escalation"
 TANKA = "tk"
 SKIP_LOCAL_CMDS = False  # If set to true, skips actually running local commands (useful for developing and testing Tiltfile itself)
 TANKA_DEPS_HANDLED = []
@@ -70,6 +70,11 @@ DASHBOARDS = []
 # "kinds"
 DEP_TREE = {
     APERTURE_CONTROLLER_NS: {
+        "consul": {
+            "renderer": "consul",
+            "labels": ["consul"],
+            "child_resources": [],
+        },
         "aperture-grafana": {
             "labels": ["ApertureController"],
             # construct directory path to tkenv
@@ -228,7 +233,7 @@ DEP_TREE = {
                 {
                     "workload": "agent",
                     "new_name": "agent",
-                    "resource_deps": ["controller", "agent-aperture-agent-manager"],
+                    "resource_deps": ["controller", "agent-aperture-agent-manager", "consul"],
                     "extra_pod_selectors": [
                         {'app.kubernetes.io/component':  'agent', 'app.kubernetes.io/managed-by': 'aperture-operator'},
                     ]
@@ -704,6 +709,7 @@ def get_resource_list_to_deploy(names, run_only_listed, dep_tree, inv_dep_tree, 
                 resource_info = inv_dep_tree[name]
                 dependencies = resource_info.get("needs", [])
                 while len(dependencies) > 0:
+                    print(dependencies)
                     dep = dependencies.pop()
                     if dep not in resources:
                         resources.append(dep)
@@ -992,7 +998,7 @@ def process_aperture_scenario(scenario_path):
         "child_resources": [
             {
                 "workload": "wavepool-generator",
-                "resource_deps": ["scenario-policies", "agent"] if aperture_policies else ["agent"],
+                "resource_deps": ["scenario-policies", "agent", "consul"] if aperture_policies else ["agent"],
                 "extra_objects": [
                     "wavepool-config:configmap"
                 ]
@@ -1121,6 +1127,18 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, cloud_extensi
                 namespace = app_config.get("namespace", None)
                 policies = app_config.get("aperture_policies", None)
                 render_aperturectl(policies, namespace, cloud_extension)
+            elif renderer == "consul":
+                if config.tilt_subcommand == "up":
+                    local_resource(
+                        name="consul",
+                        labels="consul",
+                        cmd=(["./scripts/install_consul.sh"])
+                    )
+                else:
+                    local(
+                        quiet=True,
+                        command="consul-k8s uninstall --auto-approve --wipe-data || exit 0"
+                    )
             else:
                 fail("Tanka app is not found for %s." % app)
 
