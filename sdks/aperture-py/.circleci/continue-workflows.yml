@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+  publish-release:
+    parameters:
+      dry-run:
+        type: boolean
+        default: false
+        description: If set to false, sdk will be published to pypi
+    docker:
+      - image: cimg/python:3.11.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: Publish to pypi
+          command: |
+            poetry config pypi-token.pypi $PYPI_PASSWORD
+            poetry install
+            args=(--build)
+            if [[ "<< parameters.dry-run >>" == "true" ]]; then
+               args+=( --dry-run )
+            fi
+            poetry publish "${args[@]}"
+
+workflows:
+  version: 2
+
+  publish-release:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+    jobs:
+      - publish-release:
+          name: verify-publish-release
+          context: pypi
+          dry-run: true
