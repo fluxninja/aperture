@@ -19,10 +19,9 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
 // ControllerConfig is the config file structure for Aperture Cloud Controller.
@@ -163,8 +162,28 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 
 // CloudPolicyClient returns Cloud Controller PolicyClient, connecting to cloud controller if not yet connected.
 func (c *ControllerConn) CloudPolicyClient() (utils.CloudPolicyClient, error) {
-	// PolicyClient has no restrictions.
-	return c.policyServiceClient()
+	if c.conn == nil {
+		var err error
+		c.conn, err = c.prepareGRPCClient()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return cloudv1.NewPolicyServiceClient(c.conn), nil
+}
+
+// CloudBlueprintsClient returns Cloud Controller BlueprintsClient, connecting to cloud controller if not yet connected.
+func (c *ControllerConn) CloudBlueprintsClient() (utils.CloudBlueprintsClient, error) {
+	if c.conn == nil {
+		var err error
+		c.conn, err = c.prepareGRPCClient()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return cloudv1.NewBlueprintsServiceClient(c.conn), nil
 }
 
 // IntrospectionClient returns Controller IntrospectionClient, connecting to controller if not yet connected.
@@ -212,23 +231,6 @@ func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
 	}
 
 	return cred
-}
-
-// client returns Cloud Controller Client, connecting to controller if not yet connected.
-//
-// This functions is not exposed to force callers to go through the check above.
-func (c *ControllerConn) policyServiceClient() (cloudv1.PolicyServiceClient, error) {
-	if c.conn != nil {
-		return cloudv1.NewPolicyServiceClient(c.conn), nil
-	}
-
-	var err error
-	c.conn, err = c.prepareGRPCClient()
-	if err != nil {
-		return nil, err
-	}
-
-	return cloudv1.NewPolicyServiceClient(c.conn), nil
 }
 
 func (c *ControllerConn) prepareGRPCClient() (*grpc.ClientConn, error) {

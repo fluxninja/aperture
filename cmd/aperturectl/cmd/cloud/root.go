@@ -5,6 +5,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/apply"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/autoscale"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/decisions"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/discovery"
@@ -28,6 +29,7 @@ func init() {
 	CloudCmd.AddCommand(policiesCmd)
 	CloudCmd.AddCommand(flowcontrol.FlowControlCmd)
 	CloudCmd.AddCommand(discovery.DiscoveryCmd)
+	CloudCmd.AddCommand(blueprints.BlueprintsCmd)
 }
 
 // CloudCmd is the command to apply a policy to the Cloud Controller.

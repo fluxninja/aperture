@@ -710,6 +710,12 @@ definitions:
                 type: string
                 x-go-tag-default: 30s
         type: object
+    Blueprint:
+        properties:
+            content:
+                format: byte
+                type: string
+        type: object
     BoolVariable:
         description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -1923,6 +1929,11 @@ definitions:
             - STALE
             - OUTDATED
         type: string
+    GetResponse:
+        properties:
+            blueprint:
+                $ref: '#/definitions/Blueprint'
+        type: object
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -2638,6 +2649,14 @@ definitions:
             global_flow_control_points:
                 items:
                     $ref: '#/definitions/GlobalFlowControlPoint'
+                    type: object
+                type: array
+        type: object
+    ListResponse:
+        properties:
+            blueprints:
+                items:
+                    $ref: '#/definitions/Blueprint'
                     type: object
                 type: array
         type: object
@@ -5084,6 +5103,82 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /fluxninja/v1/blueprints:
+        get:
+            operationId: BlueprintsService_List
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ListResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{name}:
+        delete:
+            operationId: BlueprintsService_Delete
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        get:
+            operationId: BlueprintsService_Get
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        post:
+            operationId: BlueprintsService_Apply
+            parameters:
+                - in: path
+                  name: name
+                  required: true
+                  type: string
+                - format: byte
+                  in: query
+                  name: blueprint.content
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
     /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
@@ -5658,6 +5753,7 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: BlueprintsService
     - name: FlowControlService
     - name: PolicyService
     - name: PolicyService

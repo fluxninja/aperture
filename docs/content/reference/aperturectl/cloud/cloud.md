@@ -28,6 +28,7 @@ Use this command to talk to the Cloud Controller.
 - [aperturectl cloud agents](/reference/aperturectl/cloud/agents/agents.md) - List connected agents
 - [aperturectl cloud apply](/reference/aperturectl/cloud/apply/apply.md) - Apply Aperture Policies to the Cloud Controller
 - [aperturectl cloud auto-scale](/reference/aperturectl/cloud/auto-scale/auto-scale.md) - AutoScale integrations
+- [aperturectl cloud blueprints](/reference/aperturectl/cloud/blueprints/blueprints.md) - Cloud Blueprints
 - [aperturectl cloud decisions](/reference/aperturectl/cloud/decisions/decisions.md) - Get Aperture Decisions
 - [aperturectl cloud delete](/reference/aperturectl/cloud/delete/delete.md) - Delete Aperture Policies from Aperture Cloud
 - [aperturectl cloud discovery](/reference/aperturectl/cloud/discovery/discovery.md) - Discovery integrations

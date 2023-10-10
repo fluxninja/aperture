@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package aperture.cloud.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// BlueprintsService is used to receive health and status info from agents.
+service BlueprintsService {
+  rpc List(google.protobuf.Empty) returns (ListResponse) {
+    option (google.api.http) = {get: "/fluxninja/v1/blueprints"};
+  }
+
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {get: "/fluxninja/v1/blueprints/{name}"};
+  }
+
+  rpc Apply(ApplyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {post: "/fluxninja/v1/blueprints/{name}"};
+  }
+
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/fluxninja/v1/blueprints/{name}"};
+  }
+}
+
+message Blueprint {
+  bytes content = 1;
+}
+
+message ListResponse {
+  repeated Blueprint blueprints = 1;
+}
+
+message GetRequest {
+  string name = 1;
+}
+
+message GetResponse {
+  Blueprint blueprint = 1;
+}
+
+message ApplyRequest {
+  string name = 1;
+  Blueprint blueprint = 2;
+}
+
+message DeleteRequest {
+  string name = 1;
+}
