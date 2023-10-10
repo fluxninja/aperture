@@ -17,15 +17,15 @@ import Zoom from 'react-medium-image-zoom';
 
 ## Overview
 
-Quota Scheduler can be use to enforce rate limits set by third party vendors
+Quota Scheduler can be used to enforce rate limits set by third party vendors
 like OpenAI, which helps minimise the need of retrying the request and increase
 success rate of requests. Moreover, it can help reduce the third party vendor
-usages cost by scheduling the request, stopping to go beyond a certain limits.
+usages cost, by scheduling the request, stopping to go beyond a certain limit.
 
-This guide will help you understand how to use the Quota Scheduler Policy to
-manage and stop hitting rate limits imposed by OpenAI. With the help of this
-policy need of retrying the request can be optional, without having to sacrifice
-the user experience.
+This guide will help understand how to use the Quota Scheduler Policy to manage
+and stop hitting rate limits imposed by OpenAI. With the help of this policy the
+need of retrying the request can be optional, without having to sacrifice the
+user experience.
 
 ## Pre-Requisites
 
@@ -45,9 +45,9 @@ create a control point.
 
 ### Setup Control Point using JavaScript SDK
 
-Aperture JavaScript allows you to set a control point manually. Aperture Client
-instance is created earlier in the code which is not discussed in this guide.
-Detailed information about Aperture JavaScript SDK can be found in
+The Aperture JavaScript SDK allows you to set a control point manually. Aperture
+Client instance is creation is not discussed in this guide. Detailed information
+about Aperture JavaScript SDK can be found in
 [Manually setting feature control points using JavaScript SDK](/integrations/sdk/javascript/manual.md)
 
 ```typescript
@@ -55,7 +55,7 @@ if (this.apertureClient) {
   const charCount =
     this.systemMessage.length +
     message.length +
-    Strin("system" + "user").length;
+    String("system" + "user").length;
 
   const labels: Record<string, string> = {
     api_key: CryptoES.SHA256(api.apiKey).toString(),
@@ -138,9 +138,9 @@ provided below.
 Values file need to be adjusted to match the application requirements -
 
 - `policy_name`: Name of the policy. It is required.
-- `bucket_capacity`: Bucket capacity. This value define how many request can be
-  sent in a given interval. For example, if the bucket capacity is 4 & internal
-  is 60, then 4 requests can be sent in 60 seconds.
+- `bucket_capacity`: Bucket capacity. This value defines how many requests can
+  be sent in a given interval. For example, if the bucket capacity is 4 &
+  internal is 60, then 4 requests can be sent in 60 seconds.
 - `fill_amount`: Fill amount. After the tokens are consumed, the bucket will be
   filled with this amount. For example, if bucket capacity is 4 & fill amount is
   4, then after 4 requests are sent, the bucket will be filled with 4 tokens. It
@@ -152,9 +152,9 @@ Values file need to be adjusted to match the application requirements -
     api key, user id, etc, which help determine the quota for the request. In
     this case, it is `api_key`.
 
-Scheduler helps in prioritizing the requests based on the labels, and priority
-defined. In this case, we are using `priority` label which is being passed by
-Aperture SDK in code, containing the priority of the request.
+The cheduler helps in prioritizing the requests based on the labels, and
+priority defined. In this case, we are using `priority` label which is being
+passed by Aperture SDK in code, containing the priority of the request.
 
 - `scheduler`:
   - `priority_label_key`: Priority label key to match the request against. In
@@ -166,7 +166,7 @@ Aperture SDK in code, containing the priority of the request.
     - `match_labels`: Labels to match the request against. In this case, it is
       `product_reason`.
 
-Selectors parameters allows filtering of the requests to ensure where the policy
+Selectors parameters allow filtering of the requests to ensure where the policy
 will act on.
 
 - `selectors`:
@@ -177,7 +177,7 @@ will act on.
   - `label_matcher`:
   - `match_labels`: Labels to match the request against. It is optional.
 
-Below is example of values file adjusted to match with sdk code snippet &
+Below is an example of values file adjusted to match with sdk code snippet &
 control point labels.
 
 <details><summary>values.yaml</summary>
