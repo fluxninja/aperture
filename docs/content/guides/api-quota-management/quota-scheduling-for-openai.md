@@ -32,9 +32,9 @@ In this guide, we assume there's an application that makes API calls to OpenAI
 GPT. It uses various model types depending on the use case. Furthermore,
 requests come from different users, each with unique priorities aligned to
 specific tiers like free, paid and trial. The application has to ensure that
-each request are make it to OpenAI without hitting the rate limits. Delaying the
-request is acceptable to some extent i.e the request can wait till the time the
-rate limit is reset. However, the request should not be dropped.
+each requests make it to OpenAI without hitting the rate limits. Delaying the
+request is acceptable to some extent, i.e. the request can wait until the
+request rate limit is reset. However, the request should not be dropped.
 
 ## Pre-Requisites
 
@@ -59,7 +59,8 @@ Client instance creation is not discussed in this guide, detailed information
 around SDK integration can be found in
 [Manually setting feature control points using JavaScript SDK](/integrations/sdk/javascript/manual.md)
 
-Below code provide a general idea of control point creation and setting labels.
+The below code provides a general idea of control point creation and setting
+labels.
 
 ```typescript
 const charCount =
@@ -152,7 +153,7 @@ Values file need to be adjusted to match the application requirements -
     api key, user id, etc, which help determine the quota for the request. In
     this case, it is `api_key`.
 
-The cheduler helps in prioritizing the requests based on the labels, and
+The scheduler helps in prioritizing the requests based on the labels, and
 priority defined. In this case, we are using `priority` label which is being
 passed by Aperture SDK in code, containing the priority of the request.
 
