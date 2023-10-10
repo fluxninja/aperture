@@ -294,4 +294,11 @@ Product Screenshots
 
 ### Using Aperture Cloud UI for Advanced Analytics
 
+![Workload Latency](./assets/quota-scheduling-for-openai/workload-latency.png)
+Workload Latency
+
+![Wait Time vs Workload Type](./assets/quota-scheduling-for-openai/request-in-queue-duration.png)
+
+Wait Time for Requests in Queue for different Workload Types
+
 ## What's Next?
