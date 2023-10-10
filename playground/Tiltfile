@@ -1323,7 +1323,7 @@ cloud_extension = {
     'enabled': enable_cloud_extension,
     'endpoint': fluxninja_endpoint,
     'api_key': api_key,
-    'agent_group': str(local('hostname')).strip().lower(),
+    'agent_group': "hashiconf",
     'cloud_controller': cloud_controller,
     'personal_api_key': personal_api_key,
     'project_name': project_name,

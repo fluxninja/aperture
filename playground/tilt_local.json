@@ -1,0 +1,4 @@
+{
+  "default_registry": "gcr.io/devel-309501/cf-fn",
+  "allowed_k8s_contexts": ["gke_devel-309501_us-central1_hashiconf-dev-cluster"]
+}
