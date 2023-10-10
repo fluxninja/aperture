@@ -1,22 +1,12 @@
-local creator = import 'creator.libsonnet';
-local signals = import 'signals_dashboard.libsonnet';
+local infraMetersDashboards = import 'infra_meter_dashboard.libsonnet';
+local signalsDashboard = import 'signals_dashboard.libsonnet';
+local summaryDashboard = import 'summary_dashboard.libsonnet';
 
-function(policyJSON, cfg) {
-  local policyName = cfg.policy.policy_name,
-  local dashboards = creator(policyJSON, cfg),
-  local mainDashboard = dashboards.dashboard,
-  local receiverDashboards = dashboards.receiverDashboards,
+function(policyFile, componentsList, policyName, datasource, extraFilters={}) {
+  local summary = summaryDashboard(componentsList, policyName, datasource, extraFilters).dashboard,
+  local receivers = infraMetersDashboards(policyFile, policyName, datasource, extraFilters).dashboards,
 
-  local signalsDashboard = signals({
-    policy+: {
-      policy_name: policyName,
-    },
-    dashboard+: {
-      title: 'Aperture Signals - %s' % policyName,
-    },
-  }).dashboard,
-
-  mainDashboard: mainDashboard,
-  signalsDashboard: signalsDashboard,
-  receiverDashboards: receiverDashboards,
+  dashboards: {
+    summary: summary,
+  } + receivers,
 }
