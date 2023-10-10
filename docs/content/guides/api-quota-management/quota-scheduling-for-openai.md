@@ -20,12 +20,21 @@ import Zoom from 'react-medium-image-zoom';
 Quota Scheduler can be used to enforce rate limits set by third party vendors
 like OpenAI, which helps minimise the need of retrying the request and increase
 success rate of requests. Moreover, it can help reduce the third party vendor
-usages cost, by scheduling the request, stopping to go beyond a certain limit.
+usages cost, by scheduling the request and stopping to go beyond a certain
+limit.
 
 This guide will help understand how to use the Quota Scheduler Policy to manage
 and stop hitting rate limits imposed by OpenAI. With the help of this policy the
-need of retrying the request can be optional, without having to sacrifice the
+need of retrying the request can be optional and without having to sacrifice the
 user experience.
+
+In this guide, we assume there's an application that makes API calls to OpenAI
+GPT. It uses various model types depending on the use case. Furthermore,
+requests come from different users, each with unique priorities aligned to
+specific tiers like free, paid and trial. The application has to ensure that
+each request are make it to OpenAI without hitting the rate limits. Delaying the
+request is acceptable to some extent i.e the request can wait till the time the
+rate limit is reset. However, the request should not be dropped.
 
 ## Pre-Requisites
 
@@ -43,69 +52,60 @@ create a control point where the policy will act on. There are multiple ways to
 achieve this, for the scope of this guide, will be using the JavaScript SDK to
 create a control point.
 
-### Setup Control Point using JavaScript SDK
+### Control Point with JavaScript SDK
 
 The Aperture JavaScript SDK allows you to set a control point manually. Aperture
-Client instance is creation is not discussed in this guide. Detailed information
-about Aperture JavaScript SDK can be found in
+Client instance creation is not discussed in this guide, detailed information
+around SDK integration can be found in
 [Manually setting feature control points using JavaScript SDK](/integrations/sdk/javascript/manual.md)
 
+Below code provide a general idea of control point creation and setting labels.
+
 ```typescript
-if (this.apertureClient) {
-  const charCount =
-    this.systemMessage.length +
-    message.length +
-    String("system" + "user").length;
+const charCount =
+  this.systemMessage.length + message.length + String("system" + "user").length;
 
-  const labels: Record<string, string> = {
-    api_key: CryptoES.SHA256(api.apiKey).toString(),
-    // https://platform.openai.com/docs/guides/rate-limits/reduce-the-max_tokens-to-match-the-size-of-your-completions
+const labels: Record<string, string> = {
+  api_key: CryptoES.SHA256(api.apiKey).toString(),
 
-    // also see - https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+  // Rate Limits optimization suggested by OpenAI
+  // https://platform.openai.com/docs/guides/rate-limits/reduce-the-max_tokens-to-match-the-size-of-your-completions
 
-    estimated_tokens: (Math.ceil(charCount / 4) + responseTokens).toString(),
+  // Calculating number token as described by OpenAI
+  // Here -- https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+  estimated_tokens: (Math.ceil(charCount / 4) + responseTokens).toString(),
 
-    model_variant: modelVariant,
-    product_reason: this.settings.product_reason,
+  model_variant: modelVariant,
+  product_reason: this.settings.product_reason,
 
-    priority: String(PRIORITIES[this.settings.product_reason] + priorityBump),
-    prompt_type: promptType,
-  };
+  priority: String(PRIORITIES[this.settings.product_reason] + priorityBump),
+};
 
-  const apertureStart = Date.now();
+flow = await this.apertureClient.StartFlow("openai", {
+  labels: labels,
 
-  flow = await this.apertureClient.StartFlow("openai", {
-    labels: labels,
-    timeoutMilliseconds: 600000,
-  });
-  const apertureEnd = Date.now();
-
-  logger.info(
-    `OpenAI: aperture-js flow should run: ${
-      flow.ShouldRun() ? "yes" : "no"
-    }, response time: ${apertureEnd - apertureStart} ms${
-      flow.CheckResponse()
-        ? `, response: ${JSON.stringify(flow.CheckResponse())}`
-        : ""
-    }${
-      flow.Error() ? `, error: ${JSON.stringify(flow.Error())}` : ""
-    }, estimated tokens: ${
-      labels.estimated_tokens
-    }, character count: ${charCount}`,
-  );
-}
+  timeoutMilliseconds: 600000,
+  // max wait time for the request to be in queue.
+  // as soon as the token is available, request will be sent.
+});
 ```
 
 Let's understand the code snippet above, we are creating a control point named
-'openai' and setting the labels which will be used by the policy to schedule the
-request. The labels are used to identify the request and schedule it
-accordingly. The labels are as follows:
+'openai' and setting the labels which will be used by the policy to identify and
+schedule the request. Below are the labels being passed :
 
 - `api_key`: This is the api key used to authenticate the request to OpenAI.
 - `estimated_tokens`: This is the estimated number of tokens which will be used
   by the request. This is calculated by adding the number of characters in the
-  prompt and the response tokens.
-- `model_variant`: This is the model variant used by the request.
+  prompt and the response tokens. This label value can be used to create a
+  policy around OpenAI tokens limits, which is different from rate limits. More
+  information can be found in
+  [OpenAI Rate Limits](https://platform.openai.com/docs/guides/rate-limits/what-are-the-rate-limits-for-our-api).
+- `model_variant`: Multiple policy can be created based on the model variant
+  used. For example, GPT-3, GPT-4, and so on. Since each model variant has
+  different rate limits, it is recommended to create a policy for each model
+  variant, unless the application is using the same model variant for all the
+  requests.
 
 These labels serve as a structured method to categorize and prioritize your
 requests with enhanced accuracy. While you're encouraged to design labels that
@@ -291,5 +291,7 @@ kubectl apply -f policy-gen/configuration/gpt-4-rpm.yaml -n aperture-controller
 Explanation of Policy & working
 
 Product Screenshots
+
+### Using Aperture Cloud UI for Advanced Analytics
 
 ## What's Next?
