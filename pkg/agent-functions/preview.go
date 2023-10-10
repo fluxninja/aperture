@@ -3,14 +3,15 @@ package agentfunctions
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview"
 	previewconfig "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // PreviewHandler is a handler for preview-family of functions.
@@ -68,13 +69,13 @@ func (h *PreviewHandler) PreviewHTTPRequests(
 }
 
 // RegisterPreviewHandler registers PreviewHandler in handler registry.
-func RegisterPreviewHandler(handler *PreviewHandler, registry *rpc.HandlerRegistry) error {
+func RegisterPreviewHandler(handler *PreviewHandler, t *transport.EtcdTransportClient) error {
 	// Note: Registering also when handler is disabled, so that we can send
 	// more specific error code than Unimplemented.
-	if err := rpc.RegisterFunction(registry, handler.PreviewFlowLabels); err != nil {
+	if err := transport.RegisterFunction(t, handler.PreviewFlowLabels); err != nil {
 		return err
 	}
-	if err := rpc.RegisterFunction(registry, handler.PreviewHTTPRequests); err != nil {
+	if err := transport.RegisterFunction(t, handler.PreviewHTTPRequests); err != nil {
 		return err
 	}
 	return nil

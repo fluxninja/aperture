@@ -22,7 +22,6 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // PolicyService is the implementation of policylangv1.PolicyService interface.
@@ -177,72 +176,24 @@ func getLocalOnlyPolicyResponse(localPolicy *policysyncv1.PolicyWrapper) *policy
 }
 
 // UpsertPolicy creates/updates policy to the system.
-func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*policylangv1.UpsertPolicyResponse, error) {
 	if wrapper := s.policyFactory.GetPolicyWrapper(req.PolicyName); wrapper.GetSource() == policysyncv1.PolicyWrapper_K8S {
 		return nil, status.Error(codes.AlreadyExists, "policy already exists and is managed by K8S object")
 	}
 
-	etcdPolicy, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName))
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	oldPolicy := &policylangv1.Policy{}
-	if len(etcdPolicy.Kvs) > 0 {
-		uerr := config.UnmarshalJSON(etcdPolicy.Kvs[0].Value, oldPolicy)
-		if uerr != nil {
-			// Deprecated: v3.0.0. Older way of string policy on etcd.
-			// Remove this code in v3.0.0.
-			uerr = proto.Unmarshal(etcdPolicy.Kvs[0].Value, oldPolicy)
-			if uerr != nil {
-				return nil, status.Error(codes.FailedPrecondition, "cannot patch, existing policy is invalid")
-			}
-		}
-	}
-
 	newPolicy := &policylangv1.Policy{}
 	if req.PolicyString != "" {
-		err = config.UnmarshalYAML([]byte(req.PolicyString), newPolicy)
+		err := config.UnmarshalYAML([]byte(req.PolicyString), newPolicy)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
 		}
 	} else if req.Policy != nil { // Deprecated: v2.20.0. Should stop accepting policy as proto message
-		newPolicy = proto.Clone(req.Policy).(*policylangv1.Policy)
+		newPolicy = req.Policy
 	} else {
 		return nil, status.Error(codes.InvalidArgument, "policy is empty")
 	}
 
-	if len(req.GetUpdateMask().GetPaths()) > 0 {
-		if len(etcdPolicy.Kvs) == 0 {
-			return nil, status.Error(codes.NotFound, "cannot patch, no such policy")
-		}
-
-		if len(req.UpdateMask.Paths) == 1 && req.UpdateMask.Paths[0] == "all" {
-			// We use update_mask: { paths: ["all"] } to convey that we want to
-			// update the whole Policy.  This is non-standard usage of update
-			// masks, so we cannot call ApplyFieldMask here.
-			// FIXME Do we need field masks at all? Looks like they're only
-			// used to pass a "force" flag from aperturectl.
-		} else {
-			utils.ApplyFieldMask(oldPolicy, newPolicy, req.UpdateMask)
-			newPolicy = oldPolicy
-		}
-	} else if len(etcdPolicy.Kvs) > 0 {
-		// We want to prevent accidentally overwriting valid policy, that's why
-		// it's only possible when PATCH (update mask) is specified.
-		_, _, err = ValidateAndCompileProto(ctx, "dummy-name", oldPolicy)
-		if err == nil {
-			// Note: Older aperturectl versions and Aperture Cloud rely on
-			// exact string of error message!
-			return nil, status.Error(codes.AlreadyExists, "policy already exists. Use UpsertPolicy with PATCH call to update it.")
-		}
-		if ctx.Err() != nil {
-			return nil, err
-		}
-		// Otherwise, we know policy is invalid and thus we allow overwriting it.
-	}
-
-	_, _, err = ValidateAndCompileProto(ctx, req.PolicyName, newPolicy)
+	_, _, err := ValidateAndCompileProto(ctx, req.PolicyName, newPolicy)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile policy: %s", err)
 	}
@@ -252,19 +203,28 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Errorf(codes.Internal, "failed to marshal policy: %s", err)
 	}
 
-	// FIXME compare original mod revision to make sure the policy we're patching hasn't changed meanwhile
-	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIConfigPath, req.PolicyName), string(newPolicyString))
+	hash, err := HashPolicy(newPolicy)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to hash policy: %s", err)
+	}
+
+	putResp, err := s.etcdClient.KV.Put(
+		ctx,
+		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
+		string(newPolicyString),
+		clientv3.WithPrevKV(),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(etcdPolicy.Kvs) > 0 {
+	if putResp.PrevKv != nil {
 		log.Info().Str("policy", req.PolicyName).Msg("Policy updated in etcd")
 	} else {
 		log.Info().Str("policy", req.PolicyName).Msg("Policy created in etcd")
 	}
 
-	return new(emptypb.Empty), nil
+	return &policylangv1.UpsertPolicyResponse{PolicyHash: hash}, nil
 }
 
 // PostDynamicConfig updates dynamic config to the system.

@@ -10,7 +10,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/ghodss/yaml"
-	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -107,37 +106,51 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 }
 
 // UpdatePolicyUsingAPI updates the policy using the API.
-func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policyBytes []byte, force bool) (bool, error) {
+func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policyBytes []byte, force bool) error {
 	request := policylangv1.UpsertPolicyRequest{
 		PolicyName:   name,
 		PolicyString: string(policyBytes),
 	}
-	_, err := client.UpsertPolicy(context.Background(), &request)
-	if err != nil {
-		if strings.Contains(err.Error(), "Use UpsertPolicy with PATCH call to update it.") {
-			var update bool
-			update, err = CheckForUpdate(name, force)
+
+	if !force {
+		listClient, ok := client.(PolicyClient)
+		if ok {
+			// If directly using controller API, we can call GetPolicies to
+			// verify that we're not accidentally overwriting the policy.
+			// Cloud API doesn't have this method and we always allow
+			// overwriting, even with force=false.
+			existingPolicies, err := listClient.ListPolicies(context.Background(), new(emptypb.Empty))
+
+			needsConfirmation := false
 			if err != nil {
-				return false, fmt.Errorf("failed to check for update: %w", err)
+				return err
+			}
+			for policyName, policy := range existingPolicies.GetPolicies().GetPolicies() {
+				if policyName == name && policy.Status != policylangv1.GetPolicyResponse_STALE {
+					needsConfirmation = true
+					break
+				}
 			}
 
-			if !update {
-				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
-				return false, nil
-			}
+			if needsConfirmation {
+				update, err := CheckForUpdate(name, force)
+				if err != nil {
+					return fmt.Errorf("failed to check for update: %w", err)
+				}
 
-			request.UpdateMask = &field_mask.FieldMask{
-				Paths: []string{"all"},
+				if !update {
+					log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
+					return errors.New("policy already exists")
+				}
 			}
-			_, err = client.UpsertPolicy(context.Background(), &request)
-			if err != nil {
-				return false, err
-			}
-		} else {
-			return false, err
 		}
 	}
-	return true, nil
+
+	_, err := client.UpsertPolicy(context.Background(), &request)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CheckForUpdate checks if the user wants to update the policy.

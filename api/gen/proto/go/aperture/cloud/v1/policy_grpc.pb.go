@@ -31,7 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PolicyServiceClient interface {
-	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -43,8 +43,8 @@ func NewPolicyServiceClient(cc grpc.ClientConnInterface) PolicyServiceClient {
 	return &policyServiceClient{cc}
 }
 
-func (c *policyServiceClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *policyServiceClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error) {
+	out := new(v1.UpsertPolicyResponse)
 	err := c.cc.Invoke(ctx, PolicyService_UpsertPolicy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *v1.DeletePol
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
 type PolicyServiceServer interface {
-	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error)
+	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 }
 
@@ -73,7 +73,7 @@ type PolicyServiceServer interface {
 type UnimplementedPolicyServiceServer struct {
 }
 
-func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertPolicy not implemented")
 }
 func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
