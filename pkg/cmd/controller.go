@@ -46,8 +46,12 @@ func (h *Handler) ListAgents(
 	ctx context.Context,
 	_ *emptypb.Empty,
 ) (*cmdv1.ListAgentsResponse, error) {
+	agents, err := h.agents.GetAgents()
+	if err != nil {
+		return nil, err
+	}
 	return &cmdv1.ListAgentsResponse{
-		Agents: h.agents.List(),
+		Agents: agents,
 	}, nil
 }
 

@@ -20,6 +20,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/discovery"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	agentelection "github.com/fluxninja/aperture/v2/pkg/etcd/election/agent"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
@@ -52,6 +53,7 @@ func main() {
 		discovery.Module(),
 		agentelection.Module(),
 		rpc.ClientModule,
+		transport.TransportClientModule,
 		agentfunctions.Module,
 		Module(),
 		// Start collector after all extensions started, so it won't

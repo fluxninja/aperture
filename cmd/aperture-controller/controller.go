@@ -17,6 +17,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-controller/controller"
 	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
 	"github.com/fluxninja/aperture/v2/pkg/cmd"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
@@ -38,10 +39,11 @@ func main() {
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
+		transport.TransportServerModule,
 		rpc.ServerModule,
-		agents.Module,
 		cmd.Module,
 		Module(),
+		agents.Module,
 	)
 
 	defer log.WaitFlush()
