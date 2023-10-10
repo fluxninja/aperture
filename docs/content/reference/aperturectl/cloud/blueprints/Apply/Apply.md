@@ -23,7 +23,8 @@ aperturectl cloud blueprints Apply [flags]
 ### Options
 
 ```
-  -h, --help   help for Apply
+  -h, --help                 help for Apply
+      --values-file string   Values file to use for blueprint
 ```
 
 ### Options inherited from parent commands
