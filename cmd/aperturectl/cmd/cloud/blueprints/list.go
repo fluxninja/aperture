@@ -21,7 +21,7 @@ var BlueprintsListCmd = &cobra.Command{
 		}
 
 		for _, blueprint := range listResponse.GetBlueprints() {
-			fmt.Println(blueprint.GetContent())
+			fmt.Println(blueprint.GetValues())
 		}
 
 		return nil

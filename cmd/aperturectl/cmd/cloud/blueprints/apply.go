@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 
 	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
 )
@@ -39,9 +41,46 @@ var BlueprintsApplyCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_, err := client.Apply(context.Background(), &cloudv1.ApplyRequest{
+		valuesMap := make(map[string]any)
+		err := yaml.Unmarshal(valuesFileContent, &valuesMap)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal values file: %w", err)
+		}
+
+		policy, ok := valuesMap["policy"].(map[string]any)
+		if !ok {
+			return fmt.Errorf("policy not found in blueprint values")
+		}
+
+		blueprintsName, ok := valuesMap["blueprint"].(string)
+		if !ok {
+			return fmt.Errorf("blueprint not found in blueprint values")
+		}
+
+		policyName, ok := policy["policy_name"].(string)
+		if !ok {
+			return fmt.Errorf("policy_name not found in blueprint values")
+		}
+
+		uri, ok := valuesMap["uri"].(string)
+		if !ok {
+			return fmt.Errorf("uri not found in blueprint values")
+		}
+
+		var version string
+		uriSlice := strings.Split(uri, "@")
+		if len(uriSlice) != 2 {
+			version = "latest"
+		} else {
+			version = uriSlice[1]
+		}
+
+		_, err = client.Apply(context.Background(), &cloudv1.ApplyRequest{
 			Blueprint: &cloudv1.Blueprint{
-				Content: valuesFileContent,
+				PolicyName:     policyName,
+				Version:        version,
+				Values:         valuesFileContent,
+				BlueprintsName: blueprintsName,
 			},
 		}, nil)
 		if err != nil {

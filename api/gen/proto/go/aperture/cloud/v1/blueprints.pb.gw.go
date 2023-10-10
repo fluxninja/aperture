@@ -61,14 +61,14 @@ func request_BlueprintsService_Get_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["name"]
+	val, ok = pathParams["policy_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
 	}
 
-	protoReq.Name, err = runtime.String(val)
+	protoReq.PolicyName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
 	}
 
 	msg, err := client.Get(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -87,14 +87,14 @@ func local_request_BlueprintsService_Get_0(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
-	val, ok = pathParams["name"]
+	val, ok = pathParams["policy_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
 	}
 
-	protoReq.Name, err = runtime.String(val)
+	protoReq.PolicyName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
 	}
 
 	msg, err := server.Get(ctx, &protoReq)
@@ -103,29 +103,12 @@ func local_request_BlueprintsService_Get_0(ctx context.Context, marshaler runtim
 }
 
 var (
-	filter_BlueprintsService_Apply_0 = &utilities.DoubleArray{Encoding: map[string]int{"name": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
+	filter_BlueprintsService_Apply_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
 func request_BlueprintsService_Apply_0(ctx context.Context, marshaler runtime.Marshaler, client BlueprintsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplyRequest
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -142,23 +125,6 @@ func request_BlueprintsService_Apply_0(ctx context.Context, marshaler runtime.Ma
 func local_request_BlueprintsService_Apply_0(ctx context.Context, marshaler runtime.Marshaler, server BlueprintsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ApplyRequest
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
-	}
-
-	protoReq.Name, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
-	}
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -183,14 +149,14 @@ func request_BlueprintsService_Delete_0(ctx context.Context, marshaler runtime.M
 		_   = err
 	)
 
-	val, ok = pathParams["name"]
+	val, ok = pathParams["policy_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
 	}
 
-	protoReq.Name, err = runtime.String(val)
+	protoReq.PolicyName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
 	}
 
 	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -209,14 +175,14 @@ func local_request_BlueprintsService_Delete_0(ctx context.Context, marshaler run
 		_   = err
 	)
 
-	val, ok = pathParams["name"]
+	val, ok = pathParams["policy_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
 	}
 
-	protoReq.Name, err = runtime.String(val)
+	protoReq.PolicyName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
 	}
 
 	msg, err := server.Delete(ctx, &protoReq)
@@ -263,7 +229,7 @@ func RegisterBlueprintsServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Get", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Get", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -288,7 +254,7 @@ func RegisterBlueprintsServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Apply", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Apply", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -313,7 +279,7 @@ func RegisterBlueprintsServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Delete", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Delete", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -399,7 +365,7 @@ func RegisterBlueprintsServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Get", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Get", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -421,7 +387,7 @@ func RegisterBlueprintsServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Apply", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Apply", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -443,7 +409,7 @@ func RegisterBlueprintsServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Delete", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Delete", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -465,11 +431,11 @@ func RegisterBlueprintsServiceHandlerClient(ctx context.Context, mux *runtime.Se
 var (
 	pattern_BlueprintsService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"fluxninja", "v1", "blueprints"}, ""))
 
-	pattern_BlueprintsService_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "name"}, ""))
+	pattern_BlueprintsService_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "policy_name"}, ""))
 
-	pattern_BlueprintsService_Apply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "name"}, ""))
+	pattern_BlueprintsService_Apply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"fluxninja", "v1", "blueprints"}, ""))
 
-	pattern_BlueprintsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "name"}, ""))
+	pattern_BlueprintsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "policy_name"}, ""))
 )
 
 var (

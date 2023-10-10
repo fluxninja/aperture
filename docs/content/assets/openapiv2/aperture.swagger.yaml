@@ -712,8 +712,14 @@ definitions:
         type: object
     Blueprint:
         properties:
-            content:
+            blueprints_name:
+                type: string
+            policy_name:
+                type: string
+            values:
                 format: byte
+                type: string
+            version:
                 type: string
         type: object
     BoolVariable:
@@ -5117,12 +5123,44 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - BlueprintsService
-    /fluxninja/v1/blueprints/{name}:
+        post:
+            operationId: BlueprintsService_Apply
+            parameters:
+                - in: query
+                  name: blueprint.blueprints_name
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.version
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.policy_name
+                  required: false
+                  type: string
+                - format: byte
+                  in: query
+                  name: blueprint.values
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}:
         delete:
             operationId: BlueprintsService_Delete
             parameters:
                 - in: path
-                  name: name
+                  name: policy_name
                   required: true
                   type: string
             responses:
@@ -5141,7 +5179,7 @@ paths:
             operationId: BlueprintsService_Get
             parameters:
                 - in: path
-                  name: name
+                  name: policy_name
                   required: true
                   type: string
             responses:
@@ -5149,30 +5187,6 @@ paths:
                     description: A successful response.
                     schema:
                         $ref: '#/definitions/GetResponse'
-                default:
-                    description: An unexpected error response.
-                    schema:
-                        $ref: '#/definitions/googlerpcStatus'
-            tags:
-                - BlueprintsService
-        post:
-            operationId: BlueprintsService_Apply
-            parameters:
-                - in: path
-                  name: name
-                  required: true
-                  type: string
-                - format: byte
-                  in: query
-                  name: blueprint.content
-                  required: false
-                  type: string
-            responses:
-                "200":
-                    description: A successful response.
-                    schema:
-                        properties: {}
-                        type: object
                 default:
                     description: An unexpected error response.
                     schema:

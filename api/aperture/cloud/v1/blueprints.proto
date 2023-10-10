@@ -12,20 +12,23 @@ service BlueprintsService {
   }
 
   rpc Get(GetRequest) returns (GetResponse) {
-    option (google.api.http) = {get: "/fluxninja/v1/blueprints/{name}"};
+    option (google.api.http) = {get: "/fluxninja/v1/blueprints/{policy_name}"};
   }
 
   rpc Apply(ApplyRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {post: "/fluxninja/v1/blueprints/{name}"};
+    option (google.api.http) = {post: "/fluxninja/v1/blueprints"};
   }
 
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {delete: "/fluxninja/v1/blueprints/{name}"};
+    option (google.api.http) = {delete: "/fluxninja/v1/blueprints/{policy_name}"};
   }
 }
 
 message Blueprint {
-  bytes content = 1;
+  string blueprints_name = 1;
+  string version = 2;
+  string policy_name = 3;
+  bytes values = 4;
 }
 
 message ListResponse {
@@ -33,7 +36,7 @@ message ListResponse {
 }
 
 message GetRequest {
-  string name = 1;
+  string policy_name = 1;
 }
 
 message GetResponse {
@@ -41,10 +44,9 @@ message GetResponse {
 }
 
 message ApplyRequest {
-  string name = 1;
-  Blueprint blueprint = 2;
+  Blueprint blueprint = 1;
 }
 
 message DeleteRequest {
-  string name = 1;
+  string policy_name = 1;
 }

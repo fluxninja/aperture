@@ -57,7 +57,13 @@ func (m *Blueprint) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Content
+	// no validation rules for BlueprintsName
+
+	// no validation rules for Version
+
+	// no validation rules for PolicyName
+
+	// no validation rules for Values
 
 	if len(errors) > 0 {
 		return BlueprintMultiError(errors)
@@ -291,7 +297,7 @@ func (m *GetRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Name
+	// no validation rules for PolicyName
 
 	if len(errors) > 0 {
 		return GetRequestMultiError(errors)
@@ -520,8 +526,6 @@ func (m *ApplyRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Name
-
 	if all {
 		switch v := interface{}(m.GetBlueprint()).(type) {
 		case interface{ ValidateAll() error }:
@@ -650,7 +654,7 @@ func (m *DeleteRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Name
+	// no validation rules for PolicyName
 
 	if len(errors) > 0 {
 		return DeleteRequestMultiError(errors)
