@@ -142,38 +142,35 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   local docsData = timeSeriesPanel('Documents State', datasource.name, '', stringFilters, 'short', targets=DocsQueries),
 
   // Total Docs
-  local totalDocsQuery = [
+  local totalDocsQuery =
     g.query.prometheus.new(datasource.name, 'sum(increase(elasticsearch_node_ingest_documents_total{ %(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Total Docs'),
-  ],
 
-  local totalDocs = timeSeriesPanel('Total Ingested Documents', datasource.name, '', stringFilters, 'short', targets=totalDocsQuery),
+  local totalDocs = timeSeriesPanel('Total Ingested Documents', datasource.name, '', stringFilters, 'short', targets=[totalDocsQuery]),
 
   // Current Docs
-  local currentDocsQuery = [
+  local currentDocsQuery =
     g.query.prometheus.new(datasource.name, 'sum(increase(elasticsearch_node_ingest_documents_current{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__range]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Current Docs'),
-  ],
 
-  local currentDocs = timeSeriesPanel('Current Ingested Documents', datasource.name, '', stringFilters, 'short', targets=currentDocsQuery),
+  local currentDocs = timeSeriesPanel('Current Ingested Documents', datasource.name, '', stringFilters, 'short', targets=[currentDocsQuery]),
 
-  local translogOperationsQuery = [
+  local translogOperationsQuery =
     g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_translog_operations_total{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('Translog Operations'),
-  ],
 
-  local translogOperations = timeSeriesPanel('Translog Operations', datasource.name, '', stringFilters, 'short', targets=translogOperationsQuery),
+  local translogOperations = timeSeriesPanel('Translog Operations', datasource.name, '', stringFilters, 'short', targets=[translogOperationsQuery]),
 
   // Active Threads for All Thread Pools
-  local activeThreadsQueries = [
+  local activeThreadsQueries =
     g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_threads{%(filters)s, infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('{{threadpool}} Active Threads'),
-  ],
-  local activeThreads = timeSeriesPanel('Active Threads', datasource.name, '', stringFilters, 'short', targets=activeThreadsQueries),
+
+  local activeThreads = timeSeriesPanel('Active Threads', datasource.name, '', stringFilters, 'short', targets=[activeThreadsQueries]),
 
   local httpConnectionsQuery = g.query.prometheus.new(datasource.name, 'sum(elasticsearch_node_http_connections{%(filters)s, infra_meter_name="%(infra_meter)s"})' % { filters: stringFilters, infra_meter: infraMeterName })
                                + g.query.prometheus.withIntervalFactor(1)
@@ -206,20 +203,20 @@ function(policyName, infraMeterName, datasource, extraFilters) {
   local avgDiskUsage = timeSeriesPanel('Average Disk Usage', datasource.name, '', stringFilters, '%', targets=[avgDiskUsageQuery]),
 
   // Tasks Queued for All Thread Pools
-  local tasksQueuedQueries = [
-    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_tasks_queued{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
+  local tasksQueuedQueries =
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_tasks_queued{%(filters)s , infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('{{threadpool}} Tasks Queued'),
-  ],
-  local tasksQueued = timeSeriesPanel('Tasks Queued', datasource.name, '', stringFilters, 'short', targets=tasksQueuedQueries),
+
+  local tasksQueued = timeSeriesPanel('Tasks Queued', datasource.name, '', stringFilters, 'short', targets=[tasksQueuedQueries]),
 
   // Tasks Throughput for All Thread Pools
-  local tasksThroughputQueries = [
-    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_tasks_finished_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
+  local tasksThroughputQueries =
+    g.query.prometheus.new(datasource.name, 'sum(rate(elasticsearch_node_thread_pool_tasks_finished_total{%(filters)s , infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
     + g.query.prometheus.withIntervalFactor(1)
     + g.query.prometheus.withLegendFormat('{{threadpool}} Tasks Throughput'),
-  ],
-  local tasksThroughput = timeSeriesPanel('Tasks Throughput', datasource.name, '', stringFilters, 'ops', targets=tasksThroughputQueries),
+
+  local tasksThroughput = timeSeriesPanel('Tasks Throughput', datasource.name, '', stringFilters, 'ops', targets=[tasksThroughputQueries]),
 
   // GC Collections (young and old)
   local youngGcCollectionsQuery = g.query.prometheus.new(datasource.name, 'sum(rate(jvm_gc_collections_count_total{name="young",%(filters)s,infra_meter_name="%(infra_meter)s"}[$__rate_interval]))' % { filters: stringFilters, infra_meter: infraMeterName })
