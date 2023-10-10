@@ -46,8 +46,12 @@ func (h *Handler) ListAgents(
 	ctx context.Context,
 	_ *emptypb.Empty,
 ) (*cmdv1.ListAgentsResponse, error) {
+	agents, err := h.agents.GetAgents()
+	if err != nil {
+		return nil, err
+	}
 	return &cmdv1.ListAgentsResponse{
-		Agents: h.agents.List(),
+		Agents: agents,
 	}, nil
 }
 
@@ -363,7 +367,7 @@ agentsLoop:
 }
 
 // UpsertPolicy creates/updates policies in the system.
-func (h *Handler) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (h *Handler) UpsertPolicy(ctx context.Context, req *policylangv1.UpsertPolicyRequest) (*policylangv1.UpsertPolicyResponse, error) {
 	return h.policyService.UpsertPolicy(ctx, req)
 }
 

@@ -104,9 +104,8 @@ func createAndApplyPolicy(name string, policyBytes []byte) error {
 		err = kubeClient.Create(context.Background(), policyCR)
 		if err != nil {
 			if utils.IsNoMatchError(err) {
-				var isUpdated bool
-				isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
-				if !isUpdated {
+				updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
+				if updatePolicyUsingAPIErr != nil {
 					return updatePolicyUsingAPIErr
 				}
 			} else if apierrors.IsAlreadyExists(err) {
@@ -128,8 +127,8 @@ func createAndApplyPolicy(name string, policyBytes []byte) error {
 			}
 		}
 	} else {
-		isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
-		if !isUpdated {
+		updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
+		if updatePolicyUsingAPIErr != nil {
 			return updatePolicyUsingAPIErr
 		}
 	}
