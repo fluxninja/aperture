@@ -20,7 +20,7 @@ To do so, first create an instance of ApertureClient:
 ```python
   from aperture_sdk import ApertureClient
 
-  aperture_client = ApertureClient.new_client(endpoint="localhost:8089", check_timeout=timedelta(seconds=200))
+  aperture_client = ApertureClient.new_client(endpoint="localhost:8089")
 ```
 
 The created instance can then be used to start a flow:
@@ -36,6 +36,7 @@ The created instance can then be used to start a flow:
     flow = aperture_client.start_flow(
       control_point="AwesomeFeature",
       explicit_labels=labels,
+      check_timeout=timedelta(seconds=200),
     )
 
     # Check if flow check was successful.
@@ -57,6 +58,7 @@ You can also use the flow as a context manager:
   with aperture_client.start_flow(
     control_point="AwesomeFeature",
     explicit_labels=labels,
+    check_timeout=timedelta(seconds=200),
   ) as flow:
     if flow.should_run():
       # do actual work
@@ -72,7 +74,7 @@ helpful to handle specific routes in your service.
 
 ```python
   @app.get("/awesome-feature")
-  @aperture_client.decorate("AwesomeFeature", on_reject=lambda: ("Flow was rejected", 503))
+  @aperture_client.decorate("AwesomeFeature", check_timeout=timedelta(seconds=200), on_reject=lambda: ("Flow was rejected", 503))
   async def get_awesome_feature_handler():
     return "Flow was accepted", 202
 ```

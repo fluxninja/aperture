@@ -325,6 +325,8 @@ func HashPolicy(policy *policylangv1.Policy) (string, error) {
 	}
 
 	log.Trace().Msgf("Policy message: %s", string(dat))
+	// FIXME: Use sha256.Sum256() directly instead of goObjectHash. This will
+	// result in different though.
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {
 		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))

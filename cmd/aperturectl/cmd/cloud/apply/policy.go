@@ -78,8 +78,8 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policyBytes []byte) error {
-	isUpdated, updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
-	if !isUpdated {
+	updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
+	if updatePolicyUsingAPIErr != nil {
 		return updatePolicyUsingAPIErr
 	}
 

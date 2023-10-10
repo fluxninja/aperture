@@ -622,8 +622,10 @@ def render_aperturectl(policies, namespace, cloud_extension):
     endpoint = ""
     agent_group = ""
     action = ""
+    project_name = ""
     if cloud_extension.get('cloud_controller'):
-        api_key = cloud_extension.get("api_key", "").lower()
+        api_key = cloud_extension.get("personal_api_key", "")
+        project_name = cloud_extension.get("project_name", "")
         endpoint = cloud_extension.get("endpoint", "").lower()
         agent_group = cloud_extension.get("agent_group", "default").lower()
         action = "apply" if config.tilt_subcommand == "up" else "delete"
@@ -635,7 +637,7 @@ def render_aperturectl(policies, namespace, cloud_extension):
     for policy in policies:
         policy_name = policy["policy_name"]
         values_file = policy["values_file"]
-        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri, policy_name, values_file, api_key, endpoint, agent_group, action], quiet=True)
+        rendered = local(command=["./scripts/render-policy.sh", base_dir, aperturectl_bin, blueprints_uri, policy_name, values_file, api_key, endpoint, agent_group, action, "false", project_name], quiet=True)
 
         if rendered:
             if namespace:
@@ -1261,7 +1263,9 @@ config.define_bool("race",usage="Enable race detector for agent and controller")
 config.define_bool("skip-extensions", usage="Skip extension building")
 config.define_bool("enable-cloud-extension", usage="Enable FluxNinja API key authentication, which will send the data to Aperture Cloud")
 config.define_bool("cloud-controller", usage="Uses FluxNinja Controller instead of Self-Hosted Controller")
-config.define_string("api-key", usage="FluxNinja API key")
+config.define_string("aperture-api-key", usage="FluxNinja Aperture API key")
+config.define_string("personal-api-key", usage="FluxNinja Personal API key")
+config.define_string("project-name", usage="FluxNinja Project name")
 config.define_string("fluxninja-endpoint", usage="FluxNinja Endpoint")
 cfg = config.parse()
 # Enable all resources, as calling `config.parse()` by default disables all
@@ -1281,9 +1285,21 @@ get_race = cfg.get("race",False)
 enable_cloud_extension = cfg.get("enable-cloud-extension", False)
 fluxninja_endpoint = ''
 api_key = ''
+personal_api_key = ''
+project_name = ''
 if cloud_controller or enable_cloud_extension:
     fluxninja_endpoint = cfg.get("fluxninja-endpoint", "aperture.latest.dev.fluxninja.com:443")
-    api_key = cfg.get("api-key", "2b97802cf7984791919758a537c05ad0")
+    api_key = cfg.get("aperture-api-key", "2b97802cf7984791919758a537c05ad0")
+
+    if cloud_controller:
+        personal_api_key = cfg.get("personal-api-key", "")
+        if not personal_api_key:
+            fail("Personal API key is required for cloud controller")
+
+        project_name = cfg.get("project-name", "")
+        if not project_name:
+            fail("Project name is required for cloud controller")
+
 
 cloud_extension = {
     'enabled': enable_cloud_extension,
@@ -1291,6 +1307,8 @@ cloud_extension = {
     'api_key': api_key,
     'agent_group': str(local('hostname')).strip().lower(),
     'cloud_controller': cloud_controller,
+    'personal_api_key': personal_api_key,
+    'project_name': project_name,
 }
 
 # Optionally, process a list of images that should be pulled from dockerhub instead of being
