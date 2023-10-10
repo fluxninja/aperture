@@ -107,6 +107,10 @@ jobs:
       dockerhub-image:
         type: string
         description: A name for your Docker image
+      dockerhub-ops-image:
+        type: string
+        description: A name for your Docker image to push under fluxninjaops
+        default: ""
       gcr-registry:
         type: string
         description: Google Container Registry to push images to
@@ -201,6 +205,17 @@ jobs:
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
+      - when:
+          condition:
+            not:
+              equal: ["", <<parameters.dockerhub-ops-image>>]
+          steps:
+            run:
+              name: Push images to DockerHub ops account
+              command: |
+                docker tag <<parameters.dockerhub-image>>:<<parameters.tag>> <<parameters.dockerhub-ops-image>>:<<parameters.tag>>
+                docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                docker push <<parameters.dockerhub-ops-image>>:<<parameters.tag>>
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
@@ -1195,6 +1210,7 @@ workflows:
       - build-push-add-tag:
           name: image-build-aperture-agent
           dockerhub-image: fluxninja/aperture-agent
+          dockerhub-ops-image: fluxninjaops/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
           docker-context: .
@@ -1216,6 +1232,7 @@ workflows:
       - build-push-add-tag:
           name: image-build-aperture-controller
           dockerhub-image: fluxninja/aperture-controller
+          dockerhub-ops-image: fluxninjaops/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
           docker-context: .
@@ -1329,6 +1346,7 @@ workflows:
       - build-push-add-tag:
           name: image-build-aperture-operator
           dockerhub-image: fluxninja/aperture-operator
+          dockerhub-ops-image: fluxninjaops/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
           docker-context: .
