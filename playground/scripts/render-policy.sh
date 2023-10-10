@@ -11,6 +11,7 @@ endpoint=${7:-}
 agent_group=${8:-default}
 action=${9:-apply}
 skipverify=${10:-false}
+project_name=${11:-}
 
 if [[ "${skipverify}" == "true" ]]; then
 	skipverify="--skip-verify"
@@ -33,13 +34,13 @@ if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 	$SED -i "s/\bagent_group: .*/agent_group: ${agent_group}/g" "${_GEN_DIR}/values.yaml"
 	$SED -i "s/\bpolicy_name: .*/policy_name: ${new_policy_name}/g" "${_GEN_DIR}/values.yaml"
 
-	"${aperturectl}" blueprints generate --values-file "${_GEN_DIR}/values.yaml" --output-dir "${_GEN_DIR}" --overwrite >&2
+	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" --values-file "${_GEN_DIR}/values.yaml" --output-dir "${_GEN_DIR}" --overwrite >&2
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		"${aperturectl}" cloud apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" -f -s >&2
+		"${aperturectl}" cloud apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" -f -s >&2
 	else
-		"${aperturectl}" cloud delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" >&2
+		"${aperturectl}" cloud delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" || exit 0 >&2
 	fi
 else
 	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" \
