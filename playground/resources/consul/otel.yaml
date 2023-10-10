@@ -75,7 +75,7 @@ spec:
               namespace: default
           initialMetadata:
           - key: control-point
-            value: "ingress"
+            value: "egress"
   - name: builtin/otel-access-logging
     required: true
     arguments:
@@ -162,7 +162,7 @@ spec:
               namespace: default
           initialMetadata:
           - key: control-point
-            value: "ingress"
+            value: "egress"
   - name: builtin/otel-access-logging
     required: true
     arguments:
@@ -249,7 +249,7 @@ spec:
               namespace: default
           initialMetadata:
           - key: control-point
-            value: "ingress"
+            value: "egress"
   - name: builtin/otel-access-logging
     required: true
     arguments:
