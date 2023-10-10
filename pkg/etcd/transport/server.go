@@ -65,7 +65,7 @@ type Response struct {
 // NewEtcdTransportServer creates a new server on the etcd transport.
 func NewEtcdTransportServer(client *etcdclient.Client) (*EtcdTransportServer, error) {
 	if client == nil {
-		return nil, errors.New("provided etc client is nil")
+		return nil, errors.New("provided etcd client is nil")
 	}
 	return &EtcdTransportServer{
 		etcdClient: client,
@@ -78,12 +78,6 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 
 	for _, agent := range agents {
 		go func(agentName string) {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Error().Err(fmt.Errorf("panic recovered: %v", r)).Msg("failed to send request to agent")
-					respCh <- &Response{Error: fmt.Errorf("panic recovered: %v", r)}
-				}
-			}()
 			resp, err := t.SendRequest(agentName, msg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to send request to agent")
@@ -143,7 +137,7 @@ func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Re
 
 	rawReq, err := proto.Marshal(anyreq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
+		return nil, fmt.Errorf("failed to marshal request %v: %w", msg, err)
 	}
 
 	req := Request{
