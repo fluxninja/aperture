@@ -6,9 +6,9 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 	flowcontrolControlPoints "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/controlpoints"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // FlowControlControlPointsHandler is a handler for ListFlowControlPoints function
@@ -43,6 +43,6 @@ func (h *FlowControlControlPointsHandler) ListFlowControlPoints(
 }
 
 // RegisterControlPointsHandler registers ControlPointsHandler in handler registry.
-func RegisterControlPointsHandler(handler FlowControlControlPointsHandler, registry *rpc.HandlerRegistry) error {
-	return rpc.RegisterFunction(registry, handler.ListFlowControlPoints)
+func RegisterControlPointsHandler(handler FlowControlControlPointsHandler, t *transport.EtcdTransportClient) error {
+	return transport.RegisterFunction(t, handler.ListFlowControlPoints)
 }
