@@ -1,8 +1,5 @@
 ---
 title: OpenAI API Quota Scheduling
-description:
-  This guide will help you understand how to use the Quota Scheduler Policy to
-  manage and stop hitting rate limits imposed by OpenAI.
 keywords:
   - policies
   - quota
@@ -22,14 +19,13 @@ import Zoom from 'react-medium-image-zoom';
 
 Quota Scheduler can be use to enforce rate limits set by third party vendors
 like OpenAI, which helps minimise the need of retrying the request and increase
-success rate of requests to third party vendors. Moreover, it can help you
-reduce the third party vendor usages cost scheduling the request to be sent at a
-later time without having to go beyond a certain limits.
+success rate of requests. Moreover, it can help reduce the third party vendor
+usages cost by scheduling the request, stopping to go beyond a certain limits.
 
 This guide will help you understand how to use the Quota Scheduler Policy to
 manage and stop hitting rate limits imposed by OpenAI. With the help of this
-policy you can minimizing need of retrying the request without having to
-sacrifice the user experience.
+policy need of retrying the request can be optional, without having to sacrifice
+the user experience.
 
 ## Pre-Requisites
 
