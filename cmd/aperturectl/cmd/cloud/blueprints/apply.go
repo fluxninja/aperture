@@ -18,7 +18,7 @@ func init() {
 
 // BlueprintsApplyCmd is the command to apply a blueprint from the Cloud Controller.
 var BlueprintsApplyCmd = &cobra.Command{
-	Use:           "Apply",
+	Use:           "apply",
 	Short:         "Cloud Blueprints Apply",
 	Long:          `Apply cloud blueprint.`,
 	SilenceErrors: true,
@@ -82,7 +82,7 @@ var BlueprintsApplyCmd = &cobra.Command{
 				Values:         valuesFileContent,
 				BlueprintsName: blueprintsName,
 			},
-		}, nil)
+		})
 		if err != nil {
 			return err
 		}

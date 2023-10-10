@@ -28,7 +28,7 @@ var BlueprintsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		_, err := client.Delete(context.Background(), &cloudv1.DeleteRequest{
 			PolicyName: name,
-		}, nil)
+		})
 		if err != nil {
 			return err
 		}

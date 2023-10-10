@@ -3,12 +3,12 @@ sidebar_label: Apply
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_blueprints_Apply
+  - aperturectl_cloud_blueprints_apply
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud blueprints Apply
+## aperturectl cloud blueprints apply
 
 Cloud Blueprints Apply
 
@@ -17,13 +17,13 @@ Cloud Blueprints Apply
 Apply cloud blueprint.
 
 ```
-aperturectl cloud blueprints Apply [flags]
+aperturectl cloud blueprints apply [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for Apply
+  -h, --help                 help for apply
       --values-file string   Values file to use for blueprint
 ```
 

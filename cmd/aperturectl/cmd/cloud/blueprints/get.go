@@ -28,12 +28,12 @@ var BlueprintsGetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		getResponse, err := client.Get(context.Background(), &cloudv1.GetRequest{
 			PolicyName: name,
-		}, nil)
+		})
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(getResponse.GetBlueprint().GetValues())
+		fmt.Println(string(getResponse.GetBlueprint().GetValues()))
 
 		return nil
 	},

@@ -15,13 +15,13 @@ var BlueprintsListCmd = &cobra.Command{
 	Long:          `List cloud blueprints.`,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		listResponse, err := client.List(context.Background(), &emptypb.Empty{}, nil)
+		listResponse, err := client.List(context.Background(), &emptypb.Empty{})
 		if err != nil {
 			return err
 		}
 
 		for _, blueprint := range listResponse.GetBlueprints() {
-			fmt.Println(blueprint.GetValues())
+			fmt.Println(string(blueprint.GetValues()))
 		}
 
 		return nil
