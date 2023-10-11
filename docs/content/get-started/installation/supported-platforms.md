@@ -14,7 +14,6 @@ Below are the platforms supported for the Aperture Agent:
 | Platform   | Extent of Support   |
 | ---------- | ------------------- |
 | Kubernetes | 1.23 and above      |
-| Istio      | 1.14 and above      |
 | Envoy      | 1.20 and above      |
 | Debian     | 10 and above LTS    |
 | Ubuntu     | 18.04 and above LTS |
