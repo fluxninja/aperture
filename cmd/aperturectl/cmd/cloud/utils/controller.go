@@ -169,7 +169,7 @@ func (c *ControllerConn) CloudPolicyClient() (utils.CloudPolicyClient, error) {
 
 // IntrospectionClient returns Controller IntrospectionClient, connecting to controller if not yet connected.
 func (c *ControllerConn) IntrospectionClient() (utils.IntrospectionClient, error) {
-	return nil, errors.New("this subcommand cannot be used with the Cloud Controller")
+	return c.client()
 }
 
 // StatusClient returns Controller StatusClient, connecting to controller if not yet connected.
