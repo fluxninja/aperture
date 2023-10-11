@@ -318,7 +318,9 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 
 // HashPolicy returns hash of the policy.
 func HashPolicy(policy *policylangv1.Policy) (string, error) {
-	dat, err := proto.Marshal(policy)
+	// FIXME: The "Deterministic" is still not deterministic enough for our
+	// purposes – output may change with different version of aperture.
+	dat, err := proto.MarshalOptions{Deterministic: true}.Marshal(policy)
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to marshal proto message %+v", policy)
 		return "", err
