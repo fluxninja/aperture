@@ -37,7 +37,7 @@ type PolicyServiceClient interface {
 	// GetPolicies returns all policies.
 	GetPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetPoliciesResponse, error)
 	// UpsertPolicy creates/updates policy based on the provided request.
-	UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*UpsertPolicyResponse, error)
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
@@ -71,8 +71,8 @@ func (c *policyServiceClient) GetPolicies(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
-func (c *policyServiceClient) UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *policyServiceClient) UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*UpsertPolicyResponse, error) {
+	out := new(UpsertPolicyResponse)
 	err := c.cc.Invoke(ctx, PolicyService_UpsertPolicy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ type PolicyServiceServer interface {
 	// GetPolicies returns all policies.
 	GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error)
 	// UpsertPolicy creates/updates policy based on the provided request.
-	UpsertPolicy(context.Context, *UpsertPolicyRequest) (*emptypb.Empty, error)
+	UpsertPolicy(context.Context, *UpsertPolicyRequest) (*UpsertPolicyResponse, error)
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
@@ -134,7 +134,7 @@ func (UnimplementedPolicyServiceServer) GetPolicy(context.Context, *GetPolicyReq
 func (UnimplementedPolicyServiceServer) GetPolicies(context.Context, *emptypb.Empty) (*GetPoliciesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
 }
-func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *UpsertPolicyRequest) (*UpsertPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertPolicy not implemented")
 }
 func (UnimplementedPolicyServiceServer) PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error) {

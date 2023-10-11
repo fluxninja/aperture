@@ -4144,6 +4144,15 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Output signal.
         type: object
+    UpsertPolicyResponse:
+        properties:
+            policy_hash:
+                title: |-
+                    A hash of the policy, as reported in heartbeats (note: the hash might
+                    change after updating controller with new aperture version)
+                type: string
+        title: UpsertPolicyResponse is a response to UpsertPolicy
+        type: object
     Variable:
         description: Component that emits a constant signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -4506,15 +4515,12 @@ paths:
                             $ref: '#/definitions/Policy'
                         policy_string:
                             type: string
-                        update_mask:
-                            description: The paths to update.
-                            type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -4539,15 +4545,12 @@ paths:
                             $ref: '#/definitions/Policy'
                         policy_string:
                             type: string
-                        update_mask:
-                            description: The paths to update.
-                            type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:

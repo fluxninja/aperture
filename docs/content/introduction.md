@@ -17,8 +17,8 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 [Aperture](https://github.com/fluxninja/aperture) is an open source load
-management platform designed for classifying, prioritizing, scheduling, and
-rate-limiting API traffic in cloud applications. Built upon a foundation of
+management platform designed for classifying, rate limiting, queuing and
+prioritizing API traffic in cloud applications. Built upon a foundation of
 observability and a global control plane, it offers a comprehensive suite of
 load management capabilities. These capabilities enhance the reliability and
 performance of cloud applications while also optimizing resource utilization.
@@ -46,26 +46,12 @@ To sign-up to Aperture Cloud, [click here][sign-up].
 
 ## ⚙️ Load management capabilities {#load-management-capabilities}
 
-Aperture provides a variety of advanced load management features:
-
-- 🛡️ [**Adaptive Load Protection**](concepts/scheduler/load-scheduler.md):
-  Enhance resource utilization and safeguard against abrupt service overloads
-  with an intelligent queue at the entry point of services. This queue
-  dynamically adjusts the rate of requests based on live service health, thereby
-  mitigating potential service disruptions and ensuring optimal performance
-  under all load conditions. Refer to the
-  [Service Load Management](guides/service-load-management/service-load-management.md)
-  and
-  [Database Load Management](guides/database-load-management/database-load-management.md)
-  guides for more details.
-- 🎯 [**Workload Prioritization**](concepts/scheduler/scheduler.md): Safeguard
-  crucial user experience pathways and ensure prioritized access to external
-  APIs even during high-load conditions by strategically prioritizing workloads.
-  This is achieved through the use of declarative policies that label and
-  prioritize workload requests, such as API calls. By employing
-  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
-  for scheduling, Aperture ensures a fair distribution of resources that aligns
-  with the business value and urgency of requests.
+- ⏱️ [**Global Rate-Limiting**](concepts/rate-limiter.md): Safeguard APIs and
+  features against excessive usage with Aperture's high-performance, distributed
+  rate limiter. Identify individual users or entities by fine-grained labels.
+  Create precise rate limiters controlling burst-capacity and fill-rate tailored
+  to business-specific labels. Refer to the
+  [Rate Limiting](guides/per-user-rate-limiting.md) guide for more details.
 - 📊 [**API Quota Management**](concepts/scheduler/quota-scheduler.md): Maintain
   compliance with external API quotas with a global token bucket and smart
   request queuing. This feature regulates requests aimed at external services,
@@ -73,11 +59,23 @@ Aperture provides a variety of advanced load management features:
   penalties or additional costs. Refer to the
   [API Quota Management](guides/api-quota-management/api-quota-management.md)
   guide for more details.
-- ⏱️ [**Distributed Rate-Limiting**](concepts/rate-limiter.md): Safeguard APIs
-  from potential abuse with Aperture's high-performance, distributed rate
-  limiter. This feature enforces per-key limits based on fine-grained labels,
-  ensuring precise control and prevention of excessive usage. Refer to the
-  [Rate Limiting](guides/per-user-rate-limiting.md) guide for more details.
+- 🛡️ [**Adaptive Queuing**](concepts/scheduler/load-scheduler.md): Enhance
+  resource utilization and safeguard against abrupt service overloads with an
+  intelligent queue at the entry point of services. This queue dynamically
+  adjusts the rate of requests based on live service health, thereby mitigating
+  potential service disruptions and ensuring optimal performance under all load
+  conditions. Refer to the
+  [Service Load Management](guides/service-load-management/service-load-management.md)
+  and
+  [Database Load Management](guides/database-load-management/database-load-management.md)
+  guides for more details.
+- 🎯 [**Workload Prioritization**](concepts/scheduler/scheduler.md): Safeguard
+  crucial user experience pathways and ensure prioritized access to external
+  APIs by strategically prioritizing workloads. With
+  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing),
+  Aperture aligns resource distribution with business value and urgency of
+  requests. Workload prioritization applies to API Quota Management and Adaptive
+  Queuing use cases.
 
 ## 🛠️ How it works {#how-it-works}
 
