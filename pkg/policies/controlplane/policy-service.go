@@ -194,7 +194,7 @@ func unmarshalStoredPolicy(policyBytes []byte) (p *policylangv1.Policy, hash str
 		// Remove this code in v3.0.0.
 		err = proto.Unmarshal(policyBytes, &policy)
 		if err != nil {
-			return
+			return nil, "", err
 		}
 
 		// Hash the policy in legacy format as if it was converted to
