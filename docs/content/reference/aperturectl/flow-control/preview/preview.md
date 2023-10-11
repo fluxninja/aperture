@@ -17,7 +17,7 @@ Preview control points
 Preview samples of flow labels or HTTP requests on control points
 
 ```
-aperturectl flow-control preview [--http] SERVICE CONTROL_POINT [flags]
+aperturectl flow-control preview [--http] CONTROL_POINT [flags]
 ```
 
 ### Options
@@ -27,13 +27,12 @@ aperturectl flow-control preview [--http] SERVICE CONTROL_POINT [flags]
   -h, --help                 help for preview
       --http                 Preview HTTP requests instead of flow labels
       --samples int          Number of samples to collect (default 10)
+      --service string       Service FQDN (default "any")
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --api-key string         Aperture Cloud API Key to be used when using Cloud Controller
-      --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS

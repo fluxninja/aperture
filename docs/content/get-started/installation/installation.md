@@ -18,7 +18,7 @@ also needs to be installed.
 
 :::
 
-[Self-Hosting]: /self-hosting/self-hosting.md
+[Self-Hosting]: /get-started/self-hosting/self-hosting.md
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';

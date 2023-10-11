@@ -3,12 +3,14 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -136,6 +138,20 @@ func (constructor ServerConstructor) provideServer(
 
 	serverOptions = append(serverOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
 
+	keepAliveEnforcementPolicy := keepalive.EnforcementPolicy{
+		MinTime:             5 * time.Second,
+		PermitWithoutStream: true,
+	}
+
+	keepAliveServerParameters := keepalive.ServerParameters{
+		Time:    10 * time.Second,
+		Timeout: 5 * time.Second,
+	}
+
+	// add to server options
+	serverOptions = append(serverOptions, grpc.KeepaliveEnforcementPolicy(keepAliveEnforcementPolicy))
+	serverOptions = append(serverOptions, grpc.KeepaliveParams(keepAliveServerParameters))
+
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
 		otelgrpc.UnaryServerInterceptor(),
@@ -183,7 +199,7 @@ func (constructor ServerConstructor) provideServer(
 		OnStop: func(context.Context) error {
 			listener := listener.GetListener()
 			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
-			server.GracefulStop()
+			server.Stop()
 			return nil
 		},
 	})

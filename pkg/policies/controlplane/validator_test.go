@@ -1,4 +1,4 @@
-package controlplane_test
+package controlplane
 
 import (
 	"context"
@@ -14,12 +14,11 @@ import (
 	"sigs.k8s.io/yaml"
 
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/webhooks/policyvalidator"
 )
 
 var _ = Describe("Validator", Ordered, func() {
-	policySpecValidator := &controlplane.PolicySpecValidator{}
+	policySpecValidator := &PolicySpecValidator{}
 	policyValidator := policyvalidator.NewPolicyValidator([]policyvalidator.PolicySpecValidator{policySpecValidator})
 
 	validateExample := func(contents string) {

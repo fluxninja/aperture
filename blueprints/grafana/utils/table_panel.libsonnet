@@ -12,22 +12,7 @@ function(title, dsName, query, strFilters, h=20, w=10) {
     + g.panel.table.options.sortBy.withDesc(true)
     + g.panel.table.options.sortBy.withDisplayName(true)
     + g.panel.table.gridPos.withH(h)
-    + g.panel.table.gridPos.withW(w)
-    + g.panel.table.options.withFieldOptions({
-      overrides: [
-        {
-          matcher: g.panel.table.options.fieldMatcher.withId('byName').withOptions('postgresql_table_name'),
-          properties: [
-            g.panel.table.options.property.withId('displayName').withValue('Table Name'),
-          ],
-        },
-        {
-          matcher: g.panel.table.options.fieldMatcher.withId('byName').withOptions('Value'),
-          properties: [
-            g.panel.table.options.property.withId('displayName').withValue('Size (Bytes)'),
-          ],
-        },
-      ],
-    }),
+    + g.panel.table.gridPos.withW(w),
+
   panel: tablePanel,
 }

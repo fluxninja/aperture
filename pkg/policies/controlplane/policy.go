@@ -3,7 +3,6 @@ package controlplane
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"sigs.k8s.io/yaml"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -164,8 +162,13 @@ func compilePolicyWrapper(wrapperMessage *policysyncv1.PolicyWrapper, registry s
 		}
 	}
 
+	rootTree, rootTreeErr := circuitfactory.RootTree(&policylangv1.Circuit{})
+	if rootTreeErr != nil {
+		return nil, nil, nil, rootTreeErr
+	}
 	compiledCircuit := &circuitfactory.Circuit{
 		LeafComponents: make([]*runtime.ConfiguredComponent, 0),
+		Tree:           rootTree,
 	}
 
 	partialCircuitOption := fx.Options()
@@ -211,39 +214,40 @@ func (policy *Policy) TicksInDuration(duration time.Duration) int {
 }
 
 func (policy *Policy) setupCircuitJob(lifecycle fx.Lifecycle, circuitJobGroup *jobs.JobGroup) error {
-	logger := policy.GetStatusRegistry().GetLogger()
-	if policy.evaluationInterval > 0 {
-		// Job name
-		policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
-		// Job group
-		policy.circuitJobGroup = circuitJobGroup
-
-		lifecycle.Append(fx.Hook{
-			OnStart: func(_ context.Context) error {
-				// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
-				job := jobs.NewBasicJob(policy.jobName, policy.executeTick)
-				executionPeriod := config.MakeDuration(policy.evaluationInterval)
-				executionTimeout := config.MakeDuration(time.Millisecond * 100)
-				jobConfig := jobs.JobConfig{
-					InitiallyHealthy: true,
-					ExecutionPeriod:  executionPeriod,
-					ExecutionTimeout: executionTimeout,
-				}
-				// Register job with registry
-				err := policy.circuitJobGroup.RegisterJob(job, jobConfig)
-				if err != nil {
-					logger.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
-					return err
-				}
-				return nil
-			},
-			OnStop: func(_ context.Context) error {
-				// Deregister job from registry
-				_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
-				return nil
-			},
-		})
+	if policy.evaluationInterval <= 0 {
+		return nil
 	}
+	logger := policy.GetStatusRegistry().GetLogger()
+	// Job name
+	policy.jobName = fmt.Sprintf("Policy-%s", policy.GetPolicyName())
+	// Job group
+	policy.circuitJobGroup = circuitJobGroup
+
+	lifecycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			// Create a job that runs every tick i.e. evaluation_interval. Set timeout duration to half of evaluation_interval
+			job := jobs.NewBasicJob(policy.jobName, policy.executeTick)
+			executionPeriod := config.MakeDuration(policy.evaluationInterval)
+			executionTimeout := config.MakeDuration(time.Millisecond * 100)
+			jobConfig := jobs.JobConfig{
+				InitiallyHealthy: true,
+				ExecutionPeriod:  executionPeriod,
+				ExecutionTimeout: executionTimeout,
+			}
+			// Register job with registry
+			err := policy.circuitJobGroup.RegisterJob(job, jobConfig)
+			if err != nil {
+				logger.Error().Err(err).Str("job", policy.jobName).Msg("Error registering job")
+				return err
+			}
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			// Deregister job from registry
+			_ = policy.circuitJobGroup.DeregisterJob(policy.jobName)
+			return nil
+		},
+	})
 
 	return nil
 }
@@ -298,7 +302,7 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 
 // hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
 func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
-	hash, err := hashPolicy(policyMessage)
+	hash, err := HashPolicy(policyMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -312,20 +316,17 @@ func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*
 	}, nil
 }
 
-// hashPolicy returns hash of the policy.
-func hashPolicy(policy *policylangv1.Policy) (string, error) {
-	jsonDat, marshalErr := json.Marshal(policy)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to marshal proto message %+v", policy)
-		return "", marshalErr
+// HashPolicy returns hash of the policy.
+func HashPolicy(policy *policylangv1.Policy) (string, error) {
+	dat, err := proto.Marshal(policy)
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to marshal proto message %+v", policy)
+		return "", err
 	}
-	// convert dat to yaml format
-	dat, marshalErr := yaml.JSONToYAML(jsonDat)
-	if marshalErr != nil {
-		log.Error().Err(marshalErr).Msgf("Failed to convert json to yaml %+v", jsonDat)
-		return "", marshalErr
-	}
+
 	log.Trace().Msgf("Policy message: %s", string(dat))
+	// FIXME: Use sha256.Sum256() directly instead of goObjectHash. This will
+	// result in different though.
 	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
 	if hashErr != nil {
 		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))

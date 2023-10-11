@@ -11,7 +11,7 @@ import (
 func (msg *TelemetryCollector) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -19,7 +19,7 @@ func (msg *TelemetryCollector) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *TelemetryCollector) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -27,7 +27,7 @@ func (msg *TelemetryCollector) UnmarshalJSON(b []byte) error {
 func (msg *InfraMeter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -35,7 +35,7 @@ func (msg *InfraMeter) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *InfraMeter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -43,7 +43,7 @@ func (msg *InfraMeter) UnmarshalJSON(b []byte) error {
 func (msg *InfraMeter_MetricsPipeline) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -51,6 +51,6 @@ func (msg *InfraMeter_MetricsPipeline) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *InfraMeter_MetricsPipeline) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }

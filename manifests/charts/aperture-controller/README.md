@@ -168,7 +168,6 @@
 | `controller.secrets.fluxNinjaExtension.secretKeyRef.key`     | specifies which key from the Secret for Controller API Key to use                                                                                                         | `apiKey`              |
 | `controller.secrets.fluxNinjaExtension.value`                | API Key to use when creating a new Controller API Key Secret                                                                                                              | `nil`                 |
 | `controller.config.etcd.endpoints`                           | List of Etcd server endpoints. Example, ["http://etcd:2379"]. This must not be empty when etcd.enabled is set to false.                                                   | `[]`                  |
-| `controller.config.etcd.lease_ttl`                           | Lease time-to-live.                                                                                                                                                       | `60s`                 |
 | `controller.config.prometheus.address`                       | specifies the address of the Prometheus server. Example, "http://prometheus-server:80". This must not be empty when prometheus.enabled is set to false.                   | `nil`                 |
 
 ### Ingress

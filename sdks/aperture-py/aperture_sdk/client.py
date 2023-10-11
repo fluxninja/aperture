@@ -38,10 +38,8 @@ class ApertureClient:
         self,
         channel: grpc.Channel,
         otlp_exporter: OTLPSpanExporter,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
     ):
         self.logger = logging.getLogger("aperture-py-sdk")
-        self.timeout = check_timeout
 
         resource = Resource.create(
             {
@@ -63,7 +61,6 @@ class ApertureClient:
         cls: Type[TApertureClient],
         endpoint: str = "http://localhost:4317",
         insecure: bool = False,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
         grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
         credentials: Optional[grpc.ChannelCredentials] = None,
         compression: grpc.Compression = grpc.Compression.NoCompression,
@@ -77,21 +74,34 @@ class ApertureClient:
             compression=compression,
             timeout=int(grpc_timeout.total_seconds()),
         )
+        grpc_channel_options_dict = {
+            "grpc.keepalive_time_ms": 10000,
+            "grpc.keepalive_timeout_ms": 5000,
+            "grpc.keepalive_permit_without_calls": 1,
+        }
+        grpc_channel_options = [(k, v) for k, v in grpc_channel_options_dict.items()]
         grpc_channel = (
-            grpc.insecure_channel(endpoint, compression=compression)
+            grpc.insecure_channel(
+                endpoint, compression=compression, options=grpc_channel_options
+            )
             if insecure
-            else grpc.secure_channel(endpoint, credentials, compression=compression)
+            else grpc.secure_channel(
+                endpoint,
+                credentials,
+                compression=compression,
+                options=grpc_channel_options,
+            )
         )
         return cls(
             channel=grpc_channel,
             otlp_exporter=otlp_exporter,
-            check_timeout=check_timeout,
         )
 
     def start_flow(
         self,
         control_point: str,
         explicit_labels: Optional[Labels] = None,
+        check_timeout: datetime.timedelta = default_rpc_timeout,
         ramp_mode: bool = False,
     ) -> Flow:
         labels: Labels = {}
@@ -110,7 +120,7 @@ class ApertureClient:
         stub = FlowControlServiceStub(self.grpc_channel)
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
-            timeout = typing.cast(int, self.timeout.total_seconds())
+            timeout = typing.cast(int, check_timeout.total_seconds())
             response = (
                 stub.Check(request)
                 if timeout == 0
@@ -127,12 +137,15 @@ class ApertureClient:
         control_point: str,
         explicit_labels: Optional[Dict[str, str]] = None,
         on_reject: Optional[Callable] = None,
+        check_timeout: datetime.timedelta = default_rpc_timeout,
         ramp_mode: bool = False,
     ) -> Callable[[TWrappedFunction], TWrappedFunction]:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                with self.start_flow(control_point, explicit_labels, ramp_mode) as flow:
+                with self.start_flow(
+                    control_point, explicit_labels, check_timeout, ramp_mode
+                ) as flow:
                     if flow.should_run():
                         return await run_fn(fn, *args, **kwargs)
                     else:

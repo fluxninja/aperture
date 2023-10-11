@@ -11,7 +11,7 @@ import (
 func (msg *PodScaleActuator) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -19,7 +19,7 @@ func (msg *PodScaleActuator) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PodScaleActuator) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -27,7 +27,7 @@ func (msg *PodScaleActuator) UnmarshalJSON(b []byte) error {
 func (msg *PodScaleActuator_Ins) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -35,7 +35,7 @@ func (msg *PodScaleActuator_Ins) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PodScaleActuator_Ins) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -43,7 +43,7 @@ func (msg *PodScaleActuator_Ins) UnmarshalJSON(b []byte) error {
 func (msg *PodScaleReporter) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -51,7 +51,7 @@ func (msg *PodScaleReporter) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PodScaleReporter) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -59,7 +59,7 @@ func (msg *PodScaleReporter) UnmarshalJSON(b []byte) error {
 func (msg *PodScaleReporter_Outs) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -67,6 +67,6 @@ func (msg *PodScaleReporter_Outs) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PodScaleReporter_Outs) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }

@@ -109,6 +109,7 @@ Elasticsearch
 [Tt]riages
 CodeRabbit
 [Tt]iering
+[Tt]ranslate
 siloed
 [Ss]ynergy
 leverage

@@ -23,7 +23,7 @@ aperturectl cloud delete policy [flags]
 ### Examples
 
 ```
-aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key API_KEY
+aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 ```
 
 ### Options
@@ -35,12 +35,13 @@ aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION
 ### Options inherited from parent commands
 
 ```
-      --api-key string      Aperture Cloud API Key to be used when using Cloud Controller
-      --config string       Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
-      --controller string   Address of Aperture Cloud Controller
-      --insecure            Allow connection to controller running without TLS
-      --policy string       Name of the Policy to delete
-      --skip-verify         Skip TLS certificate verification while connecting to controller
+      --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
+      --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string     Address of Aperture Cloud Controller
+      --insecure              Allow connection to controller running without TLS
+      --policy string         Name of the Policy to delete
+      --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
+      --skip-verify           Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO

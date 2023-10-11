@@ -1,13 +1,11 @@
-local dashboard_group = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../common/utils.libsonnet';
 local blueprint = import './postgresql.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
+function(params) {
   local c = std.mergePatch(config, params),
-  local metadataWrapper = metadata { values: std.toString(params) },
 
   local policyName = c.policy.policy_name,
   local promqlQuery = '(sum(postgresql_backends{policy_name="%(policy_name)s",infra_meter_name="postgresql"}) / sum(postgresql_connection_max{policy_name="%(policy_name)s",infra_meter_name="postgresql"})) * 100' % { policy_name: policyName },
@@ -15,7 +13,7 @@ function(params, metadata={}) {
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: promqlQuery,
-      setpoint: c.policy.service_protection_core.setpoint,
+      setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
   },
@@ -38,15 +36,9 @@ function(params, metadata={}) {
     },
   },
 
-  local p = policy(config_with_postgresql_infra_meter, metadataWrapper),
-  local dg = dashboard_group(p.policyResource, config_with_postgresql_infra_meter),
-
+  local p = policy(config_with_postgresql_infra_meter),
   policies: {
     [std.format('%s-cr.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s.yaml', config_with_postgresql_infra_meter.policy.policy_name)]: p.policyDef,
   },
-  dashboards: {
-    [std.format('policy-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.mainDashboard,
-    [std.format('signals-%s.json', config_with_postgresql_infra_meter.policy.policy_name)]: dg.signalsDashboard,
-  } + dg.receiverDashboards,
 }

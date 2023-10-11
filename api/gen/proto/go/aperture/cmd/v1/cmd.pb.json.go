@@ -11,7 +11,7 @@ import (
 func (msg *ListServicesRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -19,7 +19,7 @@ func (msg *ListServicesRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListServicesRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -27,7 +27,7 @@ func (msg *ListServicesRequest) UnmarshalJSON(b []byte) error {
 func (msg *ListServicesAgentResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -35,7 +35,7 @@ func (msg *ListServicesAgentResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListServicesAgentResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -43,7 +43,7 @@ func (msg *ListServicesAgentResponse) UnmarshalJSON(b []byte) error {
 func (msg *ListServicesControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -51,7 +51,7 @@ func (msg *ListServicesControllerResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListServicesControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -59,7 +59,7 @@ func (msg *ListServicesControllerResponse) UnmarshalJSON(b []byte) error {
 func (msg *ListFlowControlPointsRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -67,7 +67,7 @@ func (msg *ListFlowControlPointsRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListFlowControlPointsRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -75,7 +75,7 @@ func (msg *ListFlowControlPointsRequest) UnmarshalJSON(b []byte) error {
 func (msg *ListFlowControlPointsAgentResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -83,7 +83,7 @@ func (msg *ListFlowControlPointsAgentResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListFlowControlPointsAgentResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -91,7 +91,7 @@ func (msg *ListFlowControlPointsAgentResponse) UnmarshalJSON(b []byte) error {
 func (msg *ListFlowControlPointsControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -99,7 +99,7 @@ func (msg *ListFlowControlPointsControllerResponse) MarshalJSON() ([]byte, error
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListFlowControlPointsControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -107,7 +107,7 @@ func (msg *ListFlowControlPointsControllerResponse) UnmarshalJSON(b []byte) erro
 func (msg *ListAutoScaleControlPointsRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -115,7 +115,7 @@ func (msg *ListAutoScaleControlPointsRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListAutoScaleControlPointsRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -123,7 +123,7 @@ func (msg *ListAutoScaleControlPointsRequest) UnmarshalJSON(b []byte) error {
 func (msg *ListAutoScaleControlPointsAgentResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -131,7 +131,7 @@ func (msg *ListAutoScaleControlPointsAgentResponse) MarshalJSON() ([]byte, error
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListAutoScaleControlPointsAgentResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -139,7 +139,7 @@ func (msg *ListAutoScaleControlPointsAgentResponse) UnmarshalJSON(b []byte) erro
 func (msg *ListAutoScaleControlPointsControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -147,7 +147,7 @@ func (msg *ListAutoScaleControlPointsControllerResponse) MarshalJSON() ([]byte, 
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListAutoScaleControlPointsControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -155,7 +155,7 @@ func (msg *ListAutoScaleControlPointsControllerResponse) UnmarshalJSON(b []byte)
 func (msg *ListDiscoveryEntitiesRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -163,7 +163,7 @@ func (msg *ListDiscoveryEntitiesRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListDiscoveryEntitiesRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -171,7 +171,7 @@ func (msg *ListDiscoveryEntitiesRequest) UnmarshalJSON(b []byte) error {
 func (msg *ListDiscoveryEntitiesAgentResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -179,7 +179,7 @@ func (msg *ListDiscoveryEntitiesAgentResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListDiscoveryEntitiesAgentResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -187,7 +187,7 @@ func (msg *ListDiscoveryEntitiesAgentResponse) UnmarshalJSON(b []byte) error {
 func (msg *ListDiscoveryEntitiesControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -195,7 +195,7 @@ func (msg *ListDiscoveryEntitiesControllerResponse) MarshalJSON() ([]byte, error
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListDiscoveryEntitiesControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -203,7 +203,7 @@ func (msg *ListDiscoveryEntitiesControllerResponse) UnmarshalJSON(b []byte) erro
 func (msg *ListDiscoveryEntityRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -211,7 +211,7 @@ func (msg *ListDiscoveryEntityRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListDiscoveryEntityRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -219,7 +219,7 @@ func (msg *ListDiscoveryEntityRequest) UnmarshalJSON(b []byte) error {
 func (msg *ListDiscoveryEntityAgentResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -227,7 +227,7 @@ func (msg *ListDiscoveryEntityAgentResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListDiscoveryEntityAgentResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -235,7 +235,7 @@ func (msg *ListDiscoveryEntityAgentResponse) UnmarshalJSON(b []byte) error {
 func (msg *ListAgentsResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -243,7 +243,7 @@ func (msg *ListAgentsResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *ListAgentsResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -251,7 +251,7 @@ func (msg *ListAgentsResponse) UnmarshalJSON(b []byte) error {
 func (msg *GlobalFlowControlPoint) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -259,7 +259,7 @@ func (msg *GlobalFlowControlPoint) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *GlobalFlowControlPoint) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -267,7 +267,7 @@ func (msg *GlobalFlowControlPoint) UnmarshalJSON(b []byte) error {
 func (msg *GlobalAutoScaleControlPoint) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -275,7 +275,7 @@ func (msg *GlobalAutoScaleControlPoint) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *GlobalAutoScaleControlPoint) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -283,7 +283,7 @@ func (msg *GlobalAutoScaleControlPoint) UnmarshalJSON(b []byte) error {
 func (msg *GlobalService) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -291,7 +291,7 @@ func (msg *GlobalService) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *GlobalService) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -299,7 +299,7 @@ func (msg *GlobalService) UnmarshalJSON(b []byte) error {
 func (msg *PreviewFlowLabelsRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -307,7 +307,7 @@ func (msg *PreviewFlowLabelsRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PreviewFlowLabelsRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -315,7 +315,7 @@ func (msg *PreviewFlowLabelsRequest) UnmarshalJSON(b []byte) error {
 func (msg *PreviewHTTPRequestsRequest) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -323,7 +323,7 @@ func (msg *PreviewHTTPRequestsRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PreviewHTTPRequestsRequest) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -331,7 +331,7 @@ func (msg *PreviewHTTPRequestsRequest) UnmarshalJSON(b []byte) error {
 func (msg *PreviewFlowLabelsControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -339,7 +339,7 @@ func (msg *PreviewFlowLabelsControllerResponse) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PreviewFlowLabelsControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
@@ -347,7 +347,7 @@ func (msg *PreviewFlowLabelsControllerResponse) UnmarshalJSON(b []byte) error {
 func (msg *PreviewHTTPRequestsControllerResponse) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
+		EmitUnpopulated: true,
 		UseProtoNames:   true,
 	}.Marshal(msg)
 }
@@ -355,6 +355,6 @@ func (msg *PreviewHTTPRequestsControllerResponse) MarshalJSON() ([]byte, error) 
 // UnmarshalJSON implements json.Unmarshaler
 func (msg *PreviewHTTPRequestsControllerResponse) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
-		DiscardUnknown: false,
+		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }

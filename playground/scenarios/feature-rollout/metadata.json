@@ -4,7 +4,6 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "load-ramping/base",
       "policy_name": "load-ramping",
       "values_file": "policies/load-ramping.yaml"
     }

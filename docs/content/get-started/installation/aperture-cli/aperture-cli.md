@@ -36,12 +36,19 @@ chmod +x "\${BIN}/aperturectl"
 );
 ```
 
-The Aperture CLI is available as an executable program for all major platforms,
-the binaries can be downloaded from GitHub <a
+The Aperture CLI provides a convenient way to interact with Aperture. It can be
+used to generate a policy, apply a policy, list policies, and perform other
+operations such as listing connected agents, listing flow control points and
+preview samples of flow labels or HTTP requests on control points. Its use cases
+extend beyond the aforementioned operations. Detailed documentation is available
+on the [aperturectl](/reference/aperturectl/aperturectl.md) reference page.
+
+The Aperture CLI, compatible with all major platforms, is accessible as an
+executable program. Binaries for the CLI can be obtained from the GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Release
 Page</a>.
 
-Alternatively, download it using the following script:
+Alternatively, it can also be downloaded using the following script:
 
 <Tabs groupId="packageManager" queryString>
   <TabItem value="dpkg" label="dpkg">

@@ -55,25 +55,3 @@ func WatcherLifecycle(lc fx.Lifecycle, watcher Watcher, notifiers []PrefixNotifi
 		},
 	})
 }
-
-// NotifierLifecycle adds/removed prefix notifier to etcd watcher.
-func NotifierLifecycle(lc fx.Lifecycle, watcher Watcher, notifier PrefixNotifier) {
-	lc.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			err := watcher.AddPrefixNotifier(notifier)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to add notifier")
-				return err
-			}
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			err := watcher.RemovePrefixNotifier(notifier)
-			if err != nil {
-				log.Error().Err(err).Msg("Failed to remove notifier")
-				return err
-			}
-			return nil
-		},
-	})
-}

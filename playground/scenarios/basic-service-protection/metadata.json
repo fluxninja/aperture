@@ -4,7 +4,6 @@
   "needs": ["istio"],
   "aperture_policies": [
     {
-      "blueprint_name": "load-scheduling/average-latency",
       "policy_name": "basic-service-protection",
       "values_file": "policies/basic-service-protection.yaml"
     }

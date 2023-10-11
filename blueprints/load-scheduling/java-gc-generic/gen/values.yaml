@@ -1,0 +1,38 @@
+# Generated values file for load-scheduling/java-gc-generic blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/java-gc-generic
+blueprint: load-scheduling/java-gc-generic
+uri: github.com/fluxninja/aperture/blueprints@latest
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  load_scheduling_core:
+    # Parameters for AIMD throttling strategy.
+    # Type: aperture.spec.v1.AIADLoadSchedulerParameters
+    # Required: True
+    aiad_load_scheduler:
+      alerter:
+        alert_name: "AIAD Load Throttling Event"
+      load_multiplier_linear_decrement: 0.05
+      load_multiplier_linear_increment: 0.025
+      load_scheduler:
+        selectors:
+          - control_point: __REQUIRED_FIELD__
+      max_load_multiplier: 2
+      min_load_multiplier: 0
+    # Setpoint.
+    # Type: float64
+    # Required: True
+    setpoint: __REQUIRED_FIELD__
+  jmx:
+    # Hostname for scraping metrics provided by JMX Prometheus Java Agent.
+    # Type: string
+    # Required: True
+    jmx_host: __REQUIRED_FIELD__
+    # Port number for scraping metrics provided by JMX Prometheus Java Agent.
+    # Type: int32
+    # Required: True
+    jmx_prometheus_port: __REQUIRED_FIELD__

@@ -11,6 +11,7 @@ import (
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
@@ -23,9 +24,10 @@ type EntitiesService struct {
 // RegisterEntitiesServiceIn bundles and annotates parameters.
 type RegisterEntitiesServiceIn struct {
 	fx.In
-	Server   *grpc.Server `name:"default"`
-	Cache    *Entities
-	Registry *rpc.HandlerRegistry
+	Server              *grpc.Server `name:"default"`
+	Cache               *Entities
+	Registry            *rpc.HandlerRegistry
+	EtcdTransportClient *transport.EtcdTransportClient
 }
 
 // RegisterEntitiesService registers a service for entity cache.
@@ -34,11 +36,11 @@ func RegisterEntitiesService(in RegisterEntitiesServiceIn) error {
 		entityCache: in.Cache,
 	}
 	entitiesv1.RegisterEntitiesServiceServer(in.Server, svc)
-	err := rpc.RegisterFunction(in.Registry, svc.ListDiscoveryEntities)
+	err := transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntities)
 	if err != nil {
 		return err
 	}
-	err = rpc.RegisterFunction(in.Registry, svc.ListDiscoveryEntity)
+	err = transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntity)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,7 @@ local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
   local commonPolicy = commonPolicyFn(updatedConfig),
 
@@ -11,7 +11,7 @@ function(cfg, params={}, metadata={}) {
 
   local aimdLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withAimdLoadScheduler(
-      local aimd = updatedConfig.policy.service_protection_core.aimd_load_scheduler;
+      local aimd = updatedConfig.policy.load_scheduling_core.aimd_load_scheduler;
 
       spec.v1.AIMDLoadScheduler.new()
       + spec.v1.AIMDLoadScheduler.withInPorts({
@@ -25,7 +25,7 @@ function(cfg, params={}, metadata={}) {
       })
       + spec.v1.AIMDLoadScheduler.withParameters(aimd)
       + spec.v1.AIMDLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.AIMDLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
+      + spec.v1.AIMDLoadScheduler.withDryRun(updatedConfig.policy.load_scheduling_core.dry_run)
     ),
   ),
 

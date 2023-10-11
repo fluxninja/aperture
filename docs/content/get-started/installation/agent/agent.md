@@ -88,7 +88,7 @@ and Agents are installed, you can start creating and applying policies.
 
 [Your first policy](/get-started/policies/policies.md) section provides
 step-by-step instructions on customizing, creating, and applying policies within
-Aperture. Additionally, the [use-cases](/use-cases/use-cases.md) section serves
-as a valuable resource for tailoring policies to meet specific requirements.
+Aperture. Additionally, the [guides](/guides/guides.md) section serves as a
+valuable resource for tailoring policies to meet specific requirements.
 
 [namespace-scoped-installation]: kubernetes/namespace-scoped/namespace-scoped.md

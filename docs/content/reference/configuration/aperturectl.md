@@ -1,6 +1,6 @@
 ---
 title: aperturectl Configuration File Format Reference
-sidebar_position: 5
+sidebar_position: 4
 sidebar_label: "Aperturectl"
 ---
 

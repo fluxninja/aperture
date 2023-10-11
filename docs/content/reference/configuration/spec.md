@@ -3283,7 +3283,8 @@ to features within a service.
 
 _Adaptive Load Scheduler_ component does additive increase of load multiplier
 during non-overload state. During overload, the load multiplier is throttled
-based on the provided strategy.
+based on the provided strategy. Deprecated: v3.0.0. Use _AIMD Load Scheduler_
+instead.
 
 </dd>
 <dt>aiad_load_scheduler</dt>
@@ -7418,8 +7419,7 @@ Inputs for the RateLimiter component
 
 <!-- vale on -->
 
-Capacity of the bucket to allow for bursty traffic. The bucket is given a chance
-to empty out before the filling starts.
+Capacity of the bucket to allow for bursty traffic.
 
 </dd>
 <dt>fill_amount</dt>
@@ -7468,6 +7468,23 @@ PassThrough port determines whether all requests
 
 Continuous fill determines whether the token bucket should be filled
 continuously or only on discrete intervals.
+
+</dd>
+<dt>delay_initial_fill</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Delays the initial filling of the token bucket. If set to false, the token
+bucket will start filling immediately after the first request is received. This
+can potentially lead to more requests being accepted than the specified rate
+limit during the first interval. When set to true, the token bucket will be
+given a chance to empty out before the filling starts. The delay is equal to the
+time it takes to fill the bucket.
 
 </dd>
 <dt>interval</dt>
@@ -7803,7 +7820,7 @@ of the agent(s).
 
 <!-- vale off -->
 
-([[]TelemetryCollector](#telemetry-collector))
+([[]TelemetryCollector](#telemetry-collector), **DEPRECATED**)
 
 <!-- vale on -->
 

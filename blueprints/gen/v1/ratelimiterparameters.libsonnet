@@ -7,6 +7,12 @@
   withContinuousFillMixin(continuous_fill):: {
     continuous_fill+: continuous_fill,
   },
+  withDelayInitialFill(delay_initial_fill):: {
+    delay_initial_fill: delay_initial_fill,
+  },
+  withDelayInitialFillMixin(delay_initial_fill):: {
+    delay_initial_fill+: delay_initial_fill,
+  },
   withInterval(interval):: {
     interval: interval,
   },
