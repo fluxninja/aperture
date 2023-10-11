@@ -160,6 +160,14 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
+	if len(svcs) == 0 {
+		// If no services are found in the context, use the destination service
+		// from the request.
+		//
+		// In Consul, the services in context is received as localhost.
+		svcs = destinationSvcs
+	}
+
 	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {
