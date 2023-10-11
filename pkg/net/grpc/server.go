@@ -128,29 +128,23 @@ func (constructor ServerConstructor) provideServer(
 		return nil, nil, err
 	}
 
-	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
-	grpcServerMetrics.EnableHandlingTimeHistogram(
-		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
-	)
-
 	serverOptions := []grpc.ServerOption{}
 	serverOptions = append(serverOptions, constructor.ServerOptions...)
 
 	serverOptions = append(serverOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
 
 	keepAliveEnforcementPolicy := keepalive.EnforcementPolicy{
-		MinTime:             5 * time.Second,
-		PermitWithoutStream: true,
-	}
-
-	keepAliveServerParameters := keepalive.ServerParameters{
-		Time:    10 * time.Second,
-		Timeout: 5 * time.Second,
+		MinTime: 5 * time.Second,
 	}
 
 	// add to server options
 	serverOptions = append(serverOptions, grpc.KeepaliveEnforcementPolicy(keepAliveEnforcementPolicy))
-	serverOptions = append(serverOptions, grpc.KeepaliveParams(keepAliveServerParameters))
+
+	// grpc metrics
+	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
+	grpcServerMetrics.EnableHandlingTimeHistogram(
+		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
+	)
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
