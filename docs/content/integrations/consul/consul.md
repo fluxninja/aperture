@@ -21,10 +21,10 @@ import CodeBlock from '@theme/CodeBlock';
 
 Aperture supports the following versions of Consul:
 
-| Platform         | Extent of Support |
-| ---------------- | ----------------- |
-| Consul           | 1.17 and above    |
-| Consul Dataplane | 1.2.2 and above   |
+| Platform          | Extent of Support |
+| ----------------- | ----------------- |
+| Consul            | 1.17 and above    |
+| Consul Data Plane | 1.2.2 and above   |
 
 ## Envoy Extensions {#envoy-extensions}
 
