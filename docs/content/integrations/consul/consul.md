@@ -79,7 +79,7 @@ namespace, which makes the target service name `aperture-agent` and namespace
    Envoy Extension for the outbound listener, in the Consul Proxy running with
    the application.
 
-   The Open Telemetry configuration in the following has extracted values, which
+   The OpenTelemetry configuration in the following has extracted values, which
    are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `egress` as the
@@ -118,7 +118,7 @@ namespace, which makes the target service name `aperture-agent` and namespace
    Envoy Extension, but for the inbound listener, in the Consul Proxy running
    with the application.
 
-   The Open Telemetry configuration in the following has extracted values, which
+   The OpenTelemetry configuration in the following has extracted values, which
    are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `ingress` as
@@ -214,8 +214,8 @@ namespace, which makes the target service name `aperture-agent` and namespace
 
 ## Installation {#installation}
 
-The complete Service Defaults configuration for the Consul Proxy running with
-the application is as follows:
+The complete Service Defaults configuration as an example for the Consul Proxy
+running with the application is as follows:
 
 <details><summary>service1-demo-app-service-defaults.yaml</summary>
 <p>
