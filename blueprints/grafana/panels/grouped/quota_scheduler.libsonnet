@@ -19,59 +19,59 @@ local workload_latency = import '../workload_latency.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(cfg) {
+function(datasourceName, policyName, component, extraFilters={}) {
   panels: [
-    workload_decisions(cfg).panel
+    workload_decisions(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(10),
-    workload_accepted(cfg).panel
+    workload_accepted(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(20),
-    workload_rejected(cfg).panel
+    workload_rejected(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(30),
-    total_requests(cfg).panel
+    total_requests(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(0)
     + g.panel.stat.gridPos.withY(40),
-    total_accepted_requests(cfg).panel
+    total_accepted_requests(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(8)
     + g.panel.stat.gridPos.withY(40),
-    total_rejected_requests(cfg).panel
+    total_rejected_requests(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(16)
     + g.panel.stat.gridPos.withY(40),
-    workload_latency(cfg).panel
+    workload_latency(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(50),
-    request_in_queue_duration(cfg).panel
+    request_in_queue_duration(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withX(0)
     + g.panel.timeSeries.gridPos.withY(60)
     + g.panel.timeSeries.gridPos.withW(12),
-    request_queue_duration_bar(cfg).panel
+    request_queue_duration_bar(datasourceName, policyName, component, extraFilters).panel
     + g.panel.barGauge.gridPos.withX(12)
     + g.panel.barGauge.gridPos.withY(60)
     + g.panel.barGauge.gridPos.withW(12),
-    avg_preemption_time_series(cfg).panel
+    avg_preemption_time_series(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(70)
     + g.panel.timeSeries.gridPos.withW(12),
-    avg_preemption_chart(cfg).panel
+    avg_preemption_chart(datasourceName, policyName, component, extraFilters).panel
     + g.panel.barChart.gridPos.withX(12)
     + g.panel.barChart.gridPos.withY(70)
     + g.panel.barChart.gridPos.withW(12),
-    incoming_token_rate(cfg).panel
+    incoming_token_rate(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withY(80),
-    accepted_token_rate(cfg).panel
+    accepted_token_rate(datasourceName, policyName, component, extraFilters).panel
     + g.panel.timeSeries.gridPos.withX(12)
     + g.panel.timeSeries.gridPos.withY(80),
-    total_incoming_tokens(cfg).panel
+    total_incoming_tokens(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(0)
     + g.panel.stat.gridPos.withY(90),
-    total_accepted_tokens(cfg).panel
+    total_accepted_tokens(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(8)
     + g.panel.stat.gridPos.withY(90),
-    total_rejected_tokens(cfg).panel
+    total_rejected_tokens(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(16)
     + g.panel.stat.gridPos.withY(90),
-    wfq_scheduler_flows(cfg).panel
+    wfq_scheduler_flows(datasourceName, policyName, component, extraFilters).panel
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.timeSeries.gridPos.withY(100),
-    wfq_scheduler_heap_requests(cfg).panel
+    wfq_scheduler_heap_requests(datasourceName, policyName, component, extraFilters).panel
     + g.panel.barGauge.gridPos.withH(6)
     + g.panel.barGauge.gridPos.withW(12)
     + g.panel.barGauge.gridPos.withX(12)
