@@ -13,7 +13,6 @@ import (
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Module is fx module for controlling Agents on controller side.
@@ -23,7 +22,6 @@ var Module = fx.Provide(NewAgents)
 //
 // Agents wraps functions registered in agentfunctions, types should match.
 type Agents struct {
-	*rpc.Clients
 	etcdTransport *transport.EtcdTransportServer
 	etcdClient    *etcdclient.Client
 }

@@ -8,9 +8,7 @@ import (
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/info"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Module provides rpc client for agent functions.
@@ -25,7 +23,6 @@ var Module = fx.Options(
 		ProvidePreviewHandler,
 	),
 	fx.Invoke(
-		RegisterClient,
 		RegisterEtcdTransport,
 		RegisterControlPointsHandler,
 		RegisterPreviewHandler,
@@ -37,25 +34,9 @@ type RegisterClientIn struct {
 	fx.In
 	Lc                  fx.Lifecycle
 	Unmarshaller        config.Unmarshaller
-	Handlers            *rpc.HandlerRegistry
 	ConnBuilder         grpcclient.ClientConnectionBuilder `name:"agent-functions"`
 	EtcdTransportClient *transport.EtcdTransportClient
 	EtcdClient          *etcdclient.Client
-}
-
-// RegisterClient registers a client which will allow calling agent functions from controller.
-func RegisterClient(in RegisterClientIn) error {
-	var config afconfig.AgentFunctionsConfig
-	if err := in.Unmarshaller.UnmarshalKey(afconfig.Key, &config); err != nil {
-		return err
-	}
-
-	for _, addr := range config.Endpoints {
-		rpc.RegisterStreamClient(info.UUID, in.Lc, in.Handlers, in.ConnBuilder.Build(), addr)
-		log.Info().Msgf("Rpc client started, server: %s", addr)
-	}
-
-	return nil
 }
 
 // RegisterEtcdTransport registers a server on the etcd transport.

@@ -22,7 +22,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 	"github.com/fluxninja/aperture/v2/pkg/webhooks"
 	"github.com/fluxninja/aperture/v2/pkg/webhooks/policyvalidator"
 )
@@ -40,7 +39,6 @@ func main() {
 		webhooks.Module(),
 		policyvalidator.Module(),
 		transport.TransportServerModule,
-		rpc.ServerModule,
 		cmd.Module,
 		Module(),
 		agents.Module,
