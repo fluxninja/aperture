@@ -18,6 +18,6 @@ var ControlPointsCmd = &cobra.Command{
 			return err
 		}
 
-		return utils.ParseControlPoints(client)
+		return utils.ParseAutoScaleControlPoints(client)
 	},
 }
