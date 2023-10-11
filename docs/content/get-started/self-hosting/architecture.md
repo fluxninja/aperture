@@ -36,7 +36,7 @@ infrastructure.
 <Zoom>
 
 ```mermaid
-{@include: ../assets/diagrams/architecture/architecture_simple.mmd}
+{@include: ../../assets/diagrams/architecture/architecture_simple.mmd}
 ```
 
 </Zoom>

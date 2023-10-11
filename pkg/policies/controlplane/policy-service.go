@@ -111,8 +111,7 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 //
 // localPolicy can be nil.
 func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
-	remotePolicy := &policylangv1.Policy{}
-	err := remotePolicy.UnmarshalJSON(remoteBytes)
+	remotePolicy, err := unmarshalStoredPolicy(remoteBytes)
 	if err != nil {
 		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
@@ -173,6 +172,37 @@ func getLocalOnlyPolicyResponse(localPolicy *policysyncv1.PolicyWrapper) *policy
 		Policy: localPolicy.Policy,
 		Status: policylangv1.GetPolicyResponse_VALID,
 	}
+}
+
+// unmarshalStoredPolicy unmarshals a policy stored in etcd or serialized by crwatcher.
+func unmarshalStoredPolicy(policyBytes []byte) (*policylangv1.Policy, error) {
+	// Right now we store policies in api/policies only in json, but some
+	// controller version in the past stored in protowire, so we need to take
+	// in account both cases when deserializing.
+	var policy policylangv1.Policy
+	var err error
+
+	// We're sniffing the first byte to detect format – JSON policy always
+	// starts with `{` and protowire never starts with `{` byte for proto3
+	// messages.
+	if len(policyBytes) > 0 && policyBytes[0] == '{' {
+		// Not using json.Unmarshal, because:
+		// * json.Unmarshal can produce error messages, which are invalid UTF-8
+		//   (when trying to deserialize binary data),
+		// * json.Unmarshal won't handle correctly defaults for new fields that
+		//   were added after policy was stored in etcd.
+		err = config.UnmarshalJSON(policyBytes, &policy)
+	} else {
+		// Deprecated: v3.0.0. Older way of string policy on etcd.
+		// Remove this code in v3.0.0.
+		err = proto.Unmarshal(policyBytes, &policy)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &policy, nil
 }
 
 // UpsertPolicy creates/updates policy to the system.
