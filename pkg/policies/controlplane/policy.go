@@ -303,12 +303,12 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 	return policy.registry
 }
 
-// HashStoredPolicy returns sha256 of JSON-serialized policy.
+// HashStoredPolicy returns sha256 of JSON-serialized policy, truncated to 128 bits.
 //
 // As the JSON repr of policy is not perfectly stable (it depends whether we've
 // applied defaults yet or not, and could change when adding new fields), we
 // should hash policies which are stored somewhere (e.g. in etcd).
 func HashStoredPolicy(policyJSON []byte) string {
 	sum := sha256.Sum256(policyJSON)
-	return hex.EncodeToString(sum[:])
+	return hex.EncodeToString(sum[:16])
 }
