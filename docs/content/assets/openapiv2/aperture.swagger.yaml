@@ -1019,14 +1019,6 @@ definitions:
             - ERROR_MULTI_EXPRESSION
             - ERROR_EXPRESSION_NOT_MAP
         type: string
-    ClientToServerHello:
-        properties:
-            name:
-                type: string
-            next_id:
-                format: uint64
-                type: string
-        type: object
     CommonAttributes:
         properties:
             component_id:
@@ -3948,25 +3940,6 @@ definitions:
     ReportResponse:
         description: ReportResponse is empty for now.
         type: object
-    Request:
-        properties:
-            id:
-                description: |-
-                    Id of the request, this should be unique per client connection. First
-                    request id on the connection should be equal to nextID from the Hello
-                    message.
-                format: uint64
-                type: string
-            payload:
-                $ref: '#/definitions/googleprotobufAny'
-                description: Request payload. The method on the callee will be dispatched by request's type.
-            timeout:
-                description: |-
-                    Mandatory timeout for processing request. Timeout is handled on
-                    caller-side. After it passes, caller is no longer interested in a response,
-                    and callee can forget about the request.
-                type: string
-        type: object
     Resources:
         description: |-
             :::info
@@ -4028,18 +4001,6 @@ definitions:
                 x-deprecated: true
                 x-go-tag-validate: deprecated
         title: Resources that need to be setup for the policy to function
-        type: object
-    Response:
-        properties:
-            error:
-                $ref: '#/definitions/googlerpcStatus'
-            id:
-                format: uint64
-                type: string
-            payload:
-                description: Payload is a message of a type implied by request kind.
-                format: byte
-                type: string
         type: object
     Rule:
         description: |-
@@ -4460,22 +4421,6 @@ definitions:
                 x-go-tag-default: any
         required:
             - control_point
-        type: object
-    ServerToClient:
-        properties:
-            cancel_id:
-                description: |-
-                    Cancels in-flight request.
-
-                    After cancellation, the response is not expected to be received, but
-                    might happen that it will be received. If so, it should be ignored.
-                format: uint64
-                type: string
-            request:
-                $ref: '#/definitions/Request'
-                description: |-
-                    Make a request to client. Expect AgentToController message in the
-                    future containing Response with the same id.
         type: object
     Service:
         description: |-
@@ -5673,4 +5618,3 @@ tags:
     - name: PeerDiscoveryService
     - name: FluxNinjaService
     - name: ControllerInfoService
-    - name: Coordinator

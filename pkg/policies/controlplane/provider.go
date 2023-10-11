@@ -7,7 +7,6 @@ import (
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
@@ -127,16 +126,10 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &policylangv1.Policy{}
-			unmarshalErr := proto.Unmarshal(bytes, policyMessage)
+			policyMessage, unmarshalErr := unmarshalStoredPolicy(bytes)
 			if unmarshalErr != nil {
-				// Deprecated: v3.0.0. Older way of string policy on etcd.
-				// Remove this code in v3.0.0.
-				unmarshalErr = config.UnmarshalJSON(bytes, policyMessage)
-				if unmarshalErr != nil {
-					log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
-					return key, nil, unmarshalErr
-				}
+				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+				return key, nil, unmarshalErr
 			}
 
 			wrapper, wrapErr := hashAndPolicyWrap(policyMessage, string(key))

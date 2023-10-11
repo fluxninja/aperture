@@ -29,7 +29,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/v2/pkg/prometheus"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 func main() {
@@ -52,7 +51,6 @@ func main() {
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
 		agentelection.Module(),
-		rpc.ClientModule,
 		transport.TransportClientModule,
 		agentfunctions.Module,
 		Module(),

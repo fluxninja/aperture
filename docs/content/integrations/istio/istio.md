@@ -53,7 +53,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target address.
    filter for the outbound listener, in the Istio sidecar running with the
    application.
 
-   The Open Telemetry configuration in the following patch has extracted values,
+   The OpenTelemetry configuration in the following patch has extracted values,
    which are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `egress` as the
@@ -133,7 +133,7 @@ Aperture Agent in Sidecar mode, use `localhost` as the target address.
    filter, but for the inbound listener in the Istio sidecar running with the
    application.
 
-   The Open Telemetry configuration in the following patch has extracted values,
+   The OpenTelemetry configuration in the following patch has extracted values,
    which are forwarded to the Aperture Agent instance using gRPC.
 
    The prepared log has the request method value as log body and `ingress` as
