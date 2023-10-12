@@ -709,8 +709,6 @@ github.com/fluxninja/opentelemetry-collector-contrib/receiver/podmanreceiver v0.
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/podmanreceiver v0.82.0-fn.patch.1/go.mod h1:ETjElTNxiIELrYr0CIIspt6ilvw6Su5abAKdpf50j+U=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/postgresqlreceiver v0.82.0-fn.patch.1 h1:Qzgs5pfZLmNgXxkzmRw/Ikjjx8qtEpYZ53/eM0EjICE=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/postgresqlreceiver v0.82.0-fn.patch.1/go.mod h1:hiFEV+PHHv43yVzvPrTz78yh4C/FmVr4OTt+92NhF40=
-github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusexecreceiver v0.82.0-fn.patch.1 h1:itREBKzvN+QbBvKTAdbAvsxInsjHkXY5wg20ytzGGDc=
-github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusexecreceiver v0.82.0-fn.patch.1/go.mod h1:TGwJHMQEnYmfEleqxGGY/y58UydFR5xE/jgk+K7/iXY=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.82.0-fn.patch.1 h1:cD2I4l8kvKfMOV4t+RfhNjHCyRy2fSSsACsHrBe15g0=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.82.0-fn.patch.1/go.mod h1:D2a/lSWvGdf6LRieHWawMabV8iP+/JFnOcQpBc9+v4s=
 github.com/fluxninja/opentelemetry-collector-contrib/receiver/pulsarreceiver v0.82.0-fn.patch.1 h1:b9ayUcv0ng61/9cqob54v8NGlmCxGULdR+c27ZTrW3Q=
@@ -1236,8 +1234,6 @@ github.com/karrick/godirwalk v1.8.0/go.mod h1:H5KPZjojv4lE+QYImBI8xVtrBRgYrIVsaR
 github.com/karrick/godirwalk v1.10.3/go.mod h1:RoGL9dQei4vP9ilrpETWE8CLOZ1kiN0LhBygSwrAsHA=
 github.com/karrick/godirwalk v1.17.0 h1:b4kY7nqDdioR/6qnbHQyDvmA17u5G1cZ6J+CZXwSWoI=
 github.com/karrick/godirwalk v1.17.0/go.mod h1:j4mkqPuvaLI8mp1DroR3P6ad7cyYd4c1qeJ3RV7ULlk=
-github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs=
-github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51/go.mod h1:CzGEWj7cYgsdH8dAjBGEr58BoE7ScuLd+fwFZ44+/x8=
 github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d/go.mod h1:JJNrCn9otv/2QP4D7SMJBgaleKpOf66PnW6F5WGNRIc=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
