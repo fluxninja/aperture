@@ -77,7 +77,6 @@ class ApertureClient:
         grpc_channel_options_dict = {
             "grpc.keepalive_time_ms": 10000,
             "grpc.keepalive_timeout_ms": 5000,
-            "grpc.keepalive_permit_without_calls": 1,
         }
         grpc_channel_options = [(k, v) for k, v in grpc_channel_options_dict.items()]
         grpc_channel = (
