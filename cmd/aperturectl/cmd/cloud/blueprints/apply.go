@@ -2,14 +2,14 @@ package blueprints
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"sigs.k8s.io/yaml"
 
 	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 )
 
 func init() {
@@ -26,25 +26,12 @@ var BlueprintsApplyCmd = &cobra.Command{
 		if valuesFile == "" {
 			return fmt.Errorf("--values-file is required")
 		}
-
-		_, err := os.Stat(valuesFile)
-		if err != nil && os.IsNotExist(err) {
-			return fmt.Errorf("values file does not exist: %w", err)
-		}
-
-		content, err := os.ReadFile(valuesFile)
-		if err != nil {
-			return fmt.Errorf("failed to read values file: %w", err)
-		}
-		valuesFileContent = content
-
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		valuesMap := make(map[string]any)
-		err := yaml.Unmarshal(valuesFileContent, &valuesMap)
+		valuesMap, err := blueprints.Generate(valuesFile, "", "", "")
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal values file: %w", err)
+			return err
 		}
 
 		policy, ok := valuesMap["policy"].(map[string]any)
@@ -52,14 +39,14 @@ var BlueprintsApplyCmd = &cobra.Command{
 			return fmt.Errorf("policy not found in blueprint values")
 		}
 
-		blueprintsName, ok := valuesMap["blueprint"].(string)
-		if !ok {
-			return fmt.Errorf("blueprint not found in blueprint values")
-		}
-
 		policyName, ok := policy["policy_name"].(string)
 		if !ok {
 			return fmt.Errorf("policy_name not found in blueprint values")
+		}
+
+		blueprintName, ok := valuesMap["blueprint"].(string)
+		if !ok {
+			return fmt.Errorf("blueprint not found in blueprint values")
 		}
 
 		uri, ok := valuesMap["uri"].(string)
@@ -75,12 +62,17 @@ var BlueprintsApplyCmd = &cobra.Command{
 			version = uriSlice[1]
 		}
 
+		valuesFileContent, err := json.Marshal(valuesMap)
+		if err != nil {
+			return err
+		}
+
 		_, err = client.Apply(context.Background(), &cloudv1.ApplyRequest{
 			Blueprint: &cloudv1.Blueprint{
 				PolicyName:     policyName,
 				Version:        version,
 				Values:         valuesFileContent,
-				BlueprintsName: blueprintsName,
+				BlueprintsName: blueprintName,
 			},
 		})
 		if err != nil {

@@ -9,7 +9,6 @@ var (
 	controller cloudutils.ControllerConn
 	client     utils.CloudBlueprintsClient
 
-	name              string
-	valuesFile        string
-	valuesFileContent []byte
+	name       string
+	valuesFile string
 )
