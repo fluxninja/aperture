@@ -1,14 +1,14 @@
 ---
-sidebar_label: Policy
+sidebar_label: Delete
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_delete_policy
+  - aperturectl_cloud_policy_delete
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud delete policy
+## aperturectl cloud policy delete
 
 Delete Aperture Policy from the Aperture Cloud Controller
 
@@ -17,19 +17,19 @@ Delete Aperture Policy from the Aperture Cloud Controller
 Use this command to delete the Aperture Policy from the Aperture Cloud Controller.
 
 ```
-aperturectl cloud delete policy [flags]
+aperturectl cloud policy delete POLICY_NAME [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy delete --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 ```
 
 ### Options
 
 ```
-  -h, --help   help for policy
+  -h, --help   help for delete
 ```
 
 ### Options inherited from parent commands
@@ -39,11 +39,10 @@ aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION
       --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string     Address of Aperture Cloud Controller
       --insecure              Allow connection to controller running without TLS
-      --policy string         Name of the Policy to delete
       --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
       --skip-verify           Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO
 
-- [aperturectl cloud delete](/reference/aperturectl/cloud/delete/delete.md) - Delete Aperture Policies from Aperture Cloud
+- [aperturectl cloud policy](/reference/aperturectl/cloud/policy/policy.md) - Aperture Policy related commands for the Cloud Controller

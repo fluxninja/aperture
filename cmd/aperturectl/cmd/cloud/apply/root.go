@@ -14,7 +14,6 @@ var Controller utils.ControllerConn
 func init() {
 	Controller.InitFlags(ApplyCmd.PersistentFlags())
 
-	ApplyCmd.AddCommand(ApplyPolicyCmd)
 	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
 }
 

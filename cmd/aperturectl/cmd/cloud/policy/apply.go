@@ -1,8 +1,7 @@
-package apply
+package policy
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -16,35 +15,24 @@ var (
 	dir       string
 	force     bool
 	selectAll bool
-
-	client utils.CloudPolicyClient
 )
 
 func init() {
-	ApplyPolicyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
-	ApplyPolicyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
-	ApplyPolicyCmd.Flags().BoolVarP(&force, "force", "f", false, "Force apply policy even if it already exists")
-	ApplyPolicyCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all policies in the directory")
+	ApplyCmd.Flags().StringVar(&file, "file", "", "Path to Aperture Policy file")
+	ApplyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing Aperture Policy files")
+	ApplyCmd.Flags().BoolVarP(&force, "force", "f", false, "Force apply policy even if it already exists")
+	ApplyCmd.Flags().BoolVarP(&selectAll, "select-all", "s", false, "Apply all policies in the directory")
 }
 
-// ApplyPolicyCmd is the command to apply a policy to the Aperture Cloud Controller.
-var ApplyPolicyCmd = &cobra.Command{
-	Use:           "policy",
+// ApplyCmd is the command to apply a policy to the Aperture Cloud Controller.
+var ApplyCmd = &cobra.Command{
+	Use:           "apply",
 	Short:         "Apply Aperture Policy to the Aperture Cloud Controller",
 	Long:          `Use this command to apply the Aperture Policy to the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example: `aperturectl cloud apply policy --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+	Example: `aperturectl cloud policy apply --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 
-aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-		client, err = Controller.CloudPolicyClient()
-		if err != nil {
-			return fmt.Errorf("failed to get cloud controller client: %w", err)
-		}
-
-		return nil
-	},
+aperturectl cloud policy apply --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
 			return applyPolicy(file)
@@ -78,7 +66,7 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policyBytes []byte) error {
-	updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(client, name, policyBytes, force)
+	updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(cloudClient, name, policyBytes, force)
 	if updatePolicyUsingAPIErr != nil {
 		return updatePolicyUsingAPIErr
 	}

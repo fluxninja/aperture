@@ -134,7 +134,7 @@ how to configure what aperturectl should connect to.
 :::
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl cloud apply policy --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl cloud policy apply --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.

@@ -1,14 +1,14 @@
 ---
-sidebar_label: Policy
+sidebar_label: Apply
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_apply_policy
+  - aperturectl_cloud_policy_apply
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud apply policy
+## aperturectl cloud policy apply
 
 Apply Aperture Policy to the Aperture Cloud Controller
 
@@ -17,15 +17,15 @@ Apply Aperture Policy to the Aperture Cloud Controller
 Use this command to apply the Aperture Policy to the Aperture Cloud Controller.
 
 ```
-aperturectl cloud apply policy [flags]
+aperturectl cloud policy apply [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl cloud apply policy --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy apply --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 
-aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy apply --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
 ```
 
 ### Options
@@ -34,7 +34,7 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
       --dir string    Path to directory containing Aperture Policy files
       --file string   Path to Aperture Policy file
   -f, --force         Force apply policy even if it already exists
-  -h, --help          help for policy
+  -h, --help          help for apply
   -s, --select-all    Apply all policies in the directory
 ```
 
@@ -51,4 +51,4 @@ aperturectl cloud apply policy --dir=policies --controller ORGANIZATION_NAME.app
 
 ### SEE ALSO
 
-- [aperturectl cloud apply](/reference/aperturectl/cloud/apply/apply.md) - Apply Aperture Policies to the Cloud Controller
+- [aperturectl cloud policy](/reference/aperturectl/cloud/policy/policy.md) - Aperture Policy related commands for the Cloud Controller

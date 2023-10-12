@@ -1,4 +1,4 @@
-package delete
+package policy
 
 import (
 	"fmt"
@@ -10,21 +10,22 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// DeletePolicyCmd is the command to delete a policy from the Aperture Cloud Controller.
-var DeletePolicyCmd = &cobra.Command{
-	Use:           "policy",
+// DeleteCmd is the command to delete a policy from the Aperture Cloud Controller.
+var DeleteCmd = &cobra.Command{
+	Use:           "delete POLICY_NAME",
 	Short:         "Delete Aperture Policy from the Aperture Cloud Controller",
 	Long:          `Use this command to delete the Aperture Policy from the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example:       `aperturectl cloud delete policy --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		return deletePolicy()
+	Args:          cobra.ExactArgs(1),
+	Example:       `aperturectl cloud policy delete --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
+	RunE: func(_ *cobra.Command, args []string) error {
+		return deletePolicy(args[0])
 	},
 }
 
 // deletePolicy deletes the policy from the cluster.
-func deletePolicy() error {
-	err := utils.DeletePolicyUsingAPI(client, policyName)
+func deletePolicy(policyName string) error {
+	err := utils.DeletePolicyUsingAPI(cloudClient, policyName)
 	if err != nil {
 		return fmt.Errorf("failed to delete policy: %w", err)
 	}

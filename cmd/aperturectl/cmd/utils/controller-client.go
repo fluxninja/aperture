@@ -39,6 +39,7 @@ type PolicyClient interface {
 	PostDynamicConfig(ctx context.Context, in *policylangv1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *policylangv1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *policylangv1.GetDecisionsRequest, opts ...grpc.CallOption) (*policylangv1.GetDecisionsResponse, error)
+	GetPolicy(ctx context.Context, in *policylangv1.GetPolicyRequest, opts ...grpc.CallOption) (*policylangv1.GetPolicyResponse, error)
 }
 
 // StatusClient is a subset of cmdv1.ControllerClient that covers APIs related to status.
