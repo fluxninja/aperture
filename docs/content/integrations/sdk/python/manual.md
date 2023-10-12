@@ -82,8 +82,6 @@ helpful to handle specific routes in your service.
 For more context on using the Aperture Python SDK to set feature control points,
 refer to the [example app][example] available in the repository.
 
-<!--- TODO: Change to pypi package once it is published. --->
-
-[pythonsdk]: https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py
+[pythonsdk]: https://pypi.org/project/aperture-py/
 [example]:
   https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py/example
