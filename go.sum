@@ -505,7 +505,9 @@ github.com/fluxninja/opentelemetry-collector-contrib/exporter/kafkaexporter v0.8
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.87.0-fn.patch.1 h1:6RrEQY7sg3fOuKGIwnP71mxk7JqeNE5ACjh0cUTQojY=
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.87.0-fn.patch.1/go.mod h1:u/elHQl7ShJXvRk9VAOEfitOuZYs00kmDWcHxjDYy5w=
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/signalfxexporter v0.87.0-fn.patch.1 h1:Q6vJ9i1ClRt8GYLarPgkydHxStFjhaI512e3QUTdOhw=
+github.com/fluxninja/opentelemetry-collector-contrib/exporter/signalfxexporter v0.87.0-fn.patch.1/go.mod h1:KJchjIznIY46k1HwEfJF7U3mqn0lw7B6ks57c0EUt5E=
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/splunkhecexporter v0.87.0-fn.patch.1 h1:I63A9RI69lbM6K/4yWdJRUx7wH8z8q08k+FtdFB1990=
+github.com/fluxninja/opentelemetry-collector-contrib/exporter/splunkhecexporter v0.87.0-fn.patch.1/go.mod h1:FTh+qV4tA7eUcft1oNZkzgXiTJFzu8NvBAtvcuJSiEU=
 github.com/fluxninja/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.87.0-fn.patch.1 h1:WsZBC8EGeZMI9YAXAYaVF4XbCgcC9hWbDPNn3jwARUY=
 github.com/fluxninja/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.87.0-fn.patch.1/go.mod h1:xPWViWgSZhXRGGeByF+awZSb0CwnTHyt9RGXYZ7AwPg=
 github.com/fluxninja/opentelemetry-collector-contrib/extension/healthcheckextension v0.87.0-fn.patch.1 h1:9v/n14VZsUHpKZx9fj09li9RJg/f184baGz4T8sB+yY=
@@ -515,6 +517,7 @@ github.com/fluxninja/opentelemetry-collector-contrib/extension/observer v0.87.0-
 github.com/fluxninja/opentelemetry-collector-contrib/extension/pprofextension v0.87.0-fn.patch.1 h1:HP0fkIFj0mc18Q8znGvj0PTeD6a7yh4+PJm/ADM1jRY=
 github.com/fluxninja/opentelemetry-collector-contrib/extension/pprofextension v0.87.0-fn.patch.1/go.mod h1:3u3RnNHu5kY6V1Y8wQNweIrsRtw7gGx8Fl51PHvgou8=
 github.com/fluxninja/opentelemetry-collector-contrib/extension/storage v0.87.0-fn.patch.1 h1:DWm+Nmmb7Wl74hAem+sXuGl4wqVba6QfpqPP04/J6Pk=
+github.com/fluxninja/opentelemetry-collector-contrib/extension/storage v0.87.0-fn.patch.1/go.mod h1:veiA+PB95jrqJpesawS8wU3yRPvZZGinHFFNYg+sGc0=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/aws/awsutil v0.87.0-fn.patch.1 h1:b0FNm1l9TxAAfrpusC9rVwjK5SGhCqbRUEOj1UZXQNc=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/aws/awsutil v0.87.0-fn.patch.1/go.mod h1:9WhCvAvzGyfj0FtoeieULAsFu2r5jPavJNkofqSJC3w=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/aws/containerinsight v0.87.0-fn.patch.1 h1:rnE6RJ/Qwoqz+DAu4WD54hZclLZsOJwQ/NIxvfaf5So=
@@ -542,6 +545,7 @@ github.com/fluxninja/opentelemetry-collector-contrib/internal/filter v0.87.0-fn.
 github.com/fluxninja/opentelemetry-collector-contrib/internal/k8sconfig v0.87.0-fn.patch.1 h1:pAYsKBWm1MYhudZ5JzREVtWNYI3FvBQwIg3t3dq8Gi4=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/k8sconfig v0.87.0-fn.patch.1/go.mod h1:/K1o7YNhLJ0WIoI0+pQFbhf/lqCX4FJC33J7uY0ey/U=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/k8stest v0.87.0-fn.patch.1 h1:HHsM5Hw6ZqVLjZOKHC96R/Yuu2dkg/ortfYmYros7fA=
+github.com/fluxninja/opentelemetry-collector-contrib/internal/k8stest v0.87.0-fn.patch.1/go.mod h1:ntSfqIeoGj0O+pXXyqDG9iTAw/PQg2JsO26EJ1GAKto=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/kafka v0.87.0-fn.patch.1 h1:Erxvg7NEbmCx+xjQ5ewLbHQ7B6YxibkSfL6KxUJxF70=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/kafka v0.87.0-fn.patch.1/go.mod h1:EAw9aBkrDIDWQvRBdJiDkaJmCqcgZpiZzYZEvOjg4uI=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/kubelet v0.87.0-fn.patch.1 h1:aOvXm8721irUmzw9JrFvZacQyvCuWHAdZP0BMRQNn24=
@@ -553,6 +557,7 @@ github.com/fluxninja/opentelemetry-collector-contrib/internal/sharedcomponent v0
 github.com/fluxninja/opentelemetry-collector-contrib/internal/splunk v0.87.0-fn.patch.1 h1:9BP5MBgyXG4obx7Q2DuBpQi0yT96fQm0LRzzvGId3bE=
 github.com/fluxninja/opentelemetry-collector-contrib/internal/splunk v0.87.0-fn.patch.1/go.mod h1:UzFeYKNUASQbotHqmgwyQaxWzNnxs+raNJlEfjm2dMQ=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.87.0-fn.patch.1 h1:faO8WPSTuNOaLRyoA2V22UXhPuPAOzFq58YXvFmBpA4=
+github.com/fluxninja/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.87.0-fn.patch.1/go.mod h1:rKGi5XluJau5mJNh1Mj4k1GafWnCdYobT9YJW/+zzbY=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/batchpersignal v0.87.0-fn.patch.1 h1:134gZdzFg0a3G5ziv25ITyAaxV9c3pH12reEtxfqCqw=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/batchpersignal v0.87.0-fn.patch.1/go.mod h1:trWrnucNKCkBEYpe5IBo+RgGQtzwMT454sGkWsggmDM=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/experimentalmetricmetadata v0.87.0-fn.patch.1 h1:NUreoflv+b5xEuzHx6Pc4He5j3zaZVctD/ntbTAM/fA=
@@ -560,6 +565,7 @@ github.com/fluxninja/opentelemetry-collector-contrib/pkg/experimentalmetricmetad
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/ottl v0.87.0-fn.patch.1 h1:0kyN/84VCEy0yRtB+YFE3DGej7SYTiyhnzCjJ3aIdW0=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/ottl v0.87.0-fn.patch.1/go.mod h1:LUeTOWKXKOCBZa5ERoIp9AprUgg2zXNBviZrcVLiKyE=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/pdatatest v0.87.0-fn.patch.1 h1:aKK2CYHoe4bUQ+uefeYPlLii/veqX37utHvAf2s0vKs=
+github.com/fluxninja/opentelemetry-collector-contrib/pkg/pdatatest v0.87.0-fn.patch.1/go.mod h1:Owuf6xbFFEc6EHNvsV61pIXik1jP5GA3nWj+M0nayBU=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/pdatautil v0.87.0-fn.patch.1 h1:Sfz0IpSo0SNHbaRC+lFfIJ+cMs6rRKHJrh19m5/qvJg=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/pdatautil v0.87.0-fn.patch.1/go.mod h1:IjdtiiTTNlAkspcNyAjHysWAZs5U48alWGUodTkkxhI=
 github.com/fluxninja/opentelemetry-collector-contrib/pkg/resourcetotelemetry v0.87.0-fn.patch.1 h1:850lFRBq+i7tyHV1YjkhoRCtCnNRPs7b3/16wlnRg/A=
@@ -1469,6 +1475,8 @@ github.com/open-policy-agent/opa v0.57.0 h1:DftxYfOEHOheXvO2Q6HCIM2ZVdKrvnF4cZlU
 github.com/open-policy-agent/opa v0.57.0/go.mod h1:3FY6GNSbUqOhjCdvTXCBJ2rNuh66p/XrIc2owr/hSwo=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0 h1:YccZy2FGXswLjcZrAJuz2v4kA+rmRpMFa6O5wm9SnXM=
 github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0/go.mod h1:xojeJD4/M8VAWSPzWYWAqCSpUifJZTOV1HeI4z9H/kg=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.87.0 h1:fDaRVDo9+2Gy863KFog9fvTmmZHu+3FkIYqNhPZ1iuY=
+github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.87.0/go.mod h1:tz3NA4jzjQ/gA21+V85OezinkhHCB20aJ0+TRFLKi4Y=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.0.2/go.mod h1:BtxoFyWECRxE4U/7sNtV5W15zMzWCbyJoFRP3s7yZA0=

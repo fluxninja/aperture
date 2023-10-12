@@ -59,7 +59,6 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.82.0
-	github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.82.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbyattrsprocessor v0.82.0
@@ -383,8 +382,11 @@ require (
 	github.com/nginxinc/nginx-prometheus-exporter v0.8.1-0.20201110005315-f5a5f8086c19 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/signalfxexporter v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/splunkhecexporter v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/observer v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/awsutil v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/containerinsight v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/ecsutil v0.87.0-fn.patch.1 // indirect
@@ -393,19 +395,21 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/proxy v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/xray v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/datadog v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/docker v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/filter v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8stest v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/kubelet v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/metadataproviders v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/splunk v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/experimentalmetricmetadata v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatautil v0.87.0-fn.patch.1 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.87.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatautil v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/opencensus v0.87.0-fn.patch.1 // indirect
@@ -604,7 +608,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcomponent v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/resourcetotelemetry v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/prometheusremotewrite v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.82.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/bigipreceiver v0.87.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc4 // indirect
 	github.com/opencontainers/runtime-spec v1.1.0-rc.3 // indirect
@@ -713,7 +717,6 @@ replace (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters => github.com/fluxninja/opentelemetry-collector-contrib/pkg/winperfcounters v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/attributesprocessor v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.87.0-fn.patch.1
-	github.com/open-telemetry/opentelemetry-collector-contrib/processor/datadogprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/datadogprocessor v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatorateprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/filterprocessor v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbyattrsprocessor => github.com/fluxninja/opentelemetry-collector-contrib/processor/groupbyattrsprocessor v0.87.0-fn.patch.1
