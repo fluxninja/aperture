@@ -9,13 +9,13 @@ import (
 )
 
 var (
-	Controller   utils.ControllerConn
+	controller   utils.ControllerConn
 	client       utils.PolicyClient
 	controllerNs string
 )
 
 func init() {
-	Controller.InitFlags(DynamicConfigCmd.PersistentFlags())
+	controller.InitFlags(DynamicConfigCmd.PersistentFlags())
 
 	DynamicConfigCmd.AddCommand(ApplyCmd)
 }
@@ -29,19 +29,19 @@ Use this command to manage the DynamicConfig of the Aperture Policies to the Con
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error
-		err = Controller.PreRunE(cmd, args)
+		err = controller.PreRunE(cmd, args)
 		if err != nil {
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
 
 		controllerNs = utils.GetControllerNs()
 
-		client, err = Controller.PolicyClient()
+		client, err = controller.PolicyClient()
 		if err != nil {
 			return fmt.Errorf("failed to get controller client: %w", err)
 		}
 
 		return nil
 	},
-	PersistentPostRun: Controller.PostRun,
+	PersistentPostRun: controller.PostRun,
 }

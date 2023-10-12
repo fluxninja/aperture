@@ -31,7 +31,7 @@ func init() {
 
 // ApplyCmd is the command to apply DynamicConfig to a Policy.
 var ApplyCmd = &cobra.Command{
-	Use:           "dynamic-config",
+	Use:           "apply",
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
@@ -56,9 +56,9 @@ var ApplyCmd = &cobra.Command{
 			return fmt.Errorf("failed to parse DynamicConfig YAML: %w", err)
 		}
 
-		if Controller.IsKube() {
+		if controller.IsKube() {
 			var kubeClient k8sclient.Client
-			kubeClient, err = k8sclient.New(Controller.GetKubeRestConfig(), k8sclient.Options{
+			kubeClient, err = k8sclient.New(controller.GetKubeRestConfig(), k8sclient.Options{
 				Scheme: scheme.Scheme,
 			})
 			if err != nil {
@@ -66,7 +66,7 @@ var ApplyCmd = &cobra.Command{
 			}
 
 			var deployment *appsv1.Deployment
-			deployment, err = utils.GetControllerDeployment(Controller.GetKubeRestConfig(), controllerNs)
+			deployment, err = utils.GetControllerDeployment(controller.GetKubeRestConfig(), controllerNs)
 			if err != nil {
 				return err
 			}
