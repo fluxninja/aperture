@@ -14,7 +14,7 @@ Aperture Policy related commands for the Cloud Controller
 
 ### Synopsis
 
-Use this command to apply the Aperture Policies to the Cloud Controller.
+Use this command to manage the Aperture Policies to the Cloud Controller.
 
 ### Options
 

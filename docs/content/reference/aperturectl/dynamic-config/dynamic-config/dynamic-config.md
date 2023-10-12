@@ -3,12 +3,12 @@ sidebar_label: Dynamic-Config
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_apply_dynamic-config
+  - aperturectl_dynamic-config_dynamic-config
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl apply dynamic-config
+## aperturectl dynamic-config dynamic-config
 
 Apply Aperture DynamicConfig to a Policy
 
@@ -17,13 +17,13 @@ Apply Aperture DynamicConfig to a Policy
 Use this command to apply the Aperture DynamicConfig to a Policy.
 
 ```
-aperturectl apply dynamic-config [flags]
+aperturectl dynamic-config dynamic-config [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml
+aperturectl dynamic-config apply --policy=rate-limiting --file=dynamic-config.yaml
 ```
 
 ### Options
@@ -47,4 +47,4 @@ aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.ya
 
 ### SEE ALSO
 
-- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies
+- [aperturectl dynamic-config](/reference/aperturectl/dynamic-config/dynamic-config.md) - DynamicConfig of Aperture Policy related commands for the Controller

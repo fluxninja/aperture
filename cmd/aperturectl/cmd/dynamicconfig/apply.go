@@ -1,4 +1,4 @@
-package apply
+package dynamicconfig
 
 import (
 	"context"
@@ -25,17 +25,17 @@ var (
 )
 
 func init() {
-	ApplyDynamicConfigCmd.Flags().StringVar(&policyName, "policy", "", "Name of the Policy to apply the DynamicConfig to")
-	ApplyDynamicConfigCmd.Flags().StringVar(&dynamicConfigFile, "file", "", "Path to the dynamic config file")
+	ApplyCmd.Flags().StringVar(&policyName, "policy", "", "Name of the Policy to apply the DynamicConfig to")
+	ApplyCmd.Flags().StringVar(&dynamicConfigFile, "file", "", "Path to the dynamic config file")
 }
 
-// ApplyDynamicConfigCmd is the command to apply DynamicConfig to a Policy.
-var ApplyDynamicConfigCmd = &cobra.Command{
+// ApplyCmd is the command to apply DynamicConfig to a Policy.
+var ApplyCmd = &cobra.Command{
 	Use:           "dynamic-config",
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
-	Example:       `aperturectl apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml`,
+	Example:       `aperturectl dynamic-config apply --policy=rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(_ *cobra.Command, _ []string) error {
 		var err error
 		dynamicConfigBytes, err = utils.GetDynamicConfigBytes(policyName, dynamicConfigFile)

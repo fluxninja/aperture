@@ -12,15 +12,15 @@ import (
 )
 
 var (
-	policy  string
-	cr      string
-	dot     string
-	mermaid string
-	depth   int
+	policyStr string
+	cr        string
+	dot       string
+	mermaid   string
+	depth     int
 )
 
 func init() {
-	compileCmd.Flags().StringVar(&policy, "policy", "", "Path to Aperture Policy file")
+	compileCmd.Flags().StringVar(&policyStr, "policy", "", "Path to Aperture Policy file")
 	compileCmd.Flags().StringVar(&cr, "cr", "", "Path to Aperture Policy custom resource file")
 	compileCmd.Flags().StringVar(&dot, "dot", "", "Path to store the dot file")
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "Path to store the mermaid file")
@@ -40,7 +40,7 @@ You can also generate the DOT and Mermaid graphs of the compiled Aperture Policy
 aperturectl compile --policy=policy.yaml --mermaid --dot`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		// check if policy or cr is provided
-		if policy == "" && cr == "" || policy != "" && cr != "" {
+		if policyStr == "" && cr == "" || policyStr != "" && cr != "" {
 			errStr := "either --policy or --cr must be provided"
 			return errors.New(errStr)
 		}
@@ -56,7 +56,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 			}
 			defer os.Remove(policyFile)
 		} else {
-			policyFile = policy
+			policyFile = policyStr
 		}
 		policyBytes, err := os.ReadFile(policyFile)
 		if err != nil {

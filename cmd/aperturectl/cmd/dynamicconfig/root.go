@@ -1,4 +1,4 @@
-package apply
+package dynamicconfig
 
 import (
 	"fmt"
@@ -9,25 +9,23 @@ import (
 )
 
 var (
-	// Controller is the controller connection object.
-	Controller utils.ControllerConn
-
+	Controller   utils.ControllerConn
 	client       utils.PolicyClient
 	controllerNs string
 )
 
 func init() {
-	Controller.InitFlags(ApplyCmd.PersistentFlags())
+	Controller.InitFlags(DynamicConfigCmd.PersistentFlags())
 
-	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
+	DynamicConfigCmd.AddCommand(ApplyCmd)
 }
 
-// ApplyCmd is the command to apply a policy to the cluster.
-var ApplyCmd = &cobra.Command{
-	Use:   "apply",
-	Short: "Apply Aperture Policies",
+// DynamicConfigCmd is the command to manage DynamicCOnfig of Policies in the Controller.
+var DynamicConfigCmd = &cobra.Command{
+	Use:   "dynamic-config",
+	Short: "DynamicConfig of Aperture Policy related commands for the Controller",
 	Long: `
-Use this command to apply the Aperture Policies.`,
+Use this command to manage the DynamicConfig of the Aperture Policies to the Controller.`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var err error

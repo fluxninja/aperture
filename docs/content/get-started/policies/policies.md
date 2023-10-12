@@ -230,7 +230,7 @@ Run the following command to delete the above policy:
 ```
 
 ```bash
-aperturectl delete policy --policy=rate-limiting
+aperturectl policy delete --policy=rate-limiting
 ```
 
 ```mdx-code-block

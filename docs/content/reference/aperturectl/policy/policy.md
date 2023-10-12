@@ -1,27 +1,27 @@
 ---
-sidebar_label: Apply
+sidebar_label: Policy
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_apply
+  - aperturectl_policy
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl apply
+## aperturectl policy
 
-Apply Aperture Policies
+Aperture Policy related commands for the Controller
 
 ### Synopsis
 
-Use this command to apply the Aperture Policies.
+Use this command to manage the Aperture Policies to the Controller.
 
 ### Options
 
 ```
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
-  -h, --help                   help for apply
+  -h, --help                   help for policy
       --insecure               Allow connection to controller running without TLS
       --kube                   Find controller in Kubernetes cluster, instead of connecting directly
       --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
@@ -31,4 +31,7 @@ Use this command to apply the Aperture Policies.
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
-- [aperturectl apply dynamic-config](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl policy delete](/reference/aperturectl/policy/delete/delete.md) - Delete Aperture Policy from the Aperture Controller
+- [aperturectl policy get](/reference/aperturectl/policy/get/get.md) - Get Aperture Policy from the Aperture Controller
+- [aperturectl policy list](/reference/aperturectl/policy/list/list.md) - List all Aperture Policies from the Aperture Controller
+- [aperturectl policy policy](/reference/aperturectl/policy/policy/policy.md) - Apply Aperture Policy to the cluster

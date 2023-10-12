@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	Controller utils.ControllerConn
-	client     utils.PolicyClient
+	Controller   utils.ControllerConn
+	client       utils.PolicyClient
+	controllerNs string
 )
 
 func init() {
@@ -27,13 +28,16 @@ var PolicyCmd = &cobra.Command{
 	Use:   "policy",
 	Short: "Aperture Policy related commands for the Controller",
 	Long: `
-Use this command to apply the Aperture Policies to the Controller.`,
+Use this command to manage the Aperture Policies to the Controller.`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		err := Controller.PreRunE(cmd, args)
+		var err error
+		err = Controller.PreRunE(cmd, args)
 		if err != nil {
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
+
+		controllerNs = utils.GetControllerNs()
 
 		client, err = Controller.PolicyClient()
 		if err != nil {

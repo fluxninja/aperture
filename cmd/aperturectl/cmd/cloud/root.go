@@ -25,7 +25,6 @@ func init() {
 	CloudCmd.AddCommand(decisions.DecisionsCmd)
 	CloudCmd.AddCommand(agentsCmd)
 	CloudCmd.AddCommand(status.StatusCmd)
-	CloudCmd.AddCommand(policiesCmd)
 	CloudCmd.AddCommand(flowcontrol.FlowControlCmd)
 	CloudCmd.AddCommand(discovery.DiscoveryCmd)
 	CloudCmd.AddCommand(blueprints.BlueprintsCmd)

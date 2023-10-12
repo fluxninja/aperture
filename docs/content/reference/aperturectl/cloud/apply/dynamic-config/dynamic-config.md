@@ -20,12 +20,6 @@ Use this command to apply the Aperture DynamicConfig to a Policy.
 aperturectl cloud apply dynamic-config [flags]
 ```
 
-### Examples
-
-```
-aperturectl cloud apply dynamic-config --policy=rate-limiting --file=dynamic-config.yaml
-```
-
 ### Options
 
 ```

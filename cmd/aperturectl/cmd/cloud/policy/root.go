@@ -29,7 +29,7 @@ var PolicyCmd = &cobra.Command{
 	Use:   "policy",
 	Short: "Aperture Policy related commands for the Cloud Controller",
 	Long: `
-Use this command to apply the Aperture Policies to the Cloud Controller.`,
+Use this command to manage the Aperture Policies to the Cloud Controller.`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		err := Controller.PreRunE(cmd, args)

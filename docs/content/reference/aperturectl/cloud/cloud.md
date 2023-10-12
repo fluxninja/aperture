@@ -32,6 +32,5 @@ Use this command to talk to the Cloud Controller.
 - [aperturectl cloud decisions](/reference/aperturectl/cloud/decisions/decisions.md) - Get Aperture Decisions
 - [aperturectl cloud discovery](/reference/aperturectl/cloud/discovery/discovery.md) - Discovery integrations
 - [aperturectl cloud flow-control](/reference/aperturectl/cloud/flow-control/flow-control.md) - Flow Control integrations
-- [aperturectl cloud policies](/reference/aperturectl/cloud/policies/policies.md) - List applied policies
 - [aperturectl cloud policy](/reference/aperturectl/cloud/policy/policy.md) - Aperture Policy related commands for the Cloud Controller
 - [aperturectl cloud status](/reference/aperturectl/cloud/status/status.md) - Get Jobs status
