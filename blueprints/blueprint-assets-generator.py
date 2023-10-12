@@ -698,7 +698,7 @@ def update_docs_markdown(
     if len(dynamic_config_parameters.nested_parameters.children) > 0:
         readme_copied += "\n\n## Dynamic Configuration\n\n"
         readme_copied += "\n\n:::note\n\n"
-        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n\n"
+        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.\n\n"
         readme_copied += ":::\n\n"
         rendered = template.render(
             {"nested_parameters": dynamic_config_parameters.nested_parameters}
