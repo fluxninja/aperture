@@ -1,5 +1,8 @@
 version: 2.1
 
+# this allows to use CircleCI's dynamic configuration feature
+setup: true
+
 orbs:
   path-filtering: circleci/path-filtering@0.1.3
   continuation: circleci/continuation@0.3.1
