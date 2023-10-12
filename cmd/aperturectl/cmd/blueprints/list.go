@@ -29,7 +29,7 @@ aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion)
+		blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}

@@ -91,7 +91,7 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 		}
 
 		for _, vFile := range valuesFiles {
-			_, err := Generate(vFile, overrideBlueprintsURI, overrideBlueprintsVersion, updatedOutputDir)
+			_, err := Generate(vFile, overrideBlueprintsURI, overrideBlueprintsVersion, updatedOutputDir, true)
 			if err != nil {
 				return err
 			}
@@ -123,7 +123,7 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 }
 
 // Generate generates Aperture Policy related resources from Aperture Blueprint.
-func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprintsVersion string, outputDir string) (map[string]any, error) {
+func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprintsVersion string, outputDir string, localAllowed bool) (map[string]any, error) {
 	_, err := os.Stat(valuesFile)
 	if err != nil {
 		log.Info().Msgf("Error reading values file: %s", err.Error())
@@ -173,7 +173,7 @@ func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprint
 	}
 
 	// pull
-	_, blueprintsURIRoot, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion)
+	_, blueprintsURIRoot, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, localAllowed)
 	if err != nil {
 		return nil, err
 	}

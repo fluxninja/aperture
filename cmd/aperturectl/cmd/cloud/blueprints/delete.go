@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	BlueprintsDeleteCmd.Flags().StringVar(&name, "name", "", "Name of blueprint to get")
+	BlueprintsDeleteCmd.Flags().StringVar(&name, "policy-name", "", "Delete Blueprint by Policy Name")
 }
 
 // BlueprintsDeleteCmd is the command to delete a blueprint from the Cloud Controller.
@@ -21,7 +21,7 @@ var BlueprintsDeleteCmd = &cobra.Command{
 	SilenceErrors: true,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if name == "" {
-			return fmt.Errorf("--name is required")
+			return fmt.Errorf("--policy-name is required")
 		}
 		return nil
 	},

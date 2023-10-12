@@ -29,7 +29,7 @@ var pullCmd = &cobra.Command{
 
 aperturectl blueprints pull --version latest`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_, _, _, err := pull(blueprintsURI, blueprintsVersion)
+		_, _, _, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ aperturectl blueprints pull --version latest`,
 }
 
 // Pull pulls the blueprints from the given URI and version.
-func pull(blueprintsURI string, blueprintsVersion string) (string, string, string, error) {
+func pull(blueprintsURI string, blueprintsVersion string, localAllowed bool) (string, string, string, error) {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", "", "", err
@@ -65,6 +65,9 @@ func pull(blueprintsURI string, blueprintsVersion string) (string, string, strin
 		// uri can be a file or url
 		// first detect if it's a local path
 		if _, err = os.Stat(blueprintsURI); err == nil {
+			if !localAllowed {
+				return blueprintsCacheRoot, "", "", errors.New("local paths are not allowed as blueprints URI")
+			}
 			// path exists
 			blueprintsURI, err = filepath.Abs(blueprintsURI)
 			if err != nil {

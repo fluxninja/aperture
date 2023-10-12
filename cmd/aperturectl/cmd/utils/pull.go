@@ -24,7 +24,7 @@ const (
 func PullSource(dir, uri string) error {
 	d := deps.Parse("", uri)
 	if d == nil {
-		return errors.New("unable to parse URI1: " + uri)
+		return errors.New("unable to parse URI: " + uri)
 	}
 
 	// read d and based on source write uri to uriFilename

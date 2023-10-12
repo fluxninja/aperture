@@ -54,7 +54,7 @@ Provides a values file for a given Aperture Blueprint that can be then used to g
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion)
+		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}

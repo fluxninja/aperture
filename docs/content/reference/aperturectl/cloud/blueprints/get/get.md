@@ -23,8 +23,8 @@ aperturectl cloud blueprints get [flags]
 ### Options
 
 ```
-  -h, --help          help for get
-      --name string   Name of blueprint to get
+  -h, --help                 help for get
+      --policy-name string   Get Blueprint by Policy Name
 ```
 
 ### Options inherited from parent commands

@@ -24,7 +24,7 @@ var BlueprintsListCmd = &cobra.Command{
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 		for _, blueprint := range listResponse.GetBlueprints() {
-			fmt.Fprintf(w, "%s\n", blueprint.GetBlueprintsName())
+			fmt.Fprintf(w, "%s\n", blueprint.GetPolicyName())
 		}
 
 		w.Flush()

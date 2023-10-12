@@ -26,7 +26,7 @@ aperturectl blueprints remove --all`,
 // RemoveRunE is the RunE function executed by the remove command.
 func RemoveRunE(cmd *cobra.Command, args []string) error {
 	skipPull = true
-	blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion)
+	blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
 	if err != nil {
 		return err
 	}

@@ -23,8 +23,8 @@ aperturectl cloud blueprints delete [flags]
 ### Options
 
 ```
-  -h, --help          help for delete
-      --name string   Name of blueprint to get
+  -h, --help                 help for delete
+      --policy-name string   Delete Blueprint by Policy Name
 ```
 
 ### Options inherited from parent commands

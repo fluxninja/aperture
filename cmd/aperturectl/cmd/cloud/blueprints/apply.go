@@ -29,7 +29,7 @@ var BlueprintsApplyCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		valuesMap, err := blueprints.Generate(valuesFile, "", "", "")
+		valuesMap, err := blueprints.Generate(valuesFile, "", "", "", false)
 		if err != nil {
 			return err
 		}

@@ -31,7 +31,7 @@ Provides a dynamic values file for a given Aperture Blueprint that can be then u
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion)
+		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}
