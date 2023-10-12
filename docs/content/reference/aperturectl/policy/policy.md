@@ -31,7 +31,7 @@ Use this command to manage the Aperture Policies to the Controller.
 ### SEE ALSO
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
+- [aperturectl policy apply](/reference/aperturectl/policy/apply/apply.md) - Apply Aperture Policy to the cluster
 - [aperturectl policy delete](/reference/aperturectl/policy/delete/delete.md) - Delete Aperture Policy from the Aperture Controller
 - [aperturectl policy get](/reference/aperturectl/policy/get/get.md) - Get Aperture Policy from the Aperture Controller
 - [aperturectl policy list](/reference/aperturectl/policy/list/list.md) - List all Aperture Policies from the Aperture Controller
-- [aperturectl policy policy](/reference/aperturectl/policy/policy/policy.md) - Apply Aperture Policy to the cluster

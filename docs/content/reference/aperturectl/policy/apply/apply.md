@@ -1,14 +1,14 @@
 ---
-sidebar_label: Policy
+sidebar_label: Apply
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_policy_policy
+  - aperturectl_policy_apply
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl policy policy
+## aperturectl policy apply
 
 Apply Aperture Policy to the cluster
 
@@ -17,13 +17,13 @@ Apply Aperture Policy to the cluster
 Use this command to apply the Aperture Policy to the cluster.
 
 ```
-aperturectl policy policy [flags]
+aperturectl policy apply [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl apply policy --file=policies/rate-limiting.yaml
+aperturectl policy apply --file=policies/rate-limiting.yaml
 
 aperturectl apply policy --dir=policies
 ```
@@ -34,7 +34,7 @@ aperturectl apply policy --dir=policies
       --dir string    Path to directory containing Aperture Policy files
       --file string   Path to Aperture Policy file
   -f, --force         Force apply policy even if it already exists
-  -h, --help          help for policy
+  -h, --help          help for apply
   -s, --select-all    Apply all policies in the directory
 ```
 
