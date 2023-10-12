@@ -1,4 +1,4 @@
-package apply
+package policy
 
 import (
 	"fmt"
@@ -9,34 +9,31 @@ import (
 )
 
 var (
-	// Controller is the controller connection object.
 	Controller utils.ControllerConn
-
-	client       utils.PolicyClient
-	controllerNs string
+	client     utils.PolicyClient
 )
 
 func init() {
-	Controller.InitFlags(ApplyCmd.PersistentFlags())
+	Controller.InitFlags(PolicyCmd.PersistentFlags())
 
-	ApplyCmd.AddCommand(ApplyDynamicConfigCmd)
+	PolicyCmd.AddCommand(ApplyCmd)
+	PolicyCmd.AddCommand(GetCmd)
+	PolicyCmd.AddCommand(ListCmd)
+	PolicyCmd.AddCommand(DeleteCmd)
 }
 
-// ApplyCmd is the command to apply a policy to the cluster.
-var ApplyCmd = &cobra.Command{
-	Use:   "apply",
-	Short: "Apply Aperture Policies",
+// PolicyCmd is the command to apply a policy to the Controller.
+var PolicyCmd = &cobra.Command{
+	Use:   "policy",
+	Short: "Aperture Policy related commands for the Controller",
 	Long: `
-Use this command to apply the Aperture Policies.`,
+Use this command to apply the Aperture Policies to the Controller.`,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		var err error
-		err = Controller.PreRunE(cmd, args)
+		err := Controller.PreRunE(cmd, args)
 		if err != nil {
 			return fmt.Errorf("failed to run controller pre-run: %w", err)
 		}
-
-		controllerNs = utils.GetControllerNs()
 
 		client, err = Controller.PolicyClient()
 		if err != nil {

@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -98,18 +98,18 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 		}
 
 		if applyPolicies {
-			apply.Controller = controllerConn
-			err := apply.ApplyPolicyCmd.Flag("dir").Value.Set(updatedOutputDir)
+			policy.Controller = controllerConn
+			err := policy.ApplyCmd.Flag("dir").Value.Set(updatedOutputDir)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyCmd.PersistentPreRunE(cmd, args)
+			err = policy.ApplyCmd.PersistentPreRunE(cmd, args)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyPolicyCmd.RunE(cmd, args)
+			err = policy.ApplyCmd.RunE(cmd, args)
 			if err != nil {
 				return err
 			}

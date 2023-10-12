@@ -13,7 +13,6 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
@@ -43,7 +42,6 @@ func init() {
 	RootCmd.AddCommand(discovery.DiscoveryCmd)
 	RootCmd.AddCommand(build.BuildCmd)
 	RootCmd.AddCommand(agentsCmd)
-	RootCmd.AddCommand(delete.DeleteCmd)
 	RootCmd.AddCommand(decisions.DecisionsCmd)
 	RootCmd.AddCommand(policiesCmd)
 	RootCmd.AddCommand(status.StatusCmd)

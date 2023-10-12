@@ -177,7 +177,7 @@ If the Aperture Controller is deployed on
 you can apply the policy using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.
@@ -196,7 +196,7 @@ If the Aperture Controller is deployed on
 policy using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.

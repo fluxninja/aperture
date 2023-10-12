@@ -43,7 +43,6 @@ aperturectl is a CLI tool to interact with Aperture.
 - [aperturectl compile](/reference/aperturectl/compile/compile.md) - Compile circuit from Aperture Policy file
 - [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell
 - [aperturectl decisions](/reference/aperturectl/decisions/decisions.md) - Get Aperture Decisions
-- [aperturectl delete](/reference/aperturectl/delete/delete.md) - Delete Aperture Policies
 - [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) - Discovery integrations
 - [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) - Flow Control integrations
 - [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components
