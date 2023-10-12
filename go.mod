@@ -807,14 +807,20 @@ replace (
 	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/confmap => github.com/fluxninja/opentelemetry-collector/confmap v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector/connector => github.com/fluxninja/opentelemetry-collector/connector v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/consumer => github.com/fluxninja/opentelemetry-collector/consumer v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector/exporter => github.com/fluxninja/opentelemetry-collector/exporter v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/exporter/loggingexporter => github.com/fluxninja/opentelemetry-collector/exporter/loggingexporter v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/exporter/otlpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlpexporter v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/exporter/otlphttpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlphttpexporter v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector/extension => github.com/fluxninja/opentelemetry-collector/extension v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/extension/ballastextension => github.com/fluxninja/opentelemetry-collector/extension/ballastextension v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/extension/zpagesextension => github.com/fluxninja/opentelemetry-collector/extension/zpagesextension v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector/otelcol => github.com/fluxninja/opentelemetry-collector/otelcol v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v1.0.0-rcv0014-fn.patch.1
+	go.opentelemetry.io/collector/processor => github.com/fluxninja/opentelemetry-collector/processor v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/processor/batchprocessor => github.com/fluxninja/opentelemetry-collector/processor/batchprocessor v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/processor/memorylimiterprocessor => github.com/fluxninja/opentelemetry-collector/processor/memorylimiterprocessor v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector/receiver => github.com/fluxninja/opentelemetry-collector/receiver v0.87.0-fn.patch.1
 	go.opentelemetry.io/collector/receiver/otlpreceiver => github.com/fluxninja/opentelemetry-collector/receiver/otlpreceiver v0.87.0-fn.patch.1
 )
