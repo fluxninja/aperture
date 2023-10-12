@@ -3,6 +3,8 @@ package blueprints
 import (
 	"context"
 	"fmt"
+	"os"
+	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -20,9 +22,12 @@ var BlueprintsListCmd = &cobra.Command{
 			return err
 		}
 
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 		for _, blueprint := range listResponse.GetBlueprints() {
-			fmt.Println(string(blueprint.GetValues()))
+			fmt.Fprintf(w, "%s\n", blueprint.GetBlueprintsName())
 		}
+
+		w.Flush()
 
 		return nil
 	},

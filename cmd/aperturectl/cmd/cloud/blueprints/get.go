@@ -33,7 +33,10 @@ var BlueprintsGetCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(string(getResponse.GetBlueprint().GetValues()))
+		fmt.Printf("Name: %s\n", getResponse.GetBlueprint().GetBlueprintsName())
+		fmt.Printf("Version: %s\n", getResponse.GetBlueprint().GetVersion())
+		fmt.Printf("Policy Name: %s\n", getResponse.GetBlueprint().GetPolicyName())
+		fmt.Printf("Values: \n%s\n", getResponse.GetBlueprint().GetValues())
 
 		return nil
 	},
