@@ -23,7 +23,7 @@ aperturectl cloud policy list [flags]
 ### Examples
 
 ```
-aperturectl cloud policy list --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+aperturectl cloud policy list
 ```
 
 ### Options

@@ -20,6 +20,12 @@ Apply cloud blueprint.
 aperturectl cloud blueprints apply [flags]
 ```
 
+### Examples
+
+```
+aperturectl cloud blueprints apply --value-file=values.yaml
+```
+
 ### Options
 
 ```

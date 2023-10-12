@@ -23,7 +23,7 @@ aperturectl cloud policy delete POLICY_NAME [flags]
 ### Examples
 
 ```
-aperturectl cloud policy delete --policy=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy delete --policy=rate-limiting
 ```
 
 ### Options

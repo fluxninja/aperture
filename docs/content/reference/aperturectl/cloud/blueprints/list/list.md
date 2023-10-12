@@ -20,6 +20,12 @@ List cloud blueprints.
 aperturectl cloud blueprints list [flags]
 ```
 
+### Examples
+
+```
+aperturectl cloud blueprints list --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+```
+
 ### Options
 
 ```

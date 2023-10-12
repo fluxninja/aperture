@@ -19,6 +19,7 @@ var BlueprintsDeleteCmd = &cobra.Command{
 	Short:         "Cloud Blueprints Delete",
 	Long:          `Delete cloud blueprint.`,
 	SilenceErrors: true,
+	Example:       `aperturectl cloud blueprints delete --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if name == "" {
 			return fmt.Errorf("--policy-name is required")

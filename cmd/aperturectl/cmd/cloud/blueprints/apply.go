@@ -22,6 +22,7 @@ var BlueprintsApplyCmd = &cobra.Command{
 	Short:         "Cloud Blueprints Apply",
 	Long:          `Apply cloud blueprint.`,
 	SilenceErrors: true,
+	Example:       `aperturectl cloud blueprints apply --value-file=values.yaml`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if valuesFile == "" {
 			return fmt.Errorf("--values-file is required")

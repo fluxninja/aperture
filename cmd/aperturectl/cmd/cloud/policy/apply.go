@@ -30,9 +30,9 @@ var ApplyCmd = &cobra.Command{
 	Short:         "Apply Aperture Policy to the Aperture Cloud Controller",
 	Long:          `Use this command to apply the Aperture Policy to the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example: `aperturectl cloud policy apply --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+	Example: `aperturectl cloud policy apply --file=policies/rate-limiting.yaml
 
-aperturectl cloud policy apply --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY`,
+aperturectl cloud policy apply --dir=policies`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		if file != "" {
 			return applyPolicy(file)

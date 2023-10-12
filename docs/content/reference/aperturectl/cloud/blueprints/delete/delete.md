@@ -20,6 +20,12 @@ Delete cloud blueprint.
 aperturectl cloud blueprints delete [flags]
 ```
 
+### Examples
+
+```
+aperturectl cloud blueprints delete --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+```
+
 ### Options
 
 ```

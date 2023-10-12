@@ -15,7 +15,7 @@ var ListCmd = &cobra.Command{
 	Short:         "List all Aperture Policies from the Aperture Cloud Controller",
 	Long:          `Use this command to list all the Aperture Policies from the Aperture Cloud Controller.`,
 	SilenceErrors: true,
-	Example:       `aperturectl cloud policy list --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME`,
+	Example:       `aperturectl cloud policy list`,
 	RunE: func(_ *cobra.Command, args []string) error {
 		policies, err := client.ListPolicies(context.Background(), new(emptypb.Empty))
 		if err != nil {

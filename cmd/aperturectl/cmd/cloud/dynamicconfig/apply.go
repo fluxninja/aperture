@@ -1,4 +1,4 @@
-package apply
+package dynamicconfig
 
 import (
 	"fmt"
@@ -15,32 +15,26 @@ var (
 	policyName         string
 	dynamicConfigFile  string
 	dynamicConfigBytes []byte
-
-	dynamicClient utils.PolicyClient
 )
 
 func init() {
-	ApplyDynamicConfigCmd.Flags().StringVar(&policyName, "policy", "", "Name of the Policy to apply the DynamicConfig to")
-	ApplyDynamicConfigCmd.Flags().StringVar(&dynamicConfigFile, "file", "", "Path to the dynamic config file")
+	ApplyCmd.Flags().StringVar(&policyName, "policy", "", "Name of the Policy to apply the DynamicConfig to")
+	ApplyCmd.Flags().StringVar(&dynamicConfigFile, "file", "", "Path to the dynamic config file")
 }
 
-// ApplyDynamicConfigCmd is the command to apply DynamicConfig to a Policy.
-var ApplyDynamicConfigCmd = &cobra.Command{
+// ApplyCmd is the command to apply DynamicConfig to a Policy.
+var ApplyCmd = &cobra.Command{
 	Use:           "dynamic-config",
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,
+	Example:       `aperturectl cloud dynamic-config apply --policy=rate-limiting --file=dynamic-config.yaml`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		// read the dynamic config file
 		var err error
 		dynamicConfigBytes, err = utils.GetDynamicConfigBytes(policyName, dynamicConfigFile)
 		if err != nil {
 			return err
-		}
-
-		dynamicClient, err = Controller.PolicyClient()
-		if err != nil {
-			return fmt.Errorf("failed to get cloud controller client: %w", err)
 		}
 
 		return nil
@@ -52,7 +46,7 @@ var ApplyDynamicConfigCmd = &cobra.Command{
 			return fmt.Errorf("failed to parse DynamicConfig YAML: %w", err)
 		}
 
-		err = utils.ApplyDynamicConfigUsingAPI(dynamicClient, dynamicConfigYAML, policyName)
+		err = utils.ApplyDynamicConfigUsingAPI(client, dynamicConfigYAML, policyName)
 		if err != nil {
 			return err
 		}

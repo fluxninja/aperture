@@ -20,6 +20,12 @@ Get cloud blueprint.
 aperturectl cloud blueprints get [flags]
 ```
 
+### Examples
+
+```
+aperturectl cloud blueprints get --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+```
+
 ### Options
 
 ```

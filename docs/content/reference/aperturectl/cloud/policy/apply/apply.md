@@ -23,9 +23,9 @@ aperturectl cloud policy apply [flags]
 ### Examples
 
 ```
-aperturectl cloud policy apply --file=policies/rate-limiting.yaml --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy apply --file=policies/rate-limiting.yaml
 
-aperturectl cloud policy apply --dir=policies --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY
+aperturectl cloud policy apply --dir=policies
 ```
 
 ### Options

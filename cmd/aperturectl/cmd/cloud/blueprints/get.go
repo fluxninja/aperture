@@ -21,6 +21,7 @@ var BlueprintsGetCmd = &cobra.Command{
 	Short:         "Cloud Blueprints Get",
 	Long:          `Get cloud blueprint.`,
 	SilenceErrors: true,
+	Example:       `aperturectl cloud blueprints get --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if name == "" {
 			return fmt.Errorf("--policy-name is required")
