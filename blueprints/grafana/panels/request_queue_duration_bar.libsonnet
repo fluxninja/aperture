@@ -9,7 +9,8 @@ function(cfg) {
                                          'topk(10, (sum by(workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__range])) ) / ((sum by(workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__range])) )) != 0)',
                                          stringFilters,
                                          instantQuery=true,
-                                         range=false),
+                                         range=false,
+                                         unit=null),
 
   panel: requestsDuration.panel,
 }
