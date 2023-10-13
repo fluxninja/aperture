@@ -226,20 +226,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.1.0 // indirect
 	github.com/Azure/go-amqp v1.0.2 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.0.0 // indirect
-	github.com/DataDog/datadog-agent/pkg/obfuscate v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/proto v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/trace v0.48.0-devel // indirect
-	github.com/DataDog/datadog-agent/pkg/util/cgroups v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/util/log v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/util/pointer v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-agent/pkg/util/scrubber v0.48.0-beta.1 // indirect
-	github.com/DataDog/datadog-go/v5 v5.1.1 // indirect
-	github.com/DataDog/go-tuf v1.0.1-0.5.2 // indirect
-	github.com/DataDog/opentelemetry-mapping-go/pkg/otlp/attributes v0.8.0 // indirect
-	github.com/DataDog/opentelemetry-mapping-go/pkg/otlp/metrics v0.8.0 // indirect
-	github.com/DataDog/opentelemetry-mapping-go/pkg/quantile v0.8.0 // indirect
-	github.com/DataDog/sketches-go v1.4.3 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.20.0 // indirect
 	github.com/IBM/sarama v1.41.2 // indirect
@@ -279,7 +265,6 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/checkpoint-restore/go-criu/v5 v5.3.0 // indirect
-	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 // indirect
 	github.com/cilium/ebpf v0.9.1 // indirect
 	github.com/cloudfoundry-incubator/uaago v0.0.0-20190307164349-8136b7bbe76e // indirect
 	github.com/cncf/udpa/go v0.0.0-20220112060539-c52dc94e7fbe // indirect
@@ -291,7 +276,6 @@ require (
 	github.com/denisenkom/go-mssqldb v0.12.2 // indirect
 	github.com/devigned/tab v0.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect
 	github.com/eapache/go-resiliency v1.4.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
@@ -382,11 +366,8 @@ require (
 	github.com/nginxinc/nginx-prometheus-exporter v0.8.1-0.20201110005315-f5a5f8086c19 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/signalfxexporter v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/splunkhecexporter v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/observer v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/awsutil v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/containerinsight v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/ecsutil v0.87.0-fn.patch.1 // indirect
@@ -399,16 +380,13 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/docker v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/filter v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8stest v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/kubelet v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/metadataproviders v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/splunk v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/experimentalmetricmetadata v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/ottl v0.87.0-fn.patch.1 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatatest v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatautil v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.87.0-fn.patch.1 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger v0.87.0-fn.patch.1 // indirect
@@ -423,9 +401,7 @@ require (
 	github.com/openshift/client-go v0.0.0-20230120202327-72f107311084 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/openzipkin/zipkin-go v0.4.2 // indirect
-	github.com/outcaste-io/ristretto v0.2.1 // indirect
 	github.com/ovh/go-ovh v1.4.1 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
@@ -435,7 +411,6 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/seccomp/libseccomp-golang v0.9.2-0.20220502022130-f33da4d89646 // indirect
-	github.com/secure-systems-lab/go-securesystemslib v0.7.0 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/signalfx/com_signalfx_metrics_protobuf v0.0.3 // indirect
@@ -498,6 +473,7 @@ require (
 	google.golang.org/grpc/examples v0.0.0-20211119005141-f45e61797429 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gotest.tools/v3 v3.4.0 // indirect
 	k8s.io/apiextensions-apiserver v0.27.2 // indirect
 	k8s.io/component-base v0.28.2 // indirect
 	k8s.io/klog v1.0.0 // indirect
@@ -807,23 +783,23 @@ replace (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowsperfcountersreceiver => github.com/fluxninja/opentelemetry-collector-contrib/receiver/windowsperfcountersreceiver v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver => github.com/fluxninja/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.87.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver => github.com/fluxninja/opentelemetry-collector-contrib/receiver/zookeeperreceiver v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/confmap => github.com/fluxninja/opentelemetry-collector/confmap v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/connector => github.com/fluxninja/opentelemetry-collector/connector v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/consumer => github.com/fluxninja/opentelemetry-collector/consumer v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/exporter => github.com/fluxninja/opentelemetry-collector/exporter v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/exporter/loggingexporter => github.com/fluxninja/opentelemetry-collector/exporter/loggingexporter v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/exporter/otlpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlpexporter v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/exporter/otlphttpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlphttpexporter v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/extension => github.com/fluxninja/opentelemetry-collector/extension v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/extension/ballastextension => github.com/fluxninja/opentelemetry-collector/extension/ballastextension v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/extension/zpagesextension => github.com/fluxninja/opentelemetry-collector/extension/zpagesextension v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/otelcol => github.com/fluxninja/opentelemetry-collector/otelcol v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v1.0.0-rcv0014-fn.patch.1
-	go.opentelemetry.io/collector/processor => github.com/fluxninja/opentelemetry-collector/processor v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/processor/batchprocessor => github.com/fluxninja/opentelemetry-collector/processor/batchprocessor v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/processor/memorylimiterprocessor => github.com/fluxninja/opentelemetry-collector/processor/memorylimiterprocessor v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/receiver => github.com/fluxninja/opentelemetry-collector/receiver v0.87.0-fn.patch.1
-	go.opentelemetry.io/collector/receiver/otlpreceiver => github.com/fluxninja/opentelemetry-collector/receiver/otlpreceiver v0.87.0-fn.patch.1
+	go.opentelemetry.io/collector => github.com/fluxninja/opentelemetry-collector v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/component => github.com/fluxninja/opentelemetry-collector/component v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/confmap => github.com/fluxninja/opentelemetry-collector/confmap v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/connector => github.com/fluxninja/opentelemetry-collector/connector v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/consumer => github.com/fluxninja/opentelemetry-collector/consumer v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/exporter => github.com/fluxninja/opentelemetry-collector/exporter v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/exporter/loggingexporter => github.com/fluxninja/opentelemetry-collector/exporter/loggingexporter v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/exporter/otlpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlpexporter v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/exporter/otlphttpexporter => github.com/fluxninja/opentelemetry-collector/exporter/otlphttpexporter v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/extension => github.com/fluxninja/opentelemetry-collector/extension v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/extension/ballastextension => github.com/fluxninja/opentelemetry-collector/extension/ballastextension v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/extension/zpagesextension => github.com/fluxninja/opentelemetry-collector/extension/zpagesextension v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/otelcol => github.com/fluxninja/opentelemetry-collector/otelcol v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/pdata => github.com/fluxninja/opentelemetry-collector/pdata v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/processor => github.com/fluxninja/opentelemetry-collector/processor v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/processor/batchprocessor => github.com/fluxninja/opentelemetry-collector/processor/batchprocessor v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/processor/memorylimiterprocessor => github.com/fluxninja/opentelemetry-collector/processor/memorylimiterprocessor v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/receiver => github.com/fluxninja/opentelemetry-collector/receiver v0.87.0-fn.patch.2
+	go.opentelemetry.io/collector/receiver/otlpreceiver => github.com/fluxninja/opentelemetry-collector/receiver/otlpreceiver v0.87.0-fn.patch.2
 )
