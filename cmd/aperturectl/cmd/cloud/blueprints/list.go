@@ -32,6 +32,6 @@ var BlueprintsListCmd = &cobra.Command{
 			return fmt.Errorf("failed to flush writer: %w", err)
 		}
 
-		return w.Flush()
+		return nil
 	},
 }
