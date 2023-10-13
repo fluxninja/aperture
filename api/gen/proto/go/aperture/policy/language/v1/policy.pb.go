@@ -409,7 +409,7 @@ func (x *GetDynamicConfigResponse) GetDynamicConfig() *structpb.Struct {
 	return nil
 }
 
-// GetDynamicConfigResponses is a list of reponses to get dynamic configuration for Policy.
+// GetDynamicConfigResponses is a list of responses to get dynamic configuration for Policy.
 type GetDynamicConfigResponses struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -1571,7 +1571,7 @@ definitions:
                 type: object
         type: object
     GetDynamicConfigResponses:
-        description: GetDynamicConfigResponses is a list of reponses to get dynamic configuration for Policy.
+        description: GetDynamicConfigResponses is a list of responses to get dynamic configuration for Policy.
         properties:
             responses:
                 items:

@@ -141,7 +141,7 @@ message GetDynamicConfigResponse {
   google.protobuf.Struct dynamic_config = 1;
 }
 
-// GetDynamicConfigResponses is a list of reponses to get dynamic configuration for Policy.
+// GetDynamicConfigResponses is a list of responses to get dynamic configuration for Policy.
 message GetDynamicConfigResponses {
   repeated GetDynamicConfigResponse responses = 1;
 }
