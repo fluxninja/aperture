@@ -1,3 +1,4 @@
+local creator = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../common/utils.libsonnet';
 local blueprint = import './java-gc.libsonnet';
 local jmxUtils = import './utils.libsonnet';
@@ -28,8 +29,14 @@ function(params) {
     },
   },
   local p = policy(config_with_jmx_infra_meter, params),
+  local d = creator(p.policyResource, config_with_jmx_infra_meter),
+
   policies: {
     [std.format('%s-cr.yaml', config_with_jmx_infra_meter.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', config_with_jmx_infra_meter.policy.policy_name)]: p.policyDef,
   },
+  dashboards: {
+    [std.format('%s.json', config_with_jmx_infra_meter.policy.policy_name)]: d.mainDashboard,
+    [std.format('signals-%s.json', config_with_jmx_infra_meter.policy.policy_name)]: d.signalsDashboard,
+  } + d.receiverDashboards,
 }
