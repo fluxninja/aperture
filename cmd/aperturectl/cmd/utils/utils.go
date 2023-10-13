@@ -366,3 +366,17 @@ func URIToRawContentURL(uri string) string {
 	}
 	return ""
 }
+
+func GetYAMLString(bytes []byte) (string, error) {
+	var data map[string]interface{}
+	err := yaml.Unmarshal(bytes, &data)
+	if err != nil {
+		return "", err
+	}
+
+	yamlString, err := yaml.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(yamlString), nil
+}

@@ -28,24 +28,31 @@ var pullCmd = &cobra.Command{
 	Example: `aperturectl blueprints pull
 
 aperturectl blueprints pull --version latest`,
-	RunE:     PullRunE,
-	PostRunE: PullPostRunE,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		_, _, _, err := pull(blueprintsURI, blueprintsVersion, true)
+		if err != nil {
+			return err
+		}
+		return nil
+	},
 }
 
-// PullRunE is the RunE function executed by the pull command.
-func PullRunE(cmd *cobra.Command, args []string) error {
+// Pull pulls the blueprints from the given URI and version.
+func pull(blueprintsURI string, blueprintsVersion string, localAllowed bool) (string, string, string, error) {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
-	blueprintsCacheRoot = filepath.Join(userHomeDir, utils.AperturectlRootDir, "blueprints")
+
+	blueprintsCacheRoot := filepath.Join(userHomeDir, utils.AperturectlRootDir, "blueprints")
 	err = os.MkdirAll(blueprintsCacheRoot, os.ModePerm)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
+
 	// either the URI or version is set, not both
 	if blueprintsURI != "" && blueprintsVersion != "" {
-		return errors.New("either the URI or version should be set, not both, uri: " + blueprintsURI + ", version: " + blueprintsVersion)
+		return blueprintsCacheRoot, "", "", errors.New("either the URI or version should be set, not both, uri: " + blueprintsURI + ", version: " + blueprintsVersion)
 	}
 
 	// set the URI
@@ -54,22 +61,24 @@ func PullRunE(cmd *cobra.Command, args []string) error {
 			blueprintsVersion = LatestTag
 		}
 		blueprintsURI = fmt.Sprintf("%s@%s", DefaultBlueprintsRepo, blueprintsVersion)
-		blueprintsVersion = ""
 	} else {
 		// uri can be a file or url
 		// first detect if it's a local path
 		if _, err = os.Stat(blueprintsURI); err == nil {
+			if !localAllowed {
+				return blueprintsCacheRoot, "", "", errors.New("local paths are not allowed as blueprints URI")
+			}
 			// path exists
 			blueprintsURI, err = filepath.Abs(blueprintsURI)
 			if err != nil {
-				return err
+				return blueprintsCacheRoot, "", "", err
 			}
 		} else {
 			// try to parse as url
 			var blueprintsURL *url.URL
 			blueprintsURL, err = url.Parse(blueprintsURI)
 			if err != nil {
-				return err
+				return blueprintsCacheRoot, "", "", err
 			}
 			blueprintsURI = blueprintsURL.String()
 		}
@@ -77,47 +86,44 @@ func PullRunE(cmd *cobra.Command, args []string) error {
 
 	// convert the URI to a local dir name which is disk friendly
 	dirName := strings.ReplaceAll(blueprintsURI, "/", "_")
-	blueprintsURIRoot = filepath.Join(blueprintsCacheRoot, dirName)
+	blueprintsURIRoot := filepath.Join(blueprintsCacheRoot, dirName)
 	err = os.MkdirAll(blueprintsURIRoot, os.ModePerm)
 	if err != nil {
-		return err
+		return blueprintsCacheRoot, "", "", err
 	}
 
 	// get a file lock on the blueprintsURIRoot
 	lock = flock.New(filepath.Join(blueprintsURIRoot, "lock"))
 	locked, err := lock.TryLockContext(context.Background(), time.Millisecond*100)
 	if err != nil {
-		return err
+		return blueprintsCacheRoot, blueprintsURIRoot, "", err
 	}
 	if !locked {
-		return errors.New("could not get lock on: " + blueprintsURIRoot)
+		return blueprintsCacheRoot, blueprintsURIRoot, "", errors.New("could not get lock on: " + blueprintsURIRoot)
 	}
 
 	// pull the latest blueprints based on skipPull and whether child command is remove
 	if !skipPull {
 		err = utils.PullSource(blueprintsURIRoot, blueprintsURI)
 		if err != nil {
-			return err
+			return blueprintsCacheRoot, blueprintsURIRoot, "", err
 		}
 	} else {
 		log.Trace().Msg("Skipping pulling blueprints")
 	}
 
-	blueprintsDir = filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
+	blueprintsDir := filepath.Join(blueprintsURIRoot, utils.GetRelPath(blueprintsURIRoot))
 	// resolve symlink
 	blueprintsDir, err = filepath.EvalSymlinks(blueprintsDir)
 	if err != nil {
-		return err
+		return blueprintsCacheRoot, blueprintsURIRoot, "", err
 	}
-	return nil
-}
 
-// PullPostRunE is the PostRunE function executed by the pull command.
-func PullPostRunE(cmd *cobra.Command, args []string) error {
 	// unlock the file lock on the blueprintsURIRoot
-	err := lock.Unlock()
+	err = lock.Unlock()
 	if err != nil {
-		return err
+		return blueprintsCacheRoot, blueprintsURIRoot, blueprintsDir, err
 	}
-	return nil
+
+	return blueprintsCacheRoot, blueprintsURIRoot, blueprintsDir, nil
 }

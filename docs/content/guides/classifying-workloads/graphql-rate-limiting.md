@@ -133,7 +133,7 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/graphql.yaml --kube </CodeBlock>
+<CodeBlock language="bash">aperturectl policy apply --file=policy-gen/policies/graphql.yaml --kube </CodeBlock>
 ```
 
 ```mdx-code-block

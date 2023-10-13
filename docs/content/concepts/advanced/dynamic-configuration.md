@@ -28,7 +28,7 @@ implement dynamic control. For instance, the
 takes dynamic configuration to start or stop the rollout.
 
 The dynamic configuration can be provided to an existing policy using the
-[aperturectl CLI](/reference/aperturectl/apply/apply.md). To learn more about
-its usage, see how the dynamic configuration is provided in the service
+[aperturectl CLI](/reference/aperturectl/policy/apply/apply.md). To learn more
+about its usage, see how the dynamic configuration is provided in the service
 protection
 [blueprint](/reference/blueprints/load-scheduling/average-latency#dynamic-configuration).

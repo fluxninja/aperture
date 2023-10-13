@@ -500,7 +500,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 :::note
 
 The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+[dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md)
 at runtime, without reloading the policy.
 
 :::

@@ -710,6 +710,18 @@ definitions:
                 type: string
                 x-go-tag-default: 30s
         type: object
+    Blueprint:
+        properties:
+            blueprints_name:
+                type: string
+            policy_name:
+                type: string
+            values:
+                format: byte
+                type: string
+            version:
+                type: string
+        type: object
     BoolVariable:
         description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -1915,6 +1927,11 @@ definitions:
             - STALE
             - OUTDATED
         type: string
+    GetResponse:
+        properties:
+            blueprint:
+                $ref: '#/definitions/Blueprint'
+        type: object
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -2630,6 +2647,14 @@ definitions:
             global_flow_control_points:
                 items:
                     $ref: '#/definitions/GlobalFlowControlPoint'
+                    type: object
+                type: array
+        type: object
+    ListResponse:
+        properties:
+            blueprints:
+                items:
+                    $ref: '#/definitions/Blueprint'
                     type: object
                 type: array
         type: object
@@ -5038,6 +5063,90 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /fluxninja/v1/blueprints:
+        get:
+            operationId: BlueprintsService_List
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ListResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        post:
+            operationId: BlueprintsService_Apply
+            parameters:
+                - in: query
+                  name: blueprint.blueprints_name
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.version
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.policy_name
+                  required: false
+                  type: string
+                - format: byte
+                  in: query
+                  name: blueprint.values
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}:
+        delete:
+            operationId: BlueprintsService_Delete
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        get:
+            operationId: BlueprintsService_Get
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
     /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
@@ -5604,6 +5713,7 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: BlueprintsService
     - name: FlowControlService
     - name: PolicyService
     - name: PolicyService

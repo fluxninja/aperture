@@ -12,7 +12,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-func createValuesFile(blueprintName string, valuesFile string, dynamicConfig bool) error {
+func createValuesFile(blueprintsDir string, blueprintName string, valuesFile string, dynamicConfig bool) error {
 	valFileName := valuesFileName
 
 	if dynamicConfig {

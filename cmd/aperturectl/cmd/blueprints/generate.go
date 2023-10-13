@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -90,149 +90,26 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 			}
 		}
 
-		generate := func(vFile string) error {
-			_, err := os.Stat(vFile)
-			if err != nil {
-				return err
-			}
-			vFile, err = filepath.Abs(vFile)
-			if err != nil {
-				return err
-			}
-
-			var valuesBytes []byte
-			valuesBytes, err = os.ReadFile(vFile)
-			if err != nil {
-				return err
-			}
-
-			// decode values as yaml and retrieve blueprint and uri fields
-			var values map[string]interface{}
-			err = yaml.Unmarshal(valuesBytes, &values)
-			if err != nil {
-				return err
-			}
-
-			var ok bool
-			blueprintName, ok = values["blueprint"].(string)
-			if !ok {
-				return fmt.Errorf("values file does not contain blueprint name field")
-			}
-
-			if overrideBlueprintsVersion == "" && overrideBlueprintsURI == "" {
-				blueprintsURI, ok = values["uri"].(string)
-				if !ok {
-					return fmt.Errorf("values file does not contain uri field")
-				}
-			} else {
-				// HACK: global variables suck
-				blueprintsURI = overrideBlueprintsURI
-				blueprintsVersion = overrideBlueprintsVersion
-			}
-
-			policy, ok := values["policy"].(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("values file does not contain policy field")
-			}
-			policyName, ok := policy["policy_name"].(string)
-			if !ok {
-				return fmt.Errorf("values file does not contain policy_name field")
-			}
-
-			// pull
-			err = pullCmd.RunE(cmd, args)
-			if err != nil {
-				return err
-			}
-			defer func() {
-				_ = pullCmd.PostRunE(cmd, args)
-			}()
-
-			err = blueprintExists(blueprintName)
-			if err != nil {
-				return err
-			}
-			// check whether the blueprint is deprecated
-			blueprintDir := filepath.Join(blueprintsDir, blueprintName)
-			ok, deprecated := utils.IsBlueprintDeprecated(blueprintDir)
-			if ok {
-				if utils.AllowDeprecated {
-					log.Warn().Msgf("Blueprint %s is deprecated: %s", blueprintName, deprecated)
-				} else {
-					return fmt.Errorf("blueprint %s is deprecated: %s", blueprintName, deprecated)
-				}
-			}
-
-			if !noValidate {
-				if strings.Contains(string(valuesBytes), "__REQUIRED_FIELD__") {
-					return fmt.Errorf("values file contains '__REQUIRED_FIELD__' placeholder value")
-				}
-
-				// validate values.yaml against the json schema
-				schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
-				err = utils.ValidateWithJSONSchema(schemaFile, []string{}, vFile)
-				if err != nil {
-					log.Error().Msgf("Error validating values file: %s", err)
-					return err
-				}
-			}
-
-			buf := bytes.Buffer{}
-			vm := jsonnet.MakeVM()
-			vm.SetTraceOut(&buf)
-			vm.Importer(&jsonnet.FileImporter{
-				JPaths: []string{blueprintsURIRoot},
-			})
-
-			importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
-			bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
-		local bundle = import '%s/bundle.libsonnet';
-		local config = std.parseYaml(importstr '%s');
-		bundle(config)
-		`, importPath, vFile))
-			if err != nil {
-				return err
-			}
-
-			// change log.Error() to log.Info() for jsonnet trace output
-			// Note use this with std.trace in jsonnet code to get the trace output
-			log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
-
-			var bundle map[string]interface{}
-			err = json.Unmarshal([]byte(bundleStr), &bundle)
-			if err != nil {
-				return err
-			}
-
-			if err = processJsonnetOutput(bundle, updatedOutputDir, policyName); err != nil {
-				return err
-			}
-
-			log.Info().Msgf("Generated manifests at %s", updatedOutputDir)
-
-			return nil
-		}
-
 		for _, vFile := range valuesFiles {
-			err := generate(vFile)
+			_, err := Generate(vFile, overrideBlueprintsURI, overrideBlueprintsVersion, updatedOutputDir, true)
 			if err != nil {
 				return err
 			}
 		}
 
 		if applyPolicies {
-			apply.Controller = controllerConn
-			err := apply.ApplyPolicyCmd.Flag("dir").Value.Set(updatedOutputDir)
+			policy.Controller = controllerConn
+			err := policy.ApplyCmd.Flag("dir").Value.Set(updatedOutputDir)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyCmd.PersistentPreRunE(cmd, args)
+			err = policy.ApplyCmd.PersistentPreRunE(cmd, args)
 			if err != nil {
 				return err
 			}
 
-			err = apply.ApplyPolicyCmd.RunE(cmd, args)
+			err = policy.ApplyCmd.RunE(cmd, args)
 			if err != nil {
 				return err
 			}
@@ -245,7 +122,130 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 	},
 }
 
-func processJsonnetOutput(bundle map[string]interface{}, outputDir, policyName string) error {
+// Generate generates Aperture Policy related resources from Aperture Blueprint.
+func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprintsVersion string, outputDir string, localAllowed bool) (map[string]any, error) {
+	_, err := os.Stat(valuesFile)
+	if err != nil {
+		log.Info().Msgf("Error reading values file: %s", err.Error())
+		return nil, err
+	}
+	valuesFile, err = filepath.Abs(valuesFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var valuesBytes []byte
+	valuesBytes, err = os.ReadFile(valuesFile)
+	if err != nil {
+		return nil, err
+	}
+
+	// decode values as yaml and retrieve blueprint and uri fields
+	values := make(map[string]any)
+	err = yaml.Unmarshal(valuesBytes, &values)
+	if err != nil {
+		return nil, err
+	}
+
+	var ok bool
+	blueprintName, ok = values["blueprint"].(string)
+	if !ok {
+		return nil, fmt.Errorf("values file does not contain blueprint name field")
+	}
+
+	if overrideBlueprintsVersion == "" && overrideBlueprintsURI == "" {
+		blueprintsURI, ok = values["uri"].(string)
+		if !ok {
+			return nil, fmt.Errorf("values file does not contain uri field")
+		}
+	} else {
+		blueprintsURI = overrideBlueprintsURI
+		blueprintsVersion = overrideBlueprintsVersion
+	}
+
+	policy, ok := values["policy"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("values file does not contain policy field")
+	}
+	policyName, ok := policy["policy_name"].(string)
+	if !ok {
+		return nil, fmt.Errorf("values file does not contain policy_name field")
+	}
+
+	// pull
+	_, blueprintsURIRoot, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, localAllowed)
+	if err != nil {
+		return nil, err
+	}
+
+	err = blueprintExists(blueprintsDir, blueprintName)
+	if err != nil {
+		return nil, err
+	}
+	// check whether the blueprint is deprecated
+	blueprintDir := filepath.Join(blueprintsDir, blueprintName)
+	ok, deprecated := utils.IsBlueprintDeprecated(blueprintDir)
+	if ok {
+		if utils.AllowDeprecated {
+			log.Warn().Msgf("Blueprint %s is deprecated: %s", blueprintName, deprecated)
+		} else {
+			return nil, fmt.Errorf("blueprint %s is deprecated: %s", blueprintName, deprecated)
+		}
+	}
+
+	if !noValidate {
+		if strings.Contains(string(valuesBytes), "__REQUIRED_FIELD__") {
+			return nil, fmt.Errorf("values file contains '__REQUIRED_FIELD__' placeholder value")
+		}
+
+		// validate values.yaml against the json schema
+		schemaFile := filepath.Join(blueprintsDir, blueprintName, "gen/definitions.json")
+		err = utils.ValidateWithJSONSchema(schemaFile, []string{}, valuesFile)
+		if err != nil {
+			log.Error().Msgf("Error validating values file: %s", err)
+			return nil, err
+		}
+	}
+
+	buf := bytes.Buffer{}
+	vm := jsonnet.MakeVM()
+	vm.SetTraceOut(&buf)
+	vm.Importer(&jsonnet.FileImporter{
+		JPaths: []string{blueprintsURIRoot},
+	})
+
+	importPath := fmt.Sprintf("%s/%s", blueprintsDir, blueprintName)
+	bundleStr, err := vm.EvaluateAnonymousSnippet("bundle.libsonnet", fmt.Sprintf(`
+local bundle = import '%s/bundle.libsonnet';
+local config = std.parseYaml(importstr '%s');
+bundle(config)
+`, importPath, valuesFile))
+	if err != nil {
+		return nil, err
+	}
+
+	// change log.Error() to log.Info() for jsonnet trace output
+	// Note use this with std.trace in jsonnet code to get the trace output
+	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
+
+	var bundle map[string]interface{}
+	err = json.Unmarshal([]byte(bundleStr), &bundle)
+	if err != nil {
+		return nil, err
+	}
+
+	if outputDir != "" {
+		if err = processJsonnetOutput(blueprintsURIRoot, blueprintsDir, bundle, outputDir, policyName); err != nil {
+			return nil, err
+		}
+
+		log.Info().Msgf("Generated manifests at %s", outputDir)
+	}
+
+	return values, nil
+}
+
+func processJsonnetOutput(blueprintsURIRoot string, blueprintsDir string, bundle map[string]interface{}, outputDir, policyName string) error {
 	for categoryName, category := range bundle {
 		categoriesMap, ok := category.(map[string]interface{})
 		if !ok {
@@ -266,7 +266,7 @@ func processJsonnetOutput(bundle map[string]interface{}, outputDir, policyName s
 				log.Error().Msgf("failed to process output '%+v'", content)
 				continue
 			}
-			if err := renderOutput(categoryName, updatedPath, fileName, policyName, contentMap); err != nil {
+			if err := renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, updatedPath, fileName, policyName, contentMap); err != nil {
 				return err
 			}
 		}
@@ -274,10 +274,10 @@ func processJsonnetOutput(bundle map[string]interface{}, outputDir, policyName s
 	return nil
 }
 
-func renderOutput(categoryName string, outputDir string, fileName, policyName string, content map[string]interface{}) error {
+func renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, outputDir, fileName, policyName string, content map[string]interface{}) error {
 	outputFilePath := filepath.Join(outputDir, fileName)
 	if strings.HasSuffix(fileName, ".yaml") {
-		yamlBytes, err := saveYAMLFile(categoryName, outputFilePath, content)
+		yamlBytes, err := saveYAMLFile(blueprintsURIRoot, blueprintsDir, categoryName, outputFilePath, content)
 		if err != nil {
 			return err
 		}
@@ -289,7 +289,7 @@ func renderOutput(categoryName string, outputDir string, fileName, policyName st
 				return err
 			}
 
-			err = generateDashboards(string(yamlBytes), componentsList, policyName, outputDir)
+			err = generateDashboards(blueprintsURIRoot, blueprintsDir, string(yamlBytes), componentsList, policyName, outputDir)
 			if err != nil {
 				return err
 			}
@@ -307,7 +307,7 @@ func renderOutput(categoryName string, outputDir string, fileName, policyName st
 	return nil
 }
 
-func saveYAMLFile(categoryName, outputFilePath string, content map[string]interface{}) ([]byte, error) {
+func saveYAMLFile(blueprintsURIRoot, blueprintsDir, categoryName, outputFilePath string, content map[string]interface{}) ([]byte, error) {
 	yamlBytes, err := yaml.Marshal(content)
 	if err != nil {
 		return nil, err
@@ -364,8 +364,8 @@ func saveJSONFile(outputFilePath string, content map[string]interface{}) error {
 	return nil
 }
 
-func blueprintExists(name string) error {
-	blueprintsList, err := getBlueprints(blueprintsURIRoot, true)
+func blueprintExists(blueprintsDir, name string) error {
+	blueprintsList, err := getBlueprints(blueprintsDir, true)
 	if err != nil {
 		return err
 	}
@@ -468,7 +468,7 @@ func processPolicy(content []byte, policyPath string) (*circuitfactory.Circuit, 
 	return circuit, componentsList, nil
 }
 
-func generateDashboards(policyFile, componentsList, policyName, outputDir string) error {
+func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, componentsList, policyName, outputDir string) error {
 	dir := filepath.Join(filepath.Dir(outputDir), "dashboards")
 	// create the directory if it does not exist
 	err := os.MkdirAll(dir, os.ModePerm)
@@ -490,8 +490,10 @@ func generateDashboards(policyFile, componentsList, policyName, outputDir string
 	vm.TLAVar("datasource", "controller-prometheus")
 
 	dashboardGroupFile := filepath.Join(blueprintsDir, "grafana", "dashboard_group.libsonnet")
+	// fmt.Printf("Evaluating file blueprintsURIRoot: %s, blueprintsDir: %s, policyName: %s, datasource: %s\n", blueprintsURIRoot, blueprintsDir, policyName, "controller-prometheus")
 	dashboardsJSON, err := vm.EvaluateFile(dashboardGroupFile)
 	if err != nil {
+		fmt.Printf("Error evaluating file: %s\n", err.Error())
 		return err
 	}
 	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())

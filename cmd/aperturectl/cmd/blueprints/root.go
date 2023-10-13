@@ -12,14 +12,6 @@ const (
 )
 
 var (
-	// Location of cache for blueprints. E.g. ~/.aperturectl/blueprints.
-	blueprintsCacheRoot string
-	// Location of blueprints uri within cache. E.g. ~/.aperturectl/blueprints/github.com/fluxninja/aperture/blueprints@latest.
-	blueprintsURIRoot string
-
-	// Location of blueprints directory within URI directory. E.g. ~/.aperturectl/blueprints/github.com_fluxninja_aperture_blueprints@v0.26.1/github.com/fluxninja/aperture/blueprints/.
-	blueprintsDir string
-
 	// Args for `blueprints`.
 	blueprintsURI     string
 	blueprintsVersion string

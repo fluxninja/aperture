@@ -7,16 +7,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/dynamicconfig"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -35,7 +35,6 @@ func init() {
 	RootCmd.AddCommand(cloud.CloudCmd)
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
-	RootCmd.AddCommand(apply.ApplyCmd)
 	RootCmd.AddCommand(installation.InstallCmd)
 	RootCmd.AddCommand(installation.UnInstallCmd)
 	RootCmd.AddCommand(flowcontrol.FlowControlCmd)
@@ -43,10 +42,10 @@ func init() {
 	RootCmd.AddCommand(discovery.DiscoveryCmd)
 	RootCmd.AddCommand(build.BuildCmd)
 	RootCmd.AddCommand(agentsCmd)
-	RootCmd.AddCommand(delete.DeleteCmd)
 	RootCmd.AddCommand(decisions.DecisionsCmd)
-	RootCmd.AddCommand(policiesCmd)
 	RootCmd.AddCommand(status.StatusCmd)
+	RootCmd.AddCommand(dynamicconfig.DynamicConfigCmd)
+	RootCmd.AddCommand(policy.PolicyCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

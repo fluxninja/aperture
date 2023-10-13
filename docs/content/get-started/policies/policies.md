@@ -134,7 +134,7 @@ how to configure what aperturectl should connect to.
 :::
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl cloud apply policy --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl cloud policy apply --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.
@@ -177,7 +177,7 @@ If the Aperture Controller is deployed on
 you can apply the policy using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.
@@ -196,7 +196,7 @@ If the Aperture Controller is deployed on
 policy using the following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.
@@ -230,7 +230,7 @@ Run the following command to delete the above policy:
 ```
 
 ```bash
-aperturectl delete policy --policy=rate-limiting
+aperturectl policy delete --policy=rate-limiting
 ```
 
 ```mdx-code-block
