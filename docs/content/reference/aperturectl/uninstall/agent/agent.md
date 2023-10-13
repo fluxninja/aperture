@@ -41,7 +41,7 @@ aperturectl uninstall agent --namespace=aperture
       --namespace string     Namespace from which the component will be uninstalled. Defaults to 'default' namespace (default "default")
       --timeout int          Timeout of waiting for uninstallation hooks completion (default 300)
       --values-file string   Values YAML file containing parameters to customize the installation
-      --version string       Version of the Aperture (default "latest")
+      --version string       Version of the Aperture
 ```
 
 ### SEE ALSO
