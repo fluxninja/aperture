@@ -17,20 +17,19 @@ Cloud Blueprints Get
 Get cloud blueprint.
 
 ```
-aperturectl cloud blueprints get [flags]
+aperturectl cloud blueprints get POLICY_NAME [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl cloud blueprints get --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+aperturectl cloud blueprints get rate-limiting
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for get
-      --policy-name string   Get Blueprint by Policy Name
+  -h, --help   help for get
 ```
 
 ### Options inherited from parent commands

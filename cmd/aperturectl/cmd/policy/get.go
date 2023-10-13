@@ -24,7 +24,7 @@ var GetCmd = &cobra.Command{
 			Name: args[0],
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get policy: %w", err)
 		}
 
 		jsonBytes, err := policy.Policy.MarshalJSON()

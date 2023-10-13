@@ -23,7 +23,7 @@ aperturectl cloud policy get POLICY_NAME [flags]
 ### Examples
 
 ```
-aperturectl cloud policy get POLICY_NAME --project-name PROJECT_NAME
+aperturectl cloud policy get POLICY_NAME
 ```
 
 ### Options

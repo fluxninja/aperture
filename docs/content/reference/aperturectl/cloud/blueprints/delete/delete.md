@@ -10,27 +10,26 @@ keywords:
 
 ## aperturectl cloud blueprints delete
 
-Cloud Blueprints Delete
+Cloud Blueprints Delete for the given Policy Name
 
 ### Synopsis
 
 Delete cloud blueprint.
 
 ```
-aperturectl cloud blueprints delete [flags]
+aperturectl cloud blueprints delete POLICY_NAME [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl cloud blueprints delete --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME
+aperturectl cloud blueprints delete rate-limiting
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for delete
-      --policy-name string   Delete Blueprint by Policy Name
+  -h, --help   help for delete
 ```
 
 ### Options inherited from parent commands

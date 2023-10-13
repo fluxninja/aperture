@@ -11,26 +11,17 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
-func init() {
-	BlueprintsGetCmd.Flags().StringVar(&name, "policy-name", "", "Get Blueprint by Policy Name")
-}
-
 // BlueprintsGetCmd is the command to get a blueprint from the Cloud Controller.
 var BlueprintsGetCmd = &cobra.Command{
-	Use:           "get",
+	Use:           "get POLICY_NAME",
 	Short:         "Cloud Blueprints Get",
 	Long:          `Get cloud blueprint.`,
 	SilenceErrors: true,
-	Example:       `aperturectl cloud blueprints get --policy-name=rate-limiting --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME`,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if name == "" {
-			return fmt.Errorf("--policy-name is required")
-		}
-		return nil
-	},
+	Args:          cobra.ExactArgs(1),
+	Example:       `aperturectl cloud blueprints get rate-limiting`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		getResponse, err := client.Get(context.Background(), &cloudv1.GetRequest{
-			PolicyName: name,
+			PolicyName: args[0],
 		})
 		if err != nil {
 			return err

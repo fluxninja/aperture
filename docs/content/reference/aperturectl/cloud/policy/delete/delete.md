@@ -23,7 +23,7 @@ aperturectl cloud policy delete POLICY_NAME [flags]
 ### Examples
 
 ```
-aperturectl cloud policy delete --policy=rate-limiting
+aperturectl cloud policy delete POLICY_NAME
 ```
 
 ### Options

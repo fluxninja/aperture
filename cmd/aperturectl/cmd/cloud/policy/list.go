@@ -19,7 +19,7 @@ var ListCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, args []string) error {
 		policies, err := client.ListPolicies(context.Background(), new(emptypb.Empty))
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to list policies: %w", err)
 		}
 
 		for policyName := range policies.GetPolicies().GetPolicies() {

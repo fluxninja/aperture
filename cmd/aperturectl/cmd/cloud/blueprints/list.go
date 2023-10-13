@@ -16,11 +16,11 @@ var BlueprintsListCmd = &cobra.Command{
 	Short:         "Cloud Blueprints List",
 	Long:          `List cloud blueprints.`,
 	SilenceErrors: true,
-	Example:       `aperturectl cloud blueprints list --controller ORGANIZATION_NAME.app.fluxninja.com:443 --api-key PERSONAL_API_KEY --project-name PROJECT_NAME`,
+	Example:       `aperturectl cloud blueprints list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		listResponse, err := client.List(context.Background(), &emptypb.Empty{})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to list blueprints: %w", err)
 		}
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
@@ -28,8 +28,10 @@ var BlueprintsListCmd = &cobra.Command{
 			fmt.Fprintf(w, "%s\n", blueprint.GetPolicyName())
 		}
 
-		w.Flush()
+		if err := w.Flush(); err != nil {
+			return fmt.Errorf("failed to flush writer: %w", err)
+		}
 
-		return nil
+		return w.Flush()
 	},
 }

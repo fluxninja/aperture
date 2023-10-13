@@ -77,7 +77,7 @@ var BlueprintsApplyCmd = &cobra.Command{
 			},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to apply blueprint: %w", err)
 		}
 
 		return nil

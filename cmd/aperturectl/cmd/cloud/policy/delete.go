@@ -17,7 +17,7 @@ var DeleteCmd = &cobra.Command{
 	Long:          `Use this command to delete the Aperture Policy from the Aperture Cloud Controller.`,
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(1),
-	Example:       `aperturectl cloud policy delete --policy=rate-limiting`,
+	Example:       `aperturectl cloud policy delete POLICY_NAME`,
 	RunE: func(_ *cobra.Command, args []string) error {
 		return deletePolicy(args[0])
 	},

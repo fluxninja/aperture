@@ -18,13 +18,13 @@ var GetCmd = &cobra.Command{
 	Long:          `Use this command to get the Aperture Policy from the Aperture Cloud Controller.`,
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(1),
-	Example:       `aperturectl cloud policy get POLICY_NAME --project-name PROJECT_NAME`,
+	Example:       `aperturectl cloud policy get POLICY_NAME`,
 	RunE: func(_ *cobra.Command, args []string) error {
 		policy, err := client.GetPolicy(context.Background(), &policylangv1.GetPolicyRequest{
 			Name: args[0],
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get policy: %w", err)
 		}
 
 		jsonBytes, err := policy.Policy.MarshalJSON()
