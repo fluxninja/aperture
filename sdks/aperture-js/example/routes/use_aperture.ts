@@ -12,6 +12,8 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
     user: "kenobi",
   };
 
+  const startTimestamp = Date.now();
+
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
     .StartFlow("awesome-feature", {
@@ -20,6 +22,8 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       rampMode: false,
     })
     .then((flow) => {
+      const endTimestamp = Date.now();
+      console.log(`Flow took ${endTimestamp - startTimestamp}ms`);
       // See whether flow was accepted by Aperture Agent.
       if (flow.ShouldRun()) {
         // Simulate work being done
