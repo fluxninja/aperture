@@ -1,6 +1,6 @@
 import express from "express";
 
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import {ApertureClient, FlowStatusEnum} from "@fluxninja/aperture-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient();
@@ -18,7 +18,9 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
   apertureClient
     .StartFlow("awesome-feature", {
       labels: labels,
-      timeoutMilliseconds: 300000,
+      grpcCallOptions: {
+        deadline: Date.now() + 30000,
+      },
       rampMode: false,
     })
     .then((flow) => {
