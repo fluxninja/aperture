@@ -40,7 +40,6 @@ export class ApertureClient {
     channelOptions?: ChannelOptions;
   } = {}) {
     const defaultChannelOptions = {
-      "grpc.enable_retries": 1,
       "grpc.keepalive_time_ms": 10000,
       "grpc.keepalive_timeout_ms": 5000,
     };
