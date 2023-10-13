@@ -29,7 +29,7 @@ aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := pullCmd.RunE(cmd, args)
+		blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ aperturectl blueprints list --all`,
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
-			blueprintsList, err := getCachedBlueprints()
+			blueprintsList, err := getCachedBlueprints(blueprintsCacheRoot)
 			if err != nil {
 				return err
 			}
@@ -71,22 +71,17 @@ aperturectl blueprints list --all`,
 
 		return nil
 	},
-	PostRunE: func(cmd *cobra.Command, args []string) error {
-		return pullCmd.PostRunE(cmd, args)
-	},
 }
 
-func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
-	relPath := utils.GetRelPath(blURIRoot)
+func getBlueprints(blueprintsDir string, listDeprecated bool) ([]string, error) {
 	policies := []string{}
 
-	blDir := filepath.Join(blURIRoot, relPath)
-	err := symwalk.Walk(blDir, func(path string, fi fs.FileInfo, err error) error {
+	err := symwalk.Walk(blueprintsDir, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !fi.IsDir() && fi.Name() == "bundle.libsonnet" {
-			strippedPath := strings.TrimPrefix(path, blDir)
+			strippedPath := strings.TrimPrefix(path, blueprintsDir)
 			strippedPath = strings.TrimSuffix(strippedPath, "/bundle.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
 			if !listDeprecated {
@@ -108,7 +103,7 @@ func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
 	return policies, nil
 }
 
-func getCachedBlueprints() (map[string][]string, error) {
+func getCachedBlueprints(blueprintsCacheRoot string) (map[string][]string, error) {
 	blueprintsList := map[string][]string{}
 	blueprintsURIDirs, err := os.ReadDir(blueprintsCacheRoot)
 	if err != nil {

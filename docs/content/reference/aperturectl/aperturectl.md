@@ -35,7 +35,6 @@ aperturectl is a CLI tool to interact with Aperture.
 ### SEE ALSO
 
 - [aperturectl agents](/reference/aperturectl/agents/agents.md) - List connected agents
-- [aperturectl apply](/reference/aperturectl/apply/apply.md) - Apply Aperture Policies
 - [aperturectl auto-scale](/reference/aperturectl/auto-scale/auto-scale.md) - AutoScale integrations
 - [aperturectl blueprints](/reference/aperturectl/blueprints/blueprints.md) - Aperture Blueprints
 - [aperturectl build](/reference/aperturectl/build/build.md) - Builds the agent and controller binaries
@@ -43,10 +42,10 @@ aperturectl is a CLI tool to interact with Aperture.
 - [aperturectl compile](/reference/aperturectl/compile/compile.md) - Compile circuit from Aperture Policy file
 - [aperturectl completion](/reference/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell
 - [aperturectl decisions](/reference/aperturectl/decisions/decisions.md) - Get Aperture Decisions
-- [aperturectl delete](/reference/aperturectl/delete/delete.md) - Delete Aperture Policies
 - [aperturectl discovery](/reference/aperturectl/discovery/discovery.md) - Discovery integrations
+- [aperturectl dynamic-config](/reference/aperturectl/dynamic-config/dynamic-config.md) - DynamicConfig of Aperture Policy related commands for the Controller
 - [aperturectl flow-control](/reference/aperturectl/flow-control/flow-control.md) - Flow Control integrations
 - [aperturectl install](/reference/aperturectl/install/install.md) - Install Aperture components
-- [aperturectl policies](/reference/aperturectl/policies/policies.md) - List applied policies
+- [aperturectl policy](/reference/aperturectl/policy/policy.md) - Aperture Policy related commands for the Controller
 - [aperturectl status](/reference/aperturectl/status/status.md) - Get Jobs status
 - [aperturectl uninstall](/reference/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components
