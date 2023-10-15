@@ -2,8 +2,9 @@ package distcache
 
 import (
 	"errors"
-	"log"
+	stdlog "log"
 
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 )
 
@@ -22,7 +23,7 @@ func (s *ServiceDiscovery) Initialize() error {
 
 // SetLogger sets an appropriate logger.
 // This method is not implemented.
-func (s *ServiceDiscovery) SetLogger(l *log.Logger) {
+func (s *ServiceDiscovery) SetLogger(l *stdlog.Logger) {
 }
 
 // SetConfig registers plugin configuration.
@@ -38,6 +39,7 @@ func (s *ServiceDiscovery) DiscoverPeers() ([]string, error) {
 	peerInfos := s.discovery.GetPeers()
 	for _, peerInfo := range peerInfos.Peers {
 		if olricMemberlistAddr, ok := peerInfo.Services[s.serviceName]; ok {
+			log.Info().Msgf("DiscoverPeers peer: %s", olricMemberlistAddr)
 			peers = append(peers, olricMemberlistAddr)
 		}
 	}

@@ -110,7 +110,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 				}
 				advertiseAddr = hostname + ":" + port
 			}
-			log.Debug().Str("advertise_addr", advertiseAddr).Msg("advertise addr")
+			log.Info().Str("advertise_addr", advertiseAddr).Msg("advertise addr")
 
 			err := pd.Start()
 			if err != nil {
@@ -142,16 +142,16 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	peersLock       sync.RWMutex
-	servicesLock    sync.RWMutex
+	etcdWatcher     notifiers.Watcher
+	peerNotifier    notifiers.PrefixNotifier
 	peers           *peersv1.Peers
 	client          *etcdclient.Client
 	sessionScopedKV *etcdclient.SessionScopedKV
-	etcdWatcher     notifiers.Watcher
 	selfKey         string
 	etcdPath        string
-	peerNotifier    notifiers.PrefixNotifier
 	watchers        PeerWatchers
+	peersLock       sync.RWMutex
+	servicesLock    sync.RWMutex
 }
 
 // NewPeerDiscovery creates a new PeerDiscovery.
@@ -202,8 +202,6 @@ func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string)
 
 	pd.selfKey = path.Join(pd.etcdPath, pd.peers.SelfPeer.Hostname)
 
-	// register
-	log.Debug().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
 	return pd.uploadSelfPeer(ctx)
 }
 
@@ -213,12 +211,15 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 		log.Error().Err(err).Msg("failed to marshal peer info")
 		return err
 	}
+	// register
+	log.Info().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
 	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(bytes))
 	return err
 }
 
 // deregisterSelf deregisters self from etcd.
 func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
+	log.Info().Str("key", pd.selfKey).Msg("self deregistering from peer discovery table")
 	_, err := pd.client.KV.Delete(clientv3.WithRequireLeader(ctx), pd.selfKey)
 	return err
 }
@@ -270,6 +271,7 @@ func (pd *PeerDiscovery) RegisterService(name string, address string) {
 	defer pd.servicesLock.Unlock()
 
 	pd.peers.SelfPeer.Services[name] = address
+	log.Info().Str("name", name).Str("address", address).Msg("registering service")
 	err := pd.uploadSelfPeer(context.TODO())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to upload self peer")
@@ -281,6 +283,7 @@ func (pd *PeerDiscovery) DeregisterService(name string) {
 	pd.servicesLock.Lock()
 	defer pd.servicesLock.Unlock()
 
+	log.Info().Str("name", name).Msg("deregistering service")
 	delete(pd.peers.SelfPeer.Services, name)
 	err := pd.uploadSelfPeer(context.TODO())
 	if err != nil {
@@ -294,6 +297,7 @@ func (pd *PeerDiscovery) addPeer(peer *peersv1.Peer) {
 	pd.peersLock.Lock()
 	defer pd.peersLock.Unlock()
 
+	log.Info().Str("address", peer.Address).Msg("adding peer to local peer discovery table")
 	pd.peers.Peers[peer.Address] = peer
 }
 
@@ -325,6 +329,7 @@ func (pd *PeerDiscovery) GetPeerKeys() []string {
 
 func (pd *PeerDiscovery) removePeer(address string) {
 	var peer *peersv1.Peer
+	var ok bool
 	defer func() {
 		if peer != nil {
 			pd.watchers.OnPeerRemoved(peer)
@@ -334,20 +339,25 @@ func (pd *PeerDiscovery) removePeer(address string) {
 	pd.peersLock.Lock()
 	defer pd.peersLock.Unlock()
 
-	peer = pd.peers.Peers[address]
-	delete(pd.peers.Peers, address)
+	peer, ok = pd.peers.Peers[address]
+	if !ok {
+		return
+	}
+	log.Info().Str("address", address).Msg("removing peer from local peer discovery table")
+	delete(pd.peers.Peers, peer.Address)
 }
 
 func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.Unmarshaller) {
-	log.Debug().Str("event", event.String()).Msg("Updating peer")
-	if event.Type == notifiers.Write {
+	log.Info().Str("event", event.String()).Msg("Updating peer")
+	switch event.Type {
+	case notifiers.Write:
 		var peer peersv1.Peer
 		if err := unmarshaller.Unmarshal(&peer); err != nil {
 			log.Error().Err(err).Msg("failed to unmarshal peer info")
 			return
 		}
 		pd.addPeer(&peer)
-	} else if event.Type == notifiers.Remove {
+	case notifiers.Remove:
 		key := string(event.Key)
 		addr := path.Base(key)
 		pd.removePeer(addr)
