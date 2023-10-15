@@ -200,7 +200,7 @@ func (pd *PeerDiscovery) registerSelf(ctx context.Context, advertiseAddr string)
 	pd.peers.SelfPeer.Address = advertiseAddr
 	pd.peers.SelfPeer.Hostname = hostname
 
-	pd.selfKey = path.Join(pd.etcdPath, pd.peers.SelfPeer.Hostname)
+	pd.selfKey = path.Join(pd.etcdPath, pd.peers.SelfPeer.Address)
 
 	return pd.uploadSelfPeer(ctx)
 }
@@ -292,13 +292,13 @@ func (pd *PeerDiscovery) DeregisterService(name string) {
 }
 
 // addPeer adds a peer info to the PeerDiscovery peers map.
-func (pd *PeerDiscovery) addPeer(peer *peersv1.Peer) {
+func (pd *PeerDiscovery) addPeer(address string, peer *peersv1.Peer) {
 	defer pd.watchers.OnPeerAdded(peer)
 	pd.peersLock.Lock()
 	defer pd.peersLock.Unlock()
 
-	log.Info().Str("address", peer.Address).Msg("adding peer to local peer discovery table")
-	pd.peers.Peers[peer.Address] = peer
+	log.Info().Str("address", address).Msg("adding peer to local peer discovery table")
+	pd.peers.Peers[address] = peer
 }
 
 // GetPeer returns the peer info in the PeerDiscovery with the given address.
@@ -329,7 +329,6 @@ func (pd *PeerDiscovery) GetPeerKeys() []string {
 
 func (pd *PeerDiscovery) removePeer(address string) {
 	var peer *peersv1.Peer
-	var ok bool
 	defer func() {
 		if peer != nil {
 			pd.watchers.OnPeerRemoved(peer)
@@ -339,16 +338,15 @@ func (pd *PeerDiscovery) removePeer(address string) {
 	pd.peersLock.Lock()
 	defer pd.peersLock.Unlock()
 
-	peer, ok = pd.peers.Peers[address]
-	if !ok {
-		return
-	}
+	peer = pd.peers.Peers[address]
 	log.Info().Str("address", address).Msg("removing peer from local peer discovery table")
-	delete(pd.peers.Peers, peer.Address)
+	delete(pd.peers.Peers, address)
 }
 
 func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	log.Info().Str("event", event.String()).Msg("Updating peer")
+	key := string(event.Key)
+	address := path.Base(key)
 	switch event.Type {
 	case notifiers.Write:
 		var peer peersv1.Peer
@@ -356,10 +354,8 @@ func (pd *PeerDiscovery) updatePeer(event notifiers.Event, unmarshaller config.U
 			log.Error().Err(err).Msg("failed to unmarshal peer info")
 			return
 		}
-		pd.addPeer(&peer)
+		pd.addPeer(address, &peer)
 	case notifiers.Remove:
-		key := string(event.Key)
-		addr := path.Base(key)
-		pd.removePeer(addr)
+		pd.removePeer(address)
 	}
 }
