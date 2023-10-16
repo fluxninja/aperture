@@ -42,7 +42,7 @@ aperturectl install agent --values-file=values.yaml --namespace=aperture
       --kube-config string   Path to the Kubernetes cluster config. Defaults to '~/.kube/config'
       --namespace string     Namespace in which the component will be installed. Defaults to 'default' namespace (default "default")
       --values-file string   Values YAML file containing parameters to customize the installation
-      --version string       Version of the Aperture (default "latest")
+      --version string       Version of the Aperture
 ```
 
 ### SEE ALSO

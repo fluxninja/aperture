@@ -1,0 +1,34 @@
+---
+sidebar_label: Dynamic-Config
+hide_title: true
+keywords:
+  - aperturectl
+  - aperturectl_cloud_dynamic-config
+---
+
+<!-- markdownlint-disable -->
+
+## aperturectl cloud dynamic-config
+
+DynamicConfig of Aperture Policy related commands for the Cloud Controller
+
+### Synopsis
+
+Use this command to manage the DynamicConfig of the Aperture Policies to the Cloud Controller.
+
+### Options
+
+```
+      --controller string      Address of Aperture Controller
+      --controller-ns string   Namespace in which the Aperture Controller is running
+  -h, --help                   help for dynamic-config
+      --insecure               Allow connection to controller running without TLS
+      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
+      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
+      --skip-verify            Skip TLS certificate verification while connecting to controller
+```
+
+### SEE ALSO
+
+- [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
+- [aperturectl cloud dynamic-config dynamic-config](/reference/aperturectl/cloud/dynamic-config/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy

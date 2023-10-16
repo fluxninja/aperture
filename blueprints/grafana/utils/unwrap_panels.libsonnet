@@ -1,7 +1,12 @@
 local panelLibrary = import '../panel_library.libsonnet';
 
-function(datasourceName, policyName, component, extra_filters={}) {
-  local generatedPanels = panelLibrary[component.component_name](datasourceName, policyName, component, extra_filters),
+function(componentName, componentBody, config) {
+  local newConfig =
+    if componentName == 'query'
+    then config { component_body: componentBody }
+    else config,
+
+  local generatedPanels = panelLibrary[std.toString(componentName)](newConfig),
 
   // this can be either a group of panels or single panel - we have to unwrap
   panel:

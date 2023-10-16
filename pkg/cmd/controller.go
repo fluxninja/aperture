@@ -391,6 +391,10 @@ func (h *Handler) ListPolicies(ctx context.Context, _ *emptypb.Empty) (*policyla
 	return h.policyService.GetPolicies(ctx, nil)
 }
 
+func (h *Handler) GetPolicy(ctx context.Context, req *policylangv1.GetPolicyRequest) (*policylangv1.GetPolicyResponse, error) {
+	return h.policyService.GetPolicy(ctx, req)
+}
+
 // GetStatus returns status of jobs in the system.
 func (h *Handler) GetStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
 	return h.statusService.GetGroupStatus(ctx, req)

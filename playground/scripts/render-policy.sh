@@ -38,9 +38,9 @@ if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		"${aperturectl}" cloud apply policy --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" -f -s >&2
+		"${aperturectl}" cloud policy apply --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" -f -s >&2
 	else
-		"${aperturectl}" cloud delete policy --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" || exit 0 >&2
+		"${aperturectl}" cloud policy delete --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" || exit 0 >&2
 	fi
 else
 	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" \

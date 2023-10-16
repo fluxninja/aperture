@@ -1,3 +1,4 @@
+local creator = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local blueprint = import './load-ramping.libsonnet';
 
@@ -66,8 +67,14 @@ function(params) {
   },
 
   local p = policy(updated_cfg),
+  local d = creator(p.policyResource, updated_cfg),
+
   policies: {
     [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
     [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef,
   },
+  dashboards: {
+    [std.format('%s.json', updated_cfg.policy.policy_name)]: d.mainDashboard,
+    [std.format('signals-%s.json', updated_cfg.policy.policy_name)]: d.signalsDashboard,
+  } + d.receiverDashboards,
 }
