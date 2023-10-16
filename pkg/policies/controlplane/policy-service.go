@@ -311,6 +311,10 @@ func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.
 		return nil, fmt.Errorf("failed to get dynamic config '%s' from etcd: '%s'", req.PolicyName, err)
 	}
 
+	if len(resp.Kvs) < 1 {
+		return &policylangv1.GetDynamicConfigResponse{}, nil
+	}
+
 	dynamicConfigJSON := make(map[string]interface{})
 	err = json.Unmarshal(resp.Kvs[0].Value, &dynamicConfigJSON)
 	if err != nil {
