@@ -1901,15 +1901,6 @@ definitions:
             dynamic_config:
                 type: object
         type: object
-    GetDynamicConfigResponses:
-        description: GetDynamicConfigResponses is a list of responses to get dynamic configuration for Policy.
-        properties:
-            responses:
-                items:
-                    $ref: '#/definitions/GetDynamicConfigResponse'
-                    type: object
-                type: array
-        type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
         properties:
@@ -5314,7 +5305,7 @@ paths:
                     description: An unexpected error response.
                     schema:
                         $ref: '#/definitions/googlerpcStatus'
-            summary: DeleteDynamicConfig lists dynamic configuration for a policy.
+            summary: DeleteDynamicConfig deletes dynamic configuration for a policy.
             tags:
                 - aperture-controller
         get:
@@ -5328,7 +5319,7 @@ paths:
                 "200":
                     description: A successful response.
                     schema:
-                        $ref: '#/definitions/GetDynamicConfigResponses'
+                        $ref: '#/definitions/GetDynamicConfigResponse'
                 default:
                     description: An unexpected error response.
                     schema:

@@ -377,7 +377,7 @@ func (h *Handler) PostDynamicConfig(ctx context.Context, req *policylangv1.PostD
 }
 
 // GetDynamicConfig gets dynamic-config of a policy.
-func (h *Handler) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponses, error) {
+func (h *Handler) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponse, error) {
 	return h.policyService.GetDynamicConfig(ctx, req)
 }
 

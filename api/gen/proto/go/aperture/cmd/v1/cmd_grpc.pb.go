@@ -60,7 +60,7 @@ type ControllerClient interface {
 	GetPolicy(ctx context.Context, in *v1.GetPolicyRequest, opts ...grpc.CallOption) (*v1.GetPolicyResponse, error)
 	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponses, error)
+	GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error)
 	DeleteDynamicConfig(ctx context.Context, in *v1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
@@ -183,8 +183,8 @@ func (c *controllerClient) PostDynamicConfig(ctx context.Context, in *v1.PostDyn
 	return out, nil
 }
 
-func (c *controllerClient) GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponses, error) {
-	out := new(v1.GetDynamicConfigResponses)
+func (c *controllerClient) GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error) {
+	out := new(v1.GetDynamicConfigResponse)
 	err := c.cc.Invoke(ctx, Controller_GetDynamicConfig_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -245,7 +245,7 @@ type ControllerServer interface {
 	GetPolicy(context.Context, *v1.GetPolicyRequest) (*v1.GetPolicyResponse, error)
 	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
-	GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponses, error)
+	GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error)
 	DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
@@ -292,7 +292,7 @@ func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPol
 func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
 }
-func (UnimplementedControllerServer) GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponses, error) {
+func (UnimplementedControllerServer) GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicConfig not implemented")
 }
 func (UnimplementedControllerServer) DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {

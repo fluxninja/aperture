@@ -43,8 +43,8 @@ type PolicyServiceClient interface {
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GetDynamicConfig lists dynamic configuration for a policy.
-	GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponses, error)
-	// DeleteDynamicConfig lists dynamic configuration for a policy.
+	GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponse, error)
+	// DeleteDynamicConfig deletes dynamic configuration for a policy.
 	DeleteDynamicConfig(ctx context.Context, in *DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -95,8 +95,8 @@ func (c *policyServiceClient) PostDynamicConfig(ctx context.Context, in *PostDyn
 	return out, nil
 }
 
-func (c *policyServiceClient) GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponses, error) {
-	out := new(GetDynamicConfigResponses)
+func (c *policyServiceClient) GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponse, error) {
+	out := new(GetDynamicConfigResponse)
 	err := c.cc.Invoke(ctx, PolicyService_GetDynamicConfig_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -144,8 +144,8 @@ type PolicyServiceServer interface {
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
 	// GetDynamicConfig lists dynamic configuration for a policy.
-	GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponses, error)
-	// DeleteDynamicConfig lists dynamic configuration for a policy.
+	GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponse, error)
+	// DeleteDynamicConfig deletes dynamic configuration for a policy.
 	DeleteDynamicConfig(context.Context, *DeleteDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)
@@ -168,7 +168,7 @@ func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *UpsertPol
 func (UnimplementedPolicyServiceServer) PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
 }
-func (UnimplementedPolicyServiceServer) GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponses, error) {
+func (UnimplementedPolicyServiceServer) GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicConfig not implemented")
 }
 func (UnimplementedPolicyServiceServer) DeleteDynamicConfig(context.Context, *DeleteDynamicConfigRequest) (*emptypb.Empty, error) {

@@ -292,7 +292,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 }
 
 // GetDynamicConfig gets dynamic config of a policy.
-func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponses, error) {
+func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponse, error) {
 	etcdPolicy, err := s.etcdClient.Client.KV.Get(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
@@ -308,30 +308,22 @@ func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.
 
 	resp, err := s.etcdClient.KV.Get(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
 	if err != nil {
-		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
+		return nil, fmt.Errorf("failed to get dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
 	}
 
-	configs := []*policylangv1.GetDynamicConfigResponse{}
-	for _, v := range resp.Kvs {
-
-		dynamicConfigJSON := make(map[string]interface{})
-		err = json.Unmarshal(v.Value, &dynamicConfigJSON)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse DynamicConfig JSON: %w", err)
-		}
-
-		dynamicConfigStruct, err := structpb.NewStruct(dynamicConfigJSON)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
-		}
-
-		configs = append(configs, &policylangv1.GetDynamicConfigResponse{
-			DynamicConfig: dynamicConfigStruct,
-		})
+	dynamicConfigJSON := make(map[string]interface{})
+	err = json.Unmarshal(resp.Kvs[0].Value, &dynamicConfigJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse DynamicConfig JSON: %w", err)
 	}
 
-	return &policylangv1.GetDynamicConfigResponses{
-		Responses: configs,
+	dynamicConfigStruct, err := structpb.NewStruct(dynamicConfigJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse DynamicConfig Struct: %w", err)
+	}
+
+	return &policylangv1.GetDynamicConfigResponse{
+		DynamicConfig: dynamicConfigStruct,
 	}, nil
 }
 
@@ -352,7 +344,7 @@ func (s *PolicyService) DeleteDynamicConfig(ctx context.Context, req *policylang
 
 	_, err = s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
 	if err != nil {
-		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
+		return nil, fmt.Errorf("failed to delete dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
 	}
 
 	return new(emptypb.Empty), nil

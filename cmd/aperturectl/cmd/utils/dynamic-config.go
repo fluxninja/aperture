@@ -53,17 +53,15 @@ func GetDynamicConfigUsingAPI(client PolicyClient, policyName string) error {
 		return fmt.Errorf("failed to update DynamicConfig: %w", err)
 	}
 
-	for _, r := range resp.Responses {
-		j, err := r.MarshalJSON()
-		if err != nil {
-			return fmt.Errorf("failed to marshal response: %w", err)
-		}
-
-		yamlString, err := GetYAMLString(j)
-		if err != nil {
-			return err
-		}
-		fmt.Print(yamlString)
+	j, err := resp.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("failed to marshal response: %w", err)
 	}
+
+	yamlString, err := GetYAMLString(j)
+	if err != nil {
+		return err
+	}
+	fmt.Print(yamlString)
 	return nil
 }
