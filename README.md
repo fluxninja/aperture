@@ -37,7 +37,10 @@ optimizing resource utilization.
 Aperture seamlessly integrates with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
 developers to establish control points around specific features or code sections
-inside applications
+inside applications. The following diagram depicts the role of Aperture in a
+cloud application:
+
+![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg)
 
 ## ⚙️ Load management capabilities
 
@@ -118,6 +121,7 @@ To install the Aperture system, follow the
 
 ## 🎥 Videos
 
+- [IstioCon 2023 | Achieving Fault Tolerance in Istio with Observability-Driven Load Management](https://www.youtube.com/watch?v=eiSroeyACAg)
 - [SREcon'23 APAC | Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
 - [Chaos Carnival 2023 | Graceful Degradation: Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
 - [Conf42 Chaos Engineering 2023 | Graceful Degradation: When All Goes Wrong](https://www.youtube.com/watch?v=nm62d2gYqNk)
