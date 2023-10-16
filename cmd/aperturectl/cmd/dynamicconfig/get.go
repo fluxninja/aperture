@@ -42,7 +42,7 @@ var GetCmd = &cobra.Command{
 			var deployment *appsv1.Deployment
 			deployment, err = utils.GetControllerDeployment(controller.GetKubeRestConfig(), controllerNs)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to get controller deployment: %w", err)
 			}
 
 			policy := &policyv1alpha1.Policy{}
@@ -71,13 +71,13 @@ var GetCmd = &cobra.Command{
 
 			yamlString, err := utils.GetYAMLString(j)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to convert JSON to YAML: %w", err)
 			}
 			fmt.Print(yamlString)
 		} else {
 			err := utils.GetDynamicConfigUsingAPI(client, policyName)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to get dynamic config using API: %w", err)
 			}
 		}
 		return nil

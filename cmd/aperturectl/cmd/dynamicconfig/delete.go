@@ -64,10 +64,15 @@ var DelCmd = &cobra.Command{
 					return fmt.Errorf("failed to get Dynamic Config '%s': %w", policyName, err)
 				}
 			}
-			policy.DynamicConfig = runtime.RawExtension{}
-			err = kubeClient.Update(context.Background(), policy)
-			if err != nil {
-				return fmt.Errorf("failed to delete DynamicConfig for policy '%s': %w", policyName, err)
+			if policy.DynamicConfig.Raw != nil {
+				policy.DynamicConfig = runtime.RawExtension{}
+				err = kubeClient.Update(context.Background(), policy)
+				if err != nil {
+					return fmt.Errorf("failed to delete DynamicConfig for policy '%s': %w", policyName, err)
+				}
+			} else {
+				fmt.Println("No DynamicConfig found for policy", policyName)
+				return nil
 			}
 		} else {
 			_, err := client.DeleteDynamicConfig(context.Background(), &languagev1.DeleteDynamicConfigRequest{
