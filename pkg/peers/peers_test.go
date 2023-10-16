@@ -20,7 +20,7 @@ var _ = Describe("Peers", func() {
 		pd, err = NewPeerDiscovery("", nil, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		for _, peer := range hardCodedPeers.Peers {
-			pd.addPeer(peer)
+			pd.addPeer(peer.Address, peer)
 		}
 	})
 
@@ -39,7 +39,7 @@ var _ = Describe("Peers", func() {
 			hardCodedPeers3Copy := proto.Clone(createPeers(hardCodedIPAddress3, hardCodedPeer3)).(*peersv1.Peers)
 			Expect(resp).To(Equal(hardCodedPeers3Copy))
 
-			pd.addPeer(hardCodedPeer1)
+			pd.addPeer(hardCodedPeer1.Address, hardCodedPeer1)
 			pd.removePeer(hardCodedIPAddress3)
 			resp = pd.GetPeers()
 			hardCodedPeers1Copy := proto.Clone(createPeers(hardCodedIPAddress1, hardCodedPeer1)).(*peersv1.Peers)

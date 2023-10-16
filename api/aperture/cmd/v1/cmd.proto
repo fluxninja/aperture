@@ -28,6 +28,9 @@ service Controller {
   rpc GetPolicy(aperture.policy.language.v1.GetPolicyRequest) returns (aperture.policy.language.v1.GetPolicyResponse);
   rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (aperture.policy.language.v1.UpsertPolicyResponse);
   rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
+  rpc GetDynamicConfig(aperture.policy.language.v1.GetDynamicConfigRequest) returns (aperture.policy.language.v1.GetDynamicConfigResponse);
+  rpc DeleteDynamicConfig(aperture.policy.language.v1.DeleteDynamicConfigRequest) returns (google.protobuf.Empty);
+
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
   rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
   rpc GetStatus(aperture.status.v1.GroupStatusRequest) returns (aperture.status.v1.GroupStatus);
