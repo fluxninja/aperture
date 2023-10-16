@@ -166,8 +166,8 @@ Kubernetes Objects which will be created by following steps are listed
          value: AGENT_API_KEY
    ```
 
-   Replace the `NAMESPACE1`, `NAMESPACE2` and other namespaces, with the actual
-   namespaces and add more if required.
+   Replace the `NAMESPACE1`, `NAMESPACE2` with the actual namespaces and add
+   more if required.
 
    <Tabs groupId="setup" queryString>
    <TabItem value="Helm" label="Helm">
