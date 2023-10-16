@@ -18,15 +18,9 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 For services to control flows with Aperture Agent, [Control
-Points][control-point] must be set within the service.
-
-This can be achieved in the following ways:
-
-- [Istio/Envoy integration][istio] for controlling HTTP or gRPC requests flowing
-  through the service.
-- Aperture SDKs can be used to set feature or traffic (HTTP and gRPC) control
-  points within the service code. This approach allows for fine-grained flow
-  control.
+Points][control-point] must be set within the service. Aperture SDKs can be used
+to set feature or traffic (HTTP and gRPC) control points within the service
+code. This approach allows for fine-grained flow control.
 
 <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/sdks/`}>Aperture
@@ -58,7 +52,6 @@ control points with less code changes:
 <DocCardList />
 
 [control-point]: /concepts/control-point.md
-[istio]: ../istio/istio.md
 [golang]: ./go/manual.md
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md
