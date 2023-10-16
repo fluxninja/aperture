@@ -376,6 +376,16 @@ func (h *Handler) PostDynamicConfig(ctx context.Context, req *policylangv1.PostD
 	return h.policyService.PostDynamicConfig(ctx, req)
 }
 
+// GetDynamicConfig gets dynamic-config of a policy.
+func (h *Handler) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponse, error) {
+	return h.policyService.GetDynamicConfig(ctx, req)
+}
+
+// DeleteDynamicConfig deletes dynamic-config of a policy.
+func (h *Handler) DeleteDynamicConfig(ctx context.Context, req *policylangv1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
+	return h.policyService.DeleteDynamicConfig(ctx, req)
+}
+
 // DeletePolicy deletes policies from the system.
 func (h *Handler) DeletePolicy(ctx context.Context, req *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return h.policyService.DeletePolicy(ctx, req)

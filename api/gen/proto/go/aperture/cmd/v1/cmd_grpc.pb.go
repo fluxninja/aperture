@@ -36,6 +36,8 @@ const (
 	Controller_GetPolicy_FullMethodName                  = "/aperture.cmd.v1.Controller/GetPolicy"
 	Controller_UpsertPolicy_FullMethodName               = "/aperture.cmd.v1.Controller/UpsertPolicy"
 	Controller_PostDynamicConfig_FullMethodName          = "/aperture.cmd.v1.Controller/PostDynamicConfig"
+	Controller_GetDynamicConfig_FullMethodName           = "/aperture.cmd.v1.Controller/GetDynamicConfig"
+	Controller_DeleteDynamicConfig_FullMethodName        = "/aperture.cmd.v1.Controller/DeleteDynamicConfig"
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
 	Controller_GetDecisions_FullMethodName               = "/aperture.cmd.v1.Controller/GetDecisions"
 	Controller_GetStatus_FullMethodName                  = "/aperture.cmd.v1.Controller/GetStatus"
@@ -58,6 +60,8 @@ type ControllerClient interface {
 	GetPolicy(ctx context.Context, in *v1.GetPolicyRequest, opts ...grpc.CallOption) (*v1.GetPolicyResponse, error)
 	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error)
+	DeleteDynamicConfig(ctx context.Context, in *v1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
 	GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error)
@@ -179,6 +183,24 @@ func (c *controllerClient) PostDynamicConfig(ctx context.Context, in *v1.PostDyn
 	return out, nil
 }
 
+func (c *controllerClient) GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error) {
+	out := new(v1.GetDynamicConfigResponse)
+	err := c.cc.Invoke(ctx, Controller_GetDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) DeleteDynamicConfig(ctx context.Context, in *v1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Controller_DeleteDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *controllerClient) DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Controller_DeletePolicy_FullMethodName, in, out, opts...)
@@ -223,6 +245,8 @@ type ControllerServer interface {
 	GetPolicy(context.Context, *v1.GetPolicyRequest) (*v1.GetPolicyResponse, error)
 	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
+	GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error)
+	DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
 	GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error)
@@ -267,6 +291,12 @@ func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPol
 }
 func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
+}
+func (UnimplementedControllerServer) GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicConfig not implemented")
+}
+func (UnimplementedControllerServer) DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDynamicConfig not implemented")
 }
 func (UnimplementedControllerServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
@@ -505,6 +535,42 @@ func _Controller_PostDynamicConfig_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_GetDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.GetDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetDynamicConfig(ctx, req.(*v1.GetDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_DeleteDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.DeleteDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).DeleteDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_DeleteDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).DeleteDynamicConfig(ctx, req.(*v1.DeleteDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Controller_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(v1.DeletePolicyRequest)
 	if err := dec(in); err != nil {
@@ -613,6 +679,14 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostDynamicConfig",
 			Handler:    _Controller_PostDynamicConfig_Handler,
+		},
+		{
+			MethodName: "GetDynamicConfig",
+			Handler:    _Controller_GetDynamicConfig_Handler,
+		},
+		{
+			MethodName: "DeleteDynamicConfig",
+			Handler:    _Controller_DeleteDynamicConfig_Handler,
 		},
 		{
 			MethodName: "DeletePolicy",

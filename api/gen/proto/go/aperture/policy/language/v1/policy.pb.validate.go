@@ -520,6 +520,250 @@ var _ interface {
 	ErrorName() string
 } = UpsertPolicyResponseValidationError{}
 
+// Validate checks the field values on GetDynamicConfigRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDynamicConfigRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDynamicConfigRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDynamicConfigRequestMultiError, or nil if none found.
+func (m *GetDynamicConfigRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDynamicConfigRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPolicyName()) < 1 {
+		err := GetDynamicConfigRequestValidationError{
+			field:  "PolicyName",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetDynamicConfigRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDynamicConfigRequestMultiError is an error wrapping multiple validation
+// errors returned by GetDynamicConfigRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetDynamicConfigRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDynamicConfigRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDynamicConfigRequestMultiError) AllErrors() []error { return m }
+
+// GetDynamicConfigRequestValidationError is the validation error returned by
+// GetDynamicConfigRequest.Validate if the designated constraints aren't met.
+type GetDynamicConfigRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDynamicConfigRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDynamicConfigRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDynamicConfigRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDynamicConfigRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDynamicConfigRequestValidationError) ErrorName() string {
+	return "GetDynamicConfigRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDynamicConfigRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDynamicConfigRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDynamicConfigRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDynamicConfigRequestValidationError{}
+
+// Validate checks the field values on GetDynamicConfigResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDynamicConfigResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetDynamicConfigResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDynamicConfigResponseMultiError, or nil if none found.
+func (m *GetDynamicConfigResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetDynamicConfigResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetDynamicConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetDynamicConfigResponseValidationError{
+					field:  "DynamicConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetDynamicConfigResponseValidationError{
+					field:  "DynamicConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDynamicConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDynamicConfigResponseValidationError{
+				field:  "DynamicConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetDynamicConfigResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetDynamicConfigResponseMultiError is an error wrapping multiple validation
+// errors returned by GetDynamicConfigResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetDynamicConfigResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetDynamicConfigResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetDynamicConfigResponseMultiError) AllErrors() []error { return m }
+
+// GetDynamicConfigResponseValidationError is the validation error returned by
+// GetDynamicConfigResponse.Validate if the designated constraints aren't met.
+type GetDynamicConfigResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDynamicConfigResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDynamicConfigResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDynamicConfigResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDynamicConfigResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDynamicConfigResponseValidationError) ErrorName() string {
+	return "GetDynamicConfigResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDynamicConfigResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDynamicConfigResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDynamicConfigResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDynamicConfigResponseValidationError{}
+
 // Validate checks the field values on PostDynamicConfigRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -672,6 +916,119 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PostDynamicConfigRequestValidationError{}
+
+// Validate checks the field values on DeleteDynamicConfigRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DeleteDynamicConfigRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteDynamicConfigRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DeleteDynamicConfigRequestMultiError, or nil if none found.
+func (m *DeleteDynamicConfigRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteDynamicConfigRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPolicyName()) < 1 {
+		err := DeleteDynamicConfigRequestValidationError{
+			field:  "PolicyName",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DeleteDynamicConfigRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DeleteDynamicConfigRequestMultiError is an error wrapping multiple
+// validation errors returned by DeleteDynamicConfigRequest.ValidateAll() if
+// the designated constraints aren't met.
+type DeleteDynamicConfigRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteDynamicConfigRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteDynamicConfigRequestMultiError) AllErrors() []error { return m }
+
+// DeleteDynamicConfigRequestValidationError is the validation error returned
+// by DeleteDynamicConfigRequest.Validate if the designated constraints aren't met.
+type DeleteDynamicConfigRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteDynamicConfigRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteDynamicConfigRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteDynamicConfigRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteDynamicConfigRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteDynamicConfigRequestValidationError) ErrorName() string {
+	return "DeleteDynamicConfigRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DeleteDynamicConfigRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteDynamicConfigRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteDynamicConfigRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteDynamicConfigRequestValidationError{}
 
 // Validate checks the field values on DeletePolicyRequest with the rules
 // defined in the proto definition for this message. If any rules are
