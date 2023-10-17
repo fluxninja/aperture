@@ -40,7 +40,8 @@ developers to establish control points around specific features or code sections
 inside applications. The following diagram depicts the role of Aperture in a
 cloud application:
 
-![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg)
+![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg#gh-light-mode-only)
+![Unified Load Management](./docs/content/assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
 
 ## ⚙️ Load management capabilities
 
