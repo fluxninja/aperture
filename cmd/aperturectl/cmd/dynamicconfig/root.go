@@ -18,6 +18,8 @@ func init() {
 	controller.InitFlags(DynamicConfigCmd.PersistentFlags())
 
 	DynamicConfigCmd.AddCommand(ApplyCmd)
+	DynamicConfigCmd.AddCommand(GetCmd)
+	DynamicConfigCmd.AddCommand(DelCmd)
 }
 
 // DynamicConfigCmd is the command to manage DynamicCOnfig of Policies in the Controller.

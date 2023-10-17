@@ -58,6 +58,22 @@ service PolicyService {
     };
   }
 
+  // GetDynamicConfig lists dynamic configuration for a policy.
+  rpc GetDynamicConfig(GetDynamicConfigRequest) returns (GetDynamicConfigResponse) {
+    option (google.api.http) = {get: "/v1/dynamic-configs/{policy_name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
+  // DeleteDynamicConfig deletes dynamic configuration for a policy.
+  rpc DeleteDynamicConfig(DeleteDynamicConfigRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/dynamic-configs/{policy_name}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["aperture-controller"];
+    };
+  }
+
   // DeletePolicy removes a policy with the specified name.
   rpc DeletePolicy(DeletePolicyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/v1/policies/{name}"};
@@ -115,10 +131,25 @@ message UpsertPolicyResponse {
   string policy_hash = 1;
 }
 
+// GetDynamicConfigRequest is a request to get dynamic configuration for Policy.
+message GetDynamicConfigRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1];
+}
+
+// GetDynamicConfigResponse is a response containing dynamic configuration for Policy.
+message GetDynamicConfigResponse {
+  google.protobuf.Struct dynamic_config = 1;
+}
+
 // PostDynamicConfigRequest is a request to patch dynamic configuration for Policy.
 message PostDynamicConfigRequest {
   string policy_name = 1 [(validate.rules).string.min_len = 1];
   google.protobuf.Struct dynamic_config = 2 [(validate.rules).message.required = true];
+}
+
+// DeleteDynamicConfigRequest is a request to delete dynamic configuration of Policy.
+message DeleteDynamicConfigRequest {
+  string policy_name = 1 [(validate.rules).string.min_len = 1];
 }
 
 // DeletePolicyRequest is a request to delete a policy with given name.

@@ -28,7 +28,7 @@ export const ExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-${component}-apikey
         key: apiKey
-      value: API_KEY
+      value: AGENT_API_KEY
 `}</CodeBlock>
 );
 ```
@@ -47,7 +47,7 @@ export const CloudExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: API_KEY
+      value: AGENT_API_KEY
 `}</CodeBlock>
 );
 ```

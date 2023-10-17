@@ -4,19 +4,19 @@ import grpc, {
   connectivityState,
 } from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
-import {OTLPTraceExporter} from "@opentelemetry/exporter-trace-otlp-grpc";
-import {Resource} from "@opentelemetry/resources";
-import {BatchSpanProcessor, Tracer} from "@opentelemetry/sdk-trace-base";
-import {NodeTracerProvider} from "@opentelemetry/sdk-trace-node";
-import {SemanticResourceAttributes} from "@opentelemetry/semantic-conventions";
-import {serializeError} from "serialize-error";
-import {CheckRequest} from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
-import {CheckResponse__Output} from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-import {FlowControlServiceClient} from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
+import { Resource } from "@opentelemetry/resources";
+import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
+import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { serializeError } from "serialize-error";
+import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
+import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
-import {LIBRARY_NAME, LIBRARY_VERSION, URL} from "./consts.js";
-import {Flow} from "./flow.js";
-import {fcs} from "./utils.js";
+import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
+import { Flow } from "./flow.js";
+import { fcs } from "./utils.js";
 
 export interface FlowParams {
   labels?: Record<string, string>;
@@ -41,13 +41,6 @@ export class ApertureClient {
     channelCredentials?: ChannelCredentials;
     channelOptions?: ChannelOptions;
   } = {}) {
-    const defaultChannelOptions = {
-      "grpc.keepalive_time_ms": 10000,
-      "grpc.keepalive_timeout_ms": 5000,
-    };
-
-    channelOptions = { ...defaultChannelOptions, ...channelOptions };
-
     this.fcsClient = new fcs.FlowControlService(
       URL,
       channelCredentials,

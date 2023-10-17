@@ -20,12 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PolicyService_GetPolicy_FullMethodName         = "/aperture.policy.language.v1.PolicyService/GetPolicy"
-	PolicyService_GetPolicies_FullMethodName       = "/aperture.policy.language.v1.PolicyService/GetPolicies"
-	PolicyService_UpsertPolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/UpsertPolicy"
-	PolicyService_PostDynamicConfig_FullMethodName = "/aperture.policy.language.v1.PolicyService/PostDynamicConfig"
-	PolicyService_DeletePolicy_FullMethodName      = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
-	PolicyService_GetDecisions_FullMethodName      = "/aperture.policy.language.v1.PolicyService/GetDecisions"
+	PolicyService_GetPolicy_FullMethodName           = "/aperture.policy.language.v1.PolicyService/GetPolicy"
+	PolicyService_GetPolicies_FullMethodName         = "/aperture.policy.language.v1.PolicyService/GetPolicies"
+	PolicyService_UpsertPolicy_FullMethodName        = "/aperture.policy.language.v1.PolicyService/UpsertPolicy"
+	PolicyService_PostDynamicConfig_FullMethodName   = "/aperture.policy.language.v1.PolicyService/PostDynamicConfig"
+	PolicyService_GetDynamicConfig_FullMethodName    = "/aperture.policy.language.v1.PolicyService/GetDynamicConfig"
+	PolicyService_DeleteDynamicConfig_FullMethodName = "/aperture.policy.language.v1.PolicyService/DeleteDynamicConfig"
+	PolicyService_DeletePolicy_FullMethodName        = "/aperture.policy.language.v1.PolicyService/DeletePolicy"
+	PolicyService_GetDecisions_FullMethodName        = "/aperture.policy.language.v1.PolicyService/GetDecisions"
 )
 
 // PolicyServiceClient is the client API for PolicyService service.
@@ -40,6 +42,10 @@ type PolicyServiceClient interface {
 	UpsertPolicy(ctx context.Context, in *UpsertPolicyRequest, opts ...grpc.CallOption) (*UpsertPolicyResponse, error)
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(ctx context.Context, in *PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// GetDynamicConfig lists dynamic configuration for a policy.
+	GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponse, error)
+	// DeleteDynamicConfig deletes dynamic configuration for a policy.
+	DeleteDynamicConfig(ctx context.Context, in *DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *GetDecisionsRequest, opts ...grpc.CallOption) (*GetDecisionsResponse, error)
@@ -89,6 +95,24 @@ func (c *policyServiceClient) PostDynamicConfig(ctx context.Context, in *PostDyn
 	return out, nil
 }
 
+func (c *policyServiceClient) GetDynamicConfig(ctx context.Context, in *GetDynamicConfigRequest, opts ...grpc.CallOption) (*GetDynamicConfigResponse, error) {
+	out := new(GetDynamicConfigResponse)
+	err := c.cc.Invoke(ctx, PolicyService_GetDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *policyServiceClient) DeleteDynamicConfig(ctx context.Context, in *DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PolicyService_DeleteDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PolicyService_DeletePolicy_FullMethodName, in, out, opts...)
@@ -119,6 +143,10 @@ type PolicyServiceServer interface {
 	UpsertPolicy(context.Context, *UpsertPolicyRequest) (*UpsertPolicyResponse, error)
 	// PostDynamicConfig creates/updates dynamic configuration based on the provided request.
 	PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error)
+	// GetDynamicConfig lists dynamic configuration for a policy.
+	GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponse, error)
+	// DeleteDynamicConfig deletes dynamic configuration for a policy.
+	DeleteDynamicConfig(context.Context, *DeleteDynamicConfigRequest) (*emptypb.Empty, error)
 	// DeletePolicy removes a policy with the specified name.
 	DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *GetDecisionsRequest) (*GetDecisionsResponse, error)
@@ -139,6 +167,12 @@ func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *UpsertPol
 }
 func (UnimplementedPolicyServiceServer) PostDynamicConfig(context.Context, *PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
+}
+func (UnimplementedPolicyServiceServer) GetDynamicConfig(context.Context, *GetDynamicConfigRequest) (*GetDynamicConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicConfig not implemented")
+}
+func (UnimplementedPolicyServiceServer) DeleteDynamicConfig(context.Context, *DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDynamicConfig not implemented")
 }
 func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
@@ -230,6 +264,42 @@ func _PolicyService_PostDynamicConfig_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PolicyService_GetDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).GetDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_GetDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).GetDynamicConfig(ctx, req.(*GetDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PolicyService_DeleteDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).DeleteDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_DeleteDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).DeleteDynamicConfig(ctx, req.(*DeleteDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PolicyService_DeletePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeletePolicyRequest)
 	if err := dec(in); err != nil {
@@ -288,6 +358,14 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostDynamicConfig",
 			Handler:    _PolicyService_PostDynamicConfig_Handler,
+		},
+		{
+			MethodName: "GetDynamicConfig",
+			Handler:    _PolicyService_GetDynamicConfig_Handler,
+		},
+		{
+			MethodName: "DeleteDynamicConfig",
+			Handler:    _PolicyService_DeleteDynamicConfig_Handler,
 		},
 		{
 			MethodName: "DeletePolicy",

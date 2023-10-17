@@ -37,6 +37,8 @@ type PolicyClient interface {
 	ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*policylangv1.GetPoliciesResponse, error)
 	UpsertPolicy(ctx context.Context, in *policylangv1.UpsertPolicyRequest, opts ...grpc.CallOption) (*policylangv1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *policylangv1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDynamicConfig(ctx context.Context, in *policylangv1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*policylangv1.GetDynamicConfigResponse, error)
+	DeleteDynamicConfig(ctx context.Context, in *policylangv1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *policylangv1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *policylangv1.GetDecisionsRequest, opts ...grpc.CallOption) (*policylangv1.GetDecisionsResponse, error)
 	GetPolicy(ctx context.Context, in *policylangv1.GetPolicyRequest, opts ...grpc.CallOption) (*policylangv1.GetPolicyResponse, error)
