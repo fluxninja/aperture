@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -110,7 +111,8 @@ func (a Agents) GetAgents() ([]string, error) {
 
 	agents := []string{}
 	for _, kv := range resp.Kvs {
-		agents = append(agents, re.ReplaceAllString(string(kv.Key), ""))
+		agent := re.ReplaceAllString(string(kv.Key), "")
+		agents = append(agents, agent[:strings.LastIndex(agent, ":")])
 	}
 	return agents, nil
 }
