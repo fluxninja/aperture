@@ -3,17 +3,20 @@ package agents
 
 import (
 	"context"
-	"fmt"
-	"regexp"
-	"strings"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
+	proto "google.golang.org/protobuf/proto"
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
+)
+
+const (
+	etcPath = "/peers/aperture-agent/"
 )
 
 // Module is fx module for controlling Agents on controller side.
@@ -99,11 +102,6 @@ func (a Agents) PreviewHTTPRequests(
 
 // GetAgents lists the agents registered on etcd under /peers/aperture-agent.
 func (a Agents) GetAgents() ([]string, error) {
-	re := regexp.MustCompile(`/peers/aperture-agent/[^/]+/`)
-	if re == nil {
-		return nil, fmt.Errorf("failed to compile regular expression")
-	}
-
 	resp, err := a.etcdClient.Client.KV.Get(context.Background(), "/peers/aperture-agent/", clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
@@ -111,8 +109,12 @@ func (a Agents) GetAgents() ([]string, error) {
 
 	agents := []string{}
 	for _, kv := range resp.Kvs {
-		agent := re.ReplaceAllString(string(kv.Key), "")
-		agents = append(agents, agent[:strings.LastIndex(agent, ":")])
+		var peer peersv1.Peer
+		err = proto.Unmarshal(kv.Value, &peer)
+		if err != nil {
+			return nil, err
+		}
+		agents = append(agents, peer.Hostname)
 	}
 	return agents, nil
 }
