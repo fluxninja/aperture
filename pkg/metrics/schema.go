@@ -63,10 +63,12 @@ const (
 	// WorkloadOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed.
 	WorkloadOnTimeMetricName = "workload_on_time_total"
 
-	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
+	// IncomingTokensMetricName - total work measured in tokens of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
-	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
+	// AcceptedTokensMetricName - total work measured in tokens of all accepted requests.
 	AcceptedTokensMetricName = "accepted_tokens_total"
+	// RejectedTokensMetricName - total work measured in tokens of all rejected requests.
+	RejectedTokensMetricName = "rejected_tokens_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
