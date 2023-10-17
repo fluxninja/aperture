@@ -177,19 +177,34 @@ func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *R
 	}
 }
 
-func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
-	if accepted {
-		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
+func (sched *WFQScheduler) updateOutgoingTokenMetrics(accepted bool, tokens float64) {
+	if tokens <= 0 {
+		return
 	}
-	sched.metrics.IncomingTokensCounter.Add(request.Tokens)
+	if accepted {
+		sched.metrics.AcceptedTokensCounter.Add(tokens)
+	} else {
+		sched.metrics.RejectedTokensCounter.Add(tokens)
+	}
+}
+
+func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
+	sched.updateOutgoingTokenMetrics(accepted, request.Tokens)
 	sched.updateRequestInQueueMetrics(accepted, request, startTime)
 	return accepted, remaining, current
+}
+
+func (sched *WFQScheduler) updateIncomingTokensMetric(tokens float64) {
+	if tokens > 0 {
+		sched.metrics.IncomingTokensCounter.Add(tokens)
+	}
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
 // Return value - true: Accept, false: Reject.
 func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool, float64, float64) {
 	startTime := time.Now()
+	sched.updateIncomingTokensMetric(request.Tokens)
 	if request.Tokens == 0 {
 		return sched.updateMetricsAndReturn(true, 0, 0, request, startTime)
 	}
@@ -580,6 +595,7 @@ type WFQMetrics struct {
 	HeapRequestsGauge              prometheus.Gauge
 	IncomingTokensCounter          prometheus.Counter
 	AcceptedTokensCounter          prometheus.Counter
+	RejectedTokensCounter          prometheus.Counter
 	RequestInQueueDurationSummary  *prometheus.SummaryVec
 	WorkloadPreemptedTokensSummary *prometheus.SummaryVec
 	WorkloadDelayedTokensSummary   *prometheus.SummaryVec
