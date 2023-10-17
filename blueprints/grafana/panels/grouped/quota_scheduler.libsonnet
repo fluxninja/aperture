@@ -1,4 +1,4 @@
-local accepted_token_rate = import '../accepted_token_rate.libsonnet';
+local accepted_vs_rejected_token_rate = import '../accepted_vs_rejected_token_rate.libsonnet';
 local avg_preemption_chart = import '../avg_preemption_chart.libsonnet';
 local avg_preemption_time_series = import '../avg_preemption_time_series.libsonnet';
 local incoming_token_rate = import '../incoming_token_rate.libsonnet';
@@ -55,7 +55,7 @@ function(cfg) {
     + g.panel.barChart.gridPos.withW(12),
     incoming_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withY(80),
-    accepted_token_rate(cfg).panel
+    accepted_vs_rejected_token_rate(cfg).panel
     + g.panel.timeSeries.gridPos.withX(12)
     + g.panel.timeSeries.gridPos.withY(80),
     total_incoming_tokens(cfg).panel
