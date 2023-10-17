@@ -29,6 +29,7 @@ var (
 	wfqFlowsGauge                   prometheus.Gauge
 	wfqHeapRequestsGauge            prometheus.Gauge
 	wfqAcceptedTokensCounter        prometheus.Counter
+	wfqRejectedTokensCounter        prometheus.Counter
 	wfqIncomingTokensCounter        prometheus.Counter
 	requestInQueueDurationSummary   *prometheus.SummaryVec
 	tokenBucketLMGauge              prometheus.Gauge
@@ -72,6 +73,12 @@ func getMetrics() (prometheus.Gauge, *TokenBucketMetrics) {
 		ConstLabels: constLabels,
 	})
 	_ = prometheusRegistry.Register(wfqAcceptedTokensCounter)
+	wfqRejectedTokensCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        metrics.RejectedTokensMetricName,
+		Help:        "A counter measuring work rejected by Scheduler",
+		ConstLabels: constLabels,
+	})
+	_ = prometheusRegistry.Register(wfqRejectedTokensCounter)
 	requestInQueueDurationSummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.RequestInQueueDurationMetricName,
 		Help: "A summary that tracks the duration of requests in queue",
@@ -240,6 +247,7 @@ func BenchmarkBasicTokenBucket(b *testing.B) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RejectedTokensCounter:         wfqRejectedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics, labels)
@@ -280,6 +288,7 @@ func BenchmarkTokenBucketLoadMultiplier(b *testing.B) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RejectedTokensCounter:         wfqRejectedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, manager, schedMetrics, labels)
@@ -333,6 +342,7 @@ func baseOfBasicBucketTest(t *testing.T, flows flowTrackers, fillRate float64, n
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RejectedTokensCounter:         wfqRejectedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 	sched := NewWFQScheduler(c, basicBucket, metrics, labels)
@@ -576,6 +586,7 @@ func TestLoadMultiplierBucket(t *testing.T) {
 		HeapRequestsGauge:             wfqHeapRequestsGauge,
 		IncomingTokensCounter:         wfqIncomingTokensCounter,
 		AcceptedTokensCounter:         wfqAcceptedTokensCounter,
+		RejectedTokensCounter:         wfqRejectedTokensCounter,
 		RequestInQueueDurationSummary: requestInQueueDurationSummary,
 	}
 
