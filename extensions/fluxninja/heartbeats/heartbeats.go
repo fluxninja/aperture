@@ -63,7 +63,7 @@ type Heartbeats struct {
 	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo
 	election                  *election.Election
-	APIKey                    string
+	apiKey                    string
 	jobName                   string
 	installationMode          string
 	heartbeatsAddr            string
@@ -81,10 +81,15 @@ func newHeartbeats(
 	flowControlPoints *cache.Cache[selectors.TypedControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 ) *Heartbeats {
+	apiKey := extensionConfig.AgentAPIKey
+	if apiKey == "" {
+		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+		apiKey = extensionConfig.APIKey
+	}
 	return &Heartbeats{
 		heartbeatsAddr:            extensionConfig.Endpoint,
 		interval:                  extensionConfig.HeartbeatInterval,
-		APIKey:                    extensionConfig.APIKey,
+		apiKey:                    apiKey,
 		jobGroup:                  jobGroup,
 		statusRegistry:            statusRegistry,
 		entities:                  entities,
@@ -255,8 +260,8 @@ func (h *Heartbeats) newHeartbeat(
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
 	report := h.newHeartbeat(jobCtxt)
 
-	// Add api key value to metadata
-	md := metadata.Pairs("apiKey", h.APIKey)
+	// Add agent key value to metadata
+	md := metadata.Pairs("apiKey", h.apiKey)
 	ctx := metadata.NewOutgoingContext(jobCtxt, md)
 	_, err := h.heartbeatsClient.Report(ctx, report)
 	if err != nil {
@@ -280,7 +285,7 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 		log.Warn().Err(err).Msg("could not create request")
 		return &emptypb.Empty{}, err
 	}
-	req.Header.Add("apiKey", h.APIKey)
+	req.Header.Add("apiKey", h.apiKey)
 	cli := http.DefaultClient
 	cli.Transport = &http.Transport{}
 	_, err = cli.Do(req)
