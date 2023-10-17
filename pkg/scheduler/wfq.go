@@ -178,7 +178,7 @@ func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *R
 }
 
 func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float64, current float64, request *Request, startTime time.Time) (bool, float64, float64) {
-	if accepted {
+	if accepted && request.Tokens > 0 {
 		sched.metrics.AcceptedTokensCounter.Add(request.Tokens)
 	}
 	sched.updateRequestInQueueMetrics(accepted, request, startTime)
@@ -186,7 +186,9 @@ func (sched *WFQScheduler) updateMetricsAndReturn(accepted bool, remaining float
 }
 
 func (sched *WFQScheduler) updateIncomingTokensMetric(tokens float64) {
-	sched.metrics.IncomingTokensCounter.Add(tokens)
+	if tokens > 0 {
+		sched.metrics.IncomingTokensCounter.Add(tokens)
+	}
 }
 
 // Schedule blocks until the request is scheduled or until timeout.
