@@ -4,7 +4,7 @@ function(title, dsName, query, strFilters, h=10, w=24, legendFormat='', queryFor
   local barChartPanel =
     g.panel.barChart.new(title)
     + g.panel.barChart.panelOptions.withDescription(description)
-    + g.panel.barChart.queryOptions.withDatasource(dsName)
+    + g.panel.barChart.queryOptions.withDatasource('prometheus', dsName)
     + g.panel.barChart.queryOptions.withTargets([
       g.query.prometheus.new(dsName, query % { filters: strFilters })
       + g.query.prometheus.withIntervalFactor(1)
