@@ -1206,6 +1206,7 @@ workflows:
     when:
       or:
         - << pipeline.parameters.updated-aperture >>
+        - << pipeline.parameters.updated-blueprints >>
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-agent
