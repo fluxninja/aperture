@@ -43,15 +43,15 @@ possible to [self-host it][self-hosting].
 
 :::
 
-The Aperture Controller is a centralized control system, equipped with a
-comprehensive global perspective. Its role is collecting data and evaluating
-policies. Policy evaluation results in high-level adjustments, which are then
-sent down to Aperture Agents.
+Aperture Controller is a centralized service used to manage Aperture Agents and
+evaluate load management policies. It's responsible for synchronizing policies
+and adjustments down to Aperture Agents. In addition, it also provides
+diagnostic and introspection APIs that are useful for managing agents.
 
 Aperture Cloud [provides a per-project Aperture
 Controller][aperture-cloud-controller]. It is programmed using declarative
 policies. Policies can be applied by configuring a [pre-defined
-blueprint][guides]. It's also possible to build a policy [from scratch from
+blueprint][guides]. It's also possible to build a policy [from scratch using
 policy components][policy].
 
 ## Aperture Agents
@@ -76,10 +76,10 @@ example, a video streaming service might prioritize a request to play a movie by
 a customer over a recommended movies API. A SaaS product might prioritize
 features used by paid users over those being used by free users.
 
-Aperture Agents can be [installed on a variety of
-infrastructure][install-agents] such as Kubernetes, VMs, or bare-metal. In
-addition to flow control capabilities, Agents work with auto-scaling APIs for
-platforms such as Kubernetes, to help scale infrastructure when needed.
+Aperture Agents can be [installed on various infrastructure][install-agents]
+such as Kubernetes, VMs, or bare-metal. In addition to flow control
+capabilities, Agents work with auto-scaling APIs for platforms such as
+Kubernetes, to help scale infrastructure when needed.
 
 ### Metrics
 

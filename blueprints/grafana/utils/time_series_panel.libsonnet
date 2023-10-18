@@ -16,9 +16,9 @@ function(title, dsName, query, strFilters, axisLabel='', unit='', h=10, w=24, ta
   local withMultipleTargets =
     if targets != []
     then
-      timeseries + g.panel.timeSeries.withTargets(targets)
+      timeseries + g.panel.timeSeries.queryOptions.withTargets(targets)
     else
-      timeseries + g.panel.timeSeries.withTargets([
+      timeseries + g.panel.timeSeries.queryOptions.withTargets([
         g.query.prometheus.new(dsName, query % { filters: strFilters })
         + g.query.prometheus.withIntervalFactor(1),
       ]),

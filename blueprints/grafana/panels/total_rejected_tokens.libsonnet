@@ -6,7 +6,7 @@ function(cfg) {
 
   local rejectedTokens = statPanel('Total Rejected Tokens',
                                    cfg.dashboard.datasource.name,
-                                   'sum(increase(incoming_tokens_total{%(filters)s}[$__range]) - increase(accepted_tokens_total{%(filters)s}[$__range]))',
+                                   'sum(increase(rejected_tokens_total{%(filters)s}[$__range]))',
                                    stringFilters,
                                    h=10,
                                    w=8,

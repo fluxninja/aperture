@@ -219,7 +219,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to unmarshal policy: %s", err)
 		}
-	} else if req.Policy != nil { // Deprecated: v2.20.0. Should stop accepting policy as proto message
+	} else if req.Policy != nil { // Deprecated: v3.0.0. Should stop accepting policy as proto message
 		newPolicy = req.Policy
 	} else {
 		return nil, status.Error(codes.InvalidArgument, "policy is empty")

@@ -63,15 +63,13 @@ func ParseLoadScheduler(
 	)
 
 	// TODO: 30s is derived from Agent's load multiplier token bucket's window size. Define the constant at a common location.
-	acceptedTokensQuery := fmt.Sprintf(
-		"sum(rate(%s{%s}[30s]))",
+	observedLoadMultiplierQuery := fmt.Sprintf(
+		"sum(increase(%s{%s}[30s])) / (sum(increase(%s{%s}[30s])) + sum(increase(%s{%s}[30s])))",
 		metrics.AcceptedTokensMetricName,
 		policyParams,
-	)
-
-	incomingTokenRate := fmt.Sprintf(
-		"sum(rate(%s{%s}[30s]))",
-		metrics.IncomingTokensMetricName,
+		metrics.AcceptedTokensMetricName,
+		policyParams,
+		metrics.RejectedTokensMetricName,
 		policyParams,
 	)
 
@@ -157,52 +155,11 @@ func ParseLoadScheduler(
 							Promql: &policylangv1.PromQL{
 								OutPorts: &policylangv1.PromQL_Outs{
 									Output: &policylangv1.OutPort{
-										SignalName: "ACCEPTED_TOKEN_RATE",
+										SignalName: "OBSERVED_LOAD_MULTIPLIER",
 									},
 								},
-								QueryString:        acceptedTokensQuery,
+								QueryString:        observedLoadMultiplierQuery,
 								EvaluationInterval: durationpb.New(metricScrapeInterval),
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_Query{
-					Query: &policylangv1.Query{
-						Component: &policylangv1.Query_Promql{
-							Promql: &policylangv1.PromQL{
-								OutPorts: &policylangv1.PromQL_Outs{
-									Output: &policylangv1.OutPort{
-										SignalName: "INCOMING_TOKEN_RATE",
-									},
-								},
-								QueryString:        incomingTokenRate,
-								EvaluationInterval: durationpb.New(metricScrapeInterval),
-							},
-						},
-					},
-				},
-			},
-			{
-				Component: &policylangv1.Component_ArithmeticCombinator{
-					ArithmeticCombinator: &policylangv1.ArithmeticCombinator{
-						Operator: components.Div.String(),
-						InPorts: &policylangv1.ArithmeticCombinator_Ins{
-							Lhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "ACCEPTED_TOKEN_RATE",
-								},
-							},
-							Rhs: &policylangv1.InPort{
-								Value: &policylangv1.InPort_SignalName{
-									SignalName: "INCOMING_TOKEN_RATE",
-								},
-							},
-						},
-						OutPorts: &policylangv1.ArithmeticCombinator_Outs{
-							Output: &policylangv1.OutPort{
-								SignalName: "OBSERVED_LOAD_MULTIPLIER",
 							},
 						},
 					},

@@ -48,7 +48,7 @@ agent:
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: API_KEY
+      value: AGENT_API_KEY
 ```
 
 The values above assume that you have installed the

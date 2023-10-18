@@ -92,13 +92,13 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `API_KEY` with the API key linked to the project. If an API key has not been
-   created, generate a new one through the Aperture Cloud UI. Refer to [API
-   Keys][api-keys] for additional information.
+   `AGENT_API_KEY` with the API key linked to the project. If an API key has not
+   been created, generate a new one through the Aperture Cloud UI. Refer to
+   [Agent API Keys][agent-api-keys] for additional information.
 
    :::note
 
@@ -141,7 +141,7 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
@@ -221,13 +221,13 @@ Kubernetes Objects which will be created by following steps are listed
             secretKeyRef:
               name: aperture-agent-apikey
               key: apiKey
-            value: API_KEY
+            value: AGENT_API_KEY
       ```
 
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-      `API_KEY` with the API key linked to the project. If an API key has not
-      been created, generate a new one through the Aperture Cloud UI. Refer to
-      [API Keys][api-keys] for additional information.
+      `AGENT_API_KEY` with the API key linked to the project. If an API key has
+      not been created, generate a new one through the Aperture Cloud UI. Refer
+      to [Agent API Keys][agent-api-keys] for additional information.
 
       :::note
 
@@ -406,4 +406,4 @@ following these steps:
    ```
 
 [self-hosting-agent]: /get-started/self-hosting/agent.md#configuration
-[api-keys]: /get-started/aperture-cloud/api-keys.md
+[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md
