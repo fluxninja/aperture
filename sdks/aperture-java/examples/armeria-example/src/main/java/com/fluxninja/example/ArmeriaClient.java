@@ -54,7 +54,6 @@ public class ArmeriaClient {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -67,7 +66,10 @@ public class ArmeriaClient {
                 Clients.builder("http://localhost:8080")
                         .decorator(
                                 ApertureHTTPClient.newDecorator(
-                                        apertureSDK, controlPointName, rampMode))
+                                        apertureSDK,
+                                        controlPointName,
+                                        rampMode,
+                                        Duration.ofMillis(1000)))
                         .build(WebClient.class);
 
         HttpResponse res = client.get("notsuper");

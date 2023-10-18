@@ -6,6 +6,7 @@ import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.HttpService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingHttpService;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,6 +16,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private final boolean rampMode;
+    private final Duration flowTimeout;
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +26,15 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     }
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
+            ApertureSDK apertureSDK,
+            String controlPointName,
+            boolean rampMode,
+            Duration flowTimeout) {
         ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableRampMode(rampMode);
+                .setEnableRampMode(rampMode)
+                .setFlowTimeout(flowTimeout);
         return builder::build;
     }
 
@@ -36,17 +42,19 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             HttpService delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean rampMode) {
+            boolean rampMode,
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         TrafficFlowRequest request =
-                HttpUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName);
+                HttpUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName, flowTimeout);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {

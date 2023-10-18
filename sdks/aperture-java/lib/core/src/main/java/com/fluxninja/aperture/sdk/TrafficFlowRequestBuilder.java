@@ -1,6 +1,7 @@
 package com.fluxninja.aperture.sdk;
 
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -13,6 +14,7 @@ import java.util.Map;
 public class TrafficFlowRequestBuilder {
     private final CheckHTTPRequest.Builder checkHTTPRequestBuilder;
     private final CheckHTTPRequest.HttpRequest.Builder httpRequestBuilder;
+    private Duration flowTimeout;
 
     /**
      * Constructs a new TrafficFlowRequestBuilder object. Initializes the internal
@@ -21,6 +23,18 @@ public class TrafficFlowRequestBuilder {
     TrafficFlowRequestBuilder() {
         checkHTTPRequestBuilder = CheckHTTPRequest.newBuilder();
         httpRequestBuilder = CheckHTTPRequest.HttpRequest.newBuilder();
+        flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+    }
+
+    /**
+     * Sets timeout for connection to Aperture Agent. Set to 0 to block until response is received.
+     *
+     * @param flowTimeout The timeout for connection to Aperture Agent.
+     * @return The TrafficFlowRequestBuilder object itself.
+     */
+    public TrafficFlowRequestBuilder setFlowTimeout(Duration flowTimeout) {
+        this.flowTimeout = flowTimeout;
+        return this;
     }
 
     /**
@@ -156,6 +170,6 @@ public class TrafficFlowRequestBuilder {
     public TrafficFlowRequest build() {
         checkHTTPRequestBuilder.setRequest(httpRequestBuilder.build());
         CheckHTTPRequest checkHTTPRequest = checkHTTPRequestBuilder.build();
-        return new TrafficFlowRequest(checkHTTPRequest);
+        return new TrafficFlowRequest(checkHTTPRequest, this.flowTimeout);
     }
 }
