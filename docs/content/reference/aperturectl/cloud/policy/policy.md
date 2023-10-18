@@ -32,6 +32,7 @@ Use this command to manage the Aperture Policies to the Cloud Controller.
 
 - [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
 - [aperturectl cloud policy apply](/reference/aperturectl/cloud/policy/apply/apply.md) - Apply Aperture Policy to the Aperture Cloud Controller
+- [aperturectl cloud policy archive](/reference/aperturectl/cloud/policy/archive/archive.md) - Archive Aperture Policy from the Aperture Cloud Controller
 - [aperturectl cloud policy delete](/reference/aperturectl/cloud/policy/delete/delete.md) - Delete Aperture Policy from the Aperture Cloud Controller
 - [aperturectl cloud policy get](/reference/aperturectl/cloud/policy/get/get.md) - Get Aperture Policy from the Aperture Cloud Controller
 - [aperturectl cloud policy list](/reference/aperturectl/cloud/policy/list/list.md) - List all Aperture Policies from the Aperture Cloud Controller

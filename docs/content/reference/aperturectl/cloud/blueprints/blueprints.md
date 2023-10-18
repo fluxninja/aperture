@@ -32,6 +32,7 @@ Interact with cloud blueprints.
 
 - [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
 - [aperturectl cloud blueprints apply](/reference/aperturectl/cloud/blueprints/apply/apply.md) - Cloud Blueprints Apply
+- [aperturectl cloud blueprints archive](/reference/aperturectl/cloud/blueprints/archive/archive.md) - Cloud Blueprints Archive for the given Policy Name
 - [aperturectl cloud blueprints delete](/reference/aperturectl/cloud/blueprints/delete/delete.md) - Cloud Blueprints Delete for the given Policy Name
 - [aperturectl cloud blueprints get](/reference/aperturectl/cloud/blueprints/get/get.md) - Cloud Blueprints Get
 - [aperturectl cloud blueprints list](/reference/aperturectl/cloud/blueprints/list/list.md) - Cloud Blueprints List
