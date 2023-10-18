@@ -10,7 +10,7 @@ import (
 
 var (
 	Controller utils.ControllerConn
-	client     utils.PolicyClient
+	client     utils.SelfHostedPolicyClient
 )
 
 func init() {

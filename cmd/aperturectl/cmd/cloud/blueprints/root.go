@@ -13,6 +13,7 @@ func init() {
 	BlueprintsCmd.AddCommand(BlueprintsGetCmd)
 	BlueprintsCmd.AddCommand(BlueprintsDeleteCmd)
 	BlueprintsCmd.AddCommand(BlueprintsApplyCmd)
+	BlueprintsCmd.AddCommand(BlueprintsArchiveCmd)
 }
 
 // BlueprintsCmd is the command to apply a policy to the Cloud Controller.

@@ -10,7 +10,7 @@ import (
 
 var (
 	controller   utils.ControllerConn
-	client       utils.PolicyClient
+	client       utils.SelfHostedPolicyClient
 	controllerNs string
 )
 

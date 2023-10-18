@@ -118,7 +118,7 @@ func (c *ControllerConn) IntrospectionClient() (IntrospectionClient, error) {
 }
 
 // client returns Controller PolicyClient, connecting to controller if not yet connected.
-func (c *ControllerConn) PolicyClient() (PolicyClient, error) {
+func (c *ControllerConn) PolicyClient() (SelfHostedPolicyClient, error) {
 	return c.client()
 }
 

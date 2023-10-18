@@ -20,10 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BlueprintsService_List_FullMethodName   = "/aperture.cloud.v1.BlueprintsService/List"
-	BlueprintsService_Get_FullMethodName    = "/aperture.cloud.v1.BlueprintsService/Get"
-	BlueprintsService_Apply_FullMethodName  = "/aperture.cloud.v1.BlueprintsService/Apply"
-	BlueprintsService_Delete_FullMethodName = "/aperture.cloud.v1.BlueprintsService/Delete"
+	BlueprintsService_List_FullMethodName    = "/aperture.cloud.v1.BlueprintsService/List"
+	BlueprintsService_Get_FullMethodName     = "/aperture.cloud.v1.BlueprintsService/Get"
+	BlueprintsService_Apply_FullMethodName   = "/aperture.cloud.v1.BlueprintsService/Apply"
+	BlueprintsService_Delete_FullMethodName  = "/aperture.cloud.v1.BlueprintsService/Delete"
+	BlueprintsService_Archive_FullMethodName = "/aperture.cloud.v1.BlueprintsService/Archive"
 )
 
 // BlueprintsServiceClient is the client API for BlueprintsService service.
@@ -34,6 +35,7 @@ type BlueprintsServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Apply(ctx context.Context, in *ApplyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Archive(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type blueprintsServiceClient struct {
@@ -80,6 +82,15 @@ func (c *blueprintsServiceClient) Delete(ctx context.Context, in *DeleteRequest,
 	return out, nil
 }
 
+func (c *blueprintsServiceClient) Archive(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, BlueprintsService_Archive_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlueprintsServiceServer is the server API for BlueprintsService service.
 // All implementations should embed UnimplementedBlueprintsServiceServer
 // for forward compatibility
@@ -88,6 +99,7 @@ type BlueprintsServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Apply(context.Context, *ApplyRequest) (*emptypb.Empty, error)
 	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
+	Archive(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedBlueprintsServiceServer should be embedded to have forward compatible implementations.
@@ -105,6 +117,9 @@ func (UnimplementedBlueprintsServiceServer) Apply(context.Context, *ApplyRequest
 }
 func (UnimplementedBlueprintsServiceServer) Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedBlueprintsServiceServer) Archive(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Archive not implemented")
 }
 
 // UnsafeBlueprintsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -190,6 +205,24 @@ func _BlueprintsService_Delete_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlueprintsService_Archive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlueprintsServiceServer).Archive(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlueprintsService_Archive_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlueprintsServiceServer).Archive(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BlueprintsService_ServiceDesc is the grpc.ServiceDesc for BlueprintsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -212,6 +245,10 @@ var BlueprintsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _BlueprintsService_Delete_Handler,
+		},
+		{
+			MethodName: "Archive",
+			Handler:    _BlueprintsService_Archive_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -11,7 +11,7 @@ import (
 
 var (
 	Controller  cloudutils.ControllerConn
-	client      utils.PolicyClient
+	client      utils.SelfHostedPolicyClient
 	cloudClient utils.CloudPolicyClient
 )
 
@@ -22,6 +22,7 @@ func init() {
 	PolicyCmd.AddCommand(GetCmd)
 	PolicyCmd.AddCommand(ListCmd)
 	PolicyCmd.AddCommand(DeleteCmd)
+	PolicyCmd.AddCommand(ArchiveCmd)
 }
 
 // PolicyCmd is the command to apply a policy to the Cloud Controller.

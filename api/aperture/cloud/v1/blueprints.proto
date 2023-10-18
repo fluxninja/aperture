@@ -22,6 +22,10 @@ service BlueprintsService {
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/fluxninja/v1/blueprints/{policy_name}"};
   }
+
+  rpc Archive(DeleteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/fluxninja/v1/blueprints/{policy_name}/archive"};
+  }
 }
 
 message Blueprint {

@@ -24,7 +24,7 @@ func GetDynamicConfigBytes(policyName, dynamicConfigFile string) ([]byte, error)
 }
 
 // ApplyDynamicConfig applies the dynamic config.
-func ApplyDynamicConfigUsingAPI(client PolicyClient, dynamicConfigYAML map[string]interface{}, policyName string) error {
+func ApplyDynamicConfigUsingAPI(client SelfHostedPolicyClient, dynamicConfigYAML map[string]interface{}, policyName string) error {
 	var dynamicConfigStruct *structpb.Struct
 	var err error
 	dynamicConfigStruct, err = structpb.NewStruct(dynamicConfigYAML)
@@ -44,7 +44,7 @@ func ApplyDynamicConfigUsingAPI(client PolicyClient, dynamicConfigYAML map[strin
 }
 
 // GetDynamicConfigUsingAPI gets the dynamic config.
-func GetDynamicConfigUsingAPI(client PolicyClient, policyName string) error {
+func GetDynamicConfigUsingAPI(client SelfHostedPolicyClient, policyName string) error {
 	request := languagev1.GetDynamicConfigRequest{
 		PolicyName: policyName,
 	}
