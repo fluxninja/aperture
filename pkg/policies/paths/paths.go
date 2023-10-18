@@ -48,6 +48,10 @@ var (
 	SamplerConfigPath = path.Join(ConfigPrefix, "sampler")
 	// SamplerDecisionsPath is decision path in etcd for sampler decisions.
 	SamplerDecisionsPath = path.Join(DecisionsPrefix, "sampler")
+	// PeersPrefix is the prefix for peers path in etcd.
+	PeersPrefix = path.Join("/peers")
+	// AgentPeerPath is path in etcd for agent peers.
+	AgentPeerPath = path.Join(PeersPrefix, "aperture-agent")
 )
 
 // AgentGroupPrefix returns the prefix for an agent group.
