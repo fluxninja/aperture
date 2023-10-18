@@ -106,42 +106,39 @@ func GetPolicyCR(policyBytes []byte) (*policyv1alpha1.Policy, error) {
 }
 
 // UpdatePolicyUsingAPI updates the policy using the API.
-func UpdatePolicyUsingAPI(client CloudPolicyClient, name string, policyBytes []byte, force bool) error {
+func UpdatePolicyUsingAPI(client PolicyClient, listClient SelfHostedPolicyClient, name string, policyBytes []byte, force bool) error {
 	request := policylangv1.UpsertPolicyRequest{
 		PolicyName:   name,
 		PolicyString: string(policyBytes),
 	}
 
 	if !force {
-		listClient, ok := client.(PolicyClient)
-		if ok {
-			// If directly using controller API, we can call GetPolicies to
-			// verify that we're not accidentally overwriting the policy.
-			// Cloud API doesn't have this method and we always allow
-			// overwriting, even with force=false.
-			existingPolicies, err := listClient.ListPolicies(context.Background(), new(emptypb.Empty))
+		// If directly using controller API, we can call GetPolicies to
+		// verify that we're not accidentally overwriting the policy.
+		// Cloud API doesn't have this method and we always allow
+		// overwriting, even with force=false.
+		existingPolicies, err := listClient.ListPolicies(context.Background(), new(emptypb.Empty))
 
-			needsConfirmation := false
+		needsConfirmation := false
+		if err != nil {
+			return err
+		}
+		for policyName, policy := range existingPolicies.GetPolicies().GetPolicies() {
+			if policyName == name && policy.Status != policylangv1.GetPolicyResponse_STALE {
+				needsConfirmation = true
+				break
+			}
+		}
+
+		if needsConfirmation {
+			update, err := CheckForUpdate(name, force)
 			if err != nil {
-				return err
-			}
-			for policyName, policy := range existingPolicies.GetPolicies().GetPolicies() {
-				if policyName == name && policy.Status != policylangv1.GetPolicyResponse_STALE {
-					needsConfirmation = true
-					break
-				}
+				return fmt.Errorf("failed to check for update: %w", err)
 			}
 
-			if needsConfirmation {
-				update, err := CheckForUpdate(name, force)
-				if err != nil {
-					return fmt.Errorf("failed to check for update: %w", err)
-				}
-
-				if !update {
-					log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
-					return errors.New("policy already exists")
-				}
+			if !update {
+				log.Info().Str("policy", name).Str("namespace", controllerNs).Msg("Skipping update of Policy")
+				return errors.New("policy already exists")
 			}
 		}
 	}
@@ -169,7 +166,7 @@ func CheckForUpdate(name string, force bool) (bool, error) {
 }
 
 // DeletePolicyUsingAPI deletes the policy using the API.
-func DeletePolicyUsingAPI(client CloudPolicyClient, policyName string) error {
+func DeletePolicyUsingAPI(client PolicyClient, policyName string) error {
 	policyRequest := policylangv1.DeletePolicyRequest{
 		Name: policyName,
 	}
@@ -182,7 +179,7 @@ func DeletePolicyUsingAPI(client CloudPolicyClient, policyName string) error {
 }
 
 // ListPolicies lists the policies using the API.
-func ListPolicies(client PolicyClient) error {
+func ListPolicies(client SelfHostedPolicyClient) error {
 	policies, err := client.ListPolicies(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return err
