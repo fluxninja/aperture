@@ -12,7 +12,7 @@ import (
 // BlueprintsArchiveCmd is the command to archive a blueprint from the Cloud Controller.
 var BlueprintsArchiveCmd = &cobra.Command{
 	Use:           "archive POLICY_NAME",
-	Short:         "Cloud Blueprints Achieve for the given Policy Name",
+	Short:         "Cloud Blueprints Archive for the given Policy Name",
 	Long:          `Archive cloud blueprint.`,
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(1),

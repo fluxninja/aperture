@@ -10,7 +10,7 @@ keywords:
 
 ## aperturectl cloud blueprints archive
 
-Cloud Blueprints Achieve for the given Policy Name
+Cloud Blueprints Archive for the given Policy Name
 
 ### Synopsis
 
