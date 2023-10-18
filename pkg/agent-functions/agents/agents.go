@@ -13,10 +13,7 @@ import (
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
-)
-
-const (
-	etcPath = "/peers/aperture-agent/"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
 // Module is fx module for controlling Agents on controller side.
@@ -102,7 +99,7 @@ func (a Agents) PreviewHTTPRequests(
 
 // GetAgents lists the agents registered on etcd under /peers/aperture-agent.
 func (a Agents) GetAgents() ([]string, error) {
-	resp, err := a.etcdClient.Client.KV.Get(context.Background(), "/peers/aperture-agent/", clientv3.WithPrefix())
+	resp, err := a.etcdClient.Client.KV.Get(context.Background(), paths.AgentPeerPath, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}

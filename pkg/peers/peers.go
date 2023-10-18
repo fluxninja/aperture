@@ -24,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	peersconfig "github.com/fluxninja/aperture/v2/pkg/peers/config"
+	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -39,10 +40,7 @@ const (
 	watcherFxTag     = "peer-discovery-watcher"
 )
 
-var (
-	peerDiscoverySyncPath = path.Join(config.DefaultTempDirectory, "peers")
-	etcdPath              = path.Join("/peers")
-)
+var peerDiscoverySyncPath = path.Join(config.DefaultTempDirectory, "peers")
 
 // Constructor holds fields to create and configure PeerDiscovery.
 type Constructor struct {
@@ -170,7 +168,7 @@ func NewPeerDiscovery(
 			Peers: make(map[string]*peersv1.Peer),
 		},
 		watchers:        watchers,
-		etcdPath:        path.Join(etcdPath, prefix),
+		etcdPath:        path.Join(paths.PeersPrefix, prefix),
 		client:          client,
 		sessionScopedKV: sessionScopedKV,
 	}
