@@ -10,4 +10,5 @@ import "google/protobuf/empty.proto";
 service PolicyService {
   rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (aperture.policy.language.v1.UpsertPolicyResponse);
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
+  rpc ArchivePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
 }

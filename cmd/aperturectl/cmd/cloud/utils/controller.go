@@ -198,7 +198,7 @@ func (c *ControllerConn) StatusClient() (utils.StatusClient, error) {
 }
 
 // PolicyClient returns Controller PolicyClient, connecting to controller if not yet connected.
-func (c *ControllerConn) PolicyClient() (utils.PolicyClient, error) {
+func (c *ControllerConn) PolicyClient() (utils.SelfHostedPolicyClient, error) {
 	// PolicyClient has no restrictions.
 	return c.client()
 }

@@ -11,7 +11,7 @@ import (
 
 var (
 	Controller  cloudutils.ControllerConn
-	client      utils.PolicyClient
+	client      utils.SelfHostedPolicyClient
 	cloudClient utils.CloudPolicyClient
 )
 

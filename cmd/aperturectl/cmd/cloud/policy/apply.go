@@ -66,7 +66,7 @@ func applyPolicy(policyFile string) error {
 }
 
 func createAndApplyPolicy(name string, policyBytes []byte) error {
-	updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(cloudClient, name, policyBytes, force)
+	updatePolicyUsingAPIErr := utils.UpdatePolicyUsingAPI(cloudClient, client, name, policyBytes, force)
 	if updatePolicyUsingAPIErr != nil {
 		return updatePolicyUsingAPIErr
 	}

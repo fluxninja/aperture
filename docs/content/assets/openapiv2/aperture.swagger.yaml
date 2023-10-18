@@ -5153,6 +5153,26 @@ paths:
                         $ref: '#/definitions/googlerpcStatus'
             tags:
                 - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}/archive:
+        delete:
+            operationId: BlueprintsService_Archive
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
     /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
