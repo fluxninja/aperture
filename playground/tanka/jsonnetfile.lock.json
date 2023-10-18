@@ -26,8 +26,8 @@
           "subdir": "crdsonnet"
         }
       },
-      "version": "148bcc4959273c51a098bac9654a0e1a60ed5118",
-      "sum": "JNQerWOBHj/dmlTCrEc8ko30JOvjg+LQyEhjcduHH/s="
+      "version": "2251d2739015ef42777fff5e37255a12674be510",
+      "sum": "wTwQnzztnOS7xo0LeH4TNcnb11bFNYgsuGSdOWwhBC4="
     },
     {
       "source": {
@@ -56,8 +56,8 @@
           "subdir": "gen/grafonnet-v9.4.0"
         }
       },
-      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
-      "sum": "Ju+Q5MP6YAQvK4pNOGRjHWgP4eLCxzLtjUOCqXyCbf4="
+      "version": "16f374fcebd987bc1d8bc526f433a75e2e5dcb28",
+      "sum": "PFzKWPaLOx8Yp0V6kyv1n9UOHickz0/VF7goglbQ+1o="
     },
     {
       "source": {
@@ -72,21 +72,11 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/grafana/grok.git",
-          "subdir": "jsonnet/v9.4.0"
-        }
-      },
-      "version": "7a7f6b80de0ba5713a7ed45833acf5f641b08d4d",
-      "sum": "b6KSW0/Z45K0W2dF+8ZPLV32uv0ApjIsShTjk/zHEbg="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/jsonnet-libs.git",
           "subdir": "grafana-builder"
         }
       },
-      "version": "df12ee6a2559c1eaec8ff94a190162939beec698",
+      "version": "83dbb0480412d92a27c65e3a4461efa690f7263d",
       "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
@@ -96,7 +86,7 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "df12ee6a2559c1eaec8ff94a190162939beec698",
+      "version": "83dbb0480412d92a27c65e3a4461efa690f7263d",
       "sum": "0y3AFX9LQSpfWTxWKSwoLgbt0Wc9nnCwhMH2szKzHv0="
     },
     {
@@ -106,7 +96,7 @@
           "subdir": "tanka-util"
         }
       },
-      "version": "df12ee6a2559c1eaec8ff94a190162939beec698",
+      "version": "83dbb0480412d92a27c65e3a4461efa690f7263d",
       "sum": "ShSIissXdvCy1izTCDZX6tY7qxCoepE5L+WJ52Hw7ZQ="
     },
     {
@@ -116,8 +106,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "cc9df63eaca56f39e8e4e1ce192141333257b08d",
-      "sum": "f6smzUo/9K2+iOLpDEbKPiU+W1eWjpIQo6drXu6kJ7U="
+      "version": "fd8de9039b3c06da77d635a3a8289809a5bfb542",
+      "sum": "mFebrE9fhyAKW4zbnidcjVFupziN5LPA/Z7ii94uCzs="
     },
     {
       "source": {
@@ -166,8 +156,8 @@
           "subdir": ""
         }
       },
-      "version": "63337d921db856bbcd2e91814a0ac90c250410d6",
-      "sum": "x8/bMVUaNMZEh6mcwhLmTlBJnaleRqhhV+w/+h0H0Pc="
+      "version": "31169fd115654ca023c03cd7b45b9c96704a87e2",
+      "sum": "KJZ5QCtsPm3NofFURHO315rd4pnKc5+trU6ihuE64P8="
     }
   ],
   "legacyImports": false

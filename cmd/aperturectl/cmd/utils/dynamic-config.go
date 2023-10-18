@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 )
 
 // GetDynamicConfigBytes returns the bytes of the dynamic config file.
@@ -39,5 +40,28 @@ func ApplyDynamicConfigUsingAPI(client PolicyClient, dynamicConfigYAML map[strin
 		return fmt.Errorf("failed to update DynamicConfig: %w", err)
 	}
 
+	return nil
+}
+
+// GetDynamicConfigUsingAPI gets the dynamic config.
+func GetDynamicConfigUsingAPI(client PolicyClient, policyName string) error {
+	request := languagev1.GetDynamicConfigRequest{
+		PolicyName: policyName,
+	}
+	resp, err := client.GetDynamicConfig(context.Background(), &request)
+	if err != nil {
+		return fmt.Errorf("failed to update DynamicConfig: %w", err)
+	}
+
+	j, err := resp.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("failed to marshal response: %w", err)
+	}
+
+	yamlString, err := GetYAMLString(j)
+	if err != nil {
+		return err
+	}
+	fmt.Print(yamlString)
 	return nil
 }

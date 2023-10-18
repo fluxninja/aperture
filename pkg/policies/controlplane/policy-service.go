@@ -2,6 +2,7 @@ package controlplane
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -284,6 +286,69 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
 	if err != nil {
 		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
+	}
+
+	return new(emptypb.Empty), nil
+}
+
+// GetDynamicConfig gets dynamic config of a policy.
+func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponse, error) {
+	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+		ctx,
+		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
+		clientv3.WithKeysOnly(),
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(etcdPolicy.Kvs) == 0 && s.policyFactory.GetPolicyWrapper(req.PolicyName) == nil {
+		return nil, status.Error(codes.NotFound, "no such policy")
+	}
+
+	resp, err := s.etcdClient.KV.Get(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get dynamic config '%s' from etcd: '%s'", req.PolicyName, err)
+	}
+
+	if len(resp.Kvs) < 1 {
+		return &policylangv1.GetDynamicConfigResponse{}, nil
+	}
+
+	dynamicConfigJSON := make(map[string]interface{})
+	err = json.Unmarshal(resp.Kvs[0].Value, &dynamicConfigJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal DynamicConfig JSON: %w", err)
+	}
+
+	dynamicConfigStruct, err := structpb.NewStruct(dynamicConfigJSON)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert DynamicConfig to Struct: %w", err)
+	}
+
+	return &policylangv1.GetDynamicConfigResponse{
+		DynamicConfig: dynamicConfigStruct,
+	}, nil
+}
+
+// DeleteDynamicConfig deletes dynamic config of a policy.
+func (s *PolicyService) DeleteDynamicConfig(ctx context.Context, req *policylangv1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
+	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+		ctx,
+		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
+		clientv3.WithKeysOnly(),
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(etcdPolicy.Kvs) == 0 && s.policyFactory.GetPolicyWrapper(req.PolicyName) == nil {
+		return nil, status.Error(codes.NotFound, "no such policy")
+	}
+
+	_, err = s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete dynamic config '%s' from etcd: '%s'", req.PolicyName, err)
 	}
 
 	return new(emptypb.Empty), nil

@@ -32,3 +32,5 @@ Use this command to manage the DynamicConfig of the Aperture Policies to the Con
 
 - [aperturectl](/reference/aperturectl/aperturectl.md) - aperturectl - CLI tool to interact with Aperture
 - [aperturectl dynamic-config apply](/reference/aperturectl/dynamic-config/apply/apply.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl dynamic-config delete](/reference/aperturectl/dynamic-config/delete/delete.md) - Delete Aperture DynamicConfig of a Policy.
+- [aperturectl dynamic-config get](/reference/aperturectl/dynamic-config/get/get.md) - Get Aperture DynamicConfig for a Policy.

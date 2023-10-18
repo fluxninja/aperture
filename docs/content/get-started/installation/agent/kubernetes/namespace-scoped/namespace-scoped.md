@@ -95,13 +95,13 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `API_KEY` with the API key linked to the project. If an API key has not been
-   created, generate a new one through the Aperture Cloud UI. Refer to [API
-   Keys][api-keys] for additional information.
+   `AGENT_API_KEY` with the API key linked to the project. If an API key has not
+   been created, generate a new one through the Aperture Cloud UI. Refer to [API
+   Keys][agent-api-keys] for additional information.
 
    :::note
 
@@ -145,7 +145,7 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
@@ -293,4 +293,4 @@ Use the same `values.yaml` file created as part of the
    ```
 
 [self-hosting-config]: /get-started/self-hosting/agent.md#configuration
-[api-keys]: /get-started/aperture-cloud/api-keys.md
+[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md

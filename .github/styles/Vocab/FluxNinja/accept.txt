@@ -114,3 +114,5 @@ siloed
 [Ss]ynergy
 leverage
 spend
+GPUs
+[Tt]okenizer

@@ -45,6 +45,7 @@ type Factory struct {
 
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
+	rejectedTokensCounterVec *prometheus.CounterVec
 
 	requestInQueueDurationSummaryVec *prometheus.SummaryVec
 
@@ -93,6 +94,13 @@ func newFactory(
 		prometheus.CounterOpts{
 			Name: metrics.AcceptedTokensMetricName,
 			Help: "A counter measuring work admitted by Scheduler",
+		},
+		MetricLabelKeys,
+	)
+	wsFactory.rejectedTokensCounterVec = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: metrics.RejectedTokensMetricName,
+			Help: "A counter measuring work rejected by Scheduler",
 		},
 		MetricLabelKeys,
 	)
@@ -178,6 +186,10 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(wsFactory.rejectedTokensCounterVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 			err = prometheusRegistry.Register(wsFactory.workloadLatencySummaryVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
@@ -222,6 +234,10 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.acceptedTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister accepted_tokens_total metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.rejectedTokensCounterVec) {
+				err := fmt.Errorf("failed to unregister rejected_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadLatencySummaryVec) {
@@ -307,11 +323,17 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, err
 	}
 
+	rejectedTokensCounter, err := wsFactory.rejectedTokensCounterVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, err
+	}
+
 	wfqMetrics := &scheduler.WFQMetrics{
 		FlowsGauge:                     wfqFlowsGauge,
 		HeapRequestsGauge:              wfqRequestsGauge,
 		IncomingTokensCounter:          incomingTokensCounter,
 		AcceptedTokensCounter:          acceptedTokensCounter,
+		RejectedTokensCounter:          rejectedTokensCounter,
 		RequestInQueueDurationSummary:  wsFactory.requestInQueueDurationSummaryVec,
 		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
 		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
@@ -345,6 +367,10 @@ func (sm *SchedulerMetrics) Delete() error {
 	deleted = sm.wsFactory.acceptedTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
+	}
+	deleted = sm.wsFactory.rejectedTokensCounterVec.Delete(sm.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete rejected_tokens_total counter from its metric vector"))
 	}
 	deletedCount := sm.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
