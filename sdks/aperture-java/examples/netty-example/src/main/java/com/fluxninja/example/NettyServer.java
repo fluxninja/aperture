@@ -6,6 +6,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.time.Duration;
 
 public class NettyServer {
 
@@ -51,6 +52,8 @@ public class NettyServer {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
 
+        Duration flowTimeout = Duration.ofMillis(1000);
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -66,6 +69,7 @@ public class NettyServer {
                                     agentHost,
                                     agentPort,
                                     rampMode,
+                                    flowTimeout,
                                     controlPointName,
                                     insecureGrpc,
                                     rootCertFile))

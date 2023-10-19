@@ -25,7 +25,9 @@ public class ApertureFeatureFilter implements Filter {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels, false);
+        Flow flow =
+                this.apertureSDK.startFlow(
+                        "awesomeFeature", labels, false, Duration.ofMillis(1000));
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -65,7 +67,6 @@ public class ApertureFeatureFilter implements Filter {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

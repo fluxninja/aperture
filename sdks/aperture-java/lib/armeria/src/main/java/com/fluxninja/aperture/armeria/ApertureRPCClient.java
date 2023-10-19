@@ -7,6 +7,7 @@ import com.linecorp.armeria.client.SimpleDecoratingRpcClient;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
 import com.linecorp.armeria.common.RpcResponse;
+import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -15,6 +16,7 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private final boolean rampMode;
+    private final Duration flowTimeout;
 
     public static Function<? super RpcClient, ApertureRPCClient> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -36,17 +38,19 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
             RpcClient delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean rampMode) {
+            boolean rampMode,
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     public RpcResponse execute(ClientRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels, false);
+        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels, false, flowTimeout);
 
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =

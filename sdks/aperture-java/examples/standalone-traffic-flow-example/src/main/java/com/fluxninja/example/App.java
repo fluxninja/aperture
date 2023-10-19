@@ -61,7 +61,6 @@ public class App {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -111,7 +110,8 @@ public class App {
                 .setHttpHeaders(allHeaders)
                 .setSource(req.ip(), req.port(), "TCP")
                 .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP")
-                .setRampMode(false);
+                .setRampMode(false)
+                .setFlowTimeout(Duration.ofMillis(1000));
 
         TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
 

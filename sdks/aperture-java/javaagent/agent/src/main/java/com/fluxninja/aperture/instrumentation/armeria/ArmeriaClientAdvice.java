@@ -13,6 +13,9 @@ public class ArmeriaClientAdvice {
     public static void onEnter(@Advice.This WebClientBuilder builder) {
         builder.decorator(
                 ApertureHTTPClient.newDecorator(
-                        wrapper.apertureSDK, wrapper.controlPointName, wrapper.rampMode));
+                        wrapper.apertureSDK,
+                        wrapper.controlPointName,
+                        wrapper.rampMode,
+                        wrapper.flowTimeout));
     }
 }

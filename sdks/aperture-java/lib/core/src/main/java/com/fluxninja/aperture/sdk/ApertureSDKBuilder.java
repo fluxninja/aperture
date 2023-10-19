@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
-    private Duration flowTimeout;
     private String host;
     private int port;
     private boolean useHttpsInOtlpExporter = false;
@@ -62,17 +60,6 @@ public final class ApertureSDKBuilder {
      */
     public ApertureSDKBuilder setPort(int port) {
         this.port = port;
-        return this;
-    }
-
-    /**
-     * Set timeout for connection to Aperture Agent. Set to 0 to block until response is received.
-     *
-     * @param timeout timeout for connection to Aperture Agent.
-     * @return the builder object.
-     */
-    public ApertureSDKBuilder setFlowTimeout(Duration timeout) {
-        this.flowTimeout = timeout;
         return this;
     }
 
@@ -215,11 +202,6 @@ public final class ApertureSDKBuilder {
             OtlpSpanExporterProtocol = "https";
         }
 
-        Duration flowTimeout = this.flowTimeout;
-        if (flowTimeout == null) {
-            flowTimeout = DEFAULT_RPC_TIMEOUT;
-        }
-
         ChannelCredentials creds;
         byte[] caCertContents = null;
         if (this.insecureGrpc) {
@@ -261,7 +243,6 @@ public final class ApertureSDKBuilder {
                 flowControlClient,
                 httpFlowControlClient,
                 tracer,
-                flowTimeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
     }
