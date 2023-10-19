@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/cast"
+import (
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/spf13/cast"
+)
 
 // Unmarshaller provides common interface for unmarshallers.
 type Unmarshaller interface {
@@ -39,5 +42,13 @@ func GetIntValue(unmarshaller Unmarshaller, key string, defaultVal int) int {
 
 // GetBoolValue returns the boolean value for the given key.
 func GetBoolValue(unmarshaller Unmarshaller, key string, defaultVal bool) bool {
-	return cast.ToBool(GetValue(unmarshaller, key, defaultVal))
+	value := GetValue(unmarshaller, key, defaultVal)
+
+	boolValue, err := cast.ToBoolE(value)
+	if err != nil {
+		log.Error().Err(err).Str("key", key).Any("value", value).Msg("Failed to unmarshal boolean variable")
+		return defaultVal
+	}
+
+	return boolValue
 }
