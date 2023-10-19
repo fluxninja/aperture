@@ -33,8 +33,9 @@ aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”
 ### Options
 
 ```
-      --find-by string   Find entity by [name|ip]
-  -h, --help             help for entities
+      --agent-group string   Name of the agent group to list agents for
+      --find-by string       Find entity by [name|ip]
+  -h, --help                 help for entities
 ```
 
 ### Options inherited from parent commands

@@ -12,10 +12,14 @@ import (
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
-var findBy string
+var (
+	findBy     string
+	agentGroup string
+)
 
 func init() {
 	EntitiesCmd.Flags().StringVar(&findBy, "find-by", "", "Find entity by [name|ip]")
+	EntitiesCmd.Flags().StringVar(&agentGroup, "agent-group", "", "Name of the agent group to list agents for")
 }
 
 // EntitiesCmd is the command to list control points.
@@ -74,7 +78,9 @@ aperturectl discovery entities --find-by=“ip=10.244.1.24”`,
 				return fmt.Errorf("invalid findBy argument: %s", findBy)
 			}
 		} else {
-			resp, err := client.ListDiscoveryEntities(context.Background(), &cmdv1.ListDiscoveryEntitiesRequest{})
+			resp, err := client.ListDiscoveryEntities(context.Background(), &cmdv1.ListDiscoveryEntitiesRequest{
+				AgentGroup: agentGroup,
+			})
 			if err != nil {
 				return err
 			}
