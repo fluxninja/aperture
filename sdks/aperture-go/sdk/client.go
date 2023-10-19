@@ -28,8 +28,8 @@ import (
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, rampMode bool) Flow
-	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool) HTTPFlow
+	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, rampMode bool, timeout time.Duration) Flow
+	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
 }
@@ -39,7 +39,6 @@ type apertureClient struct {
 	flowControlClient     checkgrpc.FlowControlServiceClient
 	flowControlHTTPClient checkhttpgrpc.FlowControlServiceHTTPClient
 	tracer                trace.Tracer
-	timeout               time.Duration
 	exporter              *otlptrace.Exporter
 	log                   logr.Logger
 }
@@ -48,7 +47,6 @@ type apertureClient struct {
 // FlowControlClientConn and OTLPExporterClientConn are required.
 type Options struct {
 	ApertureAgentGRPCClientConn *grpc.ClientConn
-	CheckTimeout                time.Duration
 	Logger                      *logr.Logger
 }
 
@@ -92,7 +90,6 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		flowControlClient:     fcClient,
 		flowControlHTTPClient: fcHTTPClient,
 		tracer:                tracer,
-		timeout:               opts.CheckTimeout,
 		exporter:              exporter,
 		log:                   logger,
 	}
@@ -126,11 +123,11 @@ func LabelsFromCtx(ctx context.Context) map[string]string {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, rampMode bool) Flow {
-	// if c.timeout is not 0, then create a new context with timeout
-	if c.timeout != 0 {
+func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, rampMode bool, timeout time.Duration) Flow {
+	// if timeout is not 0, then create a new context with timeout
+	if timeout != 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, c.timeout)
+		ctx, cancel = context.WithTimeout(ctx, timeout)
 		defer cancel()
 	}
 
@@ -174,8 +171,8 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 // Return value is a HTTPFlow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
-func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool) HTTPFlow {
-	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	span := c.getSpan(ctx)

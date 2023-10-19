@@ -24,7 +24,7 @@ func init() {
 
 // ApplyCmd is the command to apply DynamicConfig to a Policy.
 var ApplyCmd = &cobra.Command{
-	Use:           "dynamic-config",
+	Use:           "apply",
 	Short:         "Apply Aperture DynamicConfig to a Policy",
 	Long:          `Use this command to apply the Aperture DynamicConfig to a Policy.`,
 	SilenceErrors: true,

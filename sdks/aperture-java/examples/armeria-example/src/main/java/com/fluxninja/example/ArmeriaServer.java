@@ -86,7 +86,6 @@ public class ArmeriaServer {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -104,7 +103,10 @@ public class ArmeriaServer {
                 createHelloHTTPService()
                         .decorate(
                                 ApertureHTTPService.newDecorator(
-                                        apertureSDK, controlPointName, rampMode));
+                                        apertureSDK,
+                                        controlPointName,
+                                        rampMode,
+                                        Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

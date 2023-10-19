@@ -3,6 +3,8 @@ package agents
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
@@ -44,7 +46,7 @@ func (a Agents) ListFlowControlPoints() ([]transport.Result[*cmdv1.ListFlowContr
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](a.etcdTransport, agents, &req)
+	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListAutoScaleControlPoints lists auto-scale control points of all agents.
@@ -54,13 +56,13 @@ func (a Agents) ListAutoScaleControlPoints() ([]transport.Result[*cmdv1.ListAuto
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](a.etcdTransport, agents, &req)
+	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListDiscoveryEntities lists discovery entities.
-func (a Agents) ListDiscoveryEntities() ([]transport.Result[*cmdv1.ListDiscoveryEntitiesAgentResponse], error) {
+func (a Agents) ListDiscoveryEntities(agentGroup string) ([]transport.Result[*cmdv1.ListDiscoveryEntitiesAgentResponse], error) {
 	var req cmdv1.ListDiscoveryEntitiesRequest
-	agents, err := a.GetAgents()
+	agents, err := a.GetAgentsForGroup(agentGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,7 @@ func (a Agents) ListDiscoveryEntity(req *cmdv1.ListDiscoveryEntityRequest) (*cmd
 		return nil, err
 	}
 
-	return transport.SendRequest[cmdv1.ListDiscoveryEntityAgentResponse](a.etcdTransport, agents[0], req)
+	return transport.SendRequest[cmdv1.ListDiscoveryEntityAgentResponse](a.etcdTransport, flattenAgents(agents)[0], req)
 }
 
 // PreviewFlowLabels previews flow labels on a given agent.
@@ -98,20 +100,59 @@ func (a Agents) PreviewHTTPRequests(
 }
 
 // GetAgents lists the agents registered on etcd under /peers/aperture-agent.
-func (a Agents) GetAgents() ([]string, error) {
+func (a Agents) GetAgents() (map[string][]string, error) {
 	resp, err := a.etcdClient.Client.KV.Get(context.Background(), paths.AgentPeerPath, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
 
-	agents := []string{}
+	agents := map[string][]string{}
 	for _, kv := range resp.Kvs {
+		// Extract agent from kv
 		var peer peersv1.Peer
 		err = proto.Unmarshal(kv.Value, &peer)
 		if err != nil {
 			return nil, err
 		}
-		agents = append(agents, peer.Hostname)
+
+		// Extract agent-group from kv
+		// The etcd value currently doesn't have the agent-group in it, so need to extract it from the key
+		parts := strings.SplitN(strings.TrimPrefix(string(kv.Key), "/peers/aperture-agent/"), "/", 2)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("error fetching agent-group from etcd key %s", kv.Key)
+		}
+		agentGroup := parts[0]
+
+		if _, ok := agents[agentGroup]; !ok {
+			agents[agentGroup] = []string{peer.Hostname}
+		} else {
+			agents[agentGroup] = append(agents[agentGroup], string(peer.Hostname))
+		}
 	}
 	return agents, nil
+}
+
+// GetAgentsForGroup lists the agents under an agent-group registered on etcd under /peers/aperture-agent.
+func (a Agents) GetAgentsForGroup(agentGroup string) ([]string, error) {
+	agents, err := a.GetAgents()
+	if err != nil {
+		return nil, err
+	}
+
+	if agentGroup == "" {
+		agentGroup = "default"
+	}
+
+	if _, ok := agents[agentGroup]; !ok {
+		return nil, fmt.Errorf("no agents found for agent-group %s", agentGroup)
+	}
+	return agents[agentGroup], nil
+}
+
+func flattenAgents(agents map[string][]string) []string {
+	var flattened []string
+	for _, agent := range agents {
+		flattened = append(flattened, agent...)
+	}
+	return flattened
 }

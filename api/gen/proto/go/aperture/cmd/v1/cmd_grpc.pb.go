@@ -47,7 +47,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ControllerClient interface {
-	ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAgentsResponse, error)
+	ListAgents(ctx context.Context, in *ListAgentsRequest, opts ...grpc.CallOption) (*ListAgentsResponse, error)
 	ListServices(ctx context.Context, in *ListServicesRequest, opts ...grpc.CallOption) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(ctx context.Context, in *ListFlowControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(ctx context.Context, in *ListAutoScaleControlPointsRequest, opts ...grpc.CallOption) (*ListAutoScaleControlPointsControllerResponse, error)
@@ -75,7 +75,7 @@ func NewControllerClient(cc grpc.ClientConnInterface) ControllerClient {
 	return &controllerClient{cc}
 }
 
-func (c *controllerClient) ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAgentsResponse, error) {
+func (c *controllerClient) ListAgents(ctx context.Context, in *ListAgentsRequest, opts ...grpc.CallOption) (*ListAgentsResponse, error) {
 	out := new(ListAgentsResponse)
 	err := c.cc.Invoke(ctx, Controller_ListAgents_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -232,7 +232,7 @@ func (c *controllerClient) GetStatus(ctx context.Context, in *v11.GroupStatusReq
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
 type ControllerServer interface {
-	ListAgents(context.Context, *emptypb.Empty) (*ListAgentsResponse, error)
+	ListAgents(context.Context, *ListAgentsRequest) (*ListAgentsResponse, error)
 	ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(context.Context, *ListFlowControlPointsRequest) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error)
@@ -256,7 +256,7 @@ type ControllerServer interface {
 type UnimplementedControllerServer struct {
 }
 
-func (UnimplementedControllerServer) ListAgents(context.Context, *emptypb.Empty) (*ListAgentsResponse, error) {
+func (UnimplementedControllerServer) ListAgents(context.Context, *ListAgentsRequest) (*ListAgentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAgents not implemented")
 }
 func (UnimplementedControllerServer) ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error) {
@@ -320,7 +320,7 @@ func RegisterControllerServer(s grpc.ServiceRegistrar, srv ControllerServer) {
 }
 
 func _Controller_ListAgents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListAgentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -332,7 +332,7 @@ func _Controller_ListAgents_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Controller_ListAgents_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControllerServer).ListAgents(ctx, req.(*emptypb.Empty))
+		return srv.(ControllerServer).ListAgents(ctx, req.(*ListAgentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -1,41 +1,37 @@
 ---
-sidebar_label: Entities
+sidebar_label: Apply
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_discovery_entities
+  - aperturectl_cloud_dynamic-config_apply
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud discovery entities
+## aperturectl cloud dynamic-config apply
 
-List AutoScale control points
+Apply Aperture DynamicConfig to a Policy
 
 ### Synopsis
 
-List AutoScale control points
+Use this command to apply the Aperture DynamicConfig to a Policy.
 
 ```
-aperturectl cloud discovery entities [flags]
+aperturectl cloud dynamic-config apply [flags]
 ```
 
 ### Examples
 
 ```
-aperturectl cloud discovery entities
-
-aperturectl cloud discovery entities --find-by="name=service1-demo-app-7dfdf9c698-4wmlt"
-
-aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”
+aperturectl cloud dynamic-config apply --policy=rate-limiting --file=dynamic-config.yaml
 ```
 
 ### Options
 
 ```
-      --agent-group string   Name of the agent group to list agents for
-      --find-by string       Find entity by [name|ip]
-  -h, --help                 help for entities
+      --file string     Path to the dynamic config file
+  -h, --help            help for apply
+      --policy string   Name of the Policy to apply the DynamicConfig to
 ```
 
 ### Options inherited from parent commands
@@ -51,4 +47,4 @@ aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”
 
 ### SEE ALSO
 
-- [aperturectl cloud discovery](/reference/aperturectl/cloud/discovery/discovery.md) - Discovery integrations
+- [aperturectl cloud dynamic-config](/reference/aperturectl/cloud/dynamic-config/dynamic-config.md) - DynamicConfig of Aperture Policy related commands for the Cloud Controller

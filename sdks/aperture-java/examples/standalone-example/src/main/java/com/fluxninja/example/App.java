@@ -61,7 +61,6 @@ public class App {
                     ApertureSDK.builder()
                             .setHost(agentHost)
                             .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -94,7 +93,9 @@ public class App {
 
         // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a
         // Flow.
-        Flow flow = this.apertureSDK.startFlow(this.featureName, labels, false);
+        Flow flow =
+                this.apertureSDK.startFlow(
+                        this.featureName, labels, false, Duration.ofMillis(1000));
 
         // See whether flow was accepted by Aperture Agent.
         try {

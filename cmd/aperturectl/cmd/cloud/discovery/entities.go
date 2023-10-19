@@ -6,10 +6,14 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
-var findBy string
+var (
+	findBy     string
+	agentGroup string
+)
 
 func init() {
 	EntitiesCmd.Flags().StringVar(&findBy, "find-by", "", "Find entity by [name|ip]")
+	EntitiesCmd.Flags().StringVar(&agentGroup, "agent-group", "", "Name of the agent group to list agents for")
 }
 
 // EntitiesCmd is the command to list control points.
@@ -29,6 +33,6 @@ aperturectl cloud discovery entities --find-by=“ip=10.244.1.24”`,
 			return err
 		}
 
-		return utils.ParseEntities(client, findBy)
+		return utils.ParseEntities(client, findBy, agentGroup)
 	},
 }

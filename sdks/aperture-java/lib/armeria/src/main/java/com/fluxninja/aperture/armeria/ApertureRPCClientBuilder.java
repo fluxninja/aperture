@@ -1,13 +1,27 @@
 package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.Constants;
 import com.linecorp.armeria.client.RpcClient;
+import java.time.Duration;
 
 /** A builder for configuring an {@link ApertureRPCClient}. */
 public class ApertureRPCClientBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
     private boolean enableRampMode = false;
+    private Duration flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+
+    /**
+     * Sets timeout for connection to Aperture Agent. Set to 0 to block until response is received.
+     *
+     * @param flowTimeout The timeout for connection to Aperture Agent.
+     * @return The builder object.
+     */
+    public ApertureRPCClientBuilder setFlowTimeout(Duration flowTimeout) {
+        this.flowTimeout = flowTimeout;
+        return this;
+    }
 
     /**
      * Sets the Aperture SDK used by this service.
@@ -50,6 +64,7 @@ public class ApertureRPCClientBuilder {
         if (this.apertureSDK == null) {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
-        return new ApertureRPCClient(delegate, apertureSDK, controlPointName, enableRampMode);
+        return new ApertureRPCClient(
+                delegate, apertureSDK, controlPointName, enableRampMode, flowTimeout);
     }
 }
