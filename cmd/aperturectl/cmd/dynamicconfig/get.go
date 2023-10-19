@@ -13,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // GetCmd is a command to get a policy's dynamic config.
@@ -61,7 +62,7 @@ var GetCmd = &cobra.Command{
 				}
 			}
 			if len(policy.DynamicConfig.Raw) == 0 {
-				fmt.Printf("Dynamic Config not found for policy %s", policyName)
+				log.Info().Str("policy-name", policyName).Msg("DynamicConfig is not set for the given Policy")
 				return nil
 			}
 			j, err := policy.DynamicConfig.MarshalJSON()

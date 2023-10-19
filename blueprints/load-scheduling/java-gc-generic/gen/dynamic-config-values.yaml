@@ -1,9 +1,3 @@
-# Generated values file for load-scheduling/java-gc-generic blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/load-scheduling/java-gc-generic
-blueprint: load-scheduling/java-gc-generic
-uri: github.com/fluxninja/aperture/blueprints@latest
-
 # Dynamic configuration for setting dry run mode at runtime without restarting this policy. In dry run mode the scheduler acts as pass through to all flow and does not queue flows. It is useful for observing the behavior of load scheduler without disrupting any real traffic.
 # Type: bool
 # Required: True
