@@ -1,5 +1,0 @@
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-blueprint: quota-scheduling/base
-uri: github.com/fluxninja/aperture/blueprints@latest
