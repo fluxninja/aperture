@@ -3,18 +3,6 @@
   "type": "object",
   "title": "rate-limiting/base blueprint",
   "additionalProperties": false,
-  "properties": {
-    "blueprint": {
-      "description": "Blueprint name",
-      "type": "string",
-      "default": "rate-limiting/base",
-      "enum": ["rate-limiting/base"]
-    },
-    "uri": {
-      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
-      "default": "github.com/fluxninja/aperture/blueprints@latest",
-      "type": "string"
-    }
-  },
+  "properties": null,
   "$defs": null
 }

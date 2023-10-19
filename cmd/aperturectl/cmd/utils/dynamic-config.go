@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // GetDynamicConfigBytes returns the bytes of the dynamic config file.
@@ -53,7 +54,12 @@ func GetDynamicConfigUsingAPI(client SelfHostedPolicyClient, policyName string) 
 		return fmt.Errorf("failed to update DynamicConfig: %w", err)
 	}
 
-	j, err := resp.MarshalJSON()
+	if resp.DynamicConfig == nil {
+		log.Info().Str("policy-name", policyName).Msg("DynamicConfig is not set for the given Policy")
+		return nil
+	}
+
+	j, err := resp.DynamicConfig.MarshalJSON()
 	if err != nil {
 		return fmt.Errorf("failed to marshal response: %w", err)
 	}
