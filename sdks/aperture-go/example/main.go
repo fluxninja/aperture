@@ -63,7 +63,6 @@ func main() {
 
 	opts := aperturego.Options{
 		ApertureAgentGRPCClientConn: apertureAgentGRPCClient,
-		CheckTimeout:                200 * time.Millisecond,
 	}
 
 	// initialize Aperture Client with the provided options.
@@ -87,7 +86,7 @@ func main() {
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false).Handle)
+	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 200*time.Millisecond).Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
