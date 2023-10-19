@@ -46,7 +46,7 @@ func (a Agents) ListFlowControlPoints() ([]transport.Result[*cmdv1.ListFlowContr
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](a.etcdTransport, agents["default"], &req)
+	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListAutoScaleControlPoints lists auto-scale control points of all agents.
@@ -56,7 +56,7 @@ func (a Agents) ListAutoScaleControlPoints() ([]transport.Result[*cmdv1.ListAuto
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](a.etcdTransport, agents["default"], &req)
+	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListDiscoveryEntities lists discovery entities.
