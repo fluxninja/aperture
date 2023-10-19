@@ -5,10 +5,15 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/types/known/emptypb"
+
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
+var agentGroup string
+
 func init() {
+	agentsCmd.Flags().StringVar(&agentGroup, "agent-group", "", "Name of the agent group to list agents for")
+
 	controller.InitFlags(agentsCmd.PersistentFlags())
 }
 
@@ -25,7 +30,9 @@ var agentsCmd = &cobra.Command{
 			return err
 		}
 
-		agents, err := client.ListAgents(context.Background(), &emptypb.Empty{})
+		agents, err := client.ListAgents(context.Background(), &cmdv1.ListAgentsRequest{
+			AgentGroup: agentGroup,
+		})
 		if err != nil {
 			return err
 		}

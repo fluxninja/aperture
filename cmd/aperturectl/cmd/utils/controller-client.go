@@ -19,7 +19,7 @@ import (
 //
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
 type IntrospectionClient interface {
-	ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*cmdv1.ListAgentsResponse, error)
+	ListAgents(ctx context.Context, in *cmdv1.ListAgentsRequest, opts ...grpc.CallOption) (*cmdv1.ListAgentsResponse, error)
 	// Seems to be unimplemented on the controller at all?!
 	ListServices(ctx context.Context, in *cmdv1.ListServicesRequest, opts ...grpc.CallOption) (*cmdv1.ListServicesControllerResponse, error)
 	ListFlowControlPoints(ctx context.Context, in *cmdv1.ListFlowControlPointsRequest, opts ...grpc.CallOption) (*cmdv1.ListFlowControlPointsControllerResponse, error)

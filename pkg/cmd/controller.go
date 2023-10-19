@@ -44,9 +44,9 @@ func NewHandler(
 // ListAgents lists all agents.
 func (h *Handler) ListAgents(
 	ctx context.Context,
-	_ *emptypb.Empty,
+	req *cmdv1.ListAgentsRequest,
 ) (*cmdv1.ListAgentsResponse, error) {
-	agents, err := h.agents.GetAgents()
+	agents, err := h.agents.GetAgentsForGroup(req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (h *Handler) ListAutoScaleControlPoints(
 
 // ListDiscoveryEntities lists all Discovery entities.
 func (h *Handler) ListDiscoveryEntities(ctx context.Context, req *cmdv1.ListDiscoveryEntitiesRequest) (*cmdv1.ListDiscoveryEntitiesControllerResponse, error) {
-	discoveryEntities, err := h.agents.ListDiscoveryEntities()
+	discoveryEntities, err := h.agents.ListDiscoveryEntities(req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}

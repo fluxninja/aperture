@@ -23,6 +23,7 @@ aperturectl cloud agents [flags]
 ### Options
 
 ```
+      --agent-group string    Name of the agent group to list agents for
       --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
       --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string     Address of Aperture Cloud Controller
