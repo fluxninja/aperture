@@ -13,6 +13,9 @@ public class ArmeriaServerAdvice {
     public static void onEnter(@Advice.This ServerBuilder builder) {
         builder.decorator(
                 ApertureHTTPService.newDecorator(
-                        wrapper.apertureSDK, wrapper.controlPointName, wrapper.rampMode));
+                        wrapper.apertureSDK,
+                        wrapper.controlPointName,
+                        wrapper.rampMode,
+                        wrapper.flowTimeout));
     }
 }
