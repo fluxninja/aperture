@@ -19,16 +19,18 @@ Use this command to manage the DynamicConfig of the Aperture Policies to the Clo
 ### Options
 
 ```
-      --controller string      Address of Aperture Controller
-      --controller-ns string   Namespace in which the Aperture Controller is running
-  -h, --help                   help for dynamic-config
-      --insecure               Allow connection to controller running without TLS
-      --kube                   Find controller in Kubernetes cluster, instead of connecting directly
-      --kube-config string     Path to the Kubernetes cluster config. Defaults to '~/.kube/config' or $KUBECONFIG
-      --skip-verify            Skip TLS certificate verification while connecting to controller
+      --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
+      --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
+      --controller string     Address of Aperture Cloud Controller
+  -h, --help                  help for dynamic-config
+      --insecure              Allow connection to controller running without TLS
+      --project-name string   Aperture Cloud Project Name to be used when using Cloud Controller
+      --skip-verify           Skip TLS certificate verification while connecting to controller
 ```
 
 ### SEE ALSO
 
 - [aperturectl cloud](/reference/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
-- [aperturectl cloud dynamic-config dynamic-config](/reference/aperturectl/cloud/dynamic-config/dynamic-config/dynamic-config.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl cloud dynamic-config apply](/reference/aperturectl/cloud/dynamic-config/apply/apply.md) - Apply Aperture DynamicConfig to a Policy
+- [aperturectl cloud dynamic-config delete](/reference/aperturectl/cloud/dynamic-config/delete/delete.md) - Delete Aperture DynamicConfig of a Policy.
+- [aperturectl cloud dynamic-config get](/reference/aperturectl/cloud/dynamic-config/get/get.md) - Get Aperture DynamicConfig for a Policy.

@@ -5,11 +5,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	cloudutils "github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 var (
-	Controller utils.ControllerConn
+	Controller cloudutils.ControllerConn
 	client     utils.SelfHostedPolicyClient
 )
 
@@ -17,6 +18,8 @@ func init() {
 	Controller.InitFlags(DynamicConfigCmd.PersistentFlags())
 
 	DynamicConfigCmd.AddCommand(ApplyCmd)
+	DynamicConfigCmd.AddCommand(GetCmd)
+	DynamicConfigCmd.AddCommand(DelCmd)
 }
 
 // DynamicConfigCmd is the command to manage DynamicCOnfig of Policies in the Cloud Controller.
