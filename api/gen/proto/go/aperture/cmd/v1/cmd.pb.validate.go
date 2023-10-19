@@ -1168,6 +1168,8 @@ func (m *ListDiscoveryEntitiesRequest) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for AgentGroup
+
 	if len(errors) > 0 {
 		return ListDiscoveryEntitiesRequestMultiError(errors)
 	}
@@ -1801,6 +1803,110 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListDiscoveryEntityAgentResponseValidationError{}
+
+// Validate checks the field values on ListAgentsRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListAgentsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListAgentsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListAgentsRequestMultiError, or nil if none found.
+func (m *ListAgentsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListAgentsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AgentGroup
+
+	if len(errors) > 0 {
+		return ListAgentsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListAgentsRequestMultiError is an error wrapping multiple validation errors
+// returned by ListAgentsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ListAgentsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListAgentsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListAgentsRequestMultiError) AllErrors() []error { return m }
+
+// ListAgentsRequestValidationError is the validation error returned by
+// ListAgentsRequest.Validate if the designated constraints aren't met.
+type ListAgentsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListAgentsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListAgentsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListAgentsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListAgentsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListAgentsRequestValidationError) ErrorName() string {
+	return "ListAgentsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListAgentsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListAgentsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListAgentsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListAgentsRequestValidationError{}
 
 // Validate checks the field values on ListAgentsResponse with the rules
 // defined in the proto definition for this message. If any rules are

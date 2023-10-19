@@ -12,7 +12,7 @@ import (
 )
 
 // ParseEntities parses the entities from the cluster.
-func ParseEntities(client IntrospectionClient, findBy string) error {
+func ParseEntities(client IntrospectionClient, findBy, agentGroup string) error {
 	toPrint := ""
 
 	if findBy != "" {
@@ -52,7 +52,9 @@ func ParseEntities(client IntrospectionClient, findBy string) error {
 			return fmt.Errorf("invalid findBy argument: %s", findBy)
 		}
 	} else {
-		resp, err := client.ListDiscoveryEntities(context.Background(), &cmdv1.ListDiscoveryEntitiesRequest{})
+		resp, err := client.ListDiscoveryEntities(context.Background(), &cmdv1.ListDiscoveryEntitiesRequest{
+			AgentGroup: agentGroup,
+		})
 		if err != nil {
 			return err
 		}

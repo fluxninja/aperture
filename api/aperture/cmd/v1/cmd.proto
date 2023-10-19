@@ -13,7 +13,7 @@ import "google/protobuf/empty.proto";
 
 // Controller describes APIs of the controller from the aperturectl POV
 service Controller {
-  rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
+  rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
   rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
   rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
@@ -74,7 +74,9 @@ message ListAutoScaleControlPointsControllerResponse {
   uint32 errors_count = 2;
 }
 
-message ListDiscoveryEntitiesRequest {}
+message ListDiscoveryEntitiesRequest {
+  string agent_group = 1;
+}
 
 message ListDiscoveryEntitiesAgentResponse {
   map<string, aperture.discovery.entities.v1.Entity> entities = 1;
@@ -94,6 +96,10 @@ message ListDiscoveryEntityRequest {
 
 message ListDiscoveryEntityAgentResponse {
   aperture.discovery.entities.v1.Entity entity = 1;
+}
+
+message ListAgentsRequest {
+  string agent_group = 1;
 }
 
 message ListAgentsResponse {

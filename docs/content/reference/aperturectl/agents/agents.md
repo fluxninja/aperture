@@ -23,6 +23,7 @@ aperturectl agents [flags]
 ### Options
 
 ```
+      --agent-group string     Name of the agent group to list agents for
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
   -h, --help                   help for agents
