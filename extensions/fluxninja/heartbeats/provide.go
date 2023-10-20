@@ -66,8 +66,9 @@ type ConstructorIn struct {
 
 // provide provides a new instance of Heartbeats.
 func provide(in ConstructorIn) (*Heartbeats, error) {
-	if in.ExtensionConfig.APIKey == "" {
-		log.Info().Msg("Heartbeats API key not set, skipping")
+	//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+	if in.ExtensionConfig.AgentAPIKey == "" && in.ExtensionConfig.APIKey == "" {
+		log.Info().Msg("Heartbeats Agent Key not set, skipping")
 		return nil, nil
 	}
 

@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"google.golang.org/protobuf/types/known/emptypb"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 )
 
-func ListAgents(client IntrospectionClient) error {
-	agents, err := client.ListAgents(context.Background(), &emptypb.Empty{})
+func ListAgents(client IntrospectionClient, agentGroup string) error {
+	agents, err := client.ListAgents(context.Background(), &cmdv1.ListAgentsRequest{
+		AgentGroup: agentGroup,
+	})
 	if err != nil {
 		return err
 	}

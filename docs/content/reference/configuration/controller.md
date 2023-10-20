@@ -945,6 +945,18 @@ FluxNinjaExtensionConfig is the configuration for
 
 <!-- vale off -->
 
+(string, **DEPRECATED**)
+
+<!-- vale on -->
+
+Deprecated: v3.0.0. Use AgentAPIKey instead
+
+</dd>
+<dt>agent_api_key</dt>
+<dd>
+
+<!-- vale off -->
+
 (string)
 
 <!-- vale on -->

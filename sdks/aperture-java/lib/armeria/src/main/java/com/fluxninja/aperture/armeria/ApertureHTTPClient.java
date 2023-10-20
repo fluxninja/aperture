@@ -6,6 +6,7 @@ import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,6 +16,7 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private final boolean rampMode;
+    private final Duration flowTimeout;
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +26,15 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     }
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
+            ApertureSDK apertureSDK,
+            String controlPointName,
+            boolean rampMode,
+            Duration flowTimeout) {
         ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableRampMode(rampMode);
+                .setEnableRampMode(rampMode)
+                .setFlowTimeout(flowTimeout);
         return builder::build;
     }
 
@@ -36,17 +42,20 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
             HttpClient delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean rampMode) {
+            boolean rampMode,
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
         TrafficFlowRequest request =
-                HttpUtils.trafficFlowRequestFromRequest(ctx, req, this.controlPointName);
+                HttpUtils.trafficFlowRequestFromRequest(
+                        ctx, req, this.controlPointName, this.flowTimeout);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {

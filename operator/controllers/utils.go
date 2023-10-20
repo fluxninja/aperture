@@ -245,7 +245,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 
 	if instance.Spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
 		envs = append(envs, corev1.EnvVar{
-			Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
+			Name: "APERTURE_AGENT_FLUXNINJA_AGENT_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{

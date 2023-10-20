@@ -8,6 +8,7 @@ import io.opentelemetry.api.baggage.BaggageEntry;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ class HttpUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            RequestContext ctx, HttpRequest req, String controlPointName) {
+            RequestContext ctx, HttpRequest req, String controlPointName, Duration flowTimeout) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -62,7 +63,9 @@ class HttpUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        return addHttpAttributes(baggageLabels, ctx, req, controlPointName).build();
+        return addHttpAttributes(baggageLabels, ctx, req, controlPointName)
+                .setFlowTimeout(flowTimeout)
+                .build();
     }
 
     protected static HttpRequest updateHeaders(HttpRequest req, Map<String, String> newHeaders) {
