@@ -487,7 +487,6 @@ additionalProperties: false
 required:
 {%- if not is_dynamic_config %}
 - blueprint
-- uri
 {% endif %}
 {% for child_name in nested_parameters.required_children %}- {{ child_name }}
 {% endfor %}
@@ -519,7 +518,6 @@ YAML_TPL = """
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/{{ blueprint_name }}
 blueprint: {{ blueprint_name }}
-uri: github.com/fluxninja/aperture/blueprints@latest
 {%- endif %}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
