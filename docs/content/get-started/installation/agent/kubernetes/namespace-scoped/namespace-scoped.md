@@ -79,7 +79,7 @@ agent:
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-1. Configure the Aperture Cloud endpoint and API key parameters in the Agent.
+1. Configure the Aperture Cloud endpoint and Agent Key parameters in the Agent.
    Update the `values.yaml` file and pass it with the `install` command:
 
    ```yaml
