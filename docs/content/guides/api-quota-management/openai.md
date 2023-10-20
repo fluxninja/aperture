@@ -270,7 +270,6 @@ control point labels.
 # https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
 
 blueprint: quota-scheduling/base
-uri: github.com/fluxninja/aperture/blueprints@latest
 policy:
   # Name of the policy.
   # Type: string
@@ -317,7 +316,6 @@ policy:
 # https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
 
 blueprint: quota-scheduling/base
-uri: github.com/fluxninja/aperture/blueprints@latest
 policy:
   # Name of the policy.
   # Type: string
