@@ -96,22 +96,18 @@ labels.
 
 <!-- markdownlint-disable MD010 -->
 
-Import Aperture:
+Import and setup Aperture Client:
 
 ```typescript
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-```
 
-Setup Aperture Client:
-
-```typescript
 apertureClient = new ApertureClient({
   address: "localhost:8080",
   channelCredentials: grpc.credentials.createSsl(),
 });
 ```
 
-Wrap the OpenAI API call with Aperture SDK:
+Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
 
 ```typescript
 const PRIORITIES: Record<string, number> = {
@@ -200,11 +196,11 @@ Aperture, we also attach the following labels to each request:
   this label. For example, requests from `paid_user` can be given precedence
   over those from `trial_user` and `free_user` in example code.
 
-### Generate Policies with aperturectl
+### Policies
 
-To generate a policy using Quota Scheduler Blueprint, A values files should be
-generated first, specific to the policy. This can be achieved using the command
-provided below.
+To generate a policy using quota scheduler blueprint, `values` files should be
+generated first, specific to the policy. The values file can be generated using
+the following command:
 
 ```mdx-code-block
 <CodeBlock language="bash">aperturectl blueprints values --name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml</CodeBlock>
@@ -363,24 +359,16 @@ policy:
 </p>
 </details>
 
-#### Generate Policy
-
-Using the adjusted values file, final policies will be generated, which will be
-deployed.
-
-To generate, use the following command:
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --values-file=gpt-4-tpm.yaml --output-dir=policy-gen</CodeBlock>
-```
-
 #### Apply Policy
-
-Apply the policy using the `aperturectl` CLI or `kubectl`.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="aperturectl" label="aperturectl">
+<TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
+<CodeBlock language="bash">
+aperturectl cloud blueprints apply --values-file=gpt-4-tpm.yaml
+</CodeBlock>
+</TabItem>
+<TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
 ```
 
 Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
@@ -388,19 +376,22 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl apply policy --file=policy-gen/policies/policy_name.yaml --kube</CodeBlock>
+<CodeBlock language="bash">
+aperturectl blueprints generate --values-file=gpt-4-tpm.yaml --output-dir=policy-gen
+aperturectl apply policy --file=policy-gen/policies/gpt-4-tpm.yaml --kube
+</CodeBlock>
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="kubectl" label="kubectl">
+<TabItem value="kubectl (self-hosted controller)" label="kubectl (self-hosted controller)">
 ```
 
-Apply the policy YAML generated (Kubernetes Custom Resource) using the above
-example with `kubectl`.
+Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
 
 ```bash
-kubectl apply -f policy-gen/policies/policy_name.yaml -n aperture-controller
+aperturectl blueprints generate --values-file=gpt-4-tpm.yaml --output-dir=policy-gen
+kubectl apply -f policy-gen/policies/gpt-4-tpm-cr.yaml -n aperture-controller
 ```
 
 ```mdx-code-block
@@ -425,23 +416,51 @@ can be sent to OpenAI as soon as it reaches the application, or it can wait
 until the timeout. As the overview states, there should be no request drop; the
 highest number of timeout values means no request drop.
 
-### Using Aperture Cloud UI for Advanced Analytics
+### Monitoring the Policy and OpenAI Performance
 
-Aperture Cloud UI provides a 360\* overview of policy, which can be seen from
-panels & dashboards, a granular view of each workload, such as paid, trial, and
-free. Apart from this, Aperture Cloud allows you to view how many policies and
-control are active, acting as centralized policy management & monitoring +
-control points, and services discovery.
+Aperture Cloud provides comprehensive observability of the policy and OpenAI
+performance, providing a granular view of each workload, such as paid, trial,
+and free.
+
+The image below shows the incoming token rate and the accepted token rate for
+the `gpt-4` tokens-per-minute policy. We can observe that the incoming token
+rate is spiky, while the accepted token rate remains smooth and hovers around
+`666 tokens per second`. This roughly translates to `40,000 tokens per minute`.
+Essentially, Aperture is smoothing out the fluctuating incoming token rate to
+align it with OpenAI's rate limits.
 
 ![Token Rate in Light Mode](./assets/openai/token-rate-light.png#gh-light-mode-only)
 
 ![Token Rate in Dark Mode](./assets/openai/token-rate-dark.png#gh-dark-mode-only)
 _Incoming and Accepted Token Rate for gpt-4_
 
+The below image shows request prioritization metrics from the Aperture Cloud
+console during the same peak load period:
+
 ![Prioritization Metrics in Light Mode](./assets/openai/priorities-light.png#gh-light-mode-only)
 
 ![Prioritization Metrics in Dark Mode](./assets/openai/priorities-dark.png#gh-dark-mode-only)
 _Prioritization Metrics for gpt-4_
+
+In the upper left panel of the metrics, noticeable peaks indicate that some
+requests got queued for several minutes in Aperture. We can verify that the
+trial and free-tier users tend to experience longer queue times compared to
+their paid counterparts and chat requests.
+
+Queue wait times can fluctuate based on the volume of simultaneous requests in
+each workload. For example, wait times are significantly longer during peak
+hours as compared to off-peak hours. Aperture provides scheduler preemption
+metrics to offer further insight into the efficacy of prioritization. As
+observed in the lower panels, these metrics measure the relative impact of
+prioritization for each workload by comparing how many tokens a request gets
+preempted or delayed in the queue compared to a purely First-In, First-Out
+(FIFO) ordering.
+
+In addition to effectively managing the OpenAI quotas, Aperture provides
+insights into OpenAI API performance and errors. The graphs below show the
+overall response times for various OpenAI models we use. We observe that the
+`gpt-4` family of models is significantly slower compared to the `gpt-3.5-turbo`
+family of models.
 
 ![Flow Analytics](./assets/openai/flow-analytics-light.png#gh-light-mode-only)
 
