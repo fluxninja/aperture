@@ -155,7 +155,7 @@ func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprint
 	if overrideBlueprintsVersion == "" && overrideBlueprintsURI == "" {
 		blueprintsURI, ok = values["uri"].(string)
 		if !ok {
-			return nil, fmt.Errorf("values file does not contain uri field")
+			log.Info().Msgf("using default blueprints uri: %s@%s", DefaultBlueprintsRepo, LatestTag)
 		}
 	} else {
 		blueprintsURI = overrideBlueprintsURI

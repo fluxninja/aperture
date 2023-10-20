@@ -3,7 +3,6 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/rate-limiting/base
 blueprint: rate-limiting/base
-uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
   # Name of the policy.
