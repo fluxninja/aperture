@@ -130,13 +130,10 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 
 // GetFlatComponentsList returns a fl representation of the circuit graph.
 func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
-	circuitView, err := circuit.CircuitView()
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), -1)
 	if err != nil {
-		errMsg := fmt.Errorf("error transforming circuit to circuit view: %w", err)
-		return "", errMsg
+		return "", err
 	}
-
-	graph := circuitView.Tree.GetGraph()
 
 	flatComponentsList, err := graph.MarshalJSON()
 	if err != nil {
