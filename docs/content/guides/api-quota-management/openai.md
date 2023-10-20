@@ -401,20 +401,19 @@ kubectl apply -f policy-gen/policies/gpt-4-tpm-cr.yaml -n aperture-controller
 
 ## Policy in Action
 
-Once the policy is active, it will start ensuring that API requests are in check
-with rate limits quotas, prioritize requests based on the types of workloads as
-defined in the policy, matching with the labels that SDK passed to Aperture,
-where paid users have more priority over trial and trial over free users,
-establishing an experience baseline for each tier.
+Once the policy is activated, it will begin to ensure that API requests conform
+to OpenAI's rate limits, prioritizing requests based on the workload types
+defined in the policy. These workloads are matched with the labels that the SDK
+passes to Aperture, where paid users are prioritized over trial users, and trial
+users over free users, thereby establishing a baseline experience for each tier.
 
-If rate limits are exhausted, Aperture will schedule the request, put them in
-the queue, and wait for the bucket to be reset or the token to be available.
-Requests will wait in the queue until the timeout value, which is set during the
-`flow/control point` setup. There is no minimum time for the request to wait; as
-soon as the tokens are available, the request will be sent to OpenAI. A request
-can be sent to OpenAI as soon as it reaches the application, or it can wait
-until the timeout. As the overview states, there should be no request drop; the
-highest number of timeout values means no request drop.
+Should rate limits be exhausted, Aperture will schedule the requests, placing
+them in a queue until either the bucket is reset or a token becomes available.
+Requests will remain in the queue up to the specified timeout value, provided in
+the `StartFlow` function. There is no minimum waiting time for requests; as soon
+as tokens are available, requests will be forwarded to OpenAI. A request can be
+transmitted to OpenAI as soon as it reaches the application, or it can wait
+until the timeout.
 
 ### Monitoring the Policy and OpenAI Performance
 
