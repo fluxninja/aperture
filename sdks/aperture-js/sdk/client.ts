@@ -14,7 +14,7 @@ import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.j
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
-import { LIBRARY_NAME, LIBRARY_VERSION, URL } from "./consts.js";
+import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
@@ -35,20 +35,26 @@ export class ApertureClient {
   private readonly tracer: Tracer;
 
   constructor({
+    address,
     channelCredentials = grpc.credentials.createInsecure(),
     channelOptions = {},
   }: {
+    address?: string;
     channelCredentials?: ChannelCredentials;
     channelOptions?: ChannelOptions;
   } = {}) {
+    if (address === undefined) {
+      throw new Error("address is required");
+    }
+
     this.fcsClient = new fcs.FlowControlService(
-      URL,
+      address,
       channelCredentials,
       channelOptions,
     );
 
     this.exporter = new OTLPTraceExporter({
-      url: URL,
+      url: address,
       credentials: channelCredentials,
     });
 
