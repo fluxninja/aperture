@@ -17,6 +17,7 @@ buf-generate:
 	@rm -rfd gen/proto gen/openapiv2
 	@buf format -w
 	@buf lint
+	@buf generate --path aperture --template buf.gen.aperture-langs2.yaml
 	@buf generate --path aperture --template buf.gen.aperture-langs.yaml
 	@buf generate --path aperture --template buf.gen.aperture-grpc-ecosystem.yaml
 
@@ -24,6 +25,11 @@ buf-generate:
 	@find . -name \*.pb.go -exec protoc-go-inject-tag -input={} \;
 
 	@#generate sdk flowcontrol stubs and copy them over
+
+	@#csharp
+	@rm -rf ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
+	@cp -R gen/proto/csharp/Aperture/Flowcontrol/Check ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
+	@rm -rf gen/proto/csharp
 
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*

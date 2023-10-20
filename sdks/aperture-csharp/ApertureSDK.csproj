@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Google.Api.CommonProtos" Version="2.12.0"/>
+        <PackageReference Include="Grpc" Version="2.46.6"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.58.0"/>
+        <PackageReference Include="Grpc.Tools" Version="2.59.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="NodaTime" Version="3.1.9"/>
+        <PackageReference Include="OpenTelemetry.Api" Version="1.6.0"/>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.6.0"/>
+        <PackageReference Include="protobuf-net.Grpc" Version="1.1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Examples\Program.cs">
+            <Link>ConsoleApp1\Program.cs</Link>
+        </Compile>
+        <Compile Remove="Examples\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Remove="Examples\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Examples\**"/>
+    </ItemGroup>
+
+</Project>

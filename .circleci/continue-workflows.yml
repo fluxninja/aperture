@@ -53,6 +53,9 @@ parameters:
   updated-java-demo-app:
     type: boolean
     default: false
+  updated-aperture-csharp:
+    type: boolean
+    default: false
   updated-aperture-go:
     type: boolean
     default: false
@@ -1267,6 +1270,21 @@ workflows:
       - go-test-coverage:
           name: go-test-coverage-aperture
           work_dir: .
+
+  aperture-csharp:
+    when:
+      or:
+        - << pipeline.parameters.updated-aperture-csharp >>
+        - << pipeline.parameters.updated-sdk-validator >>
+    jobs:
+      - validate-publish-sdk:
+          name: validate-publish-aperture-csharp
+          path: sdks/aperture-csharp
+          docker-context: sdks/aperture-csharp
+          dockerfile: Dockerfile
+          docker-image: aperture-csharp-example
+          remote-repo: fluxninja/aperture-csharp
+          remote-repo-fingerprint: "5c:5a:cc:d8:51:30:a3:7c:42:91:5f:28:19:ec:e8:ce"
 
   aperture-go:
     when:
