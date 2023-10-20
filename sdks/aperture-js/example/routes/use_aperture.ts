@@ -1,9 +1,11 @@
 import express from "express";
 
-import {ApertureClient, FlowStatusEnum} from "@fluxninja/aperture-js";
+import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 // Create aperture client
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient({
+  address: "localhost:8089",
+});
 
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {

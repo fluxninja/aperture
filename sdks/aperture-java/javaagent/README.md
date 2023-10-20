@@ -52,7 +52,7 @@ system properties or environment variables:
 | Property name                          | Environment variable name              | Default value | Description                                                                                                                                  |
 | :------------------------------------- | :------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------- |
 | aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                                                                                           |
-| aperture.agent.hostname                | APERTURE_AGENT_HOSTNAME                | localhost     | Hostname of Aperture Agent to connect to                                                                                                     |
+| aperture.agent.host                    | APERTURE_AGENT_HOST                    | localhost     | Hostname of Aperture Agent to connect to                                                                                                     |
 | aperture.agent.port                    | APERTURE_AGENT_PORT                    | 8089          | Port of Aperture Agent to connect to                                                                                                         |
 | aperture.control.point.name            | APERTURE_CONTROL_POINT_NAME            |               | (Required) Name of the control point this agent represents                                                                                   |
 | aperture.javaagent.enable.ramp.mode    | APERTURE_JAVAAGENT_ENABLE_RAMP_MODE    | false         | Sets the ramp mode of flows started by the client. <br /> If set to true, all flows will require at least one ramp component to accept them. |
@@ -68,7 +68,7 @@ Example invocation with commandline-set properties:
 
 ```sh
 java -javaagent:path/to/javaagent.jar \
--Daperture.agent.hostname="some_host" \
+-Daperture.agent.host="some_host" \
 -Daperture.agent.port=12345 \
 -Daperture.control.point.name="awesomeFeature" \
 -Daperture.javaagent.ignored.paths="/healthz,/connected" \
@@ -86,7 +86,7 @@ java -javaagent:path/to/javaagent.jar \
 The `/config.properties` file:
 
 ```properties
-aperture.agent.hostname=some_host
+aperture.agent.host=some_host
 aperture.agent.port=12345
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/healthz,/connected
