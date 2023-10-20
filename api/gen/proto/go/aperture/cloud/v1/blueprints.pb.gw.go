@@ -190,6 +190,58 @@ func local_request_BlueprintsService_Delete_0(ctx context.Context, marshaler run
 
 }
 
+func request_BlueprintsService_Archive_0(ctx context.Context, marshaler runtime.Marshaler, client BlueprintsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DeleteRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["policy_name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
+	}
+
+	protoReq.PolicyName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
+	}
+
+	msg, err := client.Archive(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_BlueprintsService_Archive_0(ctx context.Context, marshaler runtime.Marshaler, server BlueprintsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DeleteRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["policy_name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "policy_name")
+	}
+
+	protoReq.PolicyName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "policy_name", err)
+	}
+
+	msg, err := server.Archive(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterBlueprintsServiceHandlerServer registers the http handlers for service BlueprintsService to "mux".
 // UnaryRPC     :call BlueprintsServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -293,6 +345,31 @@ func RegisterBlueprintsServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		}
 
 		forward_BlueprintsService_Delete_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("DELETE", pattern_BlueprintsService_Archive_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Archive", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}/archive"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_BlueprintsService_Archive_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_BlueprintsService_Archive_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -425,6 +502,28 @@ func RegisterBlueprintsServiceHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
+	mux.Handle("DELETE", pattern_BlueprintsService_Archive_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/aperture.cloud.v1.BlueprintsService/Archive", runtime.WithHTTPPathPattern("/fluxninja/v1/blueprints/{policy_name}/archive"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_BlueprintsService_Archive_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_BlueprintsService_Archive_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -436,6 +535,8 @@ var (
 	pattern_BlueprintsService_Apply_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"fluxninja", "v1", "blueprints"}, ""))
 
 	pattern_BlueprintsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"fluxninja", "v1", "blueprints", "policy_name"}, ""))
+
+	pattern_BlueprintsService_Archive_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"fluxninja", "v1", "blueprints", "policy_name", "archive"}, ""))
 )
 
 var (
@@ -446,4 +547,6 @@ var (
 	forward_BlueprintsService_Apply_0 = runtime.ForwardResponseMessage
 
 	forward_BlueprintsService_Delete_0 = runtime.ForwardResponseMessage
+
+	forward_BlueprintsService_Archive_0 = runtime.ForwardResponseMessage
 )

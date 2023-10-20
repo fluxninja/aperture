@@ -3,18 +3,6 @@
   "type": "object",
   "title": "quota-scheduling/base blueprint",
   "additionalProperties": false,
-  "properties": {
-    "blueprint": {
-      "description": "Blueprint name",
-      "type": "string",
-      "default": "quota-scheduling/base",
-      "enum": ["quota-scheduling/base"]
-    },
-    "uri": {
-      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
-      "default": "github.com/fluxninja/aperture/blueprints@latest",
-      "type": "string"
-    }
-  },
+  "properties": null,
   "$defs": null
 }

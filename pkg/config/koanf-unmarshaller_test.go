@@ -268,7 +268,7 @@ var _ = Describe("Koanf-unmarshaller", func() {
 			Expect(str).To(Equal("test"))
 			integer := GetIntValue(unmarshaller, "koanf-unmarshaller", 0)
 			Expect(integer).To(Equal(0))
-			bool := GetBoolValue(unmarshaller, "koanf-unmarshaller", true)
+			bool := GetBoolValue(unmarshaller, "koanf-unmarshaller", false)
 			Expect(bool).To(BeFalse())
 		})
 	})

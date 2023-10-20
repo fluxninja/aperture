@@ -97,8 +97,8 @@ installation of the Aperture Controller or Agent:
   </TabItem>
 </Tabs>
 
-Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
-of the organization on Aperture Cloud and API Key generated on it.
+Replace the values of `ORGANIZATION_NAME` and `AGENT_KEY` with the actual values
+of the organization on Aperture Cloud and Agent Key generated on it.
 
 :::note
 

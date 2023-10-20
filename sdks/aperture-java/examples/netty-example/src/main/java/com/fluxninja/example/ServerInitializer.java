@@ -8,6 +8,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import java.io.IOException;
+import java.time.Duration;
 
 public class ServerInitializer extends ChannelInitializer<Channel> {
 
@@ -15,6 +16,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     String agentHost;
     int agentPort;
     boolean rampMode;
+    Duration flowTimeout;
     String controlPointName;
     boolean insecureGrpc;
     String rootCertFile;
@@ -23,12 +25,14 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
             String agentHost,
             String agentPort,
             boolean rampMode,
+            Duration flowTimeout,
             String controlPointName,
             boolean insecureGrpc,
             String rootCertFile) {
         this.agentHost = agentHost;
         this.agentPort = Integer.parseInt(agentPort);
         this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
         this.controlPointName = controlPointName;
         this.insecureGrpc = insecureGrpc;
         this.rootCertFile = rootCertFile;
@@ -53,7 +57,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
         //    but after the codec handler.
-        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode));
+        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }
 }

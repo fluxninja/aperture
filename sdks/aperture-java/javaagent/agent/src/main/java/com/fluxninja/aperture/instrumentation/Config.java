@@ -91,6 +91,7 @@ public class Config {
         ApertureSDK sdk;
         String controlPointName;
         boolean rampMode;
+        Duration flowTimeout;
         try {
             controlPointName = config.getProperty(CONTROL_POINT_NAME_PROPERTY);
             rampMode =
@@ -98,6 +99,12 @@ public class Config {
                             config.getProperty(
                                     RAMP_MODE_PROPERTY, RAMP_MODE_PROPERTY_DEFAULT_VALUE));
 
+            flowTimeout =
+                    Duration.ofMillis(
+                            Integer.parseInt(
+                                    config.getProperty(
+                                            CONNECTION_TIMEOUT_MILLIS_PROPERTY,
+                                            CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE)));
             ApertureSDKBuilder sdkBuilder =
                     builder.setHost(
                                     config.getProperty(
@@ -106,12 +113,6 @@ public class Config {
                                     Integer.parseInt(
                                             config.getProperty(
                                                     AGENT_PORT_PROPERTY, AGENT_PORT_DEFAULT_VALUE)))
-                            .setFlowTimeout(
-                                    Duration.ofMillis(
-                                            Integer.parseInt(
-                                                    config.getProperty(
-                                                            CONNECTION_TIMEOUT_MILLIS_PROPERTY,
-                                                            CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE))))
                             .addIgnoredPaths(
                                     config.getProperty(
                                             IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))
@@ -143,7 +144,7 @@ public class Config {
             throw new IllegalArgumentException("Control Point name must be set");
         }
 
-        return new ApertureSDKWrapper(sdk, controlPointName, rampMode);
+        return new ApertureSDKWrapper(sdk, controlPointName, rampMode, flowTimeout);
     }
 
     private static String envNameFromPropertyName(String propertyName) {

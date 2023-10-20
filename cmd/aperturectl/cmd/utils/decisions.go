@@ -42,7 +42,7 @@ func DecisionsPreRun(all bool, decisionType string) (string, error) {
 }
 
 // ParseDecisions parses the decisions.
-func ParseDecisions(cmd *cobra.Command, client PolicyClient, all bool, decisionType string) error {
+func ParseDecisions(cmd *cobra.Command, client SelfHostedPolicyClient, all bool, decisionType string) error {
 	getDecisionsReq := &languagev1.GetDecisionsRequest{
 		DecisionType: decisionType,
 	}

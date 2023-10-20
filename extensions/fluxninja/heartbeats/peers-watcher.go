@@ -34,7 +34,12 @@ func setupPeersWatcher(
 	sessionScopedKV *etcdclient.SessionScopedKV,
 	lc fx.Lifecycle,
 ) (PeersOut, error) {
-	if extensionConfig.APIKey == "" {
+	apiKey := extensionConfig.AgentAPIKey
+	if apiKey == "" {
+		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+		apiKey = extensionConfig.APIKey
+	}
+	if apiKey == "" {
 		return PeersOut{}, nil
 	}
 

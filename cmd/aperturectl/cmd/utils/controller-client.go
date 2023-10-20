@@ -19,7 +19,7 @@ import (
 //
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
 type IntrospectionClient interface {
-	ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*cmdv1.ListAgentsResponse, error)
+	ListAgents(ctx context.Context, in *cmdv1.ListAgentsRequest, opts ...grpc.CallOption) (*cmdv1.ListAgentsResponse, error)
 	// Seems to be unimplemented on the controller at all?!
 	ListServices(ctx context.Context, in *cmdv1.ListServicesRequest, opts ...grpc.CallOption) (*cmdv1.ListServicesControllerResponse, error)
 	ListFlowControlPoints(ctx context.Context, in *cmdv1.ListFlowControlPointsRequest, opts ...grpc.CallOption) (*cmdv1.ListFlowControlPointsControllerResponse, error)
@@ -31,9 +31,15 @@ type IntrospectionClient interface {
 }
 
 // PolicyClient is a subset of cmdv1.ControllerClient that covers APIs related to policies.
+type PolicyClient interface {
+	UpsertPolicy(ctx context.Context, in *policylangv1.UpsertPolicyRequest, opts ...grpc.CallOption) (*policylangv1.UpsertPolicyResponse, error)
+	DeletePolicy(ctx context.Context, in *policylangv1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+// SelfHostedPolicyClient is a subset of cmdv1.ControllerClient that covers APIs related to policies.
 //
 // FIXME: Perhaps it'd be better to split the service on proto level (keep backcompat in mind).
-type PolicyClient interface {
+type SelfHostedPolicyClient interface {
 	ListPolicies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*policylangv1.GetPoliciesResponse, error)
 	UpsertPolicy(ctx context.Context, in *policylangv1.UpsertPolicyRequest, opts ...grpc.CallOption) (*policylangv1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *policylangv1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -55,6 +61,7 @@ type StatusClient interface {
 type CloudPolicyClient interface {
 	UpsertPolicy(ctx context.Context, in *policylangv1.UpsertPolicyRequest, opts ...grpc.CallOption) (*policylangv1.UpsertPolicyResponse, error)
 	DeletePolicy(ctx context.Context, in *policylangv1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ArchivePolicy(ctx context.Context, in *policylangv1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 var _ CloudPolicyClient = cloudv1.NewPolicyServiceClient(nil)
@@ -65,6 +72,7 @@ type CloudBlueprintsClient interface {
 	Get(ctx context.Context, in *cloudv1.GetRequest, opts ...grpc.CallOption) (*cloudv1.GetResponse, error)
 	Apply(ctx context.Context, in *cloudv1.ApplyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Delete(ctx context.Context, in *cloudv1.DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Archive(ctx context.Context, in *cloudv1.DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 var _ CloudBlueprintsClient = cloudv1.NewBlueprintsServiceClient(nil)

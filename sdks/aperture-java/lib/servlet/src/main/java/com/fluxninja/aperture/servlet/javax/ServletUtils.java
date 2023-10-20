@@ -6,6 +6,7 @@ import io.opentelemetry.api.baggage.BaggageEntry;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class ServletUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            ServletRequest req, String controlPointName) {
+            ServletRequest req, String controlPointName, Duration flowTimeout) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -49,7 +50,7 @@ public class ServletUtils {
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, req);
-        builder.setControlPoint(controlPointName).setRampMode(false);
+        builder.setControlPoint(controlPointName).setRampMode(false).setFlowTimeout(flowTimeout);
         return builder.build();
     }
 

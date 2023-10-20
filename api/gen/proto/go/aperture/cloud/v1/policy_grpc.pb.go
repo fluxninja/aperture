@@ -23,8 +23,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PolicyService_UpsertPolicy_FullMethodName = "/aperture.cloud.v1.PolicyService/UpsertPolicy"
-	PolicyService_DeletePolicy_FullMethodName = "/aperture.cloud.v1.PolicyService/DeletePolicy"
+	PolicyService_UpsertPolicy_FullMethodName  = "/aperture.cloud.v1.PolicyService/UpsertPolicy"
+	PolicyService_DeletePolicy_FullMethodName  = "/aperture.cloud.v1.PolicyService/DeletePolicy"
+	PolicyService_ArchivePolicy_FullMethodName = "/aperture.cloud.v1.PolicyService/ArchivePolicy"
 )
 
 // PolicyServiceClient is the client API for PolicyService service.
@@ -33,6 +34,7 @@ const (
 type PolicyServiceClient interface {
 	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ArchivePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type policyServiceClient struct {
@@ -61,12 +63,22 @@ func (c *policyServiceClient) DeletePolicy(ctx context.Context, in *v1.DeletePol
 	return out, nil
 }
 
+func (c *policyServiceClient) ArchivePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PolicyService_ArchivePolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PolicyServiceServer is the server API for PolicyService service.
 // All implementations should embed UnimplementedPolicyServiceServer
 // for forward compatibility
 type PolicyServiceServer interface {
 	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
+	ArchivePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedPolicyServiceServer should be embedded to have forward compatible implementations.
@@ -78,6 +90,9 @@ func (UnimplementedPolicyServiceServer) UpsertPolicy(context.Context, *v1.Upsert
 }
 func (UnimplementedPolicyServiceServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (UnimplementedPolicyServiceServer) ArchivePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ArchivePolicy not implemented")
 }
 
 // UnsafePolicyServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -127,6 +142,24 @@ func _PolicyService_DeletePolicy_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PolicyService_ArchivePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.DeletePolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PolicyServiceServer).ArchivePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PolicyService_ArchivePolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PolicyServiceServer).ArchivePolicy(ctx, req.(*v1.DeletePolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PolicyService_ServiceDesc is the grpc.ServiceDesc for PolicyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +174,10 @@ var PolicyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePolicy",
 			Handler:    _PolicyService_DeletePolicy_Handler,
+		},
+		{
+			MethodName: "ArchivePolicy",
+			Handler:    _PolicyService_ArchivePolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

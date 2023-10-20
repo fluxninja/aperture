@@ -36,7 +36,6 @@ public final class ApertureSDK {
     private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
             httpFlowControlClient;
     private final Tracer tracer;
-    private final Duration flowTimeout;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
 
@@ -46,12 +45,10 @@ public final class ApertureSDK {
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
-            Duration flowTimeout,
             List<String> ignoredPaths,
             boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
-        this.flowTimeout = flowTimeout;
         this.httpFlowControlClient = httpFlowControlClient;
         this.ignoredPaths = ignoredPaths;
         this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
@@ -74,10 +71,15 @@ public final class ApertureSDK {
      * @param controlPoint Name of the control point
      * @param explicitLabels Labels sent to Aperture Agent
      * @param rampMode Whether the flow should require ramp component match
+     * @param flowTimeout timeout for connection to Aperture Agent. Set to 0 to block until response
+     *     is received.
      * @return A Flow object
      */
     public Flow startFlow(
-            String controlPoint, Map<String, String> explicitLabels, Boolean rampMode) {
+            String controlPoint,
+            Map<String, String> explicitLabels,
+            Boolean rampMode,
+            Duration flowTimeout) {
         Map<String, String> labels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -155,12 +157,13 @@ public final class ApertureSDK {
 
         CheckHTTPResponse res = null;
         try {
-            if (flowTimeout.isZero()) {
+            if (req.getFlowTimeout().isZero()) {
                 res = this.httpFlowControlClient.checkHTTP(checkHTTPRequest);
             } else {
                 res =
                         this.httpFlowControlClient
-                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(
+                                        req.getFlowTimeout().toNanos(), TimeUnit.NANOSECONDS)
                                 .checkHTTP(checkHTTPRequest);
             }
         } catch (StatusRuntimeException e) {
