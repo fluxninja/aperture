@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -237,6 +238,11 @@ func (c *ControllerConn) prepareGRPCClient() (*grpc.ClientConn, error) {
 	var addr string
 	cred := c.prepareCred()
 	addr = c.controllerAddr
+
+	// check whether the controller address contains a port, otherwise just use 443
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		addr = net.JoinHostPort(addr, "443")
+	}
 
 	if cred == nil {
 		certPool, err := x509.SystemCertPool()
