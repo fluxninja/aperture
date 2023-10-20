@@ -126,18 +126,18 @@ func NewActuatorAndOptions(
 	return lsa, fx.Options(options...), nil
 }
 
-func (la *Actuator) setup(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
+func (la *Actuator) setup(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			la.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
+			la.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			var merr, err error
 			la.decisionWriter.Close()
 			for _, etcdPath := range la.etcdPaths {
-				_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
+				_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
 				if err != nil {
 					logger.Error().Err(err).Msg("Failed to delete load decisions")
 					merr = multierr.Append(merr, err)

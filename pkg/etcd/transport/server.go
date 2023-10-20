@@ -148,12 +148,12 @@ func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Re
 
 	path := path.Join(RPCBasePath, RPCRequestPath, req.Client, req.ID)
 
-	lease, err := t.etcdClient.Grant(context.Background(), leaseDuration)
+	lease, err := t.etcdClient.Lease.Grant(context.Background(), leaseDuration)
 	if err != nil {
 		return nil, fmt.Errorf("failed to grant lease: %w", err)
 	}
 
-	_, err = t.etcdClient.Put(context.Background(), path, string(rawReq), clientv3.WithLease(lease.ID))
+	_, err = t.etcdClient.KV.Put(context.Background(), path, string(rawReq), clientv3.WithLease(lease.ID))
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request to etcd: %w", err)
 	}
@@ -167,7 +167,7 @@ func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
 
 	responsePath := path.Join(RPCBasePath, RPCResponsePath, req.Client, req.ID)
 
-	watchCh := t.etcdClient.Watch(ctx, responsePath)
+	watchCh := t.etcdClient.Watcher.Watch(ctx, responsePath)
 	for {
 		select {
 		case watchResp, ok := <-watchCh:

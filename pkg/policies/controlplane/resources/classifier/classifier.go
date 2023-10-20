@@ -51,7 +51,7 @@ func NewClassifierOptions(
 	return fx.Options(options...), nil
 }
 
-func (configSync *classifierConfigSync) doSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) {
+func (configSync *classifierConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -68,7 +68,7 @@ func (configSync *classifierConfigSync) doSync(scopedKV *etcdclient.SessionScope
 				logger.Error().Err(err).Msg("Failed to marshal classifier")
 				return err
 			}
-			_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
+			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to put classifier")
 				return err
@@ -76,7 +76,7 @@ func (configSync *classifierConfigSync) doSync(scopedKV *etcdclient.SessionScope
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
+			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete classifier")
 				return err

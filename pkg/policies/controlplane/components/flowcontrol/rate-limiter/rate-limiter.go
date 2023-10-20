@@ -82,7 +82,7 @@ func NewRateLimiterAndOptions(
 	), nil
 }
 
-func (limiterSync *rateLimiterSync) setupSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) {
+func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
 	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -101,13 +101,13 @@ func (limiterSync *rateLimiterSync) setupSync(scopedKV *etcdclient.SessionScoped
 			}
 			var merr error
 			for _, configEtcdPath := range limiterSync.configEtcdPaths {
-				_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configEtcdPath, string(dat))
+				_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), configEtcdPath, string(dat))
 				if err != nil {
 					logger.Error().Err(err).Msg("failed to put rate limiter config")
 					merr = multierr.Append(merr, err)
 				}
 			}
-			limiterSync.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
+			limiterSync.decisionWriter = etcdwriter.NewWriter(etcdClient, true)
 			return merr
 		},
 		OnStop: func(ctx context.Context) error {
@@ -115,7 +115,7 @@ func (limiterSync *rateLimiterSync) setupSync(scopedKV *etcdclient.SessionScoped
 			deleteEtcdPath := func(paths []string) error {
 				var merr error
 				for _, path := range paths {
-					_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), path)
+					_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), path)
 					if err != nil {
 						logger.Error().Err(err).Msgf("failed to delete etcd path %s", path)
 						merr = multierr.Append(merr, err)

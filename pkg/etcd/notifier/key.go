@@ -22,9 +22,10 @@ var _ notifiers.KeyNotifier = (*KeyToEtcdNotifier)(nil)
 func NewKeyToEtcdNotifier(
 	key notifiers.Key,
 	etcdPath string,
-	kv *etcdclient.KVWrapper,
+	etcdClient *etcdclient.Client,
+	withLease bool,
 ) (*KeyToEtcdNotifier, error) {
-	return newKeyToEtcdNotifier(key, etcdPath, etcdwriter.NewWriter(kv))
+	return newKeyToEtcdNotifier(key, etcdPath, etcdwriter.NewWriter(etcdClient, withLease))
 }
 
 func newKeyToEtcdNotifier(

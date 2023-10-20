@@ -21,22 +21,24 @@ const (
 type operation struct {
 	key    string
 	value  []byte
+	opts   []clientv3.OpOption
 	opType int
 }
 
 // Writer holds fields for etcd writer.
 type Writer struct {
-	context   context.Context
-	kv        *etcdclient.KVWrapper
-	opChannel infchan.Channel[operation]
-	cancel    context.CancelFunc
+	context    context.Context
+	etcdClient *etcdclient.Client
+	opChannel  infchan.Channel[operation]
+	cancel     context.CancelFunc
+	withLease  bool
 }
 
 // NewWriter returns a new etcd writer.
-func NewWriter(kv *etcdclient.KVWrapper, opts ...clientv3.OpOption) *Writer {
+func NewWriter(etcdClient *etcdclient.Client, withLease bool, opts ...clientv3.OpOption) *Writer {
 	ew := &Writer{
-		kv:        kv,
-		opChannel: infchan.NewChannel[operation](),
+		etcdClient: etcdClient,
+		opChannel:  infchan.NewChannel[operation](),
 	}
 	// Set finalizer to automatically close channel
 	runtime.SetFinalizer(ew, func(ew *Writer) {
@@ -58,16 +60,20 @@ func NewWriter(kv *etcdclient.KVWrapper, opts ...clientv3.OpOption) *Writer {
 		for {
 			select {
 			case op := <-ew.opChannel.Out():
+				op.opts = append(op.opts, opts...)
+				if ew.withLease && op.opType == put {
+					op.opts = append(op.opts, clientv3.WithLease(etcdClient.LeaseID))
+				}
 				var err error
 				switch op.opType {
 				case put:
-					_, err = ew.kv.Put(clientv3.WithRequireLeader(ew.context), op.key, string(op.value), opts...)
+					_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ew.context), op.key, string(op.value), opts...)
 				case del:
-					_, err = ew.kv.Delete(clientv3.WithRequireLeader(ew.context), op.key, opts...)
+					_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ew.context), op.key, opts...)
 				case delPrefix:
 					opOpts := []clientv3.OpOption{clientv3.WithPrefix()}
 					opOpts = append(opOpts, opts...)
-					_, err = ew.kv.Delete(clientv3.WithRequireLeader(ew.context), op.key, opOpts...)
+					_, err = etcdClient.KV.Delete(clientv3.WithRequireLeader(ew.context), op.key, opOpts...)
 				}
 				if err != nil {
 					log.Error().Err(err).Msg("failed to write to etcd")

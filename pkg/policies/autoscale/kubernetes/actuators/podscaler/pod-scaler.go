@@ -83,7 +83,7 @@ type podScalerFactory struct {
 	controlPointTrackers notifiers.Trackers
 	election             *election.Election
 	k8sClient            k8s.K8sClient
-	sessionScopedKV      *etcdclient.SessionScopedKV
+	etcdClient           *etcdclient.Client
 	agentGroup           string
 }
 
@@ -96,7 +96,6 @@ func setupPodScalerFactory(
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	k8sClient k8s.K8sClient,
 	ai *agentinfo.AgentInfo,
 	cfg autoscalek8sconfig.AutoScaleKubernetesConfig,
@@ -125,7 +124,7 @@ func setupPodScalerFactory(
 		decisionsWatcher:     decisionsWatcher,
 		agentGroup:           agentGroup,
 		registry:             reg,
-		sessionScopedKV:      sessionScopedKV,
+		etcdClient:           etcdClient,
 		k8sClient:            k8sClient,
 		election:             election,
 	}
@@ -192,7 +191,7 @@ func (psFactory *podScalerFactory) newPodScalerOptions(
 			podScaler.setup,
 		),
 		fx.Supply(
-			psFactory.sessionScopedKV,
+			psFactory.etcdClient,
 			fx.Annotate(psFactory.k8sClient, fx.As(new(k8s.K8sClient))),
 		),
 	), nil
@@ -206,7 +205,7 @@ type podScaler struct {
 	registry   status.Registry
 	iface.Component
 	statusWriter      *etcdwriter.Writer
-	sessionScopedKV   *etcdclient.SessionScopedKV
+	etcdClient        *etcdclient.Client
 	cancel            context.CancelFunc
 	scaleCancel       context.CancelFunc
 	podScalerFactory  *podScalerFactory
@@ -219,11 +218,11 @@ type podScaler struct {
 
 func (ps *podScaler) setup(
 	lifecycle fx.Lifecycle,
-	sessionScopedKV *etcdclient.SessionScopedKV,
+	etcdClient *etcdclient.Client,
 	k8sClient k8s.K8sClient,
 ) error {
 	logger := ps.registry.GetLogger()
-	ps.sessionScopedKV = sessionScopedKV
+	ps.etcdClient = etcdClient
 	ps.k8sClient = k8sClient
 	etcdKey := paths.AgentComponentKey(ps.podScalerFactory.agentGroup,
 		ps.GetPolicyName(),
@@ -271,7 +270,7 @@ func (ps *podScaler) setup(
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var err error
-			ps.statusWriter = etcdwriter.NewWriter(&ps.sessionScopedKV.KVWrapper)
+			ps.statusWriter = etcdwriter.NewWriter(ps.etcdClient, true)
 			ps.ctx, ps.cancel = context.WithCancel(context.Background())
 
 			// add decisions notifier
@@ -306,7 +305,7 @@ func (ps *podScaler) setup(
 			ps.registry.SetStatus(status.NewStatus(nil, merr))
 			ps.cancel()
 			ps.statusWriter.Close()
-			_, err = ps.sessionScopedKV.KV.Delete(clientv3.WithRequireLeader(ctx), ps.statusEtcdPath)
+			_, err = ps.etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), ps.statusEtcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete scale status")
 				merr = multierr.Append(merr, err)

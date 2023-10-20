@@ -46,7 +46,7 @@ func NewInfraMetersOptions(
 	return fx.Options(options...), nil
 }
 
-func (configSync *infraMeterConfigSync) doSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) {
+func (configSync *infraMeterConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
 	// Get the logger instance from the status registry.
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 
@@ -70,7 +70,7 @@ func (configSync *infraMeterConfigSync) doSync(scopedKV *etcdclient.SessionScope
 
 			// Put the marshaled data in etcd using the provided etcdPath and LeaseID.
 			// It returns an error in case of any failure.
-			_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
+			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to put infra meter config")
@@ -85,7 +85,7 @@ func (configSync *infraMeterConfigSync) doSync(scopedKV *etcdclient.SessionScope
 		OnStop: func(ctx context.Context) error {
 			// Delete the data from etcd using the provided etcdPath.
 			// It returns an error in case of any failure.
-			_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
+			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
 				// Log the error and return it in case of any failure.
 				logger.Error().Err(err).Msg("Failed to delete infra meter config")

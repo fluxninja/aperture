@@ -58,7 +58,7 @@ func NewConfigSyncOptions(
 	), nil
 }
 
-func (configSync *podScalerConfigSync) doSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
+func (configSync *podScalerConfigSync) doSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := configSync.policyReadAPI.GetStatusRegistry().GetLogger()
 	// Add/remove file in lifecycle hooks in order to sync with etcd.
 	lifecycle.Append(fx.Hook{
@@ -76,7 +76,7 @@ func (configSync *podScalerConfigSync) doSync(scopedKV *etcdclient.SessionScoped
 				logger.Error().Err(err).Msg("Failed to marshal flux meter config")
 				return err
 			}
-			_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
+			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to put flux meter config")
 				return err
@@ -84,7 +84,7 @@ func (configSync *podScalerConfigSync) doSync(scopedKV *etcdclient.SessionScoped
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
+			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete flux meter config")
 				return err

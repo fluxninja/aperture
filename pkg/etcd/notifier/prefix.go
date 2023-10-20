@@ -19,13 +19,14 @@ var _ notifiers.PrefixNotifier = (*PrefixToEtcdNotifier)(nil)
 // NewPrefixToEtcdNotifier returns a new prefix notifier that writes raw/transformed contents to etcd at "etcdPath/key".
 func NewPrefixToEtcdNotifier(
 	etcdPath string,
-	kv *etcdclient.KVWrapper,
+	etcdClient *etcdclient.Client,
+	withLease bool,
 ) *PrefixToEtcdNotifier {
 	pen := &PrefixToEtcdNotifier{
 		// subscribe to all prefixes
 		PrefixBase: notifiers.NewPrefixBase(""),
 		etcdPath:   etcdPath,
-		etcdWriter: etcdwriter.NewWriter(kv),
+		etcdWriter: etcdwriter.NewWriter(etcdClient, withLease),
 	}
 	return pen
 }

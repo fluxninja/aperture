@@ -31,7 +31,6 @@ type PeersOut struct {
 func setupPeersWatcher(
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	lc fx.Lifecycle,
 ) (PeersOut, error) {
 	if extensionConfig.APIKey == "" {
@@ -41,7 +40,7 @@ func setupPeersWatcher(
 	if info.Service != utils.ApertureController {
 		return PeersOut{}, nil
 	}
-	pd, err := peers.NewPeerDiscovery("aperture-agent", etcdClient, sessionScopedKV, nil)
+	pd, err := peers.NewPeerDiscovery("aperture-agent", etcdClient, nil)
 	if err != nil {
 		return PeersOut{}, err
 	}

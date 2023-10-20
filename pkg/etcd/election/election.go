@@ -18,7 +18,7 @@ type ElectionIn struct {
 	fx.In
 	Lifecycle  fx.Lifecycle
 	Shutdowner fx.Shutdowner
-	Session    *etcd.Session
+	Client     *etcd.Client
 }
 
 // ProvideElection provides a wrapper around etcd based leader election for arbitrary key.
@@ -38,17 +38,10 @@ func ProvideElection(key string, in ElectionIn) *Election {
 			panichandler.Go(func() {
 				defer close(election.doneChan)
 
-				session, err := in.Session.WaitSession(ctx)
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to get etcd session for leader election")
-					utils.Shutdown(in.Shutdowner)
-					return
-				}
-
 				// Create an election for this client
-				election.election = concurrencyv3.NewElection(session, key)
+				election.election = concurrencyv3.NewElection(in.Client.Session, key)
 				// Campaign for leadership
-				err = election.election.Campaign(ctx, info.GetHostInfo().Uuid)
+				err := election.election.Campaign(ctx, info.GetHostInfo().Uuid)
 				if err != nil {
 					log.Error().Err(err).Msg("Unable to elect a leader")
 					utils.Shutdown(in.Shutdowner)

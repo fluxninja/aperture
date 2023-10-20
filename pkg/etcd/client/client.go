@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	concurrencyv3 "go.etcd.io/etcd/client/v3/concurrency"
 	namespacev3 "go.etcd.io/etcd/client/v3/namespace"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -16,23 +17,21 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // Module is a fx module that provides etcd client.
 func Module() fx.Option {
-	return fx.Provide(
-		ProvideClient,
-		ProvideSession,
-		ProvideSessionScopedKV,
-	)
+	return fx.Provide(ProvideClient)
 }
 
 // ConfigOverride can be provided by an extension to provide parts of etcd client config directly.
 type ConfigOverride struct {
-	Namespace         string                        // required
-	Endpoints         []string                      // required
 	PerRPCCredentials credentials.PerRPCCredentials // optional
+	Namespace         string                        // required
 	OverriderName     string                        // who is providing the override, for logs
+	Endpoints         []string                      // required
 }
 
 const (
@@ -52,29 +51,19 @@ type ClientIn struct {
 
 	Unmarshaller   config.Unmarshaller
 	Lifecycle      fx.Lifecycle
+	Shutdowner     fx.Shutdowner
 	Logger         *log.Logger
 	ConfigOverride *ConfigOverride `optional:"true"`
 }
 
-// Client is a wrapper around etcd client v3. It provides interfaces rooted by a namespace in etcd.
-//
-// Client.Client is nil before OnStart.
+// Client is a wrapper around etcd client.
 type Client struct {
-	*clientv3.Client
-	KVWrapper KVWrapper // wraps the same KV as Client
-	// hack: This field is here only so that it can be propagated from config
-	// to Session.
-	leaseTTL config.Duration
-}
-
-// KVWrapper wraps clientv3.KV, can be used when wanting to depend on clientv3.KV
-// already before OnStart.
-//
-// KVWrapper.KV is nil before OnStart.
-//
-// Note: This is not named just KV not to break .KV field access.
-type KVWrapper struct {
-	clientv3.KV
+	KV      clientv3.KV
+	Watcher clientv3.Watcher
+	Lease   clientv3.Lease
+	Client  *clientv3.Client
+	Session *concurrencyv3.Session
+	LeaseID clientv3.LeaseID
 }
 
 // ProvideClient creates a new etcd Client and provides it via Fx.
@@ -111,9 +100,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	etcdClient := Client{
-		leaseTTL: config.LeaseTTL,
-	}
+	etcdClient := Client{}
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(startCtx context.Context) error {
@@ -135,7 +122,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 
 			// Workaround for https://github.com/fluxninja/cloud/issues/10613
 			logger := in.Logger.Hook(zerolog.HookFunc(
-				func(e *zerolog.Event, level zerolog.Level, msg string) {
+				func(e *zerolog.Event, _ zerolog.Level, msg string) {
 					if msg == "lease keepalive response queue is full; dropping response send" {
 						// This log pollutes the logs, but is harmless otherwise. The
 						// queue isn't used in any meaningful way and this
@@ -173,15 +160,37 @@ func ProvideClient(in ClientIn) (*Client, error) {
 				}
 			}
 
-			if config.Namespace != "" {
-				// namespace the client
-				cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
-				cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
-				cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
-			}
-
 			etcdClient.Client = cli
-			etcdClient.KVWrapper.KV = cli.KV
+
+			// namespace the client
+			cli.Lease = namespacev3.NewLease(cli.Lease, config.Namespace)
+			etcdClient.Lease = cli.Lease
+			cli.KV = namespacev3.NewKV(cli.KV, config.Namespace)
+			etcdClient.KV = cli.KV
+			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, config.Namespace)
+			etcdClient.Watcher = cli.Watcher
+
+			// Create a new Session
+			session, err := concurrencyv3.NewSession(etcdClient.Client, concurrencyv3.WithTTL((int)(config.LeaseTTL.AsDuration().Seconds())))
+			if err != nil {
+				log.Error().Err(err).Msg("Unable to create a new session")
+				cancel()
+				return err
+			}
+			etcdClient.Session = session
+			// save the lease id
+			etcdClient.LeaseID = session.Lease()
+			// A goroutine to check if the session is expired
+			panichandler.Go(func() {
+				// wait for the context to be done or session to be closed
+				select {
+				case <-ctx.Done():
+					// regular shutdown
+				case <-session.Done():
+					log.Error().Msg("Etcd session is done, request shutdown")
+					utils.Shutdown(in.Shutdowner)
+				}
+			})
 
 			return nil
 		},

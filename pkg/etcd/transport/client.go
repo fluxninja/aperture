@@ -89,7 +89,7 @@ func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) 
 // RegisterWatcher register an agent on the etcd transport client.
 func (c *EtcdTransportClient) RegisterWatcher(agentName string) error {
 	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
-	watchCh := c.etcdClient.Watch(c.ctx, path, clientv3.WithPrefix())
+	watchCh := c.etcdClient.Watcher.Watch(c.ctx, path, clientv3.WithPrefix())
 	for watchResp := range watchCh {
 		if watchResp.Err() != nil {
 			log.Error().Err(watchResp.Err()).Msg("failed to watch etcd path")
@@ -162,13 +162,13 @@ func (c *EtcdTransportClient) callHandler(ctx context.Context, req *anypb.Any) (
 func (c *EtcdTransportClient) respond(ctx context.Context, resp Response) {
 	path := path.Join(RPCBasePath, RPCResponsePath, resp.Client, resp.ID)
 
-	lease, err := c.etcdClient.Grant(ctx, 30)
+	lease, err := c.etcdClient.Client.Lease.Grant(ctx, 30)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to grant lease")
 		return
 	}
 
-	_, err = c.etcdClient.Put(ctx, path, string(resp.Data), clientv3.WithLease(lease.ID))
+	_, err = c.etcdClient.KV.Put(ctx, path, string(resp.Data), clientv3.WithLease(lease.ID))
 	if err != nil {
 		log.Error().Err(err).Msg("failed to write response to etcd")
 	}
