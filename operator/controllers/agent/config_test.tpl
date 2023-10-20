@@ -48,6 +48,7 @@ auto_scale:
   kubernetes:
     enabled: false
 fluxninja:
+  agent_api_key: ""
   api_key: ""
   client:
     grpc:
