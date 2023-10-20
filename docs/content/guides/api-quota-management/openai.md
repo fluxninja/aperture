@@ -299,7 +299,7 @@ policy:
     # Required: True
     selectors:
       - control_point: openai
-        agent_group: coderabbit-prod
+        agent_group: default
         label_matcher:
           match_labels:
             model_variant: gpt-4
@@ -345,7 +345,7 @@ policy:
     # Required: True
     selectors:
       - control_point: openai
-        agent_group: coderabbit-prod
+        agent_group: default
         label_matcher:
           match_labels:
             model_variant: gpt-4
