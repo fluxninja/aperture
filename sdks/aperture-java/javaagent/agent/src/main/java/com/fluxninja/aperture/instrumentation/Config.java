@@ -13,7 +13,7 @@ import java.util.Properties;
 public class Config {
     public static final String CONFIG_FILENAME_PROPERTY = "aperture.javaagent.config.file";
 
-    public static final String AGENT_HOST_PROPERTY = "aperture.agent.hostname";
+    public static final String AGENT_HOST_PROPERTY = "aperture.agent.host";
     public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
     public static final String RAMP_MODE_PROPERTY = "aperture.javaagent.enable.ramp.mode";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =

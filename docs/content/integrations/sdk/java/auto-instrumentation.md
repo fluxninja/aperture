@@ -46,7 +46,7 @@ system properties or environment variables:
 | Property name                          | Environment variable name              | Default value | Description                                                                                                                                                                            |
 | :------------------------------------- | :------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |               | Path to a file containing configuration properties                                                                                                                                     |
-| aperture.agent.hostname                | APERTURE_AGENT_HOSTNAME                | localhost     | Hostname of Aperture Agent to connect to                                                                                                                                               |
+| aperture.agent.host                    | APERTURE_AGENT_HOST                    | localhost     | Hostname of Aperture Agent to connect to                                                                                                                                               |
 | aperture.agent.port                    | APERTURE_AGENT_PORT                    | 8089          | Port of Aperture Agent to connect to                                                                                                                                                   |
 | aperture.control.point.name            | APERTURE_CONTROL_POINT_NAME            |               | (Required) Name of the control point this agent represents                                                                                                                             |
 | aperture.javaagent.enable.fail.open    | APERTURE_JAVAAGENT_ENABLE_FAIL_OPEN    | true          | Sets the fail-open behavior for the client when the Aperture Agent is unreachable. <br /> If set to true, all traffic will pass through; if set to false, all traffic will be blocked. |
@@ -71,7 +71,7 @@ Example invocation with `commandline-set` properties:
 
 ```sh
 java -javaagent:path/to/javaagent.jar \
--Daperture.agent.hostname="some_host" \
+-Daperture.agent.host="some_host" \
 -Daperture.agent.port=12345 \
 -Daperture.control.point.name="awesomeFeature" \
 -Daperture.javaagent.ignored.paths="/health,/connected" \
@@ -91,7 +91,7 @@ java -javaagent:path/to/javaagent.jar \
 The `/config.properties` file:
 
 ```properties
-aperture.agent.hostname=some_host
+aperture.agent.host=some_host
 aperture.agent.port=12345
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/health,/connected

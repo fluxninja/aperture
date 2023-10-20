@@ -34,16 +34,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/grafana/grafonnet-lib.git",
-          "subdir": "grafonnet"
-        }
-      },
-      "version": "a1d61cce1da59c71409b99b5c7568511fec661ea",
-      "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet.git",
           "subdir": "gen/grafonnet-v9.4.0"
         }
