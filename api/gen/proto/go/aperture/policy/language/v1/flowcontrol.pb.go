@@ -853,7 +853,7 @@ func (x *RangeDrivenLoadScheduler) GetDryRunConfigKey() string {
 	return ""
 }
 
-// _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+// _AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.
 // During recovery, it increases the token rate linearly until the system is not overloaded.
 type AIADLoadScheduler struct {
 	state         protoimpl.MessageState
