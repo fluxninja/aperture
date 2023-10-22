@@ -27,8 +27,6 @@ linters-settings:
     exclude-generated: true
     severity: medium
     confidence: medium
-    config:
-      exclude-dir: test
   godot:
     period: true
     capital: true
