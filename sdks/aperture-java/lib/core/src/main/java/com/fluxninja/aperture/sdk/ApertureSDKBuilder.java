@@ -174,7 +174,8 @@ public final class ApertureSDKBuilder {
         String address = this.address;
         if (address == null) {
             logger.warn(
-                    "Address not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_ADDRESS);
+                    "Address not set when building Aperture SDK, defaulting to "
+                            + DEFAULT_AGENT_ADDRESS);
             address = DEFAULT_AGENT_ADDRESS;
         }
 
@@ -210,8 +211,7 @@ public final class ApertureSDKBuilder {
 
         OtlpGrpcSpanExporter spanExporter =
                 spanExporterBuilder
-                        .setEndpoint(
-                                String.format("%s://%s", OtlpSpanExporterProtocol, address))
+                        .setEndpoint(String.format("%s://%s", OtlpSpanExporterProtocol, address))
                         .build();
         SdkTracerProvider traceProvider =
                 SdkTracerProvider.builder()
