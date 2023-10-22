@@ -13,8 +13,7 @@ import java.time.Duration;
 public class ServerInitializer extends ChannelInitializer<Channel> {
 
     ApertureSDK sdk;
-    String agentHost;
-    int agentPort;
+    String agentAddress;
     boolean rampMode;
     Duration flowTimeout;
     String controlPointName;
@@ -22,15 +21,13 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     String rootCertFile;
 
     public ServerInitializer(
-            String agentHost,
-            String agentPort,
+            String agentAddress,
             boolean rampMode,
             Duration flowTimeout,
             String controlPointName,
             boolean insecureGrpc,
             String rootCertFile) {
-        this.agentHost = agentHost;
-        this.agentPort = Integer.parseInt(agentPort);
+        this.agentAddress = agentAddress;
         this.rampMode = rampMode;
         this.flowTimeout = flowTimeout;
         this.controlPointName = controlPointName;
@@ -43,8 +40,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         try {
             sdk =
                     ApertureSDK.builder()
-                            .setHost(this.agentHost)
-                            .setPort(this.agentPort)
+                            .setAddress(this.agentAddress)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
