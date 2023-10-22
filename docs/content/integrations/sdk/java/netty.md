@@ -36,7 +36,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         String controlPointName = "someFeature";
 
-        sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
+        sdk = ApertureSDK.builder().setAddress(this.agentAddress).build();
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
@@ -56,8 +56,7 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setHost(...)
-        .setPort(...)
+        .setAddress(...)
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...

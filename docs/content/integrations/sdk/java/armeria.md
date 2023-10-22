@@ -45,8 +45,7 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setHost(...)
-        .setPort(...)
+        .setAddress(...)
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...
