@@ -39,10 +39,10 @@ export class ApertureClient {
     channelCredentials = grpc.credentials.createInsecure(),
     channelOptions = {},
   }: {
-    address?: string;
+    address: string;
     channelCredentials?: ChannelCredentials;
     channelOptions?: ChannelOptions;
-  } = {}) {
+  }) {
     if (address === undefined) {
       throw new Error("address is required");
     }
