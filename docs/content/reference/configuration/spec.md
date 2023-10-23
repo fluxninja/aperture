@@ -32,9 +32,9 @@ Generated File Starts
 
 <!-- vale on -->
 
-_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload
-state. During recovery, it increases the token rate linearly until the system is
-not overloaded.
+_AIAD Load Scheduler_ reduces the token rate linearly over time while in
+overload state. During recovery, it increases the token rate linearly until the
+system is not overloaded.
 
 <dl>
 <dt>dry_run</dt>

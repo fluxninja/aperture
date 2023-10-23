@@ -1,7 +1,7 @@
 {
   "definitions": {
     "AIADLoadScheduler": {
-      "description": "_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
+      "description": "_AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
