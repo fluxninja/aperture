@@ -11,7 +11,7 @@ keywords:
 import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
 ```
 
@@ -362,12 +362,10 @@ policy:
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
-<CodeBlock language="bash">
-aperturectl cloud blueprints apply --values-file=gpt-4-tpm.yaml
-</CodeBlock>
-</TabItem>
-<TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
+  <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
+    <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (Aperture Cloud)" />
+  </TabItem>
+  <TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
 ```
 
 Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
@@ -375,26 +373,17 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">
-aperturectl blueprints generate --values-file=gpt-4-tpm.yaml --output-dir=policy-gen
-aperturectl apply policy --file=policy-gen/policies/gpt-4-tpm.yaml --kube
-</CodeBlock>
-```
-
-```mdx-code-block
+  <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (self-hosted controller)" policyName="gpt-4-tpm" />
 </TabItem>
 <TabItem value="kubectl (self-hosted controller)" label="kubectl (self-hosted controller)">
 ```
 
 Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
 
-```bash
-aperturectl blueprints generate --values-file=gpt-4-tpm.yaml --output-dir=policy-gen
-kubectl apply -f policy-gen/policies/gpt-4-tpm-cr.yaml -n aperture-controller
-```
-
 ```mdx-code-block
+  <TabContent valuesFile="gpt-4-tpm" tabValue="kubectl (self-hosted controller)" policyName="gpt-4-tpm" />
 </TabItem>
+
 </Tabs>
 ```
 

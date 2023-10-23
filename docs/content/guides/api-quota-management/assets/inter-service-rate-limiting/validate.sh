@@ -12,8 +12,8 @@ generate_from_values \
 	tmp
 
 # copy the generated policy and graph to this (assets) directory so that they can be used in the docs
-cp tmp/policies/client-side-rate-limiting-cr.yaml policy.yaml
-cp tmp/graphs/client-side-rate-limiting-cr.mmd graph.mmd
+cp tmp/policies/inter-service-rate-limiting-cr.yaml policy.yaml
+cp tmp/graphs/inter-service-rate-limiting-cr.mmd graph.mmd
 
 # git add the generated policy and graph
 "$git_root"/scripts/git_add_safely.sh policy.yaml graph.mmd
