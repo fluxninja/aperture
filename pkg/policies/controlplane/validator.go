@@ -91,7 +91,7 @@ func ValidateAndCompileYAML(ctx context.Context, name string, yamlSrc []byte) (*
 func ValidateAndCompileProto(ctx context.Context, name string, policy *policylangv1.Policy) (*circuitfactory.Circuit, *policylangv1.Policy, error) {
 	alerter := alerts.NewSimpleAlerter(100)
 	registry := status.NewRegistry(log.GetGlobalLogger(), alerter)
-	circuit, err := CompilePolicy(policy, registry)
+	circuit, err := CompilePolicy(policy, name, registry)
 	if err != nil {
 		return nil, nil, err
 	}

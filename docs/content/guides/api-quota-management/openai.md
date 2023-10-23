@@ -119,6 +119,7 @@ const PRIORITIES: Record<string, number> = {
 let flow: Flow | undefined = undefined
 
 if (this.apertureClient) {
+    // Alternatively, simply use JSON.stringify() to get charCount
     const charCount =
         this.systemMessage.length +
         message.length +

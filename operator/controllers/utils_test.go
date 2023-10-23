@@ -790,7 +790,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 				},
 			}
 
-			result := AgentVolumes(instance.Spec)
+			result := AgentVolumes(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -836,7 +836,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 				},
 			}
 
-			result := AgentVolumes(instance.Spec)
+			result := AgentVolumes(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})

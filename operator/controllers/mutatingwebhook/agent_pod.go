@@ -167,7 +167,7 @@ func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) error {
 
 	pod.Spec.ImagePullSecrets = controllers.MergeImagePullSecrets(controllers.ImagePullSecrets(spec.Image.Image), pod.Spec.ImagePullSecrets)
 	pod.Spec.InitContainers = controllers.MergeContainers(spec.InitContainers, pod.Spec.InitContainers)
-	pod.Spec.Volumes = controllers.MergeVolumes(controllers.AgentVolumes(spec), pod.Spec.Volumes)
+	pod.Spec.Volumes = controllers.MergeVolumes(controllers.AgentVolumes(instance), pod.Spec.Volumes)
 
 	return nil
 }

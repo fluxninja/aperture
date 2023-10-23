@@ -70,7 +70,7 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 
 	daemonset := &appsv1.DaemonSet{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentResourceName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: spec.Annotations,
@@ -85,7 +85,7 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 					Annotations: spec.PodAnnotations,
 				},
 				Spec: corev1.PodSpec{
-					ServiceAccountName:            controllers.AgentServiceName,
+					ServiceAccountName:            controllers.AgentServiceAccountName(instance),
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
 					Affinity:                      spec.Affinity,
@@ -149,7 +149,7 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 							VolumeMounts:             controllers.AgentVolumeMounts(spec),
 						},
 					},
-					Volumes: controllers.AgentVolumes(spec),
+					Volumes: controllers.AgentVolumes(instance),
 				},
 			},
 		},

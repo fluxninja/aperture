@@ -57,6 +57,27 @@ type AgentSpec struct {
 	// ControllerClientCertConfig configuration.
 	//+kubebuilder:validation:Optional
 	ControllerClientCertConfig common.ControllerClientCertConfig `json:"controller_client_cert"`
+
+	// DeploymentConfigSpec defines the deployment configuration of the agent.
+	// This is an experimental feature. Only DaemonSet is supported.
+	//+kubebuilder:validation:Optional
+	DeploymentConfigSpec DeploymentConfigSpec `json:"deployment_config"`
+
+	// NameOverride overrides the name of the resources created for agent.
+	// This is an experimental feature.
+	//+kubebuilder:validation:Optional
+	NameOverride string `json:"nameOverride"`
+}
+
+// DeploymentConfigSpec defines the deployment configuration of the agent.
+type DeploymentConfigSpec struct {
+	// Type of the deployment.
+	//+kubebuilder:validation:Optional
+	Type string `json:"type" default:"DaemonSet" validate:"oneof=deployment Deployment DaemonSet daemonset"`
+
+	// Number of replicas when type is set to Deployment.
+	//+kubebuilder:validation:Optional
+	Replicas int32 `json:"replicas,omitempty" default:"1" validate:"gt=0"`
 }
 
 // AgentConfigSpec holds agent configuration.

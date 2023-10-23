@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private boolean rampMode;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -27,7 +28,7 @@ public class ApertureFeatureFilter implements Filter {
 
         Flow flow =
                 this.apertureSDK.startFlow(
-                        "awesomeFeature", labels, false, Duration.ofMillis(1000));
+                        "awesomeFeature", labels, this.rampMode, Duration.ofMillis(1000));
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -49,15 +50,14 @@ public class ApertureFeatureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String agentHost;
-        String agentPort;
+        String agentAddress;
         boolean insecureGrpc;
         String rootCertificateFile;
         try {
-            agentHost = filterConfig.getInitParameter("agent_host");
-            agentPort = filterConfig.getInitParameter("agent_port");
+            agentAddress = filterConfig.getInitParameter("agent_address");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }
@@ -65,8 +65,7 @@ public class ApertureFeatureFilter implements Filter {
         try {
             this.apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
+                            .setAddress(agentAddress)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

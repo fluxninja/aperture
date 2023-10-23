@@ -70,6 +70,7 @@ func main() {
 	var controllerManager bool
 	var probeAddr string
 	var multipleControllersEnabled bool
+	var multipleAgentsEnabled bool
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -83,6 +84,8 @@ func main() {
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
 	flag.BoolVar(&multipleControllersEnabled, "experimental-multiple-controllers", false,
 		"Experimental support for deployment of multiple controllers.")
+	flag.BoolVar(&multipleAgentsEnabled, "experimental-multiple-agents", false,
+		"Experimental support for deployment of multiple agents.")
 
 	opts := zap.Options{
 		Development: true,
@@ -94,6 +97,10 @@ func main() {
 
 	if multipleControllersEnabled {
 		setupLog.Info("Experimental support for managing multiple controllers enabled.")
+	}
+
+	if multipleAgentsEnabled {
+		setupLog.Info("Experimental support for managing multiple agents enabled.")
 	}
 
 	if !agentManager && !controllerManager {
@@ -174,10 +181,11 @@ func main() {
 	var agentReconciler *agent.AgentReconciler
 	if agentManager {
 		agentReconciler = &agent.AgentReconciler{
-			Client:        mgr.GetClient(),
-			DynamicClient: dynamicClient,
-			Scheme:        mgr.GetScheme(),
-			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
+			Client:                mgr.GetClient(),
+			DynamicClient:         dynamicClient,
+			Scheme:                mgr.GetScheme(),
+			Recorder:              mgr.GetEventRecorderFor("aperture-agent"),
+			MultipleAgentsEnabled: multipleAgentsEnabled,
 		}
 
 		if err = agentReconciler.SetupWithManager(mgr); err != nil {

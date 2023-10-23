@@ -66,7 +66,7 @@ func serviceForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *run
 
 	svc := &corev1.Service{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentResourceName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: annotations,

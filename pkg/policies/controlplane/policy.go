@@ -81,8 +81,8 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 }
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
-func CompilePolicy(policyMessage *policylangv1.Policy, registry status.Registry) (*circuitfactory.Circuit, error) {
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, "DoesNotMatter")
+func CompilePolicy(policyMessage *policylangv1.Policy, policyName string, registry status.Registry) (*circuitfactory.Circuit, error) {
+	wrapperMessage, err := hashAndPolicyWrap(policyMessage, policyName)
 	if err != nil {
 		return nil, err
 	}
