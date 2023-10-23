@@ -22,12 +22,8 @@ set traffic control points for relevant services:
         <filter-name>ApertureFilter</filter-name>
         <filter-class>com.fluxninja.aperture.servlet.javax.ApertureFilter</filter-class>
         <init-param>
-            <param-name>agent_host</param-name>
-            <param-value>localhost</param-value>
-        </init-param>
-        <init-param>
-            <param-name>agent_port</param-name>
-            <param-value>8089</param-value>
+            <param-name>agent_address</param-name>
+            <param-value>localhost:8089</param-value>
         </init-param>
     </filter>
 ```

@@ -41,10 +41,8 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        String agentHost = env.getProperty("APERTURE_AGENT_HOST");
-        registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("APERTURE_AGENT_PORT");
-        registrationBean.addInitParameter("agent_port", agentPort);
+        String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
+        registrationBean.addInitParameter("agent_address", agentAddress);
         String rampMode = env.getProperty("FN_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
         String controlPointName = env.getProperty("FN_CONTROL_POINT_NAME");
@@ -68,10 +66,8 @@ public class AppController {
         registrationBean.setFilter(new ApertureFeatureFilter());
         registrationBean.addUrlPatterns("/super2");
 
-        String agentHost = env.getProperty("APERTURE_AGENT_HOST");
-        registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("APERTURE_AGENT_PORT");
-        registrationBean.addInitParameter("agent_port", agentPort);
+        String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
+        registrationBean.addInitParameter("agent_address", agentAddress);
         String rampMode = env.getProperty("FN_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");

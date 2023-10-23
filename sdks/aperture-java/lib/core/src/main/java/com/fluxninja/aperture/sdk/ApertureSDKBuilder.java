@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
-    private String host;
-    private int port;
+    private String address;
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
@@ -42,24 +41,13 @@ public final class ApertureSDKBuilder {
     }
 
     /**
-     * Set hostname of Aperture Agent to connect to.
+     * Set address of Aperture Agent to connect to.
      *
-     * @param host hostname of Aperture Agent to connect to.
+     * @param address of Aperture Agent to connect to.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setHost(String host) {
-        this.host = host;
-        return this;
-    }
-
-    /**
-     * Set port number of Aperture Agent to connect to.
-     *
-     * @param port port number of Aperture Agent to connect to.
-     * @return the builder object.
-     */
-    public ApertureSDKBuilder setPort(int port) {
-        this.port = port;
+    public ApertureSDKBuilder setAddress(String address) {
+        this.address = address;
         return this;
     }
 
@@ -183,18 +171,12 @@ public final class ApertureSDKBuilder {
      * @return The constructed ApertureSDK object.
      */
     public ApertureSDK build() {
-        String host = this.host;
-        if (host == null) {
+        String address = this.address;
+        if (address == null) {
             logger.warn(
-                    "Host not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_HOST);
-            host = DEFAULT_AGENT_HOST;
-        }
-
-        int port = this.port;
-        if (port == 0) {
-            logger.warn(
-                    "Port not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_PORT);
-            port = DEFAULT_AGENT_PORT;
+                    "Address not set when building Aperture SDK, defaulting to "
+                            + DEFAULT_AGENT_ADDRESS);
+            address = DEFAULT_AGENT_ADDRESS;
         }
 
         String OtlpSpanExporterProtocol = "http";
@@ -215,8 +197,7 @@ public final class ApertureSDKBuilder {
             }
         }
 
-        String target = host + ":" + port;
-        ManagedChannel channel = Grpc.newChannelBuilder(target, creds).build();
+        ManagedChannel channel = Grpc.newChannelBuilder(address, creds).build();
 
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
@@ -230,8 +211,7 @@ public final class ApertureSDKBuilder {
 
         OtlpGrpcSpanExporter spanExporter =
                 spanExporterBuilder
-                        .setEndpoint(
-                                String.format("%s://%s:%d", OtlpSpanExporterProtocol, host, port))
+                        .setEndpoint(String.format("%s://%s", OtlpSpanExporterProtocol, address))
                         .build();
         SdkTracerProvider traceProvider =
                 SdkTracerProvider.builder()
