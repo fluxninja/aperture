@@ -14,8 +14,7 @@ import spark.Spark;
 
 public class App {
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_FEATURE_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -33,13 +32,9 @@ public class App {
     }
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("APERTURE_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
-        }
-        String agentPort = System.getenv("APERTURE_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
         String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
         if (insecureGrpcString == null) {
@@ -52,15 +47,13 @@ public class App {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
 
-        String target = String.format("%s:%s", agentHost, agentPort);
-        final ManagedChannel channel = ManagedChannelBuilder.forTarget(target).build();
+        final ManagedChannel channel = ManagedChannelBuilder.forTarget(agentAddress).build();
 
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
+                            .setAddress(agentAddress)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

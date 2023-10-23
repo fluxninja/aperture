@@ -6,17 +6,17 @@ local quota_scheduler = import './quota_scheduler.libsonnet';
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
 
-function(cfg) {
-  panels: quota_scheduler(cfg).panels + [
-    average_load_multiplier(cfg).panel
+function(datasourceName, policyName, component, extraFilters={}) {
+  panels: quota_scheduler(datasourceName, policyName, component, extraFilters).panels + [
+    average_load_multiplier(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withY(100),
-    token_bucket_capacity(cfg).panel
+    token_bucket_capacity(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(6)
     + g.panel.stat.gridPos.withY(100),
-    token_bucket_fillrate(cfg).panel
+    token_bucket_fillrate(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(12)
     + g.panel.stat.gridPos.withY(100),
-    token_bucket_available_tokens(cfg).panel
+    token_bucket_available_tokens(datasourceName, policyName, component, extraFilters).panel
     + g.panel.stat.gridPos.withX(18)
     + g.panel.stat.gridPos.withY(100),
   ],

@@ -56,7 +56,7 @@ func configMapForAgentConfig(
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentResourceName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: instance.Spec.Annotations,
@@ -93,7 +93,7 @@ func configMapForAgentControllerClientCert(
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentControllerClientCertCMName,
+			Name:        controllers.AgentControllerClientCertResourceName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: instance.Spec.Annotations,

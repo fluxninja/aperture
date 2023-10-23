@@ -26,12 +26,14 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
 
 // updateClusterRoleBinding appends the Serviaccount in the ClusterRoleBinding if not exists.
-func updateClusterRoleBinding(client client.Client, subject rbacv1.Subject, ctx context.Context, namespace string) error {
+func updateClusterRoleBinding(client client.Client, subject rbacv1.Subject, ctx context.Context, instance *agentv1alpha1.Agent) error {
 	crb := &rbacv1.ClusterRoleBinding{}
-	err := client.Get(ctx, types.NamespacedName{Name: controllers.AgentServiceName, Namespace: namespace}, crb)
+	err := client.Get(ctx, types.NamespacedName{Name: controllers.AgentResourceName(instance), Namespace: instance.GetNamespace()}, crb)
 	if err != nil {
 		return fmt.Errorf("failed to Get the ClusterRoleBinding. Error: %+v", err)
 	}
@@ -46,7 +48,7 @@ func updateClusterRoleBinding(client client.Client, subject rbacv1.Subject, ctx 
 	err = client.Update(ctx, crb)
 	if err != nil {
 		if errors.IsConflict(err) {
-			return updateClusterRoleBinding(client, subject, ctx, namespace)
+			return updateClusterRoleBinding(client, subject, ctx, instance)
 		}
 
 		return fmt.Errorf("failed to Update the ClusterRoleBinding. Error: %+v", err)
