@@ -15,7 +15,6 @@ import (
 
 // GradientController describes gradient values.
 type GradientController struct {
-	lastOutput        runtime.Reading
 	minGradient       float64
 	maxGradient       float64
 	slope             float64
@@ -77,7 +76,6 @@ func (g *GradientController) IsActuator() bool {
 func (g *GradientController) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (outPortReadings runtime.PortToReading, err error) {
 	signal := inPortReadings.ReadSingleReadingPort("signal")
 	setpoint := inPortReadings.ReadSingleReadingPort("setpoint")
-	optimize := inPortReadings.ReadSingleReadingPort("optimize")
 	max := inPortReadings.ReadSingleReadingPort("max")
 	min := inPortReadings.ReadSingleReadingPort("min")
 	controlVariable := inPortReadings.ReadSingleReadingPort("control_variable")
@@ -103,12 +101,6 @@ func (g *GradientController) Execute(inPortReadings runtime.PortToReading, circu
 		output = runtime.InvalidReading()
 	}
 
-	// Optimize
-	if output.Valid() && optimize.Valid() {
-		targetOutput := runtime.NewReading(output.Value() + optimize.Value())
-		output = targetOutput
-	}
-
 	if output.Valid() {
 		outputReading := output
 		// Constrain output
@@ -127,9 +119,6 @@ func (g *GradientController) Execute(inPortReadings runtime.PortToReading, circu
 	if g.manualMode {
 		output = controlVariable
 	}
-
-	// Save readings for the next tick so that Controller may access them via ControllerStateReadAPI
-	g.lastOutput = output
 
 	return runtime.PortToReading{
 		"output": []runtime.Reading{output},
