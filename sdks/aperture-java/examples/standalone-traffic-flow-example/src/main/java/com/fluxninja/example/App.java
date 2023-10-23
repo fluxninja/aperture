@@ -32,7 +32,7 @@ public class App {
     }
 
     public static void main(String[] args) {
-        String agentAddress = System.getenv("APERTURE_AGENT_HOST");
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
         if (agentAddress == null) {
             agentAddress = DEFAULT_AGENT_ADDRESS;
         }
