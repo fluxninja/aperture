@@ -86,7 +86,7 @@ Apply the policy using the `aperturectl` CLI or `kubectl`.
 ```mdx-code-block
 <Tabs>
   <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
-    <TabContent valuesFile="values" tabValue="aperturectl (Aperture Cloud)" policyName="postgres-connections" />
+    <TabContent valuesFile="values" tabValue="aperturectl (Aperture Cloud)" />
   </TabItem>
   <TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
 ```
@@ -104,7 +104,7 @@ installed.
 Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
 
 ```mdx-code-block
-  <TabContent valuesFile="values" tabValue="kubectl (self-hosted controller)" />
+  <TabContent valuesFile="values" tabValue="kubectl (self-hosted controller)" policyName="postgres-connections" />
 </TabItem>
 
 </Tabs>

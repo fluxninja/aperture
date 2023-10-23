@@ -373,7 +373,7 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-  <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (self-hosted controller)" />
+  <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (self-hosted controller)" policyName="gpt-4-tpm" />
 </TabItem>
 <TabItem value="kubectl (self-hosted controller)" label="kubectl (self-hosted controller)">
 ```
@@ -381,7 +381,7 @@ installed.
 Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
 
 ```mdx-code-block
-  <TabContent valuesFile="gpt-4-tpm" tabValue="kubectl (self-hosted controller)" />
+  <TabContent valuesFile="gpt-4-tpm" tabValue="kubectl (self-hosted controller)" policyName="gpt-4-tpm" />
 </TabItem>
 
 </Tabs>

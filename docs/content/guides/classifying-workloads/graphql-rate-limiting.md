@@ -111,7 +111,7 @@ Generate a values file specific to the policy. This can be achieved using the
 command provided below.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=graphql-rate-limiting-values.yaml</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
 Apply the policy using the `aperturectl` CLI or `kubectl`.
