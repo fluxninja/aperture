@@ -146,6 +146,9 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
+
+	MinimumKubernetesVersionBool = true
+
 	err = config.UnmarshalYAML([]byte{}, &DefaultAgentInstance.Spec)
 	Expect(err).NotTo(HaveOccurred())
 })

@@ -2279,6 +2279,19 @@ spec:
                     format: int32
                     type: integer
                 type: object
+              deployment_config:
+                description: DeploymentConfigSpec defines the deployment configuration
+                  of the agent. This is an experimental feature. Only DaemonSet is
+                  supported.
+                properties:
+                  replicas:
+                    description: Number of replicas when type is set to Deployment.
+                    format: int32
+                    type: integer
+                  type:
+                    description: Type of the deployment.
+                    type: string
+                type: object
               extraEnvVars:
                 description: Array with extra environment variables to add
                 items:
@@ -5529,6 +5542,10 @@ spec:
                 required:
                 - enabled
                 type: object
+              nameOverride:
+                description: NameOverride overrides the name of the resources created
+                  for agent. This is an experimental feature.
+                type: string
               nodeSelector:
                 additionalProperties:
                   type: string

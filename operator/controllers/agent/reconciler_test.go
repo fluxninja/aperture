@@ -748,6 +748,162 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())
 		})
 
+		It("should create required resources when Agent is created with default parameters and as Deployment", func() {
+			namespace := Test + "31"
+			reconciler.MultipleAgentsEnabled = true
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
+
+			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
+			instance.Spec.DeploymentConfigSpec = agentv1alpha1.DeploymentConfigSpec{
+				Type: "Deployment",
+			}
+
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
+
+			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentConfigMap := &corev1.ConfigMap{}
+			agentConfigKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentService := &corev1.Service{}
+			agentServiceKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdClusterRole := &rbacv1.ClusterRole{}
+			clusterRoleKey := types.NamespacedName{Name: AgentServiceName}
+
+			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
+			clusterRoleBindingKey := types.NamespacedName{Name: AgentServiceName}
+
+			createdAgentServiceAccount := &corev1.ServiceAccount{}
+			agentServiceAccountKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDaemonset := &appsv1.DaemonSet{}
+			agentDaemonsetKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdAgentDeployment := &appsv1.Deployment{}
+			agentDeploymentKey := types.NamespacedName{Name: AgentServiceName, Namespace: namespace}
+
+			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey := types.NamespacedName{Name: PodMutatingWebhookName}
+
+			createdAgentSecret := &corev1.Secret{}
+			agentSecretKey := types.NamespacedName{Name: SecretName(Test, "agent", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentConfigKey, createdAgentConfigMap)
+				err2 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err3 := K8sClient.Get(Ctx, clusterRoleKey, createdClusterRole)
+				err4 := K8sClient.Get(Ctx, clusterRoleBindingKey, createdClusterRoleBinding)
+				err5 := K8sClient.Get(Ctx, agentServiceAccountKey, createdAgentServiceAccount)
+				err6 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err7 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				err8 := K8sClient.Get(Ctx, agentSecretKey, createdAgentSecret)
+				err9 := K8sClient.Get(Ctx, agentDeploymentKey, createdAgentDeployment)
+				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
+					err5 == nil && err6 != nil && err7 != nil && err8 != nil && err9 == nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+
+			reconciler.MultipleAgentsEnabled = false
+		})
+
+		It("should create required resources when Agent is created with default parameters and as Deployment with name override", func() {
+			namespace := Test + "32"
+			reconciler.MultipleAgentsEnabled = true
+			ns := &corev1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+				},
+			}
+			Expect(K8sClient.Create(Ctx, ns)).To(Succeed())
+
+			instance.Namespace = namespace
+			instance.Spec.Image.Digest = TestDigest
+			instance.Spec.DeploymentConfigSpec = agentv1alpha1.DeploymentConfigSpec{
+				Type: "Deployment",
+			}
+			name := Test + "32"
+			instance.Spec.NameOverride = name
+
+			Expect(K8sClient.Create(Ctx, instance)).To(Succeed())
+
+			res, err := reconciler.Reconcile(Ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      Test,
+					Namespace: namespace,
+				},
+			})
+
+			createdAgentConfigMap := &corev1.ConfigMap{}
+			agentConfigKey := types.NamespacedName{Name: name, Namespace: namespace}
+
+			createdAgentService := &corev1.Service{}
+			agentServiceKey := types.NamespacedName{Name: name, Namespace: namespace}
+
+			createdClusterRole := &rbacv1.ClusterRole{}
+			clusterRoleKey := types.NamespacedName{Name: name}
+
+			createdClusterRoleBinding := &rbacv1.ClusterRoleBinding{}
+			clusterRoleBindingKey := types.NamespacedName{Name: name}
+
+			createdAgentServiceAccount := &corev1.ServiceAccount{}
+			agentServiceAccountKey := types.NamespacedName{Name: name, Namespace: namespace}
+
+			createdAgentDaemonset := &appsv1.DaemonSet{}
+			agentDaemonsetKey := types.NamespacedName{Name: name, Namespace: namespace}
+
+			createdAgentDeployment := &appsv1.Deployment{}
+			agentDeploymentKey := types.NamespacedName{Name: name, Namespace: namespace}
+
+			createdMWC := &admissionregistrationv1.MutatingWebhookConfiguration{}
+			mwcKey := types.NamespacedName{Name: PodMutatingWebhookName}
+
+			createdAgentSecret := &corev1.Secret{}
+			agentSecretKey := types.NamespacedName{Name: SecretName(Test, "agent", &instance.Spec.Secrets.FluxNinjaExtension), Namespace: namespace}
+
+			Expect(reflect.DeepEqual(res, ctrl.Result{})).To(Equal(true))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() bool {
+				err1 := K8sClient.Get(Ctx, agentConfigKey, createdAgentConfigMap)
+				err2 := K8sClient.Get(Ctx, agentServiceKey, createdAgentService)
+				err3 := K8sClient.Get(Ctx, clusterRoleKey, createdClusterRole)
+				err4 := K8sClient.Get(Ctx, clusterRoleBindingKey, createdClusterRoleBinding)
+				err5 := K8sClient.Get(Ctx, agentServiceAccountKey, createdAgentServiceAccount)
+				err6 := K8sClient.Get(Ctx, agentDaemonsetKey, createdAgentDaemonset)
+				err7 := K8sClient.Get(Ctx, mwcKey, createdMWC)
+				err8 := K8sClient.Get(Ctx, agentSecretKey, createdAgentSecret)
+				err9 := K8sClient.Get(Ctx, agentDeploymentKey, createdAgentDeployment)
+				return err1 == nil && err2 == nil && err3 == nil && err4 == nil &&
+					err5 == nil && err6 != nil && err7 != nil && err8 != nil && err9 == nil
+			}, time.Second*10, time.Millisecond*250).Should(BeTrue())
+
+			Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: Test, Namespace: namespace}, instance)).To(Succeed())
+			Expect(instance.Status.Resources).To(Equal("created"))
+
+			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
+
+			reconciler.MultipleAgentsEnabled = false
+		})
+
 		AfterEach(func() {
 			_ = K8sClient.Delete(Ctx, instance)
 			_, err := reconciler.Reconcile(Ctx, reconcile.Request{
