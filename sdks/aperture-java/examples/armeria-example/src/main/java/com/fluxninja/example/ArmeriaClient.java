@@ -11,21 +11,16 @@ import java.time.Duration;
 public class ArmeriaClient {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("APERTURE_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
-        }
-        String agentPort = System.getenv("APERTURE_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
         String rampModeString = System.getenv("FN_ENABLE_RAMP_MODE");
         if (rampModeString == null) {
@@ -52,8 +47,7 @@ public class ArmeriaClient {
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
+                            .setAddress(agentAddress)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

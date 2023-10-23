@@ -8,8 +8,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @SpringBootApplication
 public class SpringBootApp {
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_GRPC_TIMEOUT_MS = "1000";
@@ -17,16 +16,11 @@ public class SpringBootApp {
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("APERTURE_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        System.setProperty("APERTURE_AGENT_HOST", agentHost);
-        String agentPort = System.getenv("APERTURE_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
-        }
-        System.setProperty("APERTURE_AGENT_PORT", agentPort);
+        System.setProperty("APERTURE_AGENT_ADDRESS", agentAddress);
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;

@@ -11,21 +11,16 @@ import java.time.Duration;
 public class NettyServer {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) throws Exception {
-        String agentHost = System.getenv("APERTURE_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
-        }
-        String agentPort = System.getenv("APERTURE_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
@@ -66,8 +61,7 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(
                             new ServerInitializer(
-                                    agentHost,
-                                    agentPort,
+                                    agentAddress,
                                     rampMode,
                                     flowTimeout,
                                     controlPointName,

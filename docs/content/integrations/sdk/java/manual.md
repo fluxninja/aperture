@@ -24,14 +24,12 @@ within a Java service.
 To do so, first create an instance of ApertureSDK:
 
 ```java
-    String agentHost = "localhost";
-    int agentPort = 8089;
+    String agentAddress = "localhost:8089";
 
     ApertureSDK apertureSDK;
 
     apertureSDK = ApertureSDK.builder()
-            .setHost(agentHost)
-            .setPort(agentPort)
+            .setAddress(agentAddress)
             .setFlowTimeout(Duration.ofMillis(1000))
             .build();
 ```

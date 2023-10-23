@@ -55,7 +55,7 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.rampMode));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             RpcResponse res;
