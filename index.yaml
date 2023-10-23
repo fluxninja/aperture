@@ -8788,6 +8788,17 @@ entries:
     version: v0.2.0
   istioconfig:
   - apiVersion: v2
+    appVersion: v2.21.0
+    created: "2023-10-23T14:39:09.166041424Z"
+    description: A Helm chart that deploys Aperture Envoy Filter via Istio
+    digest: f039882e7bf70b7c64533d465c880295d48522f56de8b69bdc3c35a7cb7a3b57
+    icon: https://raw.githubusercontent.com/fluxninja/aperture/gh-pages/FluxNinja--main--logo--ICON.svg
+    name: istioconfig
+    type: application
+    urls:
+    - https://fluxninja.github.io/aperture/istioconfig-v2.21.0.tgz
+    version: v2.21.0
+  - apiVersion: v2
     appVersion: v2.21.0-rc.1
     created: "2023-10-23T13:13:49.093335905Z"
     description: A Helm chart that deploys Aperture Envoy Filter via Istio
@@ -11449,4 +11460,4 @@ entries:
     urls:
     - https://fluxninja.github.io/aperture/istioconfig-v0.2.0.tgz
     version: v0.2.0
-generated: "2023-10-23T14:38:55.193891876Z"
+generated: "2023-10-23T14:39:09.165546188Z"
