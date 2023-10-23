@@ -88,23 +88,23 @@ AIAD Load Scheduler
 _AIAD Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
 component that uses the _Load Scheduler_ internally.
 
-This component has `signal`, `setpoint`, and `overload_confirmation` ports, and
+This component has `signal`, `setpoint`, and `overload_confirmation` ports. It
 uses `overload_condition` to compare `signal` and `setpoint` to determine if the
-service is overloaded. The _AIAD Load Scheduler_ scheduler reduces the token
-rate linearly over time while in overload state. During recovery, it increases
-the token rate linearly until the system is not overloaded.
+service is overloaded. _AIAD Load Scheduler_ reduces the token rate linearly
+over time while in overload state. During recovery, it increases the token rate
+linearly until the system is not overloaded.
 
-### Range Driven Load Scheduler {#range-driven-load-scheduler}
+### Range-Driven Load Scheduler {#range-driven-load-scheduler}
 
 :::info Specification
 
-Range Driven Load Scheduler
+Range-Driven Load Scheduler
 [Reference](../../reference/configuration/spec.md#range-driven-load-scheduler)
 
 :::
 
-Range Load Scheduler is a high-level [circuit](../advanced/circuit.md) component
-that uses the _Load Scheduler_ internally.
+_Range-Driven Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
+component that uses the _Load Scheduler_ internally.
 
 This component has `signal` and `overload_confirmation` ports. It uses the
 [polynomial range function](../../reference/configuration/spec#polynomial-range-function)
