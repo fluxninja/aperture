@@ -3,7 +3,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonn
 function(title, dsName, query, strFilters, h=20, w=10) {
   local tablePanel =
     g.panel.table.new(title)
-    + g.panel.table.queryOptions.withDatasource(dsName)
+    + g.panel.table.datasource.withType('prometheus')
+    + g.panel.table.datasource.withUid(dsName)
     + g.panel.table.queryOptions.withTargets([
       g.query.prometheus.new(dsName, query % { filters: strFilters })
       + g.query.prometheus.withIntervalFactor(1)
