@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
@@ -45,7 +44,7 @@ func NewComponentAndOptions(
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
-		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
+		ctor = mkCtor(config.GradientController, components.NewGradientControllerAndOptions)
 	case *policylangv1.Component_PidController:
 		ctor = mkCtor(config.PidController, components.NewPIDControllerAndOptions)
 	case *policylangv1.Component_Ema:
