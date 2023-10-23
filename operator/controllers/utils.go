@@ -282,7 +282,8 @@ func AgentVolumeMounts(agentSpec agentv1alpha1.AgentSpec) []corev1.VolumeMount {
 }
 
 // AgentVolumes prepares volumes for Agent.
-func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
+func AgentVolumes(instance *agentv1alpha1.Agent) []corev1.Volume {
+	agentSpec := instance.Spec
 	volumes := []corev1.Volume{
 		{
 			Name: "aperture-agent-config",
@@ -290,7 +291,7 @@ func AgentVolumes(agentSpec agentv1alpha1.AgentSpec) []corev1.Volume {
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					DefaultMode: pointer.Int32(420),
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: AgentServiceName,
+						Name: AgentResourceName(instance),
 					},
 				},
 			},
@@ -471,12 +472,43 @@ func ControllerResourcesNamespacedName(instance *controllerv1alpha1.Controller) 
 	return fmt.Sprintf("%s-%s-%s", AppName, instance.GetName(), instance.GetNamespace())
 }
 
-// ServiceAccountName generate a name for the controller service account.
-func ServiceAccountName(instance *controllerv1alpha1.Controller) string {
+// ControllerServiceAccountName generate a name for the controller service account.
+func ControllerServiceAccountName(instance *controllerv1alpha1.Controller) string {
 	if instance.Spec.ServiceAccountSpec.Create && instance.Spec.ServiceAccountSpec.Name == "" {
 		return ControllerResourcesName(instance)
 	}
 	return instance.Spec.ServiceAccountSpec.Name
+}
+
+// AgentResourceName generate a name for the agent related resources.
+func AgentResourceName(instance *agentv1alpha1.Agent) string {
+	if instance.Spec.NameOverride == "" {
+		return AgentServiceName
+	}
+
+	return instance.Spec.NameOverride
+}
+
+// AgentControllerClientCertResourceName generate a name for the agent controller client certificate.
+func AgentControllerClientCertResourceName(instance *agentv1alpha1.Agent) string {
+	if instance.Spec.NameOverride == "" {
+		return AgentControllerClientCertCMName
+	}
+
+	return fmt.Sprintf("%s-%s", instance.Spec.NameOverride, "-client-cert")
+}
+
+// AgentServiceAccountName generate a name for the agent service account.
+func AgentServiceAccountName(instance *agentv1alpha1.Agent) string {
+	if instance.Spec.ServiceAccountSpec.Name == "" && instance.Spec.NameOverride == "" {
+		return AgentServiceName
+	}
+
+	if instance.Spec.ServiceAccountSpec.Name != "" {
+		return instance.Spec.ServiceAccountSpec.Name
+	}
+
+	return instance.Spec.NameOverride
 }
 
 // SecretDataKey fetches Key for ApiKey secret from config or generates the Key if not present in config.

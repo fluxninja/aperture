@@ -48,7 +48,7 @@ func serviceAccountForAgent(instance *agentv1alpha1.Agent, scheme *runtime.Schem
 
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentServiceAccountName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: annotations,

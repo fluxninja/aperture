@@ -23,10 +23,19 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
 
 var _ = Describe("Test updateClusterRoleBinding", func() {
 	It("should update the ClusterRoleBinding when valid Subject is provided", func() {
+		instance := &agentv1alpha1.Agent{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      Test,
+				Namespace: Test,
+			},
+		}
+
 		crb := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      AgentServiceName,
@@ -53,13 +62,20 @@ var _ = Describe("Test updateClusterRoleBinding", func() {
 			Name:      TestTwo,
 			Namespace: Test,
 		}
-		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, Test)).To(Succeed())
+		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, instance)).To(Succeed())
 
 		Expect(K8sClient.Get(Ctx, types.NamespacedName{Name: AgentServiceName, Namespace: Test}, crb)).To(Succeed())
 		Expect(len(crb.Subjects)).To(Equal(2))
 	})
 
 	It("should not update the ClusterRoleBinding when valid Subject is not provided", func() {
+		instance := &agentv1alpha1.Agent{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      Test,
+				Namespace: Test,
+			},
+		}
+
 		crb := &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      AgentServiceName,
@@ -84,6 +100,6 @@ var _ = Describe("Test updateClusterRoleBinding", func() {
 			Kind: "ServiceAccount",
 			Name: TestTwo,
 		}
-		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, Test) != nil).To(BeTrue())
+		Expect(updateClusterRoleBinding(K8sClient, *subject, Ctx, instance) != nil).To(BeTrue())
 	})
 })
