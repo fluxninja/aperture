@@ -284,7 +284,7 @@ func renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, outputDir, fil
 
 		if strings.HasSuffix(fileName, "-cr.yaml") {
 			// prepare data
-			circuit, componentsList, err := processPolicy(yamlBytes, outputFilePath)
+			circuit, componentsList, err := processPolicy(yamlBytes, outputFilePath, policyName)
 			if err != nil {
 				return err
 			}
@@ -440,7 +440,7 @@ func generateGraphs(circuit *circuitfactory.Circuit, outputDir string, policyPat
 	return nil
 }
 
-func processPolicy(content []byte, policyPath string) (*circuitfactory.Circuit, string, error) {
+func processPolicy(content []byte, policyPath string, policyName string) (*circuitfactory.Circuit, string, error) {
 	policy := &policyv1alpha1.Policy{}
 	err := yaml.Unmarshal(content, policy)
 	if err != nil || policy.Kind != "Policy" {
@@ -456,7 +456,7 @@ func processPolicy(content []byte, policyPath string) (*circuitfactory.Circuit, 
 	if err != nil {
 		return nil, "", err
 	}
-	circuit, _, err := utils.CompilePolicy(filepath.Base(policyFile), policyBytes)
+	circuit, _, err := utils.CompilePolicy(policyName, policyBytes)
 	if err != nil {
 		return nil, "", err
 	}

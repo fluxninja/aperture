@@ -11,7 +11,6 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
@@ -77,10 +76,8 @@ var _ = Describe("Component factory", func() {
 				},
 			}
 			It("Creates Gradient controller", func() {
-				controllerComponent := &controller.ControllerComponent{}
-				component, options, err := controller.NewGradientControllerAndOptions(gradientControllerProto, componentId, nil)
+				_, options, err := components.NewGradientControllerAndOptions(gradientControllerProto, componentId, nil)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(reflect.TypeOf(component)).To(Equal(reflect.TypeOf(controllerComponent)))
 				Expect(options).To(BeNil())
 			})
 		})

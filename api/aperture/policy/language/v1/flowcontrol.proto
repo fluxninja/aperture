@@ -462,7 +462,7 @@ message RangeDrivenLoadScheduler {
   string dry_run_config_key = 5;
 }
 
-// _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+// _AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.
 // During recovery, it increases the token rate linearly until the system is not overloaded.
 message AIADLoadScheduler {
   // Input ports for the _AIAD Load Scheduler_.
