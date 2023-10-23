@@ -82,7 +82,7 @@ func (g *GradientController) Execute(inPortReadings runtime.PortToReading, circu
 	var output runtime.Reading
 
 	// ComputeOutput
-	if setpoint.Valid() && signal.Valid() && controlVariable.Valid() {
+	if setpoint.Valid() && setpoint.Value() != 0 && signal.Valid() && controlVariable.Valid() {
 		var gradient float64
 		gradient = math.Pow(signal.Value()/setpoint.Value(), g.slope)
 		// clamp to min/max
