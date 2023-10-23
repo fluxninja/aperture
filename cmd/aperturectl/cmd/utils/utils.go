@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -26,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
@@ -126,6 +128,60 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 		return nil, nil, err
 	}
 	return circuit, policy, nil
+}
+
+// GetFlatComponentsList returns a flat representation of the circuit graph.
+func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
+	compListJSON := ExpandTreeWithParentInfo(circuit.Tree, "")
+	// leave only top level parent name
+	for _, comp := range compListJSON {
+		tempName := strings.TrimPrefix(comp.ParentName, "/Circuit")
+		tempName = strings.TrimPrefix(tempName, "/")
+		firtLvlParent, _, found := strings.Cut(tempName, "/")
+		if !found {
+			comp.ParentName = ""
+		} else {
+			comp.ParentName = firtLvlParent
+		}
+	}
+
+	flatComponentsList, err := json.Marshal(compListJSON)
+	if err != nil {
+		errMsg := fmt.Errorf("error marshaling circuit graph: %w", err)
+		return "", errMsg
+	}
+
+	return string(flatComponentsList), nil
+}
+
+type componentOutput struct {
+	ComponentID   string          `json:"component_id"`
+	ComponentName string          `json:"component_name"`
+	ParentName    string          `json:"parent_name"`
+	Component     utils.MapStruct `json:"component"`
+}
+
+func ExpandTreeWithParentInfo(tree circuitfactory.Tree, parentName string) []*componentOutput {
+	components := []*componentOutput{}
+	newParentName := fmt.Sprintf("%s/%s", parentName, tree.Node.Component.Name())
+	// If the tree has children, recurse into them.
+	if len(tree.Children) > 0 {
+		for _, child := range tree.Children {
+			childComponents := ExpandTreeWithParentInfo(child, newParentName)
+			components = append(components, childComponents...)
+		}
+	} else {
+		// If the tree does not have children, add its root component to the list.
+		compOutput := &componentOutput{
+			ComponentID:   tree.Node.ComponentID.String(),
+			ComponentName: tree.Node.Component.Name(),
+			ParentName:    parentName,
+			Component:     tree.Node.Config,
+		}
+
+		components = append(components, compOutput)
+	}
+	return components
 }
 
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.

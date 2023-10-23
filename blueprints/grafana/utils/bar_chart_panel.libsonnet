@@ -3,8 +3,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonn
 function(title, dsName, query, strFilters, h=10, w=24, legendFormat='', queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='hidden', mode='single', sort='sort', unit='short', description='') {
   local barChartPanel =
     g.panel.barChart.new(title)
-    + g.panel.barChart.panelOptions.withDescription(description)
-    + g.panel.barChart.queryOptions.withDatasource('prometheus', dsName)
+    + g.panel.barChart.datasource.withType('prometheus')
+    + g.panel.barChart.datasource.withUid(dsName)
     + g.panel.barChart.queryOptions.withTargets([
       g.query.prometheus.new(dsName, query % { filters: strFilters })
       + g.query.prometheus.withIntervalFactor(1)

@@ -83,6 +83,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 				return err
 			}
 		}
+
 		return nil
 	},
 }
