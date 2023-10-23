@@ -11,7 +11,7 @@ sidebar_position: 1
 import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
 ```
 
@@ -114,18 +114,14 @@ command provided below.
 <CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
 ```
 
-Adjust the values to match the application requirements. Use the following
-command to generate the policy.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
-```
-
 Apply the policy using the `aperturectl` CLI or `kubectl`.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="aperturectl" label="aperturectl">
+  <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
+    <TabContent valuesFile="values" tabValue="aperturectl (Aperture Cloud)" />
+  </TabItem>
+  <TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
 ```
 
 Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
@@ -133,23 +129,17 @@ on a Kubernetes cluster in the namespace where the Aperture Controller is
 installed.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl policy apply --file=policy-gen/policies/graphql.yaml --kube </CodeBlock>
+  <TabContent valuesFile="values" tabValue="aperturectl (self-hosted controller)" policyName="graphql-rate-limiting" />
+</TabItem>
+<TabItem value="kubectl (self-hosted controller)" label="kubectl (self-hosted controller)">
 ```
+
+Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
 
 ```mdx-code-block
+  <TabContent valuesFile="values" tabValue="kubectl (self-hosted controller)" policyName="graphql-rate-limiting" />
 </TabItem>
-<TabItem value="kubectl" label="kubectl">
-```
 
-Apply the policy YAML generated (Kubernetes Custom Resource) using the above
-example with `kubectl`.
-
-```bash
-kubectl apply -f policy-gen/configuration/graphql-cr.yaml -n aperture-controller
-```
-
-```mdx-code-block
-</TabItem>
 </Tabs>
 ```
 

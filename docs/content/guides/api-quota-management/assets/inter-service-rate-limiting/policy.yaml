@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: client-side-rate-limiting
+  name: inter-service-rate-limiting
 spec:
   circuit:
     components:

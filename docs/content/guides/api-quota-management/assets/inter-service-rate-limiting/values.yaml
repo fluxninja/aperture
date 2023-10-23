@@ -6,7 +6,7 @@
 blueprint: quota-scheduling/base
 uri: ../../../../../../blueprints
 policy:
-  policy_name: client-side-rate-limiting
+  policy_name: inter-service-rate-limiting
   quota_scheduler:
     bucket_capacity: 500
     fill_amount: 25
