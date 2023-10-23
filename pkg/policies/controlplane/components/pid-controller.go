@@ -3,13 +3,14 @@ package components
 import (
 	"math"
 
+	"go.uber.org/fx"
+
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
-	"go.uber.org/fx"
 )
 
 // PIDController .
@@ -17,7 +18,7 @@ type PIDController struct {
 	lastSignal        runtime.Reading
 	lastOutput        runtime.Reading
 	parameters        *policylangv1.PIDController_Parameters
-	cpID              string
+	componentID       string
 	integral          float64
 	invalidCount      int
 	ticksPerExecution int
@@ -30,28 +31,40 @@ var _ runtime.Component = (*PIDController)(nil)
 // Make sure PID implements background job.
 var _ runtime.BackgroundJob = (*PIDController)(nil)
 
-// Name implements runtime.Component.
-func (*PIDController) Name() string { return "PID" }
-
-// Type implements runtime.Component.
-func (*PIDController) Type() runtime.ComponentType { return runtime.ComponentTypeSignalProcessor }
-
-// ShortDescription implements runtime.Component.
-func (*PIDController) ShortDescription() string { return "PID Controller" }
-
-// IsActuator implements runtime.Component.
-func (*PIDController) IsActuator() bool { return false }
-
 // NewPIDControllerAndOptions creates a PID component and its fx options.
-func NewPIDControllerAndOptions(pidProto *policylangv1.PIDController, componentID runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
+func NewPIDControllerAndOptions(
+	pidProto *policylangv1.PIDController,
+	componentID runtime.ComponentID,
+	policyReadAPI iface.Policy,
+) (runtime.Component, fx.Option, error) {
 	pid := &PIDController{
-		parameters: pidProto.Parameters,
-		lastSignal: runtime.InvalidReading(),
-		lastOutput: runtime.InvalidReading(),
-		cpID:       componentID.String(),
+		parameters:  pidProto.Parameters,
+		lastSignal:  runtime.InvalidReading(),
+		lastOutput:  runtime.InvalidReading(),
+		componentID: componentID.String(),
 	}
 	pid.ticksPerExecution = policyReadAPI.TicksInDurationPb(pidProto.Parameters.EvaluationInterval)
 	return pid, fx.Options(), nil
+}
+
+// Name implements runtime.Component.
+func (*PIDController) Name() string {
+	return "PID"
+}
+
+// Type implements runtime.Component.
+func (*PIDController) Type() runtime.ComponentType {
+	return runtime.ComponentTypeSignalProcessor
+}
+
+// ShortDescription implements runtime.Component.
+func (*PIDController) ShortDescription() string {
+	return "PID Controller"
+}
+
+// IsActuator implements runtime.Component.
+func (*PIDController) IsActuator() bool {
+	return false
 }
 
 // Execute implements runtime.Component.Execute.
@@ -139,7 +152,7 @@ func (pid *PIDController) DynamicConfigUpdate(event notifiers.Event, unmarshalle
 
 // GetJob implements runtime.BackgroundJob.GetJob.
 func (pid *PIDController) GetJob() jobs.Job {
-	return jobs.NewNoOpJob(pid.cpID)
+	return jobs.NewNoOpJob(pid.componentID)
 }
 
 // NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
