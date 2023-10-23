@@ -106,7 +106,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
-			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
+			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ControllerServiceAccountName(instance), Namespace: namespace}
 
 			createdControllerDeployment := &appsv1.Deployment{}
 			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}
@@ -179,7 +179,7 @@ var _ = Describe("Controller Reconciler", Ordered, func() {
 			clusterRoleBindingKey := types.NamespacedName{Name: controllers.ControllerResourcesNamespacedName(instance)}
 
 			createdControllerServiceAccount := &corev1.ServiceAccount{}
-			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ServiceAccountName(instance), Namespace: namespace}
+			controllerServiceAccountKey := types.NamespacedName{Name: controllers.ControllerServiceAccountName(instance), Namespace: namespace}
 
 			createdControllerDeployment := &appsv1.Deployment{}
 			controllerDeploymentKey := types.NamespacedName{Name: controllers.ControllerResourcesName(instance), Namespace: namespace}

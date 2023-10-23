@@ -78,7 +78,7 @@ func genRules(instance *agentv1alpha1.Agent) []rbacv1.PolicyRule {
 func clusterRoleForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRole {
 	clusterRole := &rbacv1.ClusterRole{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentResourceName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.OperatorName),
 			Annotations: controllers.AgentAnnotationsWithOwnerRef(instance),
 		},
@@ -92,19 +92,19 @@ func clusterRoleForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRole {
 func clusterRoleBindingForAgent(instance *agentv1alpha1.Agent) *rbacv1.ClusterRoleBinding {
 	clusterRoleBinding := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.AgentServiceName,
+			Name:        controllers.AgentResourceName(instance),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.AgentServiceName),
 			Annotations: controllers.AgentAnnotationsWithOwnerRef(instance),
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
 			Kind:     "ClusterRole",
-			Name:     controllers.AgentServiceName,
+			Name:     controllers.AgentResourceName(instance),
 		},
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      controllers.AgentServiceName,
+				Name:      controllers.AgentServiceAccountName(instance),
 				Namespace: instance.GetNamespace(),
 			},
 		},
