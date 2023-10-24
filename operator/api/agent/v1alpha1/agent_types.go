@@ -33,6 +33,7 @@ import (
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
 	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -83,6 +84,10 @@ type DeploymentConfigSpec struct {
 	// TopologySpreadConstraints to be applied to the deployment.
 	//+kubebuilder:validation:Optional
 	TopologySpreadConstraints []corev1.TopologySpreadConstraint `json:"topology_spread_constraints,omitempty"`
+
+	// Strategy to be applied to the deployment upgrades.
+	//+kubebuilder:validation:Optional
+	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty"`
 }
 
 // AgentConfigSpec holds agent configuration.

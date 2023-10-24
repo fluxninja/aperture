@@ -167,11 +167,9 @@ func deploymentMutate(dep *appsv1.Deployment, spec appsv1.DeploymentSpec) contro
 		dep.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
 		dep.Spec.Template.Spec.HostAliases = spec.Template.Spec.HostAliases
 		dep.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets
-		dep.Spec.Template.Spec.HostAliases = spec.Template.Spec.HostAliases
 		dep.Spec.Template.Spec.Affinity = spec.Template.Spec.Affinity
 		dep.Spec.Template.Spec.NodeSelector = spec.Template.Spec.NodeSelector
 		dep.Spec.Template.Spec.Tolerations = spec.Template.Spec.Tolerations
-		dep.Spec.Template.Spec.PriorityClassName = spec.Template.Spec.PriorityClassName
 		dep.Spec.Template.Spec.TopologySpreadConstraints = spec.Template.Spec.TopologySpreadConstraints
 		dep.Spec.Template.Spec.SecurityContext = spec.Template.Spec.SecurityContext
 		dep.Spec.Template.Spec.InitContainers = spec.Template.Spec.InitContainers
