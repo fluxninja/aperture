@@ -33,6 +33,7 @@ import (
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
 	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
@@ -66,7 +67,7 @@ type AgentSpec struct {
 	// NameOverride overrides the name of the resources created for agent.
 	// This is an experimental feature.
 	//+kubebuilder:validation:Optional
-	NameOverride string `json:"nameOverride"`
+	NameOverride string `json:"name_override"`
 }
 
 // DeploymentConfigSpec defines the deployment configuration of the agent.
@@ -78,6 +79,10 @@ type DeploymentConfigSpec struct {
 	// Number of replicas when type is set to Deployment.
 	//+kubebuilder:validation:Optional
 	Replicas int32 `json:"replicas,omitempty" default:"1" validate:"gt=0"`
+
+	// TopologySpreadConstraints to be applied to the deployment.
+	//+kubebuilder:validation:Optional
+	TopologySpreadConstraints []corev1.TopologySpreadConstraint `json:"topology_spread_constraints,omitempty"`
 }
 
 // AgentConfigSpec holds agent configuration.
