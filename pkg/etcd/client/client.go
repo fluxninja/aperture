@@ -68,6 +68,7 @@ const (
 	put       = 0
 	del       = 1
 	delPrefix = 2
+	bootstrap = 3
 )
 
 type operation struct {
@@ -95,9 +96,12 @@ type Client struct {
 	client               *clientv3.Client
 	readyChannel         chan bool
 	electionWatchers     map[ElectionWatcher]struct{}
+	cache                map[string]string
 	leaseID              clientv3.LeaseID
 	electionWatcherMutex sync.Mutex
+	cacheMutex           sync.Mutex
 	isLeader             atomic.Bool
+	bootstrapPending     atomic.Bool
 }
 
 // ProvideClient creates a new etcd Client and provides it via Fx.
@@ -179,7 +183,9 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		readyChannel:     make(chan bool),
 		opChannel:        infchan.NewChannel[operation](),
 		electionWatchers: make(map[ElectionWatcher]struct{}),
+		cache:            make(map[string]string),
 	}
+	etcdClient.bootstrapPending.Store(true)
 	// Set finalizer to automatically close channel
 	runtime.SetFinalizer(&etcdClient, func(etcdClient *Client) {
 		// drain the ew.opChannel.Out
@@ -255,6 +261,12 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 			// save the lease id
 			etcdClient.leaseID = session.Lease()
 
+			// bootstrap writes
+			etcdClient.bootstrapPending.Store(false)
+			etcdClient.opChannel.In() <- operation{
+				opType: bootstrap,
+			}
+
 			// write loop
 			writeLoopWaitGroup := sync.WaitGroup{}
 			writeLoopWaitGroup.Add(1)
@@ -273,6 +285,7 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 				writeLoopCancel()
 				break SESSION_LOOP
 			case <-session.Done():
+				etcdClient.bootstrapPending.Store(true)
 				campaignCancel()
 				writeLoopCancel()
 				writeLoopWaitGroup.Wait()
@@ -328,6 +341,16 @@ func (etcdClient *Client) writeLoopFn(ctx context.Context, wg *sync.WaitGroup) f
 
 				var err error
 				switch op.opType {
+				case bootstrap:
+					etcdClient.cacheMutex.Lock()
+					cacheCopy := make(map[string]string)
+					for key, value := range etcdClient.cache {
+						cacheCopy[key] = value
+					}
+					etcdClient.cacheMutex.Unlock()
+					for key, value := range cacheCopy {
+						_, err = etcdClient.kv.Put(clientv3.WithRequireLeader(ctx), key, value)
+					}
 				case put:
 					_, err = etcdClient.kv.Put(clientv3.WithRequireLeader(ctx), op.key, op.value, op.opts...)
 				case del:
@@ -394,7 +417,12 @@ func (etcdClient *Client) PutWithExpiry(key, val string, leaseTTL int, opts ...c
 
 // Put puts the given value for the given key with lease.
 func (etcdClient *Client) Put(key, val string, opts ...clientv3.OpOption) {
-	// etcd robustness TODO: update the local tracker
+	etcdClient.cacheMutex.Lock()
+	defer etcdClient.cacheMutex.Unlock()
+	etcdClient.cache[key] = val
+	if etcdClient.bootstrapPending.Load() {
+		return
+	}
 	// send the operation to the channel
 	etcdClient.opChannel.In() <- operation{
 		key:       key,
@@ -407,6 +435,12 @@ func (etcdClient *Client) Put(key, val string, opts ...clientv3.OpOption) {
 
 // Delete deletes the given key.
 func (etcdClient *Client) Delete(key string, opts ...clientv3.OpOption) {
+	etcdClient.cacheMutex.Lock()
+	defer etcdClient.cacheMutex.Unlock()
+	delete(etcdClient.cache, key)
+	if etcdClient.bootstrapPending.Load() {
+		return
+	}
 	// etcd robustness TODO: update the local tracker
 	// send the operation to the channel
 	etcdClient.opChannel.In() <- operation{

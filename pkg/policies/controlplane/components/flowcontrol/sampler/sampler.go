@@ -130,7 +130,11 @@ func (samplerSync *samplerSync) Execute(inPortReadings runtime.PortToReading, ci
 	acceptPercentageReading := inPortReadings.ReadSingleReadingPort("accept_percentage")
 	var acceptPercentageValue float64
 	if !acceptPercentageReading.Valid() {
-		acceptPercentageValue = 100 // default to 100%
+		if samplerSync.SamplerProto.Parameters.RampMode {
+			acceptPercentageValue = 0
+		} else {
+			acceptPercentageValue = 100 // default to 100%
+		}
 	} else {
 		acceptPercentageValue = acceptPercentageReading.Value()
 	}
