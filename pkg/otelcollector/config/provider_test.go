@@ -18,10 +18,10 @@ var _ = Describe("Provider", func() {
 			triggered = true
 		}
 
-		provider := otelconfig.NewProvider("foo", otelconfig.New())
+		provider := otelconfig.NewProvider("foo")
 		provider.Retrieve(context.TODO(), "xxx", onUpdate)
 		Expect(triggered).To(BeFalse())
-		provider.UpdateConfig(otelconfig.New())
+		provider.UpdateConfig()
 		Expect(triggered).To(BeTrue())
 	})
 
@@ -31,10 +31,10 @@ var _ = Describe("Provider", func() {
 			triggered = true
 		}
 
-		provider := otelconfig.NewProvider("foo", otelconfig.New())
+		provider := otelconfig.NewProvider("foo")
 		provider.Retrieve(context.TODO(), "xxx", onUpdate)
 		provider.Shutdown(context.TODO())
-		provider.UpdateConfig(otelconfig.New())
+		provider.UpdateConfig()
 		Expect(triggered).To(BeFalse())
 	})
 
@@ -44,9 +44,11 @@ var _ = Describe("Provider", func() {
 			triggered = true
 		}
 
-		cfg := otelconfig.New()
-		cfg.AddReceiver("base", map[string]any{})
-		provider := otelconfig.NewProvider("foo", cfg)
+		provider := otelconfig.NewProvider("foo")
+		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
+			cfg.AddReceiver("base", map[string]any{})
+		})
+
 		Expect(retrieveReceivers(provider, onUpdate)).To(ConsistOf([]string{
 			"base",
 		}))
@@ -75,9 +77,10 @@ var _ = Describe("Provider", func() {
 		}))
 
 		By("Updating config")
-		cfg = otelconfig.New()
-		cfg.AddReceiver("updated", map[string]any{})
-		provider.UpdateConfig(cfg)
+		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
+			cfg.AddReceiver("updated", map[string]any{})
+		})
+		provider.UpdateConfig()
 		Expect(retrieveReceivers(provider, onUpdate)).To(ConsistOf([]string{
 			"updated",
 			"ext1",

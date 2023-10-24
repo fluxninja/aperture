@@ -36,7 +36,10 @@ var _ = DescribeTable("FN Extension OTel", func(
 	unmarshaller, err := config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller(marshalledCfg)
 	Expect(err).NotTo(HaveOccurred())
 
-	configProvider := otelconfig.NewProvider("base", baseConfig.MustCopy())
+	configProvider := otelconfig.NewProvider("base")
+	configProvider.AddMutatingHook(func(otelCfg *otelconfig.Config) {
+		*otelCfg = *baseConfig
+	})
 
 	opts := fx.Options(
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.grpc"}.Annotate(),
@@ -69,10 +72,11 @@ var _ = DescribeTable("FN Extension OTel", func(
 	err = app.Start(context.TODO())
 	Expect(err).NotTo(HaveOccurred())
 
-	Expect(configProvider.MustGetConfig().Receivers).To(Equal(expected.Receivers))
-	Expect(configProvider.MustGetConfig().Processors).To(Equal(expected.Processors))
-	Expect(configProvider.MustGetConfig().Exporters).To(Equal(expected.Exporters))
-	Expect(configProvider.MustGetConfig().Service.Pipelines).To(Equal(expected.Service.Pipelines))
+	config := configProvider.GetConfig()
+	Expect(config.Receivers).To(Equal(expected.Receivers))
+	Expect(config.Processors).To(Equal(expected.Processors))
+	Expect(config.Exporters).To(Equal(expected.Exporters))
+	Expect(config.Service.Pipelines).To(Equal(expected.Service.Pipelines))
 
 	err = app.Stop(context.TODO())
 	Expect(err).NotTo(HaveOccurred())

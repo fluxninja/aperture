@@ -9,7 +9,6 @@ import (
 	"path"
 	"sync"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
@@ -207,15 +206,15 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 	}
 	// register
 	log.Info().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
-	_, err = pd.etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(bytes))
-	return err
+	pd.etcdClient.Put(pd.selfKey, string(bytes))
+	return nil
 }
 
 // deregisterSelf deregisters self from etcd.
 func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
 	log.Info().Str("key", pd.selfKey).Msg("self deregistering from peer discovery table")
-	_, err := pd.etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), pd.selfKey)
-	return err
+	pd.etcdClient.Delete(pd.selfKey)
+	return nil
 }
 
 // Start starts peer discovery.

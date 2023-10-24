@@ -7,6 +7,7 @@ import (
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -21,11 +22,12 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 	autoscalek8sdiscovery "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
@@ -62,7 +64,7 @@ type Heartbeats struct {
 	interval                  config.Duration
 	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo
-	election                  *election.Election
+	etcdClient                *etcdclient.Client
 	apiKey                    string
 	jobName                   string
 	installationMode          string
@@ -77,7 +79,7 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	election *election.Election,
+	etcdClient *etcdclient.Client,
 	flowControlPoints *cache.Cache[selectors.TypedControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 ) *Heartbeats {
@@ -96,7 +98,7 @@ func newHeartbeats(
 		agentInfo:                 agentInfo,
 		peersWatcher:              peersWatcher,
 		policyFactory:             policyFactory,
-		election:                  election,
+		etcdClient:                etcdClient,
 		flowControlPoints:         flowControlPoints,
 		autoscalek8sControlPoints: autoscalek8sControlPoints,
 		installationMode:          extensionConfig.InstallationMode,
@@ -128,6 +130,8 @@ func (h *Heartbeats) setupControllerInfo(
 	etcdClient *etcdclient.Client,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	controllerID string,
+	configProvider *otelconfig.Provider,
+	lifeCycle fx.Lifecycle,
 ) error {
 	if extensionConfig.EnableCloudController {
 		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
@@ -137,27 +141,46 @@ func (h *Heartbeats) setupControllerInfo(
 		return nil
 	}
 
-	etcdPath := "/fluxninja/controllerid"
-	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
-	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
-		Then(clientv3.OpPut(etcdPath, controllerID)).
-		Else(clientv3.OpGet(etcdPath)).Commit()
-	if err != nil {
-		log.Error().Err(err).Msg("Could not read/write controller id to etcd")
-		return err
-	}
+	ctx, cancel := context.WithCancel(ctx)
 
-	// Succeeded is true if the If condition above is true - meaning there were no controller Id in etcd
-	if !resp.Succeeded {
-		for _, res := range resp.Responses {
-			controllerID = string(res.GetResponseRange().Kvs[0].Value)
-			break
-		}
-	}
+	lifeCycle.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			panichandler.Go(func() {
+				etcdPath := "/fluxninja/controllerid"
+				txn, err := etcdClient.Txn(ctx)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not create etcd transaction")
+					return
+				}
+				resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
+					Then(clientv3.OpPut(etcdPath, controllerID)).
+					Else(clientv3.OpGet(etcdPath)).Commit()
+				if err != nil {
+					log.Error().Err(err).Msg("Could not read/write controller id to etcd")
+					return
+				}
 
-	h.ControllerInfo = &heartbeatv1.ControllerInfo{
-		Id: controllerID,
-	}
+				// Succeeded is true if the If condition above is true - meaning there were no controller Id in etcd
+				if !resp.Succeeded {
+					for _, res := range resp.Responses {
+						controllerID = string(res.GetResponseRange().Kvs[0].Value)
+						break
+					}
+				}
+
+				h.ControllerInfo = &heartbeatv1.ControllerInfo{
+					Id: controllerID,
+				}
+				// Call otelconfig.Provider.UpdateConfig() to update the controller id in the otel config
+				configProvider.UpdateConfig()
+			})
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			cancel()
+			return nil
+		},
+	})
 
 	return nil
 }
@@ -238,7 +261,7 @@ func (h *Heartbeats) newHeartbeat(
 		report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
 	}
 
-	if h.election != nil && h.election.IsLeader() {
+	if h.etcdClient != nil && h.etcdClient.IsLeader() {
 		var servicesList *heartbeatv1.ServicesList
 		if h.entities != nil {
 			servicesList = populateServicesList(h.entities)

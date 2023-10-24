@@ -23,15 +23,17 @@ func provideController(
 		return nil, err
 	}
 
-	otelCfg := otelconfig.New()
-	otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
-	otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
+	otelProvider := otelconfig.NewProvider("service")
+	otelProvider.AddMutatingHook(func(otelCfg *otelconfig.Config) {
+		otelCfg.SetDebugPort(&controllerCfg.CommonOTelConfig)
+		otelCfg.AddDebugExtensions(&controllerCfg.CommonOTelConfig)
 
-	addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
-	otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
-	otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
+		addMetricsPipeline(otelCfg, &controllerCfg, tlsConfig, lis, promClient)
+		otelCfg.AddExporter(otelconsts.ExporterLogging, nil)
+		otelconfig.AddAlertsPipeline(otelCfg, controllerCfg.CommonOTelConfig)
+	})
 
-	return otelconfig.NewProvider("service", otelCfg), nil
+	return otelProvider, nil
 }
 
 // addMetricsPipeline adds metrics to pipeline for controller OTel collector.

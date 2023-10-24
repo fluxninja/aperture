@@ -4,7 +4,6 @@ import (
 	"context"
 	"path"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 
@@ -77,13 +76,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 			}
 
 			// Put the marshaled data in etcd using the provided etcdPath and LeaseID.
-			// It returns an error in case of any failure.
-			_, err = etcdClient.KV.Put(clientv3.WithRequireLeader(ctx), configSync.etcdPath, string(dat))
-			if err != nil {
-				// Log the error and return it in case of any failure.
-				logger.Error().Err(err).Msg("Failed to put flux meter config")
-				return err
-			}
+			etcdClient.Put(configSync.etcdPath, string(dat))
 
 			// Return nil to indicate success.
 			return nil
@@ -92,13 +85,7 @@ func (configSync *fluxMeterConfigSync) doSync(etcdClient *etcdclient.Client, lif
 		// OnStop hook will be called when the application stops.
 		OnStop: func(ctx context.Context) error {
 			// Delete the data from etcd using the provided etcdPath.
-			// It returns an error in case of any failure.
-			_, err := etcdClient.KV.Delete(clientv3.WithRequireLeader(ctx), configSync.etcdPath)
-			if err != nil {
-				// Log the error and return it in case of any failure.
-				logger.Error().Err(err).Msg("Failed to delete flux meter config")
-				return err
-			}
+			etcdClient.Delete(configSync.etcdPath)
 
 			// Return nil to indicate success.
 			return nil

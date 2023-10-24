@@ -43,24 +43,29 @@ func provideAgent(
 		return nil, fmt.Errorf("unmarshalling otel config: %w", err)
 	}
 
-	otelCfg := otelconfig.New()
-	otelCfg.SetDebugPort(&agentCfg.CommonOTelConfig)
-	otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
-
-	addLogsPipeline(otelCfg, &agentCfg)
-	addTracesPipeline(otelCfg, lis)
-	addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
-
-	otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
-
-	baseOtelCfg, err := otelCfg.Copy()
-	if err != nil {
-		return nil, fmt.Errorf("failed to copy base collector config: %w", err)
-	}
-	configProvider := otelconfig.NewProvider("service", otelCfg)
-
 	allInfraMeters := map[string]*policysyncv1.InfraMeterWrapper{}
 	var allInfraMetersMutex sync.Mutex
+
+	configProvider := otelconfig.NewProvider("service")
+	configProvider.AddMutatingHook(func(otelCfg *otelconfig.Config) {
+		otelCfg.SetDebugPort(&agentCfg.CommonOTelConfig)
+		otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
+
+		addLogsPipeline(otelCfg, &agentCfg)
+		addTracesPipeline(otelCfg, lis)
+		addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
+
+		otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
+
+		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
+			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
+			utils.Shutdown(shutdowner)
+			return
+		}
+	})
+
+	configProvider.UpdateConfig()
+
 	handleInfraMeterUpdate := func(event notifiers.Event, unmarshaller config.Unmarshaller) {
 		var err error //nolint:govet
 		log.Info().Str("event", event.String()).Msg("infra meter update")
@@ -79,17 +84,9 @@ func provideAgent(
 		case notifiers.Remove:
 			delete(allInfraMeters, key)
 		}
-
-		// We already checked that the config is copiable, so MustCopy shouldn't panic.
-		otelCfg := baseOtelCfg.MustCopy()
-		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
-			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
-			utils.Shutdown(shutdowner)
-			return
-		}
 		// trigger update
 		log.Info().Msgf("received infra meter update, hot re-loading OTel, total infra meters: %d", len(allInfraMeters))
-		configProvider.UpdateConfig(otelCfg)
+		configProvider.UpdateConfig()
 	}
 
 	// Get Agent Group from host info gatherer

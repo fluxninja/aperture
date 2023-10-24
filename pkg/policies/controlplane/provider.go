@@ -148,7 +148,7 @@ func setupPoliciesNotifier(
 		return key, dat, nil
 	}
 
-	policyEtcdToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
+	policyEtcdToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient)
 	// content transform callback to wrap policy in config properties wrapper
 	policyEtcdToEtcdNotifier.SetTransformFunc(
 		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
@@ -162,14 +162,14 @@ func setupPoliciesNotifier(
 	//   problem, as no other logic runs between these starts.
 	// * Multiple notifiers writing the same key to etcd are a problem, but
 	//   it's not handled correctly anyway (FIXME).
-	policyCRToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient, true)
+	policyCRToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient)
 	policyCRToEtcdNotifier.SetTransformFunc(
 		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
 			return wrapPolicy(key, bytes, etype, policysyncv1.PolicyWrapper_K8S)
 		},
 	)
 
-	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient, true)
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

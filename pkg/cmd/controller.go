@@ -46,7 +46,7 @@ func (h *Handler) ListAgents(
 	ctx context.Context,
 	req *cmdv1.ListAgentsRequest,
 ) (*cmdv1.ListAgentsResponse, error) {
-	agents, err := h.agents.GetAgentsForGroup(req.AgentGroup)
+	agents, err := h.agents.GetAgentsForGroup(ctx, req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (h *Handler) ListFlowControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListFlowControlPointsRequest,
 ) (*cmdv1.ListFlowControlPointsControllerResponse, error) {
-	agentsControlPoints, err := h.agents.ListFlowControlPoints()
+	agentsControlPoints, err := h.agents.ListFlowControlPoints(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (h *Handler) ListAutoScaleControlPoints(
 	ctx context.Context,
 	_ *cmdv1.ListAutoScaleControlPointsRequest,
 ) (*cmdv1.ListAutoScaleControlPointsControllerResponse, error) {
-	agentsControlPoints, err := h.agents.ListAutoScaleControlPoints()
+	agentsControlPoints, err := h.agents.ListAutoScaleControlPoints(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (h *Handler) ListAutoScaleControlPoints(
 
 // ListDiscoveryEntities lists all Discovery entities.
 func (h *Handler) ListDiscoveryEntities(ctx context.Context, req *cmdv1.ListDiscoveryEntitiesRequest) (*cmdv1.ListDiscoveryEntitiesControllerResponse, error) {
-	discoveryEntities, err := h.agents.ListDiscoveryEntities(req.AgentGroup)
+	discoveryEntities, err := h.agents.ListDiscoveryEntities(ctx, req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (h *Handler) ListDiscoveryEntities(ctx context.Context, req *cmdv1.ListDisc
 
 // ListDiscoveryEntity lists all Discovery entity.
 func (h *Handler) ListDiscoveryEntity(ctx context.Context, req *cmdv1.ListDiscoveryEntityRequest) (*cmdv1.ListDiscoveryEntityAgentResponse, error) {
-	discoveryEntity, err := h.agents.ListDiscoveryEntity(req)
+	discoveryEntity, err := h.agents.ListDiscoveryEntity(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func doPreview[AgentResp, ControllerResp any](
 	h *Handler,
 	req *previewv1.PreviewRequest,
 	cp selectors.GlobalControlPointID,
-	preview func(string, *previewv1.PreviewRequest) (AgentResp, error),
+	preview func(context.Context, string, *previewv1.PreviewRequest) (AgentResp, error),
 	wrap func(AgentResp) ControllerResp,
 ) (ControllerResp, error) {
 	var nilResp ControllerResp
@@ -292,7 +292,7 @@ func doPreview[AgentResp, ControllerResp any](
 		default:
 		}
 
-		resp, err := preview(agent, req)
+		resp, err := preview(ctx, agent, req)
 		if err != nil {
 			if status.Code(err) == codes.FailedPrecondition {
 				// This error is only returned by agent in case of disabled preview.
@@ -332,7 +332,7 @@ func (h *Handler) agentsWithControlPoint(
 	// we'd cache agent groups.
 	// FIXME we can add argument to ListFlowControlPoints for agents to filter
 	// non-matching control points.
-	agentsControlPoints, err := h.agents.ListFlowControlPoints()
+	agentsControlPoints, err := h.agents.ListFlowControlPoints(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -40,68 +40,70 @@ func NewAgents(transport *transport.EtcdTransportServer, client *etcdclient.Clie
 // ListFlowControlPoints lists control points of all agents.
 //
 // Handled by agentfunctions.ControlPointsHandler.
-func (a Agents) ListFlowControlPoints() ([]transport.Result[*cmdv1.ListFlowControlPointsAgentResponse], error) {
+func (a Agents) ListFlowControlPoints(ctx context.Context) ([]transport.Result[*cmdv1.ListFlowControlPointsAgentResponse], error) {
 	var req cmdv1.ListFlowControlPointsRequest
-	agents, err := a.GetAgents()
+	agents, err := a.GetAgents(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
+	return transport.SendRequests[cmdv1.ListFlowControlPointsAgentResponse](ctx, a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListAutoScaleControlPoints lists auto-scale control points of all agents.
-func (a Agents) ListAutoScaleControlPoints() ([]transport.Result[*cmdv1.ListAutoScaleControlPointsAgentResponse], error) {
+func (a Agents) ListAutoScaleControlPoints(ctx context.Context) ([]transport.Result[*cmdv1.ListAutoScaleControlPointsAgentResponse], error) {
 	var req cmdv1.ListAutoScaleControlPointsRequest
-	agents, err := a.GetAgents()
+	agents, err := a.GetAgents(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](a.etcdTransport, flattenAgents(agents), &req)
+	return transport.SendRequests[cmdv1.ListAutoScaleControlPointsAgentResponse](ctx, a.etcdTransport, flattenAgents(agents), &req)
 }
 
 // ListDiscoveryEntities lists discovery entities.
-func (a Agents) ListDiscoveryEntities(agentGroup string) ([]transport.Result[*cmdv1.ListDiscoveryEntitiesAgentResponse], error) {
+func (a Agents) ListDiscoveryEntities(ctx context.Context, agentGroup string) ([]transport.Result[*cmdv1.ListDiscoveryEntitiesAgentResponse], error) {
 	var req cmdv1.ListDiscoveryEntitiesRequest
-	agents, err := a.GetAgentsForGroup(agentGroup)
+	agents, err := a.GetAgentsForGroup(ctx, agentGroup)
 	if err != nil {
 		return nil, err
 	}
-	return transport.SendRequests[cmdv1.ListDiscoveryEntitiesAgentResponse](a.etcdTransport, agents, &req)
+	return transport.SendRequests[cmdv1.ListDiscoveryEntitiesAgentResponse](ctx, a.etcdTransport, agents, &req)
 }
 
 // ListDiscoveryEntity lists discovery entity by ip address or name.
-func (a Agents) ListDiscoveryEntity(req *cmdv1.ListDiscoveryEntityRequest) (*cmdv1.ListDiscoveryEntityAgentResponse, error) {
-	agents, err := a.GetAgents()
+func (a Agents) ListDiscoveryEntity(ctx context.Context, req *cmdv1.ListDiscoveryEntityRequest) (*cmdv1.ListDiscoveryEntityAgentResponse, error) {
+	agents, err := a.GetAgents(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return transport.SendRequest[cmdv1.ListDiscoveryEntityAgentResponse](a.etcdTransport, flattenAgents(agents)[0], req)
+	return transport.SendRequest[cmdv1.ListDiscoveryEntityAgentResponse](ctx, a.etcdTransport, flattenAgents(agents)[0], req)
 }
 
 // PreviewFlowLabels previews flow labels on a given agent.
 //
 // Handled by agentfunctions.PreviewHandler.
 func (a Agents) PreviewFlowLabels(
+	ctx context.Context,
 	agent string,
 	req *previewv1.PreviewRequest,
 ) (*previewv1.PreviewFlowLabelsResponse, error) {
-	return transport.SendRequest[previewv1.PreviewFlowLabelsResponse](a.etcdTransport, agent, &cmdv1.PreviewFlowLabelsRequest{Request: req})
+	return transport.SendRequest[previewv1.PreviewFlowLabelsResponse](ctx, a.etcdTransport, agent, &cmdv1.PreviewFlowLabelsRequest{Request: req})
 }
 
 // PreviewHTTPRequests previews flow labels on a given agent.
 //
 // Handled by agentfunctions.PreviewHandler.
 func (a Agents) PreviewHTTPRequests(
+	ctx context.Context,
 	agent string,
 	req *previewv1.PreviewRequest,
 ) (*previewv1.PreviewHTTPRequestsResponse, error) {
-	return transport.SendRequest[previewv1.PreviewHTTPRequestsResponse](a.etcdTransport, agent, &cmdv1.PreviewHTTPRequestsRequest{Request: req})
+	return transport.SendRequest[previewv1.PreviewHTTPRequestsResponse](ctx, a.etcdTransport, agent, &cmdv1.PreviewHTTPRequestsRequest{Request: req})
 }
 
 // GetAgents lists the agents registered on etcd under /peers/aperture-agent.
-func (a Agents) GetAgents() (map[string][]string, error) {
-	resp, err := a.etcdClient.Client.KV.Get(context.Background(), paths.AgentPeerPath, clientv3.WithPrefix())
+func (a Agents) GetAgents(ctx context.Context) (map[string][]string, error) {
+	resp, err := a.etcdClient.Get(ctx, paths.AgentPeerPath, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
@@ -133,8 +135,8 @@ func (a Agents) GetAgents() (map[string][]string, error) {
 }
 
 // GetAgentsForGroup lists the agents under an agent-group registered on etcd under /peers/aperture-agent.
-func (a Agents) GetAgentsForGroup(agentGroup string) ([]string, error) {
-	agents, err := a.GetAgents()
+func (a Agents) GetAgentsForGroup(ctx context.Context, agentGroup string) ([]string, error) {
+	agents, err := a.GetAgents(ctx)
 	if err != nil {
 		return nil, err
 	}

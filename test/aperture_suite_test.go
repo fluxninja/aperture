@@ -230,35 +230,39 @@ var _ = AfterSuite(func() {
 })
 
 func provideOTelConfig() *otelconfig.Provider {
-	cfg := otelconfig.New()
+	provider := otelconfig.NewProvider("service")
 	if phStarted {
-		cfg.AddReceiver("prometheus", map[string]interface{}{
-			"config": map[string]interface{}{
-				"scrape_configs": []map[string]interface{}{
-					{
-						"job_name":        "aperture-agent",
-						"scrape_interval": "5s",
-						"static_configs": []map[string]interface{}{
-							{
-								"targets": []string{addr},
+		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
+			cfg.AddReceiver("prometheus", map[string]interface{}{
+				"config": map[string]interface{}{
+					"scrape_configs": []map[string]interface{}{
+						{
+							"job_name":        "aperture-agent",
+							"scrape_interval": "5s",
+							"static_configs": []map[string]interface{}{
+								{
+									"targets": []string{addr},
+								},
 							},
 						},
 					},
 				},
-			},
-		})
-		cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
-			"endpoint": ph.Endpoint + "/api/v1/write",
-		})
-		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
-			Receivers: []string{"prometheus"},
-			Exporters: []string{"prometheusremotewrite"},
+			})
+			cfg.AddExporter("prometheusremotewrite", map[string]interface{}{
+				"endpoint": ph.Endpoint + "/api/v1/write",
+			})
+			cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+				Receivers: []string{"prometheus"},
+				Exporters: []string{"prometheusremotewrite"},
+			})
 		})
 	} else {
-		cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
-			Receivers: []string{otelconsts.ReceiverOTLP},
-			Exporters: []string{otelconsts.ExporterLogging},
+		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
+			cfg.Service.AddPipeline("metrics", otelconfig.Pipeline{
+				Receivers: []string{otelconsts.ReceiverOTLP},
+				Exporters: []string{otelconsts.ExporterLogging},
+			})
 		})
 	}
-	return otelconfig.NewProvider("service", cfg)
+	return provider
 }
