@@ -86,6 +86,7 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 					Annotations: spec.PodAnnotations,
 				},
 				Spec: corev1.PodSpec{
+					TopologySpreadConstraints:     spec.DeploymentConfigSpec.TopologySpreadConstraints,
 					ServiceAccountName:            controllers.AgentServiceAccountName(instance),
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
@@ -174,6 +175,7 @@ func deploymentMutate(dply *appsv1.Deployment, spec appsv1.DeploymentSpec) contr
 		dply.Spec.Template.Annotations = spec.Template.Annotations
 		dply.Spec.Template.Labels = spec.Template.Labels
 		dply.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
+		dply.Spec.Template.Spec.TopologySpreadConstraints = spec.Template.Spec.TopologySpreadConstraints
 		dply.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets
 		dply.Spec.Template.Spec.NodeSelector = spec.Template.Spec.NodeSelector
 		dply.Spec.Template.Spec.Tolerations = spec.Template.Spec.Tolerations

@@ -173,6 +173,7 @@ var _ = Describe("Agent Deployment", func() {
 							},
 						},
 						Spec: corev1.PodSpec{
+							TopologySpreadConstraints:     nil,
 							ServiceAccountName:            AgentServiceName,
 							ImagePullSecrets:              []corev1.LocalObjectReference{},
 							NodeSelector:                  nil,
@@ -307,6 +308,7 @@ var _ = Describe("Agent Deployment", func() {
 					NameOverride: Test,
 					DeploymentConfigSpec: agentv1alpha1.DeploymentConfigSpec{
 						Replicas: 1,
+						Type:     "Deployment",
 					},
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
@@ -404,7 +406,7 @@ var _ = Describe("Agent Deployment", func() {
 					},
 				},
 			}
-			expected := &appsv1.DaemonSet{
+			expected := &appsv1.Deployment{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      Test,
 					Namespace: AppName,
@@ -426,7 +428,8 @@ var _ = Describe("Agent Deployment", func() {
 					},
 					Annotations: TestMap,
 				},
-				Spec: appsv1.DaemonSetSpec{
+				Spec: appsv1.DeploymentSpec{
+					Replicas: pointer.Int32(1),
 					Selector: &metav1.LabelSelector{
 						MatchLabels: selectorLabels,
 					},
@@ -444,7 +447,8 @@ var _ = Describe("Agent Deployment", func() {
 							},
 						},
 						Spec: corev1.PodSpec{
-							ServiceAccountName: Test,
+							TopologySpreadConstraints: nil,
+							ServiceAccountName:        Test,
 							ImagePullSecrets: []corev1.LocalObjectReference{
 								{
 									Name: Test,
@@ -627,7 +631,7 @@ var _ = Describe("Agent Deployment", func() {
 				},
 			}
 
-			result, err := daemonsetForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
+			result, err := deploymentForAgent(instance.DeepCopy(), logr.Logger{}, scheme.Scheme)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result).To(Equal(expected))
@@ -635,11 +639,11 @@ var _ = Describe("Agent Deployment", func() {
 	})
 })
 
-var _ = Describe("Test DaemonSet Mutate", func() {
+var _ = Describe("Test Deployment Mutate", func() {
 	It("Mutate should update required fields only", func() {
-		expected := &appsv1.DaemonSet{
+		expected := &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{},
-			Spec: appsv1.DaemonSetSpec{
+			Spec: appsv1.DeploymentSpec{
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{},
 				},
@@ -649,10 +653,11 @@ var _ = Describe("Test DaemonSet Mutate", func() {
 						Annotations: map[string]string{},
 					},
 					Spec: corev1.PodSpec{
-						ServiceAccountName: Test,
-						ImagePullSecrets:   []corev1.LocalObjectReference{},
-						NodeSelector:       map[string]string{},
-						Tolerations:        []corev1.Toleration{},
+						ServiceAccountName:        Test,
+						TopologySpreadConstraints: nil,
+						ImagePullSecrets:          []corev1.LocalObjectReference{},
+						NodeSelector:              map[string]string{},
+						Tolerations:               []corev1.Toleration{},
 						SecurityContext: &corev1.PodSecurityContext{
 							FSGroup: pointer.Int64(1001),
 						},
@@ -668,10 +673,10 @@ var _ = Describe("Test DaemonSet Mutate", func() {
 			},
 		}
 
-		dms := &appsv1.DaemonSet{}
-		err := daemonsetMutate(dms, expected.Spec)()
+		dply := &appsv1.Deployment{}
+		err := deploymentMutate(dply, expected.Spec)()
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(dms).To(Equal(expected))
+		Expect(dply).To(Equal(expected))
 	})
 })
