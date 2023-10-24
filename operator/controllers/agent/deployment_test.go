@@ -162,6 +162,7 @@ var _ = Describe("Agent Deployment", func() {
 					Selector: &metav1.LabelSelector{
 						MatchLabels: selectorLabels,
 					},
+					Strategy: appsv1.DeploymentStrategy{},
 					Template: corev1.PodTemplateSpec{
 						ObjectMeta: metav1.ObjectMeta{
 							Annotations: nil,
@@ -433,6 +434,7 @@ var _ = Describe("Agent Deployment", func() {
 					Selector: &metav1.LabelSelector{
 						MatchLabels: selectorLabels,
 					},
+					Strategy: appsv1.DeploymentStrategy{},
 					Template: corev1.PodTemplateSpec{
 						ObjectMeta: metav1.ObjectMeta{
 							Annotations: map[string]string{
@@ -647,6 +649,8 @@ var _ = Describe("Test Deployment Mutate", func() {
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{},
 				},
+				Strategy: appsv1.DeploymentStrategy{},
+				Replicas: nil,
 				Template: corev1.PodTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Labels:      map[string]string{},
@@ -654,6 +658,8 @@ var _ = Describe("Test Deployment Mutate", func() {
 					},
 					Spec: corev1.PodSpec{
 						ServiceAccountName:        Test,
+						HostAliases:               nil,
+						Affinity:                  nil,
 						TopologySpreadConstraints: nil,
 						ImagePullSecrets:          []corev1.LocalObjectReference{},
 						NodeSelector:              map[string]string{},
