@@ -19,6 +19,7 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent/otel/prometheusreceiver"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/cache"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
@@ -156,6 +157,9 @@ var _ = BeforeSuite(func() {
 			agentinfo.ProvideAgentInfo,
 			flowcontrol.NewEngine,
 			cache.NewCache[selectors.TypedControlPointID],
+		),
+		fx.Supply(
+			fx.Annotate("/election/test", fx.ResultTags(config.NameTag("etcd.election-path"))),
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
