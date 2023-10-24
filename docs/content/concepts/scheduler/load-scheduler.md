@@ -107,6 +107,6 @@ _Range-Driven Load Scheduler_ is a high-level [circuit](../advanced/circuit.md)
 component that uses the _Load Scheduler_ internally.
 
 This component has `signal` and `overload_confirmation` ports. It uses the
-[polynomial range function](../../reference/configuration/spec#polynomial-range-function)
+[polynomial range function](../../reference/configuration/spec.md#polynomial-range-function)
 to throttle the token rate based on the range of the `signal`, attempting to
 keep it between `low_throttle_threshold` and `high_throttle_threshold`.
