@@ -80,7 +80,8 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 			Selector: &v1.LabelSelector{
 				MatchLabels: controllers.SelectorLabels(instance.GetName(), controllers.AgentServiceName),
 			},
-			Strategy: spec.DeploymentConfigSpec.Strategy,
+			Strategy:        spec.DeploymentConfigSpec.Strategy,
+			MinReadySeconds: spec.MinReadySeconds,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: v1.ObjectMeta{
 					Labels:      podLabels,

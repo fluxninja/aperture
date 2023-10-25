@@ -173,6 +173,10 @@ type CommonSpec struct {
 	//+kubebuilder:validation:Optional
 	CustomReadinessProbe *corev1.Probe `json:"customReadinessProbe,omitempty"`
 
+	// MinReadySeconds to be applied to the deployment and daemonset.
+	//+kubebuilder:validation:Optional
+	MinReadySeconds int32 `json:"minReadySeconds,omitempty" default:"30" validate:"gte=0"`
+
 	// Resource requests and limits
 	//+kubebuilder:validation:Optional
 	Resources corev1.ResourceRequirements `json:"resources"`
