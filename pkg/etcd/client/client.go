@@ -3,7 +3,6 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -186,37 +185,44 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		cache:            make(map[string]string),
 	}
 	etcdClient.bootstrapPending.Store(true)
-	// Set finalizer to automatically close channel
-	runtime.SetFinalizer(&etcdClient, func(etcdClient *Client) {
-		// drain the ew.opChannel.Out
-		for {
-			select {
-			case <-etcdClient.opChannel.Out():
-			default:
-				etcdClient.opChannel.Close()
-				return
-			}
-		}
-	})
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			// A goroutine keeps trying etcd connection in the background
-			panichandler.Go(etcdClient.mainLoopFn(clientConfig, in.Shutdowner, ctx, cancel, config.Namespace, (int)(config.LeaseTTL.AsDuration().Seconds()), in.ElectionPath))
+			panichandler.Go(etcdClient.mainLoopFn(clientConfig, in.Shutdowner, ctx, cancel, config.Namespace, (int)(config.LeaseTTL.AsDuration().Seconds()), in.ElectionPath, wg))
 
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
 			log.Info().Msg("Closing etcd connections")
 			cancel()
+			wg.Wait()
+			etcdClient.closeOpChannel()
+
 			return etcdClient.client.Close()
 		},
 	})
 	return &etcdClient, nil
 }
 
-func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx.Shutdowner, ctx context.Context, cancel context.CancelFunc, namespace string, ttl int, electionPath string) func() {
+func (etcdClient *Client) closeOpChannel() {
+	// drain the opChannel.Out
+	for {
+		select {
+		case <-etcdClient.opChannel.Out():
+		default:
+			etcdClient.opChannel.Close()
+			return
+		}
+	}
+}
+
+func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx.Shutdowner, ctx context.Context, cancel context.CancelFunc, namespace string, ttl int, electionPath string, wg *sync.WaitGroup) func() {
 	return func() {
+		defer wg.Done()
 		for {
 			log.Info().Msg("Initializing etcd client")
 			cli, err := clientv3.New(clientConfig)
@@ -283,6 +289,7 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 				// regular shutdown
 				campaignCancel()
 				writeLoopCancel()
+				writeLoopWaitGroup.Wait()
 				break SESSION_LOOP
 			case <-session.Done():
 				etcdClient.bootstrapPending.Store(true)

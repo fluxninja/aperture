@@ -23,6 +23,7 @@ type LoadMultiplierTokenBucket struct {
 	lm                 float64 // load multiplier >=0
 	lock               sync.Mutex
 	continuousTracking bool
+	validTillTimestamp time.Time
 }
 
 // NewLoadMultiplierTokenBucket creates a new TokenBucketLoadMultiplier.
@@ -40,6 +41,7 @@ func NewLoadMultiplierTokenBucket(
 		counter:            NewWindowedCounter(clk, slotCount, slotDuration),
 		lm:                 0,
 		continuousTracking: false,
+		validTillTimestamp: time.Time{},
 	}
 	tbls.tbb.setPassThrough(true)
 
@@ -63,6 +65,13 @@ func (tbls *LoadMultiplierTokenBucket) SetLoadDecisionValues(loadDecision *polic
 
 	lm := loadDecision.GetLoadMultiplier()
 	if lm >= 0 {
+		// set valid till timestamp if it is set else set it to 0
+		loadDecisionValidTillTimestamp := loadDecision.GetValidTillTimestamp()
+		if loadDecisionValidTillTimestamp != nil {
+			tbls.validTillTimestamp = loadDecisionValidTillTimestamp.AsTime()
+		} else {
+			tbls.validTillTimestamp = time.Time{}
+		}
 		tbls.lm = lm
 		tbls.setLMGauge(float64(tbls.lm))
 		if !tbls.counter.IsBootstrapping() {
@@ -125,7 +134,7 @@ func (tbls *LoadMultiplierTokenBucket) PreprocessRequest(_ context.Context, requ
 		return true
 	}
 
-	return tbls.tbb.getPassThrough()
+	return tbls.getPassThrough()
 }
 
 // TakeIfAvailable takes tokens from the token bucket if available, otherwise return false.
@@ -161,6 +170,14 @@ func (tbls *LoadMultiplierTokenBucket) setLMGauge(v float64) {
 func (tbls *LoadMultiplierTokenBucket) GetPassThrough() bool {
 	tbls.lock.Lock()
 	defer tbls.lock.Unlock()
+	return tbls.getPassThrough()
+}
+
+// getPassThrough gets value of passThrough flag. Unsafe, must be called with lock held.
+func (tbls *LoadMultiplierTokenBucket) getPassThrough() bool {
+	if !tbls.validTillTimestamp.IsZero() && tbls.validTillTimestamp.Before(time.Now()) {
+		return true
+	}
 	return tbls.tbb.getPassThrough()
 }
 

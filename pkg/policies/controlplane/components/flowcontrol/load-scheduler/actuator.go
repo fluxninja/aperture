@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"math"
 	"path"
+	"time"
 
 	prometheusmodel "github.com/prometheus/common/model"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
@@ -214,12 +216,15 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 	}
 	la.doActuate = false
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+	// validTillTimestamp = time.Now() + tickInfo.Interval() * la.ticksPerExecution
+	validTillTimestamp := tickInfo.Timestamp().Add(tickInfo.Interval() * time.Duration(la.ticksPerExecution*5))
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
 		LoadMultiplier:        loadMultiplier,
 		PassThrough:           passThrough,
 		TickInfo:              tickInfo.Serialize(),
 		TokensByWorkloadIndex: tokensByWorkload,
+		ValidTillTimestamp:    timestamppb.New(validTillTimestamp),
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")

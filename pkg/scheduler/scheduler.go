@@ -29,8 +29,4 @@ type TokenManager interface {
 	Return(ctx context.Context, tokens float64)
 	// Provides TokenManager the request that the scheduler processing -- some TokenManager implementations use this level of visibility for their algorithms. Return value decides whether the request has to be accepted right away in case TokenManger is not yet ready or configured to accept all traffic (short circuit).
 	PreprocessRequest(ctx context.Context, request *Request) (accept bool)
-	// SetPassThrough sets the pass through flag for the token manager.
-	SetPassThrough(passThrough bool)
-	// GetPassThrough returns the pass through flag for the token manager.
-	GetPassThrough() bool
 }

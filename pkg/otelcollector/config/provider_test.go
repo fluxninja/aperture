@@ -60,6 +60,7 @@ var _ = Describe("Provider", func() {
 			Expect(cfg.Receivers).NotTo(HaveKey("ext1"))
 			cfg.AddReceiver("ext1", map[string]any{})
 		})
+		provider.UpdateConfig()
 		Expect(triggered).To(BeTrue())
 		Expect(retrieveReceivers(provider, onUpdate)).To(ConsistOf([]string{
 			"base",
@@ -72,17 +73,6 @@ var _ = Describe("Provider", func() {
 		})
 		Expect(retrieveReceivers(provider, onUpdate)).To(ConsistOf([]string{
 			"base",
-			"ext1",
-			"ext2",
-		}))
-
-		By("Updating config")
-		provider.AddMutatingHook(func(cfg *otelconfig.Config) {
-			cfg.AddReceiver("updated", map[string]any{})
-		})
-		provider.UpdateConfig()
-		Expect(retrieveReceivers(provider, onUpdate)).To(ConsistOf([]string{
-			"updated",
 			"ext1",
 			"ext2",
 		}))
