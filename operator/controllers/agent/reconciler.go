@@ -47,6 +47,7 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/api"
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	"github.com/go-logr/logr"
 )
 
@@ -519,9 +520,9 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
-	} else {
-		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesSidecar
+	} else if strings.ToLower(instance.Spec.DeploymentConfigSpec.Type) != "deployment" {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesDaemonSet
 	}
 
 	if !instance.Spec.ConfigSpec.FluxNinja.EnableCloudController {
@@ -542,6 +543,11 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 
 	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
 		return updateStatus(instance, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
+	}
+
+	if instance.Spec.ConfigSpec.FluxNinja.InstallationMode != utils.InstallationModeCloudAgent && instance.Spec.ConfigSpec.AgentInfo.AgentGroup == utils.ApertureCloudAgentGroup {
+		return updateStatus(instance, "ValidationFailed",
+			fmt.Sprintf("'%s' is a reserved group name for FluxNinja Cloud Agents. Please use a different agent group name", utils.ApertureCloudAgentGroup))
 	}
 
 	if instance.Status.Resources == controllers.FailedStatus {

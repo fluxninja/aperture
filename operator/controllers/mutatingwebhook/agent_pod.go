@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -142,6 +143,10 @@ func agentPod(instance *v1alpha1.Agent, pod *corev1.Pod) error {
 	agentGroup := ""
 	if pod.Annotations != nil {
 		agentGroup = pod.Annotations[controllers.AgentGroupKey]
+	}
+
+	if agentGroup == utils.ApertureCloudAgentGroup {
+		return fmt.Errorf("'%s' is a reserved group name for FluxNinja Cloud Agents. Please use a different agent group name", utils.ApertureCloudAgentGroup)
 	}
 
 	container := corev1.Container{}

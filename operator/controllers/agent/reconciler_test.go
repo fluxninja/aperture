@@ -26,6 +26,7 @@ import (
 	"time"
 
 	. "github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -245,7 +246,7 @@ var _ = Describe("Agent Reconcile", Ordered, func() {
 			Expect(instance.Finalizers).To(Equal([]string{FinalizerName}))
 			Expect(instance.Spec.Secrets.FluxNinjaExtension.Create).To(BeFalse())
 			Expect(instance.Spec.Secrets.FluxNinjaExtension.Value).To(Equal(""))
-			Expect(instance.Spec.ConfigSpec.FluxNinja.InstallationMode).To(Equal("KUBERNETES_DAEMONSET"))
+			Expect(instance.Spec.ConfigSpec.FluxNinja.InstallationMode).To(Equal(utils.InstallationModeKubernetesDaemonSet))
 
 			Expect(K8sClient.Delete(Ctx, ns)).To(Succeed())
 			Expect(K8sClient.Delete(Ctx, ns1)).To(Succeed())

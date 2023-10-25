@@ -102,6 +102,7 @@ var _ = Describe("Agent Deployment", func() {
 				Spec: agentv1alpha1.AgentSpec{
 					DeploymentConfigSpec: agentv1alpha1.DeploymentConfigSpec{
 						Replicas: 1,
+						Type:     "Deployment",
 					},
 					ConfigSpec: agentv1alpha1.AgentConfigSpec{
 						CommonConfigSpec: common.CommonConfigSpec{
@@ -208,10 +209,6 @@ var _ = Describe("Agent Deployment", func() {
 													FieldPath:  "spec.nodeName",
 												},
 											},
-										},
-										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
-											Value: "true",
 										},
 									},
 									EnvFrom:   []corev1.EnvFromSource{},
@@ -503,10 +500,6 @@ var _ = Describe("Agent Deployment", func() {
 													FieldPath:  "spec.nodeName",
 												},
 											},
-										},
-										{
-											Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
-											Value: "true",
 										},
 									},
 									EnvFrom: []corev1.EnvFromSource{

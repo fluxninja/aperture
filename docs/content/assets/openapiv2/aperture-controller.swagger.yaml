@@ -3736,7 +3736,7 @@ definitions:
             ```
         properties:
             agent_group:
-                default: default
+                default: aperture-cloud
                 description: |+
                     [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
@@ -3750,7 +3750,7 @@ definitions:
                     :::
 
                 type: string
-                x-go-tag-default: default
+                x-go-tag-default: aperture-cloud
             control_point:
                 description: |+
                     [Control Point](/concepts/control-point.md)

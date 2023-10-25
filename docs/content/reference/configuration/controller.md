@@ -1040,7 +1040,8 @@ Interval between each heartbeat.
 
 <!-- vale off -->
 
-(string, one of: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`,
+(string, one of:
+`KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL | CLOUD_AGENT`,
 default: `"LINUX_BARE_METAL"`)
 
 <!-- vale on -->

@@ -1229,6 +1229,17 @@ workflows:
           environment-path: environments/latest/
           component: aperture-agent
           update: images
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: cloud-agent-update-environment
+          requires:
+            - image-build-aperture-agent
+          environment-path: environments/latest/
+          component: cloud-agent
+          update: images
 
       - build-push-add-tag:
           name: image-build-aperture-controller
