@@ -8,11 +8,12 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	tokenbucketv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/tokenbucket/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
-	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 const (
@@ -125,12 +126,12 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return false, 0, 0, 0
 	}
 
-	req := takeNRequest{
+	req := tokenbucketv1.TakeNRequest{
+		Deadline: timestamppb.New(deadline),
 		Want:     n,
 		CanWait:  canWait,
-		Deadline: deadline,
 	}
-	reqBytes, err := utils.MarshalGob(req)
+	reqBytes, err := req.MarshalVT()
 	if err != nil {
 		log.Autosample().Errorf("error encoding request: %v", err)
 		return true, 0, 0, 0
@@ -142,16 +143,17 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return true, 0, 0, 0
 	}
 
-	var resp takeNResponse
-	err = utils.UnmarshalGob(resultBytes, &resp)
+	var resp tokenbucketv1.TakeNResponse
+	err = resp.UnmarshalVT(resultBytes)
 	if err != nil {
 		log.Autosample().Errorf("error decoding response: %v", err)
 		return true, 0, 0, 0
 	}
 
 	var waitTime time.Duration
-	if !resp.AvailableAt.IsZero() {
-		waitTime = time.Until(resp.AvailableAt)
+	availableAt := resp.GetAvailableAt().AsTime()
+	if !availableAt.IsZero() {
+		waitTime = time.Until(availableAt)
 		if waitTime < 0 {
 			waitTime = 0
 		}
@@ -185,32 +187,12 @@ func (gtb *GlobalTokenBucket) Return(ctx context.Context, label string, n float6
 	return remaining, current
 }
 
-// Per-label tracking in distributed cache.
-type tokenBucketState struct {
-	StartFillAt time.Time // To prevent more tokens than fillRate in a time window while using burst capacity
-	LastFill    time.Time
-	Available   float64
-}
-
-type takeNRequest struct {
-	Deadline time.Time
-	Want     float64
-	CanWait  bool
-}
-
-type takeNResponse struct {
-	AvailableAt time.Time
-	Current     float64
-	Remaining   float64
-	Ok          bool
-}
-
 // takeN takes a number of tokens from the bucket.
 func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]byte, []byte, error) {
 	gtb.mu.RLock()
 	defer gtb.mu.RUnlock()
 
-	// Decode currentState from gob encoded currentStateBytes
+	// Decode currentState from proto encoded currentStateBytes
 	now := time.Now()
 
 	state, err := gtb.fastForwardState(now, stateBytes, key)
@@ -218,28 +200,29 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		return nil, nil, err
 	}
 
-	// Decode arg from gob encoded argBytes
-	var arg takeNRequest
+	// Decode arg from proto encoded argBytes
+	var arg tokenbucketv1.TakeNRequest
 	if argBytes != nil {
-		err = utils.UnmarshalGob(argBytes, &arg)
+		err = arg.UnmarshalVT(argBytes)
 		if err != nil {
 			log.Autosample().Errorf("error decoding arg: %v", err)
 			return nil, nil, err
 		}
 	}
 
-	result := takeNResponse{
+	result := tokenbucketv1.TakeNResponse{
 		Ok:          true,
-		AvailableAt: now,
+		AvailableAt: timestamppb.New(now),
 	}
 
 	// if we are first time drawing from the bucket, set the start fill time
 	if gtb.delayInitialFill && state.Available == gtb.bucketCapacity {
-		state.StartFillAt = now.Add(gtb.timeToFill(gtb.bucketCapacity))
+		state.StartFillAt = timestamppb.New(now.Add(gtb.timeToFill(gtb.bucketCapacity)))
 		if gtb.continuousFill {
-			state.LastFill = state.StartFillAt
+			state.LastFillAt = state.StartFillAt
 		} else {
-			state.LastFill = state.StartFillAt.Add(-gtb.interval)
+			startFilleAtTime := state.StartFillAt.AsTime()
+			state.LastFillAt = timestamppb.New(startFilleAtTime.Add(-gtb.interval))
 		}
 	}
 
@@ -249,8 +232,9 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 		if state.Available < 0 {
 			result.Ok = arg.CanWait && gtb.fillAmount != 0
 			if gtb.fillAmount != 0 {
-				result.AvailableAt = gtb.getAvailableAt(now, state)
-				if arg.CanWait && !arg.Deadline.IsZero() && result.AvailableAt.After(arg.Deadline) {
+				result.AvailableAt = timestamppb.New(gtb.getAvailableAt(now, state))
+				deadlineTime := arg.Deadline.AsTime()
+				if arg.CanWait && !deadlineTime.IsZero() && result.AvailableAt.AsTime().After(arg.Deadline.AsTime()) {
 					result.Ok = false
 				}
 			}
@@ -268,15 +252,15 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	result.Remaining = state.Available
 	result.Current = gtb.bucketCapacity - state.Available
 
-	// Encode result to gob encoded resultBytes
-	resultBytes, err := utils.MarshalGob(result)
+	// Encode result to proto encoded resultBytes
+	resultBytes, err := result.MarshalVT()
 	if err != nil {
 		log.Autosample().Errorf("error encoding result: %v", err)
 		return nil, nil, err
 	}
 
-	// Encode currentState to gob encoded newStateBytes
-	newStateBytes, err := utils.MarshalGob(state)
+	// Encode currentState to proto encoded newStateBytes
+	newStateBytes, err := state.MarshalVT()
 	if err != nil {
 		log.Autosample().Errorf("error encoding new state: %v", err)
 		return nil, nil, err
@@ -285,34 +269,37 @@ func (gtb *GlobalTokenBucket) takeN(key string, stateBytes, argBytes []byte) ([]
 	return newStateBytes, resultBytes, nil
 }
 
-func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte, key string) (*tokenBucketState, error) {
-	var state tokenBucketState
+func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte, key string) (*tokenbucketv1.State, error) {
+	var state tokenbucketv1.State
 
 	if stateBytes != nil {
-		err := utils.UnmarshalGob(stateBytes, &state)
+		err := state.UnmarshalVT(stateBytes)
 		if err != nil {
 			log.Autosample().Errorf("error decoding current state: %v", err)
 			return nil, err
 		}
 	} else {
 		log.Info().Msgf("Creating new token bucket state for key %s in dmap %s", key, gtb.dMap.Name())
-		state.LastFill = now
+		state.LastFillAt = timestamppb.New(now)
 		state.Available = gtb.bucketCapacity
 	}
 
+	startFillAtTime := state.StartFillAt.AsTime()
+	lastFillAtTime := state.LastFillAt.AsTime()
+
 	// do not fill the bucket until the start fill time
-	if state.StartFillAt.IsZero() || now.After(state.StartFillAt) {
+	if startFillAtTime.IsZero() || now.After(startFillAtTime) {
 		// Calculate the time passed since the last fill
-		sinceLastFill := now.Sub(state.LastFill)
+		sinceLastFill := now.Sub(lastFillAtTime)
 		fillAmount := 0.0
 		if gtb.continuousFill {
 			fillAmount = gtb.fillAmount * float64(sinceLastFill) / float64(gtb.interval)
-			state.LastFill = now
+			state.LastFillAt = timestamppb.New(now)
 		} else if sinceLastFill >= gtb.interval {
 			fills := int(sinceLastFill / gtb.interval)
 			if fills > 0 {
 				fillAmount = gtb.fillAmount * float64(fills)
-				state.LastFill = state.LastFill.Add(time.Duration(fills) * gtb.interval)
+				state.LastFillAt = timestamppb.New(lastFillAtTime.Add(time.Duration(fills) * gtb.interval))
 			}
 		}
 		// Fill the calculated amount
@@ -340,18 +327,20 @@ func (gtb *GlobalTokenBucket) timeToFill(tokens float64) time.Duration {
 }
 
 // getAvailableAt calculates the time at which the given number of tokens will be available.
-func (gtb *GlobalTokenBucket) getAvailableAt(now time.Time, state *tokenBucketState) time.Time {
+func (gtb *GlobalTokenBucket) getAvailableAt(now time.Time, state *tokenbucketv1.State) time.Time {
 	if state.Available >= 0 {
 		return now
 	}
 	timeToFill := gtb.timeToFill(-state.Available)
-	if now.Before(state.StartFillAt) {
-		return state.StartFillAt.Add(timeToFill)
+	startFillAtTime := state.StartFillAt.AsTime()
+	if now.Before(startFillAtTime) {
+		return startFillAtTime.Add(timeToFill)
 	} else {
 		// this code assumes that other parts of the code are correct, such as
 		// LastFill is not in the future if now is after StartFillAt
 		// And timeSinceLastFill is not greater than interval
-		timeSinceLastFill := now.Sub(state.LastFill)
+		lastFillAtTime := state.LastFillAt.AsTime()
+		timeSinceLastFill := now.Sub(lastFillAtTime)
 		if timeSinceLastFill > gtb.interval {
 			log.Autosample().Errorf("time since last fill is greater than interval: %v", timeSinceLastFill)
 			timeSinceLastFill = time.Duration(0)

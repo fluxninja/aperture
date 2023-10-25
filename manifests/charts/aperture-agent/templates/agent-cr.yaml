@@ -68,6 +68,7 @@ spec:
   {{- if .Values.agent.customReadinessProbe }}
   customReadinessProbe: {{ .Values.agent.customReadinessProbe | toYaml | nindent 4 }}
   {{- end }}
+  minReadySeconds: {{ .Values.agent.minReadySeconds }}
   {{- if or .Values.agent.resources.limits .Values.agent.resources.requests }}
   resources: {{ .Values.agent.resources | toYaml | nindent 4 }}
   {{- end }}

@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
@@ -33,8 +35,6 @@ import (
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
 	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 )
 
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.

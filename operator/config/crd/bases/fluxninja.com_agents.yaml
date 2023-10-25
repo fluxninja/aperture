@@ -5771,6 +5771,10 @@ spec:
                 required:
                 - enabled
                 type: object
+              minReadySeconds:
+                description: MinReadySeconds to be applied to the deployment and daemonset.
+                format: int32
+                type: integer
               name_override:
                 description: NameOverride overrides the name of the resources created
                   for agent. This is an experimental feature.

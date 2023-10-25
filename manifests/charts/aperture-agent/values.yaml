@@ -437,6 +437,8 @@ agent:
   ## @param agent.customReadinessProbe Custom readinessProbe that overrides the default one
   ##
   customReadinessProbe: {}
+  ## @param agent.minReadySeconds Minimum number of seconds for which a newly created Agent pod should be ready without any of its container crashing, for it to be considered available. Defaults to 30 seconds.
+  minReadySeconds: 30
   ## Agent container resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ## @param agent.resources.limits The resources limits for the Agent containers

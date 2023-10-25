@@ -11,12 +11,12 @@ function(componentsList, policyName, datasource, extraFilters={}) {
 
   local signalNameVar = queryVariable('signal_name',
                                       'label_values(signal_reading{policy_name="%(policy_name)s"}, signal_name)' % { policy_name: policyName },
-                                      '${datasource}',
+                                      '%(datasource)s' % { datasource: datasource },
                                       'Signal Name').variable,
 
   local subCircuitIDVar = queryVariable('sub_circuit_id',
                                         'label_values(signal_reading{policy_name="%(policy_name)s",signal_name="${signal_name}"}, sub_circuit_id)' % { policy_name: policyName },
-                                        '${datasource}',
+                                        '%(datasource)s' % { datasource: datasource },
                                         'Sub Circuit ID').variable,
 
   local final = dashboard.baseDashboard
