@@ -26,5 +26,5 @@ message LoadDecision {
   double load_multiplier = 2;
   bool pass_through = 3;
   map<string, double> tokens_by_workload_index = 4;
-  google.protobuf.Timestamp valid_till_timestamp = 5;
+  google.protobuf.Timestamp valid_until = 5;
 }

@@ -158,8 +158,8 @@ func (m *LoadDecision) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.ValidTillTimestamp != nil {
-		if vtmsg, ok := interface{}(m.ValidTillTimestamp).(interface {
+	if m.ValidUntil != nil {
+		if vtmsg, ok := interface{}(m.ValidUntil).(interface {
 			MarshalToSizedBufferVT([]byte) (int, error)
 		}); ok {
 			size, err := vtmsg.MarshalToSizedBufferVT(dAtA[:i])
@@ -169,7 +169,7 @@ func (m *LoadDecision) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			i -= size
 			i = encodeVarint(dAtA, i, uint64(size))
 		} else {
-			encoded, err := proto.Marshal(m.ValidTillTimestamp)
+			encoded, err := proto.Marshal(m.ValidUntil)
 			if err != nil {
 				return 0, err
 			}
@@ -287,13 +287,13 @@ func (m *LoadDecision) SizeVT() (n int) {
 			n += mapEntrySize + 1 + sov(uint64(mapEntrySize))
 		}
 	}
-	if m.ValidTillTimestamp != nil {
-		if size, ok := interface{}(m.ValidTillTimestamp).(interface {
+	if m.ValidUntil != nil {
+		if size, ok := interface{}(m.ValidUntil).(interface {
 			SizeVT() int
 		}); ok {
 			l = size.SizeVT()
 		} else {
-			l = proto.Size(m.ValidTillTimestamp)
+			l = proto.Size(m.ValidUntil)
 		}
 		n += 1 + l + sov(uint64(l))
 	}
@@ -751,7 +751,7 @@ func (m *LoadDecision) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ValidTillTimestamp", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidUntil", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -778,17 +778,17 @@ func (m *LoadDecision) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ValidTillTimestamp == nil {
-				m.ValidTillTimestamp = &timestamppb.Timestamp{}
+			if m.ValidUntil == nil {
+				m.ValidUntil = &timestamppb.Timestamp{}
 			}
-			if unmarshal, ok := interface{}(m.ValidTillTimestamp).(interface {
+			if unmarshal, ok := interface{}(m.ValidUntil).(interface {
 				UnmarshalVT([]byte) error
 			}); ok {
 				if err := unmarshal.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.ValidTillTimestamp); err != nil {
+				if err := proto.Unmarshal(dAtA[iNdEx:postIndex], m.ValidUntil); err != nil {
 					return err
 				}
 			}

@@ -216,15 +216,15 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 	}
 	la.doActuate = false
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
-	// validTillTimestamp = time.Now() + tickInfo.Interval() * la.ticksPerExecution
-	validTillTimestamp := tickInfo.Timestamp().Add(tickInfo.Interval() * time.Duration(la.ticksPerExecution*5))
+	// validUntil = time.Now() + tickInfo.Interval() * la.ticksPerExecution
+	validUntil := tickInfo.Timestamp().Add(tickInfo.Interval() * time.Duration(la.ticksPerExecution*5))
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
 		LoadMultiplier:        loadMultiplier,
 		PassThrough:           passThrough,
 		TickInfo:              tickInfo.Serialize(),
 		TokensByWorkloadIndex: tokensByWorkload,
-		ValidTillTimestamp:    timestamppb.New(validTillTimestamp),
+		ValidUntil:            timestamppb.New(validUntil),
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
