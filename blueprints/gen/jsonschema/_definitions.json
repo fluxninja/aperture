@@ -3452,10 +3452,10 @@
       "description": "Selects flows based on control point, flow labels, agent group and the service\nthat the flow control component\nwill operate on.\n\n:::info\n\nSee also [Selector overview](/concepts/selector.md).\n\n:::\n\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
         "agent_group": {
-          "default": "default",
+          "default": "aperture-cloud",
           "description": "[_Agent Group_](/concepts/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThe agents within an agent group receive exact same policy configuration and\nform a peer to peer cluster to constantly share state.\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-default": "default"
+          "x-go-tag-default": "aperture-cloud"
         },
         "control_point": {
           "description": "[Control Point](/concepts/control-point.md)\nidentifies location within services where policies can act on flows.\nFor an SDK based insertion,\na _Control Point_ can represent a particular feature or execution\nblock within a service. In case of service mesh or middleware insertion, a\n_Control Point_ can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",

@@ -237,10 +237,12 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 				},
 			},
 		})
-		envs = append(envs, corev1.EnvVar{
-			Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
-			Value: "true",
-		})
+		if spec.DeploymentConfigSpec.Type != "Deployment" {
+			envs = append(envs, corev1.EnvVar{
+				Name:  "APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED",
+				Value: "true",
+			})
+		}
 	}
 
 	if instance.Spec.Secrets.FluxNinjaExtension.Create || instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef.Name != "" {
