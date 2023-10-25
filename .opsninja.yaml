@@ -49,6 +49,16 @@ applications:
     argo_manifests:
       - app_path: apps/app-of-apps/aperture-system/agent.yaml
         image_prefix: NINJA_AGENT_CONTROLLER_
+  cloud-agent:
+    image:
+      name: aperture-agent
+      docker_context: cmd/aperture-agent
+      dockerfile: cmd/aperture-agent/Dockerfile
+    argo_manifests:
+      - app_path: apps/app-of-apps/cloud/organization-operator.yaml
+        image_prefix: NINJA_APERTURE_AGENT_
+      - app_path: apps/app-of-apps/cloud/temporal-worker.yaml
+        image_prefix: NINJA_APERTURE_AGENT_
   cloud-controller:
     image:
       name: aperture-controller
