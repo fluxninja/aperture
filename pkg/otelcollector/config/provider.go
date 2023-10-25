@@ -39,13 +39,20 @@ func (p *Provider) Retrieve(
 
 	p.watchFunc = watchFn
 
-	config := p.GetConfig()
+	config := p.getConfig()
 
 	return confmap.NewRetrieved(config.AsMap())
 }
 
 // GetConfig returns the current config.
 func (p *Provider) GetConfig() *Config {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	return p.getConfig()
+}
+
+func (p *Provider) getConfig() *Config {
 	config := New()
 	for _, hook := range p.hooks {
 		hook(config)
@@ -65,15 +72,15 @@ func (p *Provider) Shutdown(ctx context.Context) error {
 // Scheme implements confmap.Provider.
 func (p *Provider) Scheme() string { return p.scheme }
 
-// UpdateConfig sets the new config, replacing the old one.
-// Before new config is set, hooks are allowed to modify the config.
-// Collector update is triggered asynchronously.
-//
-// Note: Caller should not use the passed config object after calling this function.
+// UpdateConfig triggers Collector update asynchronously.
 func (p *Provider) UpdateConfig() {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 
+	p.notifyWatchFunc()
+}
+
+func (p *Provider) notifyWatchFunc() {
 	// Set post-hooks config and trigger update, assuming p.lock locked.
 	if p.watchFunc != nil {
 		p.watchFunc(&confmap.ChangeEvent{})
@@ -93,4 +100,6 @@ func (p *Provider) AddMutatingHook(hook func(*Config)) {
 	defer p.lock.Unlock()
 
 	p.hooks = append(p.hooks, hook)
+
+	p.notifyWatchFunc()
 }
