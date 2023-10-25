@@ -75,7 +75,8 @@ spec:
             load_multiplier_linear_increment: 0.025
             load_scheduler:
               selectors:
-              - control_point: ingress
+              - agent_group: default
+                control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
               workload_latency_based_tokens: true
             max_load_multiplier: 2
