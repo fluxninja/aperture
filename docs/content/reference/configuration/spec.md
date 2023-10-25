@@ -8615,7 +8615,7 @@ label_matcher:
 
 <!-- vale off -->
 
-(string, default: `"default"`)
+(string, default: `"aperture-cloud"`)
 
 <!-- vale on -->
 

@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/admission/v1"
@@ -60,7 +61,7 @@ var _ = Describe("Agent Hook Tests", Ordered, func() {
 			for _, patch := range res.Patches {
 				if patch.Operation == "add" && patch.Path == "/spec/config/fluxninja" {
 					changes := patch.Value.(map[string]interface{})
-					patchFound = changes["installation_mode"] == "KUBERNETES_DAEMONSET"
+					patchFound = changes["installation_mode"] == utils.InstallationModeKubernetesDaemonSet
 				}
 			}
 			Expect(patchFound).To(Equal(true))

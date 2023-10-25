@@ -25,7 +25,7 @@ local apertureAgentMixin =
         createUninstallHook: false,
         config+: {
           agent_info+: {
-            agent_group: if cloudController then agentGroup else 'default',
+            agent_group: 'aperture-cloud',
           },
           fluxninja+: {
             enable_cloud_controller: cloudController,

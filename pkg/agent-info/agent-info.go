@@ -1,11 +1,21 @@
 // +kubebuilder:validation:Optional
 package agentinfo
 
-import "github.com/fluxninja/aperture/v2/pkg/config"
+import (
+	"fmt"
+
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
+)
 
 const (
 	configKey = "agent_info"
 )
+
+// InstallationModeConfig can be provided by an extension to provide mode of installation.
+type InstallationModeConfig struct {
+	InstallationMode string
+}
 
 // swagger:operation POST /agent_info common-configuration AgentInfo
 // ---
@@ -31,11 +41,16 @@ type AgentInfo struct {
 }
 
 // ProvideAgentInfo provides the agent info via Fx.
-func ProvideAgentInfo(unmarshaller config.Unmarshaller) (*AgentInfo, error) {
+func ProvideAgentInfo(unmarshaller config.Unmarshaller, configOverride *InstallationModeConfig) (*AgentInfo, error) {
 	var config AgentInfoConfig
 	if err := unmarshaller.UnmarshalKey(configKey, &config); err != nil {
 		return nil, err
 	}
+
+	if configOverride != nil && configOverride.InstallationMode != utils.InstallationModeCloudAgent && config.AgentGroup == utils.ApertureCloudAgentGroup {
+		return nil, fmt.Errorf("'%s' is a reserved group name for FluxNinja Cloud Agents. Please use a different agent group name", utils.ApertureCloudAgentGroup)
+	}
+
 	return NewAgentInfo(config.AgentGroup), nil
 }
 

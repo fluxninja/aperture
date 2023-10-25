@@ -18,13 +18,16 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 
 	"github.com/clarketm/json"
 	"github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -61,6 +64,11 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 		return admission.Denied("The value for 'spec.secrets.fluxNinjaExtension.value' can not be empty when 'spec.secrets.fluxNinjaExtension.create' is set to true")
 	}
 
+	if newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode != utils.InstallationModeCloudAgent && newAgent.Spec.ConfigSpec.AgentInfo.AgentGroup == utils.ApertureCloudAgentGroup {
+		return admission.Denied(
+			fmt.Sprintf("'%s' is a reserved group name for FluxNinja Cloud Agents. Please use a different agent group name", utils.ApertureCloudAgentGroup))
+	}
+
 	if newAgent.ObjectMeta.Annotations == nil {
 		newAgent.ObjectMeta.Annotations = map[string]string{}
 	}
@@ -79,9 +87,9 @@ func (agentHooks *AgentHooks) Handle(ctx context.Context, req admission.Request)
 	}
 
 	if newAgent.Spec.Sidecar.Enabled {
-		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
-	} else {
-		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesSidecar
+	} else if strings.ToLower(newAgent.Spec.DeploymentConfigSpec.Type) != "deployment" {
+		newAgent.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesDaemonSet
 	}
 
 	updatedAgent, err := json.Marshal(newAgent)
