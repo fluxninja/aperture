@@ -9,7 +9,6 @@ import (
 	"path"
 	"sync"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
@@ -65,14 +64,13 @@ type PeerDiscoveryPrefix string
 // PeerDiscoveryIn holds parameters for newPeerDiscovery.
 type PeerDiscoveryIn struct {
 	fx.In
-	Lifecycle       fx.Lifecycle
-	Unmarshaller    config.Unmarshaller
-	Client          *etcdclient.Client
-	SessionScopedKV *etcdclient.SessionScopedKV
-	Listener        *listener.Listener
-	StatusRegistry  status.Registry
-	Prefix          PeerDiscoveryPrefix
-	Watchers        PeerWatchers `group:"peer-watchers"`
+	Lifecycle      fx.Lifecycle
+	Unmarshaller   config.Unmarshaller
+	Client         *etcdclient.Client
+	Listener       *listener.Listener
+	StatusRegistry status.Registry
+	Prefix         PeerDiscoveryPrefix
+	Watchers       PeerWatchers `group:"peer-watchers"`
 }
 
 func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDiscovery, error) {
@@ -88,7 +86,7 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 		return nil, err
 	}
 
-	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.SessionScopedKV, in.Watchers)
+	pd, err := NewPeerDiscovery(string(in.Prefix), in.Client, in.Watchers)
 	if err != nil {
 		return nil, err
 	}
@@ -140,23 +138,21 @@ func (constructor Constructor) providePeerDiscovery(in PeerDiscoveryIn) (*PeerDi
 
 // PeerDiscovery holds fields to manage peer discovery.
 type PeerDiscovery struct {
-	etcdWatcher     notifiers.Watcher
-	peerNotifier    notifiers.PrefixNotifier
-	peers           *peersv1.Peers
-	client          *etcdclient.Client
-	sessionScopedKV *etcdclient.SessionScopedKV
-	selfKey         string
-	etcdPath        string
-	watchers        PeerWatchers
-	peersLock       sync.RWMutex
-	servicesLock    sync.RWMutex
+	etcdWatcher  notifiers.Watcher
+	peerNotifier notifiers.PrefixNotifier
+	peers        *peersv1.Peers
+	etcdClient   *etcdclient.Client
+	selfKey      string
+	etcdPath     string
+	watchers     PeerWatchers
+	peersLock    sync.RWMutex
+	servicesLock sync.RWMutex
 }
 
 // NewPeerDiscovery creates a new PeerDiscovery.
 func NewPeerDiscovery(
 	prefix string,
 	client *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	watchers PeerWatchers,
 ) (*PeerDiscovery, error) {
 	var err error
@@ -167,10 +163,9 @@ func NewPeerDiscovery(
 			},
 			Peers: make(map[string]*peersv1.Peer),
 		},
-		watchers:        watchers,
-		etcdPath:        path.Join(paths.PeersPrefix, prefix),
-		client:          client,
-		sessionScopedKV: sessionScopedKV,
+		watchers:   watchers,
+		etcdPath:   path.Join(paths.PeersPrefix, prefix),
+		etcdClient: client,
 	}
 
 	// create and start etcdwatcher to track peers and sync them to disk
@@ -211,15 +206,15 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 	}
 	// register
 	log.Info().Str("key", pd.selfKey).Msg("self registering in peer discovery table")
-	_, err = pd.sessionScopedKV.Put(clientv3.WithRequireLeader(ctx), pd.selfKey, string(bytes))
-	return err
+	pd.etcdClient.Put(pd.selfKey, string(bytes))
+	return nil
 }
 
 // deregisterSelf deregisters self from etcd.
 func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
 	log.Info().Str("key", pd.selfKey).Msg("self deregistering from peer discovery table")
-	_, err := pd.client.KV.Delete(clientv3.WithRequireLeader(ctx), pd.selfKey)
-	return err
+	pd.etcdClient.Delete(pd.selfKey)
+	return nil
 }
 
 // Start starts peer discovery.

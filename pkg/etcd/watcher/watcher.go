@@ -19,11 +19,11 @@ import (
 // watcher holds the state of the watcher.
 type watcher struct {
 	notifiers.Trackers
-	waitGroup  panichandler.WaitGroup
 	ctx        context.Context
 	etcdClient *etcdclient.Client
 	cancel     context.CancelFunc
 	etcdPath   string
+	waitGroup  panichandler.WaitGroup
 }
 
 // Make sure Watcher implements notifiers.Watcher interface.
@@ -89,7 +89,7 @@ func (w *watcher) doWatch() error {
 		ctx, cancel := context.WithTimeout(w.ctx, 5*time.Second)
 		defer cancel()
 		var err error
-		getResp, err = w.etcdClient.KV.Get(ctx, w.etcdPath, clientv3.WithPrefix())
+		getResp, err = w.etcdClient.Get(ctx, w.etcdPath, clientv3.WithPrefix())
 		if err != nil {
 			log.Error().Err(err).Str("etcdPath", w.etcdPath).Msg("Failed to list keys")
 			return err
@@ -122,8 +122,12 @@ func (w *watcher) doWatch() error {
 	// Note: Watching from "Get" revision + 1, because revision passed to
 	// WithRev is inclusive and we want to watch for all events occurring
 	// _after_ we retrieved the initial state.
-	wCh := w.etcdClient.Watcher.Watch(clientv3.WithRequireLeader(w.ctx),
+	wCh, err := w.etcdClient.Watch(clientv3.WithRequireLeader(w.ctx),
 		w.etcdPath, clientv3.WithRev(getResp.Header.Revision+1), clientv3.WithPrefix())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to start etcd watch")
+		return err
+	}
 
 	for resp := range wCh {
 		if err := resp.Err(); err != nil {

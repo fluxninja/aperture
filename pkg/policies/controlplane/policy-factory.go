@@ -54,7 +54,6 @@ type PolicyFactory struct {
 	policiesDynamicConfigEtcdWatcher notifiers.Watcher
 	circuitJobGroup                  *jobs.JobGroup
 	etcdClient                       *etcdclient.Client
-	sessionScopedKV                  *etcdclient.SessionScopedKV
 	prometheusEnforcer               *prom.PrometheusEnforcer
 	policyTracker                    map[string]*policysyncv1.PolicyWrapper // keyed by wrapper.CommonAttributes.PolicyName
 	lock                             sync.RWMutex
@@ -65,7 +64,6 @@ func providePolicyFactory(
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	enforcer *prom.PrometheusEnforcer,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
@@ -94,7 +92,6 @@ func providePolicyFactory(
 		registry:                         policiesStatusRegistry,
 		circuitJobGroup:                  circuitJobGroup,
 		etcdClient:                       etcdClient,
-		sessionScopedKV:                  sessionScopedKV,
 		prometheusEnforcer:               enforcer,
 		alerterIface:                     alerterIface,
 		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
@@ -171,7 +168,6 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
-			factory.sessionScopedKV,
 			factory.prometheusEnforcer,
 			factory.alerterIface,
 			&wrapperMessage,

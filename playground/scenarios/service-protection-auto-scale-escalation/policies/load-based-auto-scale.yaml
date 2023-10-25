@@ -18,7 +18,8 @@ policy:
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
   latency_baseliner:
     latency_tolerance_multiplier: 1.1

@@ -4,16 +4,13 @@ import (
 	"context"
 	"path"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -25,7 +22,7 @@ type samplerSync struct {
 	policyReadAPI          iface.Policy
 	SamplerProto           *policylangv1.Sampler
 	decision               *policysyncv1.SamplerDecision
-	decisionWriter         *etcdwriter.Writer
+	etcdClient             *etcdclient.Client
 	componentID            string
 	configEtcdPaths        []string
 	decisionEtcdPaths      []string
@@ -81,8 +78,9 @@ func NewSamplerAndOptions(
 	), nil
 }
 
-func (samplerSync *samplerSync) setupSync(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
+func (samplerSync *samplerSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
 	logger := samplerSync.policyReadAPI.GetStatusRegistry().GetLogger()
+	samplerSync.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &policysyncv1.SamplerWrapper{
@@ -98,34 +96,21 @@ func (samplerSync *samplerSync) setupSync(scopedKV *etcdclient.SessionScopedKV, 
 				logger.Error().Err(err).Msg("failed to marshal  sampler config")
 				return err
 			}
-			var merr error
 			for _, configEtcdPath := range samplerSync.configEtcdPaths {
-				_, err = scopedKV.Put(clientv3.WithRequireLeader(ctx), configEtcdPath, string(dat))
-				if err != nil {
-					logger.Error().Err(err).Msg("failed to put sampler config")
-					merr = multierr.Append(merr, err)
-				}
+				etcdClient.Put(configEtcdPath, string(dat))
 			}
-			samplerSync.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
-			return merr
+			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			samplerSync.decisionWriter.Close()
-			deleteEtcdPath := func(paths []string) error {
-				var merr error
+			deleteEtcdPath := func(paths []string) {
 				for _, path := range paths {
-					_, err := scopedKV.Delete(clientv3.WithRequireLeader(ctx), path)
-					if err != nil {
-						logger.Error().Err(err).Msgf("failed to delete etcd path %s", path)
-						merr = multierr.Append(merr, err)
-					}
+					etcdClient.Delete(path)
 				}
-				return merr
 			}
 
-			merr := deleteEtcdPath(samplerSync.configEtcdPaths)
-			merr = multierr.Append(merr, deleteEtcdPath(samplerSync.decisionEtcdPaths))
-			return merr
+			deleteEtcdPath(samplerSync.configEtcdPaths)
+			deleteEtcdPath(samplerSync.decisionEtcdPaths)
+			return nil
 		},
 	})
 	return nil
@@ -145,7 +130,11 @@ func (samplerSync *samplerSync) Execute(inPortReadings runtime.PortToReading, ci
 	acceptPercentageReading := inPortReadings.ReadSingleReadingPort("accept_percentage")
 	var acceptPercentageValue float64
 	if !acceptPercentageReading.Valid() {
-		acceptPercentageValue = 100 // default to 100%
+		if samplerSync.SamplerProto.Parameters.RampMode {
+			acceptPercentageValue = 0
+		} else {
+			acceptPercentageValue = 100 // default to 100%
+		}
 	} else {
 		acceptPercentageValue = acceptPercentageReading.Value()
 	}
@@ -172,11 +161,8 @@ func (samplerSync *samplerSync) publishAcceptPercentage(acceptPercentageValue fl
 		logger.Error().Err(err).Msg("failed to marshal flux sampler decision")
 		return err
 	}
-	if samplerSync.decisionWriter == nil {
-		logger.Panic().Msg("decision writer is nil")
-	}
 	for _, decisionEtcdPath := range samplerSync.decisionEtcdPaths {
-		samplerSync.decisionWriter.Write(decisionEtcdPath, dat)
+		samplerSync.etcdClient.Put(decisionEtcdPath, string(dat))
 	}
 
 	return nil

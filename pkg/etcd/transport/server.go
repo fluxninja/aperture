@@ -73,12 +73,12 @@ func NewEtcdTransportServer(client *etcdclient.Client) (*EtcdTransportServer, er
 }
 
 // SendRequests allows consumers of the etcd transport to send requests to agents.
-func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportServer, agents []string, msg proto.Message) ([]Result[*RespValue], error) {
+func SendRequests[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportServer, agents []string, msg proto.Message) ([]Result[*RespValue], error) {
 	respCh := make(chan *Response, len(agents))
 
 	for _, agent := range agents {
 		go func(agentName string) {
-			resp, err := t.SendRequest(agentName, msg)
+			resp, err := t.SendRequest(ctx, agentName, msg)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to send request to agent")
 				respCh <- &Response{
@@ -114,8 +114,8 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportS
 }
 
 // SendRequest allows consumers of the etcd transport to send single request to agents.
-func SendRequest[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportServer, client string, msg proto.Message) (*RespValue, error) {
-	resp, err := t.SendRequest(client, msg)
+func SendRequest[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportServer, client string, msg proto.Message) (*RespValue, error) {
+	resp, err := t.SendRequest(ctx, client, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func SendRequest[RespValue any, Resp ExactMessage[RespValue]](t *EtcdTransportSe
 }
 
 // SendRequest sends a request to etcd, supposed to be consumed by an agent.
-func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Response, error) {
+func (t *EtcdTransportServer) SendRequest(ctx context.Context, client string, msg proto.Message) (*Response, error) {
 	anyreq, err := anypb.New(msg)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -148,26 +148,21 @@ func (t *EtcdTransportServer) SendRequest(client string, msg proto.Message) (*Re
 
 	path := path.Join(RPCBasePath, RPCRequestPath, req.Client, req.ID)
 
-	lease, err := t.etcdClient.Grant(context.Background(), leaseDuration)
-	if err != nil {
-		return nil, fmt.Errorf("failed to grant lease: %w", err)
-	}
+	t.etcdClient.PutWithExpiry(path, string(rawReq), leaseDuration)
 
-	_, err = t.etcdClient.Put(context.Background(), path, string(rawReq), clientv3.WithLease(lease.ID))
-	if err != nil {
-		return nil, fmt.Errorf("failed to send request to etcd: %w", err)
-	}
-
-	return t.waitForResponse(req)
+	return t.waitForResponse(ctx, req)
 }
 
-func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), serverWatchDuration*time.Second)
+func (t *EtcdTransportServer) waitForResponse(ctx context.Context, req Request) (*Response, error) {
+	watchCtx, cancel := context.WithTimeout(ctx, serverWatchDuration*time.Second)
 	defer cancel()
 
 	responsePath := path.Join(RPCBasePath, RPCResponsePath, req.Client, req.ID)
 
-	watchCh := t.etcdClient.Watch(ctx, responsePath)
+	watchCh, err := t.etcdClient.Watch(watchCtx, responsePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to watch etcd path: %w", err)
+	}
 	for {
 		select {
 		case watchResp, ok := <-watchCh:
@@ -186,7 +181,7 @@ func (t *EtcdTransportServer) waitForResponse(req Request) (*Response, error) {
 					}, nil
 				}
 			}
-		case <-ctx.Done():
+		case <-watchCtx.Done():
 			return nil, fmt.Errorf("context deadline exceeded")
 		}
 	}

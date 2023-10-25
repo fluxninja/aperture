@@ -2738,7 +2738,10 @@ definitions:
         properties:
             sampler:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             steps:
                 items:
                     $ref: '#/definitions/LoadRampParametersStep'
@@ -4134,7 +4137,10 @@ definitions:
                 description: Input ports for the _Sampler_.
             parameters:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             pass_through_label_values:
                 description: Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
                 items:

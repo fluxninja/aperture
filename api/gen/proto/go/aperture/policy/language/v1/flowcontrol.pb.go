@@ -1059,7 +1059,7 @@ type Sampler struct {
 	// Input ports for the _Sampler_.
 	InPorts *Sampler_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty"`
 	// Parameters for the _Sampler_.
-	Parameters *Sampler_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty"`
+	Parameters *Sampler_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
 	PassThroughLabelValues []string `protobuf:"bytes,5,rep,name=pass_through_label_values,json=passThroughLabelValues,proto3" json:"pass_through_label_values,omitempty"`
 	// Configuration key for setting pass through label values through dynamic configuration.
@@ -3945,8 +3945,8 @@ type LoadRamp_Parameters struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Parameters for the _Sampler_.
-	Sampler *Sampler_Parameters         `protobuf:"bytes,1,opt,name=sampler,proto3" json:"sampler,omitempty"`
-	Steps   []*LoadRamp_Parameters_Step `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,gt=0,dive"` // @gotags: validate:"required,gt=0,dive"
+	Sampler *Sampler_Parameters         `protobuf:"bytes,1,opt,name=sampler,proto3" json:"sampler,omitempty" validate:"required"` // @gotags: validate:"required"
+	Steps   []*LoadRamp_Parameters_Step `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty" validate:"required,gt=0,dive"`     // @gotags: validate:"required,gt=0,dive"
 }
 
 func (x *LoadRamp_Parameters) Reset() {

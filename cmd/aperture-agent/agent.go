@@ -17,9 +17,10 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
 	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agent-functions"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
-	agentelection "github.com/fluxninja/aperture/v2/pkg/etcd/election/agent"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -41,7 +42,9 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			fx.Annotate(AgentElectionPath, fx.ResultTags(config.NameTag(etcdclient.ElectionPathFxTag))),
 		),
+		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
 		),
@@ -50,7 +53,6 @@ func main() {
 		autoscale.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
-		agentelection.Module(),
 		transport.TransportClientModule,
 		agentfunctions.Module,
 		Module(),
@@ -73,4 +75,8 @@ func main() {
 
 	log.Info().Msg("aperture-agent app created")
 	platform.Run(app)
+}
+
+func AgentElectionPath(agentInfo *agentinfo.AgentInfo) string {
+	return "/election/" + agentInfo.GetAgentGroup()
 }

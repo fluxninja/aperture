@@ -13,9 +13,8 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/fx"
 
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	etcd "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
-	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
 const (
@@ -35,12 +34,12 @@ func Module() fx.Option {
 }
 
 // NewFactory creates a new aperture_leader_only receiver factory using given leader election.
-func NewFactory(election *election.Election) receiver.Factory {
+func NewFactory(etcdClient *etcd.Client) receiver.Factory {
 	return receiver.NewFactory(
 		type_,
 		func() component.Config {
 			return &Config{
-				leaderElection: election,
+				etcdClient: etcdClient,
 			}
 		},
 		receiver.WithMetrics(createMetricsReceiver, stability))
@@ -49,8 +48,8 @@ func NewFactory(election *election.Election) receiver.Factory {
 // Config is a config for leader-only-receiver.
 type Config struct {
 	// Config for the wrapped receiver
-	leaderElection *election.Election
-	Inner          map[string]any `mapstructure:"config"`
+	etcdClient *etcd.Client
+	Inner      map[string]any `mapstructure:"config"`
 	// Type of the wrapped receiver
 	InnerType component.Type `mapstructure:"type"`
 }
@@ -78,7 +77,6 @@ func createMetricsReceiver(
 }
 
 type leaderOnlyReceiver struct {
-	backgroundWG       *panichandler.CancellableWaitGroup // nil if background goroutine not started
 	consumer           consumer.Metrics
 	factory            receiver.Factory
 	host               component.Host
@@ -86,6 +84,9 @@ type leaderOnlyReceiver struct {
 	origCreateSettings receiver.CreateSettings
 	config             Config
 }
+
+// leaderOnlyReceiver implements LeaderWatcher interface.
+var _ etcd.ElectionWatcher = (*leaderOnlyReceiver)(nil)
 
 // Start implements component.Component.
 func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host) error {
@@ -97,7 +98,7 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 	r.factory = factory.(receiver.Factory)
 	r.host = host
 
-	if r.config.leaderElection.IsLeader() {
+	if r.config.etcdClient.IsLeader() {
 		// If we already know we're the leader, we can skip creating background
 		// goroutine and start inner receiver immediately.
 		if err := r.startInnerReceiver(startCtx); err != nil {
@@ -106,35 +107,42 @@ func (r *leaderOnlyReceiver) Start(startCtx context.Context, host component.Host
 		return nil
 	}
 
-	r.backgroundWG = panichandler.NewCancellableWaitGroup()
-	r.backgroundWG.GoOnDone(r.config.leaderElection.Done(), r.onLeaderElectionDone)
+	r.config.etcdClient.AddElectionWatcher(r)
 
 	return nil
 }
 
 // Shutdown implements component.Component.
 func (r *leaderOnlyReceiver) Shutdown(ctx context.Context) error {
-	if r.backgroundWG != nil {
-		r.backgroundWG.CancelAndWait()
-	}
+	r.config.etcdClient.RemoveElectionWatcher(r)
 	if r.inner != nil {
 		return r.inner.Shutdown(ctx)
 	}
 	return nil
 }
 
-func (r *leaderOnlyReceiver) onLeaderElectionDone(ctx context.Context) {
-	if !r.config.leaderElection.IsLeader() {
-		return
-	}
-
-	startCtx, cancel := context.WithTimeout(ctx, lateStartTimeout)
+// OnLeaderStart starts the inner receiver.
+func (r *leaderOnlyReceiver) OnLeaderStart() {
+	startCtx, cancel := context.WithTimeout(context.Background(), lateStartTimeout)
 	defer cancel()
 	if err := r.startInnerReceiver(startCtx); err != nil {
 		r.host.ReportFatalError(fmt.Errorf(
 			"failed to start %s receiver after becoming a leader: %w",
 			r.config.InnerType, err,
 		))
+	}
+}
+
+// OnLeaderStop stops the inner receiver.
+func (r *leaderOnlyReceiver) OnLeaderStop() {
+	if r.inner != nil {
+		err := r.inner.Shutdown(context.Background())
+		if err != nil {
+			r.host.ReportFatalError(fmt.Errorf(
+				"failed to stop %s receiver after becoming a follower: %w",
+				r.config.InnerType, err,
+			))
+		}
 	}
 }
 

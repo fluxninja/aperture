@@ -4,16 +4,13 @@ import (
 	"context"
 	"path"
 
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
 
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -23,7 +20,7 @@ import (
 // ScaleActuator struct.
 type ScaleActuator struct {
 	policyReadAPI        iface.Policy
-	decisionWriter       *etcdwriter.Writer
+	etcdClient           *etcdclient.Client
 	scaleActuatorProto   *policyprivatev1.PodScaleActuator
 	decisionsEtcdPath    string
 	agentGroupName       string
@@ -65,22 +62,15 @@ func NewScaleActuatorAndOptions(
 	), nil
 }
 
-func (sa *ScaleActuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
-	logger := sa.policyReadAPI.GetStatusRegistry().GetLogger()
+func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	sa.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			sa.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			var merr, err error
-			sa.decisionWriter.Close()
-			_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), sa.decisionsEtcdPath)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to delete scale decisions")
-				merr = multierr.Append(merr, err)
-			}
-			return merr
+			etcdClient.Delete(sa.decisionsEtcdPath)
+			return nil
 		},
 	})
 
@@ -111,7 +101,7 @@ func (sa *ScaleActuator) DynamicConfigUpdate(event notifiers.Event, unmarshaller
 
 func (sa *ScaleActuator) publishDefaultDecision() {
 	// delete the decision
-	sa.decisionWriter.Delete(sa.decisionsEtcdPath)
+	sa.etcdClient.Delete(sa.decisionsEtcdPath)
 }
 
 func (sa *ScaleActuator) publishDecision(desiredReplicas float64) error {
@@ -135,6 +125,6 @@ func (sa *ScaleActuator) publishDecision(desiredReplicas float64) error {
 		logger.Error().Err(err).Msg("Failed to marshal policy decision")
 		return err
 	}
-	sa.decisionWriter.Write(sa.decisionsEtcdPath, dat)
+	sa.etcdClient.Put(sa.decisionsEtcdPath, string(dat))
 	return nil
 }

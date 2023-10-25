@@ -638,7 +638,7 @@ message Sampler {
   Ins in_ports = 1;
 
   // Parameters for the _Sampler_.
-  Parameters parameters = 2;
+  Parameters parameters = 2; // @gotags: validate:"required"
 
   // Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
   repeated string pass_through_label_values = 5;
@@ -674,7 +674,7 @@ message LoadRamp {
     }
 
     // Parameters for the _Sampler_.
-    Sampler.Parameters sampler = 1;
+    Sampler.Parameters sampler = 1; // @gotags: validate:"required"
 
     repeated Step steps = 2; // @gotags: validate:"required,gt=0,dive"
   }

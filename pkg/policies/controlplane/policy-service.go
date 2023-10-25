@@ -56,7 +56,7 @@ func RegisterPolicyService(in RegisterPolicyServiceIn) *PolicyService {
 // GetPolicies returns all the policies running (or supposed to be running) in the system.
 func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*policylangv1.GetPoliciesResponse, error) {
 	localPolicies := s.policyFactory.GetPolicyWrappers()
-	remotePolicies, err := s.etcdClient.Client.KV.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
+	remotePolicies, err := s.etcdClient.Get(ctx, paths.PoliciesAPIConfigPath, clientv3.WithPrefix())
 	if err != nil {
 		log.Warn().Err(err).Msg("GetPolicies: failed to fetch policies from etcd")
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policies from etcd: %s", err))
@@ -91,7 +91,7 @@ func (s *PolicyService) GetPolicies(ctx context.Context, _ *emptypb.Empty) (*pol
 // Returns error if policy cannot be found in *neither* etcd nor locally.
 func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.GetPolicyRequest) (*policylangv1.GetPolicyResponse, error) {
 	localPolicy := s.policyFactory.GetPolicyWrapper(request.Name)
-	remotePolicies, err := s.etcdClient.Client.KV.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
+	remotePolicies, err := s.etcdClient.Get(ctx, path.Join(paths.PoliciesAPIConfigPath, request.Name))
 	if err != nil {
 		log.Warn().Err(err).Str("policy", request.Name).Msg("GetPolicy: failed to fetch policy from etcd")
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to fetch policy from etcd: %s", err))
@@ -240,7 +240,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Errorf(codes.Internal, "failed to hash policy: %s", err)
 	}
 
-	putResp, err := s.etcdClient.KV.Put(
+	putResp, err := s.etcdClient.PutSync(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
 		string(newPolicyString),
@@ -261,7 +261,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 
 // PostDynamicConfig updates dynamic config to the system.
 func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
-	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+	etcdPolicy, err := s.etcdClient.Get(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
 		clientv3.WithKeysOnly(),
@@ -283,7 +283,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 	// to non-existing policy.
 	// Note: Right now we allow setting dynamic config for k8s-managed policy.
 	// Do we want to continue supporting that?
-	_, err = s.etcdClient.KV.Put(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
+	_, err = s.etcdClient.PutSync(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName), string(jsonDynamicConfig))
 	if err != nil {
 		return nil, fmt.Errorf("failed to write dynamic config '%s' to etcd: '%s'", req.PolicyName, err)
 	}
@@ -293,7 +293,7 @@ func (s *PolicyService) PostDynamicConfig(ctx context.Context, req *policylangv1
 
 // GetDynamicConfig gets dynamic config of a policy.
 func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.GetDynamicConfigRequest) (*policylangv1.GetDynamicConfigResponse, error) {
-	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+	etcdPolicy, err := s.etcdClient.Get(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
 		clientv3.WithKeysOnly(),
@@ -306,7 +306,7 @@ func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.
 		return nil, status.Error(codes.NotFound, "no such policy")
 	}
 
-	resp, err := s.etcdClient.KV.Get(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
+	resp, err := s.etcdClient.Get(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get dynamic config '%s' from etcd: '%s'", req.PolicyName, err)
 	}
@@ -333,7 +333,7 @@ func (s *PolicyService) GetDynamicConfig(ctx context.Context, req *policylangv1.
 
 // DeleteDynamicConfig deletes dynamic config of a policy.
 func (s *PolicyService) DeleteDynamicConfig(ctx context.Context, req *policylangv1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
-	etcdPolicy, err := s.etcdClient.Client.KV.Get(
+	etcdPolicy, err := s.etcdClient.Get(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
 		clientv3.WithKeysOnly(),
@@ -346,7 +346,7 @@ func (s *PolicyService) DeleteDynamicConfig(ctx context.Context, req *policylang
 		return nil, status.Error(codes.NotFound, "no such policy")
 	}
 
-	_, err = s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
+	_, err = s.etcdClient.DeleteSync(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, req.PolicyName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to delete dynamic config '%s' from etcd: '%s'", req.PolicyName, err)
 	}
@@ -356,7 +356,7 @@ func (s *PolicyService) DeleteDynamicConfig(ctx context.Context, req *policylang
 
 // DeletePolicy deletes a policy from the system.
 func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.DeletePolicyRequest) (*emptypb.Empty, error) {
-	resp, err := s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIConfigPath, policy.Name))
+	resp, err := s.etcdClient.DeleteSync(ctx, path.Join(paths.PoliciesAPIConfigPath, policy.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -367,7 +367,7 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, policy *policylangv1.D
 	// FIXME: If Deleted==0 we should return NotFound, but first we need to ensure
 	// that the delete activity in cloud handles such status correctly.
 
-	_, err = s.etcdClient.KV.Delete(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
+	_, err = s.etcdClient.DeleteSync(ctx, path.Join(paths.PoliciesAPIDynamicConfigPath, policy.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -388,7 +388,7 @@ func (s *PolicyService) GetDecisions(ctx context.Context, req *policylangv1.GetD
 		}
 	}
 
-	resp, err := s.etcdClient.Client.KV.Get(ctx, decisionsPathPrefix, clientv3.WithPrefix())
+	resp, err := s.etcdClient.Get(ctx, decisionsPathPrefix, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}

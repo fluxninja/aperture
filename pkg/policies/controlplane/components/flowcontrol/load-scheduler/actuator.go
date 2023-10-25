@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"math"
 	"path"
+	"time"
 
 	prometheusmodel "github.com/prometheus/common/model"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -30,7 +30,7 @@ import (
 // Actuator struct.
 type Actuator struct {
 	policyReadAPI            iface.Policy
-	decisionWriter           *etcdwriter.Writer
+	etcdClient               *etcdclient.Client
 	actuatorProto            *policyprivatev1.LoadActuator
 	tokensQuery              *promql.TaggedQuery
 	loadSchedulerComponentID string
@@ -126,24 +126,17 @@ func NewActuatorAndOptions(
 	return lsa, fx.Options(options...), nil
 }
 
-func (la *Actuator) setup(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
-	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+func (la *Actuator) setup(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	la.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			la.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			var merr, err error
-			la.decisionWriter.Close()
 			for _, etcdPath := range la.etcdPaths {
-				_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
-				if err != nil {
-					logger.Error().Err(err).Msg("Failed to delete load decisions")
-					merr = multierr.Append(merr, err)
-				}
+				etcdClient.Delete(etcdPath)
 			}
-			return merr
+			return nil
 		},
 	})
 
@@ -223,12 +216,15 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 	}
 	la.doActuate = false
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+	// validUntil = time.Now() + tickInfo.Interval() * la.ticksPerExecution
+	validUntil := tickInfo.Timestamp().Add(tickInfo.Interval() * time.Duration(la.ticksPerExecution*5))
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
 		LoadMultiplier:        loadMultiplier,
 		PassThrough:           passThrough,
 		TickInfo:              tickInfo.Serialize(),
 		TokensByWorkloadIndex: tokensByWorkload,
+		ValidUntil:            timestamppb.New(validUntil),
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
@@ -246,7 +242,7 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		return err
 	}
 	for _, etcdPath := range la.etcdPaths {
-		la.decisionWriter.Write(etcdPath, dat)
+		la.etcdClient.Put(etcdPath, string(dat))
 	}
 
 	return nil

@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sourcegraph/conc"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
@@ -22,13 +21,10 @@ import (
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
-	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
@@ -81,9 +77,8 @@ type podScalerFactory struct {
 	registry             status.Registry
 	decisionsWatcher     notifiers.Watcher
 	controlPointTrackers notifiers.Trackers
-	election             *election.Election
 	k8sClient            k8s.K8sClient
-	sessionScopedKV      *etcdclient.SessionScopedKV
+	etcdClient           *etcdclient.Client
 	agentGroup           string
 }
 
@@ -91,12 +86,10 @@ type podScalerFactory struct {
 func setupPodScalerFactory(
 	watcher notifiers.Watcher,
 	controlPointTrackers notifiers.Trackers,
-	election *election.Election,
 	lifecycle fx.Lifecycle,
 	statusRegistry status.Registry,
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	k8sClient k8s.K8sClient,
 	ai *agentinfo.AgentInfo,
 	cfg autoscalek8sconfig.AutoScaleKubernetesConfig,
@@ -125,9 +118,8 @@ func setupPodScalerFactory(
 		decisionsWatcher:     decisionsWatcher,
 		agentGroup:           agentGroup,
 		registry:             reg,
-		sessionScopedKV:      sessionScopedKV,
+		etcdClient:           etcdClient,
 		k8sClient:            k8sClient,
-		election:             election,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -192,7 +184,7 @@ func (psFactory *podScalerFactory) newPodScalerOptions(
 			podScaler.setup,
 		),
 		fx.Supply(
-			psFactory.sessionScopedKV,
+			psFactory.etcdClient,
 			fx.Annotate(psFactory.k8sClient, fx.As(new(k8s.K8sClient))),
 		),
 	), nil
@@ -200,14 +192,12 @@ func (psFactory *podScalerFactory) newPodScalerOptions(
 
 // podScaler implement  pod scaler on the agent side.
 type podScaler struct {
-	stateMutex sync.Mutex
-	ctx        context.Context
-	k8sClient  k8s.K8sClient
-	registry   status.Registry
 	iface.Component
-	statusWriter      *etcdwriter.Writer
-	sessionScopedKV   *etcdclient.SessionScopedKV
+	ctx               context.Context
+	k8sClient         k8s.K8sClient
+	registry          status.Registry
 	cancel            context.CancelFunc
+	etcdClient        *etcdclient.Client
 	scaleCancel       context.CancelFunc
 	podScalerFactory  *podScalerFactory
 	podScalerProto    *policylangv1.PodScaler
@@ -215,15 +205,19 @@ type podScaler struct {
 	scaleWaitGroup    *conc.WaitGroup
 	controlPoint      discovery.AutoScaleControlPoint
 	statusEtcdPath    string
+	stateMutex        sync.Mutex
 }
+
+// podScaler implements etcdclient.ElectionWatcher.
+var _ etcdclient.ElectionWatcher = (*podScaler)(nil)
 
 func (ps *podScaler) setup(
 	lifecycle fx.Lifecycle,
-	sessionScopedKV *etcdclient.SessionScopedKV,
+	etcdClient *etcdclient.Client,
 	k8sClient k8s.K8sClient,
 ) error {
 	logger := ps.registry.GetLogger()
-	ps.sessionScopedKV = sessionScopedKV
+	ps.etcdClient = etcdClient
 	ps.k8sClient = k8sClient
 	etcdKey := paths.AgentComponentKey(ps.podScalerFactory.agentGroup,
 		ps.GetPolicyName(),
@@ -271,7 +265,6 @@ func (ps *podScaler) setup(
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var err error
-			ps.statusWriter = etcdwriter.NewWriter(&ps.sessionScopedKV.KVWrapper)
 			ps.ctx, ps.cancel = context.WithCancel(context.Background())
 
 			// add decisions notifier
@@ -288,7 +281,7 @@ func (ps *podScaler) setup(
 
 			return err
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			var merr, err error
 
 			// remove decisions notifier
@@ -305,8 +298,7 @@ func (ps *podScaler) setup(
 			}
 			ps.registry.SetStatus(status.NewStatus(nil, merr))
 			ps.cancel()
-			ps.statusWriter.Close()
-			_, err = ps.sessionScopedKV.KV.Delete(clientv3.WithRequireLeader(ctx), ps.statusEtcdPath)
+			ps.etcdClient.Delete(ps.statusEtcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete scale status")
 				merr = multierr.Append(merr, err)
@@ -316,19 +308,27 @@ func (ps *podScaler) setup(
 		},
 	})
 
-	panichandler.FxOnDone(ps.podScalerFactory.election.Done(), ps.electionResultCallback, lifecycle)
+	ps.etcdClient.AddElectionWatcher(ps)
 
 	return nil
 }
 
-func (ps *podScaler) electionResultCallback(_ context.Context) {
-	log.Info().Msg("Election result callback")
-
-	// invoke the lastScaleDecision
+// OnLeaderStart is called when the agent becomes the leader.
+func (ps *podScaler) OnLeaderStart() {
 	ps.stateMutex.Lock()
 	defer ps.stateMutex.Unlock()
-	if ps.lastScaleDecision != nil && ps.podScalerFactory.election.IsLeader() {
+	if ps.lastScaleDecision != nil {
 		ps.scale(ps.lastScaleDecision)
+	}
+}
+
+// OnLeaderStop is called when the agent stops being the leader.
+func (ps *podScaler) OnLeaderStop() {
+	ps.stateMutex.Lock()
+	defer ps.stateMutex.Unlock()
+	if ps.scaleCancel != nil {
+		ps.scaleCancel()
+		ps.scaleCancel = nil
 	}
 }
 
@@ -358,7 +358,7 @@ func (ps *podScaler) decisionUpdateCallback(event notifiers.Event, unmarshaller 
 	}
 	scaleDecision := wrapperMessage.ScaleDecision
 	ps.lastScaleDecision = scaleDecision
-	if ps.podScalerFactory.election.IsLeader() {
+	if ps.podScalerFactory.etcdClient.IsLeader() {
 		ps.scale(scaleDecision)
 	}
 }
@@ -417,7 +417,7 @@ func (ps *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 	logger := ps.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Control point removed")
-		ps.statusWriter.Delete(ps.statusEtcdPath)
+		ps.etcdClient.Delete(ps.statusEtcdPath)
 		return
 	}
 
@@ -446,5 +446,5 @@ func (ps *podScaler) controlPointUpdateCallback(event notifiers.Event, unmarshal
 		log.Error().Err(err).Msg("Unable to marshal scale status")
 		return
 	}
-	ps.statusWriter.Write(ps.statusEtcdPath, data)
+	ps.etcdClient.Put(ps.statusEtcdPath, string(data))
 }

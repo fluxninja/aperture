@@ -29,9 +29,9 @@ var TransportClientModule = fx.Options(
 type EtcdTransportClient struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
-	waitGroup  panichandler.WaitGroup
 	etcdClient *etcdclient.Client
 	Registry   *HandlerRegistry
+	waitGroup  panichandler.WaitGroup
 }
 
 // NewEtcdTransportClient creates and returns a new etcd transport client module.
@@ -89,7 +89,11 @@ func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) 
 // RegisterWatcher register an agent on the etcd transport client.
 func (c *EtcdTransportClient) RegisterWatcher(agentName string) error {
 	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
-	watchCh := c.etcdClient.Watch(c.ctx, path, clientv3.WithPrefix())
+	watchCh, err := c.etcdClient.Watch(c.ctx, path, clientv3.WithPrefix())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to watch etcd path")
+		return err
+	}
 	for watchResp := range watchCh {
 		if watchResp.Err() != nil {
 			log.Error().Err(watchResp.Err()).Msg("failed to watch etcd path")
@@ -162,16 +166,7 @@ func (c *EtcdTransportClient) callHandler(ctx context.Context, req *anypb.Any) (
 func (c *EtcdTransportClient) respond(ctx context.Context, resp Response) {
 	path := path.Join(RPCBasePath, RPCResponsePath, resp.Client, resp.ID)
 
-	lease, err := c.etcdClient.Grant(ctx, 30)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to grant lease")
-		return
-	}
-
-	_, err = c.etcdClient.Put(ctx, path, string(resp.Data), clientv3.WithLease(lease.ID))
-	if err != nil {
-		log.Error().Err(err).Msg("failed to write response to etcd")
-	}
+	c.etcdClient.PutWithExpiry(path, string(resp.Data), 30)
 }
 
 // RegisterFunction register a function as a handler in the registry
