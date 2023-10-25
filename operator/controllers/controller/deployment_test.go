@@ -648,7 +648,6 @@ var _ = Describe("Test Deployment Mutate", func() {
 						Affinity:                  &corev1.Affinity{},
 						NodeSelector:              map[string]string{},
 						Tolerations:               []corev1.Toleration{},
-						PriorityClassName:         Test,
 						TopologySpreadConstraints: []corev1.TopologySpreadConstraint{},
 						SecurityContext: &corev1.PodSecurityContext{
 							FSGroup: pointer.Int64(1001),

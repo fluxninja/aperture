@@ -79,6 +79,7 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 			Selector: &v1.LabelSelector{
 				MatchLabels: controllers.SelectorLabels(instance.GetName(), controllers.AgentServiceName),
 			},
+			MinReadySeconds: spec.MinReadySeconds,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: v1.ObjectMeta{
 					Labels:      podLabels,

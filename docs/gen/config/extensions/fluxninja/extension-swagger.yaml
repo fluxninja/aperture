@@ -158,12 +158,13 @@ definitions:
                     - KUBERNETES_SIDECAR
                     - KUBERNETES_DAEMONSET
                     - LINUX_BARE_METAL
+                    - CLOUD_AGENT
                 type: string
                 x-go-name: InstallationMode
                 x-go-tag-default: LINUX_BARE_METAL
                 x-go-tag-json: installation_mode
-                x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL
-                x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL
+                x-go-tag-validate: oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL CLOUD_AGENT
+                x-oneof: KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL | CLOUD_AGENT
         title: FluxNinjaExtensionConfig is the configuration for [FluxNinja integration](/reference/fluxninja.md).
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig

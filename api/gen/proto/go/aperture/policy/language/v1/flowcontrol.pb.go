@@ -2149,7 +2149,7 @@ type Selector struct {
 	// form a peer to peer cluster to constantly share state.
 	//
 	// :::
-	AgentGroup string `protobuf:"bytes,2,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"default"` // @gotags: default:"default"
+	AgentGroup string `protobuf:"bytes,2,opt,name=agent_group,json=agentGroup,proto3" json:"agent_group,omitempty" default:"aperture-cloud"` // @gotags: default:"aperture-cloud"
 	// The Fully Qualified Domain Name of the
 	// [service](/concepts/selector.md) to select.
 	//

@@ -3,7 +3,6 @@ package distcache
 import (
 	"context"
 	"errors"
-	"fmt"
 	stdlog "log"
 	"net"
 	"strconv"
@@ -127,12 +126,11 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		memberlistAddr = defaultConfig.MemberlistAdvertiseAddr
 	}
 
-	serviceName := fmt.Sprintf("%s-%s", olricMemberlistServiceName, info.GetVersionInfo().Version)
 	oc.ServiceDiscovery = map[string]interface{}{
 		"plugin": &ServiceDiscovery{
 			discovery:   in.PeerDiscovery,
 			addr:        memberlistAddr,
-			serviceName: serviceName,
+			serviceName: olricMemberlistServiceName,
 		},
 	}
 

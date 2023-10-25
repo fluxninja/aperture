@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
@@ -31,7 +32,7 @@ type FluxNinjaExtensionConfig struct {
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
 	AgentAPIKey string `json:"agent_api_key"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
-	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
+	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL CLOUD_AGENT" default:"LINUX_BARE_METAL"`
 	// Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 	//
 	// Enabling this flag configures various agent components to point to the
@@ -66,6 +67,7 @@ func Module() fx.Option {
 		fx.Provide(provideConfig),
 		fx.Provide(provideEtcdConfigOverride),
 		fx.Provide(providePrometheusConfigOverride),
+		fx.Provide(provideAgentInfoConfigOverride),
 	)
 }
 
@@ -76,6 +78,12 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 		return nil, err
 	}
 	return &extensionConfig, nil
+}
+
+func provideAgentInfoConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *agentinfo.InstallationModeConfig {
+	return &agentinfo.InstallationModeConfig{
+		InstallationMode: extensionConfig.InstallationMode,
+	}
 }
 
 func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {

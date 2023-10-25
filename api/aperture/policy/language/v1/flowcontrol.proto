@@ -1114,7 +1114,7 @@ message Selector {
   // form a peer to peer cluster to constantly share state.
   //
   // :::
-  string agent_group = 2; // @gotags: default:"default"
+  string agent_group = 2; // @gotags: default:"aperture-cloud"
 
   // The Fully Qualified Domain Name of the
   // [service](/concepts/selector.md) to select.

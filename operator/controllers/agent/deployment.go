@@ -80,12 +80,15 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 			Selector: &v1.LabelSelector{
 				MatchLabels: controllers.SelectorLabels(instance.GetName(), controllers.AgentServiceName),
 			},
+			Strategy:        spec.DeploymentConfigSpec.Strategy,
+			MinReadySeconds: spec.MinReadySeconds,
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: v1.ObjectMeta{
 					Labels:      podLabels,
 					Annotations: spec.PodAnnotations,
 				},
 				Spec: corev1.PodSpec{
+					TopologySpreadConstraints:     spec.DeploymentConfigSpec.TopologySpreadConstraints,
 					ServiceAccountName:            controllers.AgentServiceAccountName(instance),
 					ImagePullSecrets:              controllers.ImagePullSecrets(spec.Image.Image),
 					NodeSelector:                  spec.NodeSelector,
@@ -167,20 +170,26 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 }
 
 // deploymentMutate returns a mutate function that can be used to update the Deployment's spec.
-func deploymentMutate(dply *appsv1.Deployment, spec appsv1.DeploymentSpec) controllerutil.MutateFn {
+func deploymentMutate(dep *appsv1.Deployment, spec appsv1.DeploymentSpec) controllerutil.MutateFn {
 	return func() error {
-		dply.Spec.Selector = spec.Selector
-		dply.Spec.Replicas = spec.Replicas
-		dply.Spec.Template.Annotations = spec.Template.Annotations
-		dply.Spec.Template.Labels = spec.Template.Labels
-		dply.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
-		dply.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets
-		dply.Spec.Template.Spec.NodeSelector = spec.Template.Spec.NodeSelector
-		dply.Spec.Template.Spec.Tolerations = spec.Template.Spec.Tolerations
-		dply.Spec.Template.Spec.SecurityContext = spec.Template.Spec.SecurityContext
-		dply.Spec.Template.Spec.InitContainers = spec.Template.Spec.InitContainers
-		dply.Spec.Template.Spec.Containers = spec.Template.Spec.Containers
-		dply.Spec.Template.Spec.Volumes = spec.Template.Spec.Volumes
+		if dep.Spec.Replicas != nil && spec.Replicas != nil {
+			*dep.Spec.Replicas = *spec.Replicas
+		}
+		dep.Spec.Selector = spec.Selector
+		dep.Spec.Strategy = spec.Strategy
+		dep.Spec.Template.Annotations = spec.Template.Annotations
+		dep.Spec.Template.Labels = spec.Template.Labels
+		dep.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
+		dep.Spec.Template.Spec.HostAliases = spec.Template.Spec.HostAliases
+		dep.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets
+		dep.Spec.Template.Spec.Affinity = spec.Template.Spec.Affinity
+		dep.Spec.Template.Spec.NodeSelector = spec.Template.Spec.NodeSelector
+		dep.Spec.Template.Spec.Tolerations = spec.Template.Spec.Tolerations
+		dep.Spec.Template.Spec.TopologySpreadConstraints = spec.Template.Spec.TopologySpreadConstraints
+		dep.Spec.Template.Spec.SecurityContext = spec.Template.Spec.SecurityContext
+		dep.Spec.Template.Spec.InitContainers = spec.Template.Spec.InitContainers
+		dep.Spec.Template.Spec.Containers = spec.Template.Spec.Containers
+		dep.Spec.Template.Spec.Volumes = spec.Template.Spec.Volumes
 		return nil
 	}
 }
