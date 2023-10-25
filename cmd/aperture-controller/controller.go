@@ -11,6 +11,7 @@
 package main
 
 import (
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
@@ -36,6 +37,7 @@ func main() {
 		),
 		fx.Supply(
 			fx.Annotate("/controller-election", fx.ResultTags(config.NameTag("etcd.election-path"))),
+			fx.Annotate(true, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag))),
 		),
 		otelcollector.Module(),
 		controlplane.Module(),

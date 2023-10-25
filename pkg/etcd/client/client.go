@@ -50,17 +50,23 @@ const (
 	//   schema:
 	//     $ref: "#/definitions/EtcdConfig"
 	defaultClientConfigKey = "etcd"
+
+	// ElectionPathFxTag is the fx tag for the election path.
+	ElectionPathFxTag = "etcd.election-path"
+	// EnforceLeaderOnlyFxTag is the fx tag for the enforce leader only flag.
+	EnforceLeaderOnlyFxTag = "etcd.enforce-leader-only"
 )
 
 // ClientIn holds parameters for ProvideClient.
 type ClientIn struct {
 	fx.In
-	Unmarshaller   config.Unmarshaller
-	Lifecycle      fx.Lifecycle
-	Shutdowner     fx.Shutdowner
-	Logger         *log.Logger
-	ConfigOverride *ConfigOverride `optional:"true"`
-	ElectionPath   string          `name:"etcd.election-path"`
+	Unmarshaller      config.Unmarshaller
+	Lifecycle         fx.Lifecycle
+	Shutdowner        fx.Shutdowner
+	Logger            *log.Logger
+	ConfigOverride    *ConfigOverride `optional:"true"`
+	ElectionPath      string          `name:"etcd.election-path"`
+	EnforceLeaderOnly bool            `name:"etcd.enforce-leader-only"`
 }
 
 const (
@@ -101,6 +107,7 @@ type Client struct {
 	cacheMutex           sync.Mutex
 	isLeader             atomic.Bool
 	bootstrapPending     atomic.Bool
+	enforceLeaderOnly    bool
 }
 
 // ProvideClient creates a new etcd Client and provides it via Fx.
@@ -179,10 +186,11 @@ func ProvideClient(in ClientIn) (*Client, error) {
 	}
 
 	etcdClient := Client{
-		readyChannel:     make(chan bool),
-		opChannel:        infchan.NewChannel[operation](),
-		electionWatchers: make(map[ElectionWatcher]struct{}),
-		cache:            make(map[string]string),
+		readyChannel:      make(chan bool),
+		opChannel:         infchan.NewChannel[operation](),
+		electionWatchers:  make(map[ElectionWatcher]struct{}),
+		cache:             make(map[string]string),
+		enforceLeaderOnly: in.EnforceLeaderOnly,
 	}
 	etcdClient.bootstrapPending.Store(true)
 
@@ -249,8 +257,10 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 			cli.Watcher = namespacev3.NewWatcher(cli.Watcher, namespace)
 			etcdClient.watcher = cli.Watcher
 
-			// close the ready channel
-			close(etcdClient.readyChannel)
+			if !etcdClient.enforceLeaderOnly {
+				// close the ready channel
+				close(etcdClient.readyChannel)
+			}
 			break
 		}
 
@@ -267,22 +277,17 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 			// save the lease id
 			etcdClient.leaseID = session.Lease()
 
-			// bootstrap writes
-			etcdClient.bootstrapPending.Store(false)
-			etcdClient.opChannel.In() <- operation{
-				opType: bootstrap,
-			}
-
-			// write loop
+			// write loop wait group and context
 			writeLoopWaitGroup := sync.WaitGroup{}
-			writeLoopWaitGroup.Add(1)
 			writeLoopCtx, writeLoopCancel := context.WithCancel(ctx)
-			panichandler.Go(etcdClient.writeLoopFn(writeLoopCtx, &writeLoopWaitGroup))
 
 			campaignCtx, campaignCancel := context.WithCancel(context.Background())
 			// A goroutine keeps trying to campaign for leadership
-			panichandler.Go(etcdClient.campaignLoopFn(campaignCtx, session, electionPath))
+			panichandler.Go(etcdClient.campaignLoopFn(campaignCtx, session, electionPath, &writeLoopWaitGroup, writeLoopCtx))
 
+			if !etcdClient.enforceLeaderOnly {
+				etcdClient.launchWriteLoopRoutine(&writeLoopWaitGroup, writeLoopCtx)
+			}
 			// wait for the context to be done or session to be closed
 			select {
 			case <-ctx.Done():
@@ -299,13 +304,20 @@ func (etcdClient *Client) mainLoopFn(clientConfig clientv3.Config, shutdowner fx
 				if etcdClient.isLeader.Load() {
 					etcdClient.informElectionWatcher(false)
 				}
-				log.Error().Msg("Etcd session is done, re-create it")
+				if etcdClient.enforceLeaderOnly {
+					// Shutdown
+					log.Info().Msg("Etcd session is done, shutting down")
+					utils.Shutdown(shutdowner)
+					break SESSION_LOOP
+				} else {
+					log.Error().Msg("Etcd session is done, re-create it")
+				}
 			}
 		}
 	}
 }
 
-func (etcdClient *Client) campaignLoopFn(ctx context.Context, session *concurrencyv3.Session, electionPath string) func() {
+func (etcdClient *Client) campaignLoopFn(ctx context.Context, session *concurrencyv3.Session, electionPath string, writeLoopWaitGroup *sync.WaitGroup, writeLoopCtx context.Context) func() {
 	return func() {
 		for {
 			// Create an election for this client
@@ -322,10 +334,28 @@ func (etcdClient *Client) campaignLoopFn(ctx context.Context, session *concurren
 			}
 			// This is the leader
 			etcdClient.informElectionWatcher(true)
-			log.Info().Msg("Node is now a leader")
+			if etcdClient.enforceLeaderOnly {
+				// close the ready channel
+				close(etcdClient.readyChannel)
+				etcdClient.launchWriteLoopRoutine(writeLoopWaitGroup, writeLoopCtx)
+			}
+
+			log.Info().Msg("Node is now the leader")
 			break
 		}
 	}
+}
+
+func (etcdClient *Client) launchWriteLoopRoutine(writeLoopWaitGroup *sync.WaitGroup, writeLoopCtx context.Context) {
+	// bootstrap writes
+	etcdClient.bootstrapPending.Store(false)
+	etcdClient.opChannel.In() <- operation{
+		opType: bootstrap,
+	}
+
+	writeLoopWaitGroup.Add(1)
+	// write loop
+	panichandler.Go(etcdClient.writeLoopFn(writeLoopCtx, writeLoopWaitGroup))
 }
 
 func (etcdClient *Client) writeLoopFn(ctx context.Context, wg *sync.WaitGroup) func() {
