@@ -160,6 +160,7 @@ var _ = BeforeSuite(func() {
 		),
 		fx.Supply(
 			fx.Annotate("/election/test", fx.ResultTags(config.NameTag("etcd.election-path"))),
+			fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag))),
 		),
 		otelcollector.Module(),
 		grpc.ClientConstructor{Name: "flowcontrol-grpc-client", ConfigKey: "flowcontrol.client.grpc"}.Annotate(),
