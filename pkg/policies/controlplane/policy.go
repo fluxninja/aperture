@@ -2,12 +2,12 @@ package controlplane
 
 import (
 	"context"
-	"encoding/base64"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"time"
 
-	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -16,7 +16,6 @@ import (
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -82,11 +81,15 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy, policyName string, registry status.Registry) (*circuitfactory.Circuit, error) {
-	wrapperMessage, err := hashAndPolicyWrap(policyMessage, policyName)
-	if err != nil {
-		return nil, err
+	policyWrapper := policysyncv1.PolicyWrapper{
+		Policy: policyMessage,
+		CommonAttributes: &policysyncv1.CommonAttributes{
+			PolicyName: policyName,
+			PolicyHash: "dummy-hash",
+		},
 	}
-	_, circuit, _, err := compilePolicyWrapper(wrapperMessage, registry)
+
+	_, circuit, _, err := compilePolicyWrapper(&policyWrapper, registry)
 	if err != nil {
 		return nil, err
 	}
@@ -300,40 +303,12 @@ func (policy *Policy) GetStatusRegistry() status.Registry {
 	return policy.registry
 }
 
-// hashAndPolicyWrap wraps a proto message with a config properties wrapper and hashes it.
-func hashAndPolicyWrap(policyMessage *policylangv1.Policy, policyName string) (*policysyncv1.PolicyWrapper, error) {
-	hash, err := HashPolicy(policyMessage)
-	if err != nil {
-		return nil, err
-	}
-
-	return &policysyncv1.PolicyWrapper{
-		Policy: policyMessage,
-		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName: policyName,
-			PolicyHash: hash,
-		},
-	}, nil
-}
-
-// HashPolicy returns hash of the policy.
-func HashPolicy(policy *policylangv1.Policy) (string, error) {
-	// FIXME: The "Deterministic" is still not deterministic enough for our
-	// purposes – output may change with different version of aperture.
-	dat, err := proto.MarshalOptions{Deterministic: true}.Marshal(policy)
-	if err != nil {
-		log.Error().Err(err).Msgf("Failed to marshal proto message %+v", policy)
-		return "", err
-	}
-
-	log.Trace().Msgf("Policy message: %s", string(dat))
-	// FIXME: Use sha256.Sum256() directly instead of goObjectHash. This will
-	// result in different though.
-	hashBytes, hashErr := goObjectHash.ObjectHash(dat)
-	if hashErr != nil {
-		log.Warn().Err(hashErr).Msgf("Failed to hash json serialized proto message %s", string(dat))
-		return "", hashErr
-	}
-
-	return base64.StdEncoding.EncodeToString(hashBytes[:]), nil
+// HashStoredPolicy returns sha256 of JSON-serialized policy, truncated to 128 bits.
+//
+// As the JSON repr of policy is not perfectly stable (it depends whether we've
+// applied defaults yet or not, and could change when adding new fields), we
+// should hash policies which are stored somewhere (e.g. in etcd).
+func HashStoredPolicy(policyJSON []byte) string {
+	sum := sha256.Sum256(policyJSON)
+	return hex.EncodeToString(sum[:16])
 }

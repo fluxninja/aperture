@@ -1037,7 +1037,12 @@ definitions:
                 description: The id of Component within the circuit.
                 type: string
             policy_hash:
-                description: Hash of the entire Policy spec.
+                description: |-
+                    Hash of the entire Policy spec.
+
+                    This is the 128 bits of sha256 sum of the policy, as stored in etcd. This
+                    hash will never change after applying policy.  For k8s-managed policies,
+                    the hash might change with new version of the controller.
                 type: string
             policy_name:
                 description: Name of the Policy.

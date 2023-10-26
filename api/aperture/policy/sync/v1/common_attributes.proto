@@ -6,6 +6,10 @@ message CommonAttributes {
   // Name of the Policy.
   string policy_name = 1;
   // Hash of the entire Policy spec.
+  //
+  // This is the 128 bits of sha256 sum of the policy, as stored in etcd. This
+  // hash will never change after applying policy.  For k8s-managed policies,
+  // the hash might change with new version of the controller.
   string policy_hash = 2;
   // The id of Component within the circuit.
   string component_id = 3;

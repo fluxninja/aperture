@@ -113,7 +113,7 @@ func (s *PolicyService) GetPolicy(ctx context.Context, request *policylangv1.Get
 //
 // localPolicy can be nil.
 func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapper) *policylangv1.GetPolicyResponse {
-	remotePolicy, err := unmarshalStoredPolicy(remoteBytes)
+	remotePolicy, remoteHash, err := unmarshalStoredPolicy(remoteBytes)
 	if err != nil {
 		if localPolicy == nil {
 			return &policylangv1.GetPolicyResponse{
@@ -133,15 +133,6 @@ func getPolicyResponse(remoteBytes []byte, localPolicy *policysyncv1.PolicyWrapp
 			Policy: remotePolicy,
 			Status: policylangv1.GetPolicyResponse_NOT_LOADED,
 			Reason: "not loaded into controller",
-		}
-	}
-
-	remoteHash, err := HashPolicy(remotePolicy)
-	if err != nil {
-		return &policylangv1.GetPolicyResponse{
-			Policy: localPolicy.Policy,
-			Status: policylangv1.GetPolicyResponse_OUTDATED,
-			Reason: fmt.Sprintf("failed to compute remote policy hash: %s", err),
 		}
 	}
 
@@ -176,13 +167,13 @@ func getLocalOnlyPolicyResponse(localPolicy *policysyncv1.PolicyWrapper) *policy
 	}
 }
 
-// unmarshalStoredPolicy unmarshals a policy stored in etcd or serialized by crwatcher.
-func unmarshalStoredPolicy(policyBytes []byte) (*policylangv1.Policy, error) {
+// unmarshalStoredPolicy unmarshals a policy stored in etcd or serialized by
+// crwatcher and computes its canonical hash.
+func unmarshalStoredPolicy(policyBytes []byte) (p *policylangv1.Policy, hash string, err error) {
 	// Right now we store policies in api/policies only in json, but some
 	// controller version in the past stored in protowire, so we need to take
 	// in account both cases when deserializing.
 	var policy policylangv1.Policy
-	var err error
 
 	// We're sniffing the first byte to detect format – JSON policy always
 	// starts with `{` and protowire never starts with `{` byte for proto3
@@ -194,17 +185,28 @@ func unmarshalStoredPolicy(policyBytes []byte) (*policylangv1.Policy, error) {
 		// * json.Unmarshal won't handle correctly defaults for new fields that
 		//   were added after policy was stored in etcd.
 		err = config.UnmarshalJSON(policyBytes, &policy)
+		if err != nil {
+			return nil, "", err
+		}
+		return &policy, HashStoredPolicy(policyBytes), err
 	} else {
 		// Deprecated: v3.0.0. Older way of string policy on etcd.
 		// Remove this code in v3.0.0.
 		err = proto.Unmarshal(policyBytes, &policy)
-	}
+		if err != nil {
+			return nil, "", err
+		}
 
-	if err != nil {
-		return nil, err
-	}
+		// Hash the policy in legacy format as if it was converted to
+		// JSON. This way, when policy gets reapplied in JSON format,
+		// it won't change its hash.
+		jsonBytes, err := json.Marshal(&policy)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to marshal policy for hashing: %s", err)
+		}
 
-	return &policy, nil
+		return &policy, HashStoredPolicy(jsonBytes), err
+	}
 }
 
 // UpsertPolicy creates/updates policy to the system.
@@ -235,11 +237,6 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		return nil, status.Errorf(codes.Internal, "failed to marshal policy: %s", err)
 	}
 
-	hash, err := HashPolicy(newPolicy)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to hash policy: %s", err)
-	}
-
 	putResp, err := s.etcdClient.PutSync(
 		ctx,
 		path.Join(paths.PoliciesAPIConfigPath, req.PolicyName),
@@ -256,7 +253,7 @@ func (s *PolicyService) UpsertPolicy(ctx context.Context, req *policylangv1.Upse
 		log.Info().Str("policy", req.PolicyName).Msg("Policy created in etcd")
 	}
 
-	return &policylangv1.UpsertPolicyResponse{PolicyHash: hash}, nil
+	return &policylangv1.UpsertPolicyResponse{PolicyHash: HashStoredPolicy(newPolicyString)}, nil
 }
 
 // PostDynamicConfig updates dynamic config to the system.
