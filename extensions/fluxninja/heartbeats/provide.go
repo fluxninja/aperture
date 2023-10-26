@@ -89,15 +89,11 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 
 	runCtx, cancel := context.WithCancel(context.Background())
 
+	heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.ExtensionConfig, getControllerID(in.ExtensionConfig), in.OtelConfigProvider, in.Lifecycle)
+
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.ExtensionConfig, getControllerID(in.ExtensionConfig), in.OtelConfigProvider, in.Lifecycle)
-			if err != nil {
-				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
-				return err
-			}
-
-			err = heartbeats.start(runCtx, &in)
+			err := heartbeats.start(runCtx, &in)
 			if err != nil {
 				log.Error().Err(err).Msg("Heartbeats start had an error")
 				return err

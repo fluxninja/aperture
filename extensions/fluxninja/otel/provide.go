@@ -75,6 +75,11 @@ func injectOtelConfig(
 		configProvider.AddMutatingHook(func(config *otelconfig.Config) {
 			addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
 
+			if heartbeats.ControllerInfo == nil {
+				log.Info().Msg("Heartbeats controller info not set, skipping")
+				return
+			}
+
 			controllerID := heartbeats.ControllerInfo.Id
 
 			addAttributesProcessor(config, controllerID)

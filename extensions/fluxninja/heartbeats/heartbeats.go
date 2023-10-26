@@ -132,20 +132,21 @@ func (h *Heartbeats) setupControllerInfo(
 	controllerID string,
 	configProvider *otelconfig.Provider,
 	lifeCycle fx.Lifecycle,
-) error {
+) {
 	if extensionConfig.EnableCloudController {
 		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
 		h.ControllerInfo = &heartbeatv1.ControllerInfo{
 			Id: "cloud",
 		}
-		return nil
+		return
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
 
 	lifeCycle.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
+		OnStart: func(context.Context) error {
 			panichandler.Go(func() {
+				log.Info().Msg("Creating controller id")
 				etcdPath := "/fluxninja/controllerid"
 				txn, err := etcdClient.Txn(ctx)
 				if err != nil {
@@ -171,18 +172,17 @@ func (h *Heartbeats) setupControllerInfo(
 				h.ControllerInfo = &heartbeatv1.ControllerInfo{
 					Id: controllerID,
 				}
+				log.Info().Str("controllerId", controllerID).Msg("Controller id created")
 				// Call otelconfig.Provider.UpdateConfig() to update the controller id in the otel config
 				configProvider.UpdateConfig()
 			})
 			return nil
 		},
-		OnStop: func(_ context.Context) error {
+		OnStop: func(context.Context) error {
 			cancel()
 			return nil
 		},
 	})
-
-	return nil
 }
 
 func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder grpcclient.ClientConnectionBuilder) (jobs.Job, error) {
