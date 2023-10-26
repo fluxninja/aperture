@@ -25,7 +25,7 @@ if err != nil {
 
 ### HTTP Middleware
 
-`aperture-go` provides a HTTP middleware to be used with routers.
+`aperture-go` provides an HTTP middleware to be used with routers.
 
 ```go
 // Create a new mux router

@@ -245,6 +245,9 @@ func runDockerContainer(image string, port string) (string, error) {
 			AttachStdout: true,
 			AttachStderr: true,
 			ExposedPorts: exposedPorts,
+			Env: []string{
+				"APERTURE_AGENT_INSECURE=true",
+			},
 		},
 		&container.HostConfig{
 			Binds: []string{
