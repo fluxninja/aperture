@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture-go/v2
 
-go 1.20
+go 1.21
 
 require (
 	buf.build/gen/go/fluxninja/aperture/grpc/go v1.3.0-20230922113103-98fe61af5f4b.1
