@@ -1307,9 +1307,13 @@ cloud_extension = {
     'api_key': api_key,
     'agent_group': str(local('hostname')).strip().lower(),
     'cloud_controller': cloud_controller,
-    'personal_api_key': personal_api_key,
-    'project_name': project_name,
 }
+
+if personal_api_key:
+    cloud_extension['personal_api_key'] = personal_api_key
+
+if project_name:
+    cloud_extension['project_name'] = project_name
 
 # Optionally, process a list of images that should be pulled from dockerhub instead of being
 # built locally. This is mostly meant for aperture-agent, aperture-controller and aperture-operator.
