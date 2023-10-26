@@ -17,6 +17,7 @@ var (
 	dot       string
 	mermaid   string
 	graph     string
+	tree      string
 	depth     int
 )
 
@@ -26,6 +27,7 @@ func init() {
 	compileCmd.Flags().StringVar(&dot, "dot", "", "Path to store the dot file")
 	compileCmd.Flags().StringVar(&mermaid, "mermaid", "", "Path to store the mermaid file")
 	compileCmd.Flags().StringVar(&graph, "graph", "", "Path to store the graph file")
+	compileCmd.Flags().StringVar(&tree, "tree", "", "Path to store the graph file")
 	compileCmd.Flags().IntVar(&depth, "depth", 1, "Maximum depth to expand the graph. Use -1 for maximum possible depth")
 }
 
@@ -88,6 +90,11 @@ aperturectl compile --policy=policy.yaml --mermaid --dot`,
 		// if --graph flag is set, write graph file
 		if graph != "" {
 			if err := utils.GenerateGraphFile(circuit, graph, depth); err != nil {
+				return err
+			}
+		}
+		if tree != "" {
+			if err := utils.GenerateTreeGraph(circuit, tree); err != nil {
 				return err
 			}
 		}

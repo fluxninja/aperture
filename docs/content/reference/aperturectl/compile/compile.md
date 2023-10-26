@@ -39,6 +39,7 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
   -h, --help             help for compile
       --mermaid string   Path to store the mermaid file
       --policy string    Path to Aperture Policy file
+      --tree string      Path to store the graph file
 ```
 
 ### SEE ALSO

@@ -162,6 +162,35 @@ func GenerateGraphFile(circuit *circuitfactory.Circuit, graphFilePath string, de
 	return nil
 }
 
+// GenerateTreeGraph generates a tree graph from the given circuit.
+func GenerateTreeGraph(circuit *circuitfactory.Circuit, treeFilePath string) error {
+	treeGraph, err := circuit.Tree.TreeGraph()
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(treeFilePath)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating file")
+		return err
+	}
+	defer f.Close()
+
+	treeGraphJSON, err := json.Marshal(treeGraph)
+	if err != nil {
+		log.Error().Err(err).Msg("error marshaling graph")
+		return err
+	}
+
+	_, err = f.Write(treeGraphJSON)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing to file")
+		return err
+	}
+
+	return nil
+}
+
 // CompilePolicy compiles the policy and returns the circuit.
 func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	ctx := context.Background()
