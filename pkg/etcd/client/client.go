@@ -406,6 +406,11 @@ func (etcdClient *Client) writeLoopFn(ctx context.Context, wg *sync.WaitGroup) f
 	}
 }
 
+// ETCDClient returns the underlying ETCD client.
+func (etcdClient *Client) ETCDClient() *clientv3.Client {
+	return etcdClient.client
+}
+
 // Watch starts a watch with etcd and returns a channel that will receive events.
 func (etcdClient *Client) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) (clientv3.WatchChan, error) {
 	// wait for the client to be ready
