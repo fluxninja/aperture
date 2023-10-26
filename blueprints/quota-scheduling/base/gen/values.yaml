@@ -2,7 +2,6 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
 blueprint: quota-scheduling/base
-uri: github.com/fluxninja/aperture/blueprints@latest
 
 policy:
   # Name of the policy.
@@ -29,4 +28,3 @@ policy:
     # Required: True
     selectors:
       - control_point: __REQUIRED_FIELD__
-        service: __REQUIRED_FIELD__

@@ -3,7 +3,7 @@
   "type": "object",
   "title": "auto-scaling/pod-auto-scaler blueprint",
   "additionalProperties": false,
-  "required": ["blueprint", "uri", "policy"],
+  "required": ["blueprint", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",

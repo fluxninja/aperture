@@ -12,9 +12,8 @@ import java.util.concurrent.CompletableFuture;
 public class ArmeriaServer {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_FAIL_OPEN = "true";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
+    public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -47,23 +46,19 @@ public class ArmeriaServer {
     }
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("APERTURE_AGENT_HOST");
+        String agentHost = System.getenv("APERTURE_AGENT_ADDRESS");
         if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
-        }
-        String agentPort = System.getenv("APERTURE_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+            agentHost = DEFAULT_AGENT_ADDRESS;
         }
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
-        String failOpenString = System.getenv("FN_ENABLE_FAIL_OPEN");
-        if (failOpenString == null) {
-            failOpenString = DEFAULT_FAIL_OPEN;
+        String rampModeString = System.getenv("FN_ENABLE_RAMP_MODE");
+        if (rampModeString == null) {
+            rampModeString = DEFAULT_RAMP_MODE;
         }
-        boolean failOpen = Boolean.parseBoolean(failOpenString);
+        boolean rampMode = Boolean.parseBoolean(rampModeString);
 
         String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
         if (controlPointName == null) {
@@ -84,9 +79,7 @@ public class ArmeriaServer {
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
+                            .setAddress(agentHost)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -104,7 +97,10 @@ public class ArmeriaServer {
                 createHelloHTTPService()
                         .decorate(
                                 ApertureHTTPService.newDecorator(
-                                        apertureSDK, controlPointName, failOpen));
+                                        apertureSDK,
+                                        controlPointName,
+                                        rampMode,
+                                        Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

@@ -1,4 +1,5 @@
 import enum
+import logging
 import time
 from contextlib import AbstractContextManager
 from typing import Optional, TypeVar
@@ -35,15 +36,13 @@ class Flow(AbstractContextManager):
         self._check_response = check_response
         self._status_code = FlowStatus.OK
         self._ended = False
-        self._fail_open = True
+        self._ramp_mode = False
+        self.logger = logging.getLogger("aperture-py-sdk-flow")
 
     def should_run(self) -> bool:
         return self.decision == FlowDecision.Accepted or (
-            self._fail_open and self.decision == FlowDecision.Unreachable
+            (not self._ramp_mode) and self.decision == FlowDecision.Unreachable
         )
-
-    def disable_fail_open(self) -> None:
-        self._fail_open = False
 
     @property
     def decision(self) -> FlowDecision:
@@ -69,7 +68,8 @@ class Flow(AbstractContextManager):
 
     def end(self) -> None:
         if self._ended:
-            raise ValueError("flow already ended")
+            self.logger.warning("attempting to end an already ended flow")
+            return
         self._ended = True
 
         check_response_json = (

@@ -2,7 +2,7 @@ local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common/policy.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
   local commonPolicy = commonPolicyFn(updatedConfig),
 
@@ -11,7 +11,7 @@ function(cfg, params={}, metadata={}) {
 
   local rangeDrivenLoadSchedulerComponent = spec.v1.Component.withFlowControl(
     spec.v1.FlowControl.withRangeDrivenLoadScheduler(
-      local range = updatedConfig.policy.service_protection_core.range_driven_load_scheduler;
+      local range = updatedConfig.policy.load_scheduling_core.range_driven_load_scheduler;
 
       spec.v1.RangeDrivenLoadScheduler.new()
       + spec.v1.RangeDrivenLoadScheduler.withInPorts({
@@ -24,7 +24,7 @@ function(cfg, params={}, metadata={}) {
       })
       + spec.v1.RangeDrivenLoadScheduler.withParameters(range)
       + spec.v1.RangeDrivenLoadScheduler.withDryRunConfigKey('dry_run')
-      + spec.v1.RangeDrivenLoadScheduler.withDryRun(updatedConfig.policy.service_protection_core.dry_run)
+      + spec.v1.RangeDrivenLoadScheduler.withDryRun(updatedConfig.policy.load_scheduling_core.dry_run)
     ),
   ),
 

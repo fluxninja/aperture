@@ -47,18 +47,44 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/api"
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	"github.com/go-logr/logr"
 )
 
 // AgentReconciler reconciles a Agent object.
 type AgentReconciler struct {
 	client.Client
-	DynamicClient    dynamic.Interface
-	Scheme           *runtime.Scheme
-	Recorder         record.EventRecorder
-	ApertureInjector *mutatingwebhook.ApertureInjector
-	resourcesDeleted bool
-	defaultsExecuted bool
+	DynamicClient         dynamic.Interface
+	Scheme                *runtime.Scheme
+	Recorder              record.EventRecorder
+	ApertureInjector      *mutatingwebhook.ApertureInjector
+	MultipleAgentsEnabled bool
+	resourcesDeleted      bool
+	defaultsExecuted      bool
+}
+
+// verifySingletonAgentExists checks if there is already an Agent resource in the cluster.
+func (r *AgentReconciler) verifySingletonAgentExists(ctx context.Context, instance *agentv1alpha1.Agent, instances *agentv1alpha1.AgentList) (bool, error) {
+	// Check if this is an update request. If not, skip the resource creation as only single Agent is required in a cluster.
+	if instances.Items != nil && len(instances.Items) != 0 {
+		for _, ins := range instances.Items {
+			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
+				continue
+			}
+			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
+				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
+					"The required resources are already deployed. Skipping resource creation as currently, the Agent does not support multiple replicas.")
+
+				instance.Status.Resources = "skipped"
+				if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+					return false, err
+				}
+
+				return false, nil
+			}
+		}
+	}
+	return true, nil
 }
 
 //+kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
@@ -114,6 +140,15 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
+	// Checking if the Minimum kubernetes version condition is satisfied.
+	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
+		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
+			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
+		instance.Status.Resources = "failed"
+		err = r.updateStatus(ctx, instance.DeepCopy())
+		return ctrl.Result{}, err
+	}
+
 	// Handing delete operation
 	if instance.GetDeletionTimestamp() != nil {
 		logger.Info(fmt.Sprintf("Handling deletion of resources for Instance '%s' in Namespace '%s'", instance.GetName(), instance.GetNamespace()))
@@ -137,24 +172,19 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
-	// Check if this is an update request. If not, skip the resource creation as only single Controller is required in a cluster.
-	if instances.Items != nil && len(instances.Items) != 0 {
-		for _, ins := range instances.Items {
-			if ins.GetNamespace() == instance.GetNamespace() && ins.GetName() == instance.GetName() {
-				continue
-			}
-			if ins.GetDeletionTimestamp() == nil && (ins.Status.Resources == "creating" || ins.Status.Resources == "created") {
-				r.Recorder.Event(instance, corev1.EventTypeWarning, "ResourcesExist",
-					"The required resources are already deployed. Skipping resource creation as currently, the Agent does not require multiple replicas.")
-
-				instance.Status.Resources = "skipped"
-				if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-					return ctrl.Result{}, err
-				}
-
-				return ctrl.Result{}, nil
-			}
+	if !r.MultipleAgentsEnabled {
+		passed, innerErr := r.verifySingletonAgentExists(ctx, instance, instances)
+		if innerErr != nil {
+			return ctrl.Result{}, innerErr
 		}
+		if !passed {
+			return ctrl.Result{}, nil
+		}
+	}
+
+	instance.Status.Resources = "creating"
+	if err = r.updateStatus(ctx, instance.DeepCopy()); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	if instance.Annotations == nil || instance.Annotations[controllers.DefaulterAnnotationKey] != "true" || !r.defaultsExecuted {
@@ -165,12 +195,6 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 			return ctrl.Result{}, nil
 		}
 		r.defaultsExecuted = true
-	}
-
-	// Checking if the Minimum kubernetes version condition is satisfied.
-	if len(instance.Status.Resources) == 0 && !controllers.MinimumKubernetesVersionBool {
-		r.Recorder.Event(instance, corev1.EventTypeWarning, "MinimumKubernetesVersionFail",
-			fmt.Sprintf("Kubernetes version %v is not supported. Please use a kubernetes cluster with version %v or above.", controllers.CurrentKubernetesVersion.String(), controllers.MinimumKubernetesVersion))
 	}
 
 	if instance.Annotations != nil && instance.Annotations[controllers.AgentModeChangeAnnotationKey] == "true" {
@@ -187,10 +211,6 @@ func (r *AgentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		delete(instance.Annotations, controllers.AgentModeChangeAnnotationKey)
 	}
 
-	instance.Status.Resources = "creating"
-	if err := r.updateStatus(ctx, instance.DeepCopy()); err != nil {
-		return ctrl.Result{}, err
-	}
 	r.resourcesDeleted = false
 
 	if err := r.manageResources(ctx, logger, instance); err != nil {
@@ -248,12 +268,28 @@ func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log 
 				log.Error(err, "failed to delete object of ConfigMap for Controller Client Cert")
 			}
 		}
+
+		if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+			// Deleting older ConfigMap
+			configMap.Name = controllers.AgentControllerClientCertCMName
+			if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "failed to delete object of ConfigMap for Controller Client Cert")
+			}
+		}
 	}
 
 	cm, err := configMapForAgentConfig(ctx, r.Client, instance.DeepCopy(), r.Scheme)
 	if err == nil {
 		if err = r.Delete(ctx, cm); err != nil {
 			log.Error(err, "failed to delete object of ConfigMap")
+		}
+
+		if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+			// Deleting older ConfigMap
+			cm.Name = controllers.AgentServiceName
+			if err = r.Delete(ctx, cm); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "failed to delete object of ConfigMap")
+			}
 		}
 	}
 
@@ -262,6 +298,14 @@ func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log 
 		if err = r.Delete(ctx, svc); err != nil {
 			log.Error(err, "failed to delete object of Service")
 		}
+
+		if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+			// Deleting older Service
+			svc.Name = controllers.AgentServiceName
+			if err = r.Delete(ctx, svc); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "failed to delete object of Service")
+			}
+		}
 	}
 
 	sa, err := serviceAccountForAgent(instance.DeepCopy(), r.Scheme)
@@ -269,12 +313,28 @@ func (r *AgentReconciler) deleteDaemonSetModeResources(ctx context.Context, log 
 		if err = r.Delete(ctx, sa); err != nil {
 			log.Error(err, "failed to delete object of ServiceAccount")
 		}
+
+		if instance.Spec.ServiceAccountSpec.Name != controllers.AgentServiceName {
+			// Deleting older ServiceAccount
+			sa.Name = controllers.AgentServiceName
+			if err = r.Delete(ctx, sa); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "failed to delete object of ServiceAccount")
+			}
+		}
 	}
 
 	ds, err := daemonsetForAgent(instance.DeepCopy(), log, r.Scheme)
 	if err == nil {
 		if err = r.Delete(ctx, ds); err != nil {
 			log.Error(err, "failed to delete object of DaemonSet")
+		}
+
+		if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+			// Deleting older DaemonSet
+			ds.Name = controllers.AgentServiceName
+			if err = r.Delete(ctx, ds); err != nil && !errors.IsNotFound(err) {
+				log.Error(err, "failed to delete object of DaemonSet")
+			}
 		}
 	}
 
@@ -318,6 +378,14 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 				log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
 			}
 
+			if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+				// Deleting older ConfigMap
+				configMap.Name = controllers.AgentServiceName
+				if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+					log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+				}
+			}
+
 			if len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 				instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName {
 				configMap, err = configMapForAgentControllerClientCert(ctx, r.Client, instance, nil)
@@ -330,6 +398,14 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 					configMap.Annotations = controllers.AgentAnnotationsWithOwnerRef(instance)
 					if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
 						log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+					}
+
+					if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+						// Deleting older ConfigMap
+						configMap.Name = controllers.AgentControllerClientCertCMName
+						if err = r.Delete(ctx, configMap); err != nil && !errors.IsNotFound(err) {
+							log.Error(err, fmt.Sprintf("failed to delete object of ConfigMap '%s' in namespace %s", configMap.GetName(), ns.GetName()))
+						}
 					}
 				}
 			}
@@ -358,19 +434,28 @@ func (r *AgentReconciler) deleteSidecarModeResources(ctx context.Context, log lo
 
 // deleteResources deletes cluster-scoped resources for which owner-reference is not added.
 func (r *AgentReconciler) deleteResources(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) {
-	// Deleting old ClusterRole
-	cr := clusterRoleForAgent(instance)
-	cr.Name = controllers.AppName
-	if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
-		log.Error(err, "failed to delete object of ClusterRole")
-	}
-
 	if err := r.Delete(ctx, clusterRoleForAgent(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRole")
 	}
 
 	if err := r.Delete(ctx, clusterRoleBindingForAgent(instance)); err != nil {
 		log.Error(err, "failed to delete object of ClusterRoleBinding")
+	}
+
+	if instance.Spec.NameOverride != "" && instance.Spec.NameOverride != controllers.AgentServiceName {
+		// Deleting old ClusterRole
+		cr := clusterRoleForAgent(instance)
+		cr.Name = controllers.AgentServiceName
+		if err := r.Delete(ctx, cr); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "failed to delete object of ClusterRole")
+		}
+
+		// Deleting old ClusterRoleBinding
+		crb := clusterRoleBindingForAgent(instance)
+		crb.Name = controllers.AgentServiceName
+		if err := r.Delete(ctx, crb); err != nil && !errors.IsNotFound(err) {
+			log.Error(err, "failed to delete object of ClusterRoleBinding")
+		}
 	}
 
 	if instance.Spec.Sidecar.Enabled {
@@ -435,9 +520,9 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 	}
 
 	if instance.Spec.Sidecar.Enabled {
-		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_SIDECAR"
-	} else {
-		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = "KUBERNETES_DAEMONSET"
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesSidecar
+	} else if strings.ToLower(instance.Spec.DeploymentConfigSpec.Type) != "deployment" {
+		instance.Spec.ConfigSpec.FluxNinja.InstallationMode = utils.InstallationModeKubernetesDaemonSet
 	}
 
 	if !instance.Spec.ConfigSpec.FluxNinja.EnableCloudController {
@@ -458,6 +543,11 @@ func (r *AgentReconciler) checkDefaults(ctx context.Context, instance *agentv1al
 
 	if (instance.Spec.Image.Digest == "" && instance.Spec.Image.Tag == "") || (instance.Spec.Image.Digest != "" && instance.Spec.Image.Tag != "") {
 		return updateStatus(instance, "ValidationFailed", "Either 'spec.image.digest' or 'spec.image.tag' should be provided.")
+	}
+
+	if instance.Spec.ConfigSpec.FluxNinja.InstallationMode != utils.InstallationModeCloudAgent && instance.Spec.ConfigSpec.AgentInfo.AgentGroup == utils.ApertureCloudAgentGroup {
+		return updateStatus(instance, "ValidationFailed",
+			fmt.Sprintf("'%s' is a reserved group name for FluxNinja Cloud Agents. Please use a different agent group name", utils.ApertureCloudAgentGroup))
 	}
 
 	if instance.Status.Resources == controllers.FailedStatus {
@@ -496,6 +586,10 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 		return err
 	}
 
+	if err := r.reconcileDeployment(ctx, log, instance); err != nil {
+		return err
+	}
+
 	if err := r.reconcileSecret(ctx, instance); err != nil {
 		return err
 	}
@@ -513,7 +607,7 @@ func (r *AgentReconciler) manageResources(ctx context.Context, log logr.Logger, 
 // reconcileControllerCertConfigMap prepares the desired states for Agent configmaps containing Controller cert and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileControllerCertConfigMap(ctx context.Context, instance *agentv1alpha1.Agent) error {
-	if !instance.Spec.Sidecar.Enabled &&
+	if !r.MultipleAgentsEnabled && !instance.Spec.Sidecar.Enabled &&
 		len(instance.Spec.ConfigSpec.AgentFunctions.Endpoints) > 0 &&
 		(instance.Spec.ControllerClientCertConfig.ConfigMapName == "" ||
 			instance.Spec.ControllerClientCertConfig.ConfigMapName == controllers.AgentControllerClientCertCMName) {
@@ -660,7 +754,9 @@ func (r *AgentReconciler) reconcileServiceAccount(ctx context.Context, log logr.
 // reconcileDaemonset prepares the desired states for Agent DaemonSet and
 // sends an request to Kubernetes API to move the actual state to the prepared desired state.
 func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
-	if instance.Spec.Sidecar.Enabled {
+	if instance.Spec.Sidecar.Enabled || (r.MultipleAgentsEnabled &&
+		instance.Spec.DeploymentConfigSpec.Type != "" &&
+		strings.ToLower(instance.Spec.DeploymentConfigSpec.Type) != "daemonset") {
 		return nil
 	}
 
@@ -686,6 +782,42 @@ func (r *AgentReconciler) reconcileDaemonset(ctx context.Context, log logr.Logge
 		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetCreationSuccessful", "Created DaemonSet '%s'", dms.GetName())
 	case controllerutil.OperationResultUpdated:
 		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DaemonSetUpdationSuccessful", "Updated DaemonSet '%s'", dms.GetName())
+	case controllerutil.OperationResultNone:
+	default:
+	}
+
+	return nil
+}
+
+// reconcileDeployment prepares the desired states for Agent Deployment and
+// sends an request to Kubernetes API to move the actual state to the prepared desired state.
+func (r *AgentReconciler) reconcileDeployment(ctx context.Context, log logr.Logger, instance *agentv1alpha1.Agent) error {
+	if instance.Spec.Sidecar.Enabled || !r.MultipleAgentsEnabled || strings.ToLower(instance.Spec.DeploymentConfigSpec.Type) != "deployment" {
+		return nil
+	}
+
+	dply, err := deploymentForAgent(instance.DeepCopy(), log, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	res, err := controllerutil.CreateOrUpdate(ctx, r.Client, dply, deploymentMutate(dply, dply.Spec))
+	if err != nil {
+		if errors.IsConflict(err) {
+			return r.reconcileDeployment(ctx, log, instance)
+		}
+
+		msg := fmt.Sprintf("failed to create Deployment '%s' for Instance '%s' in Namespace '%s'. Response='%v', Error='%s'",
+			dply.GetName(), instance.GetName(), instance.GetNamespace(), res, err.Error())
+		r.Recorder.Event(instance, corev1.EventTypeNormal, "DeploymentCreationFailed", msg)
+		return fmt.Errorf(msg)
+	}
+
+	switch res {
+	case controllerutil.OperationResultCreated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DeploymentCreationSuccessful", "Created Deployment '%s'", dply.GetName())
+	case controllerutil.OperationResultUpdated:
+		r.Recorder.Eventf(instance, corev1.EventTypeNormal, "DeploymentUpdationSuccessful", "Updated Deployment '%s'", dply.GetName())
 	case controllerutil.OperationResultNone:
 	default:
 	}
@@ -912,6 +1044,9 @@ func eventFiltersForAgent() predicate.Predicate {
 func (r *AgentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.Agent{}).
+		Owns(&appsv1.DaemonSet{}).
+		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
 		Owns(&corev1.ConfigMap{}).
 		Owns(&corev1.Secret{}).
 		Owns(&corev1.ServiceAccount{}).

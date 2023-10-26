@@ -13,7 +13,7 @@ executors:
       - image: cimg/base:2022.07
   go-cimg-executor:
     docker:
-      - image: cimg/go:1.20.6
+      - image: cimg/go:1.21.3
         user: root
   python-cimg-executor:
     docker:
@@ -107,6 +107,10 @@ jobs:
       dockerhub-image:
         type: string
         description: A name for your Docker image
+      dockerhub-ops-image:
+        type: string
+        description: A name for your Docker image to push under fluxninjaops
+        default: ""
       gcr-registry:
         type: string
         description: Google Container Registry to push images to
@@ -201,6 +205,17 @@ jobs:
       - gcp-gcr/push-image:
           image: <<parameters.gcr-image>>
           tag: <<parameters.tag>>
+      - when:
+          condition:
+            not:
+              equal: ["", <<parameters.dockerhub-ops-image>>]
+          steps:
+            run:
+              name: Push images to DockerHub ops account
+              command: |
+                docker tag <<parameters.dockerhub-image>>:<<parameters.tag>> <<parameters.dockerhub-ops-image>>:<<parameters.tag>>
+                docker login -u "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+                docker push <<parameters.dockerhub-ops-image>>:<<parameters.tag>>
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
@@ -1081,7 +1096,8 @@ jobs:
         description: Name of the playground scenario to apply
       controller-endpoint:
         type: string
-        description: The endpoint of the controller to which the policy should be applied
+        description:
+          The endpoint of the controller to which the policy should be applied
     executor: go-cimg-executor
     steps:
       - checkout
@@ -1093,8 +1109,8 @@ jobs:
           name: Apply Policy
           working_directory: .
           command: |
-            go run ./cmd/aperturectl/main.go cloud apply policy --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
-            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} -f -s
+            go run ./cmd/aperturectl/main.go cloud policy apply --file ./playground/scenarios/<< parameters.scenario-name >>/policies/<< parameters.policy-name >>-cr.yaml \
+            --controller << parameters.controller-endpoint >> --api-key ${CONTROLLER_API_KEY} --project-name latest-dev -f -s
       - save_cache:
           name: Save go cache
           key: aperture-v2-go-cache-upload-policies
@@ -1190,10 +1206,12 @@ workflows:
     when:
       or:
         - << pipeline.parameters.updated-aperture >>
+        - << pipeline.parameters.updated-blueprints >>
     jobs:
       - build-push-add-tag:
           name: image-build-aperture-agent
           dockerhub-image: fluxninja/aperture-agent
+          dockerhub-ops-image: fluxninjaops/aperture-agent
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-agent
           docker-context: .
@@ -1211,10 +1229,22 @@ workflows:
           environment-path: environments/latest/
           component: aperture-agent
           update: images
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: cloud-agent-update-environment
+          requires:
+            - image-build-aperture-agent
+          environment-path: environments/latest/
+          component: cloud-agent
+          update: images
 
       - build-push-add-tag:
           name: image-build-aperture-controller
           dockerhub-image: fluxninja/aperture-controller
+          dockerhub-ops-image: fluxninjaops/aperture-controller
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-controller
           docker-context: .
@@ -1230,7 +1260,7 @@ workflows:
           requires:
             - image-build-aperture-controller
           environment-path: environments/latest/
-          component: aperture-controller
+          component: cloud-controller
           update: images
 
       - go-test-coverage:
@@ -1328,6 +1358,7 @@ workflows:
       - build-push-add-tag:
           name: image-build-aperture-operator
           dockerhub-image: fluxninja/aperture-operator
+          dockerhub-ops-image: fluxninjaops/aperture-operator
           gcr-registry: gcr.io/devel-309501
           gcr-image: cf-fn/aperture-operator
           docker-context: .

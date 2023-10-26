@@ -3,7 +3,7 @@ consumes:
 definitions:
     AIADLoadScheduler:
         description: |-
-            _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+            _AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.
             During recovery, it increases the token rate linearly until the system is not overloaded.
         properties:
             dry_run:
@@ -710,6 +710,18 @@ definitions:
                 type: string
                 x-go-tag-default: 30s
         type: object
+    Blueprint:
+        properties:
+            blueprints_name:
+                type: string
+            policy_name:
+                type: string
+            values:
+                format: byte
+                type: string
+            version:
+                type: string
+        type: object
     BoolVariable:
         description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -1019,21 +1031,18 @@ definitions:
             - ERROR_MULTI_EXPRESSION
             - ERROR_EXPRESSION_NOT_MAP
         type: string
-    ClientToServerHello:
-        properties:
-            name:
-                type: string
-            next_id:
-                format: uint64
-                type: string
-        type: object
     CommonAttributes:
         properties:
             component_id:
                 description: The id of Component within the circuit.
                 type: string
             policy_hash:
-                description: Hash of the entire Policy spec.
+                description: |-
+                    Hash of the entire Policy spec.
+
+                    This is the 128 bits of sha256 sum of the policy, as stored in etcd. This
+                    hash will never change after applying policy.  For k8s-managed policies,
+                    the hash might change with new version of the controller.
                 type: string
             policy_name:
                 description: Name of the Policy.
@@ -1079,9 +1088,11 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: |-
+                description: |+
                     Differentiator calculates rate of change per tick.
                     Deprecated: v3.0.0. Use `PIDController` instead.
+
+                x-go-tag-validate: deprecated
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -1644,7 +1655,11 @@ definitions:
         properties:
             adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
-                description: _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                description: |+
+                    _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                    Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+
+                x-go-tag-validate: deprecated
             aiad_load_scheduler:
                 $ref: '#/definitions/AIADLoadScheduler'
                 description: AIAD Load Scheduler.
@@ -1885,6 +1900,12 @@ definitions:
                     type: string
                 type: object
         type: object
+    GetDynamicConfigResponse:
+        description: GetDynamicConfigResponse is a response containing dynamic configuration for Policy.
+        properties:
+            dynamic_config:
+                type: object
+        type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
         properties:
@@ -1917,6 +1938,11 @@ definitions:
             - STALE
             - OUTDATED
         type: string
+    GetResponse:
+        properties:
+            blueprint:
+                $ref: '#/definitions/Blueprint'
+        type: object
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -2635,6 +2661,14 @@ definitions:
                     type: object
                 type: array
         type: object
+    ListResponse:
+        properties:
+            blueprints:
+                items:
+                    $ref: '#/definitions/Blueprint'
+                    type: object
+                type: array
+        type: object
     ListServicesControllerResponse:
         properties:
             errors_count:
@@ -2709,7 +2743,10 @@ definitions:
         properties:
             sampler:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             steps:
                 items:
                     $ref: '#/definitions/LoadRampParametersStep'
@@ -3317,10 +3354,16 @@ definitions:
         properties:
             circuit:
                 $ref: '#/definitions/Circuit'
-                description: Defines the control-loop logic of the policy.
+                description: |+
+                    Defines the control-loop logic of the policy.
+
+                x-go-tag-validate: required_without=Resources
             resources:
                 $ref: '#/definitions/Resources'
-                description: Resources (such as Flux Meters, Classifiers) to setup.
+                description: |+
+                    Resources (such as Flux Meters, Classifiers) to setup.
+
+                x-go-tag-validate: required_without=Circuit
         type: object
     PolicyWrapper:
         properties:
@@ -3718,7 +3761,7 @@ definitions:
             bucket_capacity:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.
+                    Capacity of the bucket to allow for bursty traffic.
 
                 x-go-tag-validate: required
             fill_amount:
@@ -3742,6 +3785,20 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
+            delay_initial_fill:
+                default: false
+                description: |+
+                    Delays the initial filling of the token bucket.
+                    If set to false, the token bucket will start filling immediately
+                    after the first request is received. This can potentially lead to
+                    more requests being accepted than the specified rate limit during
+                    the first interval.
+                    When set to true, the token bucket will be given a chance to
+                    empty out before the filling starts. The delay is equal to the
+                    time it takes to fill the bucket.
+
+                type: boolean
+                x-go-tag-default: "false"
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -3922,25 +3979,6 @@ definitions:
     ReportResponse:
         description: ReportResponse is empty for now.
         type: object
-    Request:
-        properties:
-            id:
-                description: |-
-                    Id of the request, this should be unique per client connection. First
-                    request id on the connection should be equal to nextID from the Hello
-                    message.
-                format: uint64
-                type: string
-            payload:
-                $ref: '#/definitions/googleprotobufAny'
-                description: Request payload. The method on the callee will be dispatched by request's type.
-            timeout:
-                description: |-
-                    Mandatory timeout for processing request. Timeout is handled on
-                    caller-side. After it passes, caller is no longer interested in a response,
-                    and callee can forget about the request.
-                type: string
-        type: object
     Resources:
         description: |-
             :::info
@@ -3991,26 +4029,17 @@ definitions:
                     :::
                 type: object
             telemetry_collectors:
-                description: |-
+                description: |+
                     TelemetryCollector configures OpenTelemetry collector integration.
                     Deprecated: v3.0.0. Use `infra_meters` instead.
+
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
                 type: array
+                x-deprecated: true
+                x-go-tag-validate: deprecated
         title: Resources that need to be setup for the policy to function
-        type: object
-    Response:
-        properties:
-            error:
-                $ref: '#/definitions/googlerpcStatus'
-            id:
-                format: uint64
-                type: string
-            payload:
-                description: Payload is a message of a type implied by request kind.
-                format: byte
-                type: string
         type: object
     Rule:
         description: |-
@@ -4113,7 +4142,10 @@ definitions:
                 description: Input ports for the _Sampler_.
             parameters:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             pass_through_label_values:
                 description: Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
                 items:
@@ -4375,7 +4407,7 @@ definitions:
             ```
         properties:
             agent_group:
-                default: default
+                default: aperture-cloud
                 description: |+
                     [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
@@ -4389,7 +4421,7 @@ definitions:
                     :::
 
                 type: string
-                x-go-tag-default: default
+                x-go-tag-default: aperture-cloud
             control_point:
                 description: |+
                     [Control Point](/concepts/control-point.md)
@@ -4431,22 +4463,6 @@ definitions:
                 x-go-tag-default: any
         required:
             - control_point
-        type: object
-    ServerToClient:
-        properties:
-            cancel_id:
-                description: |-
-                    Cancels in-flight request.
-
-                    After cancellation, the response is not expected to be received, but
-                    might happen that it will be received. If so, it should be ignored.
-                format: uint64
-                type: string
-            request:
-                $ref: '#/definitions/Request'
-                description: |-
-                    Make a request to client. Expect AgentToController message in the
-                    future containing Response with the same id.
         type: object
     Service:
         description: |-
@@ -4847,6 +4863,15 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Output signal.
         type: object
+    UpsertPolicyResponse:
+        properties:
+            policy_hash:
+                title: |-
+                    A hash of the policy, as reported in heartbeats (note: the hash might
+                    change after updating controller with new aperture version)
+                type: string
+        title: UpsertPolicyResponse is a response to UpsertPolicy
+        type: object
     Variable:
         description: Component that emits a constant signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -5055,6 +5080,110 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /fluxninja/v1/blueprints:
+        get:
+            operationId: BlueprintsService_List
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ListResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        post:
+            operationId: BlueprintsService_Apply
+            parameters:
+                - in: query
+                  name: blueprint.blueprints_name
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.version
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.policy_name
+                  required: false
+                  type: string
+                - format: byte
+                  in: query
+                  name: blueprint.values
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}:
+        delete:
+            operationId: BlueprintsService_Delete
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        get:
+            operationId: BlueprintsService_Get
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}/archive:
+        delete:
+            operationId: BlueprintsService_Archive
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
     /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
@@ -5190,6 +5319,45 @@ paths:
             tags:
                 - aperture-agent
     /v1/dynamic-configs/{policy_name}:
+        delete:
+            operationId: PolicyService_DeleteDynamicConfig
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: DeleteDynamicConfig deletes dynamic configuration for a policy.
+            tags:
+                - aperture-controller
+        get:
+            operationId: PolicyService_GetDynamicConfig
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetDynamicConfigResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: GetDynamicConfig lists dynamic configuration for a policy.
+            tags:
+                - aperture-controller
         post:
             operationId: PolicyService_PostDynamicConfig
             parameters:
@@ -5550,16 +5718,14 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        update_mask:
-                            description: The paths to update.
+                        policy_string:
                             type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        properties: {}
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -5582,16 +5748,14 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        update_mask:
-                            description: The paths to update.
+                        policy_string:
                             type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        properties: {}
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -5625,6 +5789,7 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: BlueprintsService
     - name: FlowControlService
     - name: PolicyService
     - name: PolicyService
@@ -5639,4 +5804,3 @@ tags:
     - name: PeerDiscoveryService
     - name: FluxNinjaService
     - name: ControllerInfoService
-    - name: Coordinator

@@ -368,7 +368,11 @@ func (fr *sampler) decisionUpdateCallback(event notifiers.Event, unmarshaller co
 	logger := fr.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
-		fr.acceptPercentage = 100
+		if fr.proto.Parameters.RampMode {
+			fr.acceptPercentage = 0
+		} else {
+			fr.acceptPercentage = 100
+		}
 		return
 	}
 

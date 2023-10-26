@@ -31,17 +31,21 @@ type PeersOut struct {
 func setupPeersWatcher(
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	lc fx.Lifecycle,
 ) (PeersOut, error) {
-	if extensionConfig.APIKey == "" {
+	apiKey := extensionConfig.AgentAPIKey
+	if apiKey == "" {
+		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+		apiKey = extensionConfig.APIKey
+	}
+	if apiKey == "" {
 		return PeersOut{}, nil
 	}
 
 	if info.Service != utils.ApertureController {
 		return PeersOut{}, nil
 	}
-	pd, err := peers.NewPeerDiscovery("aperture-agent", etcdClient, sessionScopedKV, nil)
+	pd, err := peers.NewPeerDiscovery("aperture-agent", etcdClient, nil)
 	if err != nil {
 		return PeersOut{}, err
 	}

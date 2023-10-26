@@ -3,7 +3,7 @@ local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config-defaults.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
@@ -57,7 +57,7 @@ function(cfg, params={}, metadata={}) {
 
   local confirmationAccumulator = std.foldl(
     addOverloadConfirmation,
-    (if std.objectHas(updatedConfig.policy.service_protection_core, 'overload_confirmations') then updatedConfig.policy.service_protection_core.overload_confirmations else []),
+    (if std.objectHas(updatedConfig.policy.load_scheduling_core, 'overload_confirmations') then updatedConfig.policy.load_scheduling_core.overload_confirmations else []),
     confirmationAccumulatorInitial
   ),
 

@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: basic-service-protection
+  name: workload-prioritization
 spec:
   circuit:
     components:
@@ -33,6 +33,18 @@ spec:
               slope: -1
             load_multiplier_linear_increment: 0.025
             load_scheduler:
+              scheduler:
+                workloads:
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: guest
+                  parameters:
+                    priority: 50
+                - label_matcher:
+                    match_labels:
+                      http.request.header.user_type: subscriber
+                  parameters:
+                    priority: 200
               selectors:
               - control_point: ingress
                 service: cart-service.prod.svc.cluster.local
@@ -43,18 +55,18 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="basic-service-protection",
-            policy_name="basic-service-protection"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="basic-service-protection", policy_name="basic-service-protection"}[30s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
+            policy_name="workload-prioritization"}[30s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[30s]))
     - query:
         promql:
           evaluation_interval: 30s
           out_ports:
             output:
               signal_name: SIGNAL_LONG_TERM
-          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="basic-service-protection",
-            policy_name="basic-service-protection"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
-            flux_meter_name="basic-service-protection", policy_name="basic-service-protection"}[1800s]))
+          query_string: sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="workload-prioritization",
+            policy_name="workload-prioritization"}[1800s]))/sum(increase(flux_meter_count{flow_status="OK",
+            flux_meter_name="workload-prioritization", policy_name="workload-prioritization"}[1800s]))
     - arithmetic_combinator:
         in_ports:
           lhs:
@@ -71,7 +83,7 @@ spec:
     flow_control:
       classifiers: []
       flux_meters:
-        basic-service-protection:
+        workload-prioritization:
           selectors:
           - control_point: ingress
             service: cart-service.prod.svc.cluster.local

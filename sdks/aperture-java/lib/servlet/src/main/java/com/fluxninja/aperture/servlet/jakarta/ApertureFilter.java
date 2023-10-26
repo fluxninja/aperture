@@ -18,13 +18,14 @@ public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
     private String controlPointName;
-    private boolean failOpen;
+    private boolean rampMode;
+    private Duration flowTimeout;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         TrafficFlowRequest trafficFlowRequest =
-                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName);
+                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName, flowTimeout);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
@@ -40,7 +41,7 @@ public class ApertureFilter implements Filter {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             try {
@@ -63,8 +64,7 @@ public class ApertureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String agentHost;
-        String agentPort;
+        String agentAddress;
         String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
@@ -72,10 +72,8 @@ public class ApertureFilter implements Filter {
         String ignoredPaths;
         boolean ignoredPathsRegex;
         try {
-            agentHost = filterConfig.getInitParameter("agent_host");
-            agentPort = filterConfig.getInitParameter("agent_port");
+            agentAddress = filterConfig.getInitParameter("agent_address");
             initControlPointName = filterConfig.getInitParameter("control_point_name");
-            timeoutMs = filterConfig.getInitParameter("timeout_ms");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
             ignoredPaths = filterConfig.getInitParameter("ignored_paths");
@@ -83,7 +81,13 @@ public class ApertureFilter implements Filter {
                     Boolean.parseBoolean(
                             filterConfig.getInitParameter("ignored_paths_match_regex"));
 
-            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
+            timeoutMs = filterConfig.getInitParameter("timeout_ms");
+            if (timeoutMs != null) {
+                this.flowTimeout = Duration.ofMillis(Integer.parseInt(timeoutMs));
+            } else {
+                this.flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+            }
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
 
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
@@ -95,11 +99,7 @@ public class ApertureFilter implements Filter {
         controlPointName = initControlPointName;
 
         ApertureSDKBuilder builder = ApertureSDK.builder();
-        builder.setHost(agentHost);
-        builder.setPort(Integer.parseInt(agentPort));
-        if (timeoutMs != null) {
-            builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
-        }
+        builder.setAddress(agentAddress);
         builder.useInsecureGrpc(insecureGrpc);
         if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
             try {

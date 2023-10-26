@@ -3,7 +3,7 @@
   "type": "object",
   "title": "load-scheduling/promql blueprint",
   "additionalProperties": false,
-  "required": ["blueprint", "uri", "policy"],
+  "required": ["blueprint", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",
@@ -21,7 +21,7 @@
       "additionalProperties": false,
       "required": [
         "policy_name",
-        "service_protection_core",
+        "load_scheduling_core",
         "promql_query",
         "setpoint",
         "overload_condition"
@@ -51,7 +51,7 @@
           "type": "object",
           "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
         },
-        "service_protection_core": {
+        "load_scheduling_core": {
           "type": "object",
           "additionalProperties": false,
           "required": ["aiad_load_scheduler"],
@@ -87,8 +87,7 @@
                 "load_scheduler": {
                   "selectors": [
                     {
-                      "control_point": "__REQUIRED_FIELD__",
-                      "service": "__REQUIRED_FIELD__"
+                      "control_point": "__REQUIRED_FIELD__"
                     }
                   ]
                 },

@@ -28,6 +28,10 @@ type CommonAttributes struct {
 	// Name of the Policy.
 	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
 	// Hash of the entire Policy spec.
+	//
+	// This is the 128 bits of sha256 sum of the policy, as stored in etcd. This
+	// hash will never change after applying policy.  For k8s-managed policies,
+	// the hash might change with new version of the controller.
 	PolicyHash string `protobuf:"bytes,2,opt,name=policy_hash,json=policyHash,proto3" json:"policy_hash,omitempty"`
 	// The id of Component within the circuit.
 	ComponentId string `protobuf:"bytes,3,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`

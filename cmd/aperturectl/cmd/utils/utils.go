@@ -2,16 +2,19 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -24,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
@@ -119,11 +123,65 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, policy, err := controlplane.ValidateAndCompile(ctx, name, policyBytes)
+	circuit, policy, err := controlplane.ValidateAndCompileYAML(ctx, name, policyBytes)
 	if err != nil {
 		return nil, nil, err
 	}
 	return circuit, policy, nil
+}
+
+// GetFlatComponentsList returns a flat representation of the circuit graph.
+func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
+	compListJSON := ExpandTreeWithParentInfo(circuit.Tree, "")
+	// leave only top level parent name
+	for _, comp := range compListJSON {
+		tempName := strings.TrimPrefix(comp.ParentName, "/Circuit")
+		tempName = strings.TrimPrefix(tempName, "/")
+		firtLvlParent, _, found := strings.Cut(tempName, "/")
+		if !found {
+			comp.ParentName = ""
+		} else {
+			comp.ParentName = firtLvlParent
+		}
+	}
+
+	flatComponentsList, err := json.Marshal(compListJSON)
+	if err != nil {
+		errMsg := fmt.Errorf("error marshaling circuit graph: %w", err)
+		return "", errMsg
+	}
+
+	return string(flatComponentsList), nil
+}
+
+type componentOutput struct {
+	ComponentID   string          `json:"component_id"`
+	ComponentName string          `json:"component_name"`
+	ParentName    string          `json:"parent_name"`
+	Component     utils.MapStruct `json:"component"`
+}
+
+func ExpandTreeWithParentInfo(tree circuitfactory.Tree, parentName string) []*componentOutput {
+	components := []*componentOutput{}
+	newParentName := fmt.Sprintf("%s/%s", parentName, tree.Node.Component.Name())
+	// If the tree has children, recurse into them.
+	if len(tree.Children) > 0 {
+		for _, child := range tree.Children {
+			childComponents := ExpandTreeWithParentInfo(child, newParentName)
+			components = append(components, childComponents...)
+		}
+	} else {
+		// If the tree does not have children, add its root component to the list.
+		compOutput := &componentOutput{
+			ComponentID:   tree.Node.ComponentID.String(),
+			ComponentName: tree.Node.Component.Name(),
+			ParentName:    parentName,
+			Component:     tree.Node.Config,
+		}
+
+		components = append(components, compOutput)
+	}
+	return components
 }
 
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.
@@ -305,4 +363,57 @@ func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*ap
 	}
 
 	return &deployment.Items[0], nil
+}
+
+func IsNoMatchError(err error) bool {
+	return apimeta.IsNoMatchError(err) || strings.Contains(err.Error(), "failed to get API group resources")
+}
+
+// URIToRawContentURL converts a URI to a raw content URL, mainly for GitHub right now.
+func URIToRawContentURL(uri string) string {
+	if strings.Contains(uri, "github.com") {
+		// Splitting at '@' to get the tag
+		parts := strings.Split(uri, "@")
+		if len(parts) == 2 {
+
+			tag := parts[1]
+
+			// Removing github.com and tag
+			trimmedURI := parts[0][len("github.com/"):]
+
+			// Get org and repo
+			orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
+			if len(orgRepoParts) < 2 {
+				return ""
+			}
+			org := orgRepoParts[0]
+			repoAndPath := orgRepoParts[1]
+
+			// Split repo and path
+			repoPathParts := strings.SplitN(repoAndPath, "/", 2)
+			repo := repoPathParts[0]
+			path := ""
+			if len(repoPathParts) > 1 {
+				path = repoPathParts[1]
+			}
+
+			// Construct the raw GitHub URL
+			return fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s", org, repo, tag, path)
+		}
+	}
+	return ""
+}
+
+func GetYAMLString(bytes []byte) (string, error) {
+	var data map[string]interface{}
+	err := yaml.Unmarshal(bytes, &data)
+	if err != nil {
+		return "", err
+	}
+
+	yamlString, err := yaml.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(yamlString), nil
 }

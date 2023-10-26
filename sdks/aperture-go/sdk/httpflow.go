@@ -28,26 +28,26 @@ type httpflow struct {
 	checkResponse *checkhttpproto.CheckHTTPResponse
 	statusCode    FlowStatus
 	ended         bool
-	failOpen      bool
+	rampMode      bool
 	err           error
 }
 
 // newFlow creates a new flow with default field values.
-func newHTTPFlow(span trace.Span, failOpen bool) *httpflow {
+func newHTTPFlow(span trace.Span, rampMode bool) *httpflow {
 	return &httpflow{
 		span:          span,
 		checkResponse: nil,
 		statusCode:    OK,
 		ended:         false,
-		failOpen:      failOpen,
+		rampMode:      rampMode,
 		err:           nil,
 	}
 }
 
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
-// By default, fail-open behavior is enabled. Use DisableFailOpen to disable it.
+// By default, fail-open behavior is enabled. Set rampMode to disable it.
 func (f *httpflow) ShouldRun() bool {
-	if (f.failOpen && f.checkResponse == nil) || (f.checkResponse.Status.Code == int32(code.Code_OK)) {
+	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.Status.Code == int32(code.Code_OK)) {
 		return true
 	} else {
 		return false

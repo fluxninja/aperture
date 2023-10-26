@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpc"
@@ -26,17 +27,19 @@ type FluxNinjaExtensionConfig struct {
 	// For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
 	// For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
+	// Deprecated: v3.0.0. Use AgentAPIKey instead
+	APIKey string `json:"api_key" validate:"deprecated"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
-	APIKey string `json:"api_key"`
+	AgentAPIKey string `json:"agent_api_key"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
-	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL" default:"LINUX_BARE_METAL"`
+	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL CLOUD_AGENT" default:"LINUX_BARE_METAL"`
 	// Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).
 	//
 	// Enabling this flag configures various agent components to point to the
 	// Aperture Cloud Controller, for example configures remote etcd endpoint and disables
 	// local Prometheus OTel pipelines.
 	//
-	// Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
+	// Disable this flag only if using [Self-Hosted](/get-started/self-hosting/self-hosting.md) Aperture Controller.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 	// Interval between each heartbeat.
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
@@ -64,6 +67,7 @@ func Module() fx.Option {
 		fx.Provide(provideConfig),
 		fx.Provide(provideEtcdConfigOverride),
 		fx.Provide(providePrometheusConfigOverride),
+		fx.Provide(provideAgentInfoConfigOverride),
 	)
 }
 
@@ -76,14 +80,25 @@ func provideConfig(unmarshaller config.Unmarshaller) (*FluxNinjaExtensionConfig,
 	return &extensionConfig, nil
 }
 
+func provideAgentInfoConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *agentinfo.InstallationModeConfig {
+	return &agentinfo.InstallationModeConfig{
+		InstallationMode: extensionConfig.InstallationMode,
+	}
+}
+
 func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdclient.ConfigOverride {
 	if extensionConfig.EnableCloudController {
+		apiKey := extensionConfig.AgentAPIKey
+		if apiKey == "" {
+			//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+			apiKey = extensionConfig.APIKey
+		}
 		return &etcdclient.ConfigOverride{
 			Namespace: "",
 			Endpoints: []string{extensionConfig.Endpoint},
 			PerRPCCredentials: perRPCHeaders{
 				headers: map[string]string{
-					"apiKey": extensionConfig.APIKey,
+					"apiKey": apiKey,
 				},
 			},
 			OverriderName: "fluxninja extension",

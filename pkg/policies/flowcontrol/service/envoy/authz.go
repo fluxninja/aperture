@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -128,12 +127,8 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 			Code(codes.InvalidArgument).Msg("missing control-point")
 	}
 
-	sourceAddress := req.GetAttributes().GetSource().GetAddress().GetSocketAddress()
-	sourceSvcs := h.serviceGetter.ServicesFromSocketAddress(sourceAddress)
-	sourceSvcsStr := strings.Join(sourceSvcs, ",")
-	destinationAddress := req.GetAttributes().GetDestination().GetAddress().GetSocketAddress()
-	destinationSvcs := h.serviceGetter.ServicesFromSocketAddress(destinationAddress)
-	destinationSvcsStr := strings.Join(destinationSvcs, ",")
+	sourceSvcs, sourceSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetSource().GetAddress().GetSocketAddress())
+	destinationSvcs, destinationSvcsStr := h.serviceGetter.ParseServicesFromAddress(req.GetAttributes().GetDestination().GetAddress().GetSocketAddress())
 
 	// make flowlabels from source and destination services
 	sdFlowLabels := make(flowlabel.FlowLabels, 2)
@@ -165,6 +160,14 @@ func (h *Handler) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.
 	flowlabel.Merge(mergedFlowLabels, sdFlowLabels)
 
 	svcs := h.serviceGetter.ServicesFromContext(ctx)
+	if len(svcs) == 0 {
+		// If no services are found in the context, use the destination service
+		// from the request.
+		//
+		// In Consul, the services in context is received as localhost.
+		svcs = destinationSvcs
+	}
+
 	classifierMsgs, newFlowLabels := h.classifier.Classify(ctx, svcs, ctrlPt, mergedFlowLabels, input)
 
 	for key, fl := range newFlowLabels {

@@ -64,7 +64,8 @@ func injectOtelConfig(
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	configProvider *otelconfig.Provider,
 ) {
-	if extensionConfig.APIKey == "" {
+	//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+	if extensionConfig.AgentAPIKey == "" && extensionConfig.APIKey == "" {
 		return
 	}
 
@@ -73,6 +74,11 @@ func injectOtelConfig(
 		// heartbeats.ControllerInfo, that's populated only in heartbeats start.
 		configProvider.AddMutatingHook(func(config *otelconfig.Config) {
 			addFluxNinjaExporter(config, extensionConfig, grpcClientConfig, httpClientConfig)
+
+			if heartbeats.ControllerInfo == nil {
+				log.Info().Msg("Heartbeats controller info not set, skipping")
+				return
+			}
 
 			controllerID := heartbeats.ControllerInfo.Id
 
@@ -226,10 +232,15 @@ func addFluxNinjaExporter(config *otelconfig.Config,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 ) {
+	apiKey := extensionConfig.AgentAPIKey
+	if apiKey == "" {
+		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+		apiKey = extensionConfig.APIKey
+	}
 	cfg := map[string]interface{}{
 		"endpoint": extensionConfig.Endpoint,
 		"headers": map[string]interface{}{
-			"authorization": fmt.Sprintf("Bearer %s", extensionConfig.APIKey),
+			"authorization": fmt.Sprintf("Bearer %s", apiKey),
 		},
 		"sending_queue": map[string]interface{}{
 			// Needed to avoid sending metrics out of order, which leads to metrics

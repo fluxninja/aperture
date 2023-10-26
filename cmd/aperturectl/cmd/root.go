@@ -2,20 +2,21 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/apply"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/autoscale"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/blueprints"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/build"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/decisions"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/delete"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/dynamicconfig"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -23,9 +24,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
-// Version shows the version of ApertureCtl.
 var (
-	Version = info.Version
+	version = info.Version
 	verbose bool
 
 	controller utils.ControllerConn
@@ -35,7 +35,6 @@ func init() {
 	RootCmd.AddCommand(cloud.CloudCmd)
 	RootCmd.AddCommand(blueprints.BlueprintsCmd)
 	RootCmd.AddCommand(compileCmd)
-	RootCmd.AddCommand(apply.ApplyCmd)
 	RootCmd.AddCommand(installation.InstallCmd)
 	RootCmd.AddCommand(installation.UnInstallCmd)
 	RootCmd.AddCommand(flowcontrol.FlowControlCmd)
@@ -43,10 +42,10 @@ func init() {
 	RootCmd.AddCommand(discovery.DiscoveryCmd)
 	RootCmd.AddCommand(build.BuildCmd)
 	RootCmd.AddCommand(agentsCmd)
-	RootCmd.AddCommand(delete.DeleteCmd)
 	RootCmd.AddCommand(decisions.DecisionsCmd)
-	RootCmd.AddCommand(policiesCmd)
 	RootCmd.AddCommand(status.StatusCmd)
+	RootCmd.AddCommand(dynamicconfig.DynamicConfigCmd)
+	RootCmd.AddCommand(policy.PolicyCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true
@@ -58,9 +57,8 @@ var RootCmd = &cobra.Command{
 	Short:              "aperturectl - CLI tool to interact with Aperture",
 	DisableAutoGenTag:  true,
 	DisableSuggestions: false,
-	Long: `
-aperturectl is a CLI tool which can be used to interact with Aperture seamlessly.`,
-	Version: Version,
+	Long:               `aperturectl is a CLI tool to interact with Aperture.`,
+	Version:            version,
 }
 
 // Execute is the entry point for the CLI. It is called from the main package.
@@ -92,7 +90,33 @@ func Execute() {
 		os.Exit(1)
 	}
 
-	if err := RootCmd.Execute(); err != nil {
+	newer, err := utils.IsCurrentVersionNewer(info.Version)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to check if current version is newer")
+	}
+	if newer {
+		var userHomeDir string
+		userHomeDir, err = os.UserHomeDir()
+		if err == nil {
+			aperturectlRootDir := filepath.Join(userHomeDir, utils.AperturectlRootDir)
+			aperturectlBlueprintsCacheRoot := filepath.Join(aperturectlRootDir, utils.BlueprintsCacheRoot)
+			err = os.RemoveAll(aperturectlBlueprintsCacheRoot)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to remove latest blueprints")
+			}
+			aperturectlBuilderCacheRoot := filepath.Join(aperturectlRootDir, utils.BuilderCacheRoot)
+			err = os.RemoveAll(aperturectlBuilderCacheRoot)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to remove builder cache")
+			}
+		}
+		err = utils.UpdateVersionFile(info.Version)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to update version file")
+		}
+	}
+
+	if err = RootCmd.Execute(); err != nil {
 		log.Error().Err(err).Msg("Error executing aperturectl")
 		os.Exit(1)
 	}

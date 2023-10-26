@@ -54,11 +54,21 @@ const (
 	WorkloadLatencyCountMetricName = "workload_latency_ms_count"
 	// WorkloadCounterMetricName - metric used for counting workload requests.
 	WorkloadCounterMetricName = "workload_requests_total"
+	// RequestInQueueDurationMetricName - metric used for grouping durations for requests in queue of Scheduler.
+	RequestInQueueDurationMetricName = "request_in_queue_duration_ms"
+	// WorkloadPreemptedTokensMetricName - metric used for counting tokens preempted per request.
+	WorkloadPreemptedTokensMetricName = "workload_preempted_tokens"
+	// WorkloadDelayedTokensMetricName - metric used for counting tokens delayed per request.
+	WorkloadDelayedTokensMetricName = "workload_delayed_tokens"
+	// WorkloadOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed.
+	WorkloadOnTimeMetricName = "workload_on_time_total"
 
-	// IncomingTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all incoming requests.
+	// IncomingTokensMetricName - total work measured in tokens of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
-	// AcceptedTokensMetricName - total work measured in tokens (auto-tokens are seconds of estimated duration) of all accepted requests.
+	// AcceptedTokensMetricName - total work measured in tokens of all accepted requests.
 	AcceptedTokensMetricName = "accepted_tokens_total"
+	// RejectedTokensMetricName - total work measured in tokens of all rejected requests.
+	RejectedTokensMetricName = "rejected_tokens_total"
 
 	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
 	WFQFlowsMetricName = "wfq_flows_total"
@@ -84,9 +94,6 @@ const (
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
 
 	// Check flow metrics.
-
-	// RequestInQueueDurationMetricName - metric used for grouping durations for requests in queue of Scheduler.
-	RequestInQueueDurationMetricName = "request_in_queue_duration_ms"
 
 	// OTel metrics.
 
@@ -160,21 +167,4 @@ const (
 	DefaultWorkloadIndex = "default"
 	// DefaultAgentGroup - default agent group.
 	DefaultAgentGroup = "default"
-
-	// K8S METRICS.
-
-	// K8sPodCount - number of pods in the cluster.
-	K8sPodCount = "k8s_pod_count"
-	// K8sNamespaceName - namespace of a resource.
-	K8sNamespaceName = "k8s_namespace_name"
-	// K8sNodeName - name of a node.
-	K8sNodeName = "k8s_node_name"
-	// K8sReplicasetName - name of a replicaset.
-	K8sReplicasetName = "k8s_replicaset_name"
-	// K8sDaemonsetName - name of a daemonset.
-	K8sDaemonsetName = "k8s_daemonset_name"
-	// K8sStatefulsetName - name of a statefulset.
-	K8sStatefulsetName = "k8s_statefulset_name"
-	// K8sDeploymentName - name of a deployment.
-	K8sDeploymentName = "k8s_deployment_name"
 )

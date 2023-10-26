@@ -94,11 +94,12 @@ func NewEtcdHarness(etcdErrWriter io.Writer) (*EtcdHarness, error) {
 	if _, err = serverKeyFile.Write(serverKey.Bytes()); err != nil {
 		return nil, err
 	}
-	// #nosec G402
 	etcdTLSConfig := &tls.Config{
-		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: true,
+		MinVersion: tls.VersionTLS12,
 	}
+	// see - https://github.com/securego/gosec/issues/1044#issuecomment-1764948001
+	etcdTLSConfig.InsecureSkipVerify = true // #nosec G402
+
 	h.etcdServer = exec.Command(
 		etcdBin,
 		"--data-dir="+h.etcdDir,

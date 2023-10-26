@@ -21,12 +21,12 @@ _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'aperture.flowcontrol.check.v1.check_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n5com.fluxninja.generated.aperture.flowcontrol.check.v1B\nCheckProtoP\001ZWgithub.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1;checkv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check.V1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Aperture\\Flowcontrol\\Check\\V1\\GPBMetadata\352\002 Aperture::Flowcontrol::Check::V1'
-  _CHECKREQUEST_LABELSENTRY._options = None
-  _CHECKREQUEST_LABELSENTRY._serialized_options = b'8\001'
-  _CHECKRESPONSE_TELEMETRYFLOWLABELSENTRY._options = None
-  _CHECKRESPONSE_TELEMETRYFLOWLABELSENTRY._serialized_options = b'8\001'
+  _globals['DESCRIPTOR']._options = None
+  _globals['DESCRIPTOR']._serialized_options = b'\n5com.fluxninja.generated.aperture.flowcontrol.check.v1B\nCheckProtoP\001ZWgithub.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1;checkv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check.V1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Aperture\\Flowcontrol\\Check\\V1\\GPBMetadata\352\002 Aperture::Flowcontrol::Check::V1'
+  _globals['_CHECKREQUEST_LABELSENTRY']._options = None
+  _globals['_CHECKREQUEST_LABELSENTRY']._serialized_options = b'8\001'
+  _globals['_CHECKRESPONSE_TELEMETRYFLOWLABELSENTRY']._options = None
+  _globals['_CHECKRESPONSE_TELEMETRYFLOWLABELSENTRY']._serialized_options = b'8\001'
   _globals['_STATUSCODE']._serialized_start=3647
   _globals['_STATUSCODE']._serialized_end=4852
   _globals['_CHECKREQUEST']._serialized_start=142

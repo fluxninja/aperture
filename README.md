@@ -28,56 +28,58 @@
 # 🥷 FluxNinja Aperture
 
 Aperture is an observability-driven load management platform designed for
-classifying, scheduling, and rate-limiting API traffic in cloud applications.
-Built upon a foundation of observability and a global control plane, it offers a
-comprehensive suite of load management capabilities that enhance the reliability
-and performance of cloud applications while also optimizing resource
-utilization.
+classifying, rate limiting, queuing and prioritizing API traffic in cloud
+applications. Built upon a foundation of observability and a global control
+plane, it offers a comprehensive suite of load management capabilities that
+enhance the reliability and performance of cloud applications while also
+optimizing resource utilization.
 
 Aperture seamlessly integrates with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
 developers to establish control points around specific features or code sections
-inside applications
+inside applications. The following diagram depicts the role of Aperture in a
+cloud application:
 
-## ⚙️ Features
+![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg#gh-light-mode-only)
+![Unified Load Management](./docs/content/assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
 
-Aperture provides a variety of advanced load management features:
+## ⚙️ Load management capabilities
 
-- **Adaptive service protection:** Enhance resource utilization and safeguard
-  against abrupt service overloads with an intelligent queue at the entry point
-  of services. This queue dynamically adjusts the rate of requests based on live
-  service health, thereby mitigating potential service disruptions and ensuring
-  optimal performance under all load conditions.
-- **Global quota management:** Maintain compliance with external API quotas with
-  a global token bucket and smart request queuing. This feature regulates
-  requests aimed at external services, ensuring that the usage remains within
-  prescribed rate limits and avoids penalties or additional costs.
-- **Workload prioritization:** Safeguard crucial user experience pathways and
-  ensure prioritized access to external APIs even during high-load conditions by
-  strategically prioritizing workloads. This is achieved through the use of
-  declarative policies that label and prioritize workload requests, such as API
-  calls. By employing
-  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing)
-  for scheduling, Aperture ensures a fair distribution of resources that aligns
-  with the business value and urgency of requests.
-- **Load-based auto-scaling:** Eliminate the need for costly over-provisioning
-  and enhance efficiency with Aperture's load-based auto-scaling. Aperture's
-  policies are expressed as circuit graphs that continuously track deviations
-  from service-level objectives and calculate recovery or escalation actions.
-  Auto-scaling can be implemented as an escalation that triggers based on load
-  throttling signal.
-- **Distributed rate-limiting:** Safeguard APIs from potential abuse with
-  Aperture's high-performance, distributed rate limiter. This feature enforces
-  per-key limits based on fine-grained labels, ensuring precise control and
-  prevention of excessive usage.
-- **Percentage rollouts:** Enable teams to gradually release new features to a
-  subset of users, without impacting the rest of the system. Aperture provides
-  automated load ramping functionality, allowing for a safe and controlled
-  increment of load to new features or API endpoints. This feature continuously
-  monitors for potential performance issues and includes an automatic response
-  mechanism to dial back load in case of a performance regression. This
-  proactive approach minimizes service disruptions and maintains consistent
-  performance, even when rolling out new features.
+- ⏱️
+  [**Global Rate-Limiting**](https://docs.fluxninja.com/concepts/rate-limiter):
+  Safeguard APIs and features against excessive usage with Aperture's
+  high-performance, distributed rate limiter. Identify individual users or
+  entities by fine-grained labels. Create precise rate limiters controlling
+  burst-capacity and fill-rate tailored to business-specific labels. Refer to
+  the [Rate Limiting](https://docs.fluxninja.com/guides/per-user-rate-limiting)
+  guide for more details.
+- 📊
+  [**API Quota Management**](https://docs.fluxninja.com/concepts/scheduler/quota-scheduler):
+  Maintain compliance with external API quotas with a global token bucket and
+  smart request queuing. This feature regulates requests aimed at external
+  services, ensuring that the usage remains within prescribed rate limits and
+  avoids penalties or additional costs. Refer to the
+  [API Quota Management](https://docs.fluxninja.com/guides/api-quota-management/)
+  guide for more details.
+- 🛡️
+  [**Adaptive Queuing**](https://docs.fluxninja.com/concepts/scheduler/load-scheduler):
+  Enhance resource utilization and safeguard against abrupt service overloads
+  with an intelligent queue at the entry point of services. This queue
+  dynamically adjusts the rate of requests based on live service health, thereby
+  mitigating potential service disruptions and ensuring optimal performance
+  under all load conditions. Refer to the
+  [Service Load Management](https://docs.fluxninja.com/guides/service-load-management/)
+  and
+  [Database Load Management](https://docs.fluxninja.com/guides/database-load-management/)
+  guides for more details.
+- 🎯
+  [**Workload Prioritization**](https://docs.fluxninja.com/concepts/scheduler/):
+  Safeguard crucial user experience pathways and ensure prioritized access to
+  external APIs by strategically prioritizing workloads. With
+  [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing),
+  Aperture aligns resource distribution with business value and urgency of
+  requests. Workload prioritization applies to API Quota Management and Adaptive
+  Queuing use cases.
 
 ## 🏗️ Architecture
 
@@ -109,18 +111,17 @@ To try Aperture in a local Kubernetes environment, refer to
 To install the Aperture system, follow the
 [Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
-### 📖 Use Cases
+### 📖 Learn More
 
-- [Use Cases](https://docs.fluxninja.com/use-cases) section in Aperture
-  documentation.
-
-### 🖥️ Slide Decks
-
+- [Concepts](https://docs.fluxninja.com/concepts) section in Aperture
+  documentation provides an overview of Aperture's features and architecture.
+- [Guides](https://docs.fluxninja.com/guides) section in Aperture documentation.
 - [Observability-driven Load Management](https://docs.google.com/presentation/d/1Funig5u63w96G91ZjHV7ftgLOl1c5z5yDeuoVRH1QSs)
   deck covers the overview and use-cases of Aperture.
 
 ## 🎥 Videos
 
+- [IstioCon 2023 | Achieving Fault Tolerance in Istio with Observability-Driven Load Management](https://www.youtube.com/watch?v=eiSroeyACAg)
 - [SREcon'23 APAC | Mastering Chaos: Achieving Fault Tolerance with Observability-Driven Prioritized Load Shedding](https://www.youtube.com/watch?v=ws9__JjaJsE)
 - [Chaos Carnival 2023 | Graceful Degradation: Keeping The Lights On When Everything Goes Wrong](https://www.youtube.com/watch?v=yHKPXsZOc5I)
 - [Conf42 Chaos Engineering 2023 | Graceful Degradation: When All Goes Wrong](https://www.youtube.com/watch?v=nm62d2gYqNk)

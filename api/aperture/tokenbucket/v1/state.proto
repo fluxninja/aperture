@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package aperture.tokenbucket.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message State {
+  google.protobuf.Timestamp start_fill_at = 1;
+  google.protobuf.Timestamp last_fill_at = 2;
+  double available = 3;
+}
+
+message TakeNRequest {
+  google.protobuf.Timestamp deadline = 1;
+  double want = 2;
+  bool can_wait = 3;
+}
+
+message TakeNResponse {
+  google.protobuf.Timestamp available_at = 1;
+  double current = 2;
+  double remaining = 3;
+  bool ok = 4;
+}

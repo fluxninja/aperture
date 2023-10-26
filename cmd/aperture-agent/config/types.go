@@ -42,7 +42,7 @@ type AgentOTelConfig struct {
 	EnableHighCardinalityPlatformMetrics bool `json:"enable_high_cardinality_platform_metrics" default:"false"`
 }
 
-// BatchPrerollupConfig defines configuration for OTel batch processor.
+// BatchPrerollupConfig defines pre-rollup configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model
@@ -58,7 +58,7 @@ type BatchPrerollupConfig struct {
 	SendBatchMaxSize uint32 `json:"send_batch_max_size" validate:"gte=0" default:"10000"`
 }
 
-// BatchPostrollupConfig defines configuration for OTel batch processor.
+// BatchPostrollupConfig defines post-rollup configuration for OTel batch processor.
 // +kubebuilder:object:generate=true
 //
 //swagger:model

@@ -2,13 +2,11 @@ package controlplane
 
 import (
 	"context"
-	"encoding/json"
 
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
-	"sigs.k8s.io/yaml"
+	"google.golang.org/protobuf/proto"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
@@ -17,7 +15,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/crwatcher"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
@@ -45,7 +42,7 @@ const (
 func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			providePolicyValidator,
+			ProvidePolicyValidator,
 			fx.Annotate(
 				provideTrackers,
 				fx.ResultTags(
@@ -114,7 +111,7 @@ func setupPoliciesNotifier(
 	policyDynamicConfigTrackers notifiers.Trackers,
 	policyAPIWatcher notifiers.Watcher,
 	policyAPIDynamicConfigWatcher notifiers.Watcher,
-	scopedKV *etcdclient.SessionScopedKV,
+	etcdClient *etcdclient.Client,
 	lifecycle fx.Lifecycle,
 ) {
 	wrapPolicy := func(
@@ -129,28 +126,23 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage := &iface.PolicyMessage{
-				Policy: &languagev1.Policy{},
-			}
-			unmarshalErr := json.Unmarshal(bytes, policyMessage)
+			policyMessage, policyHash, unmarshalErr := unmarshalStoredPolicy(bytes)
 			if unmarshalErr != nil {
 				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 				return key, nil, unmarshalErr
 			}
-			wrapper, wrapErr := hashAndPolicyWrap(policyMessage.Policy, string(key))
-			if wrapErr != nil {
-				log.Warn().Err(wrapErr).Msg("Failed to wrap message in config properties")
-				return key, nil, wrapErr
+
+			wrapper := policysyncv1.PolicyWrapper{
+				Policy: policyMessage,
+				CommonAttributes: &policysyncv1.CommonAttributes{
+					PolicyName: string(key),
+					PolicyHash: policyHash,
+				},
+				Source: source,
 			}
-			wrapper.Source = source
+
 			var marshalWrapErr error
-			jsonDat, marshalWrapErr := json.Marshal(wrapper)
-			if marshalWrapErr != nil {
-				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
-				return key, nil, marshalWrapErr
-			}
-			// convert to yaml
-			dat, marshalWrapErr = yaml.JSONToYAML(jsonDat)
+			dat, marshalWrapErr = proto.Marshal(&wrapper)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr
@@ -159,7 +151,7 @@ func setupPoliciesNotifier(
 		return key, dat, nil
 	}
 
-	policyEtcdToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
+	policyEtcdToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient)
 	// content transform callback to wrap policy in config properties wrapper
 	policyEtcdToEtcdNotifier.SetTransformFunc(
 		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
@@ -173,14 +165,14 @@ func setupPoliciesNotifier(
 	//   problem, as no other logic runs between these starts.
 	// * Multiple notifiers writing the same key to etcd are a problem, but
 	//   it's not handled correctly anyway (FIXME).
-	policyCRToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, &scopedKV.KVWrapper)
+	policyCRToEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesConfigPath, etcdClient)
 	policyCRToEtcdNotifier.SetTransformFunc(
 		func(key notifiers.Key, bytes []byte, etype notifiers.EventType) (notifiers.Key, []byte, error) {
 			return wrapPolicy(key, bytes, etype, policysyncv1.PolicyWrapper_K8S)
 		},
 	)
 
-	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, &scopedKV.KVWrapper)
+	policyDynamicConfigEtcdNotifier := etcdnotifier.NewPrefixToEtcdNotifier(paths.PoliciesDynamicConfigPath, etcdClient)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {

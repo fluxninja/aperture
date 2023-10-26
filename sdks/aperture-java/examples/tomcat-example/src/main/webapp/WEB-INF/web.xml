@@ -31,32 +31,24 @@
         <filter-name>ApertureFeatureFilter</filter-name>
         <filter-class>com.fluxninja.example.filter.ApertureFeatureFilter</filter-class>
         <init-param>
-            <param-name>agent_host</param-name>
-            <param-value>localhost</param-value>
-        </init-param>
-        <init-param>
-            <param-name>agent_port</param-name>
-            <param-value>8089</param-value>
+            <param-name>agent_address</param-name>
+            <param-value>localhost:8089</param-value>
         </init-param>
     </filter>
     <filter>
         <filter-name>ApertureFilterImported</filter-name>
         <filter-class>com.fluxninja.aperture.servlet.javax.ApertureFilter</filter-class>
         <init-param>
-            <param-name>agent_host</param-name>
-            <param-value>localhost</param-value>
-        </init-param>
-        <init-param>
-            <param-name>agent_port</param-name>
-            <param-value>8089</param-value>
+            <param-name>agent_address</param-name>
+            <param-value>localhost:8089</param-value>
         </init-param>
         <init-param>
             <param-name>control_point_name</param-name>
             <param-value>awesome_feature</param-value>
         </init-param>
         <init-param>
-            <param-name>enable_fail_open</param-name>
-            <param-value>true</param-value>
+            <param-name>enable_ramp_mode</param-name>
+            <param-value>false</param-value>
         </init-param>
     </filter>
     <filter-mapping>

@@ -1,12 +1,13 @@
+local actuatorLibrary = import '../actuator_library.libsonnet';
 local panelLibrary = import '../panel_library.libsonnet';
 
-function(componentName, componentBody, config) {
-  local newConfig =
-    if componentName == 'query'
-    then config { component_body: componentBody }
-    else config,
-
-  local generatedPanels = panelLibrary[std.toString(componentName)](newConfig),
+function(datasourceName, policyName, component, isActuator, extraFilters={}) {
+  local generatedPanels =
+    if isActuator == true
+    then
+      actuatorLibrary[component.parent_name](datasourceName, policyName, component, extraFilters)
+    else
+      panelLibrary[component.component_name](datasourceName, policyName, component, extraFilters),
 
   // this can be either a group of panels or single panel - we have to unwrap
   panel:

@@ -13,17 +13,17 @@ An example metadata looks like this:
 ```yaml
 blueprint: Latency AIMD Concurrency Limiting Policy
 sources:
-  Dashboard:
-    prefix: dashboard
-    path: policies/service-protection/average-latency/dashboard.libsonnet
-  Policy:
-    prefix: policy
-    path: policies/service-protection/average-latency/policy.libsonnet
+  policy: service-protection/average-latency/policy.libsonnet
+deprecation_message: |
+  This blueprint is deprecated and will be removed in the future.
+  Please use the `load-scheduling/average-latency` blueprint instead.
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
 - `sources` provides a list of dashboards and policies that are part of this
   blueprint.
+- `deprecation_message` is an optional message that will be displayed in the
+  generated README.md. It can be used to mark blueprints as deprecated.
 
 ### More on sources
 

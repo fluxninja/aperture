@@ -1,13 +1,27 @@
 package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.Constants;
 import com.linecorp.armeria.server.RpcService;
+import java.time.Duration;
 
 /** A builder for configuring an {@link ApertureRPCService}. */
 public class ApertureRPCServiceBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
-    private boolean enableFailOpen = true;
+    private boolean enableRampMode = false;
+    private Duration flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+
+    /**
+     * Sets timeout for connection to Aperture Agent. Set to 0 to block until response is received.
+     *
+     * @param flowTimeout The timeout for connection to Aperture Agent.
+     * @return The builder object.
+     */
+    public ApertureRPCServiceBuilder setFlowTimeout(Duration flowTimeout) {
+        this.flowTimeout = flowTimeout;
+        return this;
+    }
 
     /**
      * Sets the Aperture SDK used by this service.
@@ -32,15 +46,14 @@ public class ApertureRPCServiceBuilder {
     }
 
     /**
-     * Sets the fail-open behavior for the service when the Aperture Agent is unreachable. If set to
-     * true, all traffic will pass through; if set to false, all traffic will be blocked.
+     * Marks started flows as ramp mode, requiring at least one ramp component to accept it. Marked
+     * flows will fail if the policy is not loaded or Agent is unreachable.
      *
-     * @param enableFailOpen whether all traffic should be accepted when Aperture Agent is
-     *     unreachable
+     * @param enableRampMode whether all started flows should be started in ramp mode
      * @return the builder object.
      */
-    public ApertureRPCServiceBuilder setEnableFailOpen(boolean enableFailOpen) {
-        this.enableFailOpen = enableFailOpen;
+    public ApertureRPCServiceBuilder setEnableRampMode(boolean enableRampMode) {
+        this.enableRampMode = enableRampMode;
         return this;
     }
 
@@ -51,6 +64,7 @@ public class ApertureRPCServiceBuilder {
         if (this.apertureSDK == null) {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
-        return new ApertureRPCService(delegate, apertureSDK, controlPointName, enableFailOpen);
+        return new ApertureRPCService(
+                delegate, apertureSDK, controlPointName, enableRampMode, flowTimeout);
     }
 }

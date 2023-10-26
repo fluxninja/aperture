@@ -1,18 +1,18 @@
-local creator = import '../../grafana/dashboard_group.libsonnet';
 local utils = import '../common/utils.libsonnet';
 local blueprint = import './elasticsearch.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
+function(params) {
   local c = std.mergePatch(config, params),
-  local metadataWrapper = metadata { values: std.toString(params) },
 
+  local policyName = c.policy.policy_name,
+  local promqlQuery = 'avg(elasticsearch_node_thread_pool_tasks_queued{policy_name="%(policy_name)s", infra_meter_name="elasticsearch", thread_pool_name="search"})' % { policy_name: policyName },
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
-      promql_query: 'avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name="search"}[30s]))',
-      setpoint: c.policy.service_protection_core.setpoint,
+      promql_query: promqlQuery,
+      setpoint: c.policy.load_scheduling_core.setpoint,
       overload_condition: 'gt',
     },
   },
@@ -58,15 +58,9 @@ function(params, metadata={}) {
     },
   },
 
-  local p = policy(config_with_elasticsearch_infra_meter, metadataWrapper),
-  local d = creator(p.policyResource, config_with_elasticsearch_infra_meter),
-
+  local p = policy(config_with_elasticsearch_infra_meter),
   policies: {
     [std.format('%s-cr.yaml', config_with_elasticsearch_infra_meter.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', config_with_elasticsearch_infra_meter.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
+    [std.format('%s.yaml', config_with_elasticsearch_infra_meter.policy.policy_name)]: p.policyDef,
   },
-  dashboards: {
-    [std.format('%s.json', config_with_elasticsearch_infra_meter.policy.policy_name)]: d.mainDashboard,
-    [std.format('signals-%s.json', config_with_elasticsearch_infra_meter.policy.policy_name)]: d.signalsDashboard,
-  } + d.receiverDashboards,
 }

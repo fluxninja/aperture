@@ -1,7 +1,7 @@
 val snapshot = true
 
 allprojects {
-  var ver = "2.15.0"
+  var ver = "2.20.0"
   if (snapshot) {
     ver += "-SNAPSHOT"
   }

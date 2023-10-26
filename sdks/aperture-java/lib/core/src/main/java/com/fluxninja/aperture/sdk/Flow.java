@@ -14,16 +14,16 @@ public final class Flow {
     private final CheckResponse checkResponse;
     private final Span span;
     private boolean ended;
-    private boolean failOpen;
+    private boolean rampMode;
     private FlowStatus flowStatus;
 
     private static final Logger logger = LoggerFactory.getLogger(Flow.class);
 
-    Flow(CheckResponse checkResponse, Span span, boolean ended) {
+    Flow(CheckResponse checkResponse, Span span, boolean ended, boolean rampMode) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
-        this.failOpen = true;
+        this.rampMode = rampMode;
         this.flowStatus = FlowStatus.OK;
     }
 
@@ -55,26 +55,16 @@ public final class Flow {
     }
 
     /**
-     * Returns whether the flow should be allowed to run, based on flow fail-open configuration and
+     * Returns whether the flow should be allowed to run, based on flow ramp mode configuration and
      * Aperture Agent response. By default, flow will be allowed to run if Aperture Agent is
-     * unreachable. To change this behavior, use {@link #withNoFailOpen()}.
+     * unreachable. To change this behavior, use rampMode parameter in {@link ApertureSDK#startFlow
+     * }.
      *
      * @return Whether the flow should be allowed to run
      */
     public boolean shouldRun() {
         return getDecision() == FlowDecision.Accepted
-                || (getDecision() == FlowDecision.Unreachable && this.failOpen);
-    }
-
-    /**
-     * Disables fail-open behavior. If set, the {@link #shouldRun} method will return False if the
-     * Aperture Agent is unreachable.
-     *
-     * @return This Flow object
-     */
-    public Flow withNoFailOpen() {
-        this.failOpen = false;
-        return this;
+                || (getDecision() == FlowDecision.Unreachable && !this.rampMode);
     }
 
     /**

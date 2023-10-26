@@ -5,19 +5,13 @@ import (
 )
 
 const (
-	defaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
-	latestTag             = "latest"
+	// DefaultBlueprintsRepo is the default repository for blueprints.
+	DefaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
+	// LatestTag is the tag for the latest version of blueprints.
+	LatestTag = "latest"
 )
 
 var (
-	// Location of cache for blueprints. E.g. ~/.aperturectl/blueprints.
-	blueprintsCacheRoot string
-	// Location of blueprints uri within cache. E.g. ~/.aperturectl/blueprints/github.com/fluxninja/aperture/blueprints@latest.
-	blueprintsURIRoot string
-
-	// Location of blueprints directory within URI directory. E.g. ~/.aperturectl/blueprints/github.com_fluxninja_aperture_blueprints@v0.26.1/github.com/fluxninja/aperture/blueprints/.
-	blueprintsDir string
-
 	// Args for `blueprints`.
 	blueprintsURI     string
 	blueprintsVersion string
@@ -40,6 +34,5 @@ func init() {
 var BlueprintsCmd = &cobra.Command{
 	Use:   "blueprints",
 	Short: "Aperture Blueprints",
-	Long: `
-Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
+	Long:  `Use this command to pull, list, remove and generate Aperture Policy resources using the Aperture Blueprints.`,
 }

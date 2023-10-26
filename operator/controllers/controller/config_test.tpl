@@ -17,6 +17,7 @@ etcd:
   username: ""
   log_level: error
 fluxninja:
+  agent_api_key: ""
   api_key: ""
   client:
     grpc:

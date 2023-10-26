@@ -36,16 +36,7 @@ where it will get deployed on all the nodes of the cluster.
 You can do the installation using the `aperturectl` CLI tool or using `Helm`.
 Install the tool of your choice using the following links:
 
-1. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
-
-   :::info Refer
-
-   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
-   see all the available command line arguments.
-
-   :::
-
-2. [Helm](https://helm.sh/docs/intro/install/)
+1. [Helm](https://helm.sh/docs/intro/install/)
 
    1. Once the Helm CLI is installed, add the
       [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
@@ -55,6 +46,15 @@ Install the tool of your choice using the following links:
       helm repo add aperture https://fluxninja.github.io/aperture/
       helm repo update
       ```
+
+2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+
+   :::info Refer
+
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
+
+   :::
 
 <!-- vale off -->
 
@@ -92,13 +92,13 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `API_KEY` with the API key linked to the project. If an API key has not been
-   created, generate a new one through the Aperture Cloud UI. Refer to [API
-   Keys][api-keys] for additional information.
+   `AGENT_API_KEY` with the API key linked to the project. If an API key has not
+   been created, generate a new one through the Aperture Cloud UI. Refer to
+   [Agent API Keys][agent-api-keys] for additional information.
 
    :::note
 
@@ -141,7 +141,7 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
@@ -221,13 +221,13 @@ Kubernetes Objects which will be created by following steps are listed
             secretKeyRef:
               name: aperture-agent-apikey
               key: apiKey
-            value: API_KEY
+            value: AGENT_API_KEY
       ```
 
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-      `API_KEY` with the API key linked to the project. If an API key has not
-      been created, generate a new one through the Aperture Cloud UI. Refer to
-      [API Keys][api-keys] for additional information.
+      `AGENT_API_KEY` with the API key linked to the project. If an API key has
+      not been created, generate a new one through the Aperture Cloud UI. Refer
+      to [Agent API Keys][agent-api-keys] for additional information.
 
       :::note
 
@@ -405,5 +405,5 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[self-hosting-agent]: /self-hosting/agent.md#configuration
-[api-keys]: /get-started/aperture-cloud/api-keys.md
+[self-hosting-agent]: /get-started/self-hosting/agent.md#configuration
+[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md

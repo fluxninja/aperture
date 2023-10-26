@@ -485,12 +485,14 @@ title: "{{ blueprint_name }} blueprint"
 additionalProperties: false
 {% if nested_parameters.required_children %}
 required:
+{%- if not is_dynamic_config %}
 - blueprint
-- uri
+{% endif %}
 {% for child_name in nested_parameters.required_children %}- {{ child_name }}
 {% endfor %}
 {% endif %}
 properties:
+{%- if not is_dynamic_config %}
   blueprint:
     description: "Blueprint name"
     type: string
@@ -500,6 +502,7 @@ properties:
     description: "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest."
     default: "github.com/fluxninja/aperture/blueprints@latest"
     type: string
+{% endif %}
 {% for child_name, child_node in nested_parameters.children.items() %}
   {{ render_properties(child_node, '@param') | indent(2) }}
 {% endfor %}
@@ -510,11 +513,12 @@ $defs:
 """
 
 YAML_TPL = """
+{%- if not is_dynamic_config %}
 # Generated values file for {{ blueprint_name }} blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/{{ blueprint_name }}
 blueprint: {{ blueprint_name }}
-uri: github.com/fluxninja/aperture/blueprints@latest
+{%- endif %}
 {%- macro render_value(value, level) %}
 {%- if value is mapping %}
 {%- if not value.items() %}
@@ -698,7 +702,7 @@ def update_docs_markdown(
     if len(dynamic_config_parameters.nested_parameters.children) > 0:
         readme_copied += "\n\n## Dynamic Configuration\n\n"
         readme_copied += "\n\n:::note\n\n"
-        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md) at runtime, without reloading the policy.\n\n"
+        readme_copied += "The following configuration parameters can be [dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.\n\n"
         readme_copied += ":::\n\n"
         rendered = template.render(
             {"nested_parameters": dynamic_config_parameters.nested_parameters}
@@ -729,16 +733,22 @@ def render_sample_config_yaml(
 
         return flattened
 
+    is_dynamic_config = True
     """Render sample config YAML file from blocks"""
     sample_config_data = parameters.nested_parameters
     if os.path.basename(sample_config_path) == "values.yaml":
+        is_dynamic_config = False
         sample_config_data = flatten_config(sample_config_data)
 
     if sample_config_data:
         env = get_jinja2_environment()
         template = env.get_template("values.yaml.j2")
         rendered = template.render(
-            {"sample_config_data": sample_config_data, "blueprint_name": blueprint_name}
+            {
+                "sample_config_data": sample_config_data,
+                "blueprint_name": blueprint_name,
+                "is_dynamic_config": is_dynamic_config,
+            }
         )
         sample_config_path.write_text(rendered)
 
@@ -749,10 +759,18 @@ def render_json_schema(
     """Render JSON schema file from blocks"""
     nested_parameters = parameters.nested_parameters
 
+    is_dynamic_config = True
+    if os.path.basename(json_schema_path) == "definitions.json":
+        is_dynamic_config = False
+
     env = get_jinja2_environment()
     template = env.get_template("definitions.json.j2")
     rendered = template.render(
-        {"nested_parameters": nested_parameters, "blueprint_name": blueprint_name}
+        {
+            "nested_parameters": nested_parameters,
+            "blueprint_name": blueprint_name,
+            "is_dynamic_config": is_dynamic_config,
+        }
     )
     # convert yaml to json
     rendered = yaml.safe_load(rendered)

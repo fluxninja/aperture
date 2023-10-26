@@ -43,8 +43,7 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        registrationBean.addInitParameter("agent_host", "localhost");
-        registrationBean.addInitParameter("agent_port", "8089");
+        registrationBean.addInitParameter("agent_address", "localhost:8089");
 
         return registrationBean;
     }

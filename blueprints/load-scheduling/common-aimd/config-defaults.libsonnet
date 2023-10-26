@@ -18,10 +18,10 @@ local aimd_load_scheduler = {
 
 commonConfig {
   /**
-  * @param (policy.service_protection_core.aimd_load_scheduler: aperture.spec.v1.AIMDLoadSchedulerParameters) Parameters for AIMD throttling strategy.
+  * @param (policy.load_scheduling_core.aimd_load_scheduler: aperture.spec.v1.AIMDLoadSchedulerParameters) Parameters for AIMD throttling strategy.
   */
   policy+: {
-    service_protection_core+: {
+    load_scheduling_core+: {
       aimd_load_scheduler: aimd_load_scheduler,
     },
   },

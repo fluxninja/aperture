@@ -5,3 +5,5 @@ scenarios/**/vendor/
 
 ../gateways/*
 resources/*
+
+*/tmp/aperture/*

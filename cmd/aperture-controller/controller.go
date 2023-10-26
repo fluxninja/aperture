@@ -11,17 +11,19 @@
 package main
 
 import (
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
 	"github.com/fluxninja/aperture/v2/cmd/aperture-controller/controller"
 	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
 	"github.com/fluxninja/aperture/v2/pkg/cmd"
+	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 	"github.com/fluxninja/aperture/v2/pkg/webhooks"
 	"github.com/fluxninja/aperture/v2/pkg/webhooks/policyvalidator"
 )
@@ -33,15 +35,18 @@ func main() {
 		fx.Provide(
 			clockwork.NewRealClock,
 		),
+		fx.Supply(
+			fx.Annotate("/controller-election", fx.ResultTags(config.NameTag("etcd.election-path"))),
+			fx.Annotate(true, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag))),
+		),
 		otelcollector.Module(),
-		enforceSingleControllerModule, // needs to be before controlplane
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
-		rpc.ServerModule,
-		agents.Module,
+		transport.TransportServerModule,
 		cmd.Module,
 		Module(),
+		agents.Module,
 	)
 
 	defer log.WaitFlush()

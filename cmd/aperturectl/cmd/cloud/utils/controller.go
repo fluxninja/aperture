@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -18,14 +20,17 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
+	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // ControllerConfig is the config file structure for Aperture Cloud Controller.
 type ControllerConfig struct {
 	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
-	URL    string `toml:"url"`
-	APIKey string `toml:"api_key"`
+	URL         string `toml:"url"`
+	APIKey      string `toml:"api_key"`
+	ProjectName string `toml:"project_name"`
 }
 
 // Config is the config file structure for Aperture.
@@ -42,12 +47,13 @@ type ControllerConn struct {
 	skipVerify     bool
 	apiKey         string
 	config         string
+	projectName    string
 
 	forwarderStopChan chan struct{}
 	conn              *grpc.ClientConn
 }
 
-// CloudInitFlags sets up flags for Cloud Controller.
+// InitFlags sets up flags for Cloud Controller.
 func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 	flags.StringVar(
 		&c.controllerAddr,
@@ -71,7 +77,13 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		&c.apiKey,
 		"api-key",
 		"",
-		"Aperture Cloud API Key to be used when using Cloud Controller",
+		"Aperture Cloud User API Key to be used when using Cloud Controller",
+	)
+	flags.StringVar(
+		&c.projectName,
+		"project-name",
+		"",
+		"Aperture Cloud Project Name to be used when using Cloud Controller",
 	)
 	flags.StringVar(
 		&c.config,
@@ -81,7 +93,7 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 	)
 }
 
-// PreRunE verifies flags (optionally loading kubeconfig) and should be run at PreRunE stage.
+// PreRunE verifies flags and should be run at PreRunE stage.
 func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	// Fetching config from environment variable
 	if c.config == "" {
@@ -92,14 +104,18 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	if c.config == "" {
 		homeDir, err := os.UserHomeDir()
 		if err == nil {
-			c.config = filepath.Join(homeDir, ".aperturectl", "config")
+			c.config = filepath.Join(homeDir, utils.AperturectlRootDir, "config")
 			if _, err := os.Stat(c.config); err != nil {
 				c.config = ""
 			}
 		}
 	}
 
-	if c.config != "" && (c.controllerAddr == "" || c.apiKey == "") {
+	if c.config == "" && (c.controllerAddr == "" || c.apiKey == "" || c.projectName == "") {
+		return errors.New("missing required flag(s): --controller, --api-key, --project-name, --config")
+	}
+
+	if c.config != "" && (c.controllerAddr == "" || c.apiKey == "" || c.projectName == "") {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
@@ -125,6 +141,14 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
 		}
 
+		if config.Controller.ProjectName == "" && c.projectName == "" {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.project_name'", c.config)
+		}
+
+		if c.projectName == "" {
+			c.projectName = config.Controller.ProjectName
+		}
+
 		if c.controllerAddr == "" {
 			c.controllerAddr = config.Controller.URL
 		}
@@ -138,9 +162,63 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 }
 
 // CloudPolicyClient returns Cloud Controller PolicyClient, connecting to cloud controller if not yet connected.
-func (c *ControllerConn) CloudPolicyClient() (CloudPolicyClient, error) {
+func (c *ControllerConn) CloudPolicyClient() (utils.CloudPolicyClient, error) {
+	if c.conn == nil {
+		var err error
+		c.conn, err = c.prepareGRPCClient()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return cloudv1.NewPolicyServiceClient(c.conn), nil
+}
+
+// CloudBlueprintsClient returns Cloud Controller BlueprintsClient, connecting to cloud controller if not yet connected.
+func (c *ControllerConn) CloudBlueprintsClient() (utils.CloudBlueprintsClient, error) {
+	if c.conn == nil {
+		var err error
+		c.conn, err = c.prepareGRPCClient()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return cloudv1.NewBlueprintsServiceClient(c.conn), nil
+}
+
+// IntrospectionClient returns Controller IntrospectionClient, connecting to controller if not yet connected.
+func (c *ControllerConn) IntrospectionClient() (utils.IntrospectionClient, error) {
+	return c.client()
+}
+
+// StatusClient returns Controller StatusClient, connecting to controller if not yet connected.
+func (c *ControllerConn) StatusClient() (utils.StatusClient, error) {
+	// StatusClient has no restrictions.
+	return c.client()
+}
+
+// PolicyClient returns Controller PolicyClient, connecting to controller if not yet connected.
+func (c *ControllerConn) PolicyClient() (utils.SelfHostedPolicyClient, error) {
 	// PolicyClient has no restrictions.
-	return c.policyServiceClient()
+	return c.client()
+}
+
+// client returns Controller Client, connecting to controller if not yet connected.
+//
+// This functions is not exposed to force callers to go through the check above.
+func (c *ControllerConn) client() (cmdv1.ControllerClient, error) {
+	if c.conn != nil {
+		return cmdv1.NewControllerClient(c.conn), nil
+	}
+
+	var err error
+	c.conn, err = c.prepareGRPCClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return cmdv1.NewControllerClient(c.conn), nil
 }
 
 func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
@@ -156,17 +234,15 @@ func (c *ControllerConn) prepareCred() credentials.TransportCredentials {
 	return cred
 }
 
-// client returns Cloud Controller Client, connecting to controller if not yet connected.
-//
-// This functions is not exposed to force callers to go through the check above.
-func (c *ControllerConn) policyServiceClient() (cloudv1.PolicyServiceClient, error) {
-	if c.conn != nil {
-		return cloudv1.NewPolicyServiceClient(c.conn), nil
-	}
-
+func (c *ControllerConn) prepareGRPCClient() (*grpc.ClientConn, error) {
 	var addr string
 	cred := c.prepareCred()
 	addr = c.controllerAddr
+
+	// check whether the controller address contains a port, otherwise just use 443
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		addr = net.JoinHostPort(addr, "443")
+	}
 
 	if cred == nil {
 		certPool, err := x509.SystemCertPool()
@@ -176,13 +252,7 @@ func (c *ControllerConn) policyServiceClient() (cloudv1.PolicyServiceClient, err
 		cred = credentials.NewClientTLSFromCert(certPool, "")
 	}
 
-	var err error
-	c.conn, err = grpc.Dial(addr, grpc.WithTransportCredentials(cred), grpc.WithUnaryInterceptor(c.cloudControllerInterceptor))
-	if err != nil {
-		return nil, err
-	}
-
-	return cloudv1.NewPolicyServiceClient(c.conn), nil
+	return grpc.Dial(addr, grpc.WithTransportCredentials(cred), grpc.WithUnaryInterceptor(c.cloudControllerInterceptor))
 }
 
 // PostRun cleans up ControllerConn's resources, and should be run at PostRun stage.
@@ -207,10 +277,7 @@ func (c *ControllerConn) cloudControllerInterceptor(
 	invoker grpc.UnaryInvoker,
 	opts ...grpc.CallOption,
 ) error {
-	if c.apiKey == "" {
-		return invoker(ctx, method, req, reply, cc, opts...)
-	}
-	md := metadata.Pairs("apikey", c.apiKey)
+	md := metadata.Pairs("Authorization", fmt.Sprintf("Bearer %s", c.apiKey), "projectName", c.projectName)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	return invoker(ctx, method, req, reply, cc, opts...)
 }

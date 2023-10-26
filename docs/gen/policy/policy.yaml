@@ -4,7 +4,7 @@ consumes:
 definitions:
     AIADLoadScheduler:
         description: |-
-            _AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.
+            _AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.
             During recovery, it increases the token rate linearly until the system is not overloaded.
         properties:
             dry_run:
@@ -858,9 +858,11 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: |-
+                description: |+
                     Differentiator calculates rate of change per tick.
                     Deprecated: v3.0.0. Use `PIDController` instead.
+
+                x-go-tag-validate: deprecated
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -1341,7 +1343,11 @@ definitions:
         properties:
             adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
-                description: _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                description: |+
+                    _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                    Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+
+                x-go-tag-validate: deprecated
             aiad_load_scheduler:
                 $ref: '#/definitions/AIADLoadScheduler'
                 description: AIAD Load Scheduler.
@@ -2154,7 +2160,10 @@ definitions:
         properties:
             sampler:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             steps:
                 items:
                     $ref: '#/definitions/LoadRampParametersStep'
@@ -2710,10 +2719,16 @@ definitions:
         properties:
             circuit:
                 $ref: '#/definitions/Circuit'
-                description: Defines the control-loop logic of the policy.
+                description: |+
+                    Defines the control-loop logic of the policy.
+
+                x-go-tag-validate: required_without=Resources
             resources:
                 $ref: '#/definitions/Resources'
-                description: Resources (such as Flux Meters, Classifiers) to setup.
+                description: |+
+                    Resources (such as Flux Meters, Classifiers) to setup.
+
+                x-go-tag-validate: required_without=Circuit
         type: object
     PolynomialRangeFunction:
         description: |-
@@ -3025,7 +3040,7 @@ definitions:
             bucket_capacity:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.
+                    Capacity of the bucket to allow for bursty traffic.
 
                 x-go-tag-validate: required
             fill_amount:
@@ -3049,6 +3064,20 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
+            delay_initial_fill:
+                default: false
+                description: |+
+                    Delays the initial filling of the token bucket.
+                    If set to false, the token bucket will start filling immediately
+                    after the first request is received. This can potentially lead to
+                    more requests being accepted than the specified rate limit during
+                    the first interval.
+                    When set to true, the token bucket will be given a chance to
+                    empty out before the filling starts. The delay is equal to the
+                    time it takes to fill the bucket.
+
+                type: boolean
+                x-go-tag-default: "false"
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -3249,13 +3278,16 @@ definitions:
                     :::
                 type: object
             telemetry_collectors:
-                description: |-
+                description: |+
                     TelemetryCollector configures OpenTelemetry collector integration.
                     Deprecated: v3.0.0. Use `infra_meters` instead.
+
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
                 type: array
+                x-deprecated: true
+                x-go-tag-validate: deprecated
         title: Resources that need to be setup for the policy to function
         type: object
     Rule:
@@ -3359,7 +3391,10 @@ definitions:
                 description: Input ports for the _Sampler_.
             parameters:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             pass_through_label_values:
                 description: Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
                 items:
@@ -3621,7 +3656,7 @@ definitions:
             ```
         properties:
             agent_group:
-                default: default
+                default: aperture-cloud
                 description: |+
                     [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
@@ -3635,7 +3670,7 @@ definitions:
                     :::
 
                 type: string
-                x-go-tag-default: default
+                x-go-tag-default: aperture-cloud
             control_point:
                 description: |+
                     [Control Point](/concepts/control-point.md)

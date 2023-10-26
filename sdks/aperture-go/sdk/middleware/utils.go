@@ -96,7 +96,6 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 		logger.V(2).Info("Error reading body", "error", err)
 	}
 
-	// TODO: Set RampMode to rampMode after updating go proto dependency
 	return &checkhttpproto.CheckHTTPRequest{
 		Source: &checkhttpproto.SocketAddress{
 			Address:  sourceHost,
@@ -109,7 +108,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 			Port:     destinationPort,
 		},
 		ControlPoint: controlPoint,
-		// RampMode:     rampMode,
+		RampMode:     rampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
 			Path:     req.URL.Path,
@@ -169,12 +168,11 @@ func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		logger.V(2).Info("Unable to marshal request body")
 	}
 
-	// TODO: Set RampMode to rampMode after updating go proto dependency
 	return &checkhttpproto.CheckHTTPRequest{
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
-		// RampMode:     rampMode,
+		RampMode:     rampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     info.FullMethod,

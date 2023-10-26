@@ -3,7 +3,7 @@
   "type": "object",
   "title": "quota-scheduling/base blueprint",
   "additionalProperties": false,
-  "required": ["blueprint", "uri", "policy"],
+  "required": ["blueprint", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",
@@ -86,8 +86,7 @@
               "description": "Flow selectors to match requests against",
               "default": [
                 {
-                  "control_point": "__REQUIRED_FIELD__",
-                  "service": "__REQUIRED_FIELD__"
+                  "control_point": "__REQUIRED_FIELD__"
                 }
               ],
               "type": "array",

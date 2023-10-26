@@ -126,15 +126,16 @@ func (constructor ServerConstructor) provideServer(
 		return nil, nil, err
 	}
 
-	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
-	grpcServerMetrics.EnableHandlingTimeHistogram(
-		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
-	)
-
 	serverOptions := []grpc.ServerOption{}
 	serverOptions = append(serverOptions, constructor.ServerOptions...)
 
 	serverOptions = append(serverOptions, grpc.ConnectionTimeout(config.ConnectionTimeout.AsDuration()))
+
+	// grpc metrics
+	grpcServerMetrics := grpc_prometheus.NewServerMetrics()
+	grpcServerMetrics.EnableHandlingTimeHistogram(
+		grpc_prometheus.WithHistogramBuckets(config.LatencyBucketsMS),
+	)
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
@@ -183,7 +184,7 @@ func (constructor ServerConstructor) provideServer(
 		OnStop: func(context.Context) error {
 			listener := listener.GetListener()
 			log.Info().Str("constructor", constructor.ConfigKey).Str("addr", listener.Addr().String()).Msg("Stopping GRPC server")
-			server.GracefulStop()
+			server.Stop()
 			return nil
 		},
 	})

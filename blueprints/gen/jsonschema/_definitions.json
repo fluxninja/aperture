@@ -1,7 +1,7 @@
 {
   "definitions": {
     "AIADLoadScheduler": {
-      "description": "_AIAD Load Scheduler_ reduces the token rate linearly overtime while in overload state.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
+      "description": "_AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.\nDuring recovery, it increases the token rate linearly until the system is not overloaded.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -793,7 +793,8 @@
         },
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
-          "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead."
+          "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead.\n\n",
+          "x-go-tag-validate": "deprecated"
         },
         "ema": {
           "$ref": "#/definitions/EMA",
@@ -1304,7 +1305,8 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy."
+          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.\n\n",
+          "x-go-tag-validate": "deprecated"
         },
         "aiad_load_scheduler": {
           "$ref": "#/definitions/AIADLoadScheduler",
@@ -2048,7 +2050,8 @@
       "properties": {
         "sampler": {
           "$ref": "#/definitions/SamplerParameters",
-          "description": "Parameters for the _Sampler_."
+          "description": "Parameters for the _Sampler_.\n\n",
+          "x-go-tag-validate": "required"
         },
         "steps": {
           "items": {
@@ -2644,11 +2647,13 @@
       "properties": {
         "circuit": {
           "$ref": "#/definitions/Circuit",
-          "description": "Defines the control-loop logic of the policy."
+          "description": "Defines the control-loop logic of the policy.\n\n",
+          "x-go-tag-validate": "required_without=Resources"
         },
         "resources": {
           "$ref": "#/definitions/Resources",
-          "description": "Resources (such as Flux Meters, Classifiers) to setup."
+          "description": "Resources (such as Flux Meters, Classifiers) to setup.\n\n",
+          "x-go-tag-validate": "required_without=Circuit"
         }
       },
       "type": "object",
@@ -3004,7 +3009,7 @@
       "properties": {
         "bucket_capacity": {
           "$ref": "#/definitions/InPort",
-          "description": "Capacity of the bucket to allow for bursty traffic. The bucket is given a chance to empty out before the filling starts.\n\n",
+          "description": "Capacity of the bucket to allow for bursty traffic.\n\n",
           "x-go-tag-validate": "required"
         },
         "fill_amount": {
@@ -3028,6 +3033,12 @@
           "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",
           "type": "boolean",
           "x-go-tag-default": "true"
+        },
+        "delay_initial_fill": {
+          "default": false,
+          "description": "Delays the initial filling of the token bucket.\nIf set to false, the token bucket will start filling immediately\nafter the first request is received. This can potentially lead to\nmore requests being accepted than the specified rate limit during\nthe first interval.\nWhen set to true, the token bucket will be given a chance to\nempty out before the filling starts. The delay is equal to the\ntime it takes to fill the bucket.\n\n",
+          "type": "boolean",
+          "x-go-tag-default": "false"
         },
         "interval": {
           "description": "Interval defines the time interval in which the token bucket\nwill fill tokens specified by `fill_amount` signal.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
@@ -3138,12 +3149,14 @@
           "type": "object"
         },
         "telemetry_collectors": {
-          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v3.0.0. Use `infra_meters` instead.",
+          "description": "TelemetryCollector configures OpenTelemetry collector integration.\nDeprecated: v3.0.0. Use `infra_meters` instead.\n\n",
           "items": {
             "$ref": "#/definitions/TelemetryCollector",
             "type": "object"
           },
-          "type": "array"
+          "type": "array",
+          "x-deprecated": true,
+          "x-go-tag-validate": "deprecated"
         }
       },
       "title": "Resources that need to be setup for the policy to function",
@@ -3236,7 +3249,8 @@
         },
         "parameters": {
           "$ref": "#/definitions/SamplerParameters",
-          "description": "Parameters for the _Sampler_."
+          "description": "Parameters for the _Sampler_.\n\n",
+          "x-go-tag-validate": "required"
         },
         "pass_through_label_values": {
           "description": "Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.",
@@ -3440,10 +3454,10 @@
       "description": "Selects flows based on control point, flow labels, agent group and the service\nthat the flow control component\nwill operate on.\n\n:::info\n\nSee also [Selector overview](/concepts/selector.md).\n\n:::\n\nExample:\n```yaml\ncontrol_point: ingress\nlabel_matcher:\n  match_labels:\n    user_tier: gold\n  match_expressions:\n    - key: query\n      operator: In\n      values:\n        - insert\n        - delete\n  expression:\n    label_matches:\n        - label: user_agent\n          regex: ^(?!.*Chrome).*Safari\n```",
       "properties": {
         "agent_group": {
-          "default": "default",
+          "default": "aperture-cloud",
           "description": "[_Agent Group_](/concepts/selector.md#agent-group) this\nselector applies to.\n\n:::info\n\nAgent Groups are used to scope policies to a subset of agents connected to the same controller.\nThe agents within an agent group receive exact same policy configuration and\nform a peer to peer cluster to constantly share state.\n\n:::\n\n",
           "type": "string",
-          "x-go-tag-default": "default"
+          "x-go-tag-default": "aperture-cloud"
         },
         "control_point": {
           "description": "[Control Point](/concepts/control-point.md)\nidentifies location within services where policies can act on flows.\nFor an SDK based insertion,\na _Control Point_ can represent a particular feature or execution\nblock within a service. In case of service mesh or middleware insertion, a\n_Control Point_ can identify ingress or egress calls or distinct listeners\nor filter chains.\n\n",

@@ -782,7 +782,7 @@ empty schema
 
 | Name              | Type                           | Go type        | Required | Default | Description                                                                                                                   | Example |
 | ----------------- | ------------------------------ | -------------- | :------: | ------- | ----------------------------------------------------------------------------------------------------------------------------- | ------- |
-| APIKey            | string                         | `string`       |          |         | API Key for this agent. If this key is not set, the extension won't be enabled.                                               |         |
+| AgentAPIKey       | string                         | `string`       |          |         | API Key for this agent. If this key is not set, the extension won't be enabled.                                               |         |
 | Endpoint          | string                         | `string`       |          |         | Address to gRPC or HTTP(s) server listening in agent service. To use HTTP protocol, the address must start with `http(s)://`. |         |
 | HeartbeatInterval | string (formatted string)      | `string`       |          |         | Interval between each heartbeat.                                                                                              |         |
 | InstallationMode  | string                         | `string`       |          |         | Installation mode describes on which underlying platform the Agent or the Controller is being run.                            |         |

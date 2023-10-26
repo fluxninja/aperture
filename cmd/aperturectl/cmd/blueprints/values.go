@@ -54,13 +54,10 @@ Provides a values file for a given Aperture Blueprint that can be then used to g
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		err := pullCmd.RunE(cmd, args)
+		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}
-		return createValuesFile(blueprintName, valuesFile, false)
-	},
-	PostRunE: func(cmd *cobra.Command, args []string) error {
-		return pullCmd.PostRunE(cmd, args)
+		return createValuesFile(blueprintsDir, blueprintName, valuesFile, false)
 	},
 }

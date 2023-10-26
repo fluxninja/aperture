@@ -72,7 +72,7 @@ func (apertureInjector *ApertureInjector) Handle(ctx context.Context, req admiss
 		Namespace: req.Namespace,
 	}
 
-	if err := updateClusterRoleBinding(apertureInjector.Client, subject, ctx, apertureInjector.Instance.GetNamespace()); err != nil {
+	if err := updateClusterRoleBinding(apertureInjector.Client, subject, ctx, apertureInjector.Instance); err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 

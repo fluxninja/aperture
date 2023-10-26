@@ -21,6 +21,29 @@ resources.
 
 ## Prerequisites
 
+You can do the installation using the `aperturectl` CLI tool or using `Helm`.
+Install the tool of your choice using the following links:
+
+1. [Helm](https://helm.sh/docs/intro/install/)
+
+   1. Once the Helm CLI is installed, add the
+      [Aperture Agent Helm chart](https://artifacthub.io/packages/helm/aperture/aperture-agent)
+      repository in your environment for install or upgrade:
+
+      ```bash
+      helm repo add aperture https://fluxninja.github.io/aperture/
+      helm repo update
+      ```
+
+2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+
+   :::info Refer
+
+   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
+   see all the available command line arguments.
+
+   :::
+
 Prepare a `values.yaml` file which switches the Aperture Agent to
 namespace-scoped:
 
@@ -31,7 +54,8 @@ agent:
 
 :::note
 
-(Relevant to [Self-Hosted Aperture Controller](/self-hosting/self-hosting.md)
+(Relevant to
+[Self-Hosted Aperture Controller](/get-started/self-hosting/self-hosting.md)
 only, ignore this note if using Aperture Cloud Controller).
 
 If you want to install the Aperture Agent using `Helm` or don't want to use the
@@ -55,7 +79,7 @@ agent:
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-1. Configure the Aperture Cloud endpoint and API key parameters in the Agent.
+1. Configure the Aperture Cloud endpoint and Agent Key parameters in the Agent.
    Update the `values.yaml` file and pass it with the `install` command:
 
    ```yaml
@@ -71,13 +95,13 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `API_KEY` with the API key linked to the project. If an API key has not been
-   created, generate a new one through the Aperture Cloud UI. Refer to [API
-   Keys][api-keys] for additional information.
+   `AGENT_API_KEY` with the API key linked to the project. If an API key has not
+   been created, generate a new one through the Aperture Cloud UI. Refer to [API
+   Keys][agent-api-keys] for additional information.
 
    :::note
 
@@ -88,14 +112,14 @@ your cluster.
    :::
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml --skip-crds`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -121,18 +145,18 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: API_KEY
+         value: AGENT_API_KEY
    ```
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml --skip-crds`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -147,14 +171,14 @@ your cluster.
    `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm install agent aperture/aperture-agent -f values.yaml --namespace aperture-agent --create-namespace --skip-crds`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -168,11 +192,6 @@ Aperture Agent into your cluster.
    [Installation Steps](#agent-installation) and pass it with below command:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template agent aperture/aperture-agent -f values.yaml | kubectl apply -f -`}
@@ -185,17 +204,17 @@ Aperture Agent into your cluster.
    {`helm upgrade agent aperture/aperture-agent -f values.yaml`}
    </CodeBlock>
    </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml`}
+   </CodeBlock>
+   </TabItem>
    </Tabs>
 
 2. If you have deployed the Aperture Agent into a namespace other than
    `default`, use the `--namespace` flag:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm template agent aperture/aperture-agent -f values.yaml --namespace aperture-agent | kubectl apply -f -`}
@@ -206,6 +225,11 @@ Aperture Agent into your cluster.
 
    <CodeBlock language="bash">
    {`helm upgrade agent aperture/aperture-agent -f values.yaml --namespace aperture-agent`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl install agent --version ${apertureVersion} --values-file values.yaml --namespace aperture-agent`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -232,14 +256,14 @@ Use the same `values.yaml` file created as part of the
 1. Uninstall the Aperture Agent:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall agent --values-file values.yaml --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -248,14 +272,14 @@ Use the same `values.yaml` file created as part of the
    execute the commands below:
 
    <Tabs groupId="setup" queryString>
-   <TabItem value="aperturectl" label="aperturectl">
-   <CodeBlock language="bash">
-   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml --version ${apertureVersion}`}
-   </CodeBlock>
-   </TabItem>
    <TabItem value="Helm" label="Helm">
    <CodeBlock language="bash">
    {`helm uninstall agent --namespace aperture-agent -f values.yaml`}
+   </CodeBlock>
+   </TabItem>
+   <TabItem value="aperturectl" label="aperturectl">
+   <CodeBlock language="bash">
+   {`aperturectl uninstall agent --namespace aperture-agent --values-file values.yaml --version ${apertureVersion}`}
    </CodeBlock>
    </TabItem>
    </Tabs>
@@ -268,5 +292,5 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[self-hosting-config]: /self-hosting/agent.md#configuration
-[api-keys]: /get-started/aperture-cloud/api-keys.md
+[self-hosting-config]: /get-started/self-hosting/agent.md#configuration
+[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md
