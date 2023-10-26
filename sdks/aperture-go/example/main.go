@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net"
 	"net/http"
@@ -15,7 +16,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 
 	aperturego "github.com/fluxninja/aperture-go/v2/sdk"
 	aperturegomiddleware "github.com/fluxninja/aperture-go/v2/sdk/middleware"
@@ -43,7 +45,16 @@ func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
 		MinConnectTimeout: time.Second * 10,
 	}))
 	grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
-	grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cred := credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify: true, //nolint:gosec // Requires enabling CLI option
+	})
+	grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(cred))
+	grpcDialOptions = append(grpcDialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		log.Printf("Invoking method %s", method)
+		md := metadata.Pairs("apikey", "7b712208201b4fccb9fa1ca46d2e63fa")
+		ctx = metadata.NewOutgoingContext(ctx, md)
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}))
 
 	return grpc.DialContext(ctx, address, grpcDialOptions...)
 }
