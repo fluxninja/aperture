@@ -54,7 +54,7 @@ type apertureClient struct {
 type Options struct {
 	GRPCDialOptions []grpc.DialOption
 	Address         string
-	APIKey          string
+	AgentAPIKey     string
 	Insecure        bool
 	SkipVerify      bool
 	Logger          *logr.Logger
@@ -67,9 +67,9 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		opts.GRPCDialOptions = []grpc.DialOption{}
 	}
 
-	if opts.APIKey != "" {
+	if opts.AgentAPIKey != "" {
 		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
-			md := metadata.Pairs("apikey", opts.APIKey)
+			md := metadata.Pairs("apikey", opts.AgentAPIKey)
 			ctx = metadata.NewOutgoingContext(ctx, md)
 			return invoker(ctx, method, req, reply, cc, callOpts...)
 		}))

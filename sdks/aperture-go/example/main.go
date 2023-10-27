@@ -52,7 +52,7 @@ func main() {
 	opts := aperturego.Options{
 		Address:         getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
 		GRPCDialOptions: grpcOptions(),
-		APIKey:          getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
+		AgentAPIKey:     getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
 		Insecure:        getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false),
 		SkipVerify:      getBoolEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false),
 	}

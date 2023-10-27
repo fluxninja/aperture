@@ -12,8 +12,8 @@ functionality on fine-grained features inside service code.
 ```go
 options := aperture.Options{
    GRPCDialOptions: grpcOptions,
-   Address:         "ORGANIZATION.app.fluxninja.com",
-   APIKey:           "API_KEY",
+   Address:     "ORGANIZATION.app.fluxninja.com",
+   AgentAPIKey: "AGENT_API_KEY",
 }
 
 // initialize Aperture Client with the provided options.
