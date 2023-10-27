@@ -1,6 +1,8 @@
 package com.fluxninja.aperture.instrumentation.armeria;
 
-import static net.bytebuddy.matcher.ElementMatchers.*;
+import static net.bytebuddy.matcher.ElementMatchers.isMethod;
+import static net.bytebuddy.matcher.ElementMatchers.isPublic;
+import static net.bytebuddy.matcher.ElementMatchers.named;
 
 import com.fluxninja.aperture.instrumentation.TransformerInstrumentation;
 import net.bytebuddy.agent.builder.AgentBuilder;

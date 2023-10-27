@@ -12,57 +12,49 @@ import (
 
 	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
+	"github.com/spf13/cast"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/credentials/insecure"
 
 	aperturego "github.com/fluxninja/aperture-go/v2/sdk"
 	aperturegomiddleware "github.com/fluxninja/aperture-go/v2/sdk/middleware"
 )
 
 const (
-	defaultAgentHost = "localhost"
-	defaultAgentPort = "8089"
-	defaultAppPort   = "8080"
+	defaultAgentAddress = "localhost:8089"
+	defaultAppPort      = "8080"
 )
 
 // app struct contains the server and the Aperture client.
 type app struct {
 	server         *http.Server
-	grpcClient     *grpc.ClientConn
 	apertureClient aperturego.Client
 }
 
-// grpcClient creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcClient(ctx context.Context, address string) (*grpc.ClientConn, error) {
-	// creating a gRPC client connection is essential to allow the Aperture client to communicate with the Flow Control Service.
+// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
+func grpcOptions() []grpc.DialOption {
 	var grpcDialOptions []grpc.DialOption
 	grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff:           backoff.DefaultConfig,
 		MinConnectTimeout: time.Second * 10,
 	}))
 	grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
-	grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	return grpc.DialContext(ctx, address, grpcDialOptions...)
+	return grpcDialOptions
 }
 
 func main() {
-	agentHost := getEnvOrDefault("APERTURE_AGENT_HOST", defaultAgentHost)
-	agentPort := getEnvOrDefault("APERTURE_AGENT_PORT", defaultAgentPort)
-
 	ctx := context.Background()
-
-	apertureAgentGRPCClient, err := grpcClient(ctx, net.JoinHostPort(agentHost, agentPort))
-	if err != nil {
-		log.Fatalf("failed to create flow control client: %v", err)
-	}
 
 	stdr.SetVerbosity(2)
 
 	opts := aperturego.Options{
-		ApertureAgentGRPCClientConn: apertureAgentGRPCClient,
+		Address:         getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
+		GRPCDialOptions: grpcOptions(),
+		AgentAPIKey:     getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
+		Insecure:        getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false),
+		SkipVerify:      getBoolEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false),
 	}
 
 	// initialize Aperture Client with the provided options.
@@ -80,13 +72,12 @@ func main() {
 			Handler: mux,
 		},
 		apertureClient: apertureClient,
-		grpcClient:     apertureAgentGRPCClient,
 	}
 
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 200*time.Millisecond).Handle)
+	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 2000*time.Millisecond).Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
@@ -120,8 +111,8 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.
 func (a *app) ConnectedHandler(w http.ResponseWriter, r *http.Request) {
-	a.grpcClient.Connect()
-	state := a.grpcClient.GetState()
+	a.apertureClient.GetGRPClientConn().Connect()
+	state := a.apertureClient.GetGRPClientConn().GetState()
 	if state != connectivity.Ready {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}
@@ -132,6 +123,14 @@ func (a *app) ConnectedHandler(w http.ResponseWriter, r *http.Request) {
 func (a *app) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("Healthy"))
+}
+
+func getBoolEnvOrDefault(envName string, defaultValue bool) bool {
+	val := os.Getenv(envName)
+	if val == "" {
+		return defaultValue
+	}
+	return cast.ToBool(val)
 }
 
 func getEnvOrDefault(envName, defaultValue string) string {

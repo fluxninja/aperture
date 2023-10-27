@@ -4,7 +4,11 @@ import com.fluxninja.aperture.armeria.ApertureHTTPService;
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.*;
+import com.linecorp.armeria.server.AbstractHttpService;
+import com.linecorp.armeria.server.HttpService;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.ServiceRequestContext;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -50,6 +54,10 @@ public class ArmeriaServer {
         if (agentHost == null) {
             agentHost = DEFAULT_AGENT_ADDRESS;
         }
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
+        }
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
@@ -80,6 +88,7 @@ public class ArmeriaServer {
             apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentHost)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

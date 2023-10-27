@@ -2,6 +2,8 @@ package aperture
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"log"
 	"net/url"
@@ -24,6 +26,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -32,6 +37,7 @@ type Client interface {
 	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
+	GetGRPClientConn() *grpc.ClientConn
 }
 
 type apertureClient struct {
@@ -46,16 +52,51 @@ type apertureClient struct {
 // Options that the user can pass to Aperture in order to receive a new Client.
 // FlowControlClientConn and OTLPExporterClientConn are required.
 type Options struct {
-	ApertureAgentGRPCClientConn *grpc.ClientConn
-	Logger                      *logr.Logger
+	GRPCDialOptions []grpc.DialOption
+	Address         string
+	AgentAPIKey     string
+	Insecure        bool
+	SkipVerify      bool
+	Logger          *logr.Logger
 }
 
 // NewClient returns a new Client that can be used to perform Check calls.
 // The user will pass in options which will be used to create a connection with otel and a tracerProvider retrieved from such connection.
 func NewClient(ctx context.Context, opts Options) (Client, error) {
+	if opts.GRPCDialOptions == nil {
+		opts.GRPCDialOptions = []grpc.DialOption{}
+	}
+
+	if opts.AgentAPIKey != "" {
+		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
+			md := metadata.Pairs("apikey", opts.AgentAPIKey)
+			ctx = metadata.NewOutgoingContext(ctx, md)
+			return invoker(ctx, method, req, reply, cc, callOpts...)
+		}))
+	}
+
+	if opts.Insecure {
+		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else if opts.SkipVerify {
+		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: true, //nolint:gosec // For testing purposes only
+		})))
+	} else {
+		certPool, err := x509.SystemCertPool()
+		if err != nil {
+			return nil, err
+		}
+		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
+	}
+
+	conn, err := grpc.DialContext(ctx, opts.Address, opts.GRPCDialOptions...)
+	if err != nil {
+		return nil, err
+	}
+
 	exporter, err := otlptracegrpc.New(
 		ctx,
-		otlptracegrpc.WithGRPCConn(opts.ApertureAgentGRPCClientConn),
+		otlptracegrpc.WithGRPCConn(conn),
 	)
 	if err != nil {
 		return nil, err
@@ -82,11 +123,11 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		logger = stdr.New(log.Default()).WithName("aperture-go-sdk")
 	}
 
-	fcClient := checkgrpc.NewFlowControlServiceClient(opts.ApertureAgentGRPCClientConn)
-	fcHTTPClient := checkhttpgrpc.NewFlowControlServiceHTTPClient(opts.ApertureAgentGRPCClientConn)
+	fcClient := checkgrpc.NewFlowControlServiceClient(conn)
+	fcHTTPClient := checkhttpgrpc.NewFlowControlServiceHTTPClient(conn)
 
 	c := &apertureClient{
-		grpcClientConn:        opts.ApertureAgentGRPCClientConn,
+		grpcClientConn:        conn,
 		flowControlClient:     fcClient,
 		flowControlHTTPClient: fcHTTPClient,
 		tracer:                tracer,
@@ -223,4 +264,9 @@ func newResource() (*resource.Resource, error) {
 // GetLogger returns the logger used by the aperture client.
 func (c *apertureClient) GetLogger() logr.Logger {
 	return c.log
+}
+
+// GetGRPClientConn returns the grpc client connection used by the aperture client.
+func (c *apertureClient) GetGRPClientConn() *grpc.ClientConn {
+	return c.grpcClientConn
 }

@@ -8,15 +8,15 @@ import grpc
 from aperture_sdk import ApertureClient
 from quart import Quart
 
-defaultAgentHost = "localhost"
-defaultAgentPort = "8089"
+default_agent_address = "localhost:8089"
 
-agentHost = os.getenv("APERTURE_AGENT_HOST", defaultAgentHost)
-agentPort = os.getenv("APERTURE_AGENT_PORT", defaultAgentPort)
+agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
+agent_api_key = os.getenv("APERTURE_AGENT_API_KEY", "")
+insecure = os.getenv("APERTURE_AGENT_INSECURE", "true").lower() == "true"
 
 app = Quart(__name__)
 aperture_client = ApertureClient.new_client(
-    endpoint=f"{agentHost}:{agentPort}", insecure=True
+    address=agent_address, insecure=insecure, agent_api_key=agent_api_key
 )
 
 logging.basicConfig(level=logging.DEBUG)

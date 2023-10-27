@@ -4,7 +4,9 @@ import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
-  address: "localhost:8089",
+  address: process.env.APERTURE_AGENT_ADDRESS !== undefined ? process.env.APERTURE_AGENT_ADDRESS : "localhost:8089",
+  agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
+  isInsecure: process.env.APERTURE_AGENT_INSECURE === "true",
 });
 
 export const apertureRoute = express.Router();
@@ -18,7 +20,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
-    .StartFlow("awesome-feature", {
+    .StartFlow("awesomeFeature", {
       labels: labels,
       grpcCallOptions: {
         deadline: Date.now() + 30000,

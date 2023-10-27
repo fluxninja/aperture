@@ -1,6 +1,8 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_START_TIMESTAMP_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.SOURCE_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.WORKLOAD_START_TIMESTAMP_LABEL;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;

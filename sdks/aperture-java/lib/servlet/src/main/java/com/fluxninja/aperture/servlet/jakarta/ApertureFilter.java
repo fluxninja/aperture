@@ -1,6 +1,12 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.ApertureSDKBuilder;
+import com.fluxninja.aperture.sdk.Constants;
+import com.fluxninja.aperture.sdk.FlowDecision;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -30,7 +36,6 @@ public class ApertureFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        String path = request.getServletPath();
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
@@ -65,6 +70,7 @@ public class ApertureFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentAddress;
+        String agentAPIKey;
         String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
@@ -73,6 +79,7 @@ public class ApertureFilter implements Filter {
         boolean ignoredPathsRegex;
         try {
             agentAddress = filterConfig.getInitParameter("agent_address");
+            agentAPIKey = filterConfig.getInitParameter("agent_api_key");
             initControlPointName = filterConfig.getInitParameter("control_point_name");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
@@ -100,6 +107,7 @@ public class ApertureFilter implements Filter {
 
         ApertureSDKBuilder builder = ApertureSDK.builder();
         builder.setAddress(agentAddress);
+        builder.setAgentAPIKey(agentAPIKey);
         builder.useInsecureGrpc(insecureGrpc);
         if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
             try {

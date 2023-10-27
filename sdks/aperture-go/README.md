@@ -11,10 +11,9 @@ functionality on fine-grained features inside service code.
 
 ```go
 options := aperture.Options{
-   ClientConn: client,
-   // checkTimeout is the time that the client will wait for a response from Aperture Agent.
-   // if not provided, the default value of 200 milliseconds will be used.
-   CheckTimeout: 200 * time.Millisecond,
+   GRPCDialOptions: grpcOptions,
+   Address:     "ORGANIZATION.app.fluxninja.com",
+   AgentAPIKey: "AGENT_API_KEY",
 }
 
 // initialize Aperture Client with the provided options.
@@ -22,6 +21,32 @@ apertureClient, err := aperture.NewClient(options)
 if err != nil {
    log.Fatalf("failed to create client: %v", err)
 }
+```
+
+### HTTP Middleware
+
+`aperture-go` provides an HTTP middleware to be used with routers.
+
+```go
+// Create a new mux router
+router := mux.NewRouter()
+
+superRouter := mux.PathPrefix("/super").Subrouter()
+superRouter.HandleFunc("", a.SuperHandler)
+
+superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 2000*time.Millisecond).Handle)
+```
+
+### gRPC Unary Interceptor
+
+`aperture-go` provides a gRPC unary interceptor to be used with gRPC clients.
+
+```go
+// Create a new gRPC interceptor
+interceptor := aperturegomiddleware.NewGRPCUnaryInterceptor(apertureClient, "awesomeFeature", nil, false, 2000*time.Millisecond)
+
+// Create a new gRPC server
+s := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 ```
 
 ### Flow Interface

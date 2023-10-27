@@ -1,6 +1,10 @@
 package com.fluxninja.example;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequestBuilder;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -36,6 +40,10 @@ public class App {
         if (agentAddress == null) {
             agentAddress = DEFAULT_AGENT_ADDRESS;
         }
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
+        }
         String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
@@ -54,6 +62,7 @@ public class App {
             apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentAddress)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -108,7 +117,8 @@ public class App {
 
         TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
 
-        // StartFlow performs a flowcontrolv1.CheckHTTP call to Aperture Agent. It returns a
+        // StartFlow performs a flowcontrolv1.CheckHTTP call to Aperture Agent. It
+        // returns a
         // TrafficFlow.
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(apertureRequest);
 

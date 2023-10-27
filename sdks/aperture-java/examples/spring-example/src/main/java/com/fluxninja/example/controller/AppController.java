@@ -17,7 +17,8 @@ public class AppController {
         return "Hello World";
     }
 
-    // /super2 endpoint is protected by a Filter created using Aperture SDK feature flow
+    // /super2 endpoint is protected by a Filter created using Aperture SDK feature
+    // flow
     @RequestMapping(value = "/super2", method = RequestMethod.GET)
     public String hello2() {
         return "Hello World 2";
