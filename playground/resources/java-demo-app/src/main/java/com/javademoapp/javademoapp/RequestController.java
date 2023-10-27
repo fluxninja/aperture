@@ -1,21 +1,19 @@
 package com.javademoapp.javademoapp;
 
-import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +39,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluxninja.aperture.servlet.javax.*;
+import com.fluxninja.aperture.servlet.javax.ApertureFilter;
 
 @RestController
 public class RequestController {
@@ -140,11 +138,17 @@ public class RequestController {
     public FilterRegistrationBean<ApertureFilter> apertureFeatureFilter(Environment env) {
         FilterRegistrationBean<ApertureFilter> registrationBean = new FilterRegistrationBean<>();
 
+        String agentAddress = System.getenv().getOrDefault("APERTURE_AGENT_ADDRESS", "");
+        String agentHost = System.getenv().getOrDefault("APERTURE_AGENT_HOST", DEFAULT_HOST);
+        String agentPort = System.getenv().getOrDefault("APERTURE_AGENT_PORT", DEFAULT_AGENT_PORT);
+        if (agentAddress.isEmpty()) {
+            agentAddress = String.format("%s:%s", agentHost, agentPort);
+        }
+
         registrationBean.setFilter(apertureFilter);
         registrationBean.addUrlPatterns("/request");
-        registrationBean.addInitParameter("agent_host", System.getenv().getOrDefault("APERTURE_AGENT_HOST", DEFAULT_HOST));
-        registrationBean.addInitParameter("agent_port",
-                System.getenv().getOrDefault("APERTURE_AGENT_PORT", DEFAULT_AGENT_PORT));
+        registrationBean.addInitParameter("agent_address", agentAddress);
+        registrationBean.addInitParameter("agent_api_key", System.getenv().getOrDefault("APERTURE_AGENT_API_KEY", ""));
         registrationBean.addInitParameter("control_point_name", "awesomeFeature");
         registrationBean.addInitParameter("enable_fail_open", "true");
         registrationBean.addInitParameter("insecure_grpc", "true");

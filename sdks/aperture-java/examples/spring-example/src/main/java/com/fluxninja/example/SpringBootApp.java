@@ -21,6 +21,11 @@ public class SpringBootApp {
             agentAddress = DEFAULT_AGENT_ADDRESS;
         }
         System.setProperty("APERTURE_AGENT_ADDRESS", agentAddress);
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
+        }
+        System.setProperty("APERTURE_AGENT_API_KEY", agentAPIKey);
         String appPort = System.getenv("FN_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
