@@ -41,6 +41,11 @@ var _ = DescribeTable("FN Extension OTel", func(
 		*otelCfg = *baseConfig
 	})
 
+	heartbeats := &heartbeats.Heartbeats{}
+	heartbeats.SetControllerInfoPtr(
+		&heartbeatv1.ControllerInfo{
+			Id: "controllero",
+		})
 	opts := fx.Options(
 		grpcclient.ClientConstructor{Name: "heartbeats-grpc-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.grpc"}.Annotate(),
 		httpclient.ClientConstructor{Name: "heartbeats-http-client", ConfigKey: extconfig.ExtensionConfigKey + ".client.http"}.Annotate(),
@@ -51,11 +56,7 @@ var _ = DescribeTable("FN Extension OTel", func(
 			},
 		),
 		fx.Supply(
-			&heartbeats.Heartbeats{
-				ControllerInfo: &heartbeatv1.ControllerInfo{
-					Id: "controllero",
-				},
-			},
+			heartbeats,
 		),
 		fx.Supply(configProvider),
 		otel.Module(),
