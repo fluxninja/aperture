@@ -39,15 +39,11 @@ need to configure the Aperture Java SDK for your application. You can configure
 Aperture SDK as follows:
 
 ```java
-    String agentHost = "localhost"; // Aperture Agent Host URL
-    int agentPort = 8089; // Aperture Agent Port
-
     ApertureSDK apertureSDK;
 
     apertureSDK = ApertureSDK.builder()
-            .setHost(agentHost)
-            .setPort(agentPort)
-            .setFlowTimeout(Duration.ofMillis(1000))
+            .setAddress("ORGANIZATION.app.fluxninja.com:443")
+            .setAgentAPIKey("AGENT_API_KEY")
             .build();
 ```
 
@@ -65,38 +61,62 @@ Let's create a feature control point in the following code snippet.
 ```java
    private String handleSuperAPI(spark.Request req, spark.Response res) {
         Map<String, String> labels = new HashMap<>();
-        Map<String, String> data = new HashMap<>();
-​
-        // Get the user_id from the request
-        String userId = req.queryParams("user_id");
-        // Set the user_id as a label
-        labels.put("user_id", userId);
-​
-        // Get user type from the request
-        String userType = req.queryParams("user_type");
-        // Set the user_type as a label
-        labels.put("user_type", userType);
-​
 
-        Flow flow = this.apertureSDK.startFlow('awesomeFeature', labels);
-​
-        if (flow.shouldRun()) {
-            // Aperture accepted the flow, now execute the business logic.
-            data = this.executeBusinessLogic(spark.Request);
-            res.status(200);
-        } else {
-            // Flow has been rejected by Aperture
-            res.status(flow.getRejectionHttpStatusCode());
-            flow.setStatus(FlowStatus.Error);
+        // do some business logic to collect labels
+        labels.put("user", "kenobi");
+
+        Map<String, String> allHeaders = new HashMap<>();
+        for (String headerName : req.headers()) {
+            allHeaders.put(headerName, req.headers(headerName));
         }
-        flow.end();
+        allHeaders.putAll(labels);
+
+        TrafficFlowRequestBuilder trafficFlowRequestBuilder = TrafficFlowRequest.newBuilder();
+
+        trafficFlowRequestBuilder
+                .setControlPoint("awesomeFeature")
+                .setHttpMethod(req.requestMethod())
+                .setHttpHost(req.host())
+                .setHttpProtocol(req.protocol())
+                .setHttpPath(req.pathInfo())
+                .setHttpScheme(req.scheme())
+                .setHttpSize(req.contentLength())
+                .setHttpHeaders(allHeaders)
+                .setSource(req.ip(), req.port(), "TCP")
+                .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP")
+                .setRampMode(false)
+                .setFlowTimeout(Duration.ofMillis(1000));
+
+        TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
+
+        TrafficFlow flow = this.apertureSDK.startTrafficFlow(apertureRequest);
+
+        // See whether flow was accepted by Aperture Agent.
+        try {
+            if (flow.shouldRun()) {
+                // Aperture accepted the flow, now execute the business logic.
+                data = this.executeBusinessLogic(spark.Request);
+                res.status(200);
+            } else {
+                // Flow has been rejected by Aperture Agent.
+                res.status(flow.getRejectionHttpStatusCode());
+            }
+        } catch (Exception e) {
+            // Flow Status captures whether the feature captured by the Flow was
+            // successful or resulted in an error. When not explicitly set,
+            // the default value is FlowStatus.OK .
+            flow.setStatus(FlowStatus.Error);
+            logger.error("Error in flow execution", e);
+        } finally {
+            flow.end();
+        }
         return data;
     }
 ```
 
 This is how you can create a manual feature control point in your code. The
 complete code snippet is available
-[here](https://github.com/fluxninja/aperture-java/tree/releases/aperture-java/v2.1.0/examples/standalone-example).
+[here](https://github.com/fluxninja/aperture-java/tree/main/examples/standalone-traffic-flow-example).
 
 :::info
 

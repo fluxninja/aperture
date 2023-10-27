@@ -16,7 +16,7 @@ sidebar_label: Agent
 :::info
 
 See also
-[Aperture Agent installation](/get-started/installation/agent/agent.md).
+[Aperture Agent installation](/get-started/self-hosting/agent/agent.md).
 
 :::
 

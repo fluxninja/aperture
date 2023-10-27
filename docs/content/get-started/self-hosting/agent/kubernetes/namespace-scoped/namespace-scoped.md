@@ -292,5 +292,5 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[self-hosting-config]: /get-started/self-hosting/agent.md#configuration
+[self-hosting-config]: /get-started/self-hosting/agent/agent.md#configuration
 [agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md
