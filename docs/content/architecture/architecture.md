@@ -59,7 +59,7 @@ policy components][policy].
 :::note
 
 Here the Aperture Agents are shown as [self-hosted][self-hosting], but it's also
-available as part of Aperture Cloud.
+available as part of the Aperture Cloud.
 
 :::
 

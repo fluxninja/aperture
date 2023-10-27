@@ -16,7 +16,7 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 The architecture of the self-hosted Aperture solution differs slightly from the
-regular [Aperture Cloud based set up](/architecture/architecture.md). The main
+regular [Aperture Cloud-based set up](/architecture/architecture.md). The main
 difference is that the Aperture Controller and Agent are deployed separately.
 The Aperture Controller also needs its supporting databases.
 
