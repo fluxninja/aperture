@@ -93,7 +93,7 @@ Controller][aperture-cloud-controller] instead of deploying your own.
 
 Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the
-[Supported Linux platforms](/get-started/installation/supported-platforms.md).
+[Supported Linux platforms](/get-started/self-hosting/supported-platforms.md).
 The installation steps are available
 [here](/get-started/self-hosting/agent/bare-metal.md).
 
