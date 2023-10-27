@@ -81,11 +81,15 @@ func newPolicyOptions(wrapperMessage *policysyncv1.PolicyWrapper, registry statu
 
 // CompilePolicy takes policyMessage and returns a compiled policy. This is a helper method for standalone consumption of policy compiler.
 func CompilePolicy(policyMessage *policylangv1.Policy, policyName string, registry status.Registry) (*circuitfactory.Circuit, error) {
+	policyString, err := policyMessage.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal policy: %w", err)
+	}
 	policyWrapper := policysyncv1.PolicyWrapper{
 		Policy: policyMessage,
 		CommonAttributes: &policysyncv1.CommonAttributes{
 			PolicyName: policyName,
-			PolicyHash: "dummy-hash",
+			PolicyHash: HashStoredPolicy(policyString),
 		},
 	}
 
