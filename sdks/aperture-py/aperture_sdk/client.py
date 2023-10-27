@@ -59,16 +59,29 @@ class ApertureClient:
     @classmethod
     def new_client(
         cls: Type[TApertureClient],
-        endpoint: str = "http://localhost:4317",
+        address: str,
+        agent_api_key: Optional[str] = None,
         insecure: bool = False,
         grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
         credentials: Optional[grpc.ChannelCredentials] = None,
         compression: grpc.Compression = grpc.Compression.NoCompression,
     ) -> TApertureClient:
-        if credentials is None:
+        if not address:
+            raise ValueError("Address must be provided")
+        if not credentials:
             credentials = grpc.ssl_channel_credentials()
+        if agent_api_key:
+            credentials = grpc.composite_channel_credentials(
+                credentials,
+                grpc.metadata_call_credentials(
+                    metadata_plugin=lambda _, callback: callback(
+                        (("apikey", agent_api_key),), None
+                    ),
+                    name="apikey",
+                ),
+            )
         otlp_exporter = OTLPSpanExporter(
-            endpoint=endpoint,
+            endpoint=address,
             insecure=insecure,
             credentials=credentials,
             compression=compression,
@@ -81,11 +94,11 @@ class ApertureClient:
         grpc_channel_options = [(k, v) for k, v in grpc_channel_options_dict.items()]
         grpc_channel = (
             grpc.insecure_channel(
-                endpoint, compression=compression, options=grpc_channel_options
+                address, compression=compression, options=grpc_channel_options
             )
             if insecure
             else grpc.secure_channel(
-                endpoint,
+                address,
                 credentials,
                 compression=compression,
                 options=grpc_channel_options,
