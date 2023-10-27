@@ -46,6 +46,10 @@ export class ApertureClient {
     channelOptions?: ChannelOptions;
   }) {
 
+    if (!address) {
+      throw new Error("address is required");
+    }
+
     let channelCredentials: ChannelCredentials;
     if (isInsecure) {
       channelCredentials = grpc.credentials.createInsecure();
@@ -64,10 +68,6 @@ export class ApertureClient {
           },
         ),
       );
-    }
-
-    if (!address) {
-      throw new Error("address is required");
     }
 
     this.fcsClient = new fcs.FlowControlService(
