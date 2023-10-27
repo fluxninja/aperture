@@ -29,6 +29,14 @@ Aperture supports the following version of Istio:
 | -------- | ----------------- |
 | Istio    | 1.14 and above    |
 
+:::info
+
+This integration is currently only supported with the
+[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
+Agent.
+
+:::
+
 ## Envoy Filter {#envoy-filter}
 
 The
@@ -38,19 +46,11 @@ Aperture Agent requires additional details and needs the following
 [Configuration Patches](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-EnvoyConfigObjectPatch)
 to be added through the Envoy Filter.
 
-:::note
-
-In all the below patches, it is presumed that the Aperture Agent is running on
-the Aperture Cloud.
-
-If the [self-hosted](/get-started/self-hosting/agent/agent.md) Aperture Agent is
-installed with `DaemonSet` mode and in the `aperture-agent` namespace, the
-target address value would be `aperture-agent.aperture-agent.svc.cluster.local`.
-
-If you are running the Aperture Agent in Sidecar mode, use `localhost` as the
-target address.
-
-:::
+**Note**: In all the below patches, it is presumed that the Aperture Agent is
+installed with `DaemonSet` mode and is installed in the `aperture-agent`
+namespace, which makes the target address value
+`aperture-agent.aperture-agent.svc.cluster.local`. If you are running the
+Aperture Agent in Sidecar mode, use `localhost` as the target address.
 
 1. The below patch merges the
    [Access Log](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log)
@@ -90,11 +90,8 @@ target address.
                  log_name: egress
                  grpc_service:
                    google_grpc:
-                     target_uri: ORGANIZATION.app.fluxninja.com:443
+                     target_uri: aperture-agent.aperture-agent.svc.cluster.local:4317
                      stat_prefix: fn_otlp_access_log
-                   initial_metadata:
-                     - key: apikey
-                       value: AGENT_API_KEY
                  transport_api_version: V3
                body:
                  string_value: "%REQ(:METHOD)%"
@@ -173,11 +170,8 @@ target address.
                  log_name: ingress
                  grpc_service:
                    google_grpc:
-                     target_uri: ORGANIZATION.app.fluxninja.com:443
+                     target_uri: aperture-agent.aperture-agent.svc.cluster.local:4317
                      stat_prefix: fn_otlp_access_log
-                   initial_metadata:
-                     - key: apikey
-                       value: AGENT_API_KEY
                  transport_api_version: V3
                body:
                  string_value: "%REQ(:METHOD)%"
@@ -253,14 +247,12 @@ target address.
          failure_mode_allow: true
          grpc_service:
            google_grpc:
-             target_uri: ORGANIZATION.app.fluxninja.com:443
+             target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
            timeout: 0.5s
            initial_metadata:
              - key: control-point
                value: ingress
-             - key: apikey
-               value: AGENT_API_KEY
    ```
 
 4. The below patch also inserts the
@@ -298,14 +290,12 @@ target address.
          failure_mode_allow: true
          grpc_service:
            google_grpc:
-             target_uri: ORGANIZATION.app.fluxninja.com:443
+             target_uri: aperture-agent.aperture-agent.svc.cluster.local:80
              stat_prefix: ext_authz
            timeout: 0.5s
            initial_metadata:
              - key: control-point
-               value: ingress
-             - key: apikey
-               value: AGENT_API_KEY
+               value: egress
    ```
 
 More information about the extracted values can be found on
