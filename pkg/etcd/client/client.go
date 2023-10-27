@@ -101,7 +101,7 @@ type Client struct {
 	electionWatchers     map[ElectionWatcher]struct{}
 	readyChannel         chan bool
 	client               *clientv3.Client
-	cache                map[string]string
+	cache                map[string]operation
 	electionPath         string
 	leaseID              clientv3.LeaseID
 	electionWatcherMutex sync.Mutex
@@ -190,7 +190,7 @@ func ProvideClient(in ClientIn) (*Client, error) {
 		readyChannel:      make(chan bool),
 		opChannel:         infchan.NewChannel[operation](),
 		electionWatchers:  make(map[ElectionWatcher]struct{}),
-		cache:             make(map[string]string),
+		cache:             make(map[string]operation),
 		enforceLeaderOnly: in.EnforceLeaderOnly,
 		electionPath:      in.ElectionPath,
 	}
@@ -384,13 +384,14 @@ func (etcdClient *Client) writeLoopFn(ctx context.Context, wg *sync.WaitGroup) f
 				switch op.opType {
 				case bootstrap:
 					etcdClient.cacheMutex.Lock()
-					cacheCopy := make(map[string]string)
-					for key, value := range etcdClient.cache {
-						cacheCopy[key] = value
+					cacheCopy := make(map[string]operation)
+					for key, cachedOp := range etcdClient.cache {
+						cacheCopy[key] = cachedOp
 					}
 					etcdClient.cacheMutex.Unlock()
-					for key, value := range cacheCopy {
-						_, err = etcdClient.kv.Put(clientv3.WithRequireLeader(ctx), key, value)
+					for key, cachedOp := range cacheCopy {
+						cachedOp.opts = append(cachedOp.opts, clientv3.WithLease(etcdClient.leaseID))
+						_, err = etcdClient.kv.Put(clientv3.WithRequireLeader(ctx), key, cachedOp.value, cachedOp.opts...)
 					}
 				case put:
 					_, err = etcdClient.kv.Put(clientv3.WithRequireLeader(ctx), op.key, op.value, op.opts...)
@@ -478,18 +479,19 @@ func (etcdClient *Client) PutWithExpiry(key, val string, leaseTTL int, opts ...c
 func (etcdClient *Client) Put(key, val string, opts ...clientv3.OpOption) {
 	etcdClient.cacheMutex.Lock()
 	defer etcdClient.cacheMutex.Unlock()
-	etcdClient.cache[key] = val
-	if etcdClient.bootstrapPending.Load() {
-		return
-	}
-	// send the operation to the channel
-	etcdClient.opChannel.In() <- operation{
+	op := operation{
 		key:       key,
 		value:     val,
 		opType:    put,
 		opts:      opts,
 		withLease: true,
 	}
+	etcdClient.cache[key] = op
+	if etcdClient.bootstrapPending.Load() {
+		return
+	}
+	// send the operation to the channel
+	etcdClient.opChannel.In() <- op
 }
 
 // Delete deletes the given key.
