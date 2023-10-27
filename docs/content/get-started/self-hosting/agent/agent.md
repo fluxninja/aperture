@@ -86,7 +86,7 @@ and can result in unpredictable behavior.
 
    The Aperture Agent can also be installed on Docker as containers.
 
-## Self-Hosted Aperture Controller
+## Self-Hosted Aperture Controller {#agent-self-hosted-controller}
 
 When using the self-hosted Aperture Controller instead of the Aperture Cloud
 Controller, you need to turn off the `enable_cloud_controller` flag and

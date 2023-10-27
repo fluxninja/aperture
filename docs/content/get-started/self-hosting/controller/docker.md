@@ -301,7 +301,7 @@ have a Prometheus instance running, you can skip these steps.
 ## Installation of Aperture Agent
 
 Once the Aperture Controller is installed, you can create a
-[configuration file for the Aperture Agent](/get-started/self-hosting/agent/agent.md#configuration)
+[configuration file for the Aperture Agent](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller)
 and install it using the
 [Aperture Agent installation guide](/get-started/self-hosting/agent/agent.md).
 
