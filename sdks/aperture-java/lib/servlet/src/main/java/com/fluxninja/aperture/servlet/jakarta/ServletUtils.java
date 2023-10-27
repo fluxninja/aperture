@@ -1,6 +1,9 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequestBuilder;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import jakarta.servlet.ServletRequest;
@@ -11,7 +14,14 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ServletUtils {
     protected static void handleRejectedFlow(TrafficFlow flow, HttpServletResponse response)

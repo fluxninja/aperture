@@ -41,7 +41,8 @@ public class NettyUtils {
                         URLDecoder.decode(
                                 entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
-                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid encoding
+                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
+                // encoding
                 throw new RuntimeException(e);
             }
             baggageLabels.put(entry.getKey(), value);

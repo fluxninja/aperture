@@ -106,6 +106,7 @@ public class Config {
                     builder.setAddress(
                                     config.getProperty(
                                             AGENT_ADDRESS_PROPERTY, AGENT_ADDRESS_DEFAULT_VALUE))
+                            .setAgentAPIKey(config.getProperty("aperture.agent.api.key", ""))
                             .addIgnoredPaths(
                                     config.getProperty(
                                             IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))

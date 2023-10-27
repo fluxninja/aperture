@@ -1,6 +1,8 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.CHECK_RESPONSE_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_STATUS_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_STOP_TIMESTAMP_LABEL;
 
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse;
 import com.fluxninja.generated.google.rpc.Status;

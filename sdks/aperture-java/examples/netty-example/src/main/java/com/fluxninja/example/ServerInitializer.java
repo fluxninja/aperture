@@ -14,6 +14,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     ApertureSDK sdk;
     String agentAddress;
+    String agentAPIKey;
     boolean rampMode;
     Duration flowTimeout;
     String controlPointName;
@@ -22,12 +23,14 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
 
     public ServerInitializer(
             String agentAddress,
+            String agentAPIKey,
             boolean rampMode,
             Duration flowTimeout,
             String controlPointName,
             boolean insecureGrpc,
             String rootCertFile) {
         this.agentAddress = agentAddress;
+        this.agentAPIKey = agentAPIKey;
         this.rampMode = rampMode;
         this.flowTimeout = flowTimeout;
         this.controlPointName = controlPointName;
@@ -41,6 +44,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
             sdk =
                     ApertureSDK.builder()
                             .setAddress(this.agentAddress)
+                            .setAgentAPIKey(this.agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -51,8 +55,9 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
-        //    but after the codec handler.
+        // ApertureServerHandler must be added before the response-generating
+        // HelloWorldHandler,
+        // but after the codec handler.
         pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }

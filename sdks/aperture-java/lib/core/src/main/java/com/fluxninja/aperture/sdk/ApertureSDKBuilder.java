@@ -1,11 +1,19 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.DEFAULT_AGENT_ADDRESS;
+import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
 import com.google.common.io.ByteStreams;
-import io.grpc.*;
+import io.grpc.ChannelCredentials;
+import io.grpc.ClientInterceptor;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
+import io.grpc.Metadata;
+import io.grpc.TlsChannelCredentials;
+import io.grpc.stub.MetadataUtils;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
@@ -24,6 +32,7 @@ import org.slf4j.LoggerFactory;
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
     private String address;
+    private String agentAPIKey;
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
@@ -48,6 +57,17 @@ public final class ApertureSDKBuilder {
      */
     public ApertureSDKBuilder setAddress(String address) {
         this.address = address;
+        return this;
+    }
+
+    /**
+     * Set API key to be used when connecting to Aperture Agent.
+     *
+     * @param agentAPIKey API key to be used when connecting to Aperture Agent.
+     * @return the builder object.
+     */
+    public ApertureSDKBuilder setAgentAPIKey(String agentAPIKey) {
+        this.agentAPIKey = agentAPIKey;
         return this;
     }
 
@@ -203,6 +223,16 @@ public final class ApertureSDKBuilder {
                 FlowControlServiceGrpc.newBlockingStub(channel);
         FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
                 FlowControlServiceHTTPGrpc.newBlockingStub(channel);
+
+        String agentAPIKey = this.agentAPIKey;
+        // If agentAPIKey is not empty, add it to the request metadata
+        if (agentAPIKey != null && !agentAPIKey.isEmpty()) {
+            Metadata metadata = new Metadata();
+            metadata.put(Metadata.Key.of("apikey", Metadata.ASCII_STRING_MARSHALLER), agentAPIKey);
+            ClientInterceptor interceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
+            flowControlClient = flowControlClient.withInterceptors(interceptor);
+            httpFlowControlClient = httpFlowControlClient.withInterceptors(interceptor);
+        }
 
         OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
         if (caCertContents != null) {
