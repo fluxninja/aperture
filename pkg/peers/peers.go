@@ -213,8 +213,9 @@ func (pd *PeerDiscovery) uploadSelfPeer(ctx context.Context) error {
 // deregisterSelf deregisters self from etcd.
 func (pd *PeerDiscovery) deregisterSelf(ctx context.Context) error {
 	log.Info().Str("key", pd.selfKey).Msg("self deregistering from peer discovery table")
-	pd.etcdClient.Delete(pd.selfKey)
-	return nil
+	// DeleteSync to ensure proper cleanup
+	_, err := pd.etcdClient.DeleteSync(ctx, pd.selfKey)
+	return err
 }
 
 // Start starts peer discovery.

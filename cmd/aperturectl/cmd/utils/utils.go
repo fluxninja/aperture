@@ -114,6 +114,83 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, de
 	return nil
 }
 
+// GenerateGraphFile generates a graph from the given circuit with the specified depth.
+// The depth determines how many levels of components in the tree should be expanded in the graph.
+// If maxDepth is set to -1, the function will expand components up to the maximum possible depth.
+//
+// Parameters:
+//   - circuit: A pointer to the circuitfactory.Circuit object to be used for generating the graph.
+//   - graphFilePath: The file path where the generated graph should be saved.
+//   - maxDepth: The maximum depth the graph should be expanded to.
+//     If set to -1, the function will expand components up to the maximum possible depth.
+//
+// Returns:
+//   - An error if any issues occur during the file creation or writing process, otherwise nil.
+//
+// Example usage:
+//
+//		err := GenerateGraphFile(circuit, "output.json", 3)
+//		// This will generate a graph with components expanded up to a depth of 3.
+//
+//		err := GenerateGraphFile(circuit, "output.json", -1)
+//	 // This will generate a graph with components expanded up to the maximum possible depth.
+func GenerateGraphFile(circuit *circuitfactory.Circuit, graphFilePath string, depth int) error {
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(graphFilePath)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating file")
+		return err
+	}
+	defer f.Close()
+
+	graphJSON, err := json.Marshal(graph)
+	if err != nil {
+		log.Error().Err(err).Msg("error marshaling graph")
+		return err
+	}
+
+	_, err = f.Write(graphJSON)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing to file")
+		return err
+	}
+
+	return nil
+}
+
+// GenerateTreeGraph generates a tree graph from the given circuit.
+func GenerateTreeGraph(circuit *circuitfactory.Circuit, treeFilePath string) error {
+	treeGraph, err := circuit.Tree.TreeGraph()
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(treeFilePath)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating file")
+		return err
+	}
+	defer f.Close()
+
+	treeGraphJSON, err := json.Marshal(treeGraph)
+	if err != nil {
+		log.Error().Err(err).Msg("error marshaling graph")
+		return err
+	}
+
+	_, err = f.Write(treeGraphJSON)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing to file")
+		return err
+	}
+
+	return nil
+}
+
 // CompilePolicy compiles the policy and returns the circuit.
 func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	ctx := context.Background()

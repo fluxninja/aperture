@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"net/http"
+	"sync"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -55,7 +56,7 @@ type Heartbeats struct {
 	statusRegistry            status.Registry
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints
 	policyFactory             *controlplane.PolicyFactory
-	ControllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
+	controllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
 	jobGroup                  *jobs.JobGroup
 	clientConn                *grpc.ClientConn // set in OnStart
 	peersWatcher              *peers.PeerDiscovery
@@ -69,6 +70,7 @@ type Heartbeats struct {
 	jobName                   string
 	installationMode          string
 	heartbeatsAddr            string
+	controllerInfoMutex       sync.RWMutex
 }
 
 func newHeartbeats(
@@ -135,9 +137,9 @@ func (h *Heartbeats) setupControllerInfo(
 ) {
 	if extensionConfig.EnableCloudController {
 		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
-		h.ControllerInfo = &heartbeatv1.ControllerInfo{
+		h.SetControllerInfoPtr(&heartbeatv1.ControllerInfo{
 			Id: "cloud",
-		}
+		})
 		return
 	}
 
@@ -169,9 +171,9 @@ func (h *Heartbeats) setupControllerInfo(
 					}
 				}
 
-				h.ControllerInfo = &heartbeatv1.ControllerInfo{
+				h.SetControllerInfoPtr(&heartbeatv1.ControllerInfo{
 					Id: controllerID,
-				}
+				})
 				log.Info().Str("controllerId", controllerID).Msg("Controller id created")
 				// Call otelconfig.Provider.UpdateConfig() to update the controller id in the otel config
 				configProvider.UpdateConfig()
@@ -240,7 +242,7 @@ func (h *Heartbeats) newHeartbeat(
 		VersionInfo:      info.GetVersionInfo(),
 		ProcessInfo:      info.GetProcessInfo(),
 		HostInfo:         info.GetHostInfo(),
-		ControllerInfo:   h.ControllerInfo,
+		ControllerInfo:   h.GetControllerInfoPtr(),
 		AllStatuses:      h.statusRegistry.GetGroupStatus(),
 		InstallationMode: h.installationMode,
 	}
@@ -320,5 +322,19 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 
 // GetControllerInfo returns the controller info.
 func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
-	return h.ControllerInfo, nil
+	return h.GetControllerInfoPtr(), nil
+}
+
+// GetControllerInfoPtr returns the controller info.
+func (h *Heartbeats) GetControllerInfoPtr() *heartbeatv1.ControllerInfo {
+	h.controllerInfoMutex.RLock()
+	defer h.controllerInfoMutex.RUnlock()
+	return h.controllerInfo
+}
+
+// SetControllerInfoPtr sets the controller info.
+func (h *Heartbeats) SetControllerInfoPtr(controllerInfo *heartbeatv1.ControllerInfo) {
+	h.controllerInfoMutex.Lock()
+	defer h.controllerInfoMutex.Unlock()
+	h.controllerInfo = controllerInfo
 }
