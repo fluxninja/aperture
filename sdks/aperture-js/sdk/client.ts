@@ -53,7 +53,7 @@ export class ApertureClient {
       channelCredentials = grpc.credentials.createSsl();
     }
 
-    if (agentAPIKey !== undefined) {
+    if (agentAPIKey) {
       channelCredentials = grpc.credentials.combineChannelCredentials(
         channelCredentials,
         grpc.credentials.createFromMetadataGenerator(
