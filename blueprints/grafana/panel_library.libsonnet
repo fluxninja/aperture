@@ -7,4 +7,5 @@
   Sampler: import './panels/grouped/load_ramp.libsonnet',
   QuotaScheduler: import './panels/grouped/quota_scheduler.libsonnet',
   Signals: import './panels/grouped/signals.libsonnet',
+  LoadActuator: import './panels/grouped/load_actuator.libsonnet',
 }
