@@ -36,14 +36,37 @@ export class ApertureClient {
 
   constructor({
     address,
-    channelCredentials = grpc.credentials.createInsecure(),
+    agentAPIKey,
+    isInsecure = false,
     channelOptions = {},
   }: {
     address: string;
-    channelCredentials?: ChannelCredentials;
+    agentAPIKey?: string;
+    isInsecure?: boolean;
     channelOptions?: ChannelOptions;
   }) {
-    if (address === undefined) {
+
+    let channelCredentials: ChannelCredentials;
+    if (isInsecure) {
+      channelCredentials = grpc.credentials.createInsecure();
+    } else {
+      channelCredentials = grpc.credentials.createSsl();
+    }
+
+    if (agentAPIKey !== undefined) {
+      channelCredentials = grpc.credentials.combineChannelCredentials(
+        channelCredentials,
+        grpc.credentials.createFromMetadataGenerator(
+          (_params: any, callback: any) => {
+            const metadata = new grpc.Metadata();
+            metadata.add("apikey", agentAPIKey);
+            callback(null, metadata);
+          },
+        ),
+      );
+    }
+
+    if (!address) {
       throw new Error("address is required");
     }
 
