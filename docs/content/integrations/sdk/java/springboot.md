@@ -43,7 +43,8 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        registrationBean.addInitParameter("agent_address", "localhost:8089");
+        registrationBean.addInitParameter("agent_address", "ORGANIZATION.app.fluxninja.com:443");
+        registrationBean.addInitParameter("agent_api_key", "AGENT_API_KEY");
 
         return registrationBean;
     }

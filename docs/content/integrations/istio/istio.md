@@ -29,6 +29,14 @@ Aperture supports the following version of Istio:
 | -------- | ----------------- |
 | Istio    | 1.14 and above    |
 
+:::info
+
+This integration is currently only supported with the
+[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
+Agent.
+
+:::
+
 ## Envoy Filter {#envoy-filter}
 
 The

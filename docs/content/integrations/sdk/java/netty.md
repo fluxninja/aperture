@@ -36,7 +36,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         String controlPointName = "someFeature";
 
-        sdk = ApertureSDK.builder().setAddress(this.agentAddress).build();
+        sdk = ApertureSDK.builder().setAddress(this.agentAddress).setAgentAPIKey(this.agentAPIKey).build();
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
@@ -56,7 +56,8 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setAddress(...)
+        .setAddress("ORGANIZATION.app.fluxninja.com:443")
+        .setAgentAPIKey(agentAPIKey)
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...

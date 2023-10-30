@@ -53,8 +53,8 @@ Below are the instructions to install the Aperture Agent on Docker.
    :::note
 
    If you are using a Self-Hosted Controller Aperture Controller, modify the
-   above configuration as explained in [Self-Hosting Agent
-   Configuration][self-hosting-agent-config].
+   above configuration as explained in
+   [Self-Hosting Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -91,5 +91,4 @@ Below are the instructions to install the Aperture Agent on Docker.
    docker rm -f aperture-agent
    ```
 
-[self-hosting-agent-config]: /get-started/self-hosting/agent.md#configuration
 [agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md

@@ -39,7 +39,7 @@ details.
 
 - **Efficient Management**: Agent groups facilitate the efficient management of
   multiple Agents within complex environments, such as
-  [sidecar](/get-started/installation/agent/kubernetes/operator/sidecar.md) or
+  [sidecar](/get-started/self-hosting/agent/kubernetes/operator/sidecar.md) or
   multi-cluster installations. They enable scaling of Aperture configuration to
   meet the demands of intricate setups.
 

@@ -106,8 +106,8 @@ your cluster.
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
-   configuration as explained in [Self-Hosting: Agent
-   Configuration][self-hosting-config].
+   configuration as explained in
+   [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -292,5 +292,4 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[self-hosting-config]: /get-started/self-hosting/agent.md#configuration
 [agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md

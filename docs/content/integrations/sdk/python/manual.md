@@ -20,7 +20,7 @@ To do so, first create an instance of ApertureClient:
 ```python
   from aperture_sdk import ApertureClient
 
-  aperture_client = ApertureClient.new_client(endpoint="localhost:8089")
+  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", agent_api_key="AGENT_API_KEY")
 ```
 
 The created instance can then be used to start a flow:

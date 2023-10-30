@@ -26,6 +26,14 @@ Aperture supports the following versions of Consul:
 | Consul            | 1.17 and above    |
 | Consul Data Plane | 1.2.2 and above   |
 
+:::info
+
+This integration is currently only supported with the
+[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
+Agent.
+
+:::
+
 ## Envoy Extensions {#envoy-extensions}
 
 The

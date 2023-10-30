@@ -23,6 +23,14 @@ Integrating Aperture with Kong using Custom plugins.
 
 ## Introduction
 
+:::info
+
+This integration is currently only supported with the
+[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
+Agent.
+
+:::
+
 Custom plugins are Lua scripts that can be executed within Kong to extend its
 functionality. The Aperture Custom plugin can be downloaded from the <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>Aperture

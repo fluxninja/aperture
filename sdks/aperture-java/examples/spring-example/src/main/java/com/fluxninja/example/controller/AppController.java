@@ -44,6 +44,8 @@ public class AppController {
 
         String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
         registrationBean.addInitParameter("agent_address", agentAddress);
+        String agentAPIKey = env.getProperty("APERTURE_AGENT_API_KEY");
+        registrationBean.addInitParameter("agent_api_key", agentAPIKey);
         String rampMode = env.getProperty("FN_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
         String controlPointName = env.getProperty("FN_CONTROL_POINT_NAME");
@@ -69,6 +71,8 @@ public class AppController {
 
         String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
         registrationBean.addInitParameter("agent_address", agentAddress);
+        String agentAPIKey = env.getProperty("APERTURE_AGENT_API_KEY");
+        registrationBean.addInitParameter("agent_api_key", agentAPIKey);
         String rampMode = env.getProperty("FN_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
         String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
