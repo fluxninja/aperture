@@ -1,0 +1,48 @@
+# Generated values file for load-scheduling/cpu-overload-protection blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/cpu-overload-protection
+blueprint: load-scheduling/cpu-overload-protection
+
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: cpu-overload-protection
+  load_scheduling_core:
+    setpoint: 20
+    aiad_load_scheduler:
+      load_multiplier_linear_decrement: 0.2
+      load_multiplier_linear_increment: 0.05
+      load_scheduler:
+        selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  user_type: "guest"
+              parameters:
+                priority: 50.0
+              name: "guest"
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: "subscriber"
+              parameters:
+                priority: 250.0
+              name: "subscriber"
+    dry_run: false
+    # Setpoint.
+    # Type: float64
+    # Required: True
+    setpoint: 40
+  kubernetes_object_selector:
+    # Name of the object to protect.
+    # Type: string
+    # Required: True
+    name: service1-demo-app
+    # Namespace of the object to protect.
+    # Type: string
+    # Required: True
+    namespace: demoapp
