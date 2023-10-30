@@ -1,8 +1,8 @@
 # Generated values file for load-scheduling/cpu-overload-protection blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/cpu-overload-protection
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/cpu-overload-protection/gen/definitions.json
 blueprint: load-scheduling/cpu-overload-protection
-
 policy:
   # Name of the policy.
   # Type: string
@@ -33,10 +33,6 @@ policy:
                 priority: 250.0
               name: "subscriber"
     dry_run: false
-    # Setpoint.
-    # Type: float64
-    # Required: True
-    setpoint: 40
   kubernetes_object_selector:
     # Name of the object to protect.
     # Type: string

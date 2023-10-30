@@ -61,7 +61,7 @@ spec:
             infra_meter_name="kubeletstats"}
     - variable:
         constant_output:
-          value: 40
+          value: 20
         out_ports:
           output:
             signal_name: SETPOINT
