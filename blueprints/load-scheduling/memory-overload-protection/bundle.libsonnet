@@ -1,6 +1,6 @@
+local kubeletUtils = import '../../utils/utils.libsonnet';
 local utils = import '../common/utils.libsonnet';
 local blueprint = import './memory-overload-protection.libsonnet';
-local kubeletUtils = import '../../utils/utils.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;
@@ -14,7 +14,8 @@ function(params) {
   local promqlQuery = 'k8s_pod_cpu_utilization_ratio{k8s_deployment_name="%(k8s_pod_name)s",k8s_namespace_name="%(k8s_namespace_name)s",policy_name="%(policyName)s", infra_meter_name="kubeletstats"}' % {
     k8s_pod_name: k8s_pod_name,
     k8s_namespace_name: k8s_namespace_name,
-    policyName: policyName, },
+    policyName: policyName,
+  },
 
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
