@@ -75,6 +75,7 @@ func (ac *RealAlertManagerClient) SendAlerts(ctx context.Context, alerts []*aler
 	for i, alert := range alerts {
 		postableAlert := alert.PostableAlert()
 		postableAlerts[i] = &postableAlert
+		log.Warn().Any("labels", postableAlert.Labels).Any("start", postableAlert.StartsAt.String()).Any("end", postableAlert.EndsAt.String()).Msg("sneding alert")
 	}
 	postAlertParams := &promalert.PostAlertsParams{
 		Context:    ctx,
