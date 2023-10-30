@@ -75,6 +75,10 @@ spec:
             - name: srvhttp
               containerPort: 8099
               protocol: TCP
+          {{- with .Values.resources -}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
           env:
             # These values are "hardcoded" in envoy proxy config
             - name: SIMPLE_SERVICE_PORT
