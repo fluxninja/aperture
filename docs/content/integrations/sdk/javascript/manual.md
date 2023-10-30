@@ -21,7 +21,10 @@ be read from environment variables `APERTURE_AGENT_HOST` and
 `APERTURE_AGENT_PORT`, defaulting to localhost:8089.
 
 ```javascript
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient({
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  agentAPIKey: "AGENT_API_KEY",
+});
 ```
 
 The created instance can then be used to start a flow:

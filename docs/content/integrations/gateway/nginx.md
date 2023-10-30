@@ -24,6 +24,14 @@ Integrating Aperture with Nginx using Lua modules.
 
 ## Introduction
 
+:::info
+
+This integration is currently only supported with the
+[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
+Agent.
+
+:::
+
 Lua's modules are scripts that can be executed within Nginx to extend its
 functionality. The Aperture Lua module can be downloaded from the GitHub <a
 href={`https://github.com/fluxninja/aperture/releases/tag/${apertureVersion}`}>

@@ -24,12 +24,14 @@ within a Java service.
 To do so, first create an instance of ApertureSDK:
 
 ```java
-    String agentAddress = "localhost:8089";
+    String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
+    String agentAPIKey = "AGENT_API_KEY";
 
     ApertureSDK apertureSDK;
 
     apertureSDK = ApertureSDK.builder()
             .setAddress(agentAddress)
+            .setAgentAPIKey(agentAPIKey)
             .setFlowTimeout(Duration.ofMillis(1000))
             .build();
 ```

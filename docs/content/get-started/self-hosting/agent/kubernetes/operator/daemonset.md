@@ -22,7 +22,7 @@ This method requires access to create cluster level resources like ClusterRole,
 ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
-[Namespace-scoped Installation](/get-started/installation/agent/kubernetes/namespace-scoped/namespace-scoped.md)
+[Namespace-scoped Installation](/get-started/self-hosting/agent/kubernetes/namespace-scoped/namespace-scoped.md)
 if you do not want to assign the cluster level permissions.
 
 :::
@@ -103,8 +103,8 @@ Kubernetes Objects which will be created by following steps are listed
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
-   configuration as explained in [Self-Hosting: Agent
-   Configuration][self-hosting-agent].
+   configuration as explained in
+   [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -232,8 +232,8 @@ Kubernetes Objects which will be created by following steps are listed
       :::note
 
       If you are using a Self-Hosted Aperture Controller, modify the above
-      configuration as explained in [Self-Hosting: Agent
-      Configuration][self-hosting-agent].
+      configuration as explained in
+      [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
       :::
 
@@ -405,5 +405,4 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[self-hosting-agent]: /get-started/self-hosting/agent.md#configuration
 [agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md

@@ -28,8 +28,8 @@ they integrate with an application.
 Aperture Cloud is a highly available, fully managed load management platform
 offering:
 
-1. Hosted **Aperture Controller**
-2. Consoles for managing Aperture policies, **Aperture Agents** and self-hosted
+1. Hosted **Aperture Controller** and **Aperture Agents**
+2. Consoles for managing Aperture policies, self-hosted **Aperture Agents** and
    Aperture Controllers
 3. Traffic analytics dashboard
 4. Alerting system to notify about actions taken by Aperture Agents
@@ -55,6 +55,13 @@ blueprint][guides]. It's also possible to build a policy [from scratch using
 policy components][policy].
 
 ## Aperture Agents
+
+:::note
+
+Here the Aperture Agents are shown as [self-hosted][self-hosting], but it's also
+available as part of the Aperture Cloud.
+
+:::
 
 Serving as the workhorses of the platform, Aperture Agents provide powerful flow
 control components. These include a weighted fair queuing scheduler for workload
@@ -104,6 +111,6 @@ Aperture][architecture-self-hosted].
 [integrations]: /integrations/integrations.md
 [sdks]: /integrations/sdk/sdk.md
 [metrics]: /integrations/metrics/metrics.md
-[install-agents]: /get-started/installation/agent/agent.md
+[install-agents]: /get-started/self-hosting/agent/agent.md
 [self-hosting]: /get-started/self-hosting/self-hosting.md
 [promql-syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/

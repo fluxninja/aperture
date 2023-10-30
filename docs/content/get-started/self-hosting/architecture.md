@@ -1,7 +1,7 @@
 ---
 title: Architecture of Self-Hosted Aperture
 sidebar_label: Architecture
-sidebar_position: 0
+sidebar_position: 1
 keywords:
   - aperture
   - controller
@@ -16,9 +16,9 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 The architecture of the self-hosted Aperture solution differs slightly from the
-regular [Aperture Cloud + Aperture combination](/architecture/architecture.md).
-The main difference is that the Aperture Controller is deployed separately. The
-Aperture Controller also needs its supporting databases.
+regular [Aperture Cloud-based set up](/architecture/architecture.md). The main
+difference is that the Aperture Controller and Agent are deployed separately.
+The Aperture Controller also needs its supporting databases.
 
 Aperture uses two databases to store configuration, telemetry, and flow control
 information: [Prometheus][prometheus] and [etcd][etcd]. Prometheus enables

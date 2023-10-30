@@ -45,7 +45,8 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setAddress(...)
+        .setAddress("ORGANIZATION.app.fluxninja.com:443")
+        .setAgentAPIKey("AGENT_API_KEY")
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...

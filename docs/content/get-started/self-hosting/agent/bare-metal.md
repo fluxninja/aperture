@@ -69,7 +69,7 @@ To point the Aperture Agent to the Aperture Controller, edit the configuration
 file located at `/etc/aperture/aperture-agent/config/aperture-agent.yaml`.
 Follow the steps for
 [Aperture Cloud Controller](/reference/fluxninja.md#configuration) or
-[Self-Hosted Aperture Controller](/get-started/self-hosting/agent.md#configuration),
+[Self-Hosted Aperture Controller](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller),
 depending on your setup.
 
 :::caution

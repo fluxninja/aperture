@@ -53,7 +53,7 @@ export const CloudExtensionConfig = ({children, component}) => (
 ```
 
 FluxNinja Aperture Cloud extension enables [Aperture Cloud][] integration for
-Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
+[self-hosted][self-hosting] Aperture Agents and Controllers. It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
 periodic heartbeats to Aperture Cloud to track health and configuration. This
@@ -64,13 +64,16 @@ Aperture Cloud Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][], Aperture Agents won't be able to work.
+Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture Agents won't be able to work.
 While it's possible to [self-host][self-hosting] Aperture Controller, Aperture
 Cloud Controller can be used instead.
 
 Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture
-Cloud. The Cloud Controller is available for every Aperture Cloud Organization
-in the `default` project.
+Cloud.
+
+## Aperture Cloud Agent {#cloud-agent}
+
+Aperture Cloud Agent is an [Aperture Agent][] hosted by Aperture Cloud.
 
 ## Configuration
 
@@ -108,7 +111,7 @@ For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
 :::
 
 More details about particular agent installation modes could be found in
-[Get Started: Installation](/get-started/installation/agent/agent.md).
+[Get Started: Self-Hosting Aperture](/get-started/self-hosting/agent/agent.md).
 
 Configuration parameters for the FluxNinja Aperture Cloud extension are as
 follows:
@@ -123,5 +126,7 @@ How various components interact with the extension:
 - [Flow labels](/concepts/flow-label.md#extension)
 
 [self-hosting]: /get-started/self-hosting/self-hosting.md
+[self-hosting-agent]: /get-started/self-hosting/agent/agent.md
 [aperture cloud]: /introduction.md
 [aperture controller]: /architecture/architecture.md#aperture-controller
+[aperture agent]: /architecture/architecture.md#aperture-agent
