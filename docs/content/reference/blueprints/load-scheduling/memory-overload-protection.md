@@ -1,3 +1,7 @@
+---
+title: Memory Overload Protection
+---
+
 <!-- Configuration Marker -->
 
 ```mdx-code-block

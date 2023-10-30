@@ -1,3 +1,7 @@
+---
+title: CPU Overload Protection
+---
+
 <!-- Configuration Marker -->
 
 ```mdx-code-block
