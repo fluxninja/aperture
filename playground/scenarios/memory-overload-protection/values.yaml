@@ -1,7 +1,12 @@
 demoapp:
-  resources:
-    limits:
-      memory: 64m
+  common:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
 agent:
   agent:
     config:

@@ -71,14 +71,13 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.simplesrv.image.repository }}:{{ .Values.simplesrv.image.tag }}"
           imagePullPolicy: {{ .Values.simplesrv.image.pullPolicy }}
+          {{- if .Values.resources }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
           ports:
             - name: srvhttp
               containerPort: 8099
               protocol: TCP
-          {{- with .Values.resources -}}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- end }}
           env:
             # These values are "hardcoded" in envoy proxy config
             - name: SIMPLE_SERVICE_PORT
@@ -99,6 +98,7 @@ spec:
             {{- end }}
             - name: SIMPLE_SERVICE_REJECT_RATIO
               value: "{{ .Values.simplesrv.rejectRatio }}"
+            {{- if and .Values.rabbitmq .Values.rabbitmq.enabled }}
             - name: SIMPLE_SERVICE_RABBITMQ_ENABLED
               value: "{{ .Values.rabbitmq.enabled }}"
             - name: SIMPLE_SERVICE_RABBITMQ_HOST
@@ -109,6 +109,7 @@ spec:
               value: "{{ .Values.rabbitmq.username }}"
             - name: SIMPLE_SERVICE_RABBITMQ_PASSWORD
               value: "{{ .Values.rabbitmq.password }}"
+            {{- end }}
             {{- if and .Values.elasticsearch .Values.elasticsearch.enabled }}
             - name: SIMPLE_SERVICE_ELASTICSEARCH_ENABLED
               value: "{{ .Values.elasticsearch.enabled }}"
