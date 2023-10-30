@@ -1,9 +1,7 @@
 demoapp:
-  simplesrv:
-    memoryLoadSize: 50
   resources:
     limits:
-      cpu: 500m
+      memory: 64m
 agent:
   agent:
     config:
