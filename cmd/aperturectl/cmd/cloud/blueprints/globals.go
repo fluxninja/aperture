@@ -10,4 +10,5 @@ var (
 	client     utils.CloudBlueprintsClient
 
 	valuesFile string
+	dir        string
 )
