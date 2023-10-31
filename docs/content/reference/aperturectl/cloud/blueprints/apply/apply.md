@@ -29,8 +29,8 @@ aperturectl cloud blueprints apply --value-file=values.yaml
 ### Options
 
 ```
-      --dir string           Path to directory containing blueprint values files
   -h, --help                 help for apply
+      --values-dir string    Path to directory containing blueprint values files
       --values-file string   Values file to use for blueprint
 ```
 

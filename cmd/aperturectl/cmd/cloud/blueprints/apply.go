@@ -16,7 +16,7 @@ import (
 
 func init() {
 	BlueprintsApplyCmd.Flags().StringVar(&valuesFile, "values-file", "", "Values file to use for blueprint")
-	BlueprintsApplyCmd.Flags().StringVar(&dir, "dir", "", "Path to directory containing blueprint values files")
+	BlueprintsApplyCmd.Flags().StringVar(&valuesDir, "values-dir", "", "Path to directory containing blueprint values files")
 }
 
 // BlueprintsApplyCmd is the command to apply a blueprint from the Cloud Controller.
@@ -27,15 +27,15 @@ var BlueprintsApplyCmd = &cobra.Command{
 	SilenceErrors: true,
 	Example:       `aperturectl cloud blueprints apply --value-file=values.yaml`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if valuesFile == "" && dir == "" {
+		if valuesFile == "" && valuesDir == "" {
 			return fmt.Errorf("either --values-file or --dir is required")
 		}
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Handle directory with multiple values files
-		if dir != "" {
-			err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if valuesDir != "" {
+			err := filepath.Walk(valuesDir, func(path string, info os.FileInfo, err error) error {
 				if !info.IsDir() {
 					if err := applyBlueprint(path); err != nil {
 						return err
