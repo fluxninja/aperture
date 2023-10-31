@@ -30,5 +30,5 @@ You have [signed up][sign-up] on Aperture Cloud and created an organization.
 
 ![API Keys](./assets/personal-api-keys.gif "Creating Personal API Keys")
 
-[configure aperturectl]: /get-started/installation/configure-cli.md
+[configure aperturectl]: /get-started/setup-cli/setup-cli.md
 [sign-up]: /get-started/aperture-cloud/sign-up.md
