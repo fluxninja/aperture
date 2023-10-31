@@ -128,8 +128,8 @@ the generated policies on the Aperture Cloud Controller.
 
 :::info
 
-See [aperturectl configuration](/get-started/installation/configure-cli.md) on
-how to configure what aperturectl should connect to.
+See [Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md) for more
+information on how to configure what aperturectl should connect to.
 
 :::
 

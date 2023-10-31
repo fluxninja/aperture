@@ -47,5 +47,5 @@ environment variable to switch between different projects and organizations.
 :::
 
 [toml]: https://toml.io/
-[configure-aperturectl]: /get-started/installation/configure-cli.md
+[configure-aperturectl]: /get-started/setup-cli/configure-cli.md
 [cloud-controller]: /reference/fluxninja.md#cloud-controller

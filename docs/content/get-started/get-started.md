@@ -12,20 +12,11 @@ you need to prepare your application to have Aperture integrated. Aperture can
 be integrated in multiple ways. You can choose the one that best suits your
 application.
 
-## [Install Aperture](./installation/installation.md)
+## [Set up CLI (aperturectl)](./setup-cli/setup-cli.md)
 
-1. [**`aperturectl`**](./installation/aperture-cli/aperture-cli.md)
-
-   Aperture is accompanied by a tool called `aperturectl` that can be used to
-   install Aperture in your Kubernetes cluster. Begin with Aperture installation
-   by heading over to the
-   [Installation](/get-started/installation/installation.md) section.
-
-2. Helm
-
-   Although there is a Helm chart available for installing Aperture, it is
-   recommended to use `aperturectl` as it provides an easier and less cumbersome
-   way to get started.
+Aperture is accompanied by a tool called `aperturectl` that can be used to
+install [self-hosted Aperture](./self-hosting/self-hosting.md) in your
+Kubernetes cluster, generate a policy, apply a policy, list policies, etc.
 
 ## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
 

@@ -35,7 +35,7 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/get-started/installation/aperture-cli/aperture-cli.md)
+2. [aperturectl](/get-started/setup-cli/setup-cli.md)
 
    :::info Refer
 

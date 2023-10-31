@@ -2,3 +2,4 @@
 {"rule":"MISSING_GENITIVE","sentence":"Prometheus metrics"}
 {"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qkubectl\\E$"}
 {"rule":"AUTO_HYPHEN","sentence":"^\\QAuto Scale\\E$"}
+{"rule":"A_INSTALL","sentence":"^\\QBegin with aperturectl installation by heading over to the Install CLI section.\\E$"}
