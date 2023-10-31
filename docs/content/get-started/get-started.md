@@ -16,9 +16,7 @@ application.
 
 Aperture is accompanied by a tool called `aperturectl` that can be used to
 install [self-hosted Aperture](./self-hosting/self-hosting.md) in your
-Kubernetes cluster, generate a policy, apply a policy, list policies, etc. Begin
-with aperturectl installation by heading over to the
-[Install CLI](/get-started/setup-cli/install-cli.md) section.
+Kubernetes cluster, generate a policy, apply a policy, list policies, etc.
 
 ## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
 
