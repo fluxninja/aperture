@@ -28,8 +28,8 @@ spec:
           parameters:
             alerter:
               alert_name: AIAD Load Throttling Event
-            load_multiplier_linear_decrement: 0.2
-            load_multiplier_linear_increment: 0.05
+            load_multiplier_linear_decrement: 0.1
+            load_multiplier_linear_increment: 0.02
             load_scheduler:
               scheduler:
                 workloads:
@@ -61,7 +61,7 @@ spec:
             infra_meter_name="kubeletstats"}) * 100
     - variable:
         constant_output:
-          value: 25
+          value: 40
         out_ports:
           output:
             signal_name: SETPOINT

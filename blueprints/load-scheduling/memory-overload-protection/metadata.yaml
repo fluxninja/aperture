@@ -1,3 +1,0 @@
-blueprint: Service Protection Policy for CPU Load
-sources:
-  policy: load-scheduling/memory-overload/memory-overload-protection.libsonnet

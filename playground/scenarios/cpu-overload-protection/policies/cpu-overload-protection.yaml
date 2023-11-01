@@ -9,10 +9,10 @@ policy:
   # Required: True
   policy_name: cpu-overload-protection
   load_scheduling_core:
-    setpoint: 25
+    setpoint: 40
     aiad_load_scheduler:
-      load_multiplier_linear_decrement: 0.2
-      load_multiplier_linear_increment: 0.05
+      load_multiplier_linear_decrement: 0.1
+      load_multiplier_linear_increment: 0.02
       load_scheduler:
         selectors:
           - agent_group: default

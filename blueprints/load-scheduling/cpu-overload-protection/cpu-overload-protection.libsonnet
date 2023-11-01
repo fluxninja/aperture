@@ -1,5 +1,5 @@
 {
-  config: import '../common-overload-protection/config-defaults.libsonnet',
-  policy: import '../common-overload-protection/policy.libsonnet',
+  config: import 'config.libsonnet',
+  policy: import 'policy.libsonnet',
   bundle: import 'bundle.libsonnet',
 }
