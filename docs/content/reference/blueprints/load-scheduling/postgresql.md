@@ -22,7 +22,12 @@ can be used to configure the policy.
 An AIAD controller calculates a proportional response to limit the accepted
 token rate. The token rate is reduced by an additive factor when the service is
 overloaded, and increased by an additive factor while the service is no longer
-overloaded.
+overloaded. The following PromQL query (with appropriate filters) is used as
+`SIGNAL` for the load scheduler:
+
+```promql
+(sum(postgresql_backends) / sum(postgresql_connection_max)) * 100
+```
 
 :::info
 
