@@ -11,6 +11,7 @@ keywords:
 import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
+import TabItem from "@theme/TabItem";
 import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
 ```
@@ -60,8 +61,8 @@ Before you begin with this guide, verify the prerequisites are fulfilled.
 
 - Aperture is installed and running. If not, follow the
   [get started guide](../../get-started/get-started.md).
-- `aperturectl` is installed and configured. If not, follow the
-  [aperturectl installation guide](../../get-started/installation/aperture-cli/aperture-cli.md).
+- `aperturectl` is installed and configured. If not, head over to
+  [Set up CLI (aperturectl) guide](../../get-started/setup-cli/setup-cli.md).
 
 ## Configuration
 

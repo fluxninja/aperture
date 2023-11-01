@@ -1,5 +1,5 @@
 ---
-title: Install CLI (aperturectl)
+title: Installation
 description: Aperture CLI for interacting with Aperture seamlessly.
 keywords:
   - cli
@@ -10,8 +10,8 @@ sidebar_position: 1
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {apertureVersion, apertureVersionWithOutV} from '../../../apertureVersion.js';
-import {DownloadScript} from '../../self-hosting/agent/bare-metal.md';
+import {apertureVersion, apertureVersionWithOutV} from '../../apertureVersion.js';
+import {DownloadScript} from '../self-hosting/agent/bare-metal.md';
 ```
 
 ```mdx-code-block

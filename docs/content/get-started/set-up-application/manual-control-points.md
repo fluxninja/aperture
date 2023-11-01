@@ -132,4 +132,4 @@ your needs. [See all SDKs](/integrations/sdk/sdk.md).
 <!-- vale on -->
 
 Once the feature control point is set in code, head over to
-[install Aperture](/get-started/installation/installation.md)
+[Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md)

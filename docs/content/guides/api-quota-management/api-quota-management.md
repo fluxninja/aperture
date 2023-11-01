@@ -8,6 +8,7 @@ keywords:
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
+import Zoom from 'react-medium-image-zoom';
 ```
 
 ## Overview
