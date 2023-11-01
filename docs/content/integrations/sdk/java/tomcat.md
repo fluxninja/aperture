@@ -17,6 +17,14 @@ keywords:
 contains Aperture Filter that can be added to the web.xml file to automatically
 set traffic control points for relevant services:
 
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
+
 ```xml
     <filter>
         <filter-name>ApertureFilter</filter-name>

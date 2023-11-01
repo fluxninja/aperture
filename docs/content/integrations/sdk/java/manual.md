@@ -16,12 +16,18 @@ description:
   guide covers best practices and provides examples for implementation.
 ---
 
-<a
-href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-core`}>Aperture
-Java SDK core library</a> can be used to manually set feature control points
-within a Java service.
+[Aperture Java SDK core library](https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-core)
+can be used to manually set feature control points within a Java service.
 
 To do so, first create an instance of ApertureSDK:
+
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
 
 ```java
     String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
