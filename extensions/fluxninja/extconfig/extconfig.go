@@ -98,7 +98,7 @@ func provideEtcdConfigOverride(extensionConfig *FluxNinjaExtensionConfig) *etcdc
 			Endpoints: []string{extensionConfig.Endpoint},
 			PerRPCCredentials: perRPCHeaders{
 				headers: map[string]string{
-					"apiKey": apiKey,
+					"x-api-key": apiKey,
 				},
 			},
 			OverriderName: "fluxninja extension",

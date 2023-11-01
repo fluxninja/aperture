@@ -228,7 +228,8 @@ public final class ApertureSDKBuilder {
         // If agentAPIKey is not empty, add it to the request metadata
         if (agentAPIKey != null && !agentAPIKey.isEmpty()) {
             Metadata metadata = new Metadata();
-            metadata.put(Metadata.Key.of("apikey", Metadata.ASCII_STRING_MARSHALLER), agentAPIKey);
+            metadata.put(
+                    Metadata.Key.of("x-api-key", Metadata.ASCII_STRING_MARSHALLER), agentAPIKey);
             ClientInterceptor interceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
             flowControlClient = flowControlClient.withInterceptors(interceptor);
             httpFlowControlClient = httpFlowControlClient.withInterceptors(interceptor);

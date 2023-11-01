@@ -26,37 +26,32 @@ public class SpringBootApp {
             agentAPIKey = "";
         }
         System.setProperty("APERTURE_AGENT_API_KEY", agentAPIKey);
-        String appPort = System.getenv("FN_APP_PORT");
-        if (appPort == null) {
-            appPort = DEFAULT_APP_PORT;
-        }
-        System.setProperty("FN_APP_PORT", appPort);
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
         if (controlPointName == null) {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
-        System.setProperty("FN_CONTROL_POINT_NAME", controlPointName);
-        String rampMode = System.getenv("FN_ENABLE_RAMP_MODE");
+        System.setProperty("APERTURE_CONTROL_POINT_NAME", controlPointName);
+        String rampMode = System.getenv("APERTURE_ENABLE_RAMP_MODE");
         if (rampMode == null) {
             rampMode = DEFAULT_RAMP_MODE;
         }
-        System.setProperty("FN_ENABLE_RAMP_MODE", rampMode);
-        String grpcTimeoutMs = System.getenv("FN_GRPC_TIMEOUT_MS");
+        System.setProperty("APERTURE_ENABLE_RAMP_MODE", rampMode);
+        String grpcTimeoutMs = System.getenv("APERTURE_GRPC_TIMEOUT_MS");
         if (grpcTimeoutMs == null) {
             grpcTimeoutMs = DEFAULT_GRPC_TIMEOUT_MS;
         }
-        System.setProperty("FN_GRPC_TIMEOUT_MS", grpcTimeoutMs);
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        System.setProperty("APERTURE_GRPC_TIMEOUT_MS", grpcTimeoutMs);
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
-        System.setProperty("FN_INSECURE_GRPC", insecureGrpcString);
+        System.setProperty("APERTURE_AGENT_INSECURE", insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
-        System.setProperty("FN_ROOT_CERTIFICATE_FILE", rootCertFile);
+        System.setProperty("APERTURE_ROOT_CERTIFICATE_FILE", rootCertFile);
 
         SpringApplication.run(SpringBootApp.class, args);
     }

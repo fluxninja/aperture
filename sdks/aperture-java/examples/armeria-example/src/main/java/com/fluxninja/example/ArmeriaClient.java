@@ -26,23 +26,23 @@ public class ArmeriaClient {
         if (agentAPIKey == null) {
             agentAPIKey = "";
         }
-        String rampModeString = System.getenv("FN_ENABLE_RAMP_MODE");
+        String rampModeString = System.getenv("APERTURE_ENABLE_RAMP_MODE");
         if (rampModeString == null) {
             rampModeString = DEFAULT_RAMP_MODE;
         }
         boolean rampMode = Boolean.parseBoolean(rampModeString);
 
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
         if (controlPointName == null) {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }

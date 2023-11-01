@@ -286,7 +286,7 @@ func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message
 	report := h.newHeartbeat(jobCtxt)
 
 	// Add agent key value to metadata
-	md := metadata.Pairs("apiKey", h.apiKey)
+	md := metadata.Pairs("x-api-key", h.apiKey)
 	ctx := metadata.NewOutgoingContext(jobCtxt, md)
 	_, err := h.heartbeatsClient.Report(ctx, report)
 	if err != nil {
@@ -310,7 +310,7 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 		log.Warn().Err(err).Msg("could not create request")
 		return &emptypb.Empty{}, err
 	}
-	req.Header.Add("apiKey", h.apiKey)
+	req.Header.Add("x-api-key", h.apiKey)
 	cli := http.DefaultClient
 	cli.Transport = &http.Transport{}
 	_, err = cli.Do(req)
