@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -118,20 +119,22 @@ func main() {
 		leaderElectionID = "a4362587-controller.fluxninja.com"
 	}
 
-	server := webhook.NewServer(webhook.Options{
+	webhookServer := webhook.NewServer(webhook.Options{
 		CertDir:  os.Getenv("APERTURE_OPERATOR_CERT_DIR"),
 		CertName: os.Getenv("APERTURE_OPERATOR_CERT_NAME"),
 		KeyName:  os.Getenv("APERTURE_OPERATOR_KEY_NAME"),
+		Port:     9443,
 	})
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
+		Scheme: scheme,
+		Metrics: server.Options{
+			BindAddress: metricsAddr,
+		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       leaderElectionID,
-		WebhookServer:          server,
+		WebhookServer:          webhookServer,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -210,8 +213,8 @@ func main() {
 		}
 		agentReconciler.ApertureInjector = apertureInjector
 
-		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
-		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
+		webhookServer.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
+		webhookServer.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
 	var controllerReconciler *controller.ControllerReconciler
@@ -230,7 +233,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
+		webhookServer.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
 	}
 
 	//+kubebuilder:scaffold:builder
@@ -247,7 +250,7 @@ func main() {
 	ctx := setupContext(agentReconciler, controllerReconciler, agentManager, setupLog)
 	setupLog.Info("starting webhook server")
 	go func() {
-		if err := server.Start(ctx); err != nil {
+		if err := webhookServer.Start(ctx); err != nil {
 			setupLog.Error(err, "unable to run webhook server")
 			os.Exit(1)
 		}

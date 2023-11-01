@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/fluxninja/aperture/v2/operator/api"
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
@@ -93,8 +94,10 @@ var _ = BeforeSuite(func() {
 	Expect(K8sDynamicClient).NotTo(BeNil())
 
 	K8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		MetricsBindAddress: "0",
+		Scheme: scheme.Scheme,
+		Metrics: server.Options{
+			BindAddress: "0",
+},
 	})
 	Expect(err).ToNot(HaveOccurred())
 
