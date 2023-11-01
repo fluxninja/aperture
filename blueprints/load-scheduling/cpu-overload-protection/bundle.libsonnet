@@ -11,7 +11,7 @@ function(params) {
   local policyName = c.policy.policy_name,
   local k8s_pod_name = c.policy.kubernetes_object_selector.name,
   local k8s_namespace_name = c.policy.kubernetes_object_selector.namespace,
-  local promqlQuery = 'k8s_pod_memory_usage{k8s_deployment_name="%(k8s_pod_name)s",k8s_namespace_name="%(k8s_namespace_name)s",policy_name="%(policyName)s", infra_meter_name="kubeletstats"}' % {
+  local promqlQuery = 'avg(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="%(k8s_pod_name)s",k8s_namespace_name="%(k8s_namespace_name)s",policy_name="%(policyName)s", infra_meter_name="kubeletstats"}) * 100' % {
     k8s_pod_name: k8s_pod_name,
     k8s_namespace_name: k8s_namespace_name,
     policyName: policyName,

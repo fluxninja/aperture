@@ -1,9 +1,13 @@
 demoapp:
   simplesrv:
-    cpuLoadPercentage: 90
+    cpuLoadPercentage: 50
   resources:
     limits:
       cpu: 500m
+istio:
+  envoyfilter:
+    envoyFilter:
+      authzGrpcTimeout: 1s
 agent:
   agent:
     config:

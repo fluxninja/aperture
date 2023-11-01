@@ -57,11 +57,11 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: k8s_pod_memory_usage{k8s_deployment_name="service1-demo-app",k8s_namespace_name="demoapp",policy_name="cpu-overload-protection",
-            infra_meter_name="kubeletstats"}
+          query_string: avg(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="service1-demo-app",k8s_namespace_name="demoapp",policy_name="cpu-overload-protection",
+            infra_meter_name="kubeletstats"}) * 100
     - variable:
         constant_output:
-          value: 20
+          value: 25
         out_ports:
           output:
             signal_name: SETPOINT
