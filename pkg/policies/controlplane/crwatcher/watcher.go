@@ -86,7 +86,8 @@ func (w *watcher) Start() error {
 						os.Getenv("APERTURE_CONTROLLER_NAMESPACE"): {},
 					}
 					return cache.New(config, opts)
-				}},
+				},
+			},
 			)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to create Kubernetes Reconciler for Policy")
