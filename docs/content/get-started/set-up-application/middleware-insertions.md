@@ -92,5 +92,5 @@ examples available for each framework.
 
 <!-- vale on -->
 
-Once the middleware insertion is done, head over to
-[install Aperture](/get-started/installation/installation.md).
+Once the feature control point is set in code, head over to
+[Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md)

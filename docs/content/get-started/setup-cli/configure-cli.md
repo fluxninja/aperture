@@ -1,8 +1,8 @@
 ---
-title: Configure CLI
+title: Configuration
 keywords:
   - cli
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 Configure aperturectl to point to your Aperture Cloud endpoint: Save the

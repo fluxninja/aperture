@@ -13,9 +13,17 @@ keywords:
 ---
 
 [Aperture Python SDK][pythonsdk] can be used to manually set feature control
-points within a Go service.
+points within a Python service.
 
 To do so, first create an instance of ApertureClient:
+
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
 
 ```python
   from aperture_sdk import ApertureClient

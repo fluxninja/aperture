@@ -4,6 +4,10 @@ sidebar_position: 1
 sidebar_label: Policy Language
 ---
 
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+```
+
 :::info See also
 
 [Policy reference](/reference/configuration/spec.md#policy)
