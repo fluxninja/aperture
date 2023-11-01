@@ -74,7 +74,7 @@ export const MonitorRequest: FC<MonitorRequestProps> = ({
             color="primary"
             sx={{ alignSelf: 'center' }}
             onClick={refetch}
-            disabled={requestRecord.length < 60 && requestRecord.length > 0}
+            disabled={requestRecord.length < 100 && requestRecord.length > 0}
           >
             Start
           </Button>
@@ -103,29 +103,29 @@ export const findPercentage = (share: number, total: number) =>
   Math.round(((share / total) * 100 + Number.EPSILON) * 100) / 100
 
 export const useSuccessErrorRatePercent = (requestRecord: RequestRecord[]) => {
-  const [successRate, setSuccessRate] = useState(0)
-  const [errorRate, setErrorRate] = useState(0)
+  const [successes, setSuccesses] = useState(0)
+  const [errors, setErrors] = useState(0)
 
   useEffect(() => {
     const successCount = requestRecord.filter((record) => !record.isError)
-    const percent = findPercentage(successCount.length, requestRecord.length)
-    setSuccessRate(percent)
-  }, [requestRecord, setSuccessRate])
+    // const percent = findPercentage(successCount.length, requestRecord.length)
+    setSuccesses(successCount.length)
+  }, [requestRecord, setSuccesses])
 
   useEffect(() => {
     const errorCount = requestRecord.filter((record) => record.isError)
-    const percent = findPercentage(errorCount.length, requestRecord.length)
-    setErrorRate(percent)
-  }, [requestRecord, setErrorRate])
+    // const percent = findPercentage(errorCount.length, requestRecord.length)
+    setErrors(errorCount.length)
+  }, [requestRecord, setErrors])
 
-  return { successRate, errorRate }
+  return { successRate: successes, errorRate: errors }
 }
 
 export const SuccessRate: FC<SuccessRateProps> = ({ requestRecord }) => {
   const { successRate } = useSuccessErrorRatePercent(requestRecord)
   return (
     <SuccessErrorRateStyled isError={false}>
-      {successRate || 0}%
+      {successRate || 0}
     </SuccessErrorRateStyled>
   )
 }
@@ -134,7 +134,7 @@ export const ErrorRate: FC<SuccessRateProps> = ({ requestRecord }) => {
   const { errorRate } = useSuccessErrorRatePercent(requestRecord)
   return (
     <SuccessErrorRateStyled isError={true}>
-      {errorRate || 0}%
+      {errorRate || 0}
     </SuccessErrorRateStyled>
   )
 }
@@ -245,7 +245,7 @@ export const MonitorRequestItem = styled(Box, {
   backgroundColor: isError
     ? theme.palette.error.main
     : isRetry
-    ? theme.palette.warning.main
-    : theme.palette.success.main,
+      ? theme.palette.warning.main
+      : theme.palette.success.main,
   borderRadius: theme.spacing(1),
 }))

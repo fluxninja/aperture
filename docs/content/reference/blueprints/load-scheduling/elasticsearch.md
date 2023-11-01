@@ -18,7 +18,12 @@ All the Elasticsearch related metrics are collected by the
 so if the system under observation requires using different metrics for the
 overload confirmation, the
 [list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/elasticsearchreceiver/metadata.yaml)
-can be used to configure the policy.
+can be used to configure the policy. The following PromQL query (with
+appropriate filters) is used as `SIGNAL` for the load scheduler:
+
+```promql
+avg(elasticsearch_node_thread_pool_tasks_queued)
+```
 
 <!-- Configuration Marker -->
 

@@ -29,6 +29,14 @@ found [here][aperture-javaagent].
 
 :::
 
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
+
 ## Running the java agent
 
 To statically load the java agent when running some application `.jar`, use the
