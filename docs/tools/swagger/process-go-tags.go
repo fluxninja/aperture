@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"gopkg.in/yaml.v3"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
 // process swagger extensions such as x-go-tag-default and x-go-tag-validate
@@ -176,9 +177,6 @@ func processValue(m map[string]interface{}, d string) interface{} {
 
 func processValidateRules(m map[string]interface{}, rules []string) (required bool) {
 	mType, ok := m["type"].(string)
-	if !ok {
-		return
-	}
 	// convert go validator rules to swagger rules
 	for _, rule := range rules {
 		switch rule {
@@ -190,95 +188,97 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 			// ignore for nested rules (on items or additionalProperties) for now
 			return
 		case "omitempty":
-			if mType == "string" {
+			if mType == "string" && ok {
 				// add empty string as allowed value in pattern
 				addPattern(m, "^$", "empty")
 			}
 		default:
-			// split rule into key and value
-			parts := strings.Split(rule, "=")
-			if len(parts) == 2 {
-				key := parts[0]
-				value := parts[1]
-				switch key {
-				case "oneof":
-					// oneof=info warn crit
-					oneofs := strings.Split(value, " ")
-					m["enum"] = oneofs
-					m["x-oneof"] = strings.Join(oneofs, " | ")
-				case "gt", "gte", "min":
-					v, err := strconv.Atoi(value)
-					if err != nil {
-						// probably a time.Duration
-						continue
-					}
-					switch mType {
-					case "integer", "number":
-						m["minimum"] = v
-						if key == "gt" {
-							m["exclusiveMinimum"] = true
-						}
-					default:
-						if key == "gt" {
-							v++
+			if ok {
+				// split rule into key and value
+				parts := strings.Split(rule, "=")
+				if len(parts) == 2 {
+					key := parts[0]
+					value := parts[1]
+					switch key {
+					case "oneof":
+						// oneof=info warn crit
+						oneofs := strings.Split(value, " ")
+						m["enum"] = oneofs
+						m["x-oneof"] = strings.Join(oneofs, " | ")
+					case "gt", "gte", "min":
+						v, err := strconv.Atoi(value)
+						if err != nil {
+							// probably a time.Duration
+							continue
 						}
 						switch mType {
-						case "string":
-							m["minLength"] = v
-						case "array":
-							m["minItems"] = v
-						case "object":
-							m["minProperties"] = v
+						case "integer", "number":
+							m["minimum"] = v
+							if key == "gt" {
+								m["exclusiveMinimum"] = true
+							}
+						default:
+							if key == "gt" {
+								v++
+							}
+							switch mType {
+							case "string":
+								m["minLength"] = v
+							case "array":
+								m["minItems"] = v
+							case "object":
+								m["minProperties"] = v
+							}
 						}
-					}
-				case "lt", "lte", "max":
-					v, err := strconv.Atoi(value)
-					if err != nil {
-						// probably a time.Duration
-						continue
-					}
-					switch mType {
-					case "integer", "number":
-						m["maximum"] = v
-						if key == "lt" {
-							m["exclusiveMaximum"] = true
-						}
-					default:
-						if key == "lt" {
-							v--
+					case "lt", "lte", "max":
+						v, err := strconv.Atoi(value)
+						if err != nil {
+							// probably a time.Duration
+							continue
 						}
 						switch mType {
-						case "string":
-							m["maxLength"] = v
-						case "array":
-							m["maxItems"] = v
-						case "object":
-							m["maxProperties"] = v
+						case "integer", "number":
+							m["maximum"] = v
+							if key == "lt" {
+								m["exclusiveMaximum"] = true
+							}
+						default:
+							if key == "lt" {
+								v--
+							}
+							switch mType {
+							case "string":
+								m["maxLength"] = v
+							case "array":
+								m["maxItems"] = v
+							case "object":
+								m["maxProperties"] = v
+							}
 						}
-					}
-				default:
-					log.Warn().Msgf("unknown validation rule %s", rule)
-				}
-			} else {
-				// we got multiple subrules separated by |
-				// example: "ip|cidrv4|cidrv6"
-				subrules := strings.Split(rule, "|")
-				for _, subrule := range subrules {
-					switch subrule {
-					case "hostname_port":
-						// match pattern
-						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, subrule)
-					case "fqdn":
-						// match pattern
-						addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$`, subrule)
-					case "url":
-						// match pattern
-						addPattern(m, `^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$`, subrule)
-					case "ip":
-						// match pattern
-						addPattern(m, `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`, subrule)
 					default:
-						log.Warn().Msgf("unknown validation subrule %s", subrule)
+						log.Warn().Msgf("unknown validation rule %s", rule)
+					}
+				} else {
+					// we got multiple subrules separated by |
+					// example: "ip|cidrv4|cidrv6"
+					subrules := strings.Split(rule, "|")
+					for _, subrule := range subrules {
+						switch subrule {
+						case "hostname_port":
+							// match pattern
+							addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$`, subrule)
+						case "fqdn":
+							// match pattern
+							addPattern(m, `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])$`, subrule)
+						case "url":
+							// match pattern
+							addPattern(m, `^https?://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*$`, subrule)
+						case "ip":
+							// match pattern
+							addPattern(m, `^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$`, subrule)
+						default:
+							log.Warn().Msgf("unknown validation subrule %s", subrule)
+						}
 					}
 				}
 			}

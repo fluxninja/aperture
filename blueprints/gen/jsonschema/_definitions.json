@@ -34,7 +34,7 @@
           "x-go-tag-validate": "required"
         }
       },
-      "required": ["overload_condition"],
+      "required": ["overload_condition", "parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -56,6 +56,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["setpoint", "signal"],
       "type": "object",
       "additionalProperties": false
     },
@@ -127,6 +128,7 @@
           "x-go-tag-validate": "gte=0"
         }
       },
+      "required": ["alerter", "load_scheduler"],
       "type": "object",
       "additionalProperties": false
     },
@@ -155,6 +157,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -176,6 +179,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["setpoint", "signal"],
       "type": "object",
       "additionalProperties": false
     },
@@ -234,6 +238,7 @@
           "x-go-tag-validate": "gt=0"
         }
       },
+      "required": ["alerter", "gradient", "load_scheduler"],
       "type": "object",
       "additionalProperties": false
     },
@@ -263,6 +268,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["in_ports", "parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -284,6 +290,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["setpoint", "signal"],
       "type": "object",
       "additionalProperties": false
     },
@@ -339,6 +346,7 @@
           "x-go-tag-default": "2.0"
         }
       },
+      "required": ["alerter", "gradient", "load_scheduler"],
       "type": "object",
       "additionalProperties": false
     },
@@ -369,6 +377,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -569,6 +578,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["scaling_backend", "scaling_parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -612,6 +622,7 @@
           "description": "Output ports for _Kubernetes Replicas_."
         }
       },
+      "required": ["kubernetes_object_selector"],
       "type": "object",
       "additionalProperties": false
     },
@@ -677,6 +688,7 @@
           "x-go-tag-default": "30s"
         }
       },
+      "required": ["scale_in_alerter", "scale_out_alerter"],
       "type": "object",
       "additionalProperties": false
     },
@@ -794,6 +806,7 @@
         "differentiator": {
           "$ref": "#/definitions/Differentiator",
           "description": "Differentiator calculates rate of change per tick.\nDeprecated: v3.0.0. Use `PIDController` instead.\n\n",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated"
         },
         "ema": {
@@ -1081,6 +1094,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "title": "Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings",
       "type": "object",
       "additionalProperties": false
@@ -1219,6 +1233,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "title": "Extrapolates the input signal by repeating the last valid value during the period in which it is invalid",
       "type": "object",
       "additionalProperties": false
@@ -1306,6 +1321,7 @@
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
           "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.\n\n",
+          "x-deprecated": true,
           "x-go-tag-validate": "deprecated"
         },
         "aiad_load_scheduler": {
@@ -1520,6 +1536,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "title": "Gradient controller is a type of controller which tries to adjust the\ncontrol variable proportionally to the relative difference between setpoint\nand actual value of the signal",
       "type": "object",
       "additionalProperties": false
@@ -2004,6 +2021,7 @@
           "type": "string"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2063,7 +2081,7 @@
           "x-go-tag-validate": "required,gt=0,dive"
         }
       },
-      "required": ["steps"],
+      "required": ["sampler", "steps"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2116,6 +2134,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["in_ports", "parameters"],
       "title": "_Load Scheduler_ creates a queue for flows in front of a service to provide active service protection",
       "type": "object",
       "additionalProperties": false
@@ -2468,6 +2487,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "title": "PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.\n<!-- vale off -->\n$$\nerror = setpoint - signal \\\\\nintegral_i = integral_{i-1} + k_i \\cdot error \\\\\noutput_i = k_p \\cdot error + k_d \\cdot (signal_i - signal_{i-1}) + integral_i\n$$\n<!-- vale on -->",
       "type": "object",
       "additionalProperties": false
@@ -2613,6 +2633,7 @@
           "description": "Output ports for the PodScaler component."
         }
       },
+      "required": ["kubernetes_object_selector"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2673,6 +2694,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2855,7 +2877,7 @@
           "x-go-tag-validate": "required,gt=0,dive"
         }
       },
-      "required": ["selectors"],
+      "required": ["in_ports", "rate_limiter", "selectors"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2884,6 +2906,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2917,6 +2940,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["signal"],
       "type": "object",
       "additionalProperties": false
     },
@@ -2968,7 +2992,13 @@
           "x-go-tag-validate": "required"
         }
       },
-      "required": ["degree"],
+      "required": [
+        "alerter",
+        "degree",
+        "high_throttle_threshold",
+        "load_scheduler",
+        "low_throttle_threshold"
+      ],
       "type": "object",
       "additionalProperties": false
     },
@@ -3000,7 +3030,7 @@
           "x-go-tag-validate": "required,gt=0,dive"
         }
       },
-      "required": ["selectors"],
+      "required": ["in_ports", "parameters", "selectors"],
       "title": "Limits the traffic on a control point to specified rate",
       "type": "object",
       "additionalProperties": false
@@ -3022,6 +3052,7 @@
           "title": "PassThrough port determines whether all requests"
         }
       },
+      "required": ["bucket_capacity", "fill_amount"],
       "title": "Inputs for the RateLimiter component",
       "type": "object",
       "additionalProperties": false
@@ -3199,6 +3230,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3264,6 +3296,7 @@
           "type": "string"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3321,6 +3354,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["alerter", "controller"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3349,6 +3383,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["alerter", "controller"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3417,6 +3452,7 @@
           "description": "Parameters associated with flows matching the label matcher."
         }
       },
+      "required": ["label_matcher"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3494,6 +3530,7 @@
           "x-go-tag-validate": "required"
         }
       },
+      "required": ["parameters"],
       "type": "object",
       "additionalProperties": false
     },
@@ -3798,6 +3835,7 @@
           "description": "Output ports for the Variable component."
         }
       },
+      "required": ["constant_output"],
       "type": "object",
       "additionalProperties": false
     },

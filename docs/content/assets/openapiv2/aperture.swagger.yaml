@@ -47,6 +47,7 @@ definitions:
                 x-go-tag-validate: required
         required:
             - overload_condition
+            - parameters
         type: object
     AIADLoadSchedulerIns:
         description: Input ports for the _AIAD Load Scheduler_.
@@ -68,6 +69,9 @@ definitions:
                     The input signal to the controller.
 
                 x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
         type: object
     AIADLoadSchedulerOuts:
         description: Output ports for the _AIAD Load Scheduler_.
@@ -141,6 +145,9 @@ definitions:
                 type: number
                 x-go-tag-default: "0.0"
                 x-go-tag-validate: gte=0
+        required:
+            - alerter
+            - load_scheduler
         type: object
     AIMDLoadScheduler:
         description: |-
@@ -168,6 +175,8 @@ definitions:
                     Parameters for the _AIMD Load Scheduler_.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     AIMDLoadSchedulerIns:
         description: Input ports for the _AIMD Load Scheduler_.
@@ -189,6 +198,9 @@ definitions:
                     The input signal to the controller.
 
                 x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
         type: object
     AIMDLoadSchedulerOuts:
         description: Output ports for the _AIMD Load Scheduler_.
@@ -248,6 +260,10 @@ definitions:
                 type: number
                 x-go-tag-default: "2.0"
                 x-go-tag-validate: gt=0
+        required:
+            - alerter
+            - gradient
+            - load_scheduler
         type: object
     AdaptiveLoadScheduler:
         description: |-
@@ -277,6 +293,9 @@ definitions:
                     Parameters for the _Adaptive Load Scheduler_ component.
 
                 x-go-tag-validate: required
+        required:
+            - in_ports
+            - parameters
         type: object
     AdaptiveLoadSchedulerIns:
         description: Input ports for the _Adaptive Load Scheduler_ component.
@@ -298,6 +317,9 @@ definitions:
                     The input signal to the controller.
 
                 x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
         type: object
     AdaptiveLoadSchedulerOuts:
         description: Output ports for the _Adaptive Load Scheduler_ component.
@@ -353,6 +375,10 @@ definitions:
                 format: double
                 type: number
                 x-go-tag-default: "2.0"
+        required:
+            - alerter
+            - gradient
+            - load_scheduler
         type: object
     AddressExtractor:
         description: |-
@@ -392,6 +418,8 @@ definitions:
                 $ref: '#/definitions/AlerterParameters'
                 title: Alerter configuration
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     AlerterIns:
         description: Inputs for the Alerter component.
@@ -604,6 +632,9 @@ definitions:
                     Parameters that define the scaling behavior.
 
                 x-go-tag-validate: required
+        required:
+            - scaling_backend
+            - scaling_parameters
         type: object
     AutoScalerScalingBackend:
         properties:
@@ -642,6 +673,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicasOuts'
                 description: Output ports for _Kubernetes Replicas_.
+        required:
+            - kubernetes_object_selector
         type: object
     AutoScalerScalingBackendKubernetesReplicasOuts:
         properties:
@@ -709,6 +742,9 @@ definitions:
 
                 type: string
                 x-go-tag-default: 30s
+        required:
+            - scale_in_alerter
+            - scale_out_alerter
         type: object
     Blueprint:
         properties:
@@ -1092,6 +1128,7 @@ definitions:
                     Differentiator calculates rate of change per tick.
                     Deprecated: v3.0.0. Use `PIDController` instead.
 
+                x-deprecated: true
                 x-go-tag-validate: deprecated
             ema:
                 $ref: '#/definitions/EMA'
@@ -1386,6 +1423,8 @@ definitions:
                     Parameters for the EMA component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
         type: object
     EMAIns:
@@ -1591,6 +1630,8 @@ definitions:
                     Parameters for the Extrapolator component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
         type: object
     ExtrapolatorIns:
@@ -1659,6 +1700,7 @@ definitions:
                     _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
                     Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
 
+                x-deprecated: true
                 x-go-tag-validate: deprecated
             aiad_load_scheduler:
                 $ref: '#/definitions/AIADLoadScheduler'
@@ -2008,6 +2050,8 @@ definitions:
                     Gradient Parameters.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: |-
             Gradient controller is a type of controller which tries to adjust the
             control variable proportionally to the relative difference between setpoint
@@ -2711,6 +2755,8 @@ definitions:
             pass_through_label_values_config_key:
                 description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
+        required:
+            - parameters
         type: object
     LoadRampIns:
         description: Inputs for the _Load Ramp_ component.
@@ -2755,6 +2801,7 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - sampler
             - steps
         type: object
     LoadRampParametersStep:
@@ -2815,6 +2862,9 @@ definitions:
             parameters:
                 $ref: '#/definitions/LoadSchedulerParameters'
                 x-go-tag-validate: required
+        required:
+            - in_ports
+            - parameters
         title: _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection
         type: object
     LoadSchedulerIns:
@@ -3129,6 +3179,8 @@ definitions:
             parameters:
                 $ref: '#/definitions/PIDControllerParameters'
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: |-
             PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
             <!-- vale off -->
@@ -3314,6 +3366,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/PodScalerOuts'
                 description: Output ports for the PodScaler component.
+        required:
+            - kubernetes_object_selector
         type: object
     PodScalerIns:
         description: Inputs for the PodScaler component.
@@ -3406,6 +3460,8 @@ definitions:
             parameters:
                 $ref: '#/definitions/PolynomialRangeFunctionParameters'
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     PolynomialRangeFunctionIns:
         properties:
@@ -3621,6 +3677,8 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - in_ports
+            - rate_limiter
             - selectors
         type: object
     RangeDrivenLoadScheduler:
@@ -3646,6 +3704,8 @@ definitions:
                     Parameters for the _Range Load Scheduler_.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     RangeDrivenLoadSchedulerDatapoint:
         properties:
@@ -3673,6 +3733,8 @@ definitions:
                     The input signal to the controller.
 
                 x-go-tag-validate: required
+        required:
+            - signal
         type: object
     RangeDrivenLoadSchedulerOuts:
         description: Output ports for the _Range Load Scheduler_.
@@ -3719,7 +3781,11 @@ definitions:
                 title: Starting data-point of the throttling range
                 x-go-tag-validate: required
         required:
+            - alerter
             - degree
+            - high_throttle_threshold
+            - load_scheduler
+            - low_throttle_threshold
         type: object
     RateLimiter:
         description: |-
@@ -3753,6 +3819,8 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - in_ports
+            - parameters
             - selectors
         title: Limits the traffic on a control point to specified rate
         type: object
@@ -3773,6 +3841,9 @@ definitions:
             pass_through:
                 $ref: '#/definitions/InPort'
                 title: PassThrough port determines whether all requests
+        required:
+            - bucket_capacity
+            - fill_amount
         title: Inputs for the RateLimiter component
         type: object
     RateLimiterParameters:
@@ -4093,6 +4164,8 @@ definitions:
                     Parameters for the SMA component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     SMAIns:
         properties:
@@ -4154,6 +4227,8 @@ definitions:
             pass_through_label_values_config_key:
                 description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
+        required:
+            - parameters
         type: object
     SamplerIns:
         properties:
@@ -4207,6 +4282,9 @@ definitions:
                 $ref: '#/definitions/ScaleInControllerController'
                 title: Controller
                 x-go-tag-validate: required
+        required:
+            - alerter
+            - controller
         type: object
     ScaleInControllerController:
         properties:
@@ -4227,6 +4305,9 @@ definitions:
                 $ref: '#/definitions/ScaleOutControllerController'
                 title: Controller
                 x-go-tag-validate: required
+        required:
+            - alerter
+            - controller
         type: object
     ScaleOutControllerController:
         properties:
@@ -4326,6 +4407,8 @@ definitions:
             parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters associated with flows matching the label matcher.
+        required:
+            - label_matcher
         type: object
     SchedulerWorkloadParameters:
         description: Parameters such as priority and tokens that are applicable to flows within a workload.
@@ -4511,6 +4594,8 @@ definitions:
                     Parameters for the _Signal Generator_ component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     SignalGeneratorIns:
         description: Inputs for the _Signal Generator_ component.
@@ -4887,6 +4972,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/VariableOuts'
                 description: Output ports for the Variable component.
+        required:
+            - constant_output
         type: object
     VariableOuts:
         description: Outputs for the Variable component.
