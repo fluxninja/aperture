@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "title": "load-scheduling/cpu-overload-protection blueprint",
+  "title": "load-scheduling/cpu-overload-protection-k8s blueprint",
   "additionalProperties": false,
   "required": ["dry_run"],
   "properties": {

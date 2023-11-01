@@ -1,6 +1,25 @@
 ---
-title: CPU Overload Protection
+title: CPU Overload Protection (Kubernetes)
 ---
+
+## Introduction
+
+By default, this policy detects when the Kubernetes Pod is overloaded using the
+pod CPU utilization metric. The policy is based on the
+[adaptive load scheduling](/reference/configuration/spec.md#adaptive-load-scheduler)
+component.
+
+All the Kubernetes related metrics are collected by the
+[Kubeletstats OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver)
+so if the system under observation requires using different metrics for the
+overload confirmation, the
+[list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver/metadata.yaml)
+can be used to configure the policy. The following PromQL query (with
+appropriate filters) is used as `SIGNAL` for the load scheduler:
+
+```promql
+avg(k8s_pod_cpu_utilization_ratio)
+```
 
 <!-- Configuration Marker -->
 
@@ -14,7 +33,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/cpu-overload-protection`}>load-scheduling/cpu-overload-protection</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/cpu-overload-protection-k8s`}>load-scheduling/cpu-overload-protection-k8s</a>
 
 <!-- vale on -->
 

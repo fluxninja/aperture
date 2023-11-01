@@ -1,7 +1,7 @@
-# Generated values file for load-scheduling/cpu-overload-protection blueprint
+# Generated values file for load-scheduling/cpu-overload-protection-k8s blueprint
 # Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/load-scheduling/cpu-overload-protection
-blueprint: load-scheduling/cpu-overload-protection
+# https://docs.fluxninja.com/reference/blueprints/load-scheduling/cpu-overload-protection-k8s
+blueprint: load-scheduling/cpu-overload-protection-k8s
 
 policy:
   # Name of the policy.
