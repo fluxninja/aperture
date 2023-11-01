@@ -1,11 +1,11 @@
 ---
-title: Set up CLI
+title: Set Up CLI (aperturectl)
 keywords:
   - setup
   - cli
   - aperturectl
 sidebar_position: 1
-sidebar_label: Set up CLI (aperturectl)
+sidebar_label: Set Up CLI (aperturectl)
 ---
 
 Aperture Cloud has both the Aperture Controller and Aperture Agent

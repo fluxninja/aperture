@@ -1,9 +1,11 @@
 ---
-title: Manually setting feature control points
+title: Manually Setting Feature Control Points
 keywords:
-  - Manually setting feature control points
+  - feature-control-points
+  - manual-control-points
+  - manual-insertion
 sidebar_position: 1
-sidebar_label: Manually setting feature control points
+sidebar_label: Manually Setting Feature Control Points
 ---
 
 ```mdx-code-block
