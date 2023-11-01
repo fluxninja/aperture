@@ -65,7 +65,6 @@ type SimpleService struct {
 	latency             time.Duration // Simulated latency for each request
 	rejectRatio         float64       // Ratio of requests to be rejected
 	cpuLoadPercentage   int           // Percentage of CPU to be loaded
-	memoryLoadSize      int           // Size in bytes of memory to be loaded
 }
 
 // ResponseBody is a response body for returning a response to all requests made on api endpoints
@@ -461,7 +460,6 @@ type RequestHandler struct {
 	latency           time.Duration
 	rejectRatio       float64
 	cpuLoadPercentage int
-	memoryLoadSize    int
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -700,21 +698,6 @@ func (h RequestHandler) processRequest() (int, error) {
 		} else {
 			time.Sleep(h.latency)
 		}
-	}
-
-	// Memory allocation and retention
-	var mem []byte
-	if h.memoryLoadSize > 0 {
-		mem = make([]byte, h.memoryLoadSize)
-		// Optionally, you can write some data to this memory to ensure
-		// that the compiler doesn't optimize away the memory allocation.
-		for i := range mem {
-			mem[i] = byte(i % 256)
-		}
-	}
-
-	if h.memoryLoadSize > 0 {
-		mem = nil
 	}
 
 	return http.StatusOK, nil
