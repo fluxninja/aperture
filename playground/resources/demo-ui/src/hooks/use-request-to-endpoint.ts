@@ -70,7 +70,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
   }, [refetch])
 
   /**
-   * We stop making request if we get error or request count is greater than 60
+   * We stop making request if we get error or request count is greater than 100
    */
   useEffect(() => {
     if (!intervalId) {
@@ -82,7 +82,7 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
       return
     }
 
-    if (requestCount >= 60) {
+    if (requestCount >= 100) {
       clearInterval(intervalId)
       return
     }
@@ -90,10 +90,10 @@ export const useRequestToEndpoint = (reqSpec: RequestSpec) => {
 
   /**
    * After error we will stop the request, but if request get resolved after the graceful retry
-   * We start requesting again until we get error or request count is greater than 60
+   * We start requesting again until we get error or request count is greater than 100
    */
   useEffect(() => {
-    if (isRetry && !isError && requestCount < 60 && startFetchRef.current) {
+    if (isRetry && !isError && requestCount < 100 && startFetchRef.current) {
       clearInterval(intervalId)
       startFetchRef.current = false
       startFetch()
