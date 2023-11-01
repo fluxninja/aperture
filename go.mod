@@ -187,7 +187,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0
 	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/fx v1.20.0
-	go.uber.org/goleak v1.2.1
+	go.uber.org/goleak v1.3.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
