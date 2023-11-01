@@ -34,6 +34,13 @@ At a high level, this policy works as follows:
   decreases) the token bucket fill rates based on the incoming token rate
   observed at each agent.
 
+The following PromQL query (with appropriate filters) is used as `SIGNAL` for
+the load scheduler:
+
+```promql
+sum(increase(flux_meter_sum))/sum(increase(flux_meter_count))
+```
+
 :::info
 
 See reference for the
