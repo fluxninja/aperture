@@ -1485,8 +1485,8 @@ Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
-Disable this flag only if using
-[Self-Hosted](/get-started/self-hosting/self-hosting.md) Aperture Controller.
+Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
+Aperture Controller.
 
 </dd>
 <dt>endpoint</dt>

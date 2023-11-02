@@ -28,13 +28,13 @@ they integrate with an application.
 Aperture Cloud is a highly available, fully managed load management platform
 offering:
 
-1. Hosted **Aperture Controller** and **Aperture Agents**
+1. Managed **Aperture Controller** and **Aperture Agents**
 2. Consoles for managing Aperture policies, self-hosted **Aperture Agents** and
-   Aperture Controllers
+   **Aperture Controllers**
 3. Traffic analytics dashboard
 4. Alerting system to notify about actions taken by Aperture Agents
 
-## Aperture Controller (hosted in Aperture Cloud) {#aperture-controller}
+## Aperture Controller {#aperture-controller}
 
 :::note
 
