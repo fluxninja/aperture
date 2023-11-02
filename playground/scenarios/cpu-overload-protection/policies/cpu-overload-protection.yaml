@@ -1,7 +1,7 @@
 # Generated values file for load-scheduling/cpu-overload-protection blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/cpu-overload-protection-k8s
-# yaml-language-server: $schema=../../../../blueprints/load-scheduling/cpu-overload-protection/gen/definitions.json
+# yaml-language-server: $schema=../../../../blueprints/load-scheduling/cpu-overload-protection-k8s/gen/definitions.json
 blueprint: load-scheduling/cpu-overload-protection-k8s
 policy:
   # Name of the policy.
@@ -11,6 +11,8 @@ policy:
   load_scheduling_core:
     setpoint: 40
     aiad_load_scheduler:
+      alerter:
+        alert_name: "AIAD Load Throttling Event"
       load_multiplier_linear_decrement: 0.1
       load_multiplier_linear_increment: 0.02
       load_scheduler:
