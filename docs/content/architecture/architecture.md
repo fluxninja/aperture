@@ -105,12 +105,12 @@ Aperture][architecture-self-hosted].
 :::
 
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
-[architecture-self-hosted]: /get-started/self-hosting/architecture.md
+[architecture-self-hosted]: /self-hosting/architecture.md
 [guides]: /guides/guides.md
 [policy]: /concepts/advanced/policy.md
-[integrations]: /integrations/integrations.md
-[sdks]: /integrations/sdk/sdk.md
-[metrics]: /integrations/metrics/metrics.md
-[install-agents]: /get-started/self-hosting/agent/agent.md
-[self-hosting]: /get-started/self-hosting/self-hosting.md
+[integrations]: /self-hosting/integrations/integrations.md
+[sdks]: /sdk/sdk.md
+[metrics]: /self-hosting/integrations/metrics/metrics.md
+[install-agents]: /self-hosting/agent/agent.md
+[self-hosting]: /self-hosting/self-hosting.md
 [promql-syntax]: https://prometheus.io/docs/prometheus/latest/querying/basics/

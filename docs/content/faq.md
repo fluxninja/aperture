@@ -2,7 +2,7 @@
 title: FAQ
 slug: faq
 sidebar_label: FAQ
-sidebar_position: 9
+sidebar_position: 10
 description: Frequently asked questions about Aperture.
 image: /assets/img/aperture_logo.png
 keywords:

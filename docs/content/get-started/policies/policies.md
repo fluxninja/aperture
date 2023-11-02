@@ -128,8 +128,8 @@ the generated policies on the Aperture Cloud Controller.
 
 :::info
 
-See [Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md) for more
-information on how to configure what aperturectl should connect to.
+See [Set up CLI (aperturectl)](/setup-cli/setup-cli.md) for more information on
+how to configure what aperturectl should connect to.
 
 :::
 
@@ -154,7 +154,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Operator](/get-started/self-hosting/controller/kubernetes/operator/operator.md),
+[Kubernetes using Operator](/self-hosting/controller/kubernetes/operator/operator.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -173,7 +173,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Namespace-scoped](/get-started/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
+[Kubernetes using Namespace-scoped](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -192,8 +192,8 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Docker](/get-started/self-hosting/controller/docker.md), you can apply the
-policy using the following command:
+[Docker](/self-hosting/controller/docker.md), you can apply the policy using the
+following command:
 
 ```mdx-code-block
 <CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>

@@ -62,7 +62,7 @@ Before you begin with this guide, verify the prerequisites are fulfilled.
 - Aperture is installed and running. If not, follow the
   [get started guide](../../get-started/get-started.md).
 - `aperturectl` is installed and configured. If not, head over to
-  [Set up CLI (aperturectl) guide](../../get-started/setup-cli/setup-cli.md).
+  [Set up CLI (aperturectl) guide](../../setup-cli/setup-cli.md).
 
 ## Configuration
 

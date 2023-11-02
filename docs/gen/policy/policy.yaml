@@ -1840,7 +1840,7 @@ definitions:
 
             :::info
 
-            See also [Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
+            See also [Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
 
             :::
         properties:
@@ -2888,7 +2888,7 @@ definitions:
 
                     :::info Usage with OpenTelemetry Metrics
 
-                    Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.
+                    Aperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.
 
                     :::
                 type: string

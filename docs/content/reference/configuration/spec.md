@@ -4310,7 +4310,7 @@ configuration using format `${ENV_VAR_NAME}`.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
 
 :::
 
@@ -6871,7 +6871,7 @@ additional labels available on a Flux Meter such as `valid`, `flow_status`,
 :::info Usage with OpenTelemetry Metrics
 
 Aperture supports OpenTelemetry metrics. See
-[reference](/integrations/metrics/metrics.md) for more details.
+[reference](/self-hosting/integrations/metrics/metrics.md) for more details.
 
 :::
 

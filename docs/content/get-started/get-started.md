@@ -12,10 +12,10 @@ you need to prepare your application to have Aperture integrated. Aperture can
 be integrated in multiple ways. You can choose the one that best suits your
 application.
 
-## [Set up CLI (aperturectl)](./setup-cli/setup-cli.md)
+## [Set up CLI (aperturectl)](../setup-cli/setup-cli.md)
 
 Aperture is accompanied by a tool called `aperturectl` that can be used to
-install [self-hosted Aperture](./self-hosting/self-hosting.md) in your
+install [self-hosted Aperture](../self-hosting/self-hosting.md) in your
 Kubernetes cluster, generate a policy, apply a policy, list policies, etc.
 
 ## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
@@ -24,25 +24,25 @@ Kubernetes cluster, generate a policy, apply a policy, list policies, etc.
 
    Using Aperture SDKs, it is easier to manually set feature control points in
    your application. There are SDKs available for multiple languages. You can
-   find the list of SDKs [here](../integrations/sdk/sdk.md).
+   find the list of SDKs [here](../sdk/sdk.md).
 
 2. [**Middleware Insertions**](./set-up-application/middleware-insertions.md)
 
    To make it easier to integrate Aperture in your application, there are
-   [middleware](../integrations/sdk/java/java.md) for popular frameworks like
-   Spring Boot, Netty, Armeria. With the help of middleware, there isn't much
-   code change required in your application.
+   [middleware](../sdk/java/java.md) for popular frameworks like Spring Boot,
+   Netty, Armeria. With the help of middleware, there isn't much code change
+   required in your application.
 
 3. [**Service Meshes (Istio, Envoy) & API Gateways**](./set-up-application/service-mesh-and-gateways.md)
 
    Aperture can be integrated with service meshes like Istio and Envoy. You can
    find the list of supported service meshes
-   [here](../integrations/istio/istio.md). With help of service meshes, you can
-   control the flow of traffic in your application without any code change. It
-   is recommended to use service meshes for Aperture integration as it is easier
-   to get started with and doesn't require any code change. You can also
-   integrate Aperture with API gateways, checkout the supported
-   [API Gateways](../integrations/gateway/gateway.md).
+   [here](../self-hosting/integrations/istio/istio.md). With help of service
+   meshes, you can control the flow of traffic in your application without any
+   code change. It is recommended to use service meshes for Aperture integration
+   as it is easier to get started with and doesn't require any code change. You
+   can also integrate Aperture with API gateways, checkout the supported
+   [API Gateways](../self-hosting/integrations/gateway/gateway.md).
 
 ## [Create Your First Policy](./policies/policies.md)
 
