@@ -17,6 +17,8 @@ Aperture and ready to enforce `rate limiting as a service`. Aperture offers
 multiple integration methods, allowing you to choose the one that best suits
 your application.
 
+<!-- TODO QuickStart Guides -->
+
 <Tabs>
 
 <TabItem value="Aperture Serverless">
@@ -40,7 +42,7 @@ How to Integrate with Aperture Serverless: A Quick Guide for Developers
 <TabItem value="Aperture SaaS">
 
 How to Integrate with Aperture SaaS: A Quick Guide for Developers with Access to
-Infrastructure, Platform and/or Infrastructure Teams
+Infrastructure, Platform or Infrastructure Teams
 
 1. **Introduction**: This mode is crafted for teams running applications across
    different infrastructure platforms. It's a perfect fit for those wanting to
@@ -55,14 +57,14 @@ Infrastructure, Platform and/or Infrastructure Teams
    - Gateways
 4. **Create Your Account and Set Up Your Organization**: Get started with
    Aperture by creating an account
-5. **Map to Aperture SaaS Controller**: Link to the Quickstart section
+5. **Map to Aperture SaaS Controller**: Link to the quick start section
 
 </TabItem>
 
 <TabItem value="Aperture Open Source">
 
 How to Integrate with Aperture Open Source: A Quick Guide for Developers with
-Access to Infrastructure, Platform, and/or Infrastructure Teams
+Access to Infrastructure, Platform, or Infrastructure Teams
 
 1. **Introduction**: This mode is tailored for teams deploying applications on a
    variety of infrastructure platforms. It's well-suited for those who are
@@ -75,7 +77,7 @@ Access to Infrastructure, Platform, and/or Infrastructure Teams
    - SDKs
    - ServiceMesh
    - Gateways
-4. **Self-hosted setup**: Link to Quickstart guide
+4. **Self-hosted setup**: [Self Hosting Section](/self-hosting/self-hosting.md)
 
 </TabItem>
 

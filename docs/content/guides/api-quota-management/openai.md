@@ -210,12 +210,12 @@ the following command:
 The values file needs to be adjusted to match the application requirements -
 
 - `policy_name`: Name of the policy — This value should be unique and required.
-- `bucket_capacity`: This value defines burst capacity. E.g. in the case of
-  `gpt-4` tokens per minute policy, the bucket will have a capacity of
+- `bucket_capacity`: This value defines burst capacity. For example, in the case
+  of `gpt-4` tokens per minute policy, the bucket will have a capacity of
   `40000 tokens`.
 - `fill_amount`: After the tokens are consumed, the bucket will be filled with
-  this amount. E.g. in the case of `gpt-4` tokens per minute policy, the bucket
-  will fill at `40000 tokens per minute`.
+  this amount. For example, in the case of `gpt-4` tokens per minute policy, the
+  bucket will fill at `40000 tokens per minute`.
 - `rate_limiter`:
   - `interval`: Interval at which the rate limiter will be filled. When to reset
     the bucket.
