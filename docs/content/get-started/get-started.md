@@ -7,46 +7,76 @@ sidebar_position: 2
 sidebar_label: Get Started
 ---
 
-This guide will help you get started with Aperture in few steps. To begin with
-you need to prepare your application to have Aperture integrated. Aperture can
-be integrated in multiple ways. You can choose the one that best suits your
-application.
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
 
-## [Set up CLI (aperturectl)](../setup-cli/setup-cli.md)
+In the next 15 minutes, you should have your application integrated with
+Aperture and ready to enforce `rate limiting as a service`. Aperture offers
+multiple integration methods, allowing you to choose the one that best suits
+your application.
 
-Aperture is accompanied by a tool called `aperturectl` that can be used to
-install [self-hosted Aperture](../self-hosting/self-hosting.md) in your
-Kubernetes cluster, generate a policy, apply a policy, list policies, etc.
+<Tabs>
 
-## [Set Up Your Application: Pick an integration](./set-up-application/set-up-application.md)
+<TabItem value="Aperture Serverless">
 
-1. [**Manually setting feature control points**](./set-up-application/manual-control-points.md)
+How to Integrate with Aperture Serverless: A Quick Guide for Developers
 
-   Using Aperture SDKs, it is easier to manually set feature control points in
-   your application. There are SDKs available for multiple languages. You can
-   find the list of SDKs [here](../sdk/sdk.md).
+1. **Introduction**: This mode is tailored for developers who prefer to directly
+   use our SDKs without delving into infrastructure components.
+2. **Set Up the Environment**:
+   `Aperture Controller and Aperture agent are both hosted within the FluxNinja SaaS platform.`
+3. **Integrate the SDK**: Add the necessary few lines of code to your desired
+   feature. Link to available SDKs are [here](../sdk/sdk.md).
+4. **Configure the Organization Settings**: Point your feature to the created
+   organization within FluxNinja.
+5. **Map to Cloud Agent**: Aperture Cloud uses API keys to authenticate requests
+   coming from SDK integrations. You can create API keys for your project in the
+   Aperture Cloud UI.
 
-2. [**Middleware Insertions**](./set-up-application/middleware-insertions.md)
+</TabItem>
 
-   To make it easier to integrate Aperture in your application, there are
-   [middleware](../sdk/java/java.md) for popular frameworks like Spring Boot,
-   Netty, Armeria. With the help of middleware, there isn't much code change
-   required in your application.
+<TabItem value="Aperture SaaS">
 
-3. [**Service Meshes (Istio, Envoy) & API Gateways**](./set-up-application/service-mesh-and-gateways.md)
+How to Integrate with Aperture SaaS: A Quick Guide for Developers with Access to
+Infrastructure, Platform and/or Infrastructure Teams
 
-   Aperture can be integrated with service meshes like Istio and Envoy. You can
-   find the list of supported service meshes
-   [here](../self-hosting/integrations/istio/istio.md). With help of service
-   meshes, you can control the flow of traffic in your application without any
-   code change. It is recommended to use service meshes for Aperture integration
-   as it is easier to get started with and doesn't require any code change. You
-   can also integrate Aperture with API gateways, checkout the supported
-   [API Gateways](../self-hosting/integrations/gateway/gateway.md).
+1. **Introduction**: This mode is crafted for teams running applications across
+   different infrastructure platforms. It's a perfect fit for those wanting to
+   avoid hosting their own Prometheus and etcd instances while aiming for
+   minimal performance impact from the Aperture agent. Additionally,
+   `teams should be comfortable with metrics being sent to FluxNinja SaaS.`
+2. **Set Up the Environment**:
+   `Aperture Controller is hosted within the FluxNinja SaaS platform and Aperture Agent is within customer VPC.`
+3. **Integrate with Aperture**:
+   - SDKs
+   - ServiceMesh
+   - Gateways
+4. **Create Your Account and Set Up Your Organization**: Get started with
+   Aperture by creating an account
+5. **Map to Aperture SaaS Controller**: Link to the Quickstart section
 
-## [Create Your First Policy](./policies/policies.md)
+</TabItem>
 
-For creating policies, `aperturectl` can be of assistance. Apart from that, it
-can help with listing policies, previewing live traffic, and many more things.
-Let's explore how to create our first policy using `aperturectl` in the
-[Generating and Applying Policies](/get-started/policies/policies.md) section.
+<TabItem value="Aperture Open Source">
+
+How to Integrate with Aperture Open Source: A Quick Guide for Developers with
+Access to Infrastructure, Platform, and/or Infrastructure Teams
+
+1. **Introduction**: This mode is tailored for teams deploying applications on a
+   variety of infrastructure platforms. It's well-suited for those who are
+   `comfortable hosting their own Prometheus and etcd instances` and aim for
+   minimal performance impact from the Aperture agent. Also, teams who are not
+   comfortable with metrics being sent to FluxNinja SaaS.
+2. **Set Up the Environment**:
+   `Aperture Controller and Aperture Agent is within customer VPC.`
+3. **Integrate with Aperture**:
+   - SDKs
+   - ServiceMesh
+   - Gateways
+4. **Self-hosted setup**: Link to Quickstart guide
+
+</TabItem>
+
+</Tabs>
