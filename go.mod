@@ -3,6 +3,8 @@ module github.com/fluxninja/aperture/v2
 go 1.21
 
 require (
+	cloud.google.com/go/compute/metadata v0.2.4-0.20230617002413-005d2dfb6b68
+	cloud.google.com/go/secretmanager v1.11.1
 	github.com/BurntSushi/toml v1.3.2
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/Masterminds/semver/v3 v3.2.1
@@ -208,7 +210,6 @@ require (
 
 require (
 	cloud.google.com/go v0.110.8 // indirect
-	cloud.google.com/go/compute/metadata v0.2.4-0.20230617002413-005d2dfb6b68 // indirect
 	cloud.google.com/go/iam v1.1.2 // indirect
 	cloud.google.com/go/pubsub v1.33.0 // indirect
 	cloud.google.com/go/spanner v1.50.0 // indirect
