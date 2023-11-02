@@ -71,6 +71,12 @@ policy:
 
   load_scheduling_core:
     aimd_load_scheduler:
+      alerter:
+        alert_name: "AIMD Load Throttling Event"
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
       load_scheduler:
         workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
