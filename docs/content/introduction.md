@@ -78,7 +78,7 @@ To sign-up to Aperture Cloud, [click here][sign-up].
 ## ✨ Get started {#get-started}
 
 - [**Setting up your application**](get-started/set-up-application/set-up-application.md)
-- [**Set up CLI (aperturectl)**](get-started/setup-cli/setup-cli.md)
+- [**Set up CLI (aperturectl)**](/setup-cli/setup-cli.md)
 - [**Your first policy**](get-started/policies/policies.md)
 - [**Guides**](guides/guides.md)
 
@@ -106,4 +106,4 @@ beneficial.
 [cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
 [architecture]: /architecture/architecture.md
-[self-hosted]: /get-started/self-hosting/self-hosting.md
+[self-hosted]: /self-hosting/self-hosting.md

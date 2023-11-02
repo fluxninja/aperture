@@ -16,7 +16,7 @@ sidebar_label: Controller
 :::info
 
 See also
-[Aperture Controller installation](/get-started/self-hosting/controller/controller.md).
+[Aperture Controller installation](/self-hosting/controller/controller.md).
 
 :::
 

@@ -69,17 +69,16 @@ Before you begin with this guide, verify the prerequisites are fulfilled.
 Before creating a policy, a control point needs to be defined. Control Point
 specifies where the policy should apply the decisions. There are multiple ways
 to achieve this; for the scope of this guide, a JavaScript SDK is used to create
-a control point—check out the
-[Control Point](https://docs.fluxninja.com/concepts/control-point) Concept &
-[Integrations](https://docs.fluxninja.com/integrations/) section for more
-details.
+a control point—check out the [Control Point](/concepts/control-point.md)
+Concept & [Integrations](/self-hosting/integrations/integrations.md) section for
+more details.
 
 ### Control Point with JavaScript SDK
 
 :::info
 
 💡
-[Check out other language SDKs supported by Aperture](/integrations/integrations.md)
+[Check out other language SDKs supported by Aperture](/self-hosting/integrations/integrations.md)
 
 :::
 

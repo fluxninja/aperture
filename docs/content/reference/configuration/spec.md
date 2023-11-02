@@ -3490,7 +3490,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/integrations/istio/istio.md#envoy-filter)
+[Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
 
 :::
 
