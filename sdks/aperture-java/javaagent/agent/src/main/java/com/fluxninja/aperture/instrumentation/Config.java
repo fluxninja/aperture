@@ -26,7 +26,7 @@ public class Config {
     public static final String ROOT_CERTIFICATE_FILE_PROPERTY =
             "aperture.javaagent.root.certificate";
 
-    private static final String AGENT_ADDRESS_DEFAULT_VALUE = "localhost:8089";
+    private static final String AGENT_ADDRESS_DEFAULT_VALUE = "localhost:8080";
     private static final String AGENT_API_KEY_DEFAULT_VALUE = "";
     private static final String RAMP_MODE_PROPERTY_DEFAULT_VALUE = "false";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";

@@ -6,6 +6,13 @@ sidebar_position: 3
 sidebar_label: Load Scheduling based on Java garbage collection times
 ---
 
+The following PromQL query (with appropriate filters) is used as `SIGNAL` for
+the load scheduler:
+
+```promql
+avg(java_lang_G1_Young_Generation_LastGcInfo_duration)
+```
+
 <!-- Configuration Marker -->
 
 ```mdx-code-block

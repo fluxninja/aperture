@@ -44,7 +44,7 @@ function(values={}, environment={}) {
         containerPort.newNamed(_values.app_port, 'http'),
       ])
       + container.withEnvMap({
-        FN_APP_PORT: std.toString(_values.app_port),
+        APERTURE_APP_PORT: std.toString(_values.app_port),
         APERTURE_AGENT_HOST: _values.agent.host,
         APERTURE_AGENT_PORT: std.toString(_values.agent.port),
       }),

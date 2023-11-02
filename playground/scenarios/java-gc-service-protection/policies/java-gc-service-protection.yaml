@@ -73,6 +73,8 @@ policy:
     setpoint: 20
     dry_run: false
     aiad_load_scheduler:
+      alerter:
+        alert_name: "AIAD Load Throttling Event"
       load_multiplier_linear_decrement: 0.05
       load_multiplier_linear_increment: 0.025
       max_load_multiplier: 2
