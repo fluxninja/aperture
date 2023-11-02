@@ -36,9 +36,9 @@ export class ApertureClient {
 
   constructor({
     address,
+    agentAPIKey,
     channelCredentials,
     channelOptions = {},
-    agentAPIKey,
   }: {
     address: string;
     channelCredentials: ChannelCredentials;

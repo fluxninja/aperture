@@ -1,6 +1,9 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import packageInfo from "../package.json";
+const packageInfo: {
+  name: string;
+  version: string;
+} = require("./package.json");
 
 const __filename = fileURLToPath(import.meta.url);
 

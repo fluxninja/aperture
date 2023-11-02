@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Node 16",
   "compilerOptions": {
-    "resolveJsonModule": true,
     "baseUrl": ".",
     "module": "es2022",
     "target": "es2015",

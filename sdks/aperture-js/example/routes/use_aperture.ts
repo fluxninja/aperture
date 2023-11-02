@@ -14,7 +14,7 @@ export const apertureClient = new ApertureClient({
   channelCredentials:
     process.env.APERTURE_AGENT_INSECURE !== undefined
       ? grpc.credentials.createInsecure()
-      : undefined,
+      : grpc.credentials.createSsl(),
 });
 
 export const apertureRoute = express.Router();

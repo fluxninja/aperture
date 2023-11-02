@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "aperture_sdk" }]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 grpcio = "^1.59.2"
 opentelemetry-api = "^1.20.0"
 opentelemetry-sdk = "^1.20.0"
@@ -22,7 +22,7 @@ grpc-stubs = "^1.24.12.1"
 
 
 [tool.poetry.group.example.dependencies]
-quart = "^0.18.3"
+quart = "^0.19.3"
 
 [build-system]
 requires = ["poetry-core"]
