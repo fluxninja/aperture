@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.7-slim-buster
+FROM python:3.8-slim-buster
 
 WORKDIR /app
 
@@ -17,8 +17,8 @@ HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=5s \
 RUN pip install poetry==1.4.0
 COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false \
-    && poetry config installer.modern-installation false \
-    && poetry install --without=dev --with=example --no-root
+  && poetry config installer.modern-installation false \
+  && poetry install --without=dev --with=example --no-root
 
 COPY . .
 RUN poetry install --only-root

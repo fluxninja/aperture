@@ -8,8 +8,8 @@ export const PROTO_PATH = path.resolve(
   "../proto/flowcontrol/check/v1/check.proto",
 );
 
-export const LIBRARY_NAME = "aperture-js";
-export const LIBRARY_VERSION = "v2.2.0";
+export const LIBRARY_NAME = "@fluxninjutsu/aperture-js";
+export const LIBRARY_VERSION = "2.23.1";
 
 // Label to hold source of flow.
 export const SOURCE_LABEL = "aperture.source";

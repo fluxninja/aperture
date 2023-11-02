@@ -1,12 +1,20 @@
 import express from "express";
 
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import grpc from "@grpc/grpc-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
-  address: process.env.APERTURE_AGENT_ADDRESS !== undefined ? process.env.APERTURE_AGENT_ADDRESS : "localhost:8089",
+  address:
+    process.env.APERTURE_AGENT_ADDRESS !== undefined
+      ? process.env.APERTURE_AGENT_ADDRESS
+      : "localhost:8089",
   agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
-  isInsecure: process.env.APERTURE_AGENT_INSECURE === "true",
+  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+  channelCredentials:
+    process.env.APERTURE_AGENT_INSECURE !== undefined
+      ? grpc.credentials.createInsecure()
+      : grpc.credentials.createSsl(),
 });
 
 export const apertureRoute = express.Router();
