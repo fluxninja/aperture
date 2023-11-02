@@ -1,13 +1,15 @@
 import express from "express";
 import http from "http";
-import {createHttpTerminator} from "http-terminator";
+import { createHttpTerminator } from "http-terminator";
 
-import {connectedRouter} from "./routes/connected.js";
-import {healthRouter} from "./routes/health.js";
-import {apertureClient, apertureRoute} from "./routes/use_aperture.js";
+import { connectedRouter } from "./routes/connected.js";
+import { healthRouter } from "./routes/health.js";
+import { apertureClient, apertureRoute } from "./routes/use_aperture.js";
 
 const host = "localhost";
-const port = process.env.FN_APP_PORT ? process.env.FN_APP_PORT : "8080";
+const port = process.env.APERTURE_APP_PORT
+  ? process.env.APERTURE_APP_PORT
+  : "8080";
 
 // Create server
 const router = express();

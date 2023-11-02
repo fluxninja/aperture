@@ -15,43 +15,23 @@ public class SpringBootApp {
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
-    public static void main(String[] args) {
-        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
-        if (agentAddress == null) {
-            agentAddress = DEFAULT_AGENT_ADDRESS;
+    private static String getEnvOrDefault(String envVar, String defaultValue) {
+        String value = System.getenv(envVar);
+        if (value == null) {
+            value = defaultValue;
         }
-        System.setProperty("APERTURE_AGENT_ADDRESS", agentAddress);
-        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
-        if (agentAPIKey == null) {
-            agentAPIKey = "";
-        }
-        System.setProperty("APERTURE_AGENT_API_KEY", agentAPIKey);
-        String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
-        if (controlPointName == null) {
-            controlPointName = DEFAULT_CONTROL_POINT_NAME;
-        }
-        System.setProperty("APERTURE_CONTROL_POINT_NAME", controlPointName);
-        String rampMode = System.getenv("APERTURE_ENABLE_RAMP_MODE");
-        if (rampMode == null) {
-            rampMode = DEFAULT_RAMP_MODE;
-        }
-        System.setProperty("APERTURE_ENABLE_RAMP_MODE", rampMode);
-        String grpcTimeoutMs = System.getenv("APERTURE_GRPC_TIMEOUT_MS");
-        if (grpcTimeoutMs == null) {
-            grpcTimeoutMs = DEFAULT_GRPC_TIMEOUT_MS;
-        }
-        System.setProperty("APERTURE_GRPC_TIMEOUT_MS", grpcTimeoutMs);
-        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
-        if (insecureGrpcString == null) {
-            insecureGrpcString = DEFAULT_INSECURE_GRPC;
-        }
-        System.setProperty("APERTURE_AGENT_INSECURE", insecureGrpcString);
+        System.setProperty(envVar, value);
+        return value;
+    }
 
-        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
-        if (rootCertFile == null) {
-            rootCertFile = DEFAULT_ROOT_CERT;
-        }
-        System.setProperty("APERTURE_ROOT_CERTIFICATE_FILE", rootCertFile);
+    public static void main(String[] args) {
+        getEnvOrDefault("APERTURE_AGENT_ADDRESS", DEFAULT_AGENT_ADDRESS);
+        getEnvOrDefault("APERTURE_AGENT_API_KEY", "");
+        getEnvOrDefault("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
+        getEnvOrDefault("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
+        getEnvOrDefault("APERTURE_GRPC_TIMEOUT_MS", DEFAULT_GRPC_TIMEOUT_MS);
+        getEnvOrDefault("APERTURE_AGENT_INSECURE", DEFAULT_INSECURE_GRPC);
+        getEnvOrDefault("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);
 
         SpringApplication.run(SpringBootApp.class, args);
     }

@@ -65,7 +65,7 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	appPort := getEnvOrDefault("FN_APP_PORT", defaultAppPort)
+	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
 	mux := mux.NewRouter()
 	a := &app{
