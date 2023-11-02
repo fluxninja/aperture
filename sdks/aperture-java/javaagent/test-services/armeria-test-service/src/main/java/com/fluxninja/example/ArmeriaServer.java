@@ -37,7 +37,7 @@ public class ArmeriaServer {
     }
 
     public static void main(String[] args) {
-        String appPort = System.getenv("FN_APP_PORT");
+        String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }

@@ -42,13 +42,13 @@ public class App {
         if (agentAPIKey == null) {
             agentAPIKey = "";
         }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
@@ -69,13 +69,13 @@ public class App {
             return;
         }
 
-        String featureName = System.getenv("FN_FEATURE_NAME");
+        String featureName = System.getenv("APERTURE_FEATURE_NAME");
         if (featureName == null) {
             featureName = DEFAULT_FEATURE_NAME;
         }
 
         App app = new App(apertureSDK, channel, featureName);
-        String appPort = System.getenv("FN_APP_PORT");
+        String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }

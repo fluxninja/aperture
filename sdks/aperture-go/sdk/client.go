@@ -2,8 +2,6 @@ package aperture
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"log"
 	"net/url"
@@ -26,8 +24,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -52,44 +48,28 @@ type apertureClient struct {
 // Options that the user can pass to Aperture in order to receive a new Client.
 // FlowControlClientConn and OTLPExporterClientConn are required.
 type Options struct {
-	GRPCDialOptions []grpc.DialOption
-	Address         string
-	AgentAPIKey     string
-	Insecure        bool
-	SkipVerify      bool
-	Logger          *logr.Logger
+	Logger      *logr.Logger
+	Address     string
+	AgentAPIKey string
+	DialOptions []grpc.DialOption
 }
 
 // NewClient returns a new Client that can be used to perform Check calls.
 // The user will pass in options which will be used to create a connection with otel and a tracerProvider retrieved from such connection.
 func NewClient(ctx context.Context, opts Options) (Client, error) {
-	if opts.GRPCDialOptions == nil {
-		opts.GRPCDialOptions = []grpc.DialOption{}
+	if opts.DialOptions == nil {
+		opts.DialOptions = []grpc.DialOption{}
 	}
 
 	if opts.AgentAPIKey != "" {
-		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
-			md := metadata.Pairs("apikey", opts.AgentAPIKey)
+		opts.DialOptions = append(opts.DialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
+			md := metadata.Pairs("x-api-key", opts.AgentAPIKey)
 			ctx = metadata.NewOutgoingContext(ctx, md)
 			return invoker(ctx, method, req, reply, cc, callOpts...)
 		}))
 	}
 
-	if opts.Insecure {
-		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	} else if opts.SkipVerify {
-		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
-			InsecureSkipVerify: true, //nolint:gosec // For testing purposes only
-		})))
-	} else {
-		certPool, err := x509.SystemCertPool()
-		if err != nil {
-			return nil, err
-		}
-		opts.GRPCDialOptions = append(opts.GRPCDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
-	}
-
-	conn, err := grpc.DialContext(ctx, opts.Address, opts.GRPCDialOptions...)
+	conn, err := grpc.DialContext(ctx, opts.Address, opts.DialOptions...)
 	if err != nil {
 		return nil, err
 	}

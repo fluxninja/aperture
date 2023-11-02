@@ -37,24 +37,16 @@ export class ApertureClient {
   constructor({
     address,
     agentAPIKey,
-    isInsecure = false,
+    channelCredentials,
     channelOptions = {},
   }: {
     address: string;
-    agentAPIKey?: string;
-    isInsecure?: boolean;
+    channelCredentials: ChannelCredentials;
     channelOptions?: ChannelOptions;
+    agentAPIKey?: string;
   }) {
-
     if (!address) {
       throw new Error("address is required");
-    }
-
-    let channelCredentials: ChannelCredentials;
-    if (isInsecure) {
-      channelCredentials = grpc.credentials.createInsecure();
-    } else {
-      channelCredentials = grpc.credentials.createSsl();
     }
 
     if (agentAPIKey) {
@@ -63,7 +55,7 @@ export class ApertureClient {
         grpc.credentials.createFromMetadataGenerator(
           (_params: any, callback: any) => {
             const metadata = new grpc.Metadata();
-            metadata.add("apikey", agentAPIKey);
+            metadata.add("x-api-key", agentAPIKey);
             callback(null, metadata);
           },
         ),

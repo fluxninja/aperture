@@ -1,0 +1,16 @@
+demoapp:
+  simplesrv:
+    cpuLoadPercentage: 50
+  resources:
+    limits:
+      cpu: 500m
+istio:
+  envoyfilter:
+    envoyFilter:
+      authzGrpcTimeout: 1s
+agent:
+  agent:
+    config:
+      auto_scale:
+        kubernetes:
+          enabled: true
