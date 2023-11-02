@@ -25,21 +25,30 @@ import (
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	inframeter "github.com/fluxninja/aperture/v2/pkg/otelcollector/infra-meter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
+	"github.com/fluxninja/aperture/v2/pkg/secretmanager"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
+type ProvideAgentIn struct {
+	fx.In
+
+	Unmarshaller           config.Unmarshaller
+	Lis                    *listener.Listener
+	PromClient             promapi.Client
+	TLSConfig              *tls.Config
+	AI                     *agentinfo.AgentInfo
+	EtcdClient             *etcdclient.Client
+	Lifecycle              fx.Lifecycle
+	Shutdowner             fx.Shutdowner
+	InstallationModeConfig *agentinfo.InstallationModeConfig  `optional:"true"`
+	SecretManagetClient    *secretmanager.SecretManagerClient `optional:"true"`
+}
+
 func provideAgent(
-	unmarshaller config.Unmarshaller,
-	lis *listener.Listener,
-	promClient promapi.Client,
-	tlsConfig *tls.Config,
-	ai *agentinfo.AgentInfo,
-	etcdClient *etcdclient.Client,
-	lifecycle fx.Lifecycle,
-	shutdowner fx.Shutdowner,
+	in ProvideAgentIn,
 ) (*otelconfig.Provider, error) {
 	var agentCfg agentconfig.AgentOTelConfig
-	if err := unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey("otel", &agentCfg); err != nil {
 		return nil, fmt.Errorf("unmarshalling otel config: %w", err)
 	}
 
@@ -52,14 +61,15 @@ func provideAgent(
 		otelCfg.AddDebugExtensions(&agentCfg.CommonOTelConfig)
 
 		addLogsPipeline(otelCfg, &agentCfg)
-		addTracesPipeline(otelCfg, lis)
-		addMetricsPipeline(otelCfg, &agentCfg, tlsConfig, lis, promClient)
+		addTracesPipeline(otelCfg, in.Lis)
+		addMetricsPipeline(otelCfg, &agentCfg, in.TLSConfig, in.Lis, in.PromClient)
 
 		otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
-		if err := inframeter.AddInfraMeters(otelCfg, allInfraMeters); err != nil {
+		if err := inframeter.AddInfraMeters(
+			otelCfg, allInfraMeters, in.InstallationModeConfig.InstallationMode, in.SecretManagetClient); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
-			utils.Shutdown(shutdowner)
+			utils.Shutdown(in.Shutdowner)
 			return
 		}
 	})
@@ -90,11 +100,11 @@ func provideAgent(
 	}
 
 	// Get Agent Group from host info gatherer
-	agentGroupName := ai.GetAgentGroup()
+	agentGroupName := in.AI.GetAgentGroup()
 	// Scope the sync to the agent group.
 	etcdPath := path.Join(paths.InfraMeterConfigPath,
 		paths.AgentGroupPrefix(agentGroupName))
-	watcher, err := etcdwatcher.NewWatcher(etcdClient, etcdPath)
+	watcher, err := etcdwatcher.NewWatcher(in.EtcdClient, etcdPath)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +115,7 @@ func provideAgent(
 	if err != nil {
 		return nil, fmt.Errorf("creating unmarshal notifier: %w", err)
 	}
-	notifiers.WatcherLifecycle(lifecycle, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
+	notifiers.WatcherLifecycle(in.Lifecycle, watcher, []notifiers.PrefixNotifier{unmarshalNotifier})
 
 	return configProvider, nil
 }
