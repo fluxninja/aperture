@@ -1,9 +1,5 @@
 import path from "path";
 import { fileURLToPath } from "url";
-const packageInfo: {
-  name: string;
-  version: string;
-} = require("./package.json");
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -12,8 +8,8 @@ export const PROTO_PATH = path.resolve(
   "../proto/flowcontrol/check/v1/check.proto",
 );
 
-export const LIBRARY_NAME = packageInfo.name;
-export const LIBRARY_VERSION = packageInfo.version;
+export const LIBRARY_NAME = "@fluxninjutsu/aperture-js";
+export const LIBRARY_VERSION = "2.23.1";
 
 // Label to hold source of flow.
 export const SOURCE_LABEL = "aperture.source";

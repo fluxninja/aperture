@@ -4,6 +4,7 @@
   "description": "Flow control SDK that interfaces with FluxNinja Aperture Agents",
   "main": "./lib/index.js",
   "scripts": {
+    "postversion": "node updateVersion.mjs",
     "prebuild": "rm -rf ./lib",
     "build": "tsc -p tsconfig.json",
     "grpc-client": "npm run build && node ./lib/client.js",
