@@ -188,9 +188,11 @@ func processValidateRules(m map[string]interface{}, rules []string) (required bo
 			// ignore for nested rules (on items or additionalProperties) for now
 			return
 		case "omitempty":
-			if mType == "string" && ok {
-				// add empty string as allowed value in pattern
-				addPattern(m, "^$", "empty")
+			if ok {
+				if mType == "string" {
+					// add empty string as allowed value in pattern
+					addPattern(m, "^$", "empty")
+				}
 			}
 		default:
 			if ok {

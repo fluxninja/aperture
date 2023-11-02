@@ -30,6 +30,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/v2/pkg/prometheus"
+	"github.com/fluxninja/aperture/v2/pkg/secretmanager"
 )
 
 func main() {
@@ -55,6 +56,7 @@ func main() {
 		discovery.Module(),
 		transport.TransportClientModule,
 		agentfunctions.Module,
+		secretmanager.Module(),
 		Module(),
 		// Start collector after all extensions started, so it won't
 		// immediately reload when extensions add their config.

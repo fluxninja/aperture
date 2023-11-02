@@ -37,6 +37,7 @@ func ClusterRoleMutate(cr *rbacv1.ClusterRole, rules []rbacv1.PolicyRule) contro
 func ClusterRoleBindingMutate(crb *rbacv1.ClusterRoleBinding, roleRef rbacv1.RoleRef, subjects []rbacv1.Subject) controllerutil.MutateFn {
 	return func() error {
 		crb.RoleRef = roleRef
+		crb.Subjects = subjects
 		return nil
 	}
 }
