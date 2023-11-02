@@ -121,15 +121,8 @@ complete code snippet is available
 :::info
 
 Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs. [See all SDKs](/integrations/sdk/sdk.md).
+your needs. [See all SDKs](../../sdk/sdk.md).
 
 :::
 
 <!-- vale off -->
-
-## What's next?
-
-<!-- vale on -->
-
-Once the feature control point is set in code, head over to
-[Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md)

@@ -91,4 +91,4 @@ Below are the instructions to install the Aperture Agent on Docker.
    docker rm -f aperture-agent
    ```
 
-[agent-api-keys]: /get-started/api-keys/agent-api-keys.md
+[agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md

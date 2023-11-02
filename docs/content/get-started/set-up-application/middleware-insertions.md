@@ -81,16 +81,9 @@ public class AppController {
 :::info
 
 Aperture provides different middlewares for different java frameworks, which you
-can check out in the [Java section](/integrations/sdk/java/java.md). There are
-examples available for each framework.
+can check out in the [Java section](../../sdk/java/java.md). There are examples
+available for each framework.
 
 :::
 
 <!-- vale off -->
-
-## What's next?
-
-<!-- vale on -->
-
-Once the feature control point is set in code, head over to
-[Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md)
