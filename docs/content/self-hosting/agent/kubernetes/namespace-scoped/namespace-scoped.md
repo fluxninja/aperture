@@ -35,7 +35,7 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/get-started/setup-cli/setup-cli.md)
+2. [aperturectl](/setup-cli/setup-cli.md)
 
    :::info Refer
 
@@ -54,8 +54,7 @@ agent:
 
 :::note
 
-(Relevant to
-[Self-Hosted Aperture Controller](/get-started/self-hosting/self-hosting.md)
+(Relevant to [Self-Hosted Aperture Controller](/self-hosting/self-hosting.md)
 only, ignore this note if using Aperture Cloud Controller).
 
 If you want to install the Aperture Agent using `Helm` or don't want to use the
@@ -107,7 +106,7 @@ your cluster.
 
    If you are using a Self-Hosted Aperture Controller, modify the above
    configuration as explained in
-   [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
+   [Self-Hosting: Agent Configuration](/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -292,4 +291,4 @@ Use the same `values.yaml` file created as part of the
    kubectl delete configmap -l app.kubernetes.io/instance=agent-aperture-agent
    ```
 
-[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md
+[agent-api-keys]: /get-started/api-keys/agent-api-keys.md

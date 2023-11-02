@@ -111,7 +111,7 @@ For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
 :::
 
 More details about particular agent installation modes could be found in
-[Get Started: Self-Hosting Aperture](/get-started/self-hosting/agent/agent.md).
+[Get Started: Self-Hosting Aperture](/self-hosting/agent/agent.md).
 
 Configuration parameters for the FluxNinja Aperture Cloud extension are as
 follows:
@@ -125,8 +125,8 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[self-hosting]: /get-started/self-hosting/self-hosting.md
-[self-hosting-agent]: /get-started/self-hosting/agent/agent.md
+[self-hosting]: /self-hosting/self-hosting.md
+[self-hosting-agent]: /self-hosting/agent/agent.md
 [aperture cloud]: /introduction.md
 [aperture controller]: /architecture/architecture.md#aperture-controller
 [aperture agent]: /architecture/architecture.md#aperture-agent
