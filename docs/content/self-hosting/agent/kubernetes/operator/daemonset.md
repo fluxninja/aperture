@@ -22,7 +22,7 @@ This method requires access to create cluster level resources like ClusterRole,
 ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
-[Namespace-scoped Installation](/get-started/self-hosting/agent/kubernetes/namespace-scoped/namespace-scoped.md)
+[Namespace-scoped Installation](/self-hosting/agent/kubernetes/namespace-scoped/namespace-scoped.md)
 if you do not want to assign the cluster level permissions.
 
 :::
@@ -47,7 +47,7 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/get-started/setup-cli/setup-cli.md)
+2. [aperturectl](/setup-cli/setup-cli.md)
 
    :::info Refer
 
@@ -104,7 +104,7 @@ Kubernetes Objects which will be created by following steps are listed
 
    If you are using a Self-Hosted Aperture Controller, modify the above
    configuration as explained in
-   [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
+   [Self-Hosting: Agent Configuration](/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -233,7 +233,7 @@ Kubernetes Objects which will be created by following steps are listed
 
       If you are using a Self-Hosted Aperture Controller, modify the above
       configuration as explained in
-      [Self-Hosting: Agent Configuration](/get-started/self-hosting/agent/agent.md#agent-self-hosted-controller).
+      [Self-Hosting: Agent Configuration](/self-hosting/agent/agent.md#agent-self-hosted-controller).
 
       :::
 
@@ -248,8 +248,9 @@ Kubernetes Objects which will be created by following steps are listed
       kubectl apply -f agent.yaml
       ```
 
-5. Refer to steps on the [Istio Configuration](/integrations/istio/istio.md) if
-   you do not have the
+5. Refer to steps on the
+   [Istio Configuration](/self-hosting/integrations/istio/istio.md) if you do
+   not have the
    [Envoy Filter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/)
    configured on your cluster.
 
@@ -405,4 +406,4 @@ following these steps:
    kubectl delete crd agents.fluxninja.com
    ```
 
-[agent-api-keys]: /get-started/aperture-cloud/agent-api-keys.md
+[agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md

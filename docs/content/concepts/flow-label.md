@@ -229,9 +229,9 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [control-point]: ./control-point.md
 [otel-conventions]:
   https://github.com/open-telemetry/opentelemetry-specification/blob/v1.25.0/specification/trace/semantic_conventions/http.md
-[aperture-sdks]: /integrations/sdk/sdk.md
-[gateways]: /integrations/gateway/gateway.md
-[istio]: /integrations/istio/istio.md
+[aperture-sdks]: /sdk/sdk.md
+[gateways]: /self-hosting/integrations/gateway/gateway.md
+[istio]: /self-hosting/integrations/istio/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
 [aperturectl]: ../reference/aperturectl/flow-control/preview/
 [label-matcher]: ./selector.md#label-matcher

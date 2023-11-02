@@ -93,9 +93,8 @@ Controller][aperture-cloud-controller] instead of deploying your own.
 
 Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the
-[Supported Linux platforms](/get-started/self-hosting/supported-platforms.md).
-The installation steps are available
-[here](/get-started/self-hosting/agent/bare-metal.md).
+[Supported Linux platforms](/self-hosting/supported-platforms.md). The
+installation steps are available [here](/self-hosting/agent/bare-metal.md).
 
 ### What are Aperture Agent's performance numbers? {#agent-performance}
 
@@ -105,11 +104,11 @@ With the following setup:
 
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
-  [DaemonSet](/get-started/self-hosting/agent/kubernetes/operator/daemonset.md)
+  [DaemonSet](/self-hosting/agent/kubernetes/operator/daemonset.md)
 - 1 policy with a [rate limiter][rate-limiter], a [load
   scheduler][load-scheduler] and a [flux meter][flux-meter]
 - 3 services in `demoapp` namespace instrumented using
-  [Istio Integration](/integrations/istio/istio.md)
+  [Istio Integration](/self-hosting/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate over 30 minutes
 
 The following results were observed:
