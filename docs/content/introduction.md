@@ -103,5 +103,5 @@ beneficial.
 
 [cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
-[architecture]: /architecture/architecture.md
+[architecture]: /self-hosting/architecture.md
 [self-hosted]: /self-hosting/self-hosting.md

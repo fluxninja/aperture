@@ -23,4 +23,4 @@ traffic.
 [cloud-controller]: /reference/fluxninja.md#cloud-controller
 [cloud-agent]: /reference/fluxninja.md#cloud-agent
 [extension-config]: /reference/fluxninja.md#configuration
-[setup-integrations]: /integrations/integrations.md
+[setup-integrations]: /self-hosting/integrations/integrations.md

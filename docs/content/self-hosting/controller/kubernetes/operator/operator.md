@@ -22,7 +22,7 @@ This method requires access to create cluster level resources such as
 ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
-[Namespace-scoped Installation](/get-started/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md)
+[Namespace-scoped Installation](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md)
 if you do not want to assign the cluster level permissions.
 
 :::
