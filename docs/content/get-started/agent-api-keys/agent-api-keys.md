@@ -10,7 +10,7 @@ sidebar_position: 2
 import Zoom from 'react-medium-image-zoom';
 ```
 
-Aperture Cloud uses API keys to authenticate requests coming from
+Aperture Cloud uses Agent API keys to authenticate requests coming from
 [SDK integrations](/sdk/sdk.md), [self-hosted Agents][Agents] and [self-hosted
 Controllers][Controllers]. You can create API keys for your project in the
 Aperture Cloud UI.
@@ -25,8 +25,9 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
    project-specific. You need to create a new API key for each project._
 2. Now, from the left sidebar, click **Aperture**.
 3. Click **Agent API Keys** tab.
-4. Click **Create new agent API key**.
-5. Copy the API key and save it in a secure location.
+4. Click **Create Agent API key**.
+5. Copy the API key and save it in a secure location. This key will be used
+   during [SDK integrations](/sdk/sdk.md) or [self-hosted Agents][Agents] .
 
 ![API Keys](./assets/api-keys.gif "Creating API Keys for sudhanshu-demo-docs project")
 

@@ -77,9 +77,7 @@ To sign-up to Aperture Cloud, [click here][sign-up].
 
 ## ✨ Get started {#get-started}
 
-- [**Setting up your application**](get-started/set-up-application/set-up-application.md)
-- [**Set up CLI (aperturectl)**](/setup-cli/setup-cli.md)
-- [**Your first policy**](get-started/policies/policies.md)
+- [**Get Started**](get-started/get-started.md)
 - [**Guides**](guides/guides.md)
 
 ## 📖 Learn {#learn}

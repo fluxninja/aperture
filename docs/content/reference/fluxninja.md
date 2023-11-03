@@ -28,7 +28,7 @@ export const ExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-${component}-apikey
         key: apiKey
-      value: AGENT_API_KEY
+      value: "AGENT_API_KEY"
 `}</CodeBlock>
 );
 ```
@@ -47,12 +47,12 @@ export const CloudExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: AGENT_API_KEY
+      value: "AGENT_API_KEY"
 `}</CodeBlock>
 );
 ```
 
-FluxNinja Aperture Cloud extension enables [Aperture Cloud][] integration for
+This extension enables [Aperture Cloud][] integration for
 [self-hosted][self-hosting] Aperture Agents and Controllers. It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
