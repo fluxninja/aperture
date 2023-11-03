@@ -300,4 +300,4 @@ label_matcher:
 [load-scheduler]: ./scheduler/load-scheduler.md
 [classifier]: ./classifier.md
 [label-matcher]: /reference/configuration/spec.md#label-matcher
-[gateway]: /integrations/gateway/gateway.md
+[gateway]: /self-hosting/integrations/gateway/gateway.md

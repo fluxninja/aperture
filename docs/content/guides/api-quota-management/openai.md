@@ -70,22 +70,18 @@ Before creating a policy, a control point needs to be defined. Control Point
 specifies where the policy should apply the decisions. There are multiple ways
 to achieve this; for the scope of this guide, a JavaScript SDK is used to create
 a control point—check out the [Control Point](/concepts/control-point.md)
-Concept & [Integrations](/self-hosting/integrations/integrations.md) section for
-more details.
+Concept & [Integrations](/sdk/sdk.md) section for more details.
 
 ### Control Point with JavaScript SDK
 
 :::info
 
-💡
-[Check out other language SDKs supported by Aperture](/self-hosting/integrations/integrations.md)
-
-:::
+💡 [Check out other language SDKs supported by Aperture](/sdk/sdk.md) :::
 
 The Aperture JavaScript SDK allows you to set a control point manually. How an
 Aperture Client instance is created is not discussed in this guide; detailed
 information around SDK integration can be found in
-[Manually setting feature control points using JavaScript SDK](/integrations/sdk/javascript/manually-setting-feature-control-points-using-javascript-sdk).
+[Manually setting feature control points using JavaScript SDK](/sdk/javascript/manually-setting-feature-control-points-using-javascript-sdk).
 
 The code below provides a general idea of control point creation and setting
 labels.

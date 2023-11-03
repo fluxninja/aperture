@@ -20,7 +20,7 @@ automatically added into them using [Aperture Instrumentation Agent][javaagent].
 
 You can create an Agent API key for your project in the Aperture Cloud UI. For
 more information, refer to
-[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+[Agent API Keys](/get-started/agent-api-keys/agent-api-keys.md).
 
 :::
 
@@ -75,4 +75,4 @@ refer to the [example app][armeria-example] available in the repository.
 
 [armeria-example]:
   https://github.com/fluxninja/aperture-java/blob/releases/aperture-java/v2.1.0/examples/armeria-example/src/main/java/com/fluxninja/example/ArmeriaClient.java
-[javaagent]: /integrations/sdk/java/auto-instrumentation.md
+[javaagent]: /sdk/java/auto-instrumentation.md

@@ -226,7 +226,8 @@ playground/tilt_local.json
 
 # do not ignore cmd/aperturectl/cmd/build
 !cmd/aperturectl/cmd/build
-!docs/content/reference/aperturectl/build
+!docs/content/reference/aperture-cli/aperturectl/build
+
 
 
 # ignore .github/styles except for .github/styles/Vocab/FluxNinja
