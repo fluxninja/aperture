@@ -122,7 +122,7 @@ keywords:
 	if strings.HasSuffix(filename, "aperturectl.md") {
 		template += `:::info
 
-For installation instructions, see [Set up CLI (aperturectl)](/reference/aperture-cli/aperture-cli.mdd).
+For installation instructions, see [Aperture CLI Docs](/reference/aperture-cli/aperture-cli.md).
 
 :::
 
