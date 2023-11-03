@@ -37,7 +37,7 @@ type SecretManagerClient struct {
 }
 
 func provideSecretManagerClient(in SecretManagerClientIn) (*SecretManagerClient, error) {
-	if in.InstallationModeConfig.InstallationMode != utils.InstallationModeCloudAgent {
+	if in.InstallationModeConfig == nil || in.InstallationModeConfig.InstallationMode != utils.InstallationModeCloudAgent {
 		return nil, nil
 	}
 
