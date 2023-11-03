@@ -64,9 +64,9 @@ Aperture Cloud Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture Agents won't be able to work.
-While it's possible to [self-host][self-hosting] Aperture Controller, Aperture
-Cloud Controller can be used instead.
+Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture
+Agents won't be able to work. While it's possible to [self-host][self-hosting]
+Aperture Controller, Aperture Cloud Controller can be used instead.
 
 Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture
 Cloud.
@@ -128,5 +128,5 @@ How various components interact with the extension:
 [self-hosting]: /self-hosting/self-hosting.md
 [self-hosting-agent]: /self-hosting/agent/agent.md
 [aperture cloud]: /introduction.md
-[aperture controller]: /architecture/architecture.md#aperture-controller
-[aperture agent]: /architecture/architecture.md#aperture-agent
+[aperture controller]: /self-hosting/architecture.md#aperture-controller
+[aperture agent]: /self-hosting/architecture.md#aperture-agent

@@ -1,35 +1,26 @@
 ---
-title: Create Your First Policy
-sidebar_label: Create Your First Policy
-description: How to generate and apply policies in Aperture
+title: Manage Policies
+description: How to generate and apply policies in Aperture using aperturectl
 keywords:
   - policy
   - jsonnet
   - grafana
   - policy
-sidebar_position: 3
+sidebar_position: 6
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
+import {apertureVersion} from '../../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Introduction
-
-To simplify the process of creating policies in Aperture, the built-in blueprint
-system can be utilized. The Aperture repository contains several
-[blueprints][blueprints] that can generate [policies][policies], and [Grafana
-dashboards][grafana]. These blueprints serve as starting points for creating new
-policies, or can be used as-is by providing the required parameters or
-customizations. The [guides](/guides/guides.md) section showcases practical
-examples of blueprints in action.
-
-To manage blueprints and generate policies, use the
-[aperturectl](/reference/aperture-cli/aperturectl/aperturectl.md) CLI.
+`aperturectl` is a powerful CLI that complements the Aperture Cloud UI. With
+aperturectl, you can also manage blueprints and generate policies, dashboards,
+and graphs. In this overview, you'll explore the various commands available in
+aperturectl for managing and creating policies using blueprints.
 
 <Zoom>
 
@@ -250,6 +241,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [blueprints]: /reference/blueprints/blueprints.md
-[policies]: /concepts/advanced/policy.md
-[grafana]: https://grafana.com/docs/grafana/latest/dashboards/
 [aperture-cloud]: /introduction.md

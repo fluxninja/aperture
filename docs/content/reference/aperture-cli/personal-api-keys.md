@@ -3,7 +3,7 @@ title: Personal API Keys
 keywords:
   - Personal-API-keys
   - aperture-cloud
-sidebar_position: 9
+sidebar_position: 5
 ---
 
 ```mdx-code-block

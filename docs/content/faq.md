@@ -123,5 +123,5 @@ The following results were observed:
 [flux-meter]: /concepts/flux-meter.md
 [classifier]: /concepts/classifier.md
 [flow-label]: /concepts/flow-label.md
-[aperture-controller]: /architecture/architecture.md#aperture-controller
+[aperture-controller]: /self-hosting/architecture.md#aperture-controller
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller
