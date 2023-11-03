@@ -54,8 +54,15 @@ func provideHealthClient(GRPClientConnectionBuilder grpcclient.ClientConnectionB
 	return healthClient, nil
 }
 
+// RegisterHealthServerIn bundles and annotates parameters.
+type RegisterHealthServerIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	HealthServer *health.Server
+}
+
 // RegisterHealthServer registers health server to grpc_health_v1 api and sets default statuses.
-func RegisterHealthServer(srv *grpc.Server, healthsrv *health.Server) {
+func RegisterHealthServer(in RegisterHealthServerIn) {
 	// It registers empty name server implicitly
-	grpc_health_v1.RegisterHealthServer(srv, healthsrv)
+	grpc_health_v1.RegisterHealthServer(in.Server, in.HealthServer)
 }

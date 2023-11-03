@@ -16,6 +16,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	googletoken "github.com/fluxninja/aperture/v2/pkg/google"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -24,34 +25,22 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-// Fx tag to match etcd watcher name.
-var (
-	policiesEtcdWatcherFxTag              = "policies-driver"
-	policiesDynamicConfigEtcdWatcherFxTag = "policies-dynamic-config-driver"
-)
-
 // policyFactoryModule module for policy factory.
 func policyFactoryModule() fx.Option {
 	return fx.Options(
-		etcdwatcher.Constructor{Name: policiesEtcdWatcherFxTag, EtcdPath: paths.PoliciesConfigPath}.Annotate(),
-		etcdwatcher.Constructor{Name: policiesDynamicConfigEtcdWatcherFxTag, EtcdPath: paths.PoliciesDynamicConfigPath}.Annotate(),
 		fx.Provide(
 			fx.Annotate(
 				providePolicyFactory,
 				fx.ParamTags(
-					config.NameTag(policiesEtcdWatcherFxTag),
-					config.NameTag(policiesDynamicConfigEtcdWatcherFxTag),
 					iface.FxOptionsFuncTag,
 					alerts.AlertsFxTag,
 				),
 			),
-		),
-		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
-		fx.Provide(
 			fx.Annotate(
 				RegisterPolicyService,
 			),
 		),
+		grpcgateway.RegisterHandler{Handler: policylangv1.RegisterPolicyServiceHandlerFromEndpoint}.Annotate(),
 		prom.Module(),
 		googletoken.Module(),
 		policyModule(),
@@ -60,25 +49,21 @@ func policyFactoryModule() fx.Option {
 
 // PolicyFactory factory for policies.
 type PolicyFactory struct {
-	lock                             sync.RWMutex
-	circuitJobGroup                  *jobs.JobGroup
-	etcdClient                       *etcdclient.Client
-	sessionScopedKV                  *etcdclient.SessionScopedKV
-	prometheusEnforcer               *prom.PrometheusEnforcer
 	alerterIface                     alerts.Alerter
 	registry                         status.Registry
 	policiesDynamicConfigEtcdWatcher notifiers.Watcher
-	policyTracker                    map[string]*policysyncv1.PolicyWrapper
+	circuitJobGroup                  *jobs.JobGroup
+	etcdClient                       *etcdclient.Client
+	prometheusEnforcer               *prom.PrometheusEnforcer
+	policyTracker                    map[string]*policysyncv1.PolicyWrapper // keyed by wrapper.CommonAttributes.PolicyName
+	lock                             sync.RWMutex
 }
 
 // Main fx app.
 func providePolicyFactory(
-	policiesEtcdWatcher notifiers.Watcher,
-	policiesDynamicConfigEtcdWatcher notifiers.Watcher,
 	fxOptionsFuncs []notifiers.FxOptionsFunc,
 	alerterIface alerts.Alerter,
 	etcdClient *etcdclient.Client,
-	sessionScopedKV *etcdclient.SessionScopedKV,
 	enforcer *prom.PrometheusEnforcer,
 	lifecycle fx.Lifecycle,
 	registry status.Registry,
@@ -93,11 +78,20 @@ func providePolicyFactory(
 		return nil, err
 	}
 
+	policiesDynamicConfigEtcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, paths.PoliciesDynamicConfigPath)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create policies dynamic config watcher")
+	}
+
+	policiesConfigEtcdWatcher, err := etcdwatcher.NewWatcher(etcdClient, paths.PoliciesConfigPath)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create policies config watcher")
+	}
+
 	factory := &PolicyFactory{
 		registry:                         policiesStatusRegistry,
 		circuitJobGroup:                  circuitJobGroup,
 		etcdClient:                       etcdClient,
-		sessionScopedKV:                  sessionScopedKV,
 		prometheusEnforcer:               enforcer,
 		alerterIface:                     alerterIface,
 		policiesDynamicConfigEtcdWatcher: policiesDynamicConfigEtcdWatcher,
@@ -112,12 +106,15 @@ func providePolicyFactory(
 	fxDriver, err := notifiers.NewFxDriver(
 		policiesStatusRegistry,
 		prometheusRegistry,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		config.NewProtobufUnmarshaller,
 		optionsFunc,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	notifiers.WatcherLifecycle(lifecycle, policiesDynamicConfigEtcdWatcher, []notifiers.PrefixNotifier{})
+	notifiers.WatcherLifecycle(lifecycle, policiesConfigEtcdWatcher, []notifiers.PrefixNotifier{fxDriver})
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -137,7 +134,6 @@ func providePolicyFactory(
 		},
 	})
 
-	notifiers.NotifierLifecycle(lifecycle, policiesEtcdWatcher, fxDriver)
 	return factory, nil
 }
 
@@ -172,7 +168,6 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 			),
 			factory.circuitJobGroup,
 			factory.etcdClient,
-			factory.sessionScopedKV,
 			factory.prometheusEnforcer,
 			factory.alerterIface,
 			&wrapperMessage,
@@ -183,20 +178,25 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 }
 
 func (factory *PolicyFactory) trackPolicy(wrapperMessage *policysyncv1.PolicyWrapper, lifecycle fx.Lifecycle) {
+	policyName := wrapperMessage.GetCommonAttributes().GetPolicyName()
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			factory.lock.Lock()
 			defer factory.lock.Unlock()
-			factory.policyTracker[wrapperMessage.GetCommonAttributes().GetPolicyName()] = wrapperMessage
+			factory.policyTracker[policyName] = wrapperMessage
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			factory.lock.Lock()
 			defer factory.lock.Unlock()
-			delete(factory.policyTracker, wrapperMessage.GetCommonAttributes().GetPolicyName())
+			delete(factory.policyTracker, policyName)
 			return nil
 		},
 	})
+	lifecycle.Append(fx.StartStopHook(
+		func() { log.Info().Str("policy", policyName).Msg("Policy loaded to controller") },
+		func() { log.Info().Str("policy", policyName).Msg("Unloading policy from controller") },
+	))
 }
 
 // GetPolicyWrappers returns all policy wrappers.
@@ -204,37 +204,20 @@ func (factory *PolicyFactory) GetPolicyWrappers() map[string]*policysyncv1.Polic
 	factory.lock.RLock()
 	defer factory.lock.RUnlock()
 	// deepcopy wrappers
-	policyWrappers := make(map[string]*policysyncv1.PolicyWrapper)
+	policyWrappers := make(map[string]*policysyncv1.PolicyWrapper, len(factory.policyTracker))
 	for k, v := range factory.policyTracker {
 		policyWrappers[k] = proto.Clone(v).(*policysyncv1.PolicyWrapper)
 	}
 	return policyWrappers
 }
 
-// GetPolicies returns all policies.
-func (factory *PolicyFactory) GetPolicies() *policylangv1.Policies {
-	policyWrappers := factory.GetPolicyWrappers()
-	policies := make(map[string]*policylangv1.GetPolicyResponse)
-	for _, v := range policyWrappers {
-		policies[v.GetCommonAttributes().GetPolicyName()] = &policylangv1.GetPolicyResponse{
-			Policy: proto.Clone(v.GetPolicy()).(*policylangv1.Policy),
-			Status: policylangv1.GetPolicyResponse_VALID,
-		}
+// GetPolicyWrapper returns policy wrapper matching given name.
+func (factory *PolicyFactory) GetPolicyWrapper(name string) *policysyncv1.PolicyWrapper {
+	factory.lock.RLock()
+	defer factory.lock.RUnlock()
+	policyWrapper, exists := factory.policyTracker[name]
+	if !exists {
+		return nil
 	}
-	return &policylangv1.Policies{
-		Policies: policies,
-	}
-}
-
-// GetPolicy returns policy matching given name.
-func (factory *PolicyFactory) GetPolicy(name string) *policylangv1.Policy {
-	policyWrappers := factory.GetPolicyWrappers()
-	var policy *policylangv1.Policy
-	for _, v := range policyWrappers {
-		if v.GetCommonAttributes().GetPolicyName() == name {
-			policy = proto.Clone(v.GetPolicy()).(*policylangv1.Policy)
-			break
-		}
-	}
-	return policy
+	return proto.Clone(policyWrapper).(*policysyncv1.PolicyWrapper)
 }

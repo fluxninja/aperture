@@ -1,19 +1,20 @@
 # Generated values file for load-scheduling/average-latency blueprint
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
+blueprint: load-scheduling/average-latency
 
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
-  service_protection_core:
-    # Parameters for Adaptive Load Scheduler.
-    # Type: aperture.spec.v1.AdaptiveLoadSchedulerParameters
+  load_scheduling_core:
+    # Parameters for AIMD throttling strategy.
+    # Type: aperture.spec.v1.AIMDLoadSchedulerParameters
     # Required: True
-    adaptive_load_scheduler:
+    aimd_load_scheduler:
       alerter:
-        alert_name: "Load Throttling Event"
+        alert_name: "AIMD Load Throttling Event"
       gradient:
         max_gradient: 1
         min_gradient: 0.1
@@ -22,7 +23,6 @@ policy:
       load_scheduler:
         selectors:
           - control_point: __REQUIRED_FIELD__
-            service: __REQUIRED_FIELD__
       max_load_multiplier: 2
   latency_baseliner:
     # Flux Meter defines the scope of latency measurements.
@@ -31,4 +31,3 @@ policy:
     flux_meter:
       selectors:
         - control_point: __REQUIRED_FIELD__
-          service: __REQUIRED_FIELD__

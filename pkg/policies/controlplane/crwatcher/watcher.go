@@ -3,10 +3,8 @@ package crwatcher
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -17,26 +15,28 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/operator/api"
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 )
 
 // watcher holds the state of the watcher.
 type watcher struct {
-	waitGroup sync.WaitGroup
+	waitGroup panichandler.WaitGroup
 	notifiers.Trackers
 	policyDynamicConfigTrackers notifiers.Trackers
 	ctx                         context.Context
@@ -66,10 +66,7 @@ func NewWatcher(policyTrackers, policyDynamicConfigTrackers notifiers.Trackers) 
 
 // Start starts the watcher go routines and handles Policy Custom resource events from Kubernetes.
 func (w *watcher) Start() error {
-	w.waitGroup.Add(1)
-
-	panichandler.Go(func() {
-		defer w.waitGroup.Done()
+	w.waitGroup.Go(func() {
 		operation := func() error {
 			ctrl.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
 			scheme := runtime.NewScheme()
@@ -79,11 +76,19 @@ func (w *watcher) Start() error {
 			utilruntime.Must(api.AddToScheme(scheme))
 
 			mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-				Scheme:             scheme,
-				MetricsBindAddress: "0",
-				LeaderElection:     false,
-				Namespace:          os.Getenv("APERTURE_CONTROLLER_NAMESPACE"),
-			})
+				Scheme: scheme,
+				Metrics: server.Options{
+					BindAddress: "0",
+				},
+				LeaderElection: false,
+				NewCache: func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
+					opts.DefaultNamespaces = map[string]cache.Config{
+						os.Getenv("APERTURE_CONTROLLER_NAMESPACE"): {},
+					}
+					return cache.New(config, opts)
+				},
+			},
+			)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to create Kubernetes Reconciler for Policy")
 				return nil
@@ -212,17 +217,14 @@ func (w *watcher) updateStatus(ctx context.Context, instance *policyv1alpha1.Pol
 
 // reconcilePolicy sends a write event to notifier to get it uploaded on the Etcd.
 func (w *watcher) reconcilePolicy(ctx context.Context, instance *policyv1alpha1.Policy) error {
-	policySpec := &languagev1.Policy{}
+	policySpec := &policylangv1.Policy{}
 	unmarshalErr := config.UnmarshalYAML(instance.Spec.Raw, policySpec)
 	if unmarshalErr != nil {
 		log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
 		return unmarshalErr
 	}
 
-	policyMessage := &iface.PolicyMessage{
-		Policy: policySpec,
-	}
-	bytes, err := json.Marshal(policyMessage)
+	bytes, err := policySpec.MarshalJSON()
 	if err != nil {
 		return err
 	}

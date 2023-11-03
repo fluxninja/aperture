@@ -23,12 +23,17 @@ type FlowControlHandler struct {
 
 // Check is a dummy Check handler.
 func (f *FlowControlHandler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*flowcontrolv1.CheckResponse, error) {
-	log.Trace().Msg("Received FlowControl Check request")
+	log.Trace().Msgf("Check request: %+v", req)
 
 	services := []string{}
 	rpcPeer, peerExists := peer.FromContext(ctx)
 	if peerExists {
 		services = append(services, rpcPeer.Addr.String())
+	}
+
+	// log the deadline of the request
+	if deadline, ok := ctx.Deadline(); ok {
+		log.Trace().Msgf("Deadline: %s, timeout: %s", deadline, time.Until(deadline))
 	}
 
 	start := time.Now()

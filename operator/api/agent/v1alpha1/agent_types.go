@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
@@ -57,6 +59,35 @@ type AgentSpec struct {
 	// ControllerClientCertConfig configuration.
 	//+kubebuilder:validation:Optional
 	ControllerClientCertConfig common.ControllerClientCertConfig `json:"controller_client_cert"`
+
+	// DeploymentConfigSpec defines the deployment configuration of the agent.
+	// This is an experimental feature. Only DaemonSet is supported.
+	//+kubebuilder:validation:Optional
+	DeploymentConfigSpec DeploymentConfigSpec `json:"deployment_config"`
+
+	// NameOverride overrides the name of the resources created for agent.
+	// This is an experimental feature.
+	//+kubebuilder:validation:Optional
+	NameOverride string `json:"name_override"`
+}
+
+// DeploymentConfigSpec defines the deployment configuration of the agent.
+type DeploymentConfigSpec struct {
+	// Type of the deployment.
+	//+kubebuilder:validation:Optional
+	Type string `json:"type" default:"DaemonSet" validate:"oneof=deployment Deployment DaemonSet daemonset"`
+
+	// Number of replicas when type is set to Deployment.
+	//+kubebuilder:validation:Optional
+	Replicas int32 `json:"replicas,omitempty" default:"1" validate:"gt=0"`
+
+	// TopologySpreadConstraints to be applied to the deployment.
+	//+kubebuilder:validation:Optional
+	TopologySpreadConstraints []corev1.TopologySpreadConstraint `json:"topology_spread_constraints,omitempty"`
+
+	// Strategy to be applied to the deployment upgrades.
+	//+kubebuilder:validation:Optional
+	Strategy appsv1.DeploymentStrategy `json:"strategy,omitempty"`
 }
 
 // AgentConfigSpec holds agent configuration.

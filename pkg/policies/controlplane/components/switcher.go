@@ -12,7 +12,9 @@ import (
 )
 
 // Switcher switches between two inputs based on third input.
-type Switcher struct{}
+type Switcher struct {
+	componentID runtime.ComponentID
+}
 
 // Name implements runtime.Component.
 func (*Switcher) Name() string { return "Switcher" }
@@ -30,13 +32,15 @@ func (*Switcher) IsActuator() bool { return false }
 var _ runtime.Component = (*Switcher)(nil)
 
 // NewSwitcherAndOptions creates a new Switcher Component.
-func NewSwitcherAndOptions(_ *policylangv1.Switcher, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
-	switcher := Switcher{}
+func NewSwitcherAndOptions(_ *policylangv1.Switcher, componentID runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+	switcher := Switcher{
+		componentID: componentID,
+	}
 	return &switcher, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (dec *Switcher) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	onSignal := inPortReadings.ReadSingleReadingPort("on_signal")
 	offSignal := inPortReadings.ReadSingleReadingPort("off_signal")
 	switchValue := inPortReadings.ReadSingleReadingPort("switch")

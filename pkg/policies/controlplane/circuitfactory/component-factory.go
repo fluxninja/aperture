@@ -12,7 +12,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/controller"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
@@ -30,10 +29,9 @@ func FactoryModule() fx.Option {
 }
 
 // FactoryModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+func FactoryModuleForPolicyApp(circuitAPI runtime.CircuitSuperAPI) fx.Option {
 	return fx.Options(
 		autoScaleModuleForPolicyApp(circuitAPI),
-		promql.ModuleForPolicyApp(circuitAPI),
 	)
 }
 
@@ -46,7 +44,7 @@ func NewComponentAndOptions(
 	var ctor componentConstructor
 	switch config := componentProto.Component.(type) {
 	case *policylangv1.Component_GradientController:
-		ctor = mkCtor(config.GradientController, controller.NewGradientControllerAndOptions)
+		ctor = mkCtor(config.GradientController, components.NewGradientControllerAndOptions)
 	case *policylangv1.Component_PidController:
 		ctor = mkCtor(config.PidController, components.NewPIDControllerAndOptions)
 	case *policylangv1.Component_Ema:
@@ -97,6 +95,8 @@ func NewComponentAndOptions(
 		ctor = mkCtor(config.NestedSignalEgress, components.NewNestedSignalEgressAndOptions)
 	case *policylangv1.Component_NestedCircuit:
 		return NewNestedCircuitAndOptions(config.NestedCircuit, componentID, policyReadAPI)
+	case *policylangv1.Component_PolynomialRangeFunction:
+		ctor = mkCtor(config.PolynomialRangeFunction, components.NewPolynomialRangeFunctionAndOptions)
 	case *policylangv1.Component_Query:
 		query := componentProto.GetQuery()
 		switch queryConfig := query.Component.(type) {
@@ -125,7 +125,6 @@ func NewComponentAndOptions(
 				log.Error().Err(err).Msg("unknown flow control type")
 				return Tree{}, nil, nil, err
 			}
-
 		default:
 			return newFlowControlNestedAndOptions(flowControl, componentID, policyReadAPI)
 		}

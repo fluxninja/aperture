@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Example
 # FORMAT=png ./docs/tools/mermaid/generate_mermaid.sh ./docs/content/applying-policies/load-scheduling/assets/workload-prioritization/graph.mmd

@@ -1185,7 +1185,7 @@ type AutoScaler_ScalingParameters struct {
 	ScaleInCooldown *durationpb.Duration `protobuf:"bytes,4,opt,name=scale_in_cooldown,json=scaleInCooldown,proto3" json:"scale_in_cooldown,omitempty" default:"120s"` // @gotags: default:"120s"
 	// Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
 	// For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-	// scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+	// scale-increases by 10% or more, the previous cooldown is canceled. Defaults to 50%.
 	CooldownOverridePercentage float64 `protobuf:"fixed64,5,opt,name=cooldown_override_percentage,json=cooldownOverridePercentage,proto3" json:"cooldown_override_percentage,omitempty" default:"50"` // @gotags: default:"50"
 	// Configuration for scale-out Alerter.
 	ScaleOutAlerter *Alerter_Parameters `protobuf:"bytes,6,opt,name=scale_out_alerter,json=scaleOutAlerter,proto3" json:"scale_out_alerter,omitempty" validate:"required"` // @gotags: validate:"required"

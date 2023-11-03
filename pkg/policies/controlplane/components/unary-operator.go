@@ -97,7 +97,7 @@ func NewUnaryOperatorAndOptions(unaryOperatorProto *policylangv1.UnaryOperator, 
 }
 
 // Execute implements runtime.Component.Execute.
-func (unaryOperator *UnaryOperator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (unaryOperator *UnaryOperator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
 	output := runtime.InvalidReading()
 

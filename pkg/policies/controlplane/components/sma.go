@@ -61,7 +61,7 @@ func (sma *SMA) ShortDescription() string {
 func (*SMA) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
-func (sma *SMA) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (sma *SMA) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
 	var output runtime.Reading
 

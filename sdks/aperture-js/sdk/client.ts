@@ -1,51 +1,75 @@
-import grpc from "@grpc/grpc-js";
+import grpc, {
+  ChannelCredentials,
+  ChannelOptions,
+  connectivityState,
+} from "@grpc/grpc-js";
 import * as otelApi from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { serializeError } from "serialize-error";
+import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
+import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 
+import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
 import { Flow } from "./flow.js";
-import { fcs, FlowControlService } from "./utils.js";
-import {
-  FLOW_START_TIMESTAMP_LABEL,
-  LIBRARY_NAME,
-  LIBRARY_VERSION,
-  SOURCE_LABEL,
-  URL,
-  WORKLOAD_START_TIMESTAMP_LABEL,
-} from "./consts.js";
+import { fcs } from "./utils.js";
 
-/**
- * Types to be exported from package
- */
-export type { FlowControlService, Flow };
-
-export { grpc };
-
-type ControlPoint = unknown;
-type Label = [string, string];
+export interface FlowParams {
+  labels?: Record<string, string>;
+  rampMode?: boolean;
+  grpcCallOptions?: grpc.CallOptions;
+  tryConnect?: boolean;
+}
 
 export class ApertureClient {
-  public readonly fcsClient: FlowControlService;
+  private readonly fcsClient: FlowControlServiceClient;
 
-  public readonly exporter: OTLPTraceExporter;
+  private readonly exporter: OTLPTraceExporter;
 
-  public readonly tracerProvider: NodeTracerProvider;
+  private readonly tracerProvider: NodeTracerProvider;
 
-  public readonly tracer: Tracer;
-
-  public readonly timeout: number;
+  private readonly tracer: Tracer;
 
   constructor({
-    timeout = 200,
-    channelCredentials = grpc.credentials.createInsecure(),
-  } = {}) {
-    this.fcsClient = new fcs.FlowControlService(URL, channelCredentials);
+    address,
+    agentAPIKey,
+    channelCredentials,
+    channelOptions = {},
+  }: {
+    address: string;
+    channelCredentials: ChannelCredentials;
+    channelOptions?: ChannelOptions;
+    agentAPIKey?: string;
+  }) {
+    if (!address) {
+      throw new Error("address is required");
+    }
+
+    if (agentAPIKey) {
+      channelCredentials = grpc.credentials.combineChannelCredentials(
+        channelCredentials,
+        grpc.credentials.createFromMetadataGenerator(
+          (_params: any, callback: any) => {
+            const metadata = new grpc.Metadata();
+            metadata.add("x-api-key", agentAPIKey);
+            callback(null, metadata);
+          },
+        ),
+      );
+    }
+
+    this.fcsClient = new fcs.FlowControlService(
+      address,
+      channelCredentials,
+      channelOptions,
+    );
 
     this.exporter = new OTLPTraceExporter({
-      url: URL,
+      url: address,
       credentials: channelCredentials,
     });
 
@@ -58,69 +82,94 @@ export class ApertureClient {
     this.tracerProvider.register();
     this.tracer = this.tracerProvider.getTracer(LIBRARY_NAME, LIBRARY_VERSION);
 
-    this.timeout = timeout;
+    const kickChannel = () => {
+      const state = this.fcsClient.getChannel().getConnectivityState(true);
+      if (state != connectivityState.SHUTDOWN) {
+        this.fcsClient
+          .getChannel()
+          .watchConnectivityState(state, Infinity, kickChannel);
+      }
+    };
+    kickChannel();
   }
 
   // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
   // Return value is a Flow.
-  // The call returns immediately in case connection with Aperture Agent is not established.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-  async StartFlow(controlPointArg: ControlPoint, labelsArg: Iterable<Label>) {
-    return new Promise<Flow>((resolve, reject) => {
-      let labelsMap = new Map<string, string>();
-      let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
-
-      if (baggage !== undefined) {
-        for (const member of baggage.getAllEntries()) {
-          labelsMap.set(member[0], member[1].value);
-        }
+  async StartFlow(
+    controlPoint: string,
+    params: FlowParams = {},
+  ): Promise<Flow> {
+    return new Promise<Flow>((resolve) => {
+      if (params.rampMode === undefined) {
+        params.rampMode = false;
       }
-
-      let mergedLabels = new Map<string, string>([...labelsMap, ...labelsArg]);
       let span = this.tracer.startSpan("Aperture Check");
-      span.setAttribute(FLOW_START_TIMESTAMP_LABEL, Date.now());
-      span.setAttribute(SOURCE_LABEL, "sdk");
-      let flow = new Flow(span);
+      let startDate = Date.now();
 
-      let checkParams = { deadline: 0 };
-      if (this.timeout != null && this.timeout != 0) {
-        checkParams = { deadline: Date.now() + this.timeout };
-      }
+      const resolveFlow = (response: any, err: any) => {
+        resolve(new Flow(span, startDate, params.rampMode, response, err));
+      };
 
-      this.fcsClient.Check(
-        {
-          control_point: controlPointArg,
-          labels: mergedLabels,
-        },
-        checkParams,
-        (err, response) => {
-          span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
-
-          if (err) {
-            if (flow.failOpen) {
-              // Accept the request if failOpen is true even if we encounter an error
-              console.log(
-                `Aperture server unavailable due to ${JSON.stringify(
-                  err
-                )}. Accepting request.`
-              );
-              flow.checkResponse = null;
-            } else {
-              // Reject the request if failOpen is false if we encounter an error
-              reject(err);
-            }
-          } else {
-            flow.checkResponse = response;
+      try {
+        // check connection state
+        // if not ready, return flow with fail-to-wire semantics
+        // if ready, call check
+        if (params.tryConnect === undefined || params.tryConnect == false) {
+          const state = this.fcsClient.getChannel().getConnectivityState(true);
+          if (
+            state != connectivityState.READY &&
+            state != connectivityState.IDLE
+          ) {
+            resolveFlow(
+              null,
+              serializeError(
+                new Error(
+                  `connection with Aperture Agent is not established, state: ${state}`,
+                ),
+              ),
+            );
+            return;
           }
-
-          resolve(flow);
         }
-      );
+        let labelsBaggage = {} as Record<string, string>;
+        let baggage = otelApi.propagation.getBaggage(otelApi.context.active());
+
+        if (baggage !== undefined) {
+          for (const member of baggage.getAllEntries()) {
+            labelsBaggage[member[0]] = member[1].value;
+          }
+        }
+
+        let mergedLabels = { ...params.labels, ...labelsBaggage };
+
+        const request: CheckRequest = {
+          controlPoint: controlPoint,
+          labels: mergedLabels,
+          rampMode: params.rampMode,
+        };
+
+        const cb: grpc.requestCallback<CheckResponse__Output> = (
+          err: any,
+          response: any,
+        ) => {
+          resolveFlow(err ? null : response, err);
+          return;
+        };
+
+        if (params.grpcCallOptions === undefined) {
+          params.grpcCallOptions = {};
+        }
+
+        this.fcsClient.Check(request, params.grpcCallOptions, cb);
+      } catch (err: any) {
+        resolveFlow(null, err);
+      }
     });
   }
 
   Shutdown() {
-    grpc.closeClient(this.fcsClient);
+    this.fcsClient.getChannel().close();
     this.exporter.shutdown();
     this.tracerProvider.shutdown();
     return;

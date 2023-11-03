@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withEvaluationInterval(evaluation_interval):: {
+    evaluation_interval: evaluation_interval,
+  },
+  withEvaluationIntervalMixin(evaluation_interval):: {
+    evaluation_interval+: evaluation_interval,
+  },
   withKd(kd):: {
     kd: kd,
   },
@@ -24,11 +30,5 @@
   },
   withResetAfterInvalidSamplesMixin(reset_after_invalid_samples):: {
     reset_after_invalid_samples+: reset_after_invalid_samples,
-  },
-  withSamplePeriod(sample_period):: {
-    sample_period: sample_period,
-  },
-  withSamplePeriodMixin(sample_period):: {
-    sample_period+: sample_period,
   },
 }

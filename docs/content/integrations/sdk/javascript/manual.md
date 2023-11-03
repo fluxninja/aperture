@@ -12,16 +12,24 @@ keywords:
   - manual
 ---
 
-<a href={`https://www.npmjs.com/package/@fluxninja/aperture-js`}>Aperture
-JavaScript SDK</a> can be used to manually set feature control points within a
-JavaScript service.
+[Aperture JavaScript SDK](https://www.npmjs.com/package/@fluxninja/aperture-js)
+can be used to manually set feature control points within a JavaScript service.
 
-To do so, first create an instance of ApertureClient. Agent host and port will
-be read from environment variables `FN_AGENT_HOST` and `FN_AGENT_PORT`,
-defaulting to localhost:8089.
+To do so, first create an instance of ApertureClient:
+
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
 
 ```javascript
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient({
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  agentAPIKey: "AGENT_API_KEY",
+});
 ```
 
 The created instance can then be used to start a flow:
@@ -29,9 +37,10 @@ The created instance can then be used to start a flow:
 ```javascript
 // do some business logic to collect labels
 var labelsMap = new Map().set("key", "value");
+var rampMode = false;
 
 apertureClient
-  .StartFlow("feature-name", labelsMap)
+  .StartFlow("feature-name", labelsMap, rampMode)
   .then((flow) => {
     if (flow.ShouldRun()) {
       // Do actual work

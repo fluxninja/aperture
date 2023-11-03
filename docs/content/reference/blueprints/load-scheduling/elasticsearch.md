@@ -18,7 +18,12 @@ All the Elasticsearch related metrics are collected by the
 so if the system under observation requires using different metrics for the
 overload confirmation, the
 [list of available metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/elasticsearchreceiver/metadata.yaml)
-can be used to configure the policy.
+can be used to configure the policy. The following PromQL query (with
+appropriate filters) is used as `SIGNAL` for the load scheduler:
+
+```promql
+avg(elasticsearch_node_thread_pool_tasks_queued)
+```
 
 <!-- Configuration Marker -->
 
@@ -88,48 +93,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-evaluation-interval"></a>
-
-<ParameterDescription
-    name='policy.evaluation_interval'
-    description='The interval between successive evaluations of the Circuit.'
-    type='string'
-    reference=''
-    value='"10s"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-promql-query"></a>
-
-<ParameterDescription
-    name='policy.promql_query'
-    description='PromQL query to detect ElasticSearch overload.'
-    type='string'
-    reference=''
-    value='"avg(avg_over_time(elasticsearch_node_thread_pool_tasks_queued{thread_pool_name=\"search\"}[30s]))"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-setpoint"></a>
-
-<ParameterDescription
-    name='policy.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="policy-elasticsearch"></a>
 
 <ParameterDescription
@@ -144,30 +107,16 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-##### policy.service_protection_core {#policy-service-protection-core}
+##### policy.load_scheduling_core {#policy-load-scheduling-core}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-adaptive-load-scheduler"></a>
+<a id="policy-load-scheduling-core-dry-run"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.adaptive_load_scheduler'
-    description='Parameters for Adaptive Load Scheduler.'
-    type='Object (aperture.spec.v1.AdaptiveLoadSchedulerParameters)'
-    reference='../../configuration/spec#adaptive-load-scheduler-parameters'
-    value='{"alerter": {"alert_name": "Load Throttling Event"}, "gradient": {"max_gradient": 1, "min_gradient": 0.1, "slope": -1}, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__", "service": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-service-protection-core-dry-run"></a>
-
-<ParameterDescription
-    name='policy.service_protection_core.dry_run'
+    name='policy.load_scheduling_core.dry_run'
     description='Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.'
     type='Boolean'
     reference=''
@@ -178,10 +127,10 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-kubelet-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-kubelet-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.kubelet_overload_confirmations'
+    name='policy.load_scheduling_core.kubelet_overload_confirmations'
     description='Overload confirmation signals from kubelet.'
     type='Object (kubelet_overload_confirmations)'
     reference='#kubelet-overload-confirmations'
@@ -192,14 +141,42 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="policy-service-protection-core-overload-confirmations"></a>
+<a id="policy-load-scheduling-core-overload-confirmations"></a>
 
 <ParameterDescription
-    name='policy.service_protection_core.overload_confirmations'
+    name='policy.load_scheduling_core.overload_confirmations'
     description='List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.'
     type='Array of Object (overload_confirmation)'
     reference='#overload-confirmation'
     value='[]'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-load-scheduling-core-aiad-load-scheduler"></a>
+
+<ParameterDescription
+    name='policy.load_scheduling_core.aiad_load_scheduler'
+    description='Parameters for AIMD throttling strategy.'
+    type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
+    reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
+    value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
+<a id="policy-load-scheduling-core-setpoint"></a>
+
+<ParameterDescription
+    name='policy.load_scheduling_core.setpoint'
+    description='Setpoint.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->
@@ -500,20 +477,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
-<a id="elasticsearch-collection-interval"></a>
-
-<ParameterDescription
-    name='collection_interval'
-    description='This receiver collects metrics on an interval.'
-    type='string'
-    reference=''
-    value='null'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
 <a id="elasticsearch-endpoint"></a>
 
 <ParameterDescription
@@ -617,7 +580,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 :::note
 
 The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/apply/dynamic-config/dynamic-config.md)
+[dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md)
 at runtime, without reloading the policy.
 
 :::

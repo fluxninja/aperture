@@ -4,6 +4,7 @@ import (
 	"context"
 
 	peersv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -14,12 +15,19 @@ type PeerDiscoveryService struct {
 	peerDiscovery *PeerDiscovery
 }
 
+// RegisterPeersServiceIn bundles and annotates parameters.
+type RegisterPeersServiceIn struct {
+	fx.In
+	Server        *grpc.Server `name:"default"`
+	PeerDiscovery *PeerDiscovery
+}
+
 // RegisterPeerDiscoveryService registers a service for peer discovery.
-func RegisterPeerDiscoveryService(server *grpc.Server, pd *PeerDiscovery) {
+func RegisterPeerDiscoveryService(in RegisterPeersServiceIn) {
 	svc := &PeerDiscoveryService{
-		peerDiscovery: pd,
+		peerDiscovery: in.PeerDiscovery,
 	}
-	peersv1.RegisterPeerDiscoveryServiceServer(server, svc)
+	peersv1.RegisterPeerDiscoveryServiceServer(in.Server, svc)
 }
 
 // GetPeers returns all peers.

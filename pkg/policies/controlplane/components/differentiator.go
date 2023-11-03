@@ -57,9 +57,9 @@ func NewDifferentiatorAndOptions(diffProto *policylangv1.Differentiator, _ runti
 }
 
 // Execute implements runtime.Component.Execute.
-func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (d *Differentiator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	if !d.initialized {
-		d.init(tickInfo)
+		d.init(circuitAPI.GetTickInfo())
 	}
 
 	inputVal := inPortReadings.ReadSingleReadingPort("input")

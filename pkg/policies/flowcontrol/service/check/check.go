@@ -73,6 +73,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			FlowLabels:   labels.PlainMap(req.Labels),
 			ControlPoint: req.ControlPoint,
 			Services:     services,
+			RampMode:     req.RampMode,
 		},
 	)
 	end := time.Now()

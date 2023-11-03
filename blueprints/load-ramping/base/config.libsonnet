@@ -88,10 +88,8 @@ local kubelet_metrics_defaults = {
 local ramp_policy_base_defaults = {
   /**
   * @param (policy.load_ramp: aperture.spec.v1.LoadRampParameters) Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
-  * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.start: bool) Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
   */
-  evaluation_interval: '10s',
   load_ramp: {
     sampler: {
       selectors: commonConfig.selectors_defaults,

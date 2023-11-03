@@ -1,17 +1,22 @@
 package inframeter
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
+	secretmanagerpb "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
+	"github.com/fluxninja/aperture/v2/pkg/secretmanager"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 	"go.opentelemetry.io/collector/component"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -22,6 +27,8 @@ import (
 func AddInfraMeters(
 	config *otelconfig.Config,
 	infraMeters map[string]*policysyncv1.InfraMeterWrapper,
+	installationMode string,
+	secretManagerClient *secretmanager.SecretManagerClient,
 ) error {
 	if infraMeters == nil {
 		infraMeters = map[string]*policysyncv1.InfraMeterWrapper{}
@@ -29,7 +36,13 @@ func AddInfraMeters(
 	for pipelineName, infraMeterWrapper := range infraMeters {
 		infraMeter := infraMeterWrapper.GetInfraMeter()
 		if err := addInfraMeter(
-			config, infraMeterWrapper.GetPolicyName(), pipelineName, infraMeterWrapper.GetInfraMeterName(), infraMeter); err != nil {
+			config,
+			infraMeterWrapper.GetPolicyName(),
+			pipelineName,
+			infraMeterWrapper.GetInfraMeterName(),
+			infraMeter,
+			installationMode,
+			secretManagerClient); err != nil {
 			return fmt.Errorf("failed to add infra metric pipeline %s: %w", pipelineName, err)
 		}
 	}
@@ -42,6 +55,8 @@ func addInfraMeter(
 	pipelineName string,
 	infraMeterName string,
 	infraMeter *policylangv1.InfraMeter,
+	installationMode string,
+	secretManagerClient *secretmanager.SecretManagerClient,
 ) error {
 	processorName := fmt.Sprintf("%s-%s-%s", otelconsts.ProcessorInfraMeter, policyName, infraMeterName)
 	config.AddProcessor(processorName, map[string]any{
@@ -84,8 +99,13 @@ func addInfraMeter(
 			continue
 		}
 
-		var cfg any
-		cfg = receiverConfig.AsMap()
+		receiverMap := receiverConfig.AsMap()
+		if installationMode == utils.InstallationModeCloudAgent {
+			if err := processMapForSecrets(receiverMap, secretManagerClient); err != nil {
+				return fmt.Errorf("failed to process secrets for receiver %s: %w", strID, err)
+			}
+		}
+		var cfg any = receiverMap
 		id, cfg = leaderonlyreceiver.WrapConfigIf(infraMeter.PerAgentGroup, id, cfg)
 		strID = id.String()
 
@@ -146,7 +166,13 @@ func addInfraMeter(
 				processorConfig.Fields[otelconsts.ProcessorK8sAttributesSelectors] = selectors
 			}
 			processorIDs[origName] = strID
-			var cfg any = processorConfig.AsMap()
+			processorMap := processorConfig.AsMap()
+			if installationMode == utils.InstallationModeCloudAgent {
+				if err := processMapForSecrets(processorMap, secretManagerClient); err != nil {
+					return fmt.Errorf("failed to process secrets for processor %s: %w", strID, err)
+				}
+			}
+			var cfg any = processorMap
 			config.AddProcessor(strID, cfg)
 		}
 	}
@@ -230,4 +256,69 @@ func updateK8sAttributesProcessor(processor interface{}, selectorsList []interfa
 			processorMap[otelconsts.ProcessorK8sAttributesSelectors] = append(existingSelectorsList, selectorsList...)
 		}
 	}
+}
+
+// processMapForSecrets processes the given map to search for the secret reference and replace it with actual value.
+func processMapForSecrets(config map[string]interface{}, secretManagerClient *secretmanager.SecretManagerClient) error {
+	for key, value := range config {
+		switch v := value.(type) {
+		case map[string]interface{}:
+			if err := processMapForSecrets(v, secretManagerClient); err != nil {
+				return fmt.Errorf("error processing map for key %s: %w", key, err)
+			}
+		case string:
+			if strings.HasPrefix(v, "${") && strings.HasSuffix(v, "}") {
+				secretValue, err := getSecretValue(v, secretManagerClient)
+				if err != nil {
+					return fmt.Errorf("error getting secret value for key %s: %w", key, err)
+				}
+				config[key] = secretValue
+			}
+		case []interface{}:
+			for i, val := range v {
+				switch valStr := val.(type) {
+				case map[string]interface{}:
+					if err := processMapForSecrets(valStr, secretManagerClient); err != nil {
+						return fmt.Errorf("error processing map in slice for key %s: %w", key, err)
+					}
+				case string:
+					if strings.HasPrefix(valStr, "${") && strings.HasSuffix(valStr, "}") {
+						secretValue, err := getSecretValue(valStr, secretManagerClient)
+						if err != nil {
+							return fmt.Errorf("error getting secret value in slice for key %s: %w", key, err)
+						}
+						v[i] = secretValue
+					}
+				}
+			}
+			config[key] = v
+		}
+	}
+
+	return nil
+}
+
+// getSecretValue fetches secret value from the GCP Secret Manager.
+func getSecretValue(valueString string, secretManagerClient *secretmanager.SecretManagerClient) (string, error) {
+	secretName := strings.TrimPrefix(valueString, "${")
+	secretName = strings.TrimSuffix(secretName, "}")
+
+	secretName = fmt.Sprintf("projects/%s/secrets/%s-%s/versions/latest", secretManagerClient.GCPProjectID, secretManagerClient.ProjectID, secretName)
+
+	accessRequest := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: secretName,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	result, err := secretManagerClient.Client.AccessSecretVersion(ctx, accessRequest)
+	if err != nil {
+		return "", fmt.Errorf("failed to access secret version for secret %s: %v", secretName, err)
+	}
+
+	if result == nil || result.Payload == nil || result.Payload.Data == nil {
+		return "", fmt.Errorf("received invalid value for secret: %s", secretName)
+	}
+
+	return string(result.Payload.Data), nil
 }

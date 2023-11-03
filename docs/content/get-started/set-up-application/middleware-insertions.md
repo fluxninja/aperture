@@ -70,8 +70,8 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        registrationBean.addInitParameter("agent_host", "localhost");
-        registrationBean.addInitParameter("agent_port", "8089");
+        registrationBean.addInitParameter("agent_address", "ORGANIZATION.app.fluxninja.com:443");
+        registrationBean.addInitParameter("agent_api_key", "AGENT_API_KEY");
 
         return registrationBean;
     }
@@ -92,5 +92,5 @@ examples available for each framework.
 
 <!-- vale on -->
 
-Once the middleware insertion is done, head over to
-[install Aperture](/get-started/installation/installation.md).
+Once the feature control point is set in code, head over to
+[Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md)

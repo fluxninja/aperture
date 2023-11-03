@@ -3,12 +3,16 @@ package notifiers
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
@@ -82,6 +86,12 @@ func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 			// Supply prometheus registry
 			fx.Supply(fr.prometheusRegistry),
 			option,
+			fx.WithLogger(func() fxevent.Logger {
+				logger := zap.New(
+					log.NewZapAdapter(log.GetGlobalLogger(), fmt.Sprintf("fxdriver-%s", key.String())),
+				)
+				return &fxevent.ZapLogger{Logger: logger}
+			}),
 		)
 
 		var err error

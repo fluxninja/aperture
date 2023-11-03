@@ -16,12 +16,19 @@ keywords:
 All Netty pipelines can have an Aperture Handler automatically added into them
 using [Aperture Instrumentation Agent][javaagent].
 
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
+
 ### Netty Handler
 
-<a
-href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-netty`}>Aperture
-Java SDK Netty package</a> contains a Handler that automatically creates traffic
-flows for requests in a given pipeline:
+[Aperture Java SDK Netty package](https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-netty)
+contains a Handler that automatically creates traffic flows for requests in a
+given pipeline:
 
 ```java
 import com.fluxninja.aperture.netty.ApertureServerHandler;
@@ -36,7 +43,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         String controlPointName = "someFeature";
 
-        sdk = ApertureSDK.builder().setHost(this.agentHost).setPort(this.agentPort).build();
+        sdk = ApertureSDK.builder().setAddress(this.agentAddress).setAgentAPIKey(this.agentAPIKey).build();
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
@@ -56,8 +63,8 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setHost(...)
-        .setPort(...)
+        .setAddress("ORGANIZATION.app.fluxninja.com:443")
+        .setAgentAPIKey(agentAPIKey)
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...

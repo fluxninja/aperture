@@ -13,9 +13,9 @@ import java.util.Properties;
 public class Config {
     public static final String CONFIG_FILENAME_PROPERTY = "aperture.javaagent.config.file";
 
-    public static final String AGENT_HOST_PROPERTY = "aperture.agent.hostname";
-    public static final String AGENT_PORT_PROPERTY = "aperture.agent.port";
-    public static final String FAIL_OPEN_PROPERTY = "aperture.javaagent.enable.fail.open";
+    public static final String AGENT_ADDRESS_PROPERTY = "aperture.agent.address";
+    public static final String AGENT_API_KEY_PROPERTY = "aperture.agent.api.key";
+    public static final String RAMP_MODE_PROPERTY = "aperture.javaagent.enable.ramp.mode";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
     public static final String CONTROL_POINT_NAME_PROPERTY = "aperture.control.point.name";
@@ -26,9 +26,9 @@ public class Config {
     public static final String ROOT_CERTIFICATE_FILE_PROPERTY =
             "aperture.javaagent.root.certificate";
 
-    private static final String AGENT_HOST_DEFAULT_VALUE = "localhost";
-    private static final String AGENT_PORT_DEFAULT_VALUE = "8089";
-    private static final String FAIL_OPEN_PROPERTY_DEFAULT_VALUE = "true";
+    private static final String AGENT_ADDRESS_DEFAULT_VALUE = "localhost:8080";
+    private static final String AGENT_API_KEY_DEFAULT_VALUE = "";
+    private static final String RAMP_MODE_PROPERTY_DEFAULT_VALUE = "false";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String IGNORED_PATHS_DEFAULT_VALUE = "";
     private static final String IGNORED_PATHS_REGEX_DEFAULT_VALUE = "false";
@@ -38,9 +38,9 @@ public class Config {
     private static final List<String> allProperties =
             new ArrayList<String>() {
                 {
-                    add(AGENT_HOST_PROPERTY);
-                    add(AGENT_PORT_PROPERTY);
-                    add(FAIL_OPEN_PROPERTY);
+                    add(AGENT_ADDRESS_PROPERTY);
+                    add(AGENT_API_KEY_PROPERTY);
+                    add(RAMP_MODE_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
                     add(CONTROL_POINT_NAME_PROPERTY);
                     add(IGNORED_PATHS_PROPERTY);
@@ -90,28 +90,28 @@ public class Config {
         Properties config = loadProperties();
         ApertureSDK sdk;
         String controlPointName;
-        boolean failOpen;
+        boolean rampMode;
+        Duration flowTimeout;
         try {
             controlPointName = config.getProperty(CONTROL_POINT_NAME_PROPERTY);
-            failOpen =
+            rampMode =
                     Boolean.parseBoolean(
                             config.getProperty(
-                                    FAIL_OPEN_PROPERTY, FAIL_OPEN_PROPERTY_DEFAULT_VALUE));
+                                    RAMP_MODE_PROPERTY, RAMP_MODE_PROPERTY_DEFAULT_VALUE));
 
-            ApertureSDKBuilder sdkBuilder =
-                    builder.setHost(
+            flowTimeout =
+                    Duration.ofMillis(
+                            Integer.parseInt(
                                     config.getProperty(
-                                            AGENT_HOST_PROPERTY, AGENT_HOST_DEFAULT_VALUE))
-                            .setPort(
-                                    Integer.parseInt(
-                                            config.getProperty(
-                                                    AGENT_PORT_PROPERTY, AGENT_PORT_DEFAULT_VALUE)))
-                            .setFlowTimeout(
-                                    Duration.ofMillis(
-                                            Integer.parseInt(
-                                                    config.getProperty(
-                                                            CONNECTION_TIMEOUT_MILLIS_PROPERTY,
-                                                            CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE))))
+                                            CONNECTION_TIMEOUT_MILLIS_PROPERTY,
+                                            CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE)));
+            ApertureSDKBuilder sdkBuilder =
+                    builder.setAddress(
+                                    config.getProperty(
+                                            AGENT_ADDRESS_PROPERTY, AGENT_ADDRESS_DEFAULT_VALUE))
+                            .setAgentAPIKey(
+                                    config.getProperty(
+                                            AGENT_API_KEY_PROPERTY, AGENT_API_KEY_DEFAULT_VALUE))
                             .addIgnoredPaths(
                                     config.getProperty(
                                             IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))
@@ -143,7 +143,7 @@ public class Config {
             throw new IllegalArgumentException("Control Point name must be set");
         }
 
-        return new ApertureSDKWrapper(sdk, controlPointName, failOpen);
+        return new ApertureSDKWrapper(sdk, controlPointName, rampMode, flowTimeout);
     }
 
     private static String envNameFromPropertyName(String propertyName) {

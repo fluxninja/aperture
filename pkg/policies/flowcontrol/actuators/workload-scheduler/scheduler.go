@@ -45,9 +45,16 @@ type Factory struct {
 
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
+	rejectedTokensCounterVec *prometheus.CounterVec
+
+	requestInQueueDurationSummaryVec *prometheus.SummaryVec
 
 	workloadLatencySummaryVec *prometheus.SummaryVec
 	workloadCounterVec        *prometheus.CounterVec
+
+	workloadPreemptedTokensSummaryVec *prometheus.SummaryVec
+	workloadDelayedTokensSummaryVec   *prometheus.SummaryVec
+	workloadOnTimeCounterVec          *prometheus.CounterVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -90,6 +97,22 @@ func newFactory(
 		},
 		MetricLabelKeys,
 	)
+	wsFactory.rejectedTokensCounterVec = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: metrics.RejectedTokensMetricName,
+			Help: "A counter measuring work rejected by Scheduler",
+		},
+		MetricLabelKeys,
+	)
+	wsFactory.requestInQueueDurationSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.RequestInQueueDurationMetricName,
+		Help: "Duration of requests scheduled in Queue",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
 
 	wsFactory.workloadLatencySummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadLatencyMetricName,
@@ -113,6 +136,36 @@ func newFactory(
 		metrics.LimiterDroppedLabel,
 	})
 
+	wsFactory.workloadPreemptedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadPreemptedTokensMetricName,
+		Help: "Number of tokens a request was preempted by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadDelayedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.WorkloadDelayedTokensMetricName,
+		Help: "Number of tokens a request was delayed by",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.workloadOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.WorkloadOnTimeMetricName,
+		Help: "Counter of workload requests that were on time",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			var merr error
@@ -133,11 +186,31 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(wsFactory.rejectedTokensCounterVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 			err = prometheusRegistry.Register(wsFactory.workloadLatencySummaryVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
 			err = prometheusRegistry.Register(wsFactory.workloadCounterVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.requestInQueueDurationSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadPreemptedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadDelayedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.workloadOnTimeCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -163,12 +236,32 @@ func newFactory(
 				err := fmt.Errorf("failed to unregister accepted_tokens_total metric")
 				merr = multierr.Append(merr, err)
 			}
+			if !prometheusRegistry.Unregister(wsFactory.rejectedTokensCounterVec) {
+				err := fmt.Errorf("failed to unregister rejected_tokens_total metric")
+				merr = multierr.Append(merr, err)
+			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadLatencySummaryVec) {
 				err := fmt.Errorf("failed to unregister workload_latency_ms metric")
 				merr = multierr.Append(merr, err)
 			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadCounterVec) {
 				err := fmt.Errorf("failed to unregister workload_counter metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.requestInQueueDurationSummaryVec) {
+				err := fmt.Errorf("failed to unregister request_in_queue_duration_ms metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadPreemptedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_preempted_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadDelayedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister workload_delayed_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.workloadOnTimeCounterVec) {
+				err := fmt.Errorf("failed to unregister workload_on_time_total metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -230,11 +323,21 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		return nil, err
 	}
 
+	rejectedTokensCounter, err := wsFactory.rejectedTokensCounterVec.GetMetricWith(metricLabels)
+	if err != nil {
+		return nil, err
+	}
+
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:            wfqFlowsGauge,
-		HeapRequestsGauge:     wfqRequestsGauge,
-		IncomingTokensCounter: incomingTokensCounter,
-		AcceptedTokensCounter: acceptedTokensCounter,
+		FlowsGauge:                     wfqFlowsGauge,
+		HeapRequestsGauge:              wfqRequestsGauge,
+		IncomingTokensCounter:          incomingTokensCounter,
+		AcceptedTokensCounter:          acceptedTokensCounter,
+		RejectedTokensCounter:          rejectedTokensCounter,
+		RequestInQueueDurationSummary:  wsFactory.requestInQueueDurationSummaryVec,
+		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
+		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
+		WorkloadOnTimeCounter:          wsFactory.workloadOnTimeCounterVec,
 	}
 
 	return &SchedulerMetrics{
@@ -245,35 +348,66 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 }
 
 // Delete removes all metrics from metric vectors.
-func (metrics *SchedulerMetrics) Delete() error {
+func (sm *SchedulerMetrics) Delete() error {
 	var merr error
 
 	// Remove metrics from metric vectors
-	deleted := metrics.wsFactory.wfqFlowsGaugeVec.Delete(metrics.metricLabels)
+	deleted := sm.wsFactory.wfqFlowsGaugeVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
 	}
-	deleted = metrics.wsFactory.wfqRequestsGaugeVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.wfqRequestsGaugeVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
 	}
-	deleted = metrics.wsFactory.incomingTokensCounterVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
 	}
-	deleted = metrics.wsFactory.acceptedTokensCounterVec.Delete(metrics.metricLabels)
+	deleted = sm.wsFactory.acceptedTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete accepted_tokens_total counter from its metric vector"))
 	}
-	deletedCount := metrics.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(metrics.metricLabels)
+	deleted = sm.wsFactory.rejectedTokensCounterVec.Delete(sm.metricLabels)
+	if !deleted {
+		merr = multierr.Append(merr, errors.New("failed to delete rejected_tokens_total counter from its metric vector"))
+	}
+	deletedCount := sm.wsFactory.workloadLatencySummaryVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_latency_ms summary from its metric vector. No traffic to generate metrics?")
 	}
-	deletedCount = metrics.wsFactory.workloadCounterVec.DeletePartialMatch(metrics.metricLabels)
+	deletedCount = sm.wsFactory.workloadCounterVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_requests_total counter from its metric vector. No traffic to generate metrics?")
 	}
+	deletedCount = sm.wsFactory.requestInQueueDurationSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete request_in_queue_duration_ms summary from its metric vector. No traffic to generate metrics?")
+	}
+	deletedCount = sm.wsFactory.workloadPreemptedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_preempted_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.workloadDelayedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_delayed_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.workloadOnTimeCounterVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete workload_on_time_total counter from its metric vector.")
+	}
 	return merr
+}
+
+func (sm *SchedulerMetrics) appendWorkloadLabel(workloadLabel string) prometheus.Labels {
+	baseMetricsLabels := sm.metricLabels
+	metricsLabels := make(prometheus.Labels, len(baseMetricsLabels)+1)
+	metricsLabels[metrics.WorkloadIndexLabel] = workloadLabel
+	for k, v := range baseMetricsLabels {
+		metricsLabels[k] = v
+	}
+
+	return metricsLabels
 }
 
 // Scheduler implements load scheduler on the flowcontrol side.
@@ -284,7 +418,7 @@ type Scheduler struct {
 	proto                 *policylangv1.Scheduler
 	defaultWorkload       *workload
 	workloadMultiMatcher  *multiMatcher
-	tokensByWorkloadIndex map[string]uint64
+	tokensByWorkloadIndex map[string]float64
 	metrics               *SchedulerMetrics
 	mutex                 sync.RWMutex
 }
@@ -298,6 +432,27 @@ func (wsFactory *Factory) NewScheduler(
 	tokenManger scheduler.TokenManager,
 	schedulerMetrics *SchedulerMetrics,
 ) (*Scheduler, error) {
+	initPreemptMetrics := func(workloadLabel string) error {
+		if schedulerMetrics == nil {
+			return nil
+		}
+		workloadLabels := schedulerMetrics.appendWorkloadLabel(workloadLabel)
+		var err error
+		_, err = schedulerMetrics.wsFactory.workloadPreemptedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_preempted_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.workloadDelayedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_delayed_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.workloadOnTimeCounterVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_on_time_total counter", err)
+		}
+		return nil
+	}
+
 	mm := multimatcher.New[int, multiMatchResult]()
 	for workloadIndex, workloadProto := range proto.Workloads {
 		labelMatcher, err := selectors.MMExprFromLabelMatcher(workloadProto.GetLabelMatcher())
@@ -315,6 +470,15 @@ func (wsFactory *Factory) NewScheduler(
 		if err != nil {
 			return nil, err
 		}
+		err = initPreemptMetrics(getWorkloadLabel(workloadIndex, workloadProto))
+		if err != nil {
+			return nil, err
+		}
+	}
+	// default workload
+	err := initPreemptMetrics(metrics.DefaultWorkloadIndex)
+	if err != nil {
+		return nil, err
 	}
 
 	ws := &Scheduler{
@@ -338,17 +502,18 @@ func (wsFactory *Factory) NewScheduler(
 	}
 
 	// setup scheduler
-	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics)
+	ws.scheduler = scheduler.NewWFQScheduler(clk, tokenManger, wfqMetrics, schedulerMetrics.metricLabels)
 
 	return ws, nil
 }
 
 // Decide processes a single flow by load scheduler in a blocking manner.
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
-	var matchedWorkloadIndex string
+	var priority float64
+	var matchedWorkloadLabel string
 	// match labels against ws.workloadMultiMatcher
 	mmr := s.workloadMultiMatcher.Match(labels)
 	// if at least one match, return workload with lowest index
@@ -361,34 +526,53 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 			}
 		}
 		matchedWorkload := mmr.matchedWorkloads[smallestWorkloadIndex]
+		priority = matchedWorkload.priority
 		invPriority = 1 / matchedWorkload.priority
 		matchedWorkloadParametersProto = matchedWorkload.proto.GetParameters()
-		if matchedWorkload.proto.GetName() != "" {
-			matchedWorkloadIndex = matchedWorkload.proto.GetName()
-		} else {
-			matchedWorkloadIndex = strconv.Itoa(smallestWorkloadIndex)
-		}
+		matchedWorkloadLabel = getWorkloadLabel(smallestWorkloadIndex, matchedWorkload.proto)
 	} else {
 		// no match, return default workload
+		priority = s.defaultWorkload.priority
 		invPriority = 1 / s.defaultWorkload.priority
 		matchedWorkloadParametersProto = s.defaultWorkload.proto.Parameters
-		matchedWorkloadIndex = s.defaultWorkload.proto.Name
+		matchedWorkloadLabel = s.defaultWorkload.proto.Name
 	}
 
-	fairnessLabel := "workload:" + matchedWorkloadIndex
+	fairnessLabel := matchedWorkloadLabel
 
-	tokens := uint64(1)
-	// Precedence order (lowest to highest):
-	// 1. Estimated Tokens
-	// 2. Workload tokens
-	// 3. Label tokens
-	if tokensEstimated, ok := s.GetEstimatedTokens(matchedWorkloadIndex); ok {
-		tokens = tokensEstimated
+	tokens := float64(1)
+	// Precedence order:
+	// 1. Label tokens
+	// 2. Estimated Tokens
+	// 3. Workload tokens
+	if matchedWorkloadParametersProto.GetTokens() != 0 {
+		tokens = matchedWorkloadParametersProto.GetTokens()
 	}
 
-	if matchedWorkloadParametersProto.Tokens != 0 {
-		tokens = uint64(matchedWorkloadParametersProto.Tokens)
+	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadLabel); ok {
+		tokens = estimatedTokens
 	}
+
+	if s.proto.TokensLabelKey != "" {
+		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
+			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
+				tokens = parsedTokens
+			}
+		}
+	}
+
+	if s.proto.PriorityLabelKey != "" {
+		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
+			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
+				if parsedPriority > 0 {
+					priority = parsedPriority
+					invPriority = 1 / parsedPriority
+				}
+			}
+		}
+	}
+
+	reqCtx := ctx
 
 	var matchedWorkloadTimeout time.Duration
 	hasWorkloadTimeout := false
@@ -396,24 +580,6 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 		matchedWorkloadTimeout = matchedWorkloadParametersProto.QueueTimeout.AsDuration()
 		hasWorkloadTimeout = true
 	}
-
-	if s.proto.TokensLabelKey != "" {
-		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
-			if parsedTokens, err := strconv.ParseUint(val, 10, 64); err == nil {
-				tokens = parsedTokens
-			}
-		}
-	}
-
-	if s.proto.PrioritiesLabelKey != "" {
-		if val, ok := labels.Get(s.proto.PrioritiesLabelKey); ok {
-			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
-				invPriority = 1 / parsedPriority
-			}
-		}
-	}
-
-	reqCtx := ctx
 
 	clientDeadline, hasClientDeadline := ctx.Deadline()
 	if hasClientDeadline {
@@ -448,25 +614,28 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 
 	req := scheduler.NewRequest(fairnessLabel, tokens, invPriority)
 
-	accepted := s.scheduler.Schedule(reqCtx, req)
+	accepted, remaining, current := s.scheduler.Schedule(reqCtx, req)
 
-	tokensConsumed := uint64(0)
+	tokensConsumed := float64(0)
 	if accepted {
 		tokensConsumed = req.Tokens
 	}
 
-	return iface.LimiterDecision{
-		LimiterDecision: &flowcontrolv1.LimiterDecision{
-			PolicyName:               s.component.GetPolicyName(),
-			PolicyHash:               s.component.GetPolicyHash(),
-			ComponentId:              s.component.GetComponentId(),
-			Dropped:                  !accepted,
-			DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
-			Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
-				LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
-					WorkloadIndex:  matchedWorkloadIndex,
-					TokensConsumed: tokensConsumed,
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:               s.component.GetPolicyName(),
+		PolicyHash:               s.component.GetPolicyHash(),
+		ComponentId:              s.component.GetComponentId(),
+		Dropped:                  !accepted,
+		DeniedResponseStatusCode: s.proto.GetDeniedResponseStatusCode(),
+		Details: &flowcontrolv1.LimiterDecision_LoadSchedulerInfo{
+			LoadSchedulerInfo: &flowcontrolv1.LimiterDecision_SchedulerInfo{
+				WorkloadIndex: matchedWorkloadLabel,
+				TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+					Consumed:  tokensConsumed,
+					Remaining: remaining,
+					Current:   current,
 				},
+				Priority: priority,
 			},
 		},
 	}
@@ -475,7 +644,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) iface.Limi
 // Revert reverts the decision made by the limiter.
 func (s *Scheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
 	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
-		tokens := lsDecision.LoadSchedulerInfo.TokensConsumed
+		tokens := lsDecision.LoadSchedulerInfo.TokensInfo.Consumed
 		if tokens > 0 {
 			s.scheduler.Revert(ctx, tokens)
 		}
@@ -492,8 +661,13 @@ func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Count
 	return s.metrics.wsFactory.GetRequestCounter(labels)
 }
 
+// GetRampMode is always false for Schedulers.
+func (s *Scheduler) GetRampMode() bool {
+	return false
+}
+
 // GetEstimatedTokens returns estimated tokens for specific workload.
-func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
+func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (float64, bool) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	val, ok := s.tokensByWorkloadIndex[workloadIndex]
@@ -501,7 +675,7 @@ func (s *Scheduler) GetEstimatedTokens(workloadIndex string) (uint64, bool) {
 }
 
 // SetEstimatedTokens sets estimated tokens for specific workload.
-func (s *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]uint64) {
+func (s *Scheduler) SetEstimatedTokens(tokensByWorkloadIndex map[string]float64) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.tokensByWorkloadIndex = tokensByWorkloadIndex
@@ -577,4 +751,14 @@ func SanitizeSchedulerProto(proto *policylangv1.Scheduler) (*policylangv1.Schedu
 	}
 
 	return proto, nil
+}
+
+func getWorkloadLabel(workloadIndex int, workloadProto *policylangv1.Scheduler_Workload) string {
+	var workloadLabel string
+	if workloadProto.GetName() != "" {
+		workloadLabel = workloadProto.GetName()
+	} else {
+		workloadLabel = strconv.Itoa(workloadIndex)
+	}
+	return workloadLabel
 }

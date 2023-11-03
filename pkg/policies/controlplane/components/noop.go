@@ -25,7 +25,7 @@ func (*NoOp) ShortDescription() string { return "" }
 func (*NoOp) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.Execute.
-func (noOp *NoOp) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (noOp *NoOp) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	return inPortReadings, nil
 }
 

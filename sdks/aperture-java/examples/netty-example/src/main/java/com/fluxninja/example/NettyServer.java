@@ -6,50 +6,52 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.time.Duration;
 
 public class NettyServer {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_FAIL_OPEN = "true";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
+    public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) throws Exception {
-        String agentHost = System.getenv("FN_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        String agentPort = System.getenv("FN_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
         }
-        String appPort = System.getenv("FN_APP_PORT");
+        String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
-        String failOpenString = System.getenv("FN_ENABLE_FAIL_OPEN");
-        if (failOpenString == null) {
-            failOpenString = DEFAULT_FAIL_OPEN;
+        String rampModeString = System.getenv("APERTURE_ENABLE_RAMP_MODE");
+        if (rampModeString == null) {
+            rampModeString = DEFAULT_RAMP_MODE;
         }
-        boolean failOpen = Boolean.parseBoolean(failOpenString);
+        boolean rampMode = Boolean.parseBoolean(rampModeString);
 
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
         if (controlPointName == null) {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
+
+        Duration flowTimeout = Duration.ofMillis(1000);
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -63,9 +65,10 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(
                             new ServerInitializer(
-                                    agentHost,
-                                    agentPort,
-                                    failOpen,
+                                    agentAddress,
+                                    agentAPIKey,
+                                    rampMode,
+                                    flowTimeout,
                                     controlPointName,
                                     insecureGrpc,
                                     rootCertFile))

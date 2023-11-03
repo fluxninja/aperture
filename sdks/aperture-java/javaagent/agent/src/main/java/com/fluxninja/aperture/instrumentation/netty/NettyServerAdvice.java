@@ -21,7 +21,11 @@ public class NettyServerAdvice {
         if (handler instanceof HttpServerCodec || handler instanceof HttpRequestDecoder) {
             // only add the aperture handler after the HttpRequestDecoder or HttpServerCodec
             ApertureServerHandler apertureHandler =
-                    new ApertureServerHandler(wrapper.apertureSDK, wrapper.controlPointName);
+                    new ApertureServerHandler(
+                            wrapper.apertureSDK,
+                            wrapper.controlPointName,
+                            wrapper.rampMode,
+                            wrapper.flowTimeout);
             String hname = handlerName;
             if (hname == null) {
                 ChannelHandlerContext ctx = pipeline.context(handler);

@@ -696,6 +696,10 @@ message Integrator {
 
   // Initial value of the integrator.
   double initial_value = 3; // @gotags: default:"0"
+
+  // The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.
+  // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+  google.protobuf.Duration evaluation_interval = 4;
 }
 
 // Differentiator calculates rate of change per tick.
@@ -861,9 +865,9 @@ message PIDController {
     double ki = 2; // @gotags: validate:"gte=0" default:"0"
     // The derivative gain of the PID controller.
     double kd = 3; // @gotags: validate:"gte=0" default:"0"
-    // The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
+    // The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.
     // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-    google.protobuf.Duration sample_period = 4;
+    google.protobuf.Duration evaluation_interval = 4;
     // The integrator resets after the specified number of ticks if the signal or setpoint are continuously invalid. Defaults to 4 invalid samples.
     int32 reset_after_invalid_samples = 5; // @gotags: validate:"gte=1" default:"4"
   }
@@ -881,6 +885,78 @@ message PIDController {
 
   message Outs {
     // Output of the PID controller
+    OutPort output = 1;
+  }
+
+  Ins in_ports = 1;
+  Outs out_ports = 2;
+  Parameters parameters = 3; // @gotags: validate:"required"
+}
+
+// Polynomial Range Function:
+// Maps a continuous range of input values to a corresponding range of output values. This mapping is defined by two primary attributes:
+//     - Data-points: A pair of starting and ending data-points.
+//     - Degree: Determines the curve type of the function.
+
+// Examples:
+// 1. Given starting data-point (0, 0) and ending data-point (10, 100) with degree=1 (linear curve):
+//    - An input of 5 would map to an output of 50.
+
+// 2. For a negative growth relation, starting data-point (0, 100) and ending data-point (10, 0) with degree=1:
+//    - An input of 5 would map to an output of 50.
+
+// Outside Range Behavior:
+// If the input lies outside the defined range, its behavior is determined by specified configurations, such as:
+//     - Clamping to the nearest data-point.
+//     - Continuing with the polynomial curve.
+//     - Clamping to predefined custom values.
+// If the outside range behavior is not specified, the default behavior is to continue with the polynomial curve.
+
+// Curve Types by Degree:
+// - Degree 1: Linear
+// - Degree 2: Quadratic
+// - Degree 3: Cubic
+// - and so on.
+message PolynomialRangeFunction {
+  message Parameters {
+    message Datapoint {
+      double input = 1;
+      double output = 2;
+    }
+
+    message ClampToCustomValues {
+      double pre_start = 1;
+      double post_end = 2;
+    }
+
+    // Starting data-point for the range function
+    Datapoint start = 1;
+    // Ending data-point for the range function
+    Datapoint end = 2;
+    // Degree of the polynomial
+    double degree = 3;
+
+    // Behavior outside range. Select one of the following:
+    // 1. Continue polynomial curve
+    // 2. Clamp to the nearest data-point
+    // 3. Clamp to custom values
+    oneof outside_range {
+      // Clamp to the nearest data-point
+      bool clamp_to_datapoint = 4;
+      // Clamp to custom values
+      ClampToCustomValues clamp_to_custom_values = 5;
+      // Continue polynomial curve
+      bool continue_curve = 6;
+    }
+  }
+
+  message Ins {
+    // The input signal.
+    InPort input = 1;
+  }
+
+  message Outs {
+    // The output signal.
     OutPort output = 1;
   }
 

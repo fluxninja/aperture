@@ -11,6 +11,7 @@ import io.opentelemetry.api.baggage.BaggageEntry;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,10 @@ public class NettyUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            ChannelHandlerContext ctx, HttpRequest req, String controlPointName) {
+            ChannelHandlerContext ctx,
+            HttpRequest req,
+            String controlPointName,
+            Duration flowTimeout) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -37,14 +41,15 @@ public class NettyUtils {
                         URLDecoder.decode(
                                 entry.getValue().getValue(), StandardCharsets.UTF_8.name());
             } catch (java.io.UnsupportedEncodingException e) {
-                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid encoding
+                // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
+                // encoding
                 throw new RuntimeException(e);
             }
             baggageLabels.put(entry.getKey(), value);
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, ctx, req);
-        builder.setControlPoint(controlPointName);
+        builder.setControlPoint(controlPointName).setRampMode(false).setFlowTimeout(flowTimeout);
         return builder.build();
     }
 

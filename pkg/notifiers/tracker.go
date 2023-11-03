@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
@@ -144,7 +143,7 @@ type Trackers interface {
 
 // DefaultTrackers is a collection of key trackers.
 type DefaultTrackers struct {
-	waitGroup        sync.WaitGroup
+	waitGroup        panichandler.WaitGroup
 	ctx              context.Context
 	trackers         map[Key]*keyTracker
 	notifiersChannel chan notifierOp
@@ -381,9 +380,7 @@ func (t *DefaultTrackers) removeEvent(tracker *keyTracker, event Event) {
 // Start opens the underlying event channel and starts the event loop.
 // See AddKeyNotifier, AddPrefixNotifier, RemoveKeyNotifier, RemovePrefixNotifier, and Purge for more information.
 func (t *DefaultTrackers) Start() error {
-	t.waitGroup.Add(1)
-	panichandler.Go(func() {
-		defer t.waitGroup.Done()
+	t.waitGroup.Go(func() {
 	OUTER:
 		for {
 			select {

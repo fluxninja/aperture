@@ -22,14 +22,19 @@ func Module() fx.Option {
 	)
 }
 
+// RegisterIn bundles and annotates parameters.
+type RegisterIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	Handler      *Handler
+	HealthServer *health.Server
+	Unmarshaller cfg.Unmarshaller
+}
+
 // Register registers the handler on grpc.Server.
-func Register(handler *Handler,
-	server *grpc.Server,
-	healthsrv *health.Server,
-	unmarshaller cfg.Unmarshaller,
-) error {
+func Register(in RegisterIn) error {
 	var config previewconfig.FlowPreviewConfig
-	if err := unmarshaller.UnmarshalKey(previewconfig.Key, &config); err != nil {
+	if err := in.Unmarshaller.UnmarshalKey(previewconfig.Key, &config); err != nil {
 		return err
 	}
 
@@ -37,9 +42,9 @@ func Register(handler *Handler,
 		log.Info().Msg("flow preview service disabled")
 		return nil
 	}
-	flowpreviewv1.RegisterFlowPreviewServiceServer(server, handler)
+	flowpreviewv1.RegisterFlowPreviewServiceServer(in.Server, in.Handler)
 
-	healthsrv.SetServingStatus("aperture.flowcontrol.v1.FlowPreviewService", grpc_health_v1.HealthCheckResponse_SERVING)
+	in.HealthServer.SetServingStatus("aperture.flowcontrol.v1.FlowPreviewService", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("Preview handler registered")
 	return nil
 }

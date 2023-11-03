@@ -1,11 +1,15 @@
 local spec = import '../../spec.libsonnet';
-local commonPolicyFn = import '../common/policy.libsonnet';
+local commonPolicyFn = import '../common-aimd/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, params={}, metadata={}) {
-  local updatedConfig = config + cfg,
+function(cfg, params={}) {
+  local updatedConfig = config + cfg + {
+    policy+: {
+      overload_condition: 'gt',
+    },
+  },
 
-  local commonPolicy = commonPolicyFn(cfg, params, metadata),
+  local commonPolicy = commonPolicyFn(cfg, params),
 
   local createQuery = function(policy_name, interval) 'sum(increase(flux_meter_sum{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))/sum(increase(flux_meter_count{flow_status="OK", flux_meter_name="%(policy_name)s", policy_name="%(policy_name)s"}[%(interval)s]))' % { policy_name: policy_name, interval: interval },
 
@@ -19,7 +23,7 @@ function(cfg, params={}, metadata={}) {
             local q = createQuery(updatedConfig.policy.policy_name, '30s');
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
+            + spec.v1.PromQL.withEvaluationInterval(evaluation_interval='10s')
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),

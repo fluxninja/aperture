@@ -13,6 +13,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 	"github.com/fluxninja/aperture/v2/pkg/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 // Introducing some newtypes so that tests themselves are more readable.
@@ -221,3 +222,13 @@ func (p *simPolicyMeta) GetEvaluationInterval() time.Duration { return p.Evaluat
 
 // GetStatusRegistry implements PolicyReadAPI.
 func (p *simPolicyMeta) GetStatusRegistry() status.Registry { return p.Registry }
+
+// TicksInDurationPb implements PolicyReadAPI.
+func (p *simPolicyMeta) TicksInDurationPb(d *durationpb.Duration) int {
+	return 1
+}
+
+// TicksInDuration implements PolicyReadAPI.
+func (p *simPolicyMeta) TicksInDuration(d time.Duration) int {
+	return 1
+}

@@ -135,7 +135,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				"%s:%v,%s:%v,%s:%v,%s:%v",
 				metrics.PolicyNameLabel, decision.GetPolicyName(),
 				metrics.ComponentIDLabel, decision.GetComponentId(),
-				metrics.WorkloadIndexLabel, cl.SchedulerInfo.GetWorkloadIndex(),
+				metrics.WorkloadIndexLabel, cl.GetWorkloadIndex(),
 				metrics.PolicyHashLabel, decision.GetPolicyHash(),
 			)
 			workloadsSlice.AppendEmpty().SetStr(workloadsValue)

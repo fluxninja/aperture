@@ -22,7 +22,7 @@ spec:
           command:
             - /bin/sh
             - -xc
-          image: loadimpact/k6:latest
+          image: grafana/k6:latest
           imagePullPolicy: Always
           name: wavepool-generator
           resources:

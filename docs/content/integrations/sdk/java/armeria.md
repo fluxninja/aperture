@@ -16,12 +16,19 @@ keywords:
 All requests handled by an Armeria application can have Aperture SDK calls
 automatically added into them using [Aperture Instrumentation Agent][javaagent].
 
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
+
 ### Armeria Decorators
 
-<a
-href={`https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-armeria`}>Aperture
-Java SDK Armeria package</a> contains Armeria decorators that automatically set
-traffic control points for decorated services:
+[Aperture Java SDK Armeria package](https://search.maven.org/artifact/com.fluxninja.aperture/aperture-java-armeria)
+contains Armeria decorators that automatically set traffic control points for
+decorated services:
 
 ```java
     public static HttpService createHelloHTTPService() {
@@ -45,8 +52,8 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
-        .setHost(...)
-        .setPort(...)
+        .setAddress("ORGANIZATION.app.fluxninja.com:443")
+        .setAgentAPIKey("AGENT_API_KEY")
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...

@@ -17,9 +17,11 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperture-agent/agent"
 	agentfunctions "github.com/fluxninja/aperture/v2/pkg/agent-functions"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
@@ -28,7 +30,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
 	"github.com/fluxninja/aperture/v2/pkg/prometheus"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
+	"github.com/fluxninja/aperture/v2/pkg/secretmanager"
 )
 
 func main() {
@@ -41,7 +43,9 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			fx.Annotate(AgentElectionPath, fx.ResultTags(config.NameTag(etcdclient.ElectionPathFxTag))),
 		),
+		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
 		),
@@ -50,9 +54,9 @@ func main() {
 		autoscale.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
-		election.Module(),
-		rpc.ClientModule,
+		transport.TransportClientModule,
 		agentfunctions.Module,
+		secretmanager.Module(),
 		Module(),
 		// Start collector after all extensions started, so it won't
 		// immediately reload when extensions add their config.
@@ -73,4 +77,8 @@ func main() {
 
 	log.Info().Msg("aperture-agent app created")
 	platform.Run(app)
+}
+
+func AgentElectionPath(agentInfo *agentinfo.AgentInfo) string {
+	return "/election/" + agentInfo.GetAgentGroup()
 }

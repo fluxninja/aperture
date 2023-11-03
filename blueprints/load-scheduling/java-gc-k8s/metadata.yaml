@@ -1,0 +1,3 @@
+blueprint: Load Scheduling based on Java garbage collection times
+sources:
+  policy: load-scheduling/java-gc-k8s/policy.libsonnet

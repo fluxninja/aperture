@@ -67,7 +67,7 @@ func NewArithmeticCombinatorAndOptions(arithmeticCombinatorProto *policylangv1.A
 }
 
 // Execute implements runtime.Component.Execute.
-func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (arith *ArithmeticCombinator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	lhs := inPortReadings.ReadSingleReadingPort("lhs")
 	rhs := inPortReadings.ReadSingleReadingPort("rhs")
 	output := runtime.InvalidReading()

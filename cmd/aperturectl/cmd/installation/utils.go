@@ -24,7 +24,6 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -35,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
@@ -44,7 +44,6 @@ var (
 	kubeConfig     string
 	kubeRestConfig *rest.Config
 	version        string
-	latestVersion  string
 	namespace      string
 	dryRun         bool
 	kubeClient     client.Client
@@ -53,7 +52,7 @@ var (
 )
 
 const (
-	apertureLatestVersion  = "latest"
+	latestTag              = "latest"
 	defaultNS              = "default"
 	controller             = "controller"
 	agent                  = "agent"
@@ -64,8 +63,8 @@ const (
 	aperturectl            = "aperturectl"
 )
 
-// getTemplets loads CRDs, hooks and manifests from the Helm chart.
-func getTemplets(chartName, releaseName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
+// getTemplates loads CRDs, hooks and manifests from the Helm chart.
+func getTemplates(chartName, releaseName string, order releaseutil.KindSortOrder) ([]chart.CRD, []*release.Hook, []releaseutil.Manifest, error) {
 	chartURL := fmt.Sprintf("https://fluxninja.github.io/aperture/%s-%s.tgz", chartName, version)
 
 	resp, err := http.Get(chartURL) //nolint
@@ -182,7 +181,7 @@ func applyObjectToKubernetesWithRetry(unstructuredObject *unstructured.Unstructu
 	for attempt < 5 {
 		attempt++
 		err = applyObjectToKubernetes(unstructuredObject)
-		if err == nil || (!apimeta.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
+		if err == nil || (!utils.IsNoMatchError(err) && !apierrors.IsConflict(err)) {
 			return err
 		}
 		time.Sleep(time.Second * time.Duration(attempt))
@@ -294,7 +293,7 @@ func prepareUnstructuredObject(manifest string) (*unstructured.Unstructured, err
 
 // handleInstall handles installation for given chart using given release name.
 func handleInstall(chartName, releaseName string) error {
-	crds, _, manifests, err := getTemplets(chartName, releaseName, releaseutil.InstallOrder)
+	crds, _, manifests, err := getTemplates(chartName, releaseName, releaseutil.InstallOrder)
 	if err != nil {
 		return err
 	}
@@ -339,7 +338,7 @@ func handleInstall(chartName, releaseName string) error {
 
 // handleUnInstall handles uninstallation for given chart using given release name.
 func handleUnInstall(chartName, releaseName string) error {
-	crds, hooks, manifests, err := getTemplets(chartName, releaseName, releaseutil.UninstallOrder)
+	crds, hooks, manifests, err := getTemplates(chartName, releaseName, releaseutil.UninstallOrder)
 	if err != nil {
 		return err
 	}

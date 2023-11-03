@@ -20,20 +20,29 @@ Use this command to remove a pulled Aperture Blueprint from local system.`,
 aperturectl blueprints remove --version latest
 
 aperturectl blueprints remove --all`,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		pathToRemove := ""
+	RunE: RemoveRunE,
+}
 
-		if all {
-			pathToRemove = blueprintsCacheRoot
-		} else {
-			pathToRemove = blueprintsURIRoot
-		}
+// RemoveRunE is the RunE function executed by the remove command.
+func RemoveRunE(cmd *cobra.Command, args []string) error {
+	skipPull = true
+	blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
+	if err != nil {
+		return err
+	}
+	skipPull = false
 
-		err := os.RemoveAll(pathToRemove)
-		if err != nil {
-			return err
-		}
+	pathToRemove := ""
+	if all {
+		pathToRemove = blueprintsCacheRoot
+	} else {
+		pathToRemove = blueprintsURIRoot
+	}
 
-		return nil
-	},
+	err = os.RemoveAll(pathToRemove)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

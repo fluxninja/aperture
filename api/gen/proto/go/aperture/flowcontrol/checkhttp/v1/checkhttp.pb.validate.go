@@ -146,6 +146,8 @@ func (m *CheckHTTPRequest) validate(all bool) error {
 
 	// no validation rules for ControlPoint
 
+	// no validation rules for RampMode
+
 	if len(errors) > 0 {
 		return CheckHTTPRequestMultiError(errors)
 	}

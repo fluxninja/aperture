@@ -295,7 +295,7 @@ func (fr *sampler) GetSelectors() []*policylangv1.Selector {
 // Decide runs the limiter.
 func (fr *sampler) Decide(ctx context.Context,
 	labels labels.Labels,
-) iface.LimiterDecision {
+) *flowcontrolv1.LimiterDecision {
 	var (
 		labelValue  string
 		hasLabelKey bool
@@ -326,7 +326,7 @@ func (fr *sampler) Decide(ctx context.Context,
 	fr.passthroughLabelValuesMutex.RUnlock()
 	if ok {
 		limiterDecision.Dropped = false
-		return iface.LimiterDecision{LimiterDecision: limiterDecision}
+		return limiterDecision
 	}
 
 	// If label_key is a non-empty string and is found within labels
@@ -356,7 +356,7 @@ func (fr *sampler) Decide(ctx context.Context,
 		}
 	}
 
-	return iface.LimiterDecision{LimiterDecision: limiterDecision}
+	return limiterDecision
 }
 
 // Revert implements the Revert method of the flowcontrolv1.Sampler interface.
@@ -368,7 +368,11 @@ func (fr *sampler) decisionUpdateCallback(event notifiers.Event, unmarshaller co
 	logger := fr.registry.GetLogger()
 	if event.Type == notifiers.Remove {
 		logger.Debug().Msg("Decision removed")
-		fr.acceptPercentage = 100
+		if fr.proto.Parameters.RampMode {
+			fr.acceptPercentage = 0
+		} else {
+			fr.acceptPercentage = 100
+		}
 		return
 	}
 
@@ -408,4 +412,9 @@ func (fr *sampler) GetRequestCounter(labels map[string]string) prometheus.Counte
 	}
 
 	return counter
+}
+
+// GetRampMode returns the ramp mode flag of the sampler.
+func (fr *sampler) GetRampMode() bool {
+	return fr.proto.Parameters.RampMode
 }

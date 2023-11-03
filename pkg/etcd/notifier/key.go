@@ -4,14 +4,13 @@ import (
 	"path"
 
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 )
 
 // KeyToEtcdNotifier holds the state of a notifier that writes raw/transformed contents of a watched key to another key in etcd.
 type KeyToEtcdNotifier struct {
 	notifiers.KeyBase
-	etcdWriter *etcdwriter.Writer
+	etcdClient *etcdclient.Client
 	etcdPath   string
 }
 
@@ -22,20 +21,21 @@ var _ notifiers.KeyNotifier = (*KeyToEtcdNotifier)(nil)
 func NewKeyToEtcdNotifier(
 	key notifiers.Key,
 	etcdPath string,
-	kv *etcdclient.KVWrapper,
+	etcdClient *etcdclient.Client,
+	withLease bool,
 ) (*KeyToEtcdNotifier, error) {
-	return newKeyToEtcdNotifier(key, etcdPath, etcdwriter.NewWriter(kv))
+	return newKeyToEtcdNotifier(key, etcdPath, etcdClient)
 }
 
 func newKeyToEtcdNotifier(
 	key notifiers.Key,
 	etcdPath string,
-	etcdWriter *etcdwriter.Writer,
+	etcdClient *etcdclient.Client,
 ) (*KeyToEtcdNotifier, error) {
 	ken := &KeyToEtcdNotifier{
 		KeyBase:    notifiers.NewKeyBase(key),
 		etcdPath:   etcdPath,
-		etcdWriter: etcdWriter,
+		etcdClient: etcdClient,
 	}
 	return ken, nil
 }
@@ -43,13 +43,13 @@ func newKeyToEtcdNotifier(
 // Start starts the key notifier.
 func (ken *KeyToEtcdNotifier) Start() error {
 	// delete existing key on start
-	ken.etcdWriter.Delete(path.Join(ken.etcdPath, ken.GetKey().String()))
+	ken.etcdClient.Delete(path.Join(ken.etcdPath, ken.GetKey().String()))
 	return nil
 }
 
 // Stop stops the key notifier.
 func (ken *KeyToEtcdNotifier) Stop() error {
-	return ken.etcdWriter.Close()
+	return nil
 }
 
 // Notify writes/removes to etcd based on received event.
@@ -59,8 +59,8 @@ func (ken *KeyToEtcdNotifier) Notify(event notifiers.Event) {
 
 	switch event.Type {
 	case notifiers.Write:
-		ken.etcdWriter.Write(key, event.Value)
+		ken.etcdClient.Put(key, string(event.Value))
 	case notifiers.Remove:
-		ken.etcdWriter.Delete(key)
+		ken.etcdClient.Delete(key)
 	}
 }

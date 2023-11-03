@@ -23,7 +23,6 @@ import (
 	alertmgrconfig "github.com/fluxninja/aperture/v2/pkg/alert-manager/config"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	kubernetes "github.com/fluxninja/aperture/v2/pkg/discovery/kubernetes/config"
-	static "github.com/fluxninja/aperture/v2/pkg/discovery/static/config"
 	googletoken "github.com/fluxninja/aperture/v2/pkg/google/config"
 	jobs "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
@@ -173,6 +172,10 @@ type CommonSpec struct {
 	// Custom readinessProbe that overrides the default one
 	//+kubebuilder:validation:Optional
 	CustomReadinessProbe *corev1.Probe `json:"customReadinessProbe,omitempty"`
+
+	// MinReadySeconds to be applied to the deployment and daemonset.
+	//+kubebuilder:validation:Optional
+	MinReadySeconds int32 `json:"minReadySeconds,omitempty" default:"30" validate:"gte=0"`
 
 	// Resource requests and limits
 	//+kubebuilder:validation:Optional
@@ -402,9 +405,6 @@ type BundledExtensionsSpec struct {
 type ServiceDiscoverySpec struct {
 	// KubernetesDiscoveryConfig for Kubernetes service discovery.
 	KubernetesDiscoveryConfig kubernetes.KubernetesDiscoveryConfig `json:"kubernetes"`
-
-	// StaticDiscoveryConfig for pre-determined list of services.
-	StaticDiscoveryConfig static.StaticDiscoveryConfig `json:"static"`
 }
 
 // ControllerClientCertConfig defines configuration for client certificate for Controller.

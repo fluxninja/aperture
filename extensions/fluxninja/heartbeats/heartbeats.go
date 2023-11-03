@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"net/http"
+	"sync"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -21,11 +23,12 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	"github.com/fluxninja/aperture/v2/pkg/info"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 	autoscalek8sdiscovery "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
@@ -53,7 +56,7 @@ type Heartbeats struct {
 	statusRegistry            status.Registry
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints
 	policyFactory             *controlplane.PolicyFactory
-	ControllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
+	controllerInfo            *heartbeatv1.ControllerInfo // set in OnStart
 	jobGroup                  *jobs.JobGroup
 	clientConn                *grpc.ClientConn // set in OnStart
 	peersWatcher              *peers.PeerDiscovery
@@ -62,11 +65,12 @@ type Heartbeats struct {
 	interval                  config.Duration
 	flowControlPoints         *cache.Cache[selectors.TypedControlPointID]
 	agentInfo                 *agentinfo.AgentInfo
-	election                  *election.Election
-	APIKey                    string
+	etcdClient                *etcdclient.Client
+	apiKey                    string
 	jobName                   string
 	installationMode          string
 	heartbeatsAddr            string
+	controllerInfoMutex       sync.RWMutex
 }
 
 func newHeartbeats(
@@ -77,21 +81,26 @@ func newHeartbeats(
 	agentInfo *agentinfo.AgentInfo,
 	peersWatcher *peers.PeerDiscovery,
 	policyFactory *controlplane.PolicyFactory,
-	election *election.Election,
+	etcdClient *etcdclient.Client,
 	flowControlPoints *cache.Cache[selectors.TypedControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 ) *Heartbeats {
+	apiKey := extensionConfig.AgentAPIKey
+	if apiKey == "" {
+		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+		apiKey = extensionConfig.APIKey
+	}
 	return &Heartbeats{
 		heartbeatsAddr:            extensionConfig.Endpoint,
 		interval:                  extensionConfig.HeartbeatInterval,
-		APIKey:                    extensionConfig.APIKey,
+		apiKey:                    apiKey,
 		jobGroup:                  jobGroup,
 		statusRegistry:            statusRegistry,
 		entities:                  entities,
 		agentInfo:                 agentInfo,
 		peersWatcher:              peersWatcher,
 		policyFactory:             policyFactory,
-		election:                  election,
+		etcdClient:                etcdClient,
 		flowControlPoints:         flowControlPoints,
 		autoscalek8sControlPoints: autoscalek8sControlPoints,
 		installationMode:          extensionConfig.InstallationMode,
@@ -123,38 +132,59 @@ func (h *Heartbeats) setupControllerInfo(
 	etcdClient *etcdclient.Client,
 	extensionConfig *extconfig.FluxNinjaExtensionConfig,
 	controllerID string,
-) error {
+	configProvider *otelconfig.Provider,
+	lifeCycle fx.Lifecycle,
+) {
 	if extensionConfig.EnableCloudController {
 		log.Debug().Msg("Cloud controller enabled, hardcoding cloud controller id")
-		h.ControllerInfo = &heartbeatv1.ControllerInfo{
+		h.SetControllerInfoPtr(&heartbeatv1.ControllerInfo{
 			Id: "cloud",
-		}
-		return nil
+		})
+		return
 	}
 
-	etcdPath := "/fluxninja/controllerid"
-	txn := etcdClient.Client.Txn(etcdClient.Client.Ctx())
-	resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
-		Then(clientv3.OpPut(etcdPath, controllerID)).
-		Else(clientv3.OpGet(etcdPath)).Commit()
-	if err != nil {
-		log.Error().Err(err).Msg("Could not read/write controller id to etcd")
-		return err
-	}
+	ctx, cancel := context.WithCancel(ctx)
 
-	// Succeeded is true if the If condition above is true - meaning there were no controller Id in etcd
-	if !resp.Succeeded {
-		for _, res := range resp.Responses {
-			controllerID = string(res.GetResponseRange().Kvs[0].Value)
-			break
-		}
-	}
+	lifeCycle.Append(fx.Hook{
+		OnStart: func(context.Context) error {
+			panichandler.Go(func() {
+				log.Info().Msg("Creating controller id")
+				etcdPath := "/fluxninja/controllerid"
+				txn, err := etcdClient.Txn(ctx)
+				if err != nil {
+					log.Error().Err(err).Msg("Could not create etcd transaction")
+					return
+				}
+				resp, err := txn.If(clientv3.Compare(clientv3.CreateRevision(etcdPath), "=", 0)).
+					Then(clientv3.OpPut(etcdPath, controllerID)).
+					Else(clientv3.OpGet(etcdPath)).Commit()
+				if err != nil {
+					log.Error().Err(err).Msg("Could not read/write controller id to etcd")
+					return
+				}
 
-	h.ControllerInfo = &heartbeatv1.ControllerInfo{
-		Id: controllerID,
-	}
+				// Succeeded is true if the If condition above is true - meaning there were no controller Id in etcd
+				if !resp.Succeeded {
+					for _, res := range resp.Responses {
+						controllerID = string(res.GetResponseRange().Kvs[0].Value)
+						break
+					}
+				}
 
-	return nil
+				h.SetControllerInfoPtr(&heartbeatv1.ControllerInfo{
+					Id: controllerID,
+				})
+				log.Info().Str("controllerId", controllerID).Msg("Controller id created")
+				// Call otelconfig.Provider.UpdateConfig() to update the controller id in the otel config
+				configProvider.UpdateConfig()
+			})
+			return nil
+		},
+		OnStop: func(context.Context) error {
+			cancel()
+			return nil
+		},
+	})
 }
 
 func (h *Heartbeats) createGRPCJob(ctx context.Context, grpcClientConnBuilder grpcclient.ClientConnectionBuilder) (jobs.Job, error) {
@@ -212,7 +242,7 @@ func (h *Heartbeats) newHeartbeat(
 		VersionInfo:      info.GetVersionInfo(),
 		ProcessInfo:      info.GetProcessInfo(),
 		HostInfo:         info.GetHostInfo(),
-		ControllerInfo:   h.ControllerInfo,
+		ControllerInfo:   h.GetControllerInfoPtr(),
 		AllStatuses:      h.statusRegistry.GetGroupStatus(),
 		InstallationMode: h.installationMode,
 	}
@@ -233,7 +263,7 @@ func (h *Heartbeats) newHeartbeat(
 		report.FlowControlPoints = flowcontrolpoints.ToProto(h.flowControlPoints)
 	}
 
-	if h.election != nil && h.election.IsLeader() {
+	if h.etcdClient != nil && h.etcdClient.IsLeader() {
 		var servicesList *heartbeatv1.ServicesList
 		if h.entities != nil {
 			servicesList = populateServicesList(h.entities)
@@ -255,8 +285,8 @@ func (h *Heartbeats) newHeartbeat(
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
 	report := h.newHeartbeat(jobCtxt)
 
-	// Add api key value to metadata
-	md := metadata.Pairs("apiKey", h.APIKey)
+	// Add agent key value to metadata
+	md := metadata.Pairs("x-api-key", h.apiKey)
 	ctx := metadata.NewOutgoingContext(jobCtxt, md)
 	_, err := h.heartbeatsClient.Report(ctx, report)
 	if err != nil {
@@ -280,7 +310,7 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 		log.Warn().Err(err).Msg("could not create request")
 		return &emptypb.Empty{}, err
 	}
-	req.Header.Add("apiKey", h.APIKey)
+	req.Header.Add("x-api-key", h.apiKey)
 	cli := http.DefaultClient
 	cli.Transport = &http.Transport{}
 	_, err = cli.Do(req)
@@ -292,5 +322,19 @@ func (h *Heartbeats) sendSingleHeartbeatByHTTP(jobCtxt context.Context) (proto.M
 
 // GetControllerInfo returns the controller info.
 func (h *Heartbeats) GetControllerInfo(context.Context, *emptypb.Empty) (*heartbeatv1.ControllerInfo, error) {
-	return h.ControllerInfo, nil
+	return h.GetControllerInfoPtr(), nil
+}
+
+// GetControllerInfoPtr returns the controller info.
+func (h *Heartbeats) GetControllerInfoPtr() *heartbeatv1.ControllerInfo {
+	h.controllerInfoMutex.RLock()
+	defer h.controllerInfoMutex.RUnlock()
+	return h.controllerInfo
+}
+
+// SetControllerInfoPtr sets the controller info.
+func (h *Heartbeats) SetControllerInfoPtr(controllerInfo *heartbeatv1.ControllerInfo) {
+	h.controllerInfoMutex.Lock()
+	defer h.controllerInfoMutex.Unlock()
+	h.controllerInfo = controllerInfo
 }

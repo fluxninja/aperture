@@ -36,6 +36,27 @@ func newFlowControlNestedAndOptions(
 		isAdaptiveLoadScheduler = true
 	}
 
+	aimdLoadSchedulerProto := &policylangv1.AIMDLoadScheduler{}
+	isAIMDLoadScheduler := false
+	if proto := flowControlComponentProto.GetAimdLoadScheduler(); proto != nil {
+		aimdLoadSchedulerProto = proto
+		isAIMDLoadScheduler = true
+	}
+
+	rangeDrivenLoadSchedulerProto := &policylangv1.RangeDrivenLoadScheduler{}
+	isRangeDrivenLoadScheduler := false
+	if proto := flowControlComponentProto.GetRangeDrivenLoadScheduler(); proto != nil {
+		rangeDrivenLoadSchedulerProto = proto
+		isRangeDrivenLoadScheduler = true
+	}
+
+	aiadLoadSchedulerProto := &policylangv1.AIADLoadScheduler{}
+	isAIADLoadScheduler := false
+	if proto := flowControlComponentProto.GetAiadLoadScheduler(); proto != nil {
+		aiadLoadSchedulerProto = proto
+		isAIADLoadScheduler = true
+	}
+
 	loadRampProto := &policylangv1.LoadRamp{}
 	isLoadRamp := false
 	if proto := flowControlComponentProto.GetLoadRamp(); proto != nil {
@@ -68,7 +89,39 @@ func newFlowControlNestedAndOptions(
 
 		return tree, configuredComponents, fx.Options(options...), nil
 	} else if isAdaptiveLoadScheduler {
-		configuredComponent, nestedCircuit, err := loadscheduler.ParseAdaptiveLoadScheduler(adaptiveLoadSchedulerProto, componentID)
+		// convert to aimd load scheduler
+		adaptiveLoadSchedulerProtoBytes, err := adaptiveLoadSchedulerProto.MarshalJSON()
+		if err != nil {
+			return retErr(err)
+		}
+		aimdProto := &policylangv1.AIMDLoadScheduler{}
+		err = aimdProto.UnmarshalJSON(adaptiveLoadSchedulerProtoBytes)
+		if err != nil {
+			return retErr(err)
+		}
+
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAIMDLoadScheduler(aimdProto, componentID)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+	} else if isAIMDLoadScheduler {
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAIMDLoadScheduler(aimdLoadSchedulerProto, componentID)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+	} else if isRangeDrivenLoadScheduler {
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseRangeDrivenLoadScheduler(rangeDrivenLoadSchedulerProto, componentID)
+		if err != nil {
+			return retErr(err)
+		}
+
+		return ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+	} else if isAIADLoadScheduler {
+		configuredComponent, nestedCircuit, err := loadscheduler.ParseAIADLoadScheduler(aiadLoadSchedulerProto, componentID)
 		if err != nil {
 			return retErr(err)
 		}

@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"math"
 	"path"
+	"time"
 
 	prometheusmodel "github.com/prometheus/common/model"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	policyprivatev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/private/v1"
 	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	etcdwriter "github.com/fluxninja/aperture/v2/pkg/etcd/writer"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/query/promql"
@@ -29,12 +30,21 @@ import (
 // Actuator struct.
 type Actuator struct {
 	policyReadAPI            iface.Policy
-	decisionWriter           *etcdwriter.Writer
+	etcdClient               *etcdclient.Client
 	actuatorProto            *policyprivatev1.LoadActuator
 	tokensQuery              *promql.TaggedQuery
 	loadSchedulerComponentID string
+	cpID                     string
 	etcdPaths                []string
+	doActuate                bool
+	ticksPerExecution        int
 }
+
+// Make sure Actuator complies with Component interface.
+var _ runtime.Component = (*Actuator)(nil)
+
+// Make sure Actuator implements background job.
+var _ runtime.BackgroundJob = (*Actuator)(nil)
 
 // Name implements runtime.Component.
 func (*Actuator) Name() string { return "Actuator" }
@@ -53,7 +63,7 @@ func (*Actuator) IsActuator() bool { return true }
 // NewActuatorAndOptions creates load actuator and its fx options.
 func NewActuatorAndOptions(
 	actuatorProto *policyprivatev1.LoadActuator,
-	_ runtime.ComponentID,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	var (
@@ -77,6 +87,8 @@ func NewActuatorAndOptions(
 		loadSchedulerComponentID: loadSchedulerComponentID,
 		etcdPaths:                etcdPaths,
 		actuatorProto:            actuatorProto,
+		cpID:                     componentID.String(),
+		ticksPerExecution:        policyReadAPI.TicksInDuration(metricScrapeInterval),
 	}
 
 	// Prepare parameters for prometheus queries
@@ -109,29 +121,22 @@ func NewActuatorAndOptions(
 		options = append(options, tokensQueryOptions)
 	}
 
-	options = append(options, fx.Invoke(lsa.setupWriter))
+	options = append(options, fx.Invoke(lsa.setup))
 
 	return lsa, fx.Options(options...), nil
 }
 
-func (la *Actuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifecycle fx.Lifecycle) error {
-	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+func (la *Actuator) setup(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) error {
+	la.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			la.decisionWriter = etcdwriter.NewWriter(&scopedKV.KVWrapper)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			var merr, err error
-			la.decisionWriter.Close()
 			for _, etcdPath := range la.etcdPaths {
-				_, err = scopedKV.Delete(clientv3.WithRequireLeader(ctx), etcdPath)
-				if err != nil {
-					logger.Error().Err(err).Msg("Failed to delete load decisions")
-					merr = multierr.Append(merr, err)
-				}
+				etcdClient.Delete(etcdPath)
 			}
-			return merr
+			return nil
 		},
 	})
 
@@ -139,19 +144,20 @@ func (la *Actuator) setupWriter(scopedKV *etcdclient.SessionScopedKV, lifecycle 
 }
 
 // Execute implements runtime.Component.Execute.
-func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (la *Actuator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
+	circuitAPI.ScheduleConditionalBackgroundJob(la, la.ticksPerExecution)
 	retErr := func(err error) (runtime.PortToReading, error) {
 		var errMulti error
-		pErr := la.publishDefaultDecision(tickInfo)
+		pErr := la.publishDefaultDecision(circuitAPI.GetTickInfo())
 		if pErr != nil {
 			errMulti = multierr.Append(err, pErr)
 		}
 		return nil, errMulti
 	}
 
-	tokensByWorkload := make(map[string]uint64)
+	tokensByWorkload := make(map[string]float64)
 	if la.tokensQuery != nil {
-		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(tickInfo)
+		taggedResult, err := la.tokensQuery.ExecuteTaggedQuery(circuitAPI)
 		if err != nil {
 			if err != promql.ErrNoQueriesReturned {
 				return retErr(err)
@@ -172,7 +178,7 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 							continue
 						}
 						workloadIndex := string(v)
-						sampleValue := uint64(sample.Value)
+						sampleValue := float64(sample.Value)
 						tokensByWorkload[workloadIndex] = sampleValue
 						break
 					}
@@ -193,7 +199,7 @@ func (la *Actuator) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 		}
 	}
 
-	return nil, la.publishDecision(tickInfo, lm, pt, tokensByWorkload)
+	return nil, la.publishDecision(circuitAPI.GetTickInfo(), lm, pt, tokensByWorkload)
 }
 
 // DynamicConfigUpdate implements runtime.Component.DynamicConfigUpdate.
@@ -204,14 +210,21 @@ func (la *Actuator) publishDefaultDecision(tickInfo runtime.TickInfo) error {
 	return la.publishDecision(tickInfo, 1.0, true, nil)
 }
 
-func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]uint64) error {
+func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier float64, passThrough bool, tokensByWorkload map[string]float64) error {
+	if !la.doActuate {
+		return nil
+	}
+	la.doActuate = false
 	logger := la.policyReadAPI.GetStatusRegistry().GetLogger()
+	// validUntil = time.Now() + tickInfo.Interval() * la.ticksPerExecution
+	validUntil := tickInfo.Timestamp().Add(tickInfo.Interval() * time.Duration(la.ticksPerExecution*5))
 	// Save load multiplier in decision message
 	decision := &policysyncv1.LoadDecision{
 		LoadMultiplier:        loadMultiplier,
 		PassThrough:           passThrough,
 		TickInfo:              tickInfo.Serialize(),
 		TokensByWorkloadIndex: tokensByWorkload,
+		ValidUntil:            timestamppb.New(validUntil),
 	}
 	// Publish decision
 	logger.Autosample().Debug().Float64("loadMultiplier", loadMultiplier).Bool("passThrough", passThrough).Msg("Publish load decision")
@@ -229,8 +242,18 @@ func (la *Actuator) publishDecision(tickInfo runtime.TickInfo, loadMultiplier fl
 		return err
 	}
 	for _, etcdPath := range la.etcdPaths {
-		la.decisionWriter.Write(etcdPath, dat)
+		la.etcdClient.Put(etcdPath, string(dat))
 	}
 
 	return nil
+}
+
+// GetJob implements runtime.BackgroundJob.GetJob.
+func (la *Actuator) GetJob() jobs.Job {
+	return jobs.NewNoOpJob(la.cpID)
+}
+
+// NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
+func (la *Actuator) NotifyCompletion() {
+	la.doActuate = true
 }

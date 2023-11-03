@@ -4,12 +4,8 @@ import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStages = [
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-  { duration: "2m", target: 50 },
-  { duration: "2m", target: 100 },
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
+  { duration: "5s", target: 5 },
+  { duration: "5m", target: 30 },
 ];
 
 export let options = {
@@ -38,7 +34,7 @@ export default function () {
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
     "User-Id": userId,
-    "Wait-For": randomIntBetween(0, 20) + "s"
+    "Wait-For": randomIntBetween(0, 20) + "s",
   };
   const body = {
     request: [

@@ -29,6 +29,7 @@ export default function () {
       "session=eyJ1c2VyIjoia2Vub2JpIn0.YbsY4Q.kTaKRTyOIfVlIbNB48d9YH6Q0wo",
     "User-Type": userType,
     "User-Id": userId,
+    Tokens: "2",
   };
   const body = {
     request: [

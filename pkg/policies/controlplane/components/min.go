@@ -37,7 +37,7 @@ func NewMinAndOptions(_ *policylangv1.Min, _ runtime.ComponentID, _ iface.Policy
 }
 
 // Execute implements runtime.Component.Execute.
-func (min *Min) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (min *Min) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	minValue := math.MaxFloat64
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 	output := runtime.InvalidReading()

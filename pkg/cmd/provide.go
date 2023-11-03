@@ -16,11 +16,19 @@ var Module = fx.Options(
 	fx.Invoke(RegisterControllerServer),
 )
 
-// RegisterControllerServer registers handler for cmd.v1.Controller service.
-func RegisterControllerServer(handler *Handler, server *grpc.Server, healthsrv *health.Server) {
-	cmdv1.RegisterControllerServer(server, handler)
+// RegisterControllerServerIn bundles and annotates parameters.
+type RegisterControllerServerIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	Handler      *Handler
+	HealthServer *health.Server
+}
 
-	healthsrv.SetServingStatus(
+// RegisterControllerServer registers handler for cmd.v1.Controller service.
+func RegisterControllerServer(in RegisterControllerServerIn) {
+	cmdv1.RegisterControllerServer(in.Server, in.Handler)
+
+	in.HealthServer.SetServingStatus(
 		"aperture.cmd.v1.Controller",
 		grpc_health_v1.HealthCheckResponse_SERVING,
 	)

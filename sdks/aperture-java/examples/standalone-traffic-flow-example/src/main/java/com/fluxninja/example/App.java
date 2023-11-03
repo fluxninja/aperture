@@ -1,6 +1,10 @@
 package com.fluxninja.example;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequestBuilder;
 import io.grpc.ConnectivityState;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -14,8 +18,7 @@ import spark.Spark;
 
 public class App {
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_FEATURE_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -33,35 +36,33 @@ public class App {
     }
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        String agentPort = System.getenv("FN_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
         }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
 
-        String target = String.format("%s:%s", agentHost, agentPort);
-        final ManagedChannel channel = ManagedChannelBuilder.forTarget(target).build();
+        final ManagedChannel channel = ManagedChannelBuilder.forTarget(agentAddress).build();
 
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
+                            .setAddress(agentAddress)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -70,13 +71,13 @@ public class App {
             return;
         }
 
-        String featureName = System.getenv("FN_FEATURE_NAME");
+        String featureName = System.getenv("APERTURE_FEATURE_NAME");
         if (featureName == null) {
             featureName = DEFAULT_FEATURE_NAME;
         }
 
         App app = new App(apertureSDK, channel, featureName);
-        String appPort = System.getenv("FN_APP_PORT");
+        String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }
@@ -110,11 +111,14 @@ public class App {
                 .setHttpSize(req.contentLength())
                 .setHttpHeaders(allHeaders)
                 .setSource(req.ip(), req.port(), "TCP")
-                .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP");
+                .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP")
+                .setRampMode(false)
+                .setFlowTimeout(Duration.ofMillis(1000));
 
         TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
 
-        // StartFlow performs a flowcontrolv1.CheckHTTP call to Aperture Agent. It returns a
+        // StartFlow performs a flowcontrolv1.CheckHTTP call to Aperture Agent. It
+        // returns a
         // TrafficFlow.
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(apertureRequest);
 

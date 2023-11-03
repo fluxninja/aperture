@@ -7,11 +7,11 @@
   withContinuousFillMixin(continuous_fill):: {
     continuous_fill+: continuous_fill,
   },
-  withDeniedResponseStatusCode(denied_response_status_code):: {
-    denied_response_status_code: denied_response_status_code,
+  withDelayInitialFill(delay_initial_fill):: {
+    delay_initial_fill: delay_initial_fill,
   },
-  withDeniedResponseStatusCodeMixin(denied_response_status_code):: {
-    denied_response_status_code+: denied_response_status_code,
+  withDelayInitialFillMixin(delay_initial_fill):: {
+    delay_initial_fill+: delay_initial_fill,
   },
   withInterval(interval):: {
     interval: interval,
@@ -36,11 +36,5 @@
   },
   withMaxIdleTimeMixin(max_idle_time):: {
     max_idle_time+: max_idle_time,
-  },
-  withTokensLabelKey(tokens_label_key):: {
-    tokens_label_key: tokens_label_key,
-  },
-  withTokensLabelKeyMixin(tokens_label_key):: {
-    tokens_label_key+: tokens_label_key,
   },
 }

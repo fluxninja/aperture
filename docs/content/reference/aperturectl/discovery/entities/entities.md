@@ -33,15 +33,14 @@ aperturectl discovery entities --find-by=“ip=10.244.1.24”
 ### Options
 
 ```
-      --find-by string   Find entity by [name|ip]
-  -h, --help             help for entities
+      --agent-group string   Name of the agent group to list agents for
+      --find-by string       Find entity by [name|ip]
+  -h, --help                 help for entities
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --api-key string         Aperture Cloud API Key to be used when using Cloud Controller
-      --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Controller
       --controller-ns string   Namespace in which the Aperture Controller is running
       --insecure               Allow connection to controller running without TLS

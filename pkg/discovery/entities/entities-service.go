@@ -3,6 +3,7 @@ package entities
 import (
 	"context"
 
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -10,7 +11,7 @@ import (
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 )
 
 // EntitiesService is the implementation of entitiesv1.EntitiesService interface.
@@ -19,17 +20,25 @@ type EntitiesService struct {
 	entityCache *Entities
 }
 
+// RegisterEntitiesServiceIn bundles and annotates parameters.
+type RegisterEntitiesServiceIn struct {
+	fx.In
+	Server              *grpc.Server `name:"default"`
+	Cache               *Entities
+	EtcdTransportClient *transport.EtcdTransportClient
+}
+
 // RegisterEntitiesService registers a service for entity cache.
-func RegisterEntitiesService(server *grpc.Server, cache *Entities, registry *rpc.HandlerRegistry) error {
+func RegisterEntitiesService(in RegisterEntitiesServiceIn) error {
 	svc := &EntitiesService{
-		entityCache: cache,
+		entityCache: in.Cache,
 	}
-	entitiesv1.RegisterEntitiesServiceServer(server, svc)
-	err := rpc.RegisterFunction(registry, svc.ListDiscoveryEntities)
+	entitiesv1.RegisterEntitiesServiceServer(in.Server, svc)
+	err := transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntities)
 	if err != nil {
 		return err
 	}
-	err = rpc.RegisterFunction(registry, svc.ListDiscoveryEntity)
+	err = transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntity)
 	if err != nil {
 		return err
 	}

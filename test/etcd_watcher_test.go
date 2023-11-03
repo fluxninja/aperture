@@ -29,7 +29,7 @@ var _ = Describe("Etcd Watcher", func() {
 
 		BeforeEach(func() {
 			k := notifiers.Key(notifierKey)
-			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, &etcdClient.KVWrapper)
+			etcdKeyNotifier, err = etcdnotifier.NewKeyToEtcdNotifier(k, notifierPrefix, etcdClient, false)
 			Expect(err).NotTo(HaveOccurred())
 			etcdKeyNotifier.Start()
 			err := etcdWatcher.AddKeyNotifier(etcdKeyNotifier)
@@ -46,15 +46,14 @@ var _ = Describe("Etcd Watcher", func() {
 		})
 
 		It("tracks etcd key even if it does not exist at first", func() {
-			_, err := etcdClient.KV.Get(ctx, notifierPath)
+			_, err := etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			val := "val"
-			_, err = etcdClient.KV.Put(ctx, trackedPath, val)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put(trackedPath, val)
 			time.Sleep(1 * time.Second)
 
-			resp, err := etcdClient.KV.Get(ctx, notifierPath)
+			resp, err := etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -67,11 +66,10 @@ var _ = Describe("Etcd Watcher", func() {
 		})
 
 		It("deletes key notifier correctly", func() {
-			_, err := etcdClient.KV.Put(ctx, trackedPath, val)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put(trackedPath, val)
 			time.Sleep(1 * time.Second)
 
-			resp, err := etcdClient.KV.Get(ctx, notifierPath)
+			resp, err := etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -82,11 +80,10 @@ var _ = Describe("Etcd Watcher", func() {
 			}
 			Expect(found).To(BeTrue())
 
-			_, err = etcdClient.KV.Delete(ctx, trackedPath)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Delete(trackedPath)
 			time.Sleep(1 * time.Second)
 
-			resp, err = etcdClient.KV.Get(ctx, notifierPath)
+			resp, err = etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found = false
@@ -99,11 +96,10 @@ var _ = Describe("Etcd Watcher", func() {
 		})
 
 		It("deletes key when key notifier is removed", func() {
-			_, err := etcdClient.KV.Put(ctx, trackedPath, val)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put(trackedPath, val)
 			time.Sleep(1 * time.Second)
 
-			resp, err := etcdClient.KV.Get(ctx, notifierPath)
+			resp, err := etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -118,11 +114,10 @@ var _ = Describe("Etcd Watcher", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			newVal := "newVal"
-			_, err = etcdClient.KV.Put(ctx, trackedPath, newVal)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put(trackedPath, newVal)
 			time.Sleep(1 * time.Second)
 
-			resp, err = etcdClient.KV.Get(ctx, notifierPath)
+			resp, err = etcdClient.Get(ctx, notifierPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found = false
@@ -133,7 +128,7 @@ var _ = Describe("Etcd Watcher", func() {
 			}
 			Expect(found).To(BeFalse())
 
-			resp, err = etcdClient.KV.Get(ctx, trackedPath)
+			resp, err = etcdClient.Get(ctx, trackedPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			found = false
@@ -150,10 +145,10 @@ var _ = Describe("Etcd Watcher", func() {
 		var etcdNotifier *etcdnotifier.PrefixToEtcdNotifier
 
 		BeforeEach(func() {
-			etcdClient.KV.Put(ctx, "foo/key1", "val1")
-			etcdClient.KV.Put(ctx, "foo/key2", "val2")
-			etcdClient.KV.Put(ctx, "foo/key3", "val3")
-			etcdNotifier = etcdnotifier.NewPrefixToEtcdNotifier("bar/", &etcdClient.KVWrapper)
+			etcdClient.Put("foo/key1", "val1")
+			etcdClient.Put("foo/key2", "val2")
+			etcdClient.Put("foo/key3", "val3")
+			etcdNotifier = etcdnotifier.NewPrefixToEtcdNotifier("bar/", etcdClient)
 			etcdNotifier.Start()
 			err := etcdWatcher.AddPrefixNotifier(etcdNotifier)
 			Expect(err).ToNot(HaveOccurred())
@@ -171,7 +166,7 @@ var _ = Describe("Etcd Watcher", func() {
 		It("tracks the prefix notifier key correctly", func() {
 			val1 := "val1"
 
-			resp, err := etcdClient.KV.Get(ctx, "bar/key1")
+			resp, err := etcdClient.Get(ctx, "bar/key1")
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -189,12 +184,11 @@ var _ = Describe("Etcd Watcher", func() {
 			barkey4 := fmt.Sprintf("bar/%s", key4)
 			val4 := "val4"
 
-			_, err := etcdClient.KV.Put(ctx, fookey4, val4)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put(fookey4, val4)
 
 			time.Sleep(1 * time.Second)
 
-			resp, err := etcdClient.KV.Get(ctx, barkey4)
+			resp, err := etcdClient.Get(ctx, barkey4)
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -208,12 +202,11 @@ var _ = Describe("Etcd Watcher", func() {
 
 		It("updates the prefix notifier key correctly", func() {
 			newVal := "v1"
-			_, err := etcdClient.KV.Put(ctx, "foo/key2", newVal)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put("foo/key2", newVal)
 
 			time.Sleep(1 * time.Second)
 
-			resp, err := etcdClient.KV.Get(ctx, "bar/key2")
+			resp, err := etcdClient.Get(ctx, "bar/key2")
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -226,10 +219,9 @@ var _ = Describe("Etcd Watcher", func() {
 		})
 
 		It("deletes the prefix notifier key correctly", func() {
-			_, err := etcdClient.KV.Delete(ctx, "foo/key3")
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Delete("foo/key3")
 
-			resp, err := etcdClient.KV.Get(ctx, "bar/")
+			resp, err := etcdClient.Get(ctx, "bar/")
 			Expect(err).ToNot(HaveOccurred())
 
 			found := false
@@ -283,8 +275,7 @@ var _ = Describe("Etcd Watcher", func() {
 			fileInfo := filesystem.NewFileInfo(tempDir, "key4", ".yaml")
 			val4 := "val4"
 
-			_, err := etcdClient.KV.Put(ctx, "foo/key4", val4)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put("foo/key4", val4)
 
 			time.Sleep(1 * time.Second)
 
@@ -296,8 +287,7 @@ var _ = Describe("Etcd Watcher", func() {
 
 		It("updates the prefix notifier key correctly", func() {
 			newVal := "v1"
-			_, err := etcdClient.KV.Put(ctx, "foo/key2", newVal)
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Put("foo/key2", newVal)
 
 			time.Sleep(1 * time.Second)
 
@@ -310,8 +300,7 @@ var _ = Describe("Etcd Watcher", func() {
 		})
 
 		It("deletes the prefix notifier key correctly", func() {
-			_, err := etcdClient.KV.Delete(ctx, "foo/key3")
-			Expect(err).ToNot(HaveOccurred())
+			etcdClient.Delete("foo/key3")
 
 			fileInfo := filesystem.NewFileInfo(tempDir, "key3", ".yaml")
 

@@ -25,8 +25,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator:2.7.9")
 	implementation("io.micrometer:micrometer-registry-prometheus:1.9.0")
 	implementation("org.springframework.boot:spring-boot-starter-web:2.7.9")
-	implementation("com.fluxninja.aperture:aperture-java-core:2.3.0")
-	implementation("com.fluxninja.aperture:aperture-java-servlet:2.3.0")
+	implementation("com.fluxninja.aperture:aperture-java-core:2.20.0")
+	implementation("com.fluxninja.aperture:aperture-java-servlet:2.20.0")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools:2.7.9")
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:2.7.9")

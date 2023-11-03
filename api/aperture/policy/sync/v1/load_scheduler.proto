@@ -5,6 +5,7 @@ package aperture.policy.sync.v1;
 import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 import "aperture/policy/sync/v1/tick.proto";
+import "google/protobuf/timestamp.proto";
 
 message LoadSchedulerWrapper {
   // CommonAttributes
@@ -24,5 +25,6 @@ message LoadDecision {
   TickInfo tick_info = 1;
   double load_multiplier = 2;
   bool pass_through = 3;
-  map<string, uint64> tokens_by_workload_index = 4;
+  map<string, double> tokens_by_workload_index = 4;
+  google.protobuf.Timestamp valid_until = 5;
 }

@@ -9,8 +9,9 @@ import (
 	"text/tabwriter"
 
 	"github.com/facebookgo/symwalk"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
+
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 )
 
 func init() {
@@ -27,16 +28,16 @@ Use this command to list the Aperture Blueprints which are already pulled and av
 aperturectl blueprints list --version latest
 
 aperturectl blueprints list --all`,
-	RunE: func(_ *cobra.Command, _ []string) error {
-		err := utils.ReaderLock(blueprintsURIRoot)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
 		if err != nil {
 			return err
 		}
-		defer utils.Unlock(blueprintsURIRoot)
+
 		if all {
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 
-			blueprintsList, err := getCachedBlueprints()
+			blueprintsList, err := getCachedBlueprints(blueprintsCacheRoot)
 			if err != nil {
 				return err
 			}
@@ -72,17 +73,15 @@ aperturectl blueprints list --all`,
 	},
 }
 
-func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
-	relPath := utils.GetRelPath(blURIRoot)
+func getBlueprints(blueprintsDir string, listDeprecated bool) ([]string, error) {
 	policies := []string{}
 
-	blDir := filepath.Join(blURIRoot, relPath)
-	err := symwalk.Walk(blDir, func(path string, fi fs.FileInfo, err error) error {
+	err := symwalk.Walk(blueprintsDir, func(path string, fi fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !fi.IsDir() && fi.Name() == "bundle.libsonnet" {
-			strippedPath := strings.TrimPrefix(path, blDir)
+			strippedPath := strings.TrimPrefix(path, blueprintsDir)
 			strippedPath = strings.TrimSuffix(strippedPath, "/bundle.libsonnet")
 			strippedPath = strings.TrimPrefix(strippedPath, "/")
 			if !listDeprecated {
@@ -104,7 +103,7 @@ func getBlueprints(blURIRoot string, listDeprecated bool) ([]string, error) {
 	return policies, nil
 }
 
-func getCachedBlueprints() (map[string][]string, error) {
+func getCachedBlueprints(blueprintsCacheRoot string) (map[string][]string, error) {
 	blueprintsList := map[string][]string{}
 	blueprintsURIDirs, err := os.ReadDir(blueprintsCacheRoot)
 	if err != nil {

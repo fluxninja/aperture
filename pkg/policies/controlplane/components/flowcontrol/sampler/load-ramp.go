@@ -25,6 +25,8 @@ func ParseLoadRamp(
 		return nil, nil, err
 	}
 
+	loadRamp.Parameters.Sampler.RampMode = true
+
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadRamp.InPorts
 	if inPorts != nil {

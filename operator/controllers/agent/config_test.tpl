@@ -46,8 +46,9 @@ flow_control:
     enabled: true
 auto_scale:
   kubernetes:
-    enabled: true
+    enabled: false
 fluxninja:
+  agent_api_key: ""
   api_key: ""
   client:
     grpc:
@@ -223,7 +224,6 @@ server:
 service_discovery:
   kubernetes:
     enabled: true
-  static: {}
 token_source:
   enabled: false
 watchdog:

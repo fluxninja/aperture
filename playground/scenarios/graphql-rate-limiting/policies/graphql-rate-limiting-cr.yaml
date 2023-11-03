@@ -22,6 +22,7 @@ spec:
             lazy_sync:
               enabled: true
               num_sync: 5
+          request_parameters: {}
           selectors:
           - agent_group: default
             control_point: ingress

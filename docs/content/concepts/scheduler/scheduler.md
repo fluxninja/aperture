@@ -40,8 +40,8 @@ bucket local to each agent, which gets adjusted based on the past token rate at
 the agent. This is useful for service protection scenarios since it provides a
 robust mechanism to relatively adjust the token rate. The _Quota Scheduler_,
 uses a centralized token bucket within an [agent group](../agent-group.md). This
-is useful for scenarios involving known limits, like third-party API rate limits
-or inter-service API quotas.
+is useful for scenarios involving known limits, such as third-party API rate
+limits or inter-service API quotas.
 
 ### Workload {#workload}
 
@@ -96,10 +96,10 @@ time window.
 Tokens are determined in the following order of precedence:
 
 - Specified in the flow labels.
-- Specified in the `Workload.tokens` setting.
 - Estimated tokens (see
   [`workload_latency_based_tokens`](/reference/configuration/spec.md#load-scheduler)
   setting).
+- Specified in the `Workload.tokens` setting.
 
 ### Queue Timeout {#queue-timeout}
 

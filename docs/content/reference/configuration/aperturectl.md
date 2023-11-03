@@ -1,6 +1,6 @@
 ---
 title: aperturectl Configuration File Format Reference
-sidebar_position: 5
+sidebar_position: 4
 sidebar_label: "Aperturectl"
 ---
 
@@ -47,5 +47,5 @@ environment variable to switch between different projects and organizations.
 :::
 
 [toml]: https://toml.io/
-[configure-aperturectl]: /get-started/installation/configure-cli.md
+[configure-aperturectl]: /get-started/setup-cli/configure-cli.md
 [cloud-controller]: /reference/fluxninja.md#cloud-controller

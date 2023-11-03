@@ -3,7 +3,6 @@ package discovery
 import (
 	"context"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -17,56 +16,57 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
+	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
 
-func newControlPointDiscovery(election *election.Election, k8sClient k8s.K8sClient, controlPointStore AutoScaleControlPointStore) (*controlPointDiscovery, error) {
+func newControlPointDiscovery(etcdClient *etcdclient.Client, k8sClient k8s.K8sClient, controlPointStore AutoScaleControlPointStore) (*controlPointDiscovery, error) {
 	cpd := &controlPointDiscovery{
-		election:          election,
+		etcdClient:        etcdClient,
 		controlPointStore: controlPointStore,
 		discoveryClient:   k8sClient.GetClientSet().DiscoveryClient,
 		dynamicClient:     k8sClient.GetDynamicClient(),
 	}
+
+	etcdClient.AddElectionWatcher(cpd)
 
 	return cpd, nil
 }
 
 // controlPointDiscovery is a struct that helps with Kubernetes control point discovery.
 type controlPointDiscovery struct {
-	waitGroup         sync.WaitGroup
+	waitGroup         panichandler.WaitGroup
 	ctx               context.Context
 	cancel            context.CancelFunc
 	controlPointStore AutoScaleControlPointStore
 	discoveryClient   discovery.DiscoveryInterface
 	dynamicClient     dynamic.Interface
-	election          *election.Election
+	etcdClient        *etcdclient.Client
+}
+
+// controlPointDiscovery implements the etcdclient.ElectionWatcher interface.
+var _ etcdclient.ElectionWatcher = (*controlPointDiscovery)(nil)
+
+// OnLeaderStart is called when this instance becomes the leader.
+func (cpd *controlPointDiscovery) OnLeaderStart() {
+	log.Info().Msg("Starting kubernetes control point discovery")
+	cpd.start()
+}
+
+// OnLeaderStop is called when this instance stops being the leader.
+func (cpd *controlPointDiscovery) OnLeaderStop() {
+	log.Info().Msg("Stopping kubernetes control point discovery")
+	cpd.stop()
 }
 
 // Start starts the Kubernetes control point discovery.
 func (cpd *controlPointDiscovery) start() {
 	cpd.ctx, cpd.cancel = context.WithCancel(context.Background())
 
-	cpd.waitGroup.Add(1)
-
-	panichandler.Go(func() {
-		defer cpd.waitGroup.Done()
-
+	cpd.waitGroup.Go(func() {
 		operation := func() error {
-			// Proceed only if we are the leader
-			// FIXME this goroutine leaks if we never become a leader
-			for {
-				if cpd.election.IsLeader() {
-					// Proceed
-					break
-				} else {
-					// Check again in 5 seconds
-					time.Sleep(5 * time.Second)
-				}
-			}
-
 			// Discover all resources with /scale subresource
 			_, apiResourceListList, err := cpd.discoveryClient.ServerGroupsAndResources()
 			if err != nil {

@@ -87,9 +87,13 @@ private static final long serialVersionUID = 0L;
      */
     REJECT_REASON_NO_TOKENS(2),
     /**
-     * <code>REJECT_REASON_REGULATED = 3;</code>
+     * <code>REJECT_REASON_NOT_SAMPLED = 3;</code>
      */
-    REJECT_REASON_REGULATED(3),
+    REJECT_REASON_NOT_SAMPLED(3),
+    /**
+     * <code>REJECT_REASON_NO_MATCHING_RAMP = 4;</code>
+     */
+    REJECT_REASON_NO_MATCHING_RAMP(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -106,9 +110,13 @@ private static final long serialVersionUID = 0L;
      */
     public static final int REJECT_REASON_NO_TOKENS_VALUE = 2;
     /**
-     * <code>REJECT_REASON_REGULATED = 3;</code>
+     * <code>REJECT_REASON_NOT_SAMPLED = 3;</code>
      */
-    public static final int REJECT_REASON_REGULATED_VALUE = 3;
+    public static final int REJECT_REASON_NOT_SAMPLED_VALUE = 3;
+    /**
+     * <code>REJECT_REASON_NO_MATCHING_RAMP = 4;</code>
+     */
+    public static final int REJECT_REASON_NO_MATCHING_RAMP_VALUE = 4;
 
 
     public final int getNumber() {
@@ -138,7 +146,8 @@ private static final long serialVersionUID = 0L;
         case 0: return REJECT_REASON_NONE;
         case 1: return REJECT_REASON_RATE_LIMITED;
         case 2: return REJECT_REASON_NO_TOKENS;
-        case 3: return REJECT_REASON_REGULATED;
+        case 3: return REJECT_REASON_NOT_SAMPLED;
+        case 4: return REJECT_REASON_NO_MATCHING_RAMP;
         default: return null;
       }
     }

@@ -19,7 +19,7 @@ const ConfigKey = "auto_scale.kubernetes"
 // +kubebuilder:object:generate=true
 type AutoScaleKubernetesConfig struct {
 	// Enables the Kubernetes auto-scale capability.
-	Enabled bool `json:"enabled" default:"true"`
+	Enabled bool `json:"enabled" default:"false"`
 }
 
 func provideConfig(unmarshaller config.Unmarshaller) (AutoScaleKubernetesConfig, error) {

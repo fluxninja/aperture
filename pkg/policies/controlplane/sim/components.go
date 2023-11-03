@@ -35,7 +35,7 @@ func (i *Input) ShortDescription() string { return "" }
 func (*Input) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.
-func (i *Input) Execute(_ runtime.PortToReading, _ runtime.TickInfo) (runtime.PortToReading, error) {
+func (i *Input) Execute(_ runtime.PortToReading, _ runtime.CircuitAPI) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
 		"output": []runtime.Reading{i.execute()},
 	}, nil
@@ -79,7 +79,7 @@ func (o *output) TakeReadings() []runtime.Reading {
 }
 
 // Execute implements runtime.Component.
-func (o *output) Execute(ins runtime.PortToReading, _ runtime.TickInfo) (runtime.PortToReading, error) {
+func (o *output) Execute(ins runtime.PortToReading, _ runtime.CircuitAPI) (runtime.PortToReading, error) {
 	o.Readings = append(o.Readings, ins.ReadSingleReadingPort("input"))
 	return nil, nil
 }

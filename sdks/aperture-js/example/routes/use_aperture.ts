@@ -1,29 +1,53 @@
 import express from "express";
 
-import { ApertureClient, FlowStatus } from "@fluxninja/aperture-js";
+import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import grpc from "@grpc/grpc-js";
 
 // Create aperture client
-export const apertureClient = new ApertureClient();
+export const apertureClient = new ApertureClient({
+  address:
+    process.env.APERTURE_AGENT_ADDRESS !== undefined
+      ? process.env.APERTURE_AGENT_ADDRESS
+      : "localhost:8089",
+  agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
+  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+  channelCredentials:
+    process.env.APERTURE_AGENT_INSECURE !== undefined
+      ? grpc.credentials.createInsecure()
+      : grpc.credentials.createSsl(),
+});
 
 export const apertureRoute = express.Router();
 apertureRoute.get("/", function (_: express.Request, res: express.Response) {
   // do some business logic to collect labels
-  var labelsMap = new Map<string, string>().set("user", "kenobi");
+  const labels: Record<string, string> = {
+    user: "kenobi",
+  };
+
+  const startTimestamp = Date.now();
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
-    .StartFlow("awesome-feature", labelsMap)
+    .StartFlow("awesomeFeature", {
+      labels: labels,
+      grpcCallOptions: {
+        deadline: Date.now() + 30000,
+      },
+      rampMode: false,
+    })
     .then((flow) => {
+      const endTimestamp = Date.now();
+      console.log(`Flow took ${endTimestamp - startTimestamp}ms`);
       // See whether flow was accepted by Aperture Agent.
       if (flow.ShouldRun()) {
         // Simulate work being done
-        sleep(2000).then(() => {
+        sleep(200).then(() => {
           console.log("Work done!");
+          res.sendStatus(202);
         });
-        res.sendStatus(202);
       } else {
         // Flow has been rejected by Aperture Agent.
-        flow.SetStatus(FlowStatus.Error);
+        flow.SetStatus(FlowStatusEnum.Error);
         res.sendStatus(403);
       }
       // Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.

@@ -15,6 +15,12 @@ local ratelimiterins = import './ratelimiterins.libsonnet';
   withParametersMixin(parameters):: {
     parameters+: parameters,
   },
+  withRequestParameters(request_parameters):: {
+    request_parameters: request_parameters,
+  },
+  withRequestParametersMixin(request_parameters):: {
+    request_parameters+: request_parameters,
+  },
   withSelectors(selectors):: {
     selectors:
       if std.isArray(selectors)

@@ -79,16 +79,7 @@ func (m *PreviewRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetService()) < 1 {
-		err := PreviewRequestValidationError{
-			field:  "Service",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Service
 
 	if all {
 		switch v := interface{}(m.GetLabelMatcher()).(type) {

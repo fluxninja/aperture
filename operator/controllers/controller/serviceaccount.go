@@ -48,7 +48,7 @@ func serviceAccountForController(instance *controllerv1alpha1.Controller, scheme
 
 	sa := &corev1.ServiceAccount{
 		ObjectMeta: v1.ObjectMeta{
-			Name:        controllers.ServiceAccountName(instance),
+			Name:        controllers.ControllerServiceAccountName(instance),
 			Namespace:   instance.GetNamespace(),
 			Labels:      controllers.CommonLabels(instance.Spec.Labels, instance.GetName(), controllers.ControllerServiceName),
 			Annotations: annotations,

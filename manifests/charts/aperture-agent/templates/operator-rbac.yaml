@@ -116,6 +116,7 @@ rules:
   - apps
   resources:
   - daemonsets
+  - deployments
   verbs:
   - create
   - delete
@@ -190,7 +191,7 @@ rules:
   - update
   - watch
 {{- end }}
-{{- if or (not .Values.operator.rbac.featureBasedRoles) (or (not .Values.agent.config) (not .Values.agent.config.auto_scale) (not .Values.agent.config.auto_scale.kubernetes) .Values.agent.config.auto_scale.kubernetes.enabled) }}
+{{- if and .Values.agent.config .Values.agent.config.auto_scale .Values.agent.config.auto_scale.kubernetes .Values.agent.config.auto_scale.kubernetes.enabled }}
 # auto scale permissions
 - apiGroups: ["*"]
   resources: ["*"]

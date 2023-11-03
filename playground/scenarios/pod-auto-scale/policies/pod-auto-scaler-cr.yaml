@@ -66,7 +66,7 @@ spec:
             output:
               signal_name: PROMQL_SCALE_OUT_0
           query_string: avg(k8s_pod_cpu_utilization_ratio{k8s_deployment_name="service1-demo-app",k8s_namespace_name="demoapp",policy_name="pod-auto-scaler",infra_meter_name="kubeletstats"})
-    evaluation_interval: 10s
+    evaluation_interval: 1s
   resources:
     flow_control:
       classifiers: []

@@ -6,10 +6,18 @@ import "aperture/policy/language/v1/policy.proto";
 import "aperture/policy/sync/v1/common_attributes.proto";
 
 message PolicyWrapper {
+  enum Source {
+    UNKNOWN = 0;
+    ETCD = 1;
+    K8S = 2;
+  }
+
   // CommonAttributes
   CommonAttributes common_attributes = 1;
   // Policy
   policy.language.v1.Policy policy = 2;
+  // Where did the policy came from
+  Source source = 3;
 }
 
 message PolicyWrappers {

@@ -43,7 +43,7 @@ func NewBoolVariableAndOptions(variableProto *policylangv1.BoolVariable, _ runti
 }
 
 // Execute executes the BoolVariable component and emits the current boolean value.
-func (v *BoolVariable) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (v *BoolVariable) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	return runtime.PortToReading{
 		"output": []runtime.Reading{runtime.NewBoolReading(v.constantOutput)},
 	}, nil

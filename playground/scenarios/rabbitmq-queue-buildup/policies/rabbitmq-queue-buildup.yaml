@@ -1,10 +1,22 @@
 # yaml-language-server: $schema=../../../../blueprints/load-scheduling/promql/gen/definitions.json
+
+blueprint: load-scheduling/promql
+uri: ../../../../blueprints
 policy:
   policy_name: "service1-demoapp-rabbitmq-queue-buildup"
   promql_query: 'sum(rabbitmq_message_current{rabbitmq_queue_name="service3-demo-app.demoapp.svc.cluster.local",state="ready"})'
-  service_protection_core:
-    adaptive_load_scheduler:
+  setpoint: 1000
+  overload_condition: gt
+  load_scheduling_core:
+    aiad_load_scheduler:
+      alerter:
+        alert_name: "AIAD Load Throttling Event"
+      load_multiplier_linear_decrement: 0.05
+      load_multiplier_linear_increment: 0.025
+      max_load_multiplier: 2
+      min_load_multiplier: 0
       load_scheduler:
+        workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
         # Type: []aperture.spec.v1.Selector
         # Required: True
@@ -12,7 +24,6 @@ policy:
           - agent_group: default
             control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
-  setpoint: 1000
   resources:
     infra_meters:
       rabbitmq:

@@ -20,7 +20,14 @@ func Module() fx.Option {
 	)
 }
 
+// RegisterControlPointCacheServiceIn bundles and annotates parameters.
+type RegisterControlPointCacheServiceIn struct {
+	fx.In
+	Server  *grpc.Server `name:"default"`
+	Handler *Handler
+}
+
 // RegisterControlPointCacheService registers the ControlPointCache service handler with the gRPC server.
-func RegisterControlPointCacheService(handler *Handler, server *grpc.Server) {
-	controlpointsv1.RegisterAutoScaleKubernetesControlPointsServiceServer(server, handler)
+func RegisterControlPointCacheService(in RegisterControlPointCacheServiceIn) {
+	controlpointsv1.RegisterAutoScaleKubernetesControlPointsServiceServer(in.Server, in.Handler)
 }

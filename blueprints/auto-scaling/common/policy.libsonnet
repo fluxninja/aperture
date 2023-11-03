@@ -1,3 +1,4 @@
+local consts = import '../../consts.libsonnet';
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local config = import './config-defaults.libsonnet';
@@ -63,7 +64,7 @@ function(cfg) {
         local q = params.policy.promql_scale_in_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+        + promQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_IN_%s' % controller_idx) }),
       ),
     )
@@ -77,7 +78,7 @@ function(cfg) {
         local q = params.policy.promql_scale_out_controllers[controller_idx].query_string;
         promQL.new()
         + promQL.withQueryString(q)
-        + promQL.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+        + promQL.withEvaluationInterval(evaluation_interval=consts.metricScrapeInterval)
         + promQL.withOutPorts({ output: port.withSignalName('PROMQL_SCALE_OUT_%s' % controller_idx) }),
       ),
     )
@@ -89,7 +90,7 @@ function(cfg) {
     + spec.v1.Policy.withResources(utils.resources(params.policy.resources).updatedResources)
     + spec.v1.Policy.withCircuit(
       spec.v1.Circuit.new()
-      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=params.policy.evaluation_interval)
+      + spec.v1.Circuit.withEvaluationInterval(evaluation_interval=consts.circuitEvaluationInterval)
       + spec.v1.Circuit.withComponents(
         [
           component.new()

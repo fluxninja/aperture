@@ -17,7 +17,8 @@ public class AppController {
         return "Hello World";
     }
 
-    // /super2 endpoint is protected by a Filter created using Aperture SDK feature flow
+    // /super2 endpoint is protected by a Filter created using Aperture SDK feature
+    // flow
     @RequestMapping(value = "/super2", method = RequestMethod.GET)
     public String hello2() {
         return "Hello World 2";
@@ -41,19 +42,19 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        String agentHost = env.getProperty("FN_AGENT_HOST");
-        registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("FN_AGENT_PORT");
-        registrationBean.addInitParameter("agent_port", agentPort);
-        String failOpen = env.getProperty("FN_ENABLE_FAIL_OPEN");
-        registrationBean.addInitParameter("enable_fail_open", failOpen);
-        String controlPointName = env.getProperty("FN_CONTROL_POINT_NAME");
+        String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
+        registrationBean.addInitParameter("agent_address", agentAddress);
+        String agentAPIKey = env.getProperty("APERTURE_AGENT_API_KEY");
+        registrationBean.addInitParameter("agent_api_key", agentAPIKey);
+        String rampMode = env.getProperty("APERTURE_ENABLE_RAMP_MODE");
+        registrationBean.addInitParameter("enable_ramp_mode", rampMode);
+        String controlPointName = env.getProperty("APERTURE_CONTROL_POINT_NAME");
         registrationBean.addInitParameter("control_point_name", controlPointName);
-        String grpcTimeoutMs = env.getProperty("FN_GRPC_TIMEOUT_MS");
+        String grpcTimeoutMs = env.getProperty("APERTURE_GRPC_TIMEOUT_MS");
         registrationBean.addInitParameter("timeout_ms", grpcTimeoutMs);
-        String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
+        String insecureGrpc = env.getProperty("APERTURE_AGENT_INSECURE");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
-        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertificateFile = env.getProperty("APERTURE_ROOT_CERTIFICATE_FILE");
         registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;
@@ -68,15 +69,15 @@ public class AppController {
         registrationBean.setFilter(new ApertureFeatureFilter());
         registrationBean.addUrlPatterns("/super2");
 
-        String agentHost = env.getProperty("FN_AGENT_HOST");
-        registrationBean.addInitParameter("agent_host", agentHost);
-        String agentPort = env.getProperty("FN_AGENT_PORT");
-        registrationBean.addInitParameter("agent_port", agentPort);
-        String failOpen = env.getProperty("FN_ENABLE_FAIL_OPEN");
-        registrationBean.addInitParameter("enable_fail_open", failOpen);
-        String insecureGrpc = env.getProperty("FN_INSECURE_GRPC");
+        String agentAddress = env.getProperty("APERTURE_AGENT_ADDRESS");
+        registrationBean.addInitParameter("agent_address", agentAddress);
+        String agentAPIKey = env.getProperty("APERTURE_AGENT_API_KEY");
+        registrationBean.addInitParameter("agent_api_key", agentAPIKey);
+        String rampMode = env.getProperty("APERTURE_ENABLE_RAMP_MODE");
+        registrationBean.addInitParameter("enable_ramp_mode", rampMode);
+        String insecureGrpc = env.getProperty("APERTURE_AGENT_INSECURE");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
-        String rootCertificateFile = env.getProperty("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertificateFile = env.getProperty("APERTURE_ROOT_CERTIFICATE_FILE");
         registrationBean.addInitParameter("root_certificate_file", rootCertificateFile);
 
         return registrationBean;

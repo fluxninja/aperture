@@ -1,6 +1,9 @@
 package com.fluxninja.aperture.instrumentation.netty;
 
-import static net.bytebuddy.matcher.ElementMatchers.*;
+import static net.bytebuddy.matcher.ElementMatchers.isMethod;
+import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
 import com.fluxninja.aperture.instrumentation.TransformerInstrumentation;
 import net.bytebuddy.agent.builder.AgentBuilder;

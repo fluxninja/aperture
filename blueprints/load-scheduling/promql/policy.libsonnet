@@ -1,11 +1,11 @@
 local spec = import '../../spec.libsonnet';
-local commonPolicyFn = import '../common/policy.libsonnet';
+local commonPolicyFn = import '../common-aiad/policy.libsonnet';
 local config = import './config.libsonnet';
 
-function(cfg, params={}, metadata={}) {
+function(cfg, params={}) {
   local updatedConfig = config + cfg,
 
-  local commonPolicy = commonPolicyFn(cfg, params, metadata),
+  local commonPolicy = commonPolicyFn(cfg, params),
 
   // Add new components to commonPolicy
   local policyDef = commonPolicy.policyDef {
@@ -17,7 +17,7 @@ function(cfg, params={}, metadata={}) {
             local q = updatedConfig.policy.promql_query;
             spec.v1.PromQL.new()
             + spec.v1.PromQL.withQueryString(q)
-            + spec.v1.PromQL.withEvaluationInterval(evaluation_interval=updatedConfig.policy.evaluation_interval)
+            + spec.v1.PromQL.withEvaluationInterval(evaluation_interval='10s')
             + spec.v1.PromQL.withOutPorts({ output: spec.v1.Port.withSignalName('SIGNAL') }),
           ),
         ),

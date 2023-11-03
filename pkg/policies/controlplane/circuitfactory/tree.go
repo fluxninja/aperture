@@ -94,24 +94,7 @@ func (tree *Tree) TreeGraph() (*policymonitoringv1.Tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	actuators := collectActuators(*tree)
-	treeMsg.Actuators = actuators
 	return treeMsg, nil
-}
-
-func collectActuators(current Tree) []*policymonitoringv1.ComponentView {
-	var actuators []*policymonitoringv1.ComponentView
-
-	if current.Node.Component.IsActuator() {
-		actuators = append(actuators, componentViewFromConfiguredComponent(current.Node))
-	}
-
-	for _, child := range current.Children {
-		childActuators := collectActuators(child)
-		actuators = append(actuators, childActuators...)
-	}
-
-	return actuators
 }
 
 func treeGraph(root *Tree, current Tree) (*policymonitoringv1.Tree, error) {
@@ -124,6 +107,9 @@ func treeGraph(root *Tree, current Tree) (*policymonitoringv1.Tree, error) {
 		Node:  componentViewFromConfiguredComponent(current.Node),
 		Graph: graph,
 	}
+	if current.Node.Component.IsActuator() {
+		treeMsg.Actuators = append(treeMsg.Actuators, componentViewFromConfiguredComponent(current.Node))
+	}
 	for _, child := range current.Children {
 		childTreeMsg, childErr := treeGraph(root, child)
 		if childErr != nil {
@@ -131,6 +117,7 @@ func treeGraph(root *Tree, current Tree) (*policymonitoringv1.Tree, error) {
 			return nil, childErr
 		}
 		treeMsg.Children = append(treeMsg.Children, childTreeMsg)
+		treeMsg.Actuators = append(treeMsg.Actuators, childTreeMsg.Actuators...)
 	}
 
 	return treeMsg, nil

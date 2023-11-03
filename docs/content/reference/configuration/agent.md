@@ -16,7 +16,7 @@ sidebar_label: Agent
 :::info
 
 See also
-[Aperture Agent installation](/get-started/installation/agent/agent.md).
+[Aperture Agent installation](/get-started/self-hosting/agent/agent.md).
 
 :::
 
@@ -632,18 +632,6 @@ prefix: `APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_`
 
 <!-- vale off -->
 
-<!-- vale off -->
-
-<dt>static</dt>
-<dd>
-
-([StaticDiscoveryConfig](#static-discovery-config)) Environment variable prefix:
-`APERTURE_AGENT_SERVICE_DISCOVERY_STATIC_`
-
-</dd>
-
-<!-- vale off -->
-
 </dl>
 
 ---
@@ -900,7 +888,7 @@ AutoScaleKubernetesConfig is the configuration for the flow preview service.
 
 <!-- vale off -->
 
-(bool, default: `true`)
+(bool, default: `false`)
 
 <!-- vale on -->
 
@@ -1003,8 +991,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of alerts to send in a batch.
 
 </dd>
 <dt>timeout</dt>
@@ -1029,7 +1016,8 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPostrollupConfig defines configuration for OTel batch processor.
+BatchPostrollupConfig defines post-rollup configuration for OTel batch
+processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1054,8 +1042,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of metrics to send in a batch.
 
 </dd>
 <dt>timeout</dt>
@@ -1080,7 +1067,7 @@ Timeout sets the time after which a batch will be sent regardless of size.
 
 <!-- vale on -->
 
-BatchPrerollupConfig defines configuration for OTel batch processor.
+BatchPrerollupConfig defines pre-rollup configuration for OTel batch processor.
 
 <dl>
 <dt>send_batch_max_size</dt>
@@ -1105,8 +1092,7 @@ split into smaller units.
 
 <!-- vale on -->
 
-SendBatchSize is the size of a batch which after hit, will trigger it to be
-sent.
+SendBatchSize is the number of metrics to send in a batch.
 
 </dd>
 <dt>timeout</dt>
@@ -1305,91 +1291,6 @@ asynchronous.
 
 <!-- vale off -->
 
-### Entity {#entity}
-
-<!-- vale on -->
-
-Entity represents a pod, VM, and so on.
-
-<dl>
-<dt>ip_address</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, format: `ip`, **required**)
-
-<!-- vale on -->
-
-IP address of the entity.
-
-</dd>
-<dt>name</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Name of the entity. For example, pod name.
-
-</dd>
-<dt>namespace</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Namespace of the entity. For example, pod namespace.
-
-</dd>
-<dt>node_name</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Node name of the entity. For example, hostname.
-
-</dd>
-<dt>services</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-Services of the entity.
-
-</dd>
-<dt>uid</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Unique identifier of the entity.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### EtcdConfig {#etcd-config}
 
 <!-- vale on -->
@@ -1414,7 +1315,7 @@ List of etcd server endpoints
 
 <!-- vale off -->
 
-(string, default: `"60s"`)
+(string, default: `"10s"`)
 
 <!-- vale on -->
 
@@ -1525,6 +1426,18 @@ FluxNinjaExtensionConfig is the configuration for
 
 <!-- vale off -->
 
+(string, **DEPRECATED**)
+
+<!-- vale on -->
+
+Deprecated: v3.0.0. Use AgentAPIKey instead
+
+</dd>
+<dt>agent_api_key</dt>
+<dd>
+
+<!-- vale off -->
+
 (string)
 
 <!-- vale on -->
@@ -1573,8 +1486,8 @@ Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
-Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
-Aperture Controller.
+Disable this flag only if using
+[Self-Hosted](/get-started/self-hosting/self-hosting.md) Aperture Controller.
 
 </dd>
 <dt>endpoint</dt>
@@ -1608,7 +1521,8 @@ Interval between each heartbeat.
 
 <!-- vale off -->
 
-(string, one of: `KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL`,
+(string, one of:
+`KUBERNETES_SIDECAR | KUBERNETES_DAEMONSET | LINUX_BARE_METAL | CLOUD_AGENT`,
 default: `"LINUX_BARE_METAL"`)
 
 <!-- vale on -->
@@ -2972,29 +2886,6 @@ Enabled TLS
 <!-- vale on -->
 
 Server Key file path
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### StaticDiscoveryConfig {#static-discovery-config}
-
-<!-- vale on -->
-
-StaticDiscoveryConfig for pre-determined list of services.
-
-<dl>
-<dt>entities</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]Entity](#entity))
-
-<!-- vale on -->
 
 </dd>
 </dl>

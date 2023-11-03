@@ -11,6 +11,7 @@ import (
 	flowpreviewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 )
 
@@ -75,12 +76,17 @@ func (h *Handler) PreviewHTTPRequests(ctx context.Context, req *flowpreviewv1.Pr
 		RequestID: uuid.New().String(),
 	}
 
+	service := consts.AnyService
+	if req.Service != "" {
+		service = req.Service
+	}
+
 	selectors := []*policylangv1.Selector{
 		{
 			ControlPoint: req.ControlPoint,
 			LabelMatcher: req.LabelMatcher,
 			AgentGroup:   h.agentGroup,
-			Service:      req.Service,
+			Service:      service,
 		},
 	}
 

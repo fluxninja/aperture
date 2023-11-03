@@ -7,6 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -15,8 +16,17 @@ import (
 
 // Integrator is a component that accumulates sum of signal every tick.
 type Integrator struct {
-	sum float64
+	sum               float64
+	doExecute         bool
+	ticksPerExecution int
+	cpID              string
 }
+
+// Make sure Integrator complies with Component interface.
+var _ runtime.Component = (*Integrator)(nil)
+
+// Make sure Integrator implements background job.
+var _ runtime.BackgroundJob = (*Integrator)(nil)
 
 // Name implements runtime.Component.
 func (*Integrator) Name() string { return "Integrator" }
@@ -33,21 +43,29 @@ func (in *Integrator) ShortDescription() string {
 func (*Integrator) IsActuator() bool { return false }
 
 // NewIntegrator creates an integrator component.
-func NewIntegrator(initialValue float64) runtime.Component {
-	integrator := &Integrator{
-		sum: initialValue,
-	}
-	return integrator
-}
 
 // NewIntegratorAndOptions creates an integrator component and its fx options.
-func NewIntegratorAndOptions(integratorProto *policylangv1.Integrator, _ runtime.ComponentID, _ iface.Policy) (runtime.Component, fx.Option, error) {
+func NewIntegratorAndOptions(integratorProto *policylangv1.Integrator, componentID runtime.ComponentID, policyReadAPI iface.Policy) (runtime.Component, fx.Option, error) {
 	initialValue := integratorProto.GetInitialValue()
-	return NewIntegrator(initialValue), fx.Options(), nil
+	integrator := &Integrator{
+		sum:               initialValue,
+		cpID:              componentID.String(),
+		ticksPerExecution: policyReadAPI.TicksInDurationPb(integratorProto.EvaluationInterval),
+	}
+
+	return integrator, fx.Options(), nil
 }
 
 // Execute implements runtime.Component.Execute.
-func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (in *Integrator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
+	circuitAPI.ScheduleConditionalBackgroundJob(in, in.ticksPerExecution)
+
+	if !in.doExecute {
+		return runtime.PortToReading{
+			"output": []runtime.Reading{runtime.NewReading(in.sum)},
+		}, nil
+	}
+	in.doExecute = false
 	inputVal := inPortReadings.ReadSingleReadingPort("input")
 	resetVal := inPortReadings.ReadSingleReadingPort("reset")
 	if tristate.FromReading(resetVal).IsTrue() {
@@ -73,3 +91,13 @@ func (in *Integrator) Execute(inPortReadings runtime.PortToReading, tickInfo run
 
 // DynamicConfigUpdate is a no-op for Integrator.
 func (in *Integrator) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
+
+// GetJob implements runtime.BackgroundJob.GetJob.
+func (in *Integrator) GetJob() jobs.Job {
+	return jobs.NewNoOpJob(in.cpID)
+}
+
+// NotifyCompletion implements runtime.BackgroundJob.NotifyCompletion.
+func (in *Integrator) NotifyCompletion() {
+	in.doExecute = true
+}

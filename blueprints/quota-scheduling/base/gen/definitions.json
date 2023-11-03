@@ -3,8 +3,19 @@
   "type": "object",
   "title": "quota-scheduling/base blueprint",
   "additionalProperties": false,
-  "required": ["policy"],
+  "required": ["blueprint", "policy"],
   "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "quota-scheduling/base",
+      "enum": ["quota-scheduling/base"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
     "policy": {
       "type": "object",
       "additionalProperties": false,
@@ -75,8 +86,7 @@
               "description": "Flow selectors to match requests against",
               "default": [
                 {
-                  "control_point": "__REQUIRED_FIELD__",
-                  "service": "__REQUIRED_FIELD__"
+                  "control_point": "__REQUIRED_FIELD__"
                 }
               ],
               "type": "array",

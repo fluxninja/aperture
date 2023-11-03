@@ -78,7 +78,7 @@ func clusterRoleBindingForController(instance *controllerv1alpha1.Controller) *r
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      controllers.ServiceAccountName(instance),
+				Name:      controllers.ControllerServiceAccountName(instance),
 				Namespace: instance.GetNamespace(),
 			},
 		},

@@ -1,11 +1,16 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.FlowDecision;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,7 +19,8 @@ import java.util.function.Function;
 public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private final boolean failOpen;
+    private final boolean rampMode;
+    private final Duration flowTimeout;
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +30,15 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     }
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+            ApertureSDK apertureSDK,
+            String controlPointName,
+            boolean rampMode,
+            Duration flowTimeout) {
         ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableFailOpen(failOpen);
+                .setEnableRampMode(rampMode)
+                .setFlowTimeout(flowTimeout);
         return builder::build;
     }
 
@@ -36,17 +46,20 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
             HttpClient delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean failOpen) {
+            boolean rampMode,
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
         TrafficFlowRequest request =
-                HttpUtils.trafficFlowRequestFromRequest(ctx, req, this.controlPointName);
+                HttpUtils.trafficFlowRequestFromRequest(
+                        ctx, req, this.controlPointName, this.flowTimeout);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {
@@ -56,7 +69,7 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             HttpResponse res;

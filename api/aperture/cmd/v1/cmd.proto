@@ -13,7 +13,7 @@ import "google/protobuf/empty.proto";
 
 // Controller describes APIs of the controller from the aperturectl POV
 service Controller {
-  rpc ListAgents(google.protobuf.Empty) returns (ListAgentsResponse);
+  rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
   rpc ListServices(ListServicesRequest) returns (ListServicesControllerResponse);
   rpc ListFlowControlPoints(ListFlowControlPointsRequest) returns (ListFlowControlPointsControllerResponse);
   rpc ListAutoScaleControlPoints(ListAutoScaleControlPointsRequest) returns (ListAutoScaleControlPointsControllerResponse);
@@ -25,8 +25,12 @@ service Controller {
   rpc PreviewFlowLabels(PreviewFlowLabelsRequest) returns (PreviewFlowLabelsControllerResponse);
   rpc PreviewHTTPRequests(PreviewHTTPRequestsRequest) returns (PreviewHTTPRequestsControllerResponse);
 
-  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (google.protobuf.Empty);
+  rpc GetPolicy(aperture.policy.language.v1.GetPolicyRequest) returns (aperture.policy.language.v1.GetPolicyResponse);
+  rpc UpsertPolicy(aperture.policy.language.v1.UpsertPolicyRequest) returns (aperture.policy.language.v1.UpsertPolicyResponse);
   rpc PostDynamicConfig(aperture.policy.language.v1.PostDynamicConfigRequest) returns (google.protobuf.Empty);
+  rpc GetDynamicConfig(aperture.policy.language.v1.GetDynamicConfigRequest) returns (aperture.policy.language.v1.GetDynamicConfigResponse);
+  rpc DeleteDynamicConfig(aperture.policy.language.v1.DeleteDynamicConfigRequest) returns (google.protobuf.Empty);
+
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
   rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
   rpc GetStatus(aperture.status.v1.GroupStatusRequest) returns (aperture.status.v1.GroupStatus);
@@ -70,7 +74,9 @@ message ListAutoScaleControlPointsControllerResponse {
   uint32 errors_count = 2;
 }
 
-message ListDiscoveryEntitiesRequest {}
+message ListDiscoveryEntitiesRequest {
+  string agent_group = 1;
+}
 
 message ListDiscoveryEntitiesAgentResponse {
   map<string, aperture.discovery.entities.v1.Entity> entities = 1;
@@ -90,6 +96,10 @@ message ListDiscoveryEntityRequest {
 
 message ListDiscoveryEntityAgentResponse {
   aperture.discovery.entities.v1.Entity entity = 1;
+}
+
+message ListAgentsRequest {
+  string agent_group = 1;
 }
 
 message ListAgentsResponse {

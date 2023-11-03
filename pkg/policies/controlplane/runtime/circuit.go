@@ -103,24 +103,28 @@ type signalToReading map[Signal]Reading
 
 // Circuit manages the runtime state of a set of components and their inter linkages via signals.
 type Circuit struct {
-	// Execution lock is taken when circuit needs to execute
-	executionLock sync.Mutex
 	// Policy Read API
 	iface.Policy
 	// Status registry to track signal values
 	statusRegistry status.Registry
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
+	// Background scheduler
+	backgroundScheduler *backgroundScheduler
 	// Components
 	components []*ConfiguredComponent
 	// Tick end callbacks
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
 	tickStartCallbacks []TickStartCallback
+	// Current tick info
+	tickInfo TickInfo
+	// Execution lock is taken when circuit needs to execute
+	executionLock sync.Mutex
 }
 
 // Make sure Circuit complies with CircuitAPI interface.
-var _ CircuitAPI = &Circuit{}
+var _ CircuitSuperAPI = &Circuit{}
 
 // NewCircuitAndOptions create a new Circuit struct along with fx options.
 func NewCircuitAndOptions(
@@ -152,7 +156,9 @@ func NewCircuitAndOptions(
 }
 
 // Setup handle lifecycle of the inner metrics of Circuit.
-func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
+func (circuit *Circuit) setup(backgroundScheduler *backgroundScheduler, lifecycle fx.Lifecycle) {
+	circuit.backgroundScheduler = backgroundScheduler
+
 	var circuitMetricsLabels []prometheus.Labels
 
 	for _, component := range circuit.components {
@@ -201,6 +207,8 @@ func (circuit *Circuit) setup(lifecycle fx.Lifecycle) {
 // Execute runs one tick of computations of all the Components in the Circuit.
 func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	logger := circuit.GetStatusRegistry().GetLogger()
+	// Save tickInfo
+	circuit.tickInfo = tickInfo
 	// Lock execution
 	circuit.LockExecution()
 	// Defer unlock
@@ -209,7 +217,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	var errMulti error
 	// Invoke TickStartCallback(s)
 	for _, sc := range circuit.tickStartCallbacks {
-		err := sc(tickInfo)
+		err := sc(circuit)
 		errMulti = multierr.Append(errMulti, err)
 	}
 	policyID := fmt.Sprintf("%s-%s", circuit.GetPolicyName(), circuit.GetPolicyHash())
@@ -310,8 +318,8 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			componentOutPortReadings, err := cmp.Execute(
 				/* pass signal */
 				componentInPortReadings,
-				/* pass tick info */
-				tickInfo,
+				/* pass circuit api */
+				circuit,
 			)
 			if componentOutPortReadings == nil {
 				componentOutPortReadings = make(PortToReading)
@@ -332,7 +340,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 						componentOutPortReadings[port][index] = InvalidReading()
 					}
 				} else if len(componentOutPortReadings[port]) < len(signals) {
-					// The reading list has fewer readings compared to portOutsSpec
+					// The reading list has fewer reading, currentTick, ticksPerExecution ints compared to portOutsSpec
 					// Fill with invalid readings
 					for index := len(componentOutPortReadings[port]); index < len(signals); index++ {
 						componentOutPortReadings[port][index] = InvalidReading()
@@ -383,7 +391,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 	}
 	// Invoke TickEndCallback(s)
 	for _, ec := range circuit.tickEndCallbacks {
-		err := ec(tickInfo)
+		err := ec(circuit)
 		errMulti = multierr.Append(errMulti, err)
 	}
 	return errMulti
@@ -419,4 +427,19 @@ func (circuit *Circuit) RegisterTickEndCallback(ec TickEndCallback) {
 // RegisterTickStartCallback adds a callback function to be called when a tick starts.
 func (circuit *Circuit) RegisterTickStartCallback(sc TickStartCallback) {
 	circuit.tickStartCallbacks = append(circuit.tickStartCallbacks, sc)
+}
+
+// GetTickInfo returns the current tick info.
+func (circuit *Circuit) GetTickInfo() TickInfo {
+	return circuit.tickInfo
+}
+
+// ScheduleConditionalBackgroundJob schedules a background job for one time execution. The job gets scheduled only if currentTick is a multiple of ticksPerExecution. There can be at most a single job with a certain name pending to be run at a time. Subsequent invocations with the same job name overwrite the previous one.
+// Warning: This method should only be called by the Components during a tick execution.
+func (circuit *Circuit) ScheduleConditionalBackgroundJob(job BackgroundJob, ticksPerExecution int) {
+	// Do not schedule if currentTick is not a multiple of ticksPerExecution
+	if circuit.tickInfo.Tick()%ticksPerExecution != 0 {
+		return
+	}
+	circuit.backgroundScheduler.scheduleJob(job)
 }

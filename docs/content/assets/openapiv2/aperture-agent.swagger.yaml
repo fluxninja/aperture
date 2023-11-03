@@ -33,6 +33,9 @@ definitions:
                     The destination of a network activity, such as accepting a TCP connection.
                     In a multi hop network activity, the destination represents the receiver of
                     the last hop.
+            ramp_mode:
+                description: A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+                type: boolean
             request:
                 $ref: '#/definitions/CheckHTTPRequestHttpRequest'
                 description: Represents a network request, such as an HTTP request.

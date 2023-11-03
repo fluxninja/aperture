@@ -1,11 +1,19 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.DEFAULT_AGENT_ADDRESS;
+import static com.fluxninja.aperture.sdk.Constants.LIBRARY_NAME;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.FlowControlServiceHTTPGrpc;
 import com.google.common.io.ByteStreams;
-import io.grpc.*;
+import io.grpc.ChannelCredentials;
+import io.grpc.ClientInterceptor;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
+import io.grpc.Metadata;
+import io.grpc.TlsChannelCredentials;
+import io.grpc.stub.MetadataUtils;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporterBuilder;
@@ -15,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +31,8 @@ import org.slf4j.LoggerFactory;
 
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
-    private Duration flowTimeout;
-    private String host;
-    private int port;
+    private String address;
+    private String agentAPIKey;
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
@@ -44,35 +50,24 @@ public final class ApertureSDKBuilder {
     }
 
     /**
-     * Set hostname of Aperture Agent to connect to.
+     * Set address of Aperture Agent to connect to.
      *
-     * @param host hostname of Aperture Agent to connect to.
+     * @param address of Aperture Agent to connect to.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setHost(String host) {
-        this.host = host;
+    public ApertureSDKBuilder setAddress(String address) {
+        this.address = address;
         return this;
     }
 
     /**
-     * Set port number of Aperture Agent to connect to.
+     * Set API key to be used when connecting to Aperture Agent.
      *
-     * @param port port number of Aperture Agent to connect to.
+     * @param agentAPIKey API key to be used when connecting to Aperture Agent.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setPort(int port) {
-        this.port = port;
-        return this;
-    }
-
-    /**
-     * Set timeout for connection to Aperture Agent. Set to 0 to block until response is received.
-     *
-     * @param timeout timeout for connection to Aperture Agent.
-     * @return the builder object.
-     */
-    public ApertureSDKBuilder setFlowTimeout(Duration timeout) {
-        this.flowTimeout = timeout;
+    public ApertureSDKBuilder setAgentAPIKey(String agentAPIKey) {
+        this.agentAPIKey = agentAPIKey;
         return this;
     }
 
@@ -196,28 +191,17 @@ public final class ApertureSDKBuilder {
      * @return The constructed ApertureSDK object.
      */
     public ApertureSDK build() {
-        String host = this.host;
-        if (host == null) {
+        String address = this.address;
+        if (address == null) {
             logger.warn(
-                    "Host not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_HOST);
-            host = DEFAULT_AGENT_HOST;
-        }
-
-        int port = this.port;
-        if (port == 0) {
-            logger.warn(
-                    "Port not set when building Aperture SDK, defaulting to " + DEFAULT_AGENT_PORT);
-            port = DEFAULT_AGENT_PORT;
+                    "Address not set when building Aperture SDK, defaulting to "
+                            + DEFAULT_AGENT_ADDRESS);
+            address = DEFAULT_AGENT_ADDRESS;
         }
 
         String OtlpSpanExporterProtocol = "http";
         if (this.useHttpsInOtlpExporter) {
             OtlpSpanExporterProtocol = "https";
-        }
-
-        Duration flowTimeout = this.flowTimeout;
-        if (flowTimeout == null) {
-            flowTimeout = DEFAULT_RPC_TIMEOUT;
         }
 
         ChannelCredentials creds;
@@ -233,13 +217,23 @@ public final class ApertureSDKBuilder {
             }
         }
 
-        String target = host + ":" + port;
-        ManagedChannel channel = Grpc.newChannelBuilder(target, creds).build();
+        ManagedChannel channel = Grpc.newChannelBuilder(address, creds).build();
 
         FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient =
                 FlowControlServiceGrpc.newBlockingStub(channel);
         FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
                 FlowControlServiceHTTPGrpc.newBlockingStub(channel);
+
+        String agentAPIKey = this.agentAPIKey;
+        // If agentAPIKey is not empty, add it to the request metadata
+        if (agentAPIKey != null && !agentAPIKey.isEmpty()) {
+            Metadata metadata = new Metadata();
+            metadata.put(
+                    Metadata.Key.of("x-api-key", Metadata.ASCII_STRING_MARSHALLER), agentAPIKey);
+            ClientInterceptor interceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
+            flowControlClient = flowControlClient.withInterceptors(interceptor);
+            httpFlowControlClient = httpFlowControlClient.withInterceptors(interceptor);
+        }
 
         OtlpGrpcSpanExporterBuilder spanExporterBuilder = OtlpGrpcSpanExporter.builder();
         if (caCertContents != null) {
@@ -248,8 +242,7 @@ public final class ApertureSDKBuilder {
 
         OtlpGrpcSpanExporter spanExporter =
                 spanExporterBuilder
-                        .setEndpoint(
-                                String.format("%s://%s:%d", OtlpSpanExporterProtocol, host, port))
+                        .setEndpoint(String.format("%s://%s", OtlpSpanExporterProtocol, address))
                         .build();
         SdkTracerProvider traceProvider =
                 SdkTracerProvider.builder()
@@ -261,7 +254,6 @@ public final class ApertureSDKBuilder {
                 flowControlClient,
                 httpFlowControlClient,
                 tracer,
-                flowTimeout,
                 ignoredPaths,
                 ignoredPathsMatchRegex);
     }

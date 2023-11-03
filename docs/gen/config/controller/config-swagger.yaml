@@ -136,7 +136,7 @@ definitions:
                 x-go-tag-json: send_batch_max_size
                 x-go-tag-validate: gte=0
             send_batch_size:
-                description: SendBatchSize is the size of a batch which after hit, will trigger it to be sent.
+                description: SendBatchSize is the number of alerts to send in a batch.
                 exclusiveMinimum: true
                 format: uint32
                 minimum: 0
@@ -271,12 +271,12 @@ definitions:
                 x-go-tag-json: endpoints,omitempty
                 x-go-tag-validate: omitempty,dive,hostname_port|url|fqdn,omitempty
             lease_ttl:
-                default: 60s
+                default: 10s
                 description: Lease time-to-live
                 format: string
                 type: string
                 x-go-name: LeaseTTL
-                x-go-tag-default: 60s
+                x-go-tag-default: 10s
                 x-go-tag-json: lease_ttl
                 x-go-tag-validate: gte=1s
             log_level:

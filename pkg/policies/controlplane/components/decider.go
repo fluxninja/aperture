@@ -90,7 +90,7 @@ func NewDeciderAndOptions(deciderProto *policylangv1.Decider, _ runtime.Componen
 }
 
 // Execute implements runtime.Component.Execute.
-func (dec *Decider) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (dec *Decider) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	onTrue := runtime.NewReading(1.0)
 	onFalse := runtime.NewReading(0.0)
 	lhs := inPortReadings.ReadSingleReadingPort("lhs")
@@ -117,7 +117,7 @@ func (dec *Decider) Execute(inPortReadings runtime.PortToReading, tickInfo runti
 		}
 	}
 
-	decisionType := dec.computeDecisionType(currentDecision, tickInfo)
+	decisionType := dec.computeDecisionType(currentDecision, circuitAPI.GetTickInfo())
 
 	var output runtime.Reading
 

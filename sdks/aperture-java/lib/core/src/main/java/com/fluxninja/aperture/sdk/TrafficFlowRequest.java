@@ -1,6 +1,7 @@
 package com.fluxninja.aperture.sdk;
 
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPRequest;
+import java.time.Duration;
 
 /**
  * The TrafficFlowRequest class represents the parameters for initiating a traffic flow within the
@@ -9,14 +10,20 @@ import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPReques
  */
 public class TrafficFlowRequest {
     private final CheckHTTPRequest checkHTTPRequest;
+    private final Duration flowTimeout;
 
     /**
      * Constructs a new TrafficFlowRequest object with the specified CheckHTTPRequest.
      *
      * @param checkHTTPRequest The CheckHTTPRequest object to be encapsulated.
      */
-    TrafficFlowRequest(CheckHTTPRequest checkHTTPRequest) {
+    TrafficFlowRequest(CheckHTTPRequest checkHTTPRequest, Duration flowTimeout) {
         this.checkHTTPRequest = checkHTTPRequest;
+        this.flowTimeout = flowTimeout;
+    }
+
+    public Duration getFlowTimeout() {
+        return flowTimeout;
     }
 
     /**

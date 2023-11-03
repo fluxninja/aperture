@@ -35,9 +35,11 @@ aperturectl compile --policy=policy.yaml --mermaid --dot
       --cr string        Path to Aperture Policy custom resource file
       --depth int        Maximum depth to expand the graph. Use -1 for maximum possible depth (default 1)
       --dot string       Path to store the dot file
+      --graph string     Path to store the graph file
   -h, --help             help for compile
       --mermaid string   Path to store the mermaid file
       --policy string    Path to Aperture Policy file
+      --tree string      Path to store the graph file
 ```
 
 ### SEE ALSO

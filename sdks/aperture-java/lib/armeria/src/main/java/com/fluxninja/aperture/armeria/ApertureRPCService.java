@@ -1,12 +1,16 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.FlowDecision;
+import com.fluxninja.aperture.sdk.FlowStatus;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.RpcRequest;
 import com.linecorp.armeria.common.RpcResponse;
 import com.linecorp.armeria.server.RpcService;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.SimpleDecoratingRpcService;
+import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -14,7 +18,8 @@ import java.util.function.Function;
 public class ApertureRPCService extends SimpleDecoratingRpcService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private final boolean failOpen;
+    private final boolean rampMode;
+    private final Duration flowTimeout;
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
             ApertureSDK apertureSDK, String controlPointName) {
@@ -24,11 +29,11 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
     }
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean failOpen) {
+            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
         ApertureRPCServiceBuilder builder = new ApertureRPCServiceBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableFailOpen(failOpen);
+                .setEnableRampMode(rampMode);
         return builder::build;
     }
 
@@ -36,22 +41,26 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
             RpcService delegate,
             ApertureSDK apertureSDK,
             String controlPointName,
-            boolean failOpen) {
+            boolean rampMode,
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     public RpcResponse serve(ServiceRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels);
+        Flow flow =
+                this.apertureSDK.startFlow(
+                        this.controlPointName, labels, this.rampMode, flowTimeout);
 
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             RpcResponse res;

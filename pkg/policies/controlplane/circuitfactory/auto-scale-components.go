@@ -13,7 +13,7 @@ import (
 )
 
 // autoScaleModuleForPolicyApp for component factory run via the policy app. For singletons in the Policy scope.
-func autoScaleModuleForPolicyApp(circuitAPI runtime.CircuitAPI) fx.Option {
+func autoScaleModuleForPolicyApp(circuitAPI runtime.CircuitSuperAPI) fx.Option {
 	return fx.Options(
 		podscaler.Module(),
 	)

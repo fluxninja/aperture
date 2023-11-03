@@ -27,8 +27,6 @@ local promql_scale_controller_defaults = {
 };
 
 local auto_scaling_defaults = {
-  evaluation_interval: '10s',
-
   promql_scale_out_controllers: [],
 
   promql_scale_in_controllers: [],
@@ -42,7 +40,6 @@ local auto_scaling_defaults = {
 
 commonConfig {
   /**
-  * @param (policy.evaluation_interval: string) The interval between successive evaluations of the Circuit.
   * @param (policy.promql_scale_out_controllers: []promql_scale_out_controller) List of scale out controllers.
   * @param (policy.promql_scale_in_controllers: []promql_scale_in_controller) List of scale in controllers.
   * @param (policy.scaling_parameters: aperture.spec.v1.AutoScalerScalingParameters) Parameters that define the scaling behavior.

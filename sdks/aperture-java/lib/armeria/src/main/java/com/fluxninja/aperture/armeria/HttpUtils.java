@@ -1,13 +1,23 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.*;
-import com.linecorp.armeria.common.*;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
+import com.fluxninja.aperture.sdk.TrafficFlowRequestBuilder;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpResponseBuilder;
+import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.RequestContext;
+import com.linecorp.armeria.common.RequestHeaders;
+import com.linecorp.armeria.common.RequestHeadersBuilder;
 import io.netty.util.AsciiString;
 import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageEntry;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +55,7 @@ class HttpUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            RequestContext ctx, HttpRequest req, String controlPointName) {
+            RequestContext ctx, HttpRequest req, String controlPointName, Duration flowTimeout) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -62,7 +72,9 @@ class HttpUtils {
             baggageLabels.put(entry.getKey(), value);
         }
 
-        return addHttpAttributes(baggageLabels, ctx, req, controlPointName).build();
+        return addHttpAttributes(baggageLabels, ctx, req, controlPointName)
+                .setFlowTimeout(flowTimeout)
+                .build();
     }
 
     protected static HttpRequest updateHeaders(HttpRequest req, Map<String, String> newHeaders) {
@@ -110,6 +122,7 @@ class HttpUtils {
         TrafficFlowRequestBuilder builder = TrafficFlowRequest.newBuilder();
 
         builder.setControlPoint(controlPointName)
+                .setRampMode(false)
                 .setHttpMethod(req.method().toString())
                 .setHttpPath(req.path())
                 .setHttpHost(req.authority())

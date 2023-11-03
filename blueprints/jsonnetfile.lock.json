@@ -4,12 +4,22 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/Duologic/jsonnet-libsonnet.git",
+          "subdir": ""
+        }
+      },
+      "version": "bd08bf5f0ffc156bd755b916367bceb7fbe3de03",
+      "sum": "ZYc3KrgzQIciDlQ786i2iHeqEZqjnB8KlPiX6w8Mp38="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/crdsonnet/crdsonnet.git",
           "subdir": "crdsonnet"
         }
       },
-      "version": "522d9546e44721fa8f1331d075295fc2feef966a",
-      "sum": "abzN6XHVHqSSjrrsQGpx/zBFaQn/fwbpH3XEzfct2Mw="
+      "version": "2251d2739015ef42777fff5e37255a12674be510",
+      "sum": "wTwQnzztnOS7xo0LeH4TNcnb11bFNYgsuGSdOWwhBC4="
     },
     {
       "source": {
@@ -24,22 +34,12 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/grafana/grafonnet-lib.git",
-          "subdir": "grafonnet"
-        }
-      },
-      "version": "a1d61cce1da59c71409b99b5c7568511fec661ea",
-      "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/grafonnet.git",
           "subdir": "gen/grafonnet-v9.4.0"
         }
       },
-      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
-      "sum": "Ju+Q5MP6YAQvK4pNOGRjHWgP4eLCxzLtjUOCqXyCbf4="
+      "version": "16f374fcebd987bc1d8bc526f433a75e2e5dcb28",
+      "sum": "PFzKWPaLOx8Yp0V6kyv1n9UOHickz0/VF7goglbQ+1o="
     },
     {
       "source": {
@@ -54,22 +54,12 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/grafana/grok.git",
-          "subdir": "jsonnet/v9.4.0"
-        }
-      },
-      "version": "5ff7cfd1f478de867a25c62a7a0106ce27a72a97",
-      "sum": "b6KSW0/Z45K0W2dF+8ZPLV32uv0ApjIsShTjk/zHEbg="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/jsonnet-libs.git",
           "subdir": "grafana-builder"
         }
       },
-      "version": "8464fb13bbacf6764a39a0f90076aa2b0fcb70c8",
-      "sum": "RJjFQa1n8CDbB6m1fBQQzPye7jhOhGTUbma27Gil81I="
+      "version": "83dbb0480412d92a27c65e3a4461efa690f7263d",
+      "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
       "source": {
@@ -78,8 +68,8 @@
           "subdir": "doc-util"
         }
       },
-      "version": "7c865ec0606f2b68c0f6b2721f101e6a99cd2593",
-      "sum": "zjjufxN4yAIevldYEERiZEp27vK0BJKj1VvZcVtWiOo="
+      "version": "fd8de9039b3c06da77d635a3a8289809a5bfb542",
+      "sum": "mFebrE9fhyAKW4zbnidcjVFupziN5LPA/Z7ii94uCzs="
     },
     {
       "source": {
@@ -98,8 +88,8 @@
           "subdir": ""
         }
       },
-      "version": "d1929c3c1728274424a21a617f1b82095685d640",
-      "sum": "DHqlMNfQH/eCWHbHD2Ouc/bH00AwTkCS86z6cgzQ7UI="
+      "version": "0256a910ac71f0f842696d7bca0bf01ea77eb654",
+      "sum": "zBOpb1oTNvXdq9RF6yzTHill5r1YTJLBBoqyx4JYtAg="
     }
   ],
   "legacyImports": false

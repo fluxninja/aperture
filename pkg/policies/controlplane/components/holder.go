@@ -52,7 +52,7 @@ func NewHolderAndOptions(holderProto *policylangv1.Holder, _ runtime.ComponentID
 }
 
 // Execute implements runtime.Component.Execute.
-func (h *Holder) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (h *Holder) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
 	reset := inPortReadings.ReadSingleReadingPort("reset")
 	output := runtime.InvalidReading()

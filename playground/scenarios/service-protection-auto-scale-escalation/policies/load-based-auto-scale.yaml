@@ -3,19 +3,29 @@
 # Documentation/Reference for objects and parameters can be found at:
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
 
+blueprint: load-scheduling/average-latency
+uri: ../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: load-based-auto-scale
-  service_protection_core:
-    adaptive_load_scheduler:
+  load_scheduling_core:
+    aimd_load_scheduler:
+      gradient:
+        max_gradient: 1
+        min_gradient: 0.1
+        slope: -1
+      alerter:
+        alert_name: "AIMD Load Throttling Event"
       load_scheduler:
+        workload_latency_based_tokens: true
         # The selectors determine the flows that are protected by this policy.
         # Type: []aperture.spec.v1.Selector
         # Required: True
         selectors:
-          - control_point: ingress
+          - agent_group: default
+            control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
   latency_baseliner:
     latency_tolerance_multiplier: 1.1

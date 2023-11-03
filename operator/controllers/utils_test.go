@@ -634,7 +634,7 @@ var _ = Describe("Tests for agentEnv", func() {
 					Value: "true",
 				},
 				{
-					Name: "APERTURE_AGENT_FLUXNINJA_API_KEY",
+					Name: "APERTURE_AGENT_FLUXNINJA_AGENT_API_KEY",
 					ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -790,7 +790,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 				},
 			}
 
-			result := AgentVolumes(instance.Spec)
+			result := AgentVolumes(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})
@@ -836,7 +836,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 				},
 			}
 
-			result := AgentVolumes(instance.Spec)
+			result := AgentVolumes(instance)
 			Expect(result).To(Equal(expected))
 		})
 	})

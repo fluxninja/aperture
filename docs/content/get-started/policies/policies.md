@@ -25,17 +25,11 @@ system can be utilized. The Aperture repository contains several
 [blueprints][blueprints] that can generate [policies][policies], and [Grafana
 dashboards][grafana]. These blueprints serve as starting points for creating new
 policies, or can be used as-is by providing the required parameters or
-customizations. The [use-cases](/use-cases/use-cases.md) section showcases
-practical examples of blueprints in action.
+customizations. The [guides](/guides/guides.md) section showcases practical
+examples of blueprints in action.
 
 To manage blueprints and generate policies, use the
 [aperturectl](/reference/aperturectl/aperturectl.md) CLI.
-
-For advanced users interested in designing new policies, explore the example
-circuit created in the
-[detecting overload](../../use-cases/alerting/detecting-overload.md) use-case.
-This example serves as a valuable reference for understanding the process of
-creating custom policies in Aperture.
 
 <Zoom>
 
@@ -103,8 +97,7 @@ Once the `values.yaml` file is ready, you can generate the blueprint using the
 following command:
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
---values-file=values.yaml --output-dir=policy-gen --version={apertureVersion}</CodeBlock>
+<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
 ```
 
 The following directory structure will be generated:
@@ -127,73 +120,99 @@ The generated policies can be applied using `aperturectl` or `kubectl`.
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="aperturectl" label="aperturectl">
+<TabItem value="aperture-cloud" label="Aperture Cloud">
 ```
 
-You can pass the `--apply` flag with the `aperturectl` to directly apply the
-generated policies on a Kubernetes cluster in the namespace where the Aperture
-Controller is installed.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --name=rate-limiting/base
---values-file=values.yaml --apply --version={apertureVersion}</CodeBlock>
-```
+You can pass the `--apply` flag with the `aperturectl cloud` to directly apply
+the generated policies on the Aperture Cloud Controller.
 
 :::info
 
-See [aperturectl configuration](/get-started/installation/configure-cli.md) on
-how to configure what aperturectl should connect to.
+See [Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md) for more
+information on how to configure what aperturectl should connect to.
 
 :::
 
 ```mdx-code-block
-</TabItem>
-<TabItem value="kubectl" label="kubectl">
-```
-
-:::caution
-
-You can only apply policies with kubectl on [Self-Hosted][self-hosted] Aperture
-Controller.
-
-:::
-
-The policy YAML generated (Kubernetes Custom Resource) using the above example
-can also be applied using `kubectl`.
-
-```bash
-kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller
-```
-
-```mdx-code-block
-</TabItem>
-</Tabs>
+<CodeBlock language="bash">aperturectl cloud policy apply --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
 ```
 
 Run the following command to check if the policy was created.
 
 ```mdx-code-block
-<Tabs>
-<TabItem value="aperturectl" label="aperturectl">
-```
-
-```bash
-aperturectl policies
+<CodeBlock language="bash">aperturectl cloud policies</CodeBlock>
 ```
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="kubectl" label="kubectl">
+<TabItem value="self-hosting" label="Self Hosting">
 ```
 
-```bash
-kubectl get policies.fluxninja.com -n aperture-controller
+```mdx-code-block
+<Tabs>
+<TabItem value="Kubernetes Operator" label="Kubernetes Operator">
+```
+
+If the Aperture Controller is deployed on
+[Kubernetes using Operator](/get-started/self-hosting/controller/kubernetes/operator/operator.md),
+you can apply the policy using the following command:
+
+```mdx-code-block
+<CodeBlock language="bash">kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller</CodeBlock>
+```
+
+Run the following command to check if the policy was created.
+
+```mdx-code-block
+<CodeBlock language="bash">kubectl get policies.fluxninja.com -n aperture-controller</CodeBlock>
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Kubernetes Namespace-scoped" label="Kubernetes Namespace-scoped">
+```
+
+If the Aperture Controller is deployed on
+[Kubernetes using Namespace-scoped](/get-started/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
+you can apply the policy using the following command:
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
+```
+
+Run the following command to check if the policy was created.
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl policies --controller-ns aperture-controller</CodeBlock>
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Docker" label="Docker">
+```
+
+If the Aperture Controller is deployed on
+[Docker](/get-started/self-hosting/controller/docker.md), you can apply the
+policy using the following command:
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
+```
+
+Run the following command to check if the policy was created.
+
+```mdx-code-block
+<CodeBlock language="bash">aperturectl policies --controller localhost:8080 --insecure</CodeBlock>
 ```
 
 ```mdx-code-block
 </TabItem>
 </Tabs>
+</TabItem>
+</Tabs>
 ```
+
+---
 
 The policy runtime can be visualized in [Aperture Cloud][aperture-cloud],
 Grafana or any other Prometheus compatible analytics tool. Refer to the
@@ -211,7 +230,7 @@ Run the following command to delete the above policy:
 ```
 
 ```bash
-aperturectl delete policy --policy=rate-limiting
+aperturectl policy delete --policy=rate-limiting
 ```
 
 ```mdx-code-block
@@ -233,5 +252,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 [blueprints]: /reference/blueprints/blueprints.md
 [policies]: /concepts/advanced/policy.md
 [grafana]: https://grafana.com/docs/grafana/latest/dashboards/
-[self-hosted]: /self-hosting/self-hosting.md
 [aperture-cloud]: /introduction.md

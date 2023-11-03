@@ -1,6 +1,8 @@
 package com.fluxninja.example.filter;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.FlowStatus;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
+    private boolean rampMode;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -25,7 +28,9 @@ public class ApertureFeatureFilter implements Filter {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
-        Flow flow = this.apertureSDK.startFlow("awesomeFeature", labels);
+        Flow flow =
+                this.apertureSDK.startFlow(
+                        "awesomeFeature", labels, this.rampMode, Duration.ofMillis(1000));
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
@@ -47,15 +52,16 @@ public class ApertureFeatureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String agentHost;
-        String agentPort;
+        String agentAddress;
+        String agentAPIKey;
         boolean insecureGrpc;
         String rootCertificateFile;
         try {
-            agentHost = filterConfig.getInitParameter("agent_host");
-            agentPort = filterConfig.getInitParameter("agent_port");
+            agentAddress = filterConfig.getInitParameter("agent_address");
+            agentAPIKey = filterConfig.getInitParameter("agent_api_key");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }
@@ -63,9 +69,8 @@ public class ApertureFeatureFilter implements Filter {
         try {
             this.apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
+                            .setAddress(agentAddress)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

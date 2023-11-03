@@ -33,8 +33,11 @@ const (
 	Controller_ListPolicies_FullMethodName               = "/aperture.cmd.v1.Controller/ListPolicies"
 	Controller_PreviewFlowLabels_FullMethodName          = "/aperture.cmd.v1.Controller/PreviewFlowLabels"
 	Controller_PreviewHTTPRequests_FullMethodName        = "/aperture.cmd.v1.Controller/PreviewHTTPRequests"
+	Controller_GetPolicy_FullMethodName                  = "/aperture.cmd.v1.Controller/GetPolicy"
 	Controller_UpsertPolicy_FullMethodName               = "/aperture.cmd.v1.Controller/UpsertPolicy"
 	Controller_PostDynamicConfig_FullMethodName          = "/aperture.cmd.v1.Controller/PostDynamicConfig"
+	Controller_GetDynamicConfig_FullMethodName           = "/aperture.cmd.v1.Controller/GetDynamicConfig"
+	Controller_DeleteDynamicConfig_FullMethodName        = "/aperture.cmd.v1.Controller/DeleteDynamicConfig"
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
 	Controller_GetDecisions_FullMethodName               = "/aperture.cmd.v1.Controller/GetDecisions"
 	Controller_GetStatus_FullMethodName                  = "/aperture.cmd.v1.Controller/GetStatus"
@@ -44,7 +47,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ControllerClient interface {
-	ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAgentsResponse, error)
+	ListAgents(ctx context.Context, in *ListAgentsRequest, opts ...grpc.CallOption) (*ListAgentsResponse, error)
 	ListServices(ctx context.Context, in *ListServicesRequest, opts ...grpc.CallOption) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(ctx context.Context, in *ListFlowControlPointsRequest, opts ...grpc.CallOption) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(ctx context.Context, in *ListAutoScaleControlPointsRequest, opts ...grpc.CallOption) (*ListAutoScaleControlPointsControllerResponse, error)
@@ -54,8 +57,11 @@ type ControllerClient interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(ctx context.Context, in *PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*PreviewHTTPRequestsControllerResponse, error)
-	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetPolicy(ctx context.Context, in *v1.GetPolicyRequest, opts ...grpc.CallOption) (*v1.GetPolicyResponse, error)
+	UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error)
+	DeleteDynamicConfig(ctx context.Context, in *v1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
 	GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error)
@@ -69,7 +75,7 @@ func NewControllerClient(cc grpc.ClientConnInterface) ControllerClient {
 	return &controllerClient{cc}
 }
 
-func (c *controllerClient) ListAgents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAgentsResponse, error) {
+func (c *controllerClient) ListAgents(ctx context.Context, in *ListAgentsRequest, opts ...grpc.CallOption) (*ListAgentsResponse, error) {
 	out := new(ListAgentsResponse)
 	err := c.cc.Invoke(ctx, Controller_ListAgents_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -150,8 +156,17 @@ func (c *controllerClient) PreviewHTTPRequests(ctx context.Context, in *PreviewH
 	return out, nil
 }
 
-func (c *controllerClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *controllerClient) GetPolicy(ctx context.Context, in *v1.GetPolicyRequest, opts ...grpc.CallOption) (*v1.GetPolicyResponse, error) {
+	out := new(v1.GetPolicyResponse)
+	err := c.cc.Invoke(ctx, Controller_GetPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicyRequest, opts ...grpc.CallOption) (*v1.UpsertPolicyResponse, error) {
+	out := new(v1.UpsertPolicyResponse)
 	err := c.cc.Invoke(ctx, Controller_UpsertPolicy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -162,6 +177,24 @@ func (c *controllerClient) UpsertPolicy(ctx context.Context, in *v1.UpsertPolicy
 func (c *controllerClient) PostDynamicConfig(ctx context.Context, in *v1.PostDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Controller_PostDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) GetDynamicConfig(ctx context.Context, in *v1.GetDynamicConfigRequest, opts ...grpc.CallOption) (*v1.GetDynamicConfigResponse, error) {
+	out := new(v1.GetDynamicConfigResponse)
+	err := c.cc.Invoke(ctx, Controller_GetDynamicConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) DeleteDynamicConfig(ctx context.Context, in *v1.DeleteDynamicConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Controller_DeleteDynamicConfig_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +232,7 @@ func (c *controllerClient) GetStatus(ctx context.Context, in *v11.GroupStatusReq
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
 type ControllerServer interface {
-	ListAgents(context.Context, *emptypb.Empty) (*ListAgentsResponse, error)
+	ListAgents(context.Context, *ListAgentsRequest) (*ListAgentsResponse, error)
 	ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error)
 	ListFlowControlPoints(context.Context, *ListFlowControlPointsRequest) (*ListFlowControlPointsControllerResponse, error)
 	ListAutoScaleControlPoints(context.Context, *ListAutoScaleControlPointsRequest) (*ListAutoScaleControlPointsControllerResponse, error)
@@ -209,8 +242,11 @@ type ControllerServer interface {
 	// duplicating a bit preview.v1.FlowPreviewService to keep controller APIs in one place.
 	PreviewFlowLabels(context.Context, *PreviewFlowLabelsRequest) (*PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error)
-	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error)
+	GetPolicy(context.Context, *v1.GetPolicyRequest) (*v1.GetPolicyResponse, error)
+	UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error)
 	PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error)
+	GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error)
+	DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error)
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
 	GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error)
@@ -220,7 +256,7 @@ type ControllerServer interface {
 type UnimplementedControllerServer struct {
 }
 
-func (UnimplementedControllerServer) ListAgents(context.Context, *emptypb.Empty) (*ListAgentsResponse, error) {
+func (UnimplementedControllerServer) ListAgents(context.Context, *ListAgentsRequest) (*ListAgentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAgents not implemented")
 }
 func (UnimplementedControllerServer) ListServices(context.Context, *ListServicesRequest) (*ListServicesControllerResponse, error) {
@@ -247,11 +283,20 @@ func (UnimplementedControllerServer) PreviewFlowLabels(context.Context, *Preview
 func (UnimplementedControllerServer) PreviewHTTPRequests(context.Context, *PreviewHTTPRequestsRequest) (*PreviewHTTPRequestsControllerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreviewHTTPRequests not implemented")
 }
-func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*emptypb.Empty, error) {
+func (UnimplementedControllerServer) GetPolicy(context.Context, *v1.GetPolicyRequest) (*v1.GetPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicy not implemented")
+}
+func (UnimplementedControllerServer) UpsertPolicy(context.Context, *v1.UpsertPolicyRequest) (*v1.UpsertPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertPolicy not implemented")
 }
 func (UnimplementedControllerServer) PostDynamicConfig(context.Context, *v1.PostDynamicConfigRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostDynamicConfig not implemented")
+}
+func (UnimplementedControllerServer) GetDynamicConfig(context.Context, *v1.GetDynamicConfigRequest) (*v1.GetDynamicConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicConfig not implemented")
+}
+func (UnimplementedControllerServer) DeleteDynamicConfig(context.Context, *v1.DeleteDynamicConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDynamicConfig not implemented")
 }
 func (UnimplementedControllerServer) DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
@@ -275,7 +320,7 @@ func RegisterControllerServer(s grpc.ServiceRegistrar, srv ControllerServer) {
 }
 
 func _Controller_ListAgents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListAgentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -287,7 +332,7 @@ func _Controller_ListAgents_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Controller_ListAgents_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControllerServer).ListAgents(ctx, req.(*emptypb.Empty))
+		return srv.(ControllerServer).ListAgents(ctx, req.(*ListAgentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -436,6 +481,24 @@ func _Controller_PreviewHTTPRequests_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_GetPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.GetPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetPolicy(ctx, req.(*v1.GetPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Controller_UpsertPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(v1.UpsertPolicyRequest)
 	if err := dec(in); err != nil {
@@ -468,6 +531,42 @@ func _Controller_PostDynamicConfig_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ControllerServer).PostDynamicConfig(ctx, req.(*v1.PostDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_GetDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.GetDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).GetDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_GetDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).GetDynamicConfig(ctx, req.(*v1.GetDynamicConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_DeleteDynamicConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1.DeleteDynamicConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).DeleteDynamicConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_DeleteDynamicConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).DeleteDynamicConfig(ctx, req.(*v1.DeleteDynamicConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -570,12 +669,24 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Controller_PreviewHTTPRequests_Handler,
 		},
 		{
+			MethodName: "GetPolicy",
+			Handler:    _Controller_GetPolicy_Handler,
+		},
+		{
 			MethodName: "UpsertPolicy",
 			Handler:    _Controller_UpsertPolicy_Handler,
 		},
 		{
 			MethodName: "PostDynamicConfig",
 			Handler:    _Controller_PostDynamicConfig_Handler,
+		},
+		{
+			MethodName: "GetDynamicConfig",
+			Handler:    _Controller_GetDynamicConfig_Handler,
+		},
+		{
+			MethodName: "DeleteDynamicConfig",
+			Handler:    _Controller_DeleteDynamicConfig_Handler,
 		},
 		{
 			MethodName: "DeletePolicy",

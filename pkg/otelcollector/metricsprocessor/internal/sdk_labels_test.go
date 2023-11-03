@@ -1,6 +1,8 @@
 package internal_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -23,15 +25,29 @@ var _ = DescribeTable("SDK labels", func(before map[string]int64, after map[stri
 },
 	Entry("Sets flow duration",
 		map[string]int64{
-			otelconsts.ApertureFlowStartTimestampLabel: 123e6,
-			otelconsts.ApertureFlowEndTimestampLabel:   246e6,
+			otelconsts.ApertureFlowStartTimestampLabel: (time.Millisecond * 123).Nanoseconds(),
+			otelconsts.ApertureFlowEndTimestampLabel:   (time.Millisecond * 246).Nanoseconds(),
 		},
 		map[string]float64{otelconsts.FlowDurationLabel: 123},
 	),
 	Entry("Sets workload duration",
 		map[string]int64{
-			otelconsts.ApertureWorkloadStartTimestampLabel: 123e6,
-			otelconsts.ApertureFlowEndTimestampLabel:       246e6,
+			otelconsts.ApertureWorkloadStartTimestampLabel: (time.Millisecond * 123).Nanoseconds(),
+			otelconsts.ApertureFlowEndTimestampLabel:       (time.Millisecond * 246).Nanoseconds(),
+		},
+		map[string]float64{otelconsts.WorkloadDurationLabel: 123},
+	),
+	Entry("Sets flow ms duration",
+		map[string]int64{
+			otelconsts.ApertureFlowStartTimestampLabelMs: (time.Millisecond * 123).Milliseconds(),
+			otelconsts.ApertureFlowEndTimestampLabelMs:   (time.Millisecond * 246).Milliseconds(),
+		},
+		map[string]float64{otelconsts.FlowDurationLabel: 123},
+	),
+	Entry("Sets workload ms duration",
+		map[string]int64{
+			otelconsts.ApertureWorkloadStartTimestampLabelMs: (time.Millisecond * 123).Milliseconds(),
+			otelconsts.ApertureFlowEndTimestampLabelMs:       (time.Millisecond * 246).Milliseconds(),
 		},
 		map[string]float64{otelconsts.WorkloadDurationLabel: 123},
 	),

@@ -9,7 +9,7 @@ local flowControl = spec.v1.FlowControl;
 local rateLimiter = spec.v1.RateLimiter;
 local port = spec.v1.Port;
 
-function(cfg, metadata={}) {
+function(cfg) {
   local params = config + cfg,
   local policyDef =
     policy.new()
@@ -29,6 +29,7 @@ function(cfg, metadata={}) {
               })
               + rateLimiter.withSelectors(params.policy.rate_limiter.selectors)
               + rateLimiter.withParameters(params.policy.rate_limiter.parameters)
+              + rateLimiter.withRequestParameters(params.policy.rate_limiter.request_parameters)
             ),
           ),
         ] + params.policy.components,

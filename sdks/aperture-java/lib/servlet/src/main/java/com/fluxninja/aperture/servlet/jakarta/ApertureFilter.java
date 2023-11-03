@@ -1,6 +1,12 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.ApertureSDKBuilder;
+import com.fluxninja.aperture.sdk.Constants;
+import com.fluxninja.aperture.sdk.FlowDecision;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -18,18 +24,18 @@ public class ApertureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
     private String controlPointName;
-    private boolean failOpen;
+    private boolean rampMode;
+    private Duration flowTimeout;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         TrafficFlowRequest trafficFlowRequest =
-                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName);
+                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName, flowTimeout);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        String path = request.getServletPath();
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
         if (flow.ignored()) {
@@ -40,7 +46,7 @@ public class ApertureFilter implements Filter {
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             try {
@@ -63,8 +69,8 @@ public class ApertureFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String agentHost;
-        String agentPort;
+        String agentAddress;
+        String agentAPIKey;
         String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
@@ -72,10 +78,9 @@ public class ApertureFilter implements Filter {
         String ignoredPaths;
         boolean ignoredPathsRegex;
         try {
-            agentHost = filterConfig.getInitParameter("agent_host");
-            agentPort = filterConfig.getInitParameter("agent_port");
+            agentAddress = filterConfig.getInitParameter("agent_address");
+            agentAPIKey = filterConfig.getInitParameter("agent_api_key");
             initControlPointName = filterConfig.getInitParameter("control_point_name");
-            timeoutMs = filterConfig.getInitParameter("timeout_ms");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
             ignoredPaths = filterConfig.getInitParameter("ignored_paths");
@@ -83,7 +88,13 @@ public class ApertureFilter implements Filter {
                     Boolean.parseBoolean(
                             filterConfig.getInitParameter("ignored_paths_match_regex"));
 
-            this.failOpen = Boolean.parseBoolean(filterConfig.getInitParameter("enable_fail_open"));
+            timeoutMs = filterConfig.getInitParameter("timeout_ms");
+            if (timeoutMs != null) {
+                this.flowTimeout = Duration.ofMillis(Integer.parseInt(timeoutMs));
+            } else {
+                this.flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+            }
+            this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
 
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
@@ -95,11 +106,8 @@ public class ApertureFilter implements Filter {
         controlPointName = initControlPointName;
 
         ApertureSDKBuilder builder = ApertureSDK.builder();
-        builder.setHost(agentHost);
-        builder.setPort(Integer.parseInt(agentPort));
-        if (timeoutMs != null) {
-            builder.setFlowTimeout(Duration.ofMillis(Integer.parseInt(timeoutMs)));
-        }
+        builder.setAddress(agentAddress);
+        builder.setAgentAPIKey(agentAPIKey);
         builder.useInsecureGrpc(insecureGrpc);
         if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
             try {

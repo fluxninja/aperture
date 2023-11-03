@@ -19,7 +19,7 @@ choose to continue using Aperture Cloud by subscribing to one of the [plans][].
 :::
 
 To get started with Aperture Cloud, you'll need to register. This process will
-set up an organization and kick off a project for you.
+set up an organization and a project for you.
 
 1. For sign up, head over to
    [Aperture Cloud](https://app.fluxninja.com/sign-up).

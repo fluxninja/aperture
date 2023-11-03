@@ -41,7 +41,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/adapterconnector"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsexporter"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/alertsreceiver"
-	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/leaderonlyreceiver"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/rollupprocessor"
@@ -66,30 +65,27 @@ func ModuleForAgentOTel() fx.Option {
 		fx.Provide(
 			cache.Provide[selectors.TypedControlPointID],
 			provideAgent,
-			fx.Annotate(
-				AgentOTelComponents,
-				fx.ParamTags(
-					alerts.AlertsFxTag,
-					otelconsts.ReceiverFactoriesFxTag,
-					otelconsts.ProcessorFactoriesFxTag,
-				),
-			),
+			AgentOTelComponents,
 		),
 	)
 }
 
+// AgentOTelComponentsIn bundles and annotates parameters.
+type AgentOTelComponentsIn struct {
+	fx.In
+	Alerter            alerts.Alerter      `name:"AlertsFx"`
+	ReceiverFactories  []receiver.Factory  `group:"otel-collector-receiver-factories"`
+	ProcessorFactories []processor.Factory `group:"otel-collector-processor-factories"`
+	PromRegistry       *prometheus.Registry
+	Engine             iface.Engine
+	ClasEng            iface.ClassificationEngine
+	ServerGRPC         *grpc.Server `name:"default"`
+	ControlPointCache  *cache.Cache[selectors.TypedControlPointID]
+	AlertMgr           *alertmanager.AlertManager
+}
+
 // AgentOTelComponents constructs OTel Collector Factories for Agent.
-func AgentOTelComponents(
-	alerter alerts.Alerter,
-	receiverFactories []receiver.Factory,
-	processorFactories []processor.Factory,
-	promRegistry *prometheus.Registry,
-	engine iface.Engine,
-	clasEng iface.ClassificationEngine,
-	serverGRPC *grpc.Server,
-	controlPointCache *cache.Cache[selectors.TypedControlPointID],
-	alertMgr *alertmanager.AlertManager,
-) (otelcol.Factories, error) {
+func AgentOTelComponents(in AgentOTelComponentsIn) (otelcol.Factories, error) {
 	var errs error
 
 	extensions, err := extension.MakeFactoryMap(
@@ -106,16 +102,16 @@ func AgentOTelComponents(
 	tsw := &otlpreceiver.TraceServerWrapper{}
 	msw := &otlpreceiver.MetricServerWrapper{}
 	lsw := &otlpreceiver.LogServerWrapper{}
-	ptraceotlp.RegisterGRPCServer(serverGRPC, tsw)
-	pmetricotlp.RegisterGRPCServer(serverGRPC, msw)
-	plogotlp.RegisterGRPCServer(serverGRPC, lsw)
+	ptraceotlp.RegisterGRPCServer(in.ServerGRPC, tsw)
+	pmetricotlp.RegisterGRPCServer(in.ServerGRPC, msw)
+	plogotlp.RegisterGRPCServer(in.ServerGRPC, lsw)
 
 	rf := []receiver.Factory{
 		otlpreceiver.NewFactory(tsw, msw, lsw),
-		alertsreceiver.NewFactory(alerter),
+		alertsreceiver.NewFactory(in.Alerter),
 	}
 	// receiversFactory = append(receiversFactory, otelContribReceivers()...)
-	rf = append(rf, receiverFactories...)
+	rf = append(rf, in.ReceiverFactories...)
 	receivers, err := receiver.MakeFactoryMap(rf...)
 	errs = multierr.Append(errs, err)
 
@@ -125,17 +121,17 @@ func AgentOTelComponents(
 		otlpexporter.NewFactory(),
 		otlphttpexporter.NewFactory(),
 		prometheusremotewriteexporter.NewFactory(),
-		alertsexporter.NewFactory(alertMgr),
+		alertsexporter.NewFactory(in.AlertMgr),
 	}
 	exporters, err := exporter.MakeFactoryMap(ef...)
 	errs = multierr.Append(errs, err)
 
 	pf := []processor.Factory{
-		rollupprocessor.NewFactory(promRegistry),
-		metricsprocessor.NewFactory(promRegistry, engine, clasEng, controlPointCache),
+		rollupprocessor.NewFactory(in.PromRegistry),
+		metricsprocessor.NewFactory(in.PromRegistry, in.Engine, in.ClasEng, in.ControlPointCache),
 	}
 	// processorsFactory = append(processorsFactory, otelContribProcessors()...)
-	pf = append(pf, processorFactories...)
+	pf = append(pf, in.ProcessorFactories...)
 	processors, err := processor.MakeFactoryMap(pf...)
 	errs = multierr.Append(errs, err)
 

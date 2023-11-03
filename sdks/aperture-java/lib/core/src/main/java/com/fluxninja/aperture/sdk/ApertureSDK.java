@@ -1,6 +1,8 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_START_TIMESTAMP_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.SOURCE_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.WORKLOAD_START_TIMESTAMP_LABEL;
 
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
@@ -36,7 +38,6 @@ public final class ApertureSDK {
     private final FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub
             httpFlowControlClient;
     private final Tracer tracer;
-    private final Duration flowTimeout;
     private final List<String> ignoredPaths;
     private final boolean ignoredPathsMatchRegex;
 
@@ -46,12 +47,10 @@ public final class ApertureSDK {
             FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient,
             FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient,
             Tracer tracer,
-            Duration flowTimeout,
             List<String> ignoredPaths,
             boolean ignoredPathsMatchRegex) {
         this.flowControlClient = flowControlClient;
         this.tracer = tracer;
-        this.flowTimeout = flowTimeout;
         this.httpFlowControlClient = httpFlowControlClient;
         this.ignoredPaths = ignoredPaths;
         this.ignoredPathsMatchRegex = ignoredPathsMatchRegex;
@@ -73,9 +72,16 @@ public final class ApertureSDK {
      *
      * @param controlPoint Name of the control point
      * @param explicitLabels Labels sent to Aperture Agent
+     * @param rampMode Whether the flow should require ramp component match
+     * @param flowTimeout timeout for connection to Aperture Agent. Set to 0 to block until response
+     *     is received.
      * @return A Flow object
      */
-    public Flow startFlow(String controlPoint, Map<String, String> explicitLabels) {
+    public Flow startFlow(
+            String controlPoint,
+            Map<String, String> explicitLabels,
+            Boolean rampMode,
+            Duration flowTimeout) {
         Map<String, String> labels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -100,6 +106,7 @@ public final class ApertureSDK {
                 CheckRequest.newBuilder()
                         .setControlPoint(controlPoint)
                         .putAllLabels(labels)
+                        .setRampMode(rampMode)
                         .build();
 
         Span span =
@@ -124,7 +131,7 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new Flow(res, span, false);
+        return new Flow(res, span, false, rampMode);
     }
 
     /**
@@ -152,12 +159,13 @@ public final class ApertureSDK {
 
         CheckHTTPResponse res = null;
         try {
-            if (flowTimeout.isZero()) {
+            if (req.getFlowTimeout().isZero()) {
                 res = this.httpFlowControlClient.checkHTTP(checkHTTPRequest);
             } else {
                 res =
                         this.httpFlowControlClient
-                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(
+                                        req.getFlowTimeout().toNanos(), TimeUnit.NANOSECONDS)
                                 .checkHTTP(checkHTTPRequest);
             }
         } catch (StatusRuntimeException e) {
@@ -165,7 +173,7 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new TrafficFlow(res, span, false);
+        return new TrafficFlow(res, span, false, req.getCheckHTTPRequest().getRampMode());
     }
 
     private boolean isIgnored(String path) {

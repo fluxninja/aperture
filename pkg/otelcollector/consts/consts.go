@@ -126,12 +126,21 @@ const (
 
 	/* SDK specific labels. */
 
-	// ApertureFlowStartTimestampLabel is the start timestamp of the flow.
+	// ApertureFlowStartTimestampLabel is the start timestamp of the flow in nano seconds.
+	// Deprecated: v3.0.0. Use `aperture.flow_start_timestamp_ms` instead.
 	ApertureFlowStartTimestampLabel = "aperture.flow_start_timestamp"
-	// ApertureFlowEndTimestampLabel is the end timestamp of the flow.
+	// ApertureFlowStartTimestampLabelMs is the start timestamp of the flow in milli seconds.
+	ApertureFlowStartTimestampLabelMs = "aperture.flow_start_timestamp_ms"
+	// ApertureFlowEndTimestampLabel is the end timestamp of the flow in nano seconds.
+	// Deprecated: v3.0.0. Use `aperture.flow_end_timestamp_ms` instead.
 	ApertureFlowEndTimestampLabel = "aperture.flow_end_timestamp"
-	// ApertureWorkloadStartTimestampLabel is the start timestamp of the workload.
+	// ApertureFlowEndTimestampLabelMs is the end timestamp of the flow in milli seconds.
+	ApertureFlowEndTimestampLabelMs = "aperture.flow_end_timestamp_ms"
+	// ApertureWorkloadStartTimestampLabel is the start timestamp of the workload in nano seconds.
+	// Deprecated: v3.0.0. Use `aperture.workload_start_timestamp_ms` instead.
 	ApertureWorkloadStartTimestampLabel = "aperture.workload_start_timestamp"
+	// ApertureWorkloadStartTimestampLabelMs is the start timestamp of the workload in milli seconds.
+	ApertureWorkloadStartTimestampLabelMs = "aperture.workload_start_timestamp_ms"
 
 	/* Aperture specific enrichment labels. */
 

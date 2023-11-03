@@ -1,12 +1,24 @@
 package com.fluxninja.aperture.netty;
 
-import com.fluxninja.aperture.sdk.*;
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.Constants;
+import com.fluxninja.aperture.sdk.FlowDecision;
+import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.TrafficFlow;
+import com.fluxninja.aperture.sdk.TrafficFlowRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +27,8 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
 
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
-    private boolean failOpen = true;
+    private boolean rampMode = false;
+    private Duration flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
 
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
         if (controlPointName == null || controlPointName.trim().isEmpty()) {
@@ -28,7 +41,8 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         this.controlPointName = controlPointName;
     }
 
-    public ApertureServerHandler(ApertureSDK sdk, String controlPointName, boolean failOpen) {
+    public ApertureServerHandler(
+            ApertureSDK sdk, String controlPointName, boolean rampMode, Duration flowTimeout) {
         if (controlPointName == null || controlPointName.trim().isEmpty()) {
             throw new IllegalArgumentException("Control Point name must not be null or empty");
         }
@@ -37,13 +51,14 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         }
         this.apertureSDK = sdk;
         this.controlPointName = controlPointName;
-        this.failOpen = failOpen;
+        this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
         TrafficFlowRequest trafficFlowRequest =
-                NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName);
+                NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName, flowTimeout);
         String path = new QueryStringDecoder(req.uri()).path();
 
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
@@ -56,7 +71,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
                 (flowDecision == FlowDecision.Accepted
-                        || (flowDecision == FlowDecision.Unreachable && this.failOpen));
+                        || (flowDecision == FlowDecision.Unreachable && !this.rampMode));
 
         if (flowAccepted) {
             try {

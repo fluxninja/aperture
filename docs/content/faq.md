@@ -52,14 +52,14 @@ are still benefits of using Aperture:
 ### If Aperture is rejecting or queuing requests, how will it impact the user experience? {#reject-impact}
 
 Queuing requests should not affect user experience (apart from increased
-latency). When it comes to rejecting requests, clients (whether it's frontend
-code or some other service) should be prepared to receive 429 Too Many Requests
-or 503 Service Unavailable response and react accordingly.
+latency). When it comes to rejecting requests, clients (whether it is front-end
+code or some other service) should be prepared to receive
+`429 Too Many Requests` or `503 Service Unavailable` response and react
+accordingly.
 
-Remember that while receiving 503 by some of the users might seem like a thing
-to avoid, if such a case occurs an overload is already happening and Aperture is
-protecting your service from an unhealthy state (for example crashing) and
-therefore affecting even more users.
+Remember, that while some users receiving 503 might seem like a thing to avoid,
+if such a case occurs, an overload is already happening and Aperture is
+protecting your service from going into an unhealthy state.
 
 ### How can Flow Labels be defined for workload prioritization or rate limiting? {#flow-labels}
 
@@ -93,9 +93,9 @@ Controller][aperture-cloud-controller] instead of deploying your own.
 
 Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the
-[Supported Linux platforms](/get-started/installation/supported-platforms.md).
+[Supported Linux platforms](/get-started/self-hosting/supported-platforms.md).
 The installation steps are available
-[here](/get-started/installation/agent/bare-metal.md).
+[here](/get-started/self-hosting/agent/bare-metal.md).
 
 ### What are Aperture Agent's performance numbers? {#agent-performance}
 
@@ -105,7 +105,7 @@ With the following setup:
 
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
-  [DaemonSet](/get-started/installation/agent/kubernetes/operator/daemonset.md)
+  [DaemonSet](/get-started/self-hosting/agent/kubernetes/operator/daemonset.md)
 - 1 policy with a [rate limiter][rate-limiter], a [load
   scheduler][load-scheduler] and a [flux meter][flux-meter]
 - 3 services in `demoapp` namespace instrumented using

@@ -89,17 +89,17 @@ func (tbb *tokenBucketBase) returnTokens(toReturn float64) {
 	}
 }
 
-func (tbb *tokenBucketBase) take(ctx context.Context, tokens float64) (time.Duration, bool) {
+func (tbb *tokenBucketBase) take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
 	// if tokens aren't coming do not provide any more tokens
 	if tbb.fillRate == 0 {
-		return time.Duration(0), false
+		return false, time.Duration(0), tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 	}
 
 	tbb.adjustTokens()
 	tbb.addTokens(-tokens)
 
 	if tbb.availableTokens >= 0 {
-		return time.Duration(0), true
+		return true, time.Duration(0), tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 	}
 	// figure out when the tokens will be available
 	waitTime := time.Duration(-tbb.availableTokens * float64(1e9) / float64(tbb.fillRate))
@@ -109,19 +109,23 @@ func (tbb *tokenBucketBase) take(ctx context.Context, tokens float64) (time.Dura
 	if ok && deadline.Sub(tbb.latestTime) < waitTime {
 		// return tokens
 		tbb.addTokens(tokens)
-		return time.Duration(0), false
+		return false, time.Duration(0), tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 	}
 
-	return waitTime, true
+	return true, waitTime, tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 }
 
-func (tbb *tokenBucketBase) takeIfAvailable(tokens float64) bool {
+func (tbb *tokenBucketBase) takeIfAvailable(tokens float64) (bool, time.Duration, float64, float64) {
 	tbb.adjustTokens()
 	if tbb.availableTokens > tokens {
 		tbb.addTokens(-tokens)
-		return true
+		return true, time.Duration(0), tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 	}
-	return false
+	var waitTime time.Duration
+	if tbb.fillRate > 0 {
+		waitTime = time.Duration((tokens - tbb.availableTokens) * float64(1e9) / float64(tbb.fillRate))
+	}
+	return false, waitTime, tbb.availableTokens, tbb.bucketCapacity - tbb.availableTokens
 }
 
 func (tbb *tokenBucketBase) getFillRate() float64 {
@@ -154,7 +158,7 @@ func NewBasicTokenBucket(clk clockwork.Clock, fillRate float64, metrics *TokenBu
 }
 
 // TakeIfAvailable takes tokens from the basic token bucket if available, otherwise return false.
-func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) bool {
+func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) (bool, time.Duration, float64, float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	return btb.tbb.takeIfAvailable(tokens)
@@ -163,7 +167,7 @@ func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) 
 // Take takes tokens from the basic token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (btb *BasicTokenBucket) Take(ctx context.Context, tokens float64) (time.Duration, bool) {
+func (btb *BasicTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	return btb.tbb.take(ctx, tokens)

@@ -113,7 +113,7 @@ func provideEntities(in FxIn) (*Entities, *EntityTrackers, error) {
 	// create a ConfigPrefixNotifier
 	configPrefixNotifier, err := notifiers.NewUnmarshalPrefixNotifier("",
 		entityCache.processUpdate,
-		config.KoanfUnmarshallerConstructor{}.NewKoanfUnmarshaller,
+		config.NewProtobufUnmarshaller,
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to create config prefix notifier")
@@ -145,7 +145,7 @@ func provideEntities(in FxIn) (*Entities, *EntityTrackers, error) {
 func (e *Entities) processUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
 	log.Trace().Str("event", event.String()).Msg("Updating entity")
 	entityProto := &entitiesv1.Entity{}
-	if err := unmarshaller.UnmarshalKey("", entityProto); err != nil {
+	if err := unmarshaller.Unmarshal(entityProto); err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal entity")
 		return
 	}

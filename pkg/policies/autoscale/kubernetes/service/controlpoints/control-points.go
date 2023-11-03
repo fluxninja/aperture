@@ -8,8 +8,8 @@ import (
 	controlpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
-	"github.com/fluxninja/aperture/v2/pkg/rpc"
 )
 
 // Handler is the gRPC server handler.
@@ -33,8 +33,8 @@ func (h *Handler) GetControlPoints(ctx context.Context, _ *emptypb.Empty) (*cont
 }
 
 // RegisterControlPointsHandler registers ControlPointsHandler in RPC handler registry.
-func RegisterControlPointsHandler(handler *Handler, registry *rpc.HandlerRegistry) error {
-	return rpc.RegisterFunction(registry, handler.ListAutoScaleControlPoints)
+func RegisterControlPointsHandler(handler *Handler, t *transport.EtcdTransportClient) error {
+	return transport.RegisterFunction(t, handler.ListAutoScaleControlPoints)
 }
 
 // ListAutoScaleControlPoints lists currently discovered control points.

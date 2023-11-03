@@ -2,21 +2,19 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/ghodss/yaml"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -29,6 +27,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
+	"github.com/fluxninja/aperture/v2/pkg/utils"
 )
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
@@ -115,6 +114,83 @@ func GenerateMermaidFile(circuit *circuitfactory.Circuit, mermaidFile string, de
 	return nil
 }
 
+// GenerateGraphFile generates a graph from the given circuit with the specified depth.
+// The depth determines how many levels of components in the tree should be expanded in the graph.
+// If maxDepth is set to -1, the function will expand components up to the maximum possible depth.
+//
+// Parameters:
+//   - circuit: A pointer to the circuitfactory.Circuit object to be used for generating the graph.
+//   - graphFilePath: The file path where the generated graph should be saved.
+//   - maxDepth: The maximum depth the graph should be expanded to.
+//     If set to -1, the function will expand components up to the maximum possible depth.
+//
+// Returns:
+//   - An error if any issues occur during the file creation or writing process, otherwise nil.
+//
+// Example usage:
+//
+//		err := GenerateGraphFile(circuit, "output.json", 3)
+//		// This will generate a graph with components expanded up to a depth of 3.
+//
+//		err := GenerateGraphFile(circuit, "output.json", -1)
+//	 // This will generate a graph with components expanded up to the maximum possible depth.
+func GenerateGraphFile(circuit *circuitfactory.Circuit, graphFilePath string, depth int) error {
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), depth)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(graphFilePath)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating file")
+		return err
+	}
+	defer f.Close()
+
+	graphJSON, err := json.Marshal(graph)
+	if err != nil {
+		log.Error().Err(err).Msg("error marshaling graph")
+		return err
+	}
+
+	_, err = f.Write(graphJSON)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing to file")
+		return err
+	}
+
+	return nil
+}
+
+// GenerateTreeGraph generates a tree graph from the given circuit.
+func GenerateTreeGraph(circuit *circuitfactory.Circuit, treeFilePath string) error {
+	treeGraph, err := circuit.Tree.TreeGraph()
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(treeFilePath)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating file")
+		return err
+	}
+	defer f.Close()
+
+	treeGraphJSON, err := json.Marshal(treeGraph)
+	if err != nil {
+		log.Error().Err(err).Msg("error marshaling graph")
+		return err
+	}
+
+	_, err = f.Write(treeGraphJSON)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing to file")
+		return err
+	}
+
+	return nil
+}
+
 // CompilePolicy compiles the policy and returns the circuit.
 func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *languagev1.Policy, error) {
 	ctx := context.Background()
@@ -124,11 +200,65 @@ func CompilePolicy(name string, policyBytes []byte) (*circuitfactory.Circuit, *l
 	// command is called "circuit-compiler" though, so it is bit... surprising.
 	// If we compiled just a circuit, we could drop dependency on
 	// `controlplane` package.
-	circuit, policy, err := controlplane.ValidateAndCompile(ctx, name, policyBytes)
+	circuit, policy, err := controlplane.ValidateAndCompileYAML(ctx, name, policyBytes)
 	if err != nil {
 		return nil, nil, err
 	}
 	return circuit, policy, nil
+}
+
+// GetFlatComponentsList returns a flat representation of the circuit graph.
+func GetFlatComponentsList(circuit *circuitfactory.Circuit) (string, error) {
+	compListJSON := ExpandTreeWithParentInfo(circuit.Tree, "")
+	// leave only top level parent name
+	for _, comp := range compListJSON {
+		tempName := strings.TrimPrefix(comp.ParentName, "/Circuit")
+		tempName = strings.TrimPrefix(tempName, "/")
+		firtLvlParent, _, found := strings.Cut(tempName, "/")
+		if !found {
+			comp.ParentName = ""
+		} else {
+			comp.ParentName = firtLvlParent
+		}
+	}
+
+	flatComponentsList, err := json.Marshal(compListJSON)
+	if err != nil {
+		errMsg := fmt.Errorf("error marshaling circuit graph: %w", err)
+		return "", errMsg
+	}
+
+	return string(flatComponentsList), nil
+}
+
+type componentOutput struct {
+	ComponentID   string          `json:"component_id"`
+	ComponentName string          `json:"component_name"`
+	ParentName    string          `json:"parent_name"`
+	Component     utils.MapStruct `json:"component"`
+}
+
+func ExpandTreeWithParentInfo(tree circuitfactory.Tree, parentName string) []*componentOutput {
+	components := []*componentOutput{}
+	newParentName := fmt.Sprintf("%s/%s", parentName, tree.Node.Component.Name())
+	// If the tree has children, recurse into them.
+	if len(tree.Children) > 0 {
+		for _, child := range tree.Children {
+			childComponents := ExpandTreeWithParentInfo(child, newParentName)
+			components = append(components, childComponents...)
+		}
+	} else {
+		// If the tree does not have children, add its root component to the list.
+		compOutput := &componentOutput{
+			ComponentID:   tree.Node.ComponentID.String(),
+			ComponentName: tree.Node.Component.Name(),
+			ParentName:    parentName,
+			Component:     tree.Node.Config,
+		}
+
+		components = append(components, compOutput)
+	}
+	return components
 }
 
 // FetchPolicyFromCR extracts the spec key from a CR and saves it to a temp file.
@@ -203,48 +333,6 @@ func GetKubeConfig(kubeConfig string) (*rest.Config, error) {
 	}
 	kubeRestConfig := restConfig
 	return kubeRestConfig, nil
-}
-
-// ResolveLatestVersion returns the latest release version of Aperture.
-func ResolveLatestVersion() (string, error) {
-	remote := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
-		Name: "origin",
-		URLs: []string{apertureRepo},
-	})
-
-	refs, err := remote.List(&git.ListOptions{})
-	if err != nil {
-		return "", err
-	}
-
-	var latestRelease *semver.Version
-
-	tagsRefPrefix := "refs/tags/v"
-
-	for _, ref := range refs {
-		reference := ref.Name().String()
-		if ref.Name().IsTag() && strings.HasPrefix(reference, tagsRefPrefix) {
-			version := strings.TrimPrefix(reference, tagsRefPrefix)
-
-			release, err := semver.NewVersion(version)
-			if err != nil {
-				return "", err
-			}
-
-			if release.Prerelease() != "" {
-				continue
-			}
-
-			if latestRelease == nil || release.GreaterThan(latestRelease) {
-				latestRelease = release
-			}
-		}
-	}
-
-	if latestRelease == nil {
-		return "", errors.New("unable to resolve release tags to find latest release")
-	}
-	return fmt.Sprintf("v%s", latestRelease.String()), nil
 }
 
 // ValidateWithJSONSchema validates the given document (YAML) against the given JSON schema.
@@ -352,4 +440,57 @@ func GetControllerDeployment(kubeRestConfig *rest.Config, namespace string) (*ap
 	}
 
 	return &deployment.Items[0], nil
+}
+
+func IsNoMatchError(err error) bool {
+	return apimeta.IsNoMatchError(err) || strings.Contains(err.Error(), "failed to get API group resources")
+}
+
+// URIToRawContentURL converts a URI to a raw content URL, mainly for GitHub right now.
+func URIToRawContentURL(uri string) string {
+	if strings.Contains(uri, "github.com") {
+		// Splitting at '@' to get the tag
+		parts := strings.Split(uri, "@")
+		if len(parts) == 2 {
+
+			tag := parts[1]
+
+			// Removing github.com and tag
+			trimmedURI := parts[0][len("github.com/"):]
+
+			// Get org and repo
+			orgRepoParts := strings.SplitN(trimmedURI, "/", 2)
+			if len(orgRepoParts) < 2 {
+				return ""
+			}
+			org := orgRepoParts[0]
+			repoAndPath := orgRepoParts[1]
+
+			// Split repo and path
+			repoPathParts := strings.SplitN(repoAndPath, "/", 2)
+			repo := repoPathParts[0]
+			path := ""
+			if len(repoPathParts) > 1 {
+				path = repoPathParts[1]
+			}
+
+			// Construct the raw GitHub URL
+			return fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s", org, repo, tag, path)
+		}
+	}
+	return ""
+}
+
+func GetYAMLString(bytes []byte) (string, error) {
+	var data map[string]interface{}
+	err := yaml.Unmarshal(bytes, &data)
+	if err != nil {
+		return "", err
+	}
+
+	yamlString, err := yaml.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(yamlString), nil
 }

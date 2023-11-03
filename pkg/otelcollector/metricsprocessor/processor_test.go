@@ -191,9 +191,12 @@ var _ = Describe("Metrics Processor", func() {
 			Dropped:     true,
 			Details: &flowcontrolv1.LimiterDecision_RateLimiterInfo_{
 				RateLimiterInfo: &flowcontrolv1.LimiterDecision_RateLimiterInfo{
-					Remaining: 1,
-					Current:   1,
-					Label:     "test",
+					Label: "test",
+					TokensInfo: &flowcontrolv1.LimiterDecision_TokensInfo{
+						Remaining: 1,
+						Current:   1,
+						Consumed:  1,
+					},
 				},
 			},
 		}

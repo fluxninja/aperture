@@ -3,6 +3,12 @@ set -euo pipefail
 export LOGURU_LEVEL=TRACE
 export GIT_SSH_COMMAND="fn circleci ssh -o IdentitiesOnly=yes -o IdentityAgent=none"
 
+# Skip execution if release train is final-release and tag contains -rc-
+if [[ "${RELEASE_TRAIN:-}" == "final-release" ]] && [[ "${RELEASE_TAG:-}" == *"-rc."* ]]; then
+    echo "Skipping update_environment.sh for final-release with -rc- tag"
+    exit 0
+fi
+
 commit_author=$(git show --format="%aN <%aE>" --quiet)
 
 args=(

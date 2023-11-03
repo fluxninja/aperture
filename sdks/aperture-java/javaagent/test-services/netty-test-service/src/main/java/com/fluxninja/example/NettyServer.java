@@ -12,7 +12,7 @@ public class NettyServer {
     public static final String DEFAULT_APP_PORT = "8080";
 
     public static void main(String[] args) throws Exception {
-        String appPort = System.getenv("FN_APP_PORT");
+        String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
             appPort = DEFAULT_APP_PORT;
         }

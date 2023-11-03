@@ -1,8 +1,274 @@
 consumes:
     - application/json
 definitions:
+    AIADLoadScheduler:
+        description: |-
+            _AIAD Load Scheduler_ reduces the token rate linearly over time while in overload state.
+            During recovery, it increases the token rate linearly until the system is not overloaded.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/AIADLoadSchedulerIns'
+                description: Input ports for the _AIAD Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/AIADLoadSchedulerOuts'
+                description: Output ports for the _AIAD Load Scheduler_.
+            overload_condition:
+                default: gt
+                enum:
+                    - gt
+                    - lt
+                    - gte
+                    - lte
+                title: |-
+                    Overload condition determines the criteria to determine overload state. The default condition is "gt", that is, when the signal is greater than the setpoint. The condition must be one of:
+                    <!-- vale off -->
+                    - "gt": greater than
+                    - "lt": less than
+                    - "gte": greater than or equal to
+                    - "lte": less than or equal to
+                    <!-- vale on -->
+                type: string
+                x-go-tag-default: gt
+                x-go-tag-validate: required,oneof=gt lt gte lte
+                x-oneof: gt | lt | gte | lte
+            parameters:
+                $ref: '#/definitions/AIADLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _AIAD Load Scheduler_.
+
+                x-go-tag-validate: required
+        required:
+            - overload_condition
+            - parameters
+        type: object
+    AIADLoadSchedulerIns:
+        description: Input ports for the _AIAD Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The setpoint input to the controller.
+
+                x-go-tag-validate: required
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
+        type: object
+    AIADLoadSchedulerOuts:
+        description: Output ports for the _AIAD Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    AIADLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            load_multiplier_linear_decrement:
+                default: 0.05
+                description: |+
+                    Linear decrement to load multiplier every 10 seconds while the system is
+                    in the overloaded state, up until the `min_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.05"
+                x-go-tag-validate: gte=0
+            load_multiplier_linear_increment:
+                default: 0.025
+                description: |+
+                    Linear increment to load multiplier every 10 seconds while the system is
+                    not in the overloaded state, up until the `max_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.025"
+                x-go-tag-validate: gte=0
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            max_load_multiplier:
+                default: 2
+                description: |+
+                    The maximum load multiplier that can be reached during recovery from an overload state.
+                    - Helps protect the service from request bursts while the system is still recovering.
+                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "2.0"
+                x-go-tag-validate: gte=0
+            min_load_multiplier:
+                default: 0
+                description: |+
+                    The minimum load multiplier that can be reached during an overload state.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.0"
+                x-go-tag-validate: gte=0
+        required:
+            - alerter
+            - load_scheduler
+        type: object
+    AIMDLoadScheduler:
+        description: |-
+            _AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.
+            It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+            During recovery, it increases the token rate linearly until the system is not overloaded.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/AIMDLoadSchedulerIns'
+                description: Input ports for the _AIMD Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/AIMDLoadSchedulerOuts'
+                description: Output ports for the _AIMD Load Scheduler_.
+            parameters:
+                $ref: '#/definitions/AIMDLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _AIMD Load Scheduler_.
+
+                x-go-tag-validate: required
+        required:
+            - parameters
+        type: object
+    AIMDLoadSchedulerIns:
+        description: Input ports for the _AIMD Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            setpoint:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The setpoint input to the controller.
+
+                x-go-tag-validate: required
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
+        type: object
+    AIMDLoadSchedulerOuts:
+        description: Output ports for the _AIMD Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    AIMDLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            gradient:
+                $ref: '#/definitions/GradientControllerParameters'
+                description: |+
+                    Parameters for the Gradient Controller.
+
+                x-go-tag-validate: required
+            load_multiplier_linear_increment:
+                default: 0.025
+                description: |+
+                    Linear increment to load multiplier every 10 seconds while the system is
+                    not in the overloaded state, up until the `max_load_multiplier` is reached.
+
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "0.025"
+                x-go-tag-validate: gte=0
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            max_load_multiplier:
+                default: 2
+                description: |+
+                    The maximum load multiplier that can be reached during recovery from an overload state.
+                    - Helps protect the service from request bursts while the system is still recovering.
+                    - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
+
+                exclusiveMinimum: true
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "2.0"
+                x-go-tag-validate: gt=0
+        required:
+            - alerter
+            - gradient
+            - load_scheduler
+        type: object
     AdaptiveLoadScheduler:
-        description: The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+        description: |-
+            The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
+            Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
         properties:
             dry_run:
                 description: |-
@@ -27,6 +293,9 @@ definitions:
                     Parameters for the _Adaptive Load Scheduler_ component.
 
                 x-go-tag-validate: required
+        required:
+            - in_ports
+            - parameters
         type: object
     AdaptiveLoadSchedulerIns:
         description: Input ports for the _Adaptive Load Scheduler_ component.
@@ -48,6 +317,9 @@ definitions:
                     The input signal to the controller.
 
                 x-go-tag-validate: required
+        required:
+            - setpoint
+            - signal
         type: object
     AdaptiveLoadSchedulerOuts:
         description: Output ports for the _Adaptive Load Scheduler_ component.
@@ -80,7 +352,7 @@ definitions:
             load_multiplier_linear_increment:
                 default: 0.0025
                 description: |+
-                    Linear increment to load multiplier in each execution tick when the system is
+                    Linear increment to load multiplier every 10 seconds while the system is
                     not in the overloaded state, up until the `max_load_multiplier` is reached.
 
                 format: double
@@ -98,11 +370,15 @@ definitions:
                     The maximum load multiplier that can be reached during recovery from an overload state.
                     - Helps protect the service from request bursts while the system is still recovering.
                     - Once this value is reached, the scheduler enters the pass-through mode, allowing requests to bypass the scheduler and be sent directly to the service.
-                    - Any future overload state is detected by the control policy, and the load multiplier increment cycle is restarted.
+                    - The pass-through mode gets disabled if the system enters the overload state again.
 
                 format: double
                 type: number
                 x-go-tag-default: "2.0"
+        required:
+            - alerter
+            - gradient
+            - load_scheduler
         type: object
     AddressExtractor:
         description: |-
@@ -142,6 +418,8 @@ definitions:
                 $ref: '#/definitions/AlerterParameters'
                 title: Alerter configuration
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     AlerterIns:
         description: Inputs for the Alerter component.
@@ -354,6 +632,9 @@ definitions:
                     Parameters that define the scaling behavior.
 
                 x-go-tag-validate: required
+        required:
+            - scaling_backend
+            - scaling_parameters
         type: object
     AutoScalerScalingBackend:
         properties:
@@ -392,6 +673,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/AutoScalerScalingBackendKubernetesReplicasOuts'
                 description: Output ports for _Kubernetes Replicas_.
+        required:
+            - kubernetes_object_selector
         type: object
     AutoScalerScalingBackendKubernetesReplicasOuts:
         properties:
@@ -410,7 +693,7 @@ definitions:
                 description: |+
                     Cooldown override percentage defines a threshold change in scale-out beyond which previous cooldown is overridden.
                     For example, if the cooldown is 5 minutes and the cooldown override percentage is 10%, then if the
-                    scale-increases by 10% or more, the previous cooldown is cancelled. Defaults to 50%.
+                    scale-increases by 10% or more, the previous cooldown is canceled. Defaults to 50%.
 
                 format: double
                 type: number
@@ -459,6 +742,21 @@ definitions:
 
                 type: string
                 x-go-tag-default: 30s
+        required:
+            - scale_in_alerter
+            - scale_out_alerter
+        type: object
+    Blueprint:
+        properties:
+            blueprints_name:
+                type: string
+            policy_name:
+                type: string
+            values:
+                format: byte
+                type: string
+            version:
+                type: string
         type: object
     BoolVariable:
         description: Component that emits a constant Boolean signal which can be changed at runtime through dynamic configuration.
@@ -493,6 +791,9 @@ definitions:
                     The destination of a network activity, such as accepting a TCP connection.
                     In a multi hop network activity, the destination represents the receiver of
                     the last hop.
+            ramp_mode:
+                description: A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
+                type: boolean
             request:
                 $ref: '#/definitions/CheckHTTPRequestHttpRequest'
                 description: Represents a network request, such as an HTTP request.
@@ -633,7 +934,8 @@ definitions:
             - REJECT_REASON_NONE
             - REJECT_REASON_RATE_LIMITED
             - REJECT_REASON_NO_TOKENS
-            - REJECT_REASON_REGULATED
+            - REJECT_REASON_NOT_SAMPLED
+            - REJECT_REASON_NO_MATCHING_RAMP
         type: string
     Circuit:
         description: |-
@@ -675,14 +977,14 @@ definitions:
                 type: array
                 x-go-tag-validate: dive
             evaluation_interval:
-                default: 10s
+                default: 1s
                 description: |+
                     Evaluation interval (tick) is the time between consecutive runs of the policy circuit.
                     This interval is typically aligned with how often the corrective action (actuation) needs to be taken.
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 
                 type: string
-                x-go-tag-default: 10s
+                x-go-tag-default: 1s
         type: object
     Classifier:
         description: |-
@@ -765,21 +1067,18 @@ definitions:
             - ERROR_MULTI_EXPRESSION
             - ERROR_EXPRESSION_NOT_MAP
         type: string
-    ClientToServerHello:
-        properties:
-            name:
-                type: string
-            next_id:
-                format: uint64
-                type: string
-        type: object
     CommonAttributes:
         properties:
             component_id:
                 description: The id of Component within the circuit.
                 type: string
             policy_hash:
-                description: Hash of the entire Policy spec.
+                description: |-
+                    Hash of the entire Policy spec.
+
+                    This is the 128 bits of sha256 sum of the policy, as stored in etcd. This
+                    hash will never change after applying policy.  For k8s-managed policies,
+                    the hash might change with new version of the controller.
                 type: string
             policy_name:
                 description: Name of the Policy.
@@ -825,7 +1124,12 @@ definitions:
                 description: Decider emits the binary result of comparison operator on two operands.
             differentiator:
                 $ref: '#/definitions/Differentiator'
-                description: Differentiator calculates rate of change per tick.
+                description: |+
+                    Differentiator calculates rate of change per tick.
+                    Deprecated: v3.0.0. Use `PIDController` instead.
+
+                x-deprecated: true
+                x-go-tag-validate: deprecated
             ema:
                 $ref: '#/definitions/EMA'
                 description: Exponential Moving Average filter.
@@ -873,6 +1177,9 @@ definitions:
             pid_controller:
                 $ref: '#/definitions/PIDController'
                 description: PID Controller is a proportional–integral–derivative controller.
+            polynomial_range_function:
+                $ref: '#/definitions/PolynomialRangeFunction'
+                description: Polynomial Range Function is a function that maps a signal to a range of values following a polynomial function.
             pulse_generator:
                 $ref: '#/definitions/PulseGenerator'
                 description: Generates 0 and 1 in turns.
@@ -1116,6 +1423,8 @@ definitions:
                     Parameters for the EMA component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: Exponential Moving Average (EMA) is a type of moving average that applies exponentially more weight to recent signal readings
         type: object
     EMAIns:
@@ -1321,6 +1630,8 @@ definitions:
                     Parameters for the Extrapolator component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: Extrapolates the input signal by repeating the last valid value during the period in which it is invalid
         type: object
     ExtrapolatorIns:
@@ -1385,7 +1696,18 @@ definitions:
         properties:
             adaptive_load_scheduler:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
-                description: _Adaptive Load Scheduler_ component is based on additive increase and multiplicative decrease of token rate. It takes a signal and setpoint as inputs and reduces token rate proportionally (or any arbitrary power) based on deviation of the signal from setpoint.
+                description: |+
+                    _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
+                    Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+
+                x-deprecated: true
+                x-go-tag-validate: deprecated
+            aiad_load_scheduler:
+                $ref: '#/definitions/AIADLoadScheduler'
+                description: AIAD Load Scheduler.
+            aimd_load_scheduler:
+                $ref: '#/definitions/AIMDLoadScheduler'
+                description: AIMD Load Scheduler.
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
@@ -1394,6 +1716,9 @@ definitions:
                 description: _Load Scheduler_ provides service protection by creating a prioritized workload queue in front of the service using Weighted Fair Queuing.
             quota_scheduler:
                 $ref: '#/definitions/QuotaScheduler'
+            range_driven_load_scheduler:
+                $ref: '#/definitions/RangeDrivenLoadScheduler'
+                description: Range Driven Load Scheduler.
             rate_limiter:
                 $ref: '#/definitions/RateLimiter'
                 description: _Rate Limiter_ provides service protection by applying rate limits using the token bucket algorithm.
@@ -1617,6 +1942,12 @@ definitions:
                     type: string
                 type: object
         type: object
+    GetDynamicConfigResponse:
+        description: GetDynamicConfigResponse is a response containing dynamic configuration for Policy.
+        properties:
+            dynamic_config:
+                type: object
+        type: object
     GetPoliciesResponse:
         description: GetPoliciesResponse is a response containing all Policies.
         properties:
@@ -1636,12 +1967,24 @@ definitions:
     GetPolicyResponseStatus:
         default: VALID
         description: |4-
-             - VALID: Policy is valid.
-             - INVALID: Policy is invalid.
+             - VALID: Policy is valid, present in etcd and running in the controller.
+             - INVALID: Policy is present in etcd, but fails to parse.
+             - NOT_LOADED: Policy is present in etcd, but is not (yet) running in the controller.
+             - STALE: Policy is running on the controller, but is not present in etcd.
+             - OUTDATED: Policy is present in etcd and policy with the same name is running in
+            the controller, but these policies differ.
         enum:
             - VALID
             - INVALID
+            - NOT_LOADED
+            - STALE
+            - OUTDATED
         type: string
+    GetResponse:
+        properties:
+            blueprint:
+                $ref: '#/definitions/Blueprint'
+        type: object
     GlobalAutoScaleControlPoint:
         properties:
             agent_group:
@@ -1707,6 +2050,8 @@ definitions:
                     Gradient Parameters.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: |-
             Gradient controller is a type of controller which tries to adjust the
             control variable proportionally to the relative difference between setpoint
@@ -1988,6 +2333,11 @@ definitions:
     Integrator:
         description: Accumulates sum of signal every tick.
         properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the Integrator. This determines how often the Integrator is incremented. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             in_ports:
                 $ref: '#/definitions/IntegratorIns'
                 description: Input ports for the Integrator component.
@@ -2246,6 +2596,8 @@ definitions:
                 $ref: '#/definitions/LimiterDecisionLimiterReason'
             sampler_info:
                 $ref: '#/definitions/LimiterDecisionSamplerInfo'
+            wait_time:
+                type: string
         type: object
     LimiterDecisionLimiterReason:
         default: LIMITER_REASON_UNSPECIFIED
@@ -2257,22 +2609,20 @@ definitions:
         properties:
             label:
                 type: string
-            scheduler_info:
-                $ref: '#/definitions/LimiterDecisionSchedulerInfo'
+            priority:
+                format: double
+                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
+                type: string
         type: object
     LimiterDecisionRateLimiterInfo:
         properties:
-            current:
-                format: double
-                type: number
             label:
                 type: string
-            remaining:
-                format: double
-                type: number
-            tokens_consumed:
-                format: double
-                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
         type: object
     LimiterDecisionSamplerInfo:
         properties:
@@ -2281,11 +2631,30 @@ definitions:
         type: object
     LimiterDecisionSchedulerInfo:
         properties:
-            tokens_consumed:
-                format: uint64
-                type: string
+            priority:
+                format: double
+                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
             workload_index:
                 type: string
+        type: object
+    LimiterDecisionTokensInfo:
+        properties:
+            consumed:
+                format: double
+                type: number
+            current:
+                format: double
+                type: number
+            remaining:
+                description: |-
+                    remaining and current may not
+                    provide accurate values in case
+                    the request times out while waiting
+                    for tokens.
+                format: double
+                type: number
         type: object
     ListAgentsResponse:
         properties:
@@ -2336,6 +2705,14 @@ definitions:
                     type: object
                 type: array
         type: object
+    ListResponse:
+        properties:
+            blueprints:
+                items:
+                    $ref: '#/definitions/Blueprint'
+                    type: object
+                type: array
+        type: object
     ListServicesControllerResponse:
         properties:
             errors_count:
@@ -2378,6 +2755,8 @@ definitions:
             pass_through_label_values_config_key:
                 description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
+        required:
+            - parameters
         type: object
     LoadRampIns:
         description: Inputs for the _Load Ramp_ component.
@@ -2410,7 +2789,10 @@ definitions:
         properties:
             sampler:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             steps:
                 items:
                     $ref: '#/definitions/LoadRampParametersStep'
@@ -2419,6 +2801,7 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - sampler
             - steps
         type: object
     LoadRampParametersStep:
@@ -2456,10 +2839,8 @@ definitions:
             To make scheduling decisions the Flows are mapped into Workloads by providing match rules.
             A workload determines the priority and cost of admitting each Flow that belongs to it.
             Scheduling of Flows is based on Weighted Fair Queuing principles.
-            _Load Scheduler_ measures and controls the incoming tokens per second, which can translate
-            to (avg. latency \* in-flight requests) (Little's Law) in concurrency limiting use-case.
 
-            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted.
+            The signal at port `load_multiplier` determines the fraction of incoming tokens that get admitted. The signals gets acted on once every 10 seconds.
         properties:
             dry_run:
                 description: |-
@@ -2481,6 +2862,9 @@ definitions:
             parameters:
                 $ref: '#/definitions/LoadSchedulerParameters'
                 x-go-tag-validate: required
+        required:
+            - in_ports
+            - parameters
         title: _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection
         type: object
     LoadSchedulerIns:
@@ -2490,14 +2874,14 @@ definitions:
                 $ref: '#/definitions/InPort'
                 description: |-
                     Load multiplier is proportion of incoming
-                    token rate that needs to be accepted.
+                    token rate that needs to be accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerOuts:
         description: Output for the LoadScheduler component.
         properties:
             observed_load_multiplier:
                 $ref: '#/definitions/OutPort'
-                description: Observed load multiplier is the proportion of incoming token rate that is being accepted.
+                description: Observed load multiplier is the proportion of incoming token rate that is being accepted. The signal gets updated once every 10 seconds.
         type: object
     LoadSchedulerParameters:
         properties:
@@ -2518,21 +2902,21 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
             workload_latency_based_tokens:
-                default: true
+                default: false
                 description: |+
-                    Automatically estimate the size flows within each workload, based on
+                    Automatically estimate the size of flows within each workload, based on
                     historical latency. Each workload's `tokens` will be set to average
                     latency of flows in that workload during the last few seconds (exact duration
                     of this average can change).
                     This setting is useful in concurrency limiting use-case, where the
-                    concurrency is calculated as ``(avg. latency \* in-flight flows)`.
+                    concurrency is calculated as `(avg. latency \* in-flight flows)` (Little's Law).
 
                     The value of tokens estimated takes a lower precedence
                     than the value of `tokens` specified in the workload definition
                     and `tokens` explicitly specified in the flow labels.
 
                 type: boolean
-                x-go-tag-default: "true"
+                x-go-tag-default: "false"
         required:
             - selectors
         title: Parameters for _Load Scheduler_ component
@@ -2795,6 +3179,8 @@ definitions:
             parameters:
                 $ref: '#/definitions/PIDControllerParameters'
                 x-go-tag-validate: required
+        required:
+            - parameters
         title: |-
             PID Controller is a popular control mechanism for closed-loop feedback control. It takes a signal and a setpoint as inputs and uses the PID algorithm to compute proportional (proportional to the magnitude of error), integral (proportional to accumulation of error), and derivative (proportional to how fast the signal is changing) terms which are summed up to get a desired output.
             <!-- vale off -->
@@ -2828,6 +3214,11 @@ definitions:
         type: object
     PIDControllerParameters:
         properties:
+            evaluation_interval:
+                description: |-
+                    The evaluation interval of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation interval of the circuit.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+                type: string
             kd:
                 default: 0
                 description: |+
@@ -2868,11 +3259,6 @@ definitions:
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gte=1
-            sample_period:
-                description: |-
-                    The sampling period of the PID controller. This determines how often the PID output is computed. Defaults to the evaluation period of the circuit.
-                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-                type: string
         type: object
     PathTemplateMatcher:
         description: |-
@@ -2980,6 +3366,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/PodScalerOuts'
                 description: Output ports for the PodScaler component.
+        required:
+            - kubernetes_object_selector
         type: object
     PodScalerIns:
         description: Inputs for the PodScaler component.
@@ -3020,10 +3408,16 @@ definitions:
         properties:
             circuit:
                 $ref: '#/definitions/Circuit'
-                description: Defines the control-loop logic of the policy.
+                description: |+
+                    Defines the control-loop logic of the policy.
+
+                x-go-tag-validate: required_without=Resources
             resources:
                 $ref: '#/definitions/Resources'
-                description: Resources (such as Flux Meters, Classifiers) to setup.
+                description: |+
+                    Resources (such as Flux Meters, Classifiers) to setup.
+
+                x-go-tag-validate: required_without=Circuit
         type: object
     PolicyWrapper:
         properties:
@@ -3033,13 +3427,93 @@ definitions:
             policy:
                 $ref: '#/definitions/Policy'
                 title: Policy
+            source:
+                $ref: '#/definitions/PolicyWrapperSource'
+                title: Where did the policy came from
         type: object
+    PolicyWrapperSource:
+        default: UNKNOWN
+        enum:
+            - UNKNOWN
+            - ETCD
+            - K8S
+        type: string
     PolicyWrappers:
         properties:
             policy_wrappers:
                 additionalProperties:
                     $ref: '#/definitions/PolicyWrapper'
                 type: object
+        type: object
+    PolynomialRangeFunction:
+        description: |-
+            Curve Types by Degree:
+            - Degree 1: Linear
+            - Degree 2: Quadratic
+            - Degree 3: Cubic
+            - and so on.
+        properties:
+            in_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionIns'
+            out_ports:
+                $ref: '#/definitions/PolynomialRangeFunctionOuts'
+            parameters:
+                $ref: '#/definitions/PolynomialRangeFunctionParameters'
+                x-go-tag-validate: required
+        required:
+            - parameters
+        type: object
+    PolynomialRangeFunctionIns:
+        properties:
+            input:
+                $ref: '#/definitions/InPort'
+                description: The input signal.
+        type: object
+    PolynomialRangeFunctionOuts:
+        properties:
+            output:
+                $ref: '#/definitions/OutPort'
+                description: The output signal.
+        type: object
+    PolynomialRangeFunctionParameters:
+        properties:
+            clamp_to_custom_values:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersClampToCustomValues'
+                title: Clamp to custom values
+            clamp_to_datapoint:
+                title: Clamp to the nearest data-point
+                type: boolean
+            continue_curve:
+                title: Continue polynomial curve
+                type: boolean
+            degree:
+                format: double
+                title: Degree of the polynomial
+                type: number
+            end:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Ending data-point for the range function
+            start:
+                $ref: '#/definitions/PolynomialRangeFunctionParametersDatapoint'
+                title: Starting data-point for the range function
+        type: object
+    PolynomialRangeFunctionParametersClampToCustomValues:
+        properties:
+            post_end:
+                format: double
+                type: number
+            pre_start:
+                format: double
+                type: number
+        type: object
+    PolynomialRangeFunctionParametersDatapoint:
+        properties:
+            input:
+                format: double
+                type: number
+            output:
+                format: double
+                type: number
         type: object
     PreviewFlowLabelsControllerResponse:
         properties:
@@ -3203,7 +3677,115 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - in_ports
+            - rate_limiter
             - selectors
+        type: object
+    RangeDrivenLoadScheduler:
+        description: _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
+        properties:
+            dry_run:
+                description: |-
+                    Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.
+                    It is useful for observing the behavior of load scheduler without disrupting any real traffic.
+                type: boolean
+            dry_run_config_key:
+                description: Configuration key for setting dry run mode through dynamic configuration.
+                type: string
+            in_ports:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerIns'
+                description: Input ports for the _Range Load Scheduler_.
+            out_ports:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerOuts'
+                description: Output ports for the _Range Load Scheduler_.
+            parameters:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Range Load Scheduler_.
+
+                x-go-tag-validate: required
+        required:
+            - parameters
+        type: object
+    RangeDrivenLoadSchedulerDatapoint:
+        properties:
+            load_multiplier:
+                format: double
+                maximum: 1
+                minimum: 0
+                type: number
+                x-go-tag-validate: gte=0,lte=1
+            signal_value:
+                format: double
+                type: number
+        type: object
+    RangeDrivenLoadSchedulerIns:
+        description: Input ports for the _Range Load Scheduler_.
+        properties:
+            overload_confirmation:
+                $ref: '#/definitions/InPort'
+                description: |-
+                    The `overload_confirmation` port provides additional criteria to determine overload state which
+                    results in _Flow_ throttling at the service.
+            signal:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The input signal to the controller.
+
+                x-go-tag-validate: required
+        required:
+            - signal
+        type: object
+    RangeDrivenLoadSchedulerOuts:
+        description: Output ports for the _Range Load Scheduler_.
+        properties:
+            desired_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Desired Load multiplier is the ratio of desired token rate to the incoming token rate.
+            is_overload:
+                $ref: '#/definitions/OutPort'
+                description: A Boolean signal that indicates whether the service is in overload state.
+            observed_load_multiplier:
+                $ref: '#/definitions/OutPort'
+                description: Observed Load multiplier is the ratio of accepted token rate to the incoming token rate.
+        type: object
+    RangeDrivenLoadSchedulerParameters:
+        properties:
+            alerter:
+                $ref: '#/definitions/AlerterParameters'
+                description: |+
+                    Configuration parameters for the embedded Alerter.
+
+                x-go-tag-validate: required
+            degree:
+                format: double
+                title: |-
+                    Degree determines shape of the throttling curve.
+                    degree=1: linear
+                    degree=2: quadratic
+                    degree=3: cubic
+                type: number
+                x-go-tag-validate: required
+            high_throttle_threshold:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
+                title: Ending data-point of the throttling range
+                x-go-tag-validate: required
+            load_scheduler:
+                $ref: '#/definitions/LoadSchedulerParameters'
+                description: |+
+                    Parameters for the _Load Scheduler_.
+
+                x-go-tag-validate: required
+            low_throttle_threshold:
+                $ref: '#/definitions/RangeDrivenLoadSchedulerDatapoint'
+                title: Starting data-point of the throttling range
+                x-go-tag-validate: required
+        required:
+            - alerter
+            - degree
+            - high_throttle_threshold
+            - load_scheduler
+            - low_throttle_threshold
         type: object
     RateLimiter:
         description: |-
@@ -3223,6 +3805,9 @@ definitions:
                 $ref: '#/definitions/RateLimiterParameters'
                 title: Parameters for the RateLimiter component
                 x-go-tag-validate: required
+            request_parameters:
+                $ref: '#/definitions/RateLimiterRequestParameters'
+                title: RequestParameters for the component
             selectors:
                 description: |+
                     Selectors for the component.
@@ -3234,6 +3819,8 @@ definitions:
                 type: array
                 x-go-tag-validate: required,gt=0,dive
         required:
+            - in_ports
+            - parameters
             - selectors
         title: Limits the traffic on a control point to specified rate
         type: object
@@ -3242,7 +3829,7 @@ definitions:
             bucket_capacity:
                 $ref: '#/definitions/InPort'
                 description: |+
-                    Capacity of the bucket.
+                    Capacity of the bucket to allow for bursty traffic.
 
                 x-go-tag-validate: required
             fill_amount:
@@ -3254,6 +3841,9 @@ definitions:
             pass_through:
                 $ref: '#/definitions/InPort'
                 title: PassThrough port determines whether all requests
+        required:
+            - bucket_capacity
+            - fill_amount
         title: Inputs for the RateLimiter component
         type: object
     RateLimiterParameters:
@@ -3266,9 +3856,20 @@ definitions:
 
                 type: boolean
                 x-go-tag-default: "true"
-            denied_response_status_code:
-                $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+            delay_initial_fill:
+                default: false
+                description: |+
+                    Delays the initial filling of the token bucket.
+                    If set to false, the token bucket will start filling immediately
+                    after the first request is received. This can potentially lead to
+                    more requests being accepted than the specified rate limit during
+                    the first interval.
+                    When set to true, the token bucket will be given a chance to
+                    empty out before the filling starts. The delay is equal to the
+                    time it takes to fill the bucket.
+
+                type: boolean
+                x-go-tag-default: "false"
             interval:
                 description: |+
                     Interval defines the time interval in which the token bucket
@@ -3301,14 +3902,6 @@ definitions:
 
                 type: string
                 x-go-tag-default: 7200s
-            tokens_label_key:
-                description: |-
-                    Flow label key that will be used to override the number of tokens
-                    for this request.
-                    This is an optional parameter and takes highest precedence
-                    when assigning tokens to a request.
-                    The label value must be a valid uint64 number.
-                type: string
         required:
             - interval
         type: object
@@ -3330,6 +3923,20 @@ definitions:
                 type: integer
                 x-go-tag-default: "4"
                 x-go-tag-validate: gt=0
+        type: object
+    RateLimiterRequestParameters:
+        properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
         type: object
     Rego:
         description: |-
@@ -3443,25 +4050,6 @@ definitions:
     ReportResponse:
         description: ReportResponse is empty for now.
         type: object
-    Request:
-        properties:
-            id:
-                description: |-
-                    Id of the request, this should be unique per client connection. First
-                    request id on the connection should be equal to nextID from the Hello
-                    message.
-                format: uint64
-                type: string
-            payload:
-                $ref: '#/definitions/googleprotobufAny'
-                description: Request payload. The method on the callee will be dispatched by request's type.
-            timeout:
-                description: |-
-                    Mandatory timeout for processing request. Timeout is handled on
-                    caller-side. After it passes, caller is no longer interested in a response,
-                    and callee can forget about the request.
-                type: string
-        type: object
     Resources:
         description: |-
             :::info
@@ -3512,26 +4100,17 @@ definitions:
                     :::
                 type: object
             telemetry_collectors:
-                description: |-
+                description: |+
                     TelemetryCollector configures OpenTelemetry collector integration.
                     Deprecated: v3.0.0. Use `infra_meters` instead.
+
                 items:
                     $ref: '#/definitions/TelemetryCollector'
                     type: object
                 type: array
+                x-deprecated: true
+                x-go-tag-validate: deprecated
         title: Resources that need to be setup for the policy to function
-        type: object
-    Response:
-        properties:
-            error:
-                $ref: '#/definitions/googlerpcStatus'
-            id:
-                format: uint64
-                type: string
-            payload:
-                description: Payload is a message of a type implied by request kind.
-                format: byte
-                type: string
         type: object
     Rule:
         description: |-
@@ -3585,6 +4164,8 @@ definitions:
                     Parameters for the SMA component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     SMAIns:
         properties:
@@ -3634,7 +4215,10 @@ definitions:
                 description: Input ports for the _Sampler_.
             parameters:
                 $ref: '#/definitions/SamplerParameters'
-                description: Parameters for the _Sampler_.
+                description: |+
+                    Parameters for the _Sampler_.
+
+                x-go-tag-validate: required
             pass_through_label_values:
                 description: Specify certain label values to be always accepted by this _Sampler_ regardless of accept percentage.
                 items:
@@ -3643,6 +4227,8 @@ definitions:
             pass_through_label_values_config_key:
                 description: Configuration key for setting pass through label values through dynamic configuration.
                 type: string
+        required:
+            - parameters
         type: object
     SamplerIns:
         properties:
@@ -3664,6 +4250,13 @@ definitions:
                     - When label key is not specified, _Sampler_ acts as a stateless filter.
                       Percentage of flows are selected randomly for rejection.
                 type: string
+            ramp_mode:
+                default: false
+                description: |+
+                    Ramp component can accept flows with `ramp_mode` flag set.
+
+                type: boolean
+                x-go-tag-default: "false"
             selectors:
                 description: |+
                     Selectors for the component.
@@ -3689,6 +4282,9 @@ definitions:
                 $ref: '#/definitions/ScaleInControllerController'
                 title: Controller
                 x-go-tag-validate: required
+        required:
+            - alerter
+            - controller
         type: object
     ScaleInControllerController:
         properties:
@@ -3709,6 +4305,9 @@ definitions:
                 $ref: '#/definitions/ScaleOutControllerController'
                 title: Controller
                 x-go-tag-validate: required
+        required:
+            - alerter
+            - controller
         type: object
     ScaleOutControllerController:
         properties:
@@ -3749,16 +4348,16 @@ definitions:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-            priorities_label_key:
+            priority_label_key:
                 description: |-
                     * Key for a flow label that can be used to override the default priority for this flow.
-                    * The value associated with this key must be a valid uint64 number. Higher numbers means higher priority.
+                    * The value associated with this key must be a valid number. Higher numbers means higher priority.
                     * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
                 type: string
             tokens_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default number of tokens for this flow.
-                    * The value associated with this key must be a valid uint64 number.
+                    * Key for a flow label that can be used to override the default number of tokens for this request.
+                    * The value associated with this key must be a valid number.
                     * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
                 type: string
             workloads:
@@ -3808,6 +4407,8 @@ definitions:
             parameters:
                 $ref: '#/definitions/SchedulerWorkloadParameters'
                 description: Parameters associated with flows matching the label matcher.
+        required:
+            - label_matcher
         type: object
     SchedulerWorkloadParameters:
         description: Parameters such as priority and tokens that are applicable to flows within a workload.
@@ -3843,6 +4444,7 @@ definitions:
                     This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
                 type: string
             tokens:
+                default: 1
                 description: |+
                     Tokens determines the cost of admitting a single flow in the workload,
                     which is typically defined as milliseconds of flow latency (time to response or duration of a feature) or
@@ -3851,9 +4453,10 @@ definitions:
                     This override is applicable only if tokens for the flow aren't specified
                     in the flow labels.
 
-                format: int64
-                minLength: 0
-                type: string
+                format: double
+                minimum: 0
+                type: number
+                x-go-tag-default: "1"
                 x-go-tag-validate: gte=0
         type: object
     Selector:
@@ -3887,7 +4490,7 @@ definitions:
             ```
         properties:
             agent_group:
-                default: default
+                default: aperture-cloud
                 description: |+
                     [_Agent Group_](/concepts/selector.md#agent-group) this
                     selector applies to.
@@ -3901,7 +4504,7 @@ definitions:
                     :::
 
                 type: string
-                x-go-tag-default: default
+                x-go-tag-default: aperture-cloud
             control_point:
                 description: |+
                     [Control Point](/concepts/control-point.md)
@@ -3943,22 +4546,6 @@ definitions:
                 x-go-tag-default: any
         required:
             - control_point
-        type: object
-    ServerToClient:
-        properties:
-            cancel_id:
-                description: |-
-                    Cancels in-flight request.
-
-                    After cancellation, the response is not expected to be received, but
-                    might happen that it will be received. If so, it should be ignored.
-                format: uint64
-                type: string
-            request:
-                $ref: '#/definitions/Request'
-                description: |-
-                    Make a request to client. Expect AgentToController message in the
-                    future containing Response with the same id.
         type: object
     Service:
         description: |-
@@ -4007,6 +4594,8 @@ definitions:
                     Parameters for the _Signal Generator_ component.
 
                 x-go-tag-validate: required
+        required:
+            - parameters
         type: object
     SignalGeneratorIns:
         description: Inputs for the _Signal Generator_ component.
@@ -4359,6 +4948,15 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: Output signal.
         type: object
+    UpsertPolicyResponse:
+        properties:
+            policy_hash:
+                title: |-
+                    A hash of the policy, as reported in heartbeats (note: the hash might
+                    change after updating controller with new aperture version)
+                type: string
+        title: UpsertPolicyResponse is a response to UpsertPolicy
+        type: object
     Variable:
         description: Component that emits a constant signal which can be changed at runtime through dynamic configuration.
         properties:
@@ -4374,6 +4972,8 @@ definitions:
             out_ports:
                 $ref: '#/definitions/VariableOuts'
                 description: Output ports for the Variable component.
+        required:
+            - constant_output
         type: object
     VariableOuts:
         description: Outputs for the Variable component.
@@ -4567,6 +5167,110 @@ info:
     title: Aperture API
     version: "1.0"
 paths:
+    /fluxninja/v1/blueprints:
+        get:
+            operationId: BlueprintsService_List
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/ListResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        post:
+            operationId: BlueprintsService_Apply
+            parameters:
+                - in: query
+                  name: blueprint.blueprints_name
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.version
+                  required: false
+                  type: string
+                - in: query
+                  name: blueprint.policy_name
+                  required: false
+                  type: string
+                - format: byte
+                  in: query
+                  name: blueprint.values
+                  required: false
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}:
+        delete:
+            operationId: BlueprintsService_Delete
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+        get:
+            operationId: BlueprintsService_Get
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
+    /fluxninja/v1/blueprints/{policy_name}/archive:
+        delete:
+            operationId: BlueprintsService_Archive
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            tags:
+                - BlueprintsService
     /fluxninja/v1/controllerinfo:
         get:
             operationId: ControllerInfoService_GetControllerInfo
@@ -4702,6 +5406,45 @@ paths:
             tags:
                 - aperture-agent
     /v1/dynamic-configs/{policy_name}:
+        delete:
+            operationId: PolicyService_DeleteDynamicConfig
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        properties: {}
+                        type: object
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: DeleteDynamicConfig deletes dynamic configuration for a policy.
+            tags:
+                - aperture-controller
+        get:
+            operationId: PolicyService_GetDynamicConfig
+            parameters:
+                - in: path
+                  name: policy_name
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: A successful response.
+                    schema:
+                        $ref: '#/definitions/GetDynamicConfigResponse'
+                default:
+                    description: An unexpected error response.
+                    schema:
+                        $ref: '#/definitions/googlerpcStatus'
+            summary: GetDynamicConfig lists dynamic configuration for a policy.
+            tags:
+                - aperture-controller
         post:
             operationId: PolicyService_PostDynamicConfig
             parameters:
@@ -5062,16 +5805,14 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        update_mask:
-                            description: The paths to update.
+                        policy_string:
                             type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        properties: {}
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -5094,16 +5835,14 @@ paths:
                     properties:
                         policy:
                             $ref: '#/definitions/Policy'
-                        update_mask:
-                            description: The paths to update.
+                        policy_string:
                             type: string
                     type: object
             responses:
                 "200":
                     description: A successful response.
                     schema:
-                        properties: {}
-                        type: object
+                        $ref: '#/definitions/UpsertPolicyResponse'
                 default:
                     description: An unexpected error response.
                     schema:
@@ -5137,11 +5876,13 @@ produces:
 swagger: "2.0"
 tags:
     - name: AutoScaleKubernetesControlPointsService
+    - name: BlueprintsService
+    - name: FlowControlService
+    - name: PolicyService
+    - name: PolicyService
     - name: EntitiesService
     - name: FlowControlPointsService
     - name: FlowPreviewService
-    - name: FlowControlService
-    - name: PolicyService
     - name: StatusService
     - name: Controller
     - name: DistCacheService
@@ -5150,4 +5891,3 @@ tags:
     - name: PeerDiscoveryService
     - name: FluxNinjaService
     - name: ControllerInfoService
-    - name: Coordinator

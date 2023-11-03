@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -70,6 +71,7 @@ func main() {
 	var controllerManager bool
 	var probeAddr string
 	var multipleControllersEnabled bool
+	var multipleAgentsEnabled bool
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -83,6 +85,8 @@ func main() {
 			"Enabling this will ensure that Controller Custom Resource is monitored by the Operator.")
 	flag.BoolVar(&multipleControllersEnabled, "experimental-multiple-controllers", false,
 		"Experimental support for deployment of multiple controllers.")
+	flag.BoolVar(&multipleAgentsEnabled, "experimental-multiple-agents", false,
+		"Experimental support for deployment of multiple agents.")
 
 	opts := zap.Options{
 		Development: true,
@@ -94,6 +98,10 @@ func main() {
 
 	if multipleControllersEnabled {
 		setupLog.Info("Experimental support for managing multiple controllers enabled.")
+	}
+
+	if multipleAgentsEnabled {
+		setupLog.Info("Experimental support for managing multiple agents enabled.")
 	}
 
 	if !agentManager && !controllerManager {
@@ -111,20 +119,22 @@ func main() {
 		leaderElectionID = "a4362587-controller.fluxninja.com"
 	}
 
-	server := webhook.NewServer(webhook.Options{
+	webhookServer := webhook.NewServer(webhook.Options{
 		CertDir:  os.Getenv("APERTURE_OPERATOR_CERT_DIR"),
 		CertName: os.Getenv("APERTURE_OPERATOR_CERT_NAME"),
 		KeyName:  os.Getenv("APERTURE_OPERATOR_KEY_NAME"),
+		Port:     9443,
 	})
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
+		Scheme: scheme,
+		Metrics: server.Options{
+			BindAddress: metricsAddr,
+		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       leaderElectionID,
-		WebhookServer:          server,
+		WebhookServer:          webhookServer,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -174,10 +184,11 @@ func main() {
 	var agentReconciler *agent.AgentReconciler
 	if agentManager {
 		agentReconciler = &agent.AgentReconciler{
-			Client:        mgr.GetClient(),
-			DynamicClient: dynamicClient,
-			Scheme:        mgr.GetScheme(),
-			Recorder:      mgr.GetEventRecorderFor("aperture-agent"),
+			Client:                mgr.GetClient(),
+			DynamicClient:         dynamicClient,
+			Scheme:                mgr.GetScheme(),
+			Recorder:              mgr.GetEventRecorderFor("aperture-agent"),
+			MultipleAgentsEnabled: multipleAgentsEnabled,
 		}
 
 		if err = agentReconciler.SetupWithManager(mgr); err != nil {
@@ -202,8 +213,8 @@ func main() {
 		}
 		agentReconciler.ApertureInjector = apertureInjector
 
-		server.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
-		server.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
+		webhookServer.Register(controllers.MutatingWebhookURI, &webhook.Admission{Handler: apertureInjector})
+		webhookServer.Register(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI), &webhook.Admission{Handler: &agent.AgentHooks{}})
 	}
 
 	var controllerReconciler *controller.ControllerReconciler
@@ -222,7 +233,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		server.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
+		webhookServer.Register(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI), &webhook.Admission{Handler: &controller.ControllerHooks{}})
 	}
 
 	//+kubebuilder:scaffold:builder
@@ -239,7 +250,7 @@ func main() {
 	ctx := setupContext(agentReconciler, controllerReconciler, agentManager, setupLog)
 	setupLog.Info("starting webhook server")
 	go func() {
-		if err := server.Start(ctx); err != nil {
+		if err := webhookServer.Start(ctx); err != nil {
 			setupLog.Error(err, "unable to run webhook server")
 			os.Exit(1)
 		}

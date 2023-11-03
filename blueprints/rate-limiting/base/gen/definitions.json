@@ -3,8 +3,19 @@
   "type": "object",
   "title": "rate-limiting/base blueprint",
   "additionalProperties": false,
-  "required": ["policy"],
+  "required": ["blueprint", "policy"],
   "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "rate-limiting/base",
+      "enum": ["rate-limiting/base"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
     "policy": {
       "type": "object",
       "additionalProperties": false,
@@ -65,12 +76,17 @@
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
             },
+            "request_parameters": {
+              "description": "Request Parameters.",
+              "default": {},
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterRequestParameters"
+            },
             "selectors": {
               "description": "Flow selectors to match requests against",
               "default": [
                 {
-                  "control_point": "__REQUIRED_FIELD__",
-                  "service": "__REQUIRED_FIELD__"
+                  "control_point": "__REQUIRED_FIELD__"
                 }
               ],
               "type": "array",

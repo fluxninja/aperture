@@ -8,27 +8,31 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import java.io.IOException;
+import java.time.Duration;
 
 public class ServerInitializer extends ChannelInitializer<Channel> {
 
     ApertureSDK sdk;
-    String agentHost;
-    int agentPort;
-    boolean failOpen;
+    String agentAddress;
+    String agentAPIKey;
+    boolean rampMode;
+    Duration flowTimeout;
     String controlPointName;
     boolean insecureGrpc;
     String rootCertFile;
 
     public ServerInitializer(
-            String agentHost,
-            String agentPort,
-            boolean failOpen,
+            String agentAddress,
+            String agentAPIKey,
+            boolean rampMode,
+            Duration flowTimeout,
             String controlPointName,
             boolean insecureGrpc,
             String rootCertFile) {
-        this.agentHost = agentHost;
-        this.agentPort = Integer.parseInt(agentPort);
-        this.failOpen = failOpen;
+        this.agentAddress = agentAddress;
+        this.agentAPIKey = agentAPIKey;
+        this.rampMode = rampMode;
+        this.flowTimeout = flowTimeout;
         this.controlPointName = controlPointName;
         this.insecureGrpc = insecureGrpc;
         this.rootCertFile = rootCertFile;
@@ -39,8 +43,8 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         try {
             sdk =
                     ApertureSDK.builder()
-                            .setHost(this.agentHost)
-                            .setPort(this.agentPort)
+                            .setAddress(this.agentAddress)
+                            .setAgentAPIKey(this.agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -51,9 +55,10 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
-        //    but after the codec handler.
-        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, failOpen));
+        // ApertureServerHandler must be added before the response-generating
+        // HelloWorldHandler,
+        // but after the codec handler.
+        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }
 }

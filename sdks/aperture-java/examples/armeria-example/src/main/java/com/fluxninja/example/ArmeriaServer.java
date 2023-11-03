@@ -4,7 +4,11 @@ import com.fluxninja.aperture.armeria.ApertureHTTPService;
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.*;
+import com.linecorp.armeria.server.AbstractHttpService;
+import com.linecorp.armeria.server.HttpService;
+import com.linecorp.armeria.server.Server;
+import com.linecorp.armeria.server.ServerBuilder;
+import com.linecorp.armeria.server.ServiceRequestContext;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -12,9 +16,8 @@ import java.util.concurrent.CompletableFuture;
 public class ArmeriaServer {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_FAIL_OPEN = "true";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
+    public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -46,47 +49,34 @@ public class ArmeriaServer {
         };
     }
 
-    public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
-        }
-        String agentPort = System.getenv("FN_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
-        }
-        String appPort = System.getenv("FN_APP_PORT");
-        if (appPort == null) {
-            appPort = DEFAULT_APP_PORT;
-        }
-        String failOpenString = System.getenv("FN_ENABLE_FAIL_OPEN");
-        if (failOpenString == null) {
-            failOpenString = DEFAULT_FAIL_OPEN;
-        }
-        boolean failOpen = Boolean.parseBoolean(failOpenString);
+    public static String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return value != null ? value : defaultValue;
+    }
 
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
-        if (controlPointName == null) {
-            controlPointName = DEFAULT_CONTROL_POINT_NAME;
-        }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
-        if (insecureGrpcString == null) {
-            insecureGrpcString = DEFAULT_INSECURE_GRPC;
-        }
+    public static void main(String[] args) {
+        String agentHost = getEnv("APERTURE_AGENT_ADDRESS", DEFAULT_AGENT_ADDRESS);
+        String agentAPIKey = getEnv("APERTURE_AGENT_API_KEY", "");
+
+        String appPort = getEnv("APERTURE_APP_PORT", DEFAULT_APP_PORT);
+
+        String rampModeString = getEnv("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
+        boolean rampMode = Boolean.parseBoolean(rampModeString);
+
+        String controlPointName = getEnv("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
+
+        String insecureGrpcString = getEnv("APERTURE_AGENT_INSECURE", DEFAULT_INSECURE_GRPC);
+
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
-        if (rootCertFile == null) {
-            rootCertFile = DEFAULT_ROOT_CERT;
-        }
+        String rootCertFile = getEnv("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);
 
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
+                            .setAddress(agentHost)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -104,7 +94,10 @@ public class ArmeriaServer {
                 createHelloHTTPService()
                         .decorate(
                                 ApertureHTTPService.newDecorator(
-                                        apertureSDK, controlPointName, failOpen));
+                                        apertureSDK,
+                                        controlPointName,
+                                        rampMode,
+                                        Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
 
         Server server = serverBuilder.build();

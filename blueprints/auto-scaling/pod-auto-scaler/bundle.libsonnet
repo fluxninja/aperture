@@ -1,17 +1,11 @@
-local creator = import '../../grafana/creator.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
 local blueprint = import './pod-auto-scaler.libsonnet';
 
 local policy = blueprint.policy;
 local config = blueprint.config;
 
-function(params, metadata={}) {
-  // make sure param object contains fields that are in config
-  local extra_keys = std.setDiff(std.objectFields(params), std.objectFields(config)),
-  assert std.length(extra_keys) == 0 : 'Unknown keys in params: ' + extra_keys,
-
+function(params) {
   local c = std.mergePatch(config, params),
-  local metadataWrapper = metadata { values: std.toString(params) },
 
   local prepare_controller = function(metrics_name, gradient_slope, threshold, alert_name) {
     controller: [{
@@ -93,14 +87,9 @@ function(params, metadata={}) {
     },
   },
 
-  local p = policy(updated_cfg, metadataWrapper),
-  local d = creator(p.policyResource, updated_cfg),
-
+  local p = policy(updated_cfg),
   policies: {
     [std.format('%s-cr.yaml', updated_cfg.policy.policy_name)]: p.policyResource,
-    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef { metadata: metadataWrapper },
-  },
-  dashboards: {
-    [std.format('%s.json', updated_cfg.policy.policy_name)]: d.dashboard,
+    [std.format('%s.yaml', updated_cfg.policy.policy_name)]: p.policyDef,
   },
 }

@@ -15,12 +15,12 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/cache"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
-	"github.com/fluxninja/aperture/v2/pkg/etcd/election"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	grpcclient "github.com/fluxninja/aperture/v2/pkg/net/grpc"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 	httpclient "github.com/fluxninja/aperture/v2/pkg/net/http"
+	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 	autoscalediscovery "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
@@ -49,7 +49,8 @@ type ConstructorIn struct {
 
 	Lifecycle                        fx.Lifecycle
 	ExtensionConfig                  *extconfig.FluxNinjaExtensionConfig
-	GRPCServer                       *grpc.Server
+	OtelConfigProvider               *otelconfig.Provider
+	GRPCServer                       *grpc.Server                       `name:"default"`
 	JobGroup                         *jobs.JobGroup                     `name:"heartbeats-job-group"`
 	GRPClientConnectionBuilder       grpcclient.ClientConnectionBuilder `name:"heartbeats-grpc-client"`
 	HTTPClient                       *http.Client                       `name:"heartbeats-http-client"`
@@ -58,7 +59,6 @@ type ConstructorIn struct {
 	AgentInfo                        *agentinfo.AgentInfo `optional:"true"`
 	PeersWatcher                     *peers.PeerDiscovery `name:"fluxninja-peers-watcher" optional:"true"`
 	EtcdClient                       *etcdclient.Client
-	Election                         *election.Election                          `optional:"true"`
 	PolicyFactory                    *controlplane.PolicyFactory                 `optional:"true"`
 	FlowControlPoints                *cache.Cache[selectors.TypedControlPointID] `optional:"true"`
 	AutoscaleKubernetesControlPoints autoscalediscovery.AutoScaleControlPoints   `optional:"true"`
@@ -66,8 +66,9 @@ type ConstructorIn struct {
 
 // provide provides a new instance of Heartbeats.
 func provide(in ConstructorIn) (*Heartbeats, error) {
-	if in.ExtensionConfig.APIKey == "" {
-		log.Info().Msg("Heartbeats API key not set, skipping")
+	//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
+	if in.ExtensionConfig.AgentAPIKey == "" && in.ExtensionConfig.APIKey == "" {
+		log.Info().Msg("Heartbeats Agent Key not set, skipping")
 		return nil, nil
 	}
 
@@ -79,7 +80,7 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 		in.AgentInfo,
 		in.PeersWatcher,
 		in.PolicyFactory,
-		in.Election,
+		in.EtcdClient,
 		in.FlowControlPoints,
 		in.AutoscaleKubernetesControlPoints,
 	)
@@ -88,15 +89,11 @@ func provide(in ConstructorIn) (*Heartbeats, error) {
 
 	runCtx, cancel := context.WithCancel(context.Background())
 
+	heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.ExtensionConfig, getControllerID(in.ExtensionConfig), in.OtelConfigProvider, in.Lifecycle)
+
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			err := heartbeats.setupControllerInfo(runCtx, in.EtcdClient, in.ExtensionConfig, getControllerID(in.ExtensionConfig))
-			if err != nil {
-				log.Error().Err(err).Msg("Could not read/create controller id in heartbeats")
-				return err
-			}
-
-			err = heartbeats.start(runCtx, &in)
+			err := heartbeats.start(runCtx, &in)
 			if err != nil {
 				log.Error().Err(err).Msg("Heartbeats start had an error")
 				return err

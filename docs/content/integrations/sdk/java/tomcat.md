@@ -17,17 +17,25 @@ keywords:
 contains Aperture Filter that can be added to the web.xml file to automatically
 set traffic control points for relevant services:
 
+:::info Agent API Key
+
+You can create an Agent API key for your project in the Aperture Cloud UI. For
+more information, refer to
+[Agent API Keys](/get-started/aperture-cloud/agent-api-keys.md).
+
+:::
+
 ```xml
     <filter>
         <filter-name>ApertureFilter</filter-name>
         <filter-class>com.fluxninja.aperture.servlet.javax.ApertureFilter</filter-class>
         <init-param>
-            <param-name>agent_host</param-name>
-            <param-value>localhost</param-value>
+            <param-name>agent_address</param-name>
+            <param-value>O</param-value>
         </init-param>
         <init-param>
-            <param-name>agent_port</param-name>
-            <param-value>8089</param-value>
+            <param-name>agent_api_key</param-name>
+            <param-value>AGENT_API_KEY</param-value>
         </init-param>
     </filter>
 ```

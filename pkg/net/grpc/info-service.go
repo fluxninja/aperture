@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -37,8 +38,14 @@ func (vh *InfoService) Host(ctx context.Context, req *emptypb.Empty) (*infov1.Ho
 	return resp, nil
 }
 
+// RegisterInfoServiceIn bundles and annotates parameters.
+type RegisterInfoServiceIn struct {
+	fx.In
+	Server *grpc.Server `name:"default"`
+}
+
 // RegisterInfoService registers the InfoService implementation with the provided grpc server.
-func RegisterInfoService(server *grpc.Server) {
+func RegisterInfoService(in RegisterInfoServiceIn) {
 	vh := &InfoService{}
-	infov1.RegisterInfoServiceServer(server, vh)
+	infov1.RegisterInfoServiceServer(in.Server, vh)
 }

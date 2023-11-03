@@ -1,6 +1,8 @@
 package com.fluxninja.aperture.sdk;
 
-import static com.fluxninja.aperture.sdk.Constants.*;
+import static com.fluxninja.aperture.sdk.Constants.CHECK_RESPONSE_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_STATUS_LABEL;
+import static com.fluxninja.aperture.sdk.Constants.FLOW_STOP_TIMESTAMP_LABEL;
 
 import com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse;
 import com.fluxninja.generated.google.rpc.Status;
@@ -21,22 +23,22 @@ public class TrafficFlow {
     private final Span span;
     public boolean ended;
     private boolean ignored;
-    private boolean failOpen;
+    private boolean rampMode;
     private FlowStatus flowStatus;
 
     private static final Logger logger = LoggerFactory.getLogger(Flow.class);
 
-    TrafficFlow(CheckHTTPResponse checkResponse, Span span, boolean ended) {
+    TrafficFlow(CheckHTTPResponse checkResponse, Span span, boolean ended, boolean rampMode) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
         this.ignored = false;
-        this.failOpen = true;
+        this.rampMode = rampMode;
         this.flowStatus = FlowStatus.OK;
     }
 
     static TrafficFlow ignoredFlow() {
-        TrafficFlow flow = new TrafficFlow(successfulResponse(), null, true);
+        TrafficFlow flow = new TrafficFlow(successfulResponse(), null, true, false);
         flow.ignored = true;
         return flow;
     }
@@ -68,25 +70,14 @@ public class TrafficFlow {
     }
 
     /**
-     * Returns whether the flow should be allowed to run, based on flow fail-open configuration and
+     * Returns whether the flow should be allowed to run, based on flow ramp mode configuration and
      * Aperture Agent response.
      *
      * @return Whether the flow should be allowed to run.
      */
     public boolean shouldRun() {
         return getDecision() == FlowDecision.Accepted
-                || (getDecision() == FlowDecision.Unreachable && this.failOpen);
-    }
-
-    /**
-     * Disables fail-open behavior. If set, the {@link #shouldRun} method will return False if the
-     * Aperture Agent is unreachable.
-     *
-     * @return This TrafficFlow object
-     */
-    public TrafficFlow withNoFailOpen() {
-        this.failOpen = false;
-        return this;
+                || (getDecision() == FlowDecision.Unreachable && !this.rampMode);
     }
 
     /**

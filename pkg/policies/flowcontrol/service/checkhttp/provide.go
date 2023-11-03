@@ -41,10 +41,18 @@ func ProvideHandler(
 	return h, nil
 }
 
-// Register registers flowcontrol service on a gRPC server.
-func Register(server *grpc.Server, handler flowcontrolv1.FlowControlServiceHTTPServer, healthsrv *health.Server) {
-	flowcontrolv1.RegisterFlowControlServiceHTTPServer(server, handler)
+// RegisterIn bundles and annotates parameters.
+type RegisterIn struct {
+	fx.In
+	Server       *grpc.Server `name:"default"`
+	Handler      flowcontrolv1.FlowControlServiceHTTPServer
+	HealthServer *health.Server
+}
 
-	healthsrv.SetServingStatus("aperture.flowcontrol.v1.FlowControlServiceHTTP", grpc_health_v1.HealthCheckResponse_SERVING)
+// Register registers flowcontrol service on a gRPC server.
+func Register(in RegisterIn) {
+	flowcontrolv1.RegisterFlowControlServiceHTTPServer(in.Server, in.Handler)
+
+	in.HealthServer.SetServingStatus("aperture.flowcontrol.v1.FlowControlServiceHTTP", grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Info().Msg("flowcontrol http handler registered")
 }

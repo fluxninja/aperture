@@ -28,7 +28,7 @@ export const ExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-${component}-apikey
         key: apiKey
-      value: API_KEY
+      value: AGENT_API_KEY
 `}</CodeBlock>
 );
 ```
@@ -47,30 +47,33 @@ export const CloudExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: API_KEY
+      value: AGENT_API_KEY
 `}</CodeBlock>
 );
 ```
 
 FluxNinja Aperture Cloud extension enables [Aperture Cloud][] integration for
-Aperture Agents (and [self-hosted][self-hosting] Controllers). It enriches logs
+[self-hosted][self-hosting] Aperture Agents and Controllers. It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
 periodic heartbeats to Aperture Cloud to track health and configuration. This
 allows you to monitor your policies and analyze flows in Aperture Cloud.
 
-FluxNinja Aperture Cloud extension also provides the possibility to use the Aperture Cloud
-Controller.
+FluxNinja Aperture Cloud extension also provides the possibility to use the
+Aperture Cloud Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][], Aperture Agents won't be
-able to work. While it's possible to [self-host][self-hosting] Aperture
-Controller, Aperture Cloud Controller can be used instead.
+Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture Agents won't be able to work.
+While it's possible to [self-host][self-hosting] Aperture Controller, Aperture
+Cloud Controller can be used instead.
 
-Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture Cloud.
-The Cloud Controller is available for every Aperture Cloud Organization in the
-`default` project.
+Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture
+Cloud.
+
+## Aperture Cloud Agent {#cloud-agent}
+
+Aperture Cloud Agent is an [Aperture Agent][] hosted by Aperture Cloud.
 
 ## Configuration
 
@@ -97,8 +100,8 @@ installation of the Aperture Controller or Agent:
   </TabItem>
 </Tabs>
 
-Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
-of the organization on Aperture Cloud and API Key generated on it.
+Replace the values of `ORGANIZATION_NAME` and `AGENT_KEY` with the actual values
+of the organization on Aperture Cloud and Agent Key generated on it.
 
 :::note
 
@@ -108,9 +111,10 @@ For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
 :::
 
 More details about particular agent installation modes could be found in
-[Get Started: Installation](/get-started/installation/agent/agent.md).
+[Get Started: Self-Hosting Aperture](/get-started/self-hosting/agent/agent.md).
 
-Configuration parameters for the FluxNinja Aperture Cloud extension are as follows:
+Configuration parameters for the FluxNinja Aperture Cloud extension are as
+follows:
 
 - [Aperture Agent](/reference/configuration/agent.md#flux-ninja-extension-config)
 - [Aperture Controller](/reference/configuration/controller.md/#flux-ninja-extension-config)
@@ -121,6 +125,8 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[self-hosting]: /self-hosting/self-hosting.md
+[self-hosting]: /get-started/self-hosting/self-hosting.md
+[self-hosting-agent]: /get-started/self-hosting/agent/agent.md
 [aperture cloud]: /introduction.md
 [aperture controller]: /architecture/architecture.md#aperture-controller
+[aperture agent]: /architecture/architecture.md#aperture-agent

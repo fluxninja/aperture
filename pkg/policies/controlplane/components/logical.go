@@ -33,7 +33,7 @@ func (c *logicalCombinator) ShortDescription() string { return "" }
 func (*logicalCombinator) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.
-func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (c *logicalCombinator) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	inputs := inPortReadings.ReadRepeatedReadingPort("inputs")
 
 	output := c.neutralElement
@@ -90,7 +90,7 @@ func (c *inverter) ShortDescription() string { return "" }
 func (*inverter) IsActuator() bool { return false }
 
 // Execute implements runtime.Component.
-func (c *inverter) Execute(inPortReadings runtime.PortToReading, tickInfo runtime.TickInfo) (runtime.PortToReading, error) {
+func (c *inverter) Execute(inPortReadings runtime.PortToReading, circuitAPI runtime.CircuitAPI) (runtime.PortToReading, error) {
 	input := inPortReadings.ReadSingleReadingPort("input")
 
 	return runtime.PortToReading{

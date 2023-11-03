@@ -11,39 +11,38 @@ import java.time.Duration;
 public class ArmeriaClient {
 
     public static final String DEFAULT_APP_PORT = "8080";
-    public static final String DEFAULT_AGENT_HOST = "localhost";
-    public static final String DEFAULT_AGENT_PORT = "8089";
-    public static final String DEFAULT_FAIL_OPEN = "true";
+    public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
+    public static final String DEFAULT_RAMP_MODE = "false";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
     public static void main(String[] args) {
-        String agentHost = System.getenv("FN_AGENT_HOST");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_HOST;
+        String agentAddress = System.getenv("APERTURE_AGENT_ADDRESS");
+        if (agentAddress == null) {
+            agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        String agentPort = System.getenv("FN_AGENT_PORT");
-        if (agentPort == null) {
-            agentPort = DEFAULT_AGENT_PORT;
+        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
+        if (agentAPIKey == null) {
+            agentAPIKey = "";
         }
-        String failOpenString = System.getenv("FN_ENABLE_FAIL_OPEN");
-        if (failOpenString == null) {
-            failOpenString = DEFAULT_FAIL_OPEN;
+        String rampModeString = System.getenv("APERTURE_ENABLE_RAMP_MODE");
+        if (rampModeString == null) {
+            rampModeString = DEFAULT_RAMP_MODE;
         }
-        boolean failOpen = Boolean.parseBoolean(failOpenString);
+        boolean rampMode = Boolean.parseBoolean(rampModeString);
 
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
+        String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
         if (controlPointName == null) {
             controlPointName = DEFAULT_CONTROL_POINT_NAME;
         }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
+        String insecureGrpcString = System.getenv("APERTURE_AGENT_INSECURE");
         if (insecureGrpcString == null) {
             insecureGrpcString = DEFAULT_INSECURE_GRPC;
         }
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
+        String rootCertFile = System.getenv("APERTURE_ROOT_CERTIFICATE_FILE");
         if (rootCertFile == null) {
             rootCertFile = DEFAULT_ROOT_CERT;
         }
@@ -52,9 +51,8 @@ public class ArmeriaClient {
         try {
             apertureSDK =
                     ApertureSDK.builder()
-                            .setHost(agentHost)
-                            .setPort(Integer.parseInt(agentPort))
-                            .setFlowTimeout(Duration.ofMillis(1000))
+                            .setAddress(agentAddress)
+                            .setAgentAPIKey(agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();
@@ -67,7 +65,10 @@ public class ArmeriaClient {
                 Clients.builder("http://localhost:8080")
                         .decorator(
                                 ApertureHTTPClient.newDecorator(
-                                        apertureSDK, controlPointName, failOpen))
+                                        apertureSDK,
+                                        controlPointName,
+                                        rampMode,
+                                        Duration.ofMillis(1000)))
                         .build(WebClient.class);
 
         HttpResponse res = client.get("notsuper");
