@@ -66,8 +66,13 @@ func provideAgent(
 
 		otelconfig.AddAlertsPipeline(otelCfg, agentCfg.CommonOTelConfig, otelconsts.ProcessorAgentResourceLabels)
 
+		installationMode := ""
+		if in.InstallationModeConfig != nil {
+			installationMode = in.InstallationModeConfig.InstallationMode
+		}
+
 		if err := inframeter.AddInfraMeters(
-			otelCfg, allInfraMeters, in.InstallationModeConfig.InstallationMode, in.SecretManagetClient); err != nil {
+			otelCfg, allInfraMeters, installationMode, in.SecretManagetClient); err != nil {
 			log.Error().Err(err).Msg("unable to add custom metrics pipelines")
 			utils.Shutdown(in.Shutdowner)
 			return
