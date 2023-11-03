@@ -2,7 +2,6 @@ package loadscheduler
 
 import (
 	"fmt"
-	"time"
 
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -18,8 +17,6 @@ import (
 const (
 	inputLoadMultiplierPortName          = "load_multiplier"
 	outputObservedLoadMultiplierPortName = "observed_load_multiplier"
-	// TODO: move to a common area so that it is shared with OTEL collector.
-	metricScrapeInterval = time.Second * 10
 )
 
 // ParseLoadScheduler parses a load scheduler from a spec.
@@ -28,13 +25,8 @@ func ParseLoadScheduler(
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-	retErr := func(err error) (*runtime.ConfiguredComponent, *policylangv1.NestedCircuit, error) {
-		return nil, nil, err
-	}
-
 	nestedInPortsMap := make(map[string]*policylangv1.InPort)
 	inPorts := loadScheduler.GetInPorts()
-
 	if inPorts != nil {
 		loadMultiplierPort := inPorts.LoadMultiplier
 		if loadMultiplierPort != nil {
@@ -87,7 +79,7 @@ func ParseLoadScheduler(
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
 		})
 	if err != nil {
-		return retErr(err)
+		return nil, nil, err
 	}
 
 	nestedCircuit := &policylangv1.NestedCircuit{
@@ -159,7 +151,7 @@ func ParseLoadScheduler(
 									},
 								},
 								QueryString:        observedLoadMultiplierQuery,
-								EvaluationInterval: durationpb.New(metricScrapeInterval),
+								EvaluationInterval: durationpb.New(metrics.ScrapeInterval),
 							},
 						},
 					},
@@ -180,7 +172,7 @@ func ParseLoadScheduler(
 		false,
 	)
 	if err != nil {
-		return retErr(err)
+		return nil, nil, err
 	}
 
 	return configuredComponent, nestedCircuit, nil

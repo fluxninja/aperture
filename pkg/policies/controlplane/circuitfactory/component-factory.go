@@ -108,8 +108,6 @@ func NewComponentAndOptions(
 		switch flowControlConfig := flowControl.Component.(type) {
 		case *policylangv1.FlowControl_QuotaScheduler:
 			ctor = mkCtor(flowControlConfig.QuotaScheduler, quotascheduler.NewQuotaSchedulerAndOptions)
-		case *policylangv1.FlowControl_RateLimiter:
-			ctor = mkCtor(flowControlConfig.RateLimiter, ratelimiter.NewRateLimiterAndOptions)
 		case *policylangv1.FlowControl_Sampler:
 			ctor = mkCtor(flowControlConfig.Sampler, sampler.NewSamplerAndOptions)
 		case *policylangv1.FlowControl_Private:
@@ -120,6 +118,12 @@ func NewComponentAndOptions(
 					return Tree{}, nil, nil, err
 				}
 				ctor = mkCtor(loadActuator, loadscheduler.NewActuatorAndOptions)
+			case "type.googleapis.com/aperture.policy.private.v1.RateLimiter":
+				rateLimiter := &policyprivatev1.RateLimiter{}
+				if err := anypb.UnmarshalTo(flowControlConfig.Private, rateLimiter, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(rateLimiter, ratelimiter.NewRateLimiterAndOptions)
 			default:
 				err := fmt.Errorf("unknown flow control type: %s", flowControlConfig.Private.TypeUrl)
 				log.Error().Err(err).Msg("unknown flow control type")

@@ -1,5 +1,7 @@
 package metrics
 
+import "time"
+
 const (
 	// METRIC NAMES.
 
@@ -120,6 +122,10 @@ const (
 	ComponentIDLabel = "component_id"
 	// DecisionTypeLabel - label for decision type rejected or accepted.
 	DecisionTypeLabel = "decision_type"
+	// DecisionTypeRejected - decision type rejected.
+	DecisionTypeRejected = "DECISION_TYPE_REJECTED"
+	// DecisionTypeAccepted - decision type accepted.
+	DecisionTypeAccepted = "DECISION_TYPE_ACCEPTED"
 	// WorkloadIndexLabel - label for choosing correct workload.
 	WorkloadIndexLabel = "workload_index"
 	// LimiterDroppedLabel - label to indicate that the particular limiter has dropped the request.
@@ -167,4 +173,7 @@ const (
 	DefaultWorkloadIndex = "default"
 	// DefaultAgentGroup - default agent group.
 	DefaultAgentGroup = "default"
+
+	// ScrapeInterval - Scrape interval for metrics.
+	ScrapeInterval = time.Second * 10
 )

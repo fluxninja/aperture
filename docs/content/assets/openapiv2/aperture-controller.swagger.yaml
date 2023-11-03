@@ -3164,11 +3164,14 @@ definitions:
         properties:
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
-                title: Input ports for the RateLimiter component
+                title: Input ports for the _Rate Limiter_ component
                 x-go-tag-validate: required
+            out_ports:
+                $ref: '#/definitions/RateLimiterOuts'
+                description: Output ports for the _Rate Limiter_ component.
             parameters:
                 $ref: '#/definitions/RateLimiterParameters'
-                title: Parameters for the RateLimiter component
+                title: Parameters for the _Rate Limiter_ component
                 x-go-tag-validate: required
             request_parameters:
                 $ref: '#/definitions/RateLimiterRequestParameters'
@@ -3209,7 +3212,14 @@ definitions:
         required:
             - bucket_capacity
             - fill_amount
-        title: Inputs for the RateLimiter component
+        title: Inputs for the _Rate Limiter_ component
+        type: object
+    RateLimiterOuts:
+        description: Outputs for the _Rate Limiter_ component.
+        properties:
+            accept_percentage:
+                $ref: '#/definitions/OutPort'
+                description: The percentage of flows being accepted by the _Load Ramp_.
         type: object
     RateLimiterParameters:
         properties:

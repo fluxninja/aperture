@@ -88,7 +88,7 @@ func NewActuatorAndOptions(
 		etcdPaths:                etcdPaths,
 		actuatorProto:            actuatorProto,
 		cpID:                     componentID.String(),
-		ticksPerExecution:        policyReadAPI.TicksInDuration(metricScrapeInterval),
+		ticksPerExecution:        policyReadAPI.TicksInDuration(metrics.ScrapeInterval),
 	}
 
 	// Prepare parameters for prometheus queries

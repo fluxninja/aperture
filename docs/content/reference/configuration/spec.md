@@ -7365,7 +7365,19 @@ _Token Bucket Algorithm_.
 
 <!-- vale on -->
 
-Input ports for the RateLimiter component
+Input ports for the _Rate Limiter_ component
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([RateLimiterOuts](#rate-limiter-outs))
+
+<!-- vale on -->
+
+Output ports for the _Rate Limiter_ component.
 
 </dd>
 <dt>parameters</dt>
@@ -7377,7 +7389,7 @@ Input ports for the RateLimiter component
 
 <!-- vale on -->
 
-Parameters for the RateLimiter component
+Parameters for the _Rate Limiter_ component
 
 </dd>
 <dt>request_parameters</dt>
@@ -7414,7 +7426,7 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Inputs for the RateLimiter component
+Inputs for the _Rate Limiter_ component
 
 <dl>
 <dt>bucket_capacity</dt>
@@ -7451,6 +7463,31 @@ Number of tokens to fill within an `interval`.
 <!-- vale on -->
 
 PassThrough port determines whether all requests
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RateLimiterOuts {#rate-limiter-outs}
+
+<!-- vale on -->
+
+Outputs for the _Rate Limiter_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Load Ramp_.
 
 </dd>
 </dl>

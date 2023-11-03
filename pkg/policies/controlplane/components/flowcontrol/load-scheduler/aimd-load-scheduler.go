@@ -4,6 +4,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -173,7 +174,7 @@ func ParseAIMDLoadScheduler(
 			Component: &policylangv1.Component_Integrator{
 				Integrator: &policylangv1.Integrator{
 					InitialValue:       aimdLoadScheduler.Parameters.MaxLoadMultiplier,
-					EvaluationInterval: durationpb.New(metricScrapeInterval),
+					EvaluationInterval: durationpb.New(metrics.ScrapeInterval),
 					InPorts: &policylangv1.Integrator_Ins{
 						Input: &policylangv1.InPort{
 							Value: &policylangv1.InPort_ConstantSignal{

@@ -36,8 +36,14 @@ func NewConfigSyncOptions(
 	agentGroups := selectors.UniqueAgentGroups(s)
 
 	for _, agentGroup := range agentGroups {
-		etcdPath := path.Join(paths.LoadSchedulerConfigPath,
-			paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String()))
+		etcdPath := path.Join(
+			paths.LoadSchedulerConfigPath,
+			paths.AgentComponentKey(
+				agentGroup,
+				policyReadAPI.GetPolicyName(),
+				componentID.String(),
+			),
+		)
 		configSync := &loadSchedulerConfigSync{
 			loadSchedulerProto: loadSchedulerProto,
 			policyBaseAPI:      policyReadAPI,

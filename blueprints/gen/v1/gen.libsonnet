@@ -142,6 +142,7 @@
   RangeDrivenLoadSchedulerParameters: import 'rangedrivenloadschedulerparameters.libsonnet',
   RateLimiter: import 'ratelimiter.libsonnet',
   RateLimiterIns: import 'ratelimiterins.libsonnet',
+  RateLimiterOuts: import 'ratelimiterouts.libsonnet',
   RateLimiterParameters: import 'ratelimiterparameters.libsonnet',
   RateLimiterParametersLazySync: import 'ratelimiterparameterslazysync.libsonnet',
   RateLimiterRequestParameters: import 'ratelimiterrequestparameters.libsonnet',

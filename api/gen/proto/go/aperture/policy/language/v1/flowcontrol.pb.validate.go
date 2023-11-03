@@ -1099,6 +1099,35 @@ func (m *RateLimiter) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiterValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiterValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return RateLimiterMultiError(errors)
 	}
@@ -4803,6 +4832,135 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimiter_InsValidationError{}
+
+// Validate checks the field values on RateLimiter_Outs with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RateLimiter_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimiter_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RateLimiter_OutsMultiError, or nil if none found.
+func (m *RateLimiter_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimiter_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAcceptPercentage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimiter_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimiter_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAcceptPercentage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimiter_OutsValidationError{
+				field:  "AcceptPercentage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return RateLimiter_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// RateLimiter_OutsMultiError is an error wrapping multiple validation errors
+// returned by RateLimiter_Outs.ValidateAll() if the designated constraints
+// aren't met.
+type RateLimiter_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimiter_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimiter_OutsMultiError) AllErrors() []error { return m }
+
+// RateLimiter_OutsValidationError is the validation error returned by
+// RateLimiter_Outs.Validate if the designated constraints aren't met.
+type RateLimiter_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimiter_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimiter_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimiter_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimiter_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimiter_OutsValidationError) ErrorName() string { return "RateLimiter_OutsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RateLimiter_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimiter_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimiter_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimiter_OutsValidationError{}
 
 // Validate checks the field values on RateLimiter_Parameters_LazySync with the
 // rules defined in the proto definition for this message. If any rules are
