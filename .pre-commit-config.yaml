@@ -93,7 +93,7 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@2.8.8
-        exclude: ^(docs/content/reference/.*|docs/content/reference/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen)
         types_or:
           [
             sh,

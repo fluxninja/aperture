@@ -32,8 +32,7 @@ Aperture supports the following version of Istio:
 :::info
 
 This integration is currently only supported with the
-[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
-Agent.
+[self-hosted](/self-hosting/agent/agent.md) version of Aperture Agent.
 
 :::
 
@@ -317,12 +316,12 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/get-started/setup-cli/setup-cli.md)
+2. [aperturectl](/reference/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
-   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
-   see all the available command line arguments.
+   [aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
+   to see all the available command line arguments.
 
    :::
 

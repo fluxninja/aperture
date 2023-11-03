@@ -61,7 +61,7 @@ data:
 ```
 
 To use these Secret and ConfigMap during the
-[Aperture Agent Installation](/get-started/self-hosting/agent/agent.md#agent-installation-modes),
+[Aperture Agent Installation](/self-hosting/agent/agent.md#agent-installation-modes),
 refer to them in the values.yaml file, as shown below:
 
 ```yaml
@@ -77,4 +77,4 @@ import DocCardList from '@theme/DocCardList';
 <DocCardList />
 
 [config]: /reference/configuration/spec.md#resources
-[rabbitmq]: /integrations/metrics/rabbitmq.md
+[rabbitmq]: /self-hosting/integrations/metrics/rabbitmq.md

@@ -306,6 +306,6 @@ rego:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
 [control-point]: ./control-point.md
 [install-istio]: /self-hosting/integrations/istio/istio.md
-[aperturectl]: /setup-cli/setup-cli.md
+[aperturectl]: /reference/aperture-cli/aperture-cli.md
 [json-extractor]: /reference/configuration/spec.md#json-extractor
 [jwt-extractor]: /reference/configuration/spec.md#j-w-t-extractor

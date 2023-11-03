@@ -47,12 +47,12 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/setup-cli/setup-cli.md)
+2. [aperturectl](/reference/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
-   [aperturectl install agent](/reference/aperturectl/install/agent/agent.md) to
-   see all the available command line arguments.
+   [aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
+   to see all the available command line arguments.
 
    :::
 

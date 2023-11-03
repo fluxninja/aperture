@@ -183,7 +183,7 @@ cluster resource that can be scaled in or out. Aperture Agents perform automated
 discovery of Kubernetes Control Points in a cluster.
 
 Use the
-[`aperturectl auto-scale control-points`](/reference/aperturectl/auto-scale/control-points/control-points.md)
+[`aperturectl auto-scale control-points`](/reference/aperture-cli/aperturectl/auto-scale/control-points/control-points.md)
 CLI command to list active control points.
 
 For example:

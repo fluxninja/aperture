@@ -107,7 +107,7 @@ entities belonging to the same service.
 ## Live Preview of Control Points
 
 Use the
-[`aperturectl flow-control control-points`](../reference/aperturectl/discovery/entities/)
+[`aperturectl flow-control control-points`](../reference/aperture-cli/aperturectl/discovery/entities/)
 CLI command to list active control points.
 
 For example:

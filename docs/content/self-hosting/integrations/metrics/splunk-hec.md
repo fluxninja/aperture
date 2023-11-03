@@ -40,7 +40,7 @@ policy:
           splunk_hec: [splunkhecreceiver configuration here]
 ```
 
-[build]: /reference/aperturectl/build/agent/agent.md
+[build]: /reference/aperture-cli/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/splunkhecreceiver
 [opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector

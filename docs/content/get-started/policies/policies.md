@@ -29,7 +29,7 @@ customizations. The [guides](/guides/guides.md) section showcases practical
 examples of blueprints in action.
 
 To manage blueprints and generate policies, use the
-[aperturectl](/reference/aperturectl/aperturectl.md) CLI.
+[aperturectl](/reference/aperture-cli/aperturectl/aperturectl.md) CLI.
 
 <Zoom>
 
@@ -128,8 +128,8 @@ the generated policies on the Aperture Cloud Controller.
 
 :::info
 
-See [Set up CLI (aperturectl)](/setup-cli/setup-cli.md) for more information on
-how to configure what aperturectl should connect to.
+See [Set up CLI (aperturectl)](/reference/aperture-cli/aperture-cli.md) for more
+information on how to configure what aperturectl should connect to.
 
 :::
 

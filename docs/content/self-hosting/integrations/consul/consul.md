@@ -29,8 +29,7 @@ Aperture supports the following versions of Consul:
 :::info
 
 This integration is currently only supported with the
-[self-hosted](/get-started/self-hosting/agent/agent.md) version of Aperture
-Agent.
+[self-hosted](/self-hosting/agent/agent.md) version of Aperture Agent.
 
 :::
 

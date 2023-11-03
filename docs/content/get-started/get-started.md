@@ -12,12 +12,14 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 ```
 
-In this tutorial, we will show you how to integrate Aperture with your
-application. Once integrated with Aperture, you are ready to enforce
-`rate limiting as a service`. Below are two different ways to get started with
-Aperture, ranging from Serverless to Self-Hosted. If you are unsure which one to
-choose, **we recommend starting with the Serverless option**, as it's the
-fastest way to get started and involves fewer teams.
+Get stated guide will provide you quick overview on how to integrate Aperture
+with your application. Once integrated with Aperture, you are ready to enforce
+`rate limiting as a service`.
+
+Below are two different ways to get started with Aperture, ranging from
+Serverless to Self-Hosted. If you are unsure which one to choose, **we recommend
+starting with the Serverless option**, as it's the fastest way to get started
+and involves fewer teams.
 
 <Tabs>
 
@@ -66,8 +68,12 @@ ideal for situations like air-gapped environments.
    modes. For installation steps, please refer to the following
    [page](/self-hosting/agent/agent.md).
 
-   :::info For more details on fully self-hosted solutions, please refer to the
+   :::info
+
+   For more details on fully self-hosted solutions, please refer to the
    following [page](/self-hosting/).
+
+   :::
 
 3. **Integrate with Aperture**: Here are various
    [Integrations](/self-hosting/integrations/integrations.md) methods with
@@ -77,7 +83,7 @@ ideal for situations like air-gapped environments.
    - [Istio](/self-hosting/integrations/istio)
    - [Gateways](/self-hosting/integrations/gateway)
    - [Consul](/self-hosting/integrations/consul)
-   - [AutoScale](/self-hosting/integrations/auto-scale)
+   - [Auto Scale](/self-hosting/integrations/auto-scale)
    - [Metrics](/self-hosting/integrations/metrics)
 
 4. **Map to Aperture SaaS Controller**: Aperture Agent authenticates requests

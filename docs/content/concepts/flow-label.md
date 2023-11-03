@@ -233,6 +233,6 @@ For _Classifier_ created labels, you can disable this behavior by setting
 [gateways]: /self-hosting/integrations/gateway/gateway.md
 [istio]: /self-hosting/integrations/istio/istio.md
 [span]: https://opentelemetry.io/docs/reference/specification/trace/api/#span
-[aperturectl]: ../reference/aperturectl/flow-control/preview/
+[aperturectl]: ../reference/aperture-cli/aperturectl/flow-control/preview/
 [label-matcher]: ./selector.md#label-matcher
 [otel-baggage]: https://opentelemetry.io/docs/concepts/signals/baggage/

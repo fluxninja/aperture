@@ -40,7 +40,7 @@ policy:
           purefb: [purefbreceiver configuration here]
 ```
 
-[build]: /reference/aperturectl/build/agent/agent.md
+[build]: /reference/aperture-cli/aperturectl/build/agent/agent.md
 [receiver]:
   https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/purefbreceiver
 [opentelemetry-collector]: /reference/configuration/spec.md#telemetry-collector

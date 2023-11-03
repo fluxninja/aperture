@@ -20,8 +20,8 @@ generate-mermaid:
 generate-aperturectl-docs:
 	@echo generating aperturectl
 	@go run tools/aperturectl/generate-docs/generate-docs.go
-	@prettier --prose-wrap="preserve" ./content/reference/aperturectl/ --write
-	@git add ./content/reference/aperturectl/
+	@prettier --prose-wrap="preserve" ./content/reference/aperture-cli/aperturectl/ --write
+	@git add ./content/reference/aperture-cli/aperturectl/
 
 generate-otel-docs:
 	@echo generating metrics docs

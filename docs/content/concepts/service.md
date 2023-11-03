@@ -45,7 +45,7 @@ An entity might belong to multiple services.
 ## Live Preview of Services
 
 Use the
-[`aperturectl discovery entities`](../reference/aperturectl/discovery/entities/)
+[`aperturectl discovery entities`](../reference/aperture-cli/aperturectl/discovery/entities/)
 CLI command to list the discovered entities (pods, VMs) and their mapping to
 services.
 

@@ -23,5 +23,5 @@ Dashboards][generating-policies] contains an example how to run this command).
 of how a Policy object could look like (look for `Generated Policy`). Such a
 Policy can be then applied with regular `kubectl apply`.
 
-[generate]: /reference/aperturectl/blueprints/generate/generate.md
+[generate]: /reference/aperture-cli/aperturectl/blueprints/generate/generate.md
 [generating-policies]: /get-started/policies/policies.md#generating-policies
