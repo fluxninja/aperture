@@ -34,7 +34,7 @@ reliable identification of services during flow control decision-making.
 Upon receiving a flow control decision request from an entity, Aperture uses the
 IP address to service mapping to identify the service name(s). The service
 name(s) along with flow labels determine which flow control components to
-execute. Refer to [Selector concept](selector.md) for more details.
+execute. Refer to [Selector concept](/concepts/selector.md) for more details.
 
 :::note
 

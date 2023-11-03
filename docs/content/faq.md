@@ -120,8 +120,8 @@ The following results were observed:
 
 [rate-limiter]: /concepts/rate-limiter.md
 [load-scheduler]: /concepts/scheduler/load-scheduler.md
-[flux-meter]: /concepts/flux-meter.md
-[classifier]: /concepts/classifier.md
+[flux-meter]: /concepts/advanced/flux-meter.md
+[classifier]: /concepts/advanced/classifier.md
 [flow-label]: /concepts/flow-label.md
 [aperture-controller]: /self-hosting/architecture.md#aperture-controller
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller

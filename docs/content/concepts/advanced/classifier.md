@@ -57,12 +57,12 @@ labels aren't isolated in any way and are shared across policies.
 :::
 
 Any _Flow Labels_ created through the _Classifier_ become available in
-subsequent stages of [flow processing](./flow-lifecycle.md). Additionally, the
-_Flow Label_ is injected as baggage, so it will be available as a flow label in
-downstream flows too (assuming you have [baggage propagation][baggage]
-configured in your system). If [FluxNinja extension][arc] plugin is enabled, all
-flow labels including the ones created through classifier are available in
-traffic analytics.
+subsequent stages of [flow processing](/concepts/flow-lifecycle.md).
+Additionally, the _Flow Label_ is injected as baggage, so it will be available
+as a flow label in downstream flows too (assuming you have [baggage
+propagation][baggage] configured in your system). If [FluxNinja extension][arc]
+plugin is enabled, all flow labels including the ones created through classifier
+are available in traffic analytics.
 
 :::note
 
@@ -293,18 +293,18 @@ rego:
 [rego-playground]: https://play.openpolicyagent.org/p/mG0sXxCNdQ
 [label]: /concepts/flow-label.md
 [baggage]: /concepts/flow-label.md#baggage
-[request-labels]: ./flow-label.md#request-labels
+[request-labels]: /concepts/flow-label.md#request-labels
 [reference]: /reference/configuration/spec.md#classifier
 [rule]: /reference/configuration/spec.md#rule
 [extractor]: /reference/configuration/spec.md#extractor
 [rego-rule]: /reference/configuration/spec.md#rule-rego
 [arc]: /reference/fluxninja.md
-[selector]: ./selector.md
+[selector]: /concepts/selector.md
 [policies]: /concepts/advanced/policy.md
 [rego]: https://www.openpolicyagent.org/docs/latest/policy-language/
 [rego-kw]:
   https://www.openpolicyagent.org/docs/latest/policy-reference/#reserved-names
-[control-point]: ./control-point.md
+[control-point]: /concepts/control-point.md
 [install-istio]: /self-hosting/integrations/istio/istio.md
 [aperturectl]: /reference/aperture-cli/aperture-cli.md
 [json-extractor]: /reference/configuration/spec.md#json-extractor

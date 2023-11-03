@@ -17,12 +17,12 @@ keywords:
 :::
 
 Telemetry is central to closed loop policies in Aperture. Whereas
-[_Flux Meters_](./flux-meter.md) provide precision telemetry based on traffic
-flows, _Infra Meters_ provide telemetry from popular technology components such
-as databases, caches, and orchestrators that make up an application's underlying
-infrastructure. Several policies such as auto-scale, service protection and
-feature rollout can provide more accurate control using health and saturation
-telemetry collected from the infrastructure.
+[_Flux Meters_](/concepts/advanced/flux-meter.md) provide precision telemetry
+based on traffic flows, _Infra Meters_ provide telemetry from popular technology
+components such as databases, caches, and orchestrators that make up an
+application's underlying infrastructure. Several policies such as auto-scale,
+service protection and feature rollout can provide more accurate control using
+health and saturation telemetry collected from the infrastructure.
 
 The Aperture Agent process has a built-in
 [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector),

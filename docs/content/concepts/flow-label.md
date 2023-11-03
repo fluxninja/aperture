@@ -1,6 +1,6 @@
 ---
 title: Flow Label
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 ```mdx-code-block

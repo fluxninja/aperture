@@ -52,7 +52,7 @@ project
 
 6. After submitting, it will redirect to policies dashboard, where you can see
    the policy status. It will take some time to deploy the policy. Once the
-   policy is deployed, you can see the status as **Active**.
+   policy is deployed, you can see the status as **Applied**.
 
    ![Policy Status](./assets/8-policy-applied.png)
 

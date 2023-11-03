@@ -26,7 +26,7 @@ belong to the same agent group.
 :::note
 
 The agent group can be configured during Agent installation. Refer to the
-[agent config](../reference/configuration/agent.md#agent-info-config) for more
+[agent config](/reference/configuration/agent.md#agent-info-config) for more
 details.
 
 :::
@@ -46,9 +46,9 @@ details.
 - **State Synchronization**: An agent group defines the scope of agent-to-agent
   synchronization. Agents within the same group form a peer-to-peer network to
   synchronize fine-grained per label counters. These counters are crucial for
-  [rate-limiting](./rate-limiter.md) and for implementing global token buckets
-  used in [quota scheduling](./scheduler/quota-scheduler.md). Additionally, all
-  Agents within an agent group instantiate the same set of flow control
-  components as defined in the [policies](./advanced/policy.md) running at the
-  Controller. This ensures consistent behavior and synchronization across the
-  group.
+  [rate-limiting](/concepts/rate-limiter.md) and for implementing global token
+  buckets used in [quota scheduling](/concepts/scheduler/quota-scheduler.md).
+  Additionally, all Agents within an agent group instantiate the same set of
+  flow control components as defined in the
+  [policies](/concepts/advanced/policy.md) running at the Controller. This
+  ensures consistent behavior and synchronization across the group.

@@ -6,7 +6,7 @@ keywords:
   - priority
   - queuing
   - actuators
-sidebar_position: 12
+sidebar_position: 6
 ---
 
 :::info See Also

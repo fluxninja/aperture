@@ -1,7 +1,7 @@
 ---
 title: Selector
 sidebar_label: Selector
-sidebar_position: 6
+sidebar_position: 4
 keywords:
   - flows
   - services

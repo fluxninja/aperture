@@ -1,7 +1,7 @@
 ---
 title: Flow Lifecycle
 sidebar_label: Flow Lifecycle
-sidebar_position: 5
+sidebar_position: 3
 keywords:
   - flows
   - services

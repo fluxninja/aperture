@@ -1772,7 +1772,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/classifier.md).
+See also [Classifier overview](/concepts/advanced/classifier.md).
 
 ::: Example
 
@@ -3447,7 +3447,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flux-meter.md).
+See also [Flux Meter overview](/concepts/advanced/flux-meter.md).
 
 ::: Example:
 
@@ -6859,12 +6859,12 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux
-Meter defines histogram type of metrics in Prometheus. Therefore, one can refer
-to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`. The particular
-Flux Meter can be identified with the `flux_meter_name` label. There are
-additional labels available on a Flux Meter such as `valid`, `flow_status`,
-`http_status_code` and `decision_type`.
+[Flux Meter](/concepts/advanced/flux-meter.md) metrics can be queried using
+PromQL. Flux Meter defines histogram type of metrics in Prometheus. Therefore,
+one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+The particular Flux Meter can be identified with the `flux_meter_name` label.
+There are additional labels available on a Flux Meter such as `valid`,
+`flow_status`, `http_status_code` and `decision_type`.
 
 :::
 
@@ -7647,7 +7647,8 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
-You can use the [live-preview](/concepts/classifier.md#live-previewing-requests)
+You can use the
+[live-preview](/concepts/advanced/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -8049,7 +8050,7 @@ specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
+See also [_Sampler_ overview](/concepts/advanced/load-ramp.md#sampler).
 
 :::
 
