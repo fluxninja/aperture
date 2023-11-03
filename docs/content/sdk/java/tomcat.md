@@ -20,7 +20,8 @@ set traffic control points for relevant services:
 :::info Agent API Key
 
 You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to [Agent API Keys](/get-started/agent-api-keys.md).
+more information, refer to
+[Agent API Keys](/get-started/agent-api-keys/agent-api-keys.md).
 
 :::
 
