@@ -10,13 +10,13 @@ managed:
       - buf.build/grpc-ecosystem/grpc-gateway
       - buf.build/envoyproxy/protoc-gen-validate
 plugins:
-  - plugin: buf.build/protocolbuffers/java
+  - plugin: buf.build/protocolbuffers/java:v24.4
     out: gen/proto/java
   - plugin: buf.build/grpc/java
     out: gen/proto/java
   - plugin: buf.build/grpc/python
     out: gen/proto/python
-  - plugin: buf.build/protocolbuffers/python
+  - plugin: buf.build/protocolbuffers/python:v24.4
     out: gen/proto/python
   - plugin: buf.build/protocolbuffers/pyi
     out: gen/proto/python
