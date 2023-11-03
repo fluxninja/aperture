@@ -9,8 +9,8 @@ deps:
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: b65e310e14a04242a123570d4fec3894
-    digest: shake256:5fff96e791125f298c0945ddb105a3a2375d5b0d8b07f69c97fcfdc936ccace2701c66905ac823e1477bb4dd60ecebdb2b4dfcc2fdef5dc5053624285a999c4e
+    commit: add999ccbc014144b8caeddd49b1ef6b
+    digest: shake256:015721fb32e75260367a4f36a996ee86a130a6d19d07e1d72d3bf96a66c846ab322d95e405730222df0bef66bb6d9120e431dfdcebb574be83e9a4b2561ae9bf
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
