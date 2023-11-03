@@ -86,6 +86,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
 
 <!-- vale off -->
 
+<a id="policy-rate-limiter-alerter"></a>
+
+<ParameterDescription
+    name='policy.rate_limiter.alerter'
+    description='Alerter.'
+    type='Object (aperture.spec.v1.Alerter)'
+    reference='../../configuration/spec#alerter'
+    value='{"alert_name": "More than 90% of requests are being rate limited"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-rate-limiter-bucket-capacity"></a>
 
 <ParameterDescription
