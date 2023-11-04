@@ -316,11 +316,11 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/reference/aperture-cli/aperture-cli.md)
+2. [Aperturectl](/reference/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
-   [aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
+   [Aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
    to see all the available command line arguments.
 
    :::
@@ -334,7 +334,7 @@ your setup using the
 By following these instructions, you will have installed the Istio EnvoyFilter
 into your cluster.
 
-1. Execute the below command to install or upgrade the Istio EnvoyFilter:
+1. Run the below command to install or upgrade the Istio EnvoyFilter:
 
    :::info
 

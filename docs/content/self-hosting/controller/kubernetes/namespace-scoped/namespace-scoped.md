@@ -257,8 +257,8 @@ Use the same `values.yaml` file created as part of
    </TabItem>
    </Tabs>
 
-2. If you have installed the chart in some other namespace than `default`,
-   execute the below commands:
+2. If you have installed the chart in some other namespace than `default`, run
+   the below commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="Helm" label="Helm">

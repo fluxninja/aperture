@@ -34,11 +34,11 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/reference/aperture-cli/aperture-cli.md)
+2. [Aperturectl](/reference/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
-   [aperturectl install controller](/reference/aperture-cli/aperturectl/install/controller/controller.md)
+   [Aperturectl install controller](/reference/aperture-cli/aperturectl/install/controller/controller.md)
    to see all the available command line arguments.
 
    :::

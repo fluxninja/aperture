@@ -135,7 +135,7 @@ the plugin is already installed:
    `KONG_PLUGINS`.
 
 4. Enable the Aperture Custom plugin for all the services and routes by creating
-   a YAML file like below:
+   a YAML file such as below:
 
    ```yaml
    _format_version: "3.0"

@@ -18,8 +18,8 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVers
 
 :::info
 
-This method requires access to create cluster level resources like ClusterRole,
-ClusterRoleBinding, CustomResourceDefinition and so on.
+This method requires access to create cluster level resources such as
+ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
 [Namespace-scoped Installation](/self-hosting/agent/kubernetes/namespace-scoped/namespace-scoped.md)
@@ -70,11 +70,11 @@ Install the tool of your choice using the following links:
       helm repo update
       ```
 
-2. [aperturectl](/reference/aperture-cli/aperture-cli.md)
+2. [Aperturectl](/reference/aperture-cli/aperture-cli.md)
 
    :::info Refer
 
-   [aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
+   [Aperturectl install agent](/reference/aperture-cli/aperturectl/install/agent/agent.md)
    to see all the available command line arguments.
 
    :::

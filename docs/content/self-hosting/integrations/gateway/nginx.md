@@ -161,8 +161,8 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    ```
 
 4. Add the `access_by_lua_block` section under the `http` block of the Nginx
-   configuration to execute the Aperture check for all servers and locations
-   before the request is forwarded to upstream:
+   configuration to run the Aperture check for all servers and locations before
+   the request is forwarded to upstream:
 
    ```bash
    http {
@@ -222,7 +222,7 @@ Follow these steps to configure Nginx to use the installed Aperture Lua module:
    }
    ```
 
-8. Below is how a complete Nginx configuration would look like:
+8. Below is how a complete Nginx configuration would look such as:
 
    ```bash
    worker_processes auto;

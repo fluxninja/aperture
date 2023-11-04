@@ -322,8 +322,8 @@ following the below steps:
       </TabItem>
       </Tabs>
 
-3. If you have installed the chart in some other namespace than `default`,
-   execute the below commands:
+3. If you have installed the chart in some other namespace than `default`, run
+   the below commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="Helm" label="Helm">
@@ -340,7 +340,7 @@ following the below steps:
    </Tabs>
 
 4. If you have installed the Contour chart for exposing the etcd and Prometheus
-   service, execute the below command:
+   service, run the below command:
 
    ```bash
    helm uninstall aperture -n projectcontour

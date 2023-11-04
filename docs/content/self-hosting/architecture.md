@@ -21,7 +21,7 @@ Agents.
 ## Aperture Controller {#aperture-controller}
 
 The Aperture Controller is responsible for managing agents and evaluating
-declarative load management policies. Policies define service level objectives,
+declarative load management policies. Policies define service-level objectives,
 telemetry metrics, and adjustments to make in response to metric deviations. The
 controller synchronizes policies and adjustments to the agents. The controller
 can be hosted in _Aperture Cloud or self-hosted_.
@@ -97,13 +97,13 @@ databases.
 The self-hosted configuration of Aperture differs as it requires independent deployment of the Controller and Agents.
 Where Aperture Controller also needs its supporting databases. It uses two
 databases to store configuration, telemetry, and flow control information:
-[Prometheus](https://prometheus.io) and [etcd](https://etcd.io).
+[prometheus](https://prometheus.io) and [etcd](https://etcd.io).
 
 Prometheus enables Aperture to monitor the system and detect deviations from the
-service-level objectives (SLOs) defined in the declarative policies. Controller
-uses etcd (distributed key-value store) to persist the declarative policies that
-define the control circuits and their components, and the adjustments
-synchronized between the Controller and Agents.
+service-level objectives (SLOs) defined in the declarative policies. The
+Aperture controller uses etcd (distributed key-value store) to persist the
+declarative policies that define the control circuits and their components, and
+the adjustments synchronized between the Controller and Agents.
 
 Existing etcd and
 [scalable Prometheus](https://promlabs.com/blog/2021/10/14/promql-vendor-compatibility-round-three)
