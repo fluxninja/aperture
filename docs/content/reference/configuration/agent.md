@@ -854,7 +854,7 @@ BatchPostrollup configures the OTel batch post-processor.
 
 <!-- vale on -->
 
-BatchPrerollup configures the OTel batch pre-processor.
+BatchPrerollup configures the OTel batch preprocessor.
 
 </dd>
 <dt>ports</dt>
@@ -2124,7 +2124,7 @@ JobConfig is configuration for a periodic job
 <!-- vale on -->
 
 Time between job executions. Zero or negative value means that the job will
-never execute periodically.
+never run periodically.
 
 </dd>
 <dt>execution_timeout</dt>

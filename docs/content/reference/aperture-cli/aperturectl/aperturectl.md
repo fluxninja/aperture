@@ -18,7 +18,7 @@ For installation instructions, see [Set up CLI (aperturectl)](/reference/apertur
 
 See also [aperturectl configuration file format reference](/reference/configuration/aperturectl.md).
 
-:::## Aperturectl
+:::## aperturectl
 
 aperturectl - CLI tool to interact with Aperture
 

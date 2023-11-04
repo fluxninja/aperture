@@ -1644,7 +1644,7 @@ JobConfig is configuration for a periodic job
 <!-- vale on -->
 
 Time between job executions. Zero or negative value means that the job will
-never execute periodically.
+never run periodically.
 
 </dd>
 <dt>execution_timeout</dt>
