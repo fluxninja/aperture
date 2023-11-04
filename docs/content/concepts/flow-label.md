@@ -218,11 +218,11 @@ For _Classifier_ created labels, you can disable this behavior by setting
 :::
 
 [selectors]: ./selector.md
-[classifier]: ./classifier.md
+[classifier]: ./advanced/classifier.md
 [workload]: ./scheduler/scheduler.md#workload
 [ratelimiter]: ./rate-limiter.md
 [quota-scheduler]: ./scheduler/quota-scheduler.md
-[flux-meter]: ./flux-meter.md
+[flux-meter]: ./advanced/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:
   https://opentelemetry.io/docs/concepts/observability-primer/#distributed-traces

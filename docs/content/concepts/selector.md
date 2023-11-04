@@ -110,7 +110,7 @@ these matching methods.
 ## Agent Group {#agent-group}
 
 The agent group parameter identifies the Agents where the selector gets applied.
-For more details, refer to the [agent group concept](agent-group.md).
+For more details, refer to the [agent group concept](./advanced/agent-group.md).
 
 In the example below, the agent group is `prod-cluster`.
 
@@ -125,7 +125,8 @@ label_matcher:
 ## Service {#service}
 
 The service parameter limits the selector to flows that belong to the specified
-service. For more details, refer to the [service concept](service.md).
+service. For more details, refer to the
+[service concept](./advanced/service.md).
 
 :::tip Special Service Names
 
@@ -296,8 +297,8 @@ label_matcher:
 ```
 
 [label]: ./flow-label.md
-[flux-meter]: ./flux-meter.md
+[flux-meter]: ./advanced/flux-meter.md
 [load-scheduler]: ./scheduler/load-scheduler.md
-[classifier]: ./classifier.md
+[classifier]: ./advanced/classifier.md
 [label-matcher]: /reference/configuration/spec.md#label-matcher
 [gateway]: /self-hosting/integrations/gateway/gateway.md
