@@ -854,7 +854,7 @@ BatchPostrollup configures the OTel batch post-processor.
 
 <!-- vale on -->
 
-BatchPrerollup configures the OTel batch preprocessor.
+BatchPrerollup configures the OTel batch pre-processor.
 
 </dd>
 <dt>ports</dt>
