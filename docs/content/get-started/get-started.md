@@ -31,8 +31,8 @@ application and requires minimal permissions to get started.
 
 1. **Sign up for an account**: Get started with Aperture by
    [creating an account](/get-started/sign-up.md), completing the simple
-   onboarding - giving you an introduction into the dashboard - and inviting
-   your team members so you can all collaborate on creating your first policy.
+   onboarding - giving you an introduction to dashboard - and inviting your team
+   members so you can all collaborate on creating your first policy.
 2. **Map to Cloud Agent**: Aperture Agent authenticates requests from SDK
    integrations using Agent API keys, which can be created for your project
    within the Aperture UI; for more information, see

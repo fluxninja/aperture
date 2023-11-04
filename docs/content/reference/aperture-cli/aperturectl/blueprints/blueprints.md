@@ -8,7 +8,7 @@ keywords:
 
 <!-- markdownlint-disable -->
 
-## aperturectl blueprints
+## Aperturectl blueprints
 
 Aperture Blueprints
 
