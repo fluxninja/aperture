@@ -25,7 +25,7 @@ To load completions in your current shell session:
 
     source <(aperturectl completion zsh)
 
-To load completions for every new session, run once:
+To load completions for every new session, execute once:
 
 #### Linux:
 
