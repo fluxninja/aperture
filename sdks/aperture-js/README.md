@@ -18,5 +18,5 @@
 Agent. It allows flow control functionality on fine-grained features inside
 service code.
 
-Refer [documentation](https://docs.fluxninja.com/integrations/sdk/javascript/)
-for more details.
+Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
+details.

@@ -910,7 +910,7 @@ definitions:
         properties:
             execution_period:
                 default: 10s
-                description: Time between job executions. Zero or negative value means that the job will never execute periodically.
+                description: Time between job executions. Zero or negative value means that the job will never run periodically.
                 format: string
                 type: string
                 x-go-name: ExecutionPeriod
@@ -1146,7 +1146,7 @@ definitions:
         properties:
             execution_period:
                 default: 10s
-                description: Time between job executions. Zero or negative value means that the job will never execute periodically.
+                description: Time between job executions. Zero or negative value means that the job will never run periodically.
                 format: string
                 type: string
                 x-go-name: ExecutionPeriod

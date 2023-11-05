@@ -28,7 +28,7 @@ export const ExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-${component}-apikey
         key: apiKey
-      value: AGENT_API_KEY
+      value: "AGENT_API_KEY"
 `}</CodeBlock>
 );
 ```
@@ -47,12 +47,12 @@ export const CloudExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: AGENT_API_KEY
+      value: "AGENT_API_KEY"
 `}</CodeBlock>
 );
 ```
 
-FluxNinja Aperture Cloud extension enables [Aperture Cloud][] integration for
+This extension enables [Aperture Cloud][] integration for
 [self-hosted][self-hosting] Aperture Agents and Controllers. It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
@@ -64,9 +64,9 @@ Aperture Cloud Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture Agents won't be able to work.
-While it's possible to [self-host][self-hosting] Aperture Controller, Aperture
-Cloud Controller can be used instead.
+Without the [Aperture Controller][], [self-hosted][self-hosting-agent] Aperture
+Agents won't be able to work. While it's possible to [self-host][self-hosting]
+Aperture Controller, Aperture Cloud Controller can be used instead.
 
 Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture
 Cloud.
@@ -111,7 +111,7 @@ For connecting to the Aperture Cloud-based controller, the `endpoint` must be a
 :::
 
 More details about particular agent installation modes could be found in
-[Get Started: Self-Hosting Aperture](/get-started/self-hosting/agent/agent.md).
+[Get Started: Self-Hosting Aperture](/self-hosting/agent/agent.md).
 
 Configuration parameters for the FluxNinja Aperture Cloud extension are as
 follows:
@@ -125,8 +125,8 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[self-hosting]: /get-started/self-hosting/self-hosting.md
-[self-hosting-agent]: /get-started/self-hosting/agent/agent.md
+[self-hosting]: /self-hosting/self-hosting.md
+[self-hosting-agent]: /self-hosting/agent/agent.md
 [aperture cloud]: /introduction.md
-[aperture controller]: /architecture/architecture.md#aperture-controller
-[aperture agent]: /architecture/architecture.md#aperture-agent
+[aperture controller]: /self-hosting/architecture.md#aperture-controller
+[aperture agent]: /self-hosting/architecture.md#aperture-agent

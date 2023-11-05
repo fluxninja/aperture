@@ -745,7 +745,7 @@
       "additionalProperties": false
     },
     "Classifier": {
-      "description": ":::info\n\nSee also [Classifier overview](/concepts/classifier.md).\n\n:::\nExample\n```yaml\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
+      "description": ":::info\n\nSee also [Classifier overview](/concepts/advanced/classifier.md).\n\n:::\nExample\n```yaml\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\n     label_matcher:\n        match_labels:\n          user_tier: gold\n        match_expressions:\n          - key: user_type\n            operator: In\nrules:\n  user:\n   extractor:\n     from: request.http.headers.user-agent\n  telemetry: false\n```",
       "properties": {
         "rego": {
           "$ref": "#/definitions/Rego",
@@ -1384,11 +1384,11 @@
       "additionalProperties": false
     },
     "FluxMeter": {
-      "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/flux-meter.md).\n\n:::\nExample:\n```yaml\nstatic_buckets:\n   buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\nattribute_key: response_duration_ms\n```",
+      "description": "Flux Meter gathers metrics for the traffic that matches its selector.\nThe histogram created by Flux Meter measures the workload latency by default.\n\n:::info\n\nSee also [Flux Meter overview](/concepts/advanced/flux-meter.md).\n\n:::\nExample:\n```yaml\nstatic_buckets:\n   buckets: [5.0,10.0,25.0,50.0,100.0,250.0,500.0,1000.0,2500.0,5000.0,10000.0]\nselectors:\n   - agent_group: demoapp\n     service: service1-demo-app.demoapp.svc.cluster.local\n     control_point: ingress\nattribute_key: response_duration_ms\n```",
       "properties": {
         "attribute_key": {
           "default": "workload_duration_ms",
-          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/integrations/istio/istio.md#envoy-filter)\n\n:::\n\n",
+          "description": "Key of the attribute in access log or span from which the metric for this flux meter is read.\n\n:::info\n\nFor list of available attributes in Envoy access logs, refer\n[Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)\n\n:::\n\n",
           "type": "string",
           "x-go-tag-default": "workload_duration_ms"
         },
@@ -1720,7 +1720,7 @@
       "additionalProperties": false
     },
     "InfraMeter": {
-      "description": "InfraMeter is a resource that sets up OpenTelemetry pipelines.\nIt defines receivers, processors, and a single metrics pipeline\nwhich will be exported to the configured Prometheus instance.\nEnvironment variables can be used in the configuration using format `${ENV_VAR_NAME}`.\n\n:::info\n\nSee also [Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).\n\n:::",
+      "description": "InfraMeter is a resource that sets up OpenTelemetry pipelines.\nIt defines receivers, processors, and a single metrics pipeline\nwhich will be exported to the configured Prometheus instance.\nEnvironment variables can be used in the configuration using format `${ENV_VAR_NAME}`.\n\n:::info\n\nSee also [Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).\n\n:::",
       "properties": {
         "agent_group": {
           "default": "default",
@@ -2790,7 +2790,7 @@
           "description": "Output ports for the PromQL component."
         },
         "query_string": {
-          "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.\n\n:::",
+          "description": "Describes the [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/) query to be run.\n\n:::note\n\nThe query must return a single value either as a scalar or as a vector with a single element.\n\n:::\n\n:::info Usage with Flux Meter\n\n[Flux Meter](/concepts/advanced/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.\nTherefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.\nThe particular Flux Meter can be identified with the `flux_meter_name` label.\nThere are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.\n\n:::\n\n:::info Usage with OpenTelemetry Metrics\n\nAperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.\n\n:::",
           "type": "string"
         }
       },
@@ -3131,7 +3131,7 @@
       "additionalProperties": false
     },
     "Rego": {
-      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
+      "description": "Rego define a set of labels that are extracted after evaluating a Rego module.\n\n:::info\n\nYou can use the [live-preview](/concepts/advanced/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.\n\n:::\n\nExample of Rego module which also disables telemetry visibility of label:\n```yaml\nrego:\n  labels:\n    user:\n      telemetry: false\n  module: |\n    package user_from_cookie\n    cookies := split(input.attributes.request.http.headers.cookie, \"; \")\n    user := user {\n        cookie := cookies[_]\n        startswith(cookie, \"session=\")\n        session := substring(cookie, count(\"session=\"), -1)\n        parts := split(session, \".\")\n        object := json.unmarshal(base64url.decode(parts[0]))\n        user := object.user\n    }\n```",
       "properties": {
         "labels": {
           "additionalProperties": {
@@ -3273,7 +3273,7 @@
       "additionalProperties": false
     },
     "Sampler": {
-      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/load-ramp.md#sampler).\n\n:::",
+      "description": "_Sampler_ is a component that regulates the load at a\n[_Control Point_](/concepts/selector.md/#control-point) by allowing only a specified percentage of\nflows at random or by sticky sessions.\n\n:::info\n\nSee also [_Sampler_ overview](/concepts/advanced/load-ramp.md#sampler).\n\n:::",
       "properties": {
         "in_ports": {
           "$ref": "#/definitions/SamplerIns",

@@ -526,7 +526,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 :::note
 
 The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md)
+[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
 at runtime, without reloading the policy.
 
 :::

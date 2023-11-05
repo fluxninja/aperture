@@ -1312,7 +1312,7 @@ spec:
                           \n Enabling this flag configures various agent components
                           to point to the Aperture Cloud Controller, for example configures
                           remote etcd endpoint and disables local Prometheus OTel
-                          pipelines. \n Disable this flag only if using [Self-Hosted](/get-started/self-hosting/self-hosting.md)
+                          pipelines. \n Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
                           Aperture Controller."
                         type: boolean
                       endpoint:
@@ -1433,7 +1433,7 @@ spec:
                         properties:
                           execution_period:
                             description: Time between job executions. Zero or negative
-                              value means that the job will never execute periodically.
+                              value means that the job will never run periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout
@@ -1671,7 +1671,7 @@ spec:
                         properties:
                           execution_period:
                             description: Time between job executions. Zero or negative
-                              value means that the job will never execute periodically.
+                              value means that the job will never run periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout
@@ -1912,7 +1912,7 @@ spec:
                         properties:
                           execution_period:
                             description: Time between job executions. Zero or negative
-                              value means that the job will never execute periodically.
+                              value means that the job will never run periodically.
                             type: string
                           execution_timeout:
                             description: Execution timeout

@@ -123,7 +123,7 @@ func (x *TelemetryCollector) GetInfraMeters() map[string]*InfraMeter {
 //
 // :::info
 //
-// See also [Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
+// See also [Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
 //
 // :::
 type InfraMeter struct {

@@ -49,7 +49,7 @@ OTel
 Keepalives?\b
 zsh
 [Pp]owershell
-Prometheus
+[Pp]rometheus
 Pub/Sub
 [Aa]uto-scalers?\b
 [Rr]ollouts?\b
@@ -116,3 +116,5 @@ leverage
 spend
 GPUs
 [Tt]okenizer
+Serverless
+onboarding

@@ -11,7 +11,7 @@ fi
 export SED
 
 git_root=$(git rev-parse --show-toplevel)
-metrics_root="$git_root"/docs/content/integrations/metrics
+metrics_root="$git_root"/docs/content/self-hosting/integrations/metrics
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 export metrics_root

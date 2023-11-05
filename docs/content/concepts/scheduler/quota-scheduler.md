@@ -30,8 +30,8 @@ policy circuit, this component takes the same input ports as a _Rate Limiter_,
 namely `fill_rate` and `bucket_capacity`. These ports facilitate adjustment of
 the global token bucket, which can be used to model an API quota or rate limit.
 The token bucket is used as a shared ledger for Agents in an
-[agent group](../agent-group.md). This ledger records the total available tokens
-that can be distributed across the Agents.
+[agent group](../advanced/agent-group.md). This ledger records the total
+available tokens that can be distributed across the Agents.
 
 In a scenario where the token fill rate and bucket capacity (API quota) is known
 upfront, the _Quota Scheduler_ becomes particularly beneficial to enforce

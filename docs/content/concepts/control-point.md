@@ -1,7 +1,7 @@
 ---
 title: Control Point
 sidebar_label: Control Point
-sidebar_position: 2
+sidebar_position: 1
 keywords:
   - flows
   - services
@@ -39,18 +39,19 @@ frameworks.
 The integration with Envoy uses the External Authorization API. In such a setup,
 the control point can be used to identify a specific filter chain in Envoy. If
 insertion is achieved using the
-[Istio integration](/integrations/istio/istio.md), the default filter
-configuration designates `ingress` and `egress` control points as identified by
+[Istio integration](/self-hosting/integrations/istio/istio.md), the default
+filter configuration designates `ingress` and `egress` control points as
+identified by
 [PatchContext](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext)
 of Istio's EnvoyFilter CRD.
 
 ### Feature Control Points
 
-Feature control points are facilitated by the
-[Aperture SDKs](/integrations/sdk/sdk.md), which are available for a variety of
-popular programming languages. These SDKs allow any function call or code
-snippet within the service code to be wrapped as a feature control point. In
-Aperture's context, every execution of the feature is seen as a flow.
+Feature control points are facilitated by the [Aperture SDKs](/sdk/sdk.md),
+which are available for a variety of popular programming languages. These SDKs
+allow any function call or code snippet within the service code to be wrapped as
+a feature control point. In Aperture's context, every execution of the feature
+is seen as a flow.
 
 The SDK offers an API to initiate a flow, which corresponds to a
 [`flowcontrol.v1.Check`][flowcontrol-proto] call into the Agent. The response
@@ -106,7 +107,7 @@ entities belonging to the same service.
 ## Live Preview of Control Points
 
 Use the
-[`aperturectl flow-control control-points`](../reference/aperturectl/discovery/entities/)
+[`aperturectl flow-control control-points`](../reference/aperture-cli/aperturectl/discovery/entities/)
 CLI command to list active control points.
 
 For example:
