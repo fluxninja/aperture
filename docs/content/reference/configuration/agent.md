@@ -842,7 +842,7 @@ BatchAlerts configures batch alerts processor.
 
 <!-- vale on -->
 
-BatchPostrollup configures the OTel batch postprocessor.
+BatchPostrollup configures the OTel batch post-processor.
 
 </dd>
 <dt>batch_prerollup</dt>
@@ -854,7 +854,7 @@ BatchPostrollup configures the OTel batch postprocessor.
 
 <!-- vale on -->
 
-BatchPrerollup configures the OTel batch preprocessor.
+BatchPrerollup configures the OTel batch pre-processor.
 
 </dd>
 <dt>ports</dt>
