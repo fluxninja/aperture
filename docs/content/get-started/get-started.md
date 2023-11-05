@@ -71,7 +71,7 @@ ideal for situations like air-gapped environments.
    :::info
 
    For more details on fully self-hosted solutions, please refer to the
-   following [page](/self-hosting/).
+   following [page](/self-hosting/self-hosting.md).
 
    :::
 
@@ -80,11 +80,11 @@ ideal for situations like air-gapped environments.
    Aperture
 
    - [SDKs](../sdk/sdk.md)
-   - [Istio](/self-hosting/integrations/istio)
-   - [Gateways](/self-hosting/integrations/gateway)
-   - [Consul](/self-hosting/integrations/consul)
-   - [Auto Scale](/self-hosting/integrations/auto-scale)
-   - [Metrics](/self-hosting/integrations/metrics)
+   - [Istio](/self-hosting/integrations/istio/istio.md)
+   - [Gateways](/self-hosting/integrations/gateway/gateway.md)
+   - [Consul](/self-hosting/integrations/consul/consul.md)
+   - [Auto Scale](/self-hosting/integrations/auto-scale/auto-scale.md)
+   - [Metrics](/self-hosting/integrations/metrics/metrics.md)
 
 4. **Map to Aperture SaaS Controller**: Aperture Agent authenticates requests
    from integrations using Agent API keys, which can be created for your project

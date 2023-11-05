@@ -10,7 +10,7 @@ keywords:
 
 :::info
 
-For installation instructions, see [Set up CLI (aperturectl)](/reference/aperture-cli/aperture-cli.mdd).
+For installation instructions, see [Set up CLI (aperturectl)](/reference/aperture-cli/aperture-cli.md).
 
 :::
 

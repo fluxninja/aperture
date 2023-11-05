@@ -81,7 +81,7 @@ Concept & [Integrations](/sdk/sdk.md) section for more details.
 The Aperture JavaScript SDK allows you to set a control point manually. How an
 Aperture Client instance is created is not discussed in this guide; detailed
 information around SDK integration can be found in
-[Manually setting feature control points using JavaScript SDK](/sdk/javascript/manually-setting-feature-control-points-using-javascript-sdk).
+[Manually setting feature control points using JavaScript SDK](/sdk/javascript/manual.md).
 
 The code below provides a general idea of control point creation and setting
 labels.
