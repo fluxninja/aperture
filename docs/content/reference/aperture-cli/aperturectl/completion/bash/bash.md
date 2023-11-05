@@ -23,7 +23,7 @@ To load completions in your current shell session:
 
     source <(aperturectl completion bash)
 
-To load completions for every new session, run once:
+To load completions for every new session, execute once:
 
 #### Linux:
 

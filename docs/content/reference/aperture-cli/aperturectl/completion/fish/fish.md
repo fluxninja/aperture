@@ -20,7 +20,7 @@ To load completions in your current shell session:
 
     aperturectl completion fish | source
 
-To load completions for every new session, run once:
+To load completions for every new session, execute once:
 
     aperturectl completion fish > ~/.config/fish/completions/aperturectl.fish
 
