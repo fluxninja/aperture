@@ -4,7 +4,7 @@ description: Dynamically configuration of policy
 keywords:
   - policy
   - configuration
-sidebar_position: 3
+sidebar_position: 10
 ---
 
 Aperture's policies can be thought of as "Load Management Applications" running

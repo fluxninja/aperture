@@ -96,6 +96,9 @@ Aperture Agent is a binary that can be run on the
 [Supported Linux platforms](/self-hosting/supported-platforms.md). The
 installation steps are available [here](/self-hosting/agent/bare-metal.md).
 
+Note: Aperture Cloud also provides a hosted Agent for SDK integration, allowing
+you to use it by API instead of deploying your own Aperture Agents.
+
 ### What are Aperture Agent's performance numbers? {#agent-performance}
 
 The Aperture Agent is designed to be lightweight and performant.
