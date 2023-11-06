@@ -18,6 +18,7 @@ import (
 	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
+	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 var controllerConn utils.ControllerConn
@@ -284,12 +285,12 @@ func renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, outputDir, fil
 
 		if strings.HasSuffix(fileName, "-cr.yaml") {
 			// prepare data
-			circuit, componentsList, err := processPolicy(yamlBytes, outputFilePath, policyName)
+			circuit, graph, err := processPolicy(yamlBytes, outputFilePath, policyName)
 			if err != nil {
 				return err
 			}
 
-			err = generateDashboards(blueprintsURIRoot, blueprintsDir, string(yamlBytes), componentsList, policyName, outputDir)
+			err = generateDashboards(blueprintsURIRoot, blueprintsDir, string(yamlBytes), graph, policyName, outputDir)
 			if err != nil {
 				return err
 			}
@@ -460,15 +461,19 @@ func processPolicy(content []byte, policyPath string, policyName string) (*circu
 	if err != nil {
 		return nil, "", err
 	}
-	componentsList, err := utils.GetFlatComponentsList(circuit)
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), -1)
+	if err != nil {
+		return nil, "", err
+	}
+	graphJSON, err := json.Marshal(graph)
 	if err != nil {
 		return nil, "", err
 	}
 
-	return circuit, componentsList, nil
+	return circuit, string(graphJSON), nil
 }
 
-func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, componentsList, policyName, outputDir string) error {
+func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, graph, policyName, outputDir string) error {
 	dir := filepath.Join(filepath.Dir(outputDir), "dashboards")
 	// create the directory if it does not exist
 	err := os.MkdirAll(dir, os.ModePerm)
@@ -485,7 +490,7 @@ func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, components
 
 	vm.TLAReset()
 	vm.TLAVar("policyFile", policyFile)
-	vm.TLAVar("componentsList", componentsList)
+	vm.TLAVar("graph", graph)
 	vm.TLAVar("policyName", policyName)
 	vm.TLAVar("datasource", "controller-prometheus")
 
