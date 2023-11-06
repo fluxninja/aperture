@@ -45,7 +45,7 @@ func (*rateLimiter) IsActuator() bool { return true }
 // NewRateLimiterAndOptions creates fx options for RateLimiter.
 func NewRateLimiterAndOptions(
 	rateLimiterProto *policyprivatev1.RateLimiter,
-	_ runtime.ComponentID,
+	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (runtime.Component, fx.Option, error) {
 	s := rateLimiterProto.GetSelectors()
@@ -65,7 +65,7 @@ func NewRateLimiterAndOptions(
 		decision:          &policysyncv1.RateLimiterDecision{},
 		policyReadAPI:     policyReadAPI,
 		decisionEtcdPaths: decisionEtcdPaths,
-		componentID:       rateLimiterProto.GetParentComponentId(),
+		componentID:       componentID.String(),
 	}
 	return rl, fx.Options(fx.Invoke(rl.setup)), nil
 }

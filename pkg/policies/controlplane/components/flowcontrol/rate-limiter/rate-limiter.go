@@ -59,7 +59,7 @@ func ParseRateLimiter(
 		metrics.PolicyNameLabel,
 		policyReadAPI.GetPolicyName(),
 		metrics.ComponentIDLabel,
-		componentID,
+		componentID.String(),
 	)
 
 	policyParamsRejected := fmt.Sprintf("%s,%s=\"%s\"", policyParams, metrics.DecisionTypeLabel, metrics.DecisionTypeRejected)
