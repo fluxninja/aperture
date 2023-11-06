@@ -1,6 +1,6 @@
 ---
 title: Rate Limiter
-sidebar_position: 11
+sidebar_position: 5
 ---
 
 :::info See also

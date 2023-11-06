@@ -1,7 +1,7 @@
 ---
 title: Create Your First Policy
 sidebar_label: Create Your First Policy
-description: How to generate and apply policies in Aperture
+description: How to generate and apply policies in Aperture Cloud
 keywords:
   - policy
   - jsonnet
@@ -11,245 +11,54 @@ sidebar_position: 3
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Introduction
+To simplify the process of creating policies in Aperture Cloud, it includes UI
+Policy Builder. Providing several [blueprints][blueprints] that can help you
+generate [policies][policies] according to the use case. These blueprints serve
+as starting points for creating new policies, or can be used as-is by providing
+the required parameters or customizations.
 
-To simplify the process of creating policies in Aperture, the built-in blueprint
-system can be utilized. The Aperture repository contains several
-[blueprints][blueprints] that can generate [policies][policies], and [Grafana
-dashboards][grafana]. These blueprints serve as starting points for creating new
-policies, or can be used as-is by providing the required parameters or
-customizations. The [guides](/guides/guides.md) section showcases practical
-examples of blueprints in action.
+Let's see how to create a policy in Aperture Cloud.
 
-To manage blueprints and generate policies, use the
-[aperturectl](/reference/aperturectl/aperturectl.md) CLI.
+Before beginning, ensure you've [signed up][] and created an organization and
+project
 
-<Zoom>
+1. To create & deploy a policy, head over to the policies dashboard. click on
+   **Create Policy** button. ![Policies Dashboard](./assets/2-create-policy.png)
+2. Now, you will be directed to use case selection page. Select the use case for
+   which you want to create a Policy.
 
-```mermaid
-{@include: ./assets/blueprints.mmd}
-```
+   ![Use Case Selection](./assets/3-use-case-selection.png)
 
-</Zoom>
+3. After choosing the use case, select the Blueprint to customize.
 
-## Listing Available Blueprints
+   ![Blueprint Selection](./assets/4-choose-blueprint.png)
 
-The following command can be used to list available blueprints:
+4. It will open the Blueprint in the Policy Builder, allowing you to customize
+   it according to your requirements. This editor offers syntax highlighting,
+   auto-completion, and linting features for your convenience. If there is a
+   syntax error in the policy, the editor will highlight the line and provide
+   you with an error message, as shown in the example below.
 
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints list --version={apertureVersion}</CodeBlock>
-```
+   ![Policy Builder](./assets/5-customize-blueprint.png)
 
-Which will output the following:
+5. Once you have completed the customization, the next step will provide you
+   with the draft policy and an overview of the policy before the final
+   submission.
 
-```bash
-auto-scaling/pod-auto-scaler
-load-ramping/base
-load-scheduling/average-latency
-load-scheduling/postgresql
-load-scheduling/promql
-quota-scheduling/base
-rate-limiting/base
-```
+   ![Deploy Policy](./assets/7-review-the-draft.png)
 
-## Customizing Blueprints
+6. After submitting, it will redirect to the policies dashboard, where you can
+   see the policy status. It will take some time to deploy the policy. Once the
+   policy is deployed, you can see the status as **Applied**.
 
-Blueprints use a configuration file to provide required fields and to customize
-the generated policy and dashboard files.
+   ![Policy Status](./assets/8-policy-applied.png)
 
-For example, to generate a `policies/rate-limiting` policy, you can first
-generate a `values.yaml` file using the following command:
+7. Now, you can see the policy in the policy dashboard. You can also edit,
+   delete, and view the policy from here.
 
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=rate-limiting/base --version={apertureVersion} --output-file=values.yaml</CodeBlock>
-```
-
-You can then edit the `values.yaml` to provide the required fields
-(`__REQUIRED_FIELD__` placeholder) as follows:
-
-<Tabs>
-<TabItem value="Final/Edited Values">
-
-```yaml
-{@include: ./assets/values.yaml}
-```
-
-</TabItem>
-<TabItem value="Placeholder Values">
-
-```yaml
-{@include: ./assets/raw_values.yaml}
-```
-
-</TabItem>
-</Tabs>
-
-## Generating Policies and Dashboards {#generating-policies}
-
-Once the `values.yaml` file is ready, you can generate the blueprint using the
-following command:
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
-```
-
-The following directory structure will be generated:
-
-```bash
-policy-gen
-├── dashboards
-│   └── rate-limiting.json
-├── graphs
-│   ├── rate-limiting.dot
-│   └── rate-limiting.mmd
-└── policies
-│   ├── rate-limiting-cr.yaml
-│   └── rate-limiting.yaml
-```
-
-## Applying Policies
-
-The generated policies can be applied using `aperturectl` or `kubectl`.
-
-```mdx-code-block
-<Tabs>
-<TabItem value="aperture-cloud" label="Aperture Cloud">
-```
-
-You can pass the `--apply` flag with the `aperturectl cloud` to directly apply
-the generated policies on the Aperture Cloud Controller.
-
-:::info
-
-See [Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md) for more
-information on how to configure what aperturectl should connect to.
-
-:::
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl cloud policy apply --file policy-gen/policies/rate-limiting.yaml</CodeBlock>
-```
-
-Run the following command to check if the policy was created.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl cloud policies</CodeBlock>
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="self-hosting" label="Self Hosting">
-```
-
-```mdx-code-block
-<Tabs>
-<TabItem value="Kubernetes Operator" label="Kubernetes Operator">
-```
-
-If the Aperture Controller is deployed on
-[Kubernetes using Operator](/get-started/self-hosting/controller/kubernetes/operator/operator.md),
-you can apply the policy using the following command:
-
-```mdx-code-block
-<CodeBlock language="bash">kubectl apply -f policy-gen/configuration/rate-limiting-cr.yaml -n aperture-controller</CodeBlock>
-```
-
-Run the following command to check if the policy was created.
-
-```mdx-code-block
-<CodeBlock language="bash">kubectl get policies.fluxninja.com -n aperture-controller</CodeBlock>
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="Kubernetes Namespace-scoped" label="Kubernetes Namespace-scoped">
-```
-
-If the Aperture Controller is deployed on
-[Kubernetes using Namespace-scoped](/get-started/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
-you can apply the policy using the following command:
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --kube --controller-ns aperture-controller</CodeBlock>
-```
-
-Run the following command to check if the policy was created.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl policies --controller-ns aperture-controller</CodeBlock>
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="Docker" label="Docker">
-```
-
-If the Aperture Controller is deployed on
-[Docker](/get-started/self-hosting/controller/docker.md), you can apply the
-policy using the following command:
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl policy apply --file policy-gen/policies/rate-limiting.yaml --controller localhost:8080 --insecure</CodeBlock>
-```
-
-Run the following command to check if the policy was created.
-
-```mdx-code-block
-<CodeBlock language="bash">aperturectl policies --controller localhost:8080 --insecure</CodeBlock>
-```
-
-```mdx-code-block
-</TabItem>
-</Tabs>
-</TabItem>
-</Tabs>
-```
-
----
-
-The policy runtime can be visualized in [Aperture Cloud][aperture-cloud],
-Grafana or any other Prometheus compatible analytics tool. Refer to the
-Prometheus compatible metrics available from the
-[controller][controller-metrics] and [agent][agent-metrics]. Some policy
-[blueprints][blueprints] come with recommended Grafana dashboards.
-
-## Deleting Policies
-
-Run the following command to delete the above policy:
-
-```mdx-code-block
-<Tabs>
-<TabItem value="aperturectl" label="aperturectl">
-```
-
-```bash
-aperturectl policy delete --policy=rate-limiting
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="kubectl" label="kubectl">
-```
-
-```bash
-kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
-```
-
-```mdx-code-block
-</TabItem>
-</Tabs>
-```
-
-[controller-metrics]: /reference/observability/prometheus-metrics/controller.md
-[agent-metrics]: /reference/observability/prometheus-metrics/agent.md
 [blueprints]: /reference/blueprints/blueprints.md
 [policies]: /concepts/advanced/policy.md
-[grafana]: https://grafana.com/docs/grafana/latest/dashboards/
-[aperture-cloud]: /introduction.md
+[signed up]: /get-started/sign-up.md

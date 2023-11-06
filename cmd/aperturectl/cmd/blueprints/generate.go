@@ -40,7 +40,7 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate Aperture Policy related resources from Aperture Blueprints",
 	Long: `
-Use this command to generate Aperture Policy related resources like Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
+Use this command to generate Aperture Policy related resources such as Kubernetes Custom Resource, Grafana Dashboards and graphs in DOT and Mermaid format.`,
 	SilenceErrors: true,
 	Example: `aperturectl blueprints generate --values-file=rate-limiting.yaml
 

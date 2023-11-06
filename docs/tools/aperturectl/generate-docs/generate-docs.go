@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	docsDir := filepath.Join(root.Path, "docs/content/reference/aperturectl")
+	docsDir := filepath.Join(root.Path, "docs/content/reference/aperture-cli/aperturectl")
 
 	// remove all subdirectories within the docsDir except docsDir itself
 	err = filepath.Walk(docsDir, func(path string, info os.FileInfo, err error) error {
@@ -122,7 +122,7 @@ keywords:
 	if strings.HasSuffix(filename, "aperturectl.md") {
 		template += `:::info
 
-For installation instructions, see [Set up CLI (aperturectl)](/get-started/setup-cli/setup-cli.md).
+For installation instructions, see [Aperture CLI Docs](/reference/aperture-cli/aperture-cli.md).
 
 :::
 
@@ -137,5 +137,5 @@ See also [aperturectl configuration file format reference](/reference/configurat
 }
 
 func linkHandler(name string) string {
-	return filepath.Join("/reference/aperturectl", transform(name))
+	return filepath.Join("/reference/aperture-cli/aperturectl", transform(name))
 }

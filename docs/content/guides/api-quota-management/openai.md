@@ -62,31 +62,26 @@ Before you begin with this guide, verify the prerequisites are fulfilled.
 - Aperture is installed and running. If not, follow the
   [get started guide](../../get-started/get-started.md).
 - `aperturectl` is installed and configured. If not, head over to
-  [Set up CLI (aperturectl) guide](../../get-started/setup-cli/setup-cli.md).
+  [Set up CLI (aperturectl) guide](../../reference/aperture-cli/aperture-cli.md).
 
 ## Configuration
 
 Before creating a policy, a control point needs to be defined. Control Point
 specifies where the policy should apply the decisions. There are multiple ways
 to achieve this; for the scope of this guide, a JavaScript SDK is used to create
-a control point—check out the
-[Control Point](https://docs.fluxninja.com/concepts/control-point) Concept &
-[Integrations](https://docs.fluxninja.com/integrations/) section for more
-details.
+a control point—check out the [Control Point](/concepts/control-point.md)
+Concept & [Integrations](/sdk/sdk.md) section for more details.
 
 ### Control Point with JavaScript SDK
 
 :::info
 
-💡
-[Check out other language SDKs supported by Aperture](/integrations/integrations.md)
-
-:::
+💡 [Check out other language SDKs supported by Aperture](/sdk/sdk.md) :::
 
 The Aperture JavaScript SDK allows you to set a control point manually. How an
 Aperture Client instance is created is not discussed in this guide; detailed
 information around SDK integration can be found in
-[Manually setting feature control points using JavaScript SDK](/integrations/sdk/javascript/manually-setting-feature-control-points-using-javascript-sdk).
+[Manually setting feature control points using JavaScript SDK](/sdk/javascript/manual.md).
 
 The code below provides a general idea of control point creation and setting
 labels.
@@ -211,12 +206,12 @@ the following command:
 The values file needs to be adjusted to match the application requirements -
 
 - `policy_name`: Name of the policy — This value should be unique and required.
-- `bucket_capacity`: This value defines burst capacity. E.g. in the case of
-  `gpt-4` tokens per minute policy, the bucket will have a capacity of
+- `bucket_capacity`: This value defines burst capacity. For example, in the case
+  of `gpt-4` tokens per minute policy, the bucket will have a capacity of
   `40000 tokens`.
 - `fill_amount`: After the tokens are consumed, the bucket will be filled with
-  this amount. E.g. in the case of `gpt-4` tokens per minute policy, the bucket
-  will fill at `40000 tokens per minute`.
+  this amount. For example, in the case of `gpt-4` tokens per minute policy, the
+  bucket will fill at `40000 tokens per minute`.
 - `rate_limiter`:
   - `interval`: Interval at which the rate limiter will be filled. When to reset
     the bucket.

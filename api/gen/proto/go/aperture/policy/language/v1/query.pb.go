@@ -108,7 +108,7 @@ type PromQL struct {
 	//
 	// :::info Usage with Flux Meter
 	//
-	// [Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
+	// [Flux Meter](/concepts/advanced/flux-meter.md) metrics can be queried using PromQL. Flux Meter defines histogram type of metrics in Prometheus.
 	// Therefore, one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
 	// The particular Flux Meter can be identified with the `flux_meter_name` label.
 	// There are additional labels available on a Flux Meter such as `valid`, `flow_status`, `http_status_code` and `decision_type`.
@@ -117,7 +117,7 @@ type PromQL struct {
 	//
 	// :::info Usage with OpenTelemetry Metrics
 	//
-	// Aperture supports OpenTelemetry metrics. See [reference](/integrations/metrics/metrics.md) for more details.
+	// Aperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.
 	//
 	// :::
 	QueryString string `protobuf:"bytes,2,opt,name=query_string,json=queryString,proto3" json:"query_string,omitempty"`

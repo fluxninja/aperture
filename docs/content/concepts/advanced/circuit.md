@@ -1,6 +1,6 @@
 ---
 title: Circuit
-sidebar_position: 2
+sidebar_position: 9
 ---
 
 :::info See also
