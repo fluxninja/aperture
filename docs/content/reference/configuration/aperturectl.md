@@ -19,7 +19,7 @@ precedence).
 
 When any explicit flag related to controller location (e.g., `--kube`,
 `--controller`, `--api-key` or `--project-name`) is used, the value from the
-configuration file are ignored for the flag.
+configuration file is ignored for the flag.
 
 If the configuration file is not specified nor present at the default location,
 aperturectl will try to find the controller at the local Kubernetes cluster (as
