@@ -76,7 +76,9 @@ Concept & [Integrations](/sdk/sdk.md) section for more details.
 
 :::info
 
-💡 [Check out other language SDKs supported by Aperture](/sdk/sdk.md) :::
+💡 [Check out other language SDKs supported by Aperture](/sdk/sdk.md)
+
+:::
 
 The Aperture JavaScript SDK allows you to set a control point manually. How an
 Aperture Client instance is created is not discussed in this guide; detailed
