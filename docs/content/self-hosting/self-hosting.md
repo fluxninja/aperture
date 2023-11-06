@@ -5,6 +5,10 @@ keywords:
   - self-hosted
 ---
 
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+```
+
 The easiest way to install Aperture is to install just [set up the
 integrations][setup-integrations] and point them to [Aperture
 Cloud][aperture-cloud], which also [provides the Aperture
@@ -18,6 +22,8 @@ Note that [Aperture Cloud can integrate][extension-config] with Self-Hosted
 Controller And Agent too, providing an easy way to manage policies and a
 holistic view of the infrastructure, along with tools for OLAP analysis of
 traffic.
+
+<DocCardList />
 
 [aperture-cloud]: /introduction.md
 [cloud-controller]: /reference/fluxninja.md#cloud-controller
