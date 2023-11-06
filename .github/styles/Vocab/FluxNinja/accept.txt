@@ -118,3 +118,5 @@ GPUs
 [Tt]okenizer
 Serverless
 onboarding
+Duolingo
+[Ww]avepool
