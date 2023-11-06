@@ -11,6 +11,7 @@ sidebar_position: 1
 import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
+import TabItem from "@theme/TabItem";
 import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
 ```
@@ -34,8 +35,8 @@ this policy.
 :::tip
 
 Classification rules can be written based on
-[HTTP requests](/concepts/classifier.md#live-previewing-requests), and scheduler
-priorities can be defined based on
+[HTTP requests](/concepts/advanced/classifier.md#live-previewing-requests), and
+scheduler priorities can be defined based on
 [Flow Labels](/concepts/flow-label.md#live-previewing-flow-labels) by live
 previewing them first using introspection APIs.
 
@@ -152,6 +153,6 @@ time, and rejects the rest of the requests.
 
 ![GraphQL Status Rate Limiting](./assets/graphql/dashboard.png)
 
-[rego-rules]: /concepts/classifier.md#rego
+[rego-rules]: /concepts/advanced/classifier.md#rego
 [flow-label]: /concepts/flow-label.md
-[classifier]: /concepts/classifier.md
+[classifier]: /concepts/advanced/classifier.md

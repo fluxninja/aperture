@@ -70,8 +70,8 @@ public class AppController {
         registrationBean.setFilter(new ApertureFilter());
         registrationBean.addUrlPatterns("/super");
 
-        registrationBean.addInitParameter("agent_host", "localhost");
-        registrationBean.addInitParameter("agent_port", "8089");
+        registrationBean.addInitParameter("agent_address", "ORGANIZATION.app.fluxninja.com:443");
+        registrationBean.addInitParameter("agent_api_key", "AGENT_API_KEY");
 
         return registrationBean;
     }
@@ -81,16 +81,9 @@ public class AppController {
 :::info
 
 Aperture provides different middlewares for different java frameworks, which you
-can check out in the [Java section](/integrations/sdk/java/java.md). There are
-examples available for each framework.
+can check out in the [Java section](../../sdk/java/java.md). There are examples
+available for each framework.
 
 :::
 
 <!-- vale off -->
-
-## What's next?
-
-<!-- vale on -->
-
-Once the middleware insertion is done, head over to
-[install Aperture](/get-started/installation/installation.md).

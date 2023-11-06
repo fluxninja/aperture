@@ -1,7 +1,7 @@
 ---
 title: Flow Lifecycle
 sidebar_label: Flow Lifecycle
-sidebar_position: 5
+sidebar_position: 3
 keywords:
   - flows
   - services
@@ -45,17 +45,18 @@ components for that stage.
 
 - [**Selectors**](./selector.md) are the criteria used to determine the
   components that will be applied to a flow in the subsequent stages.
-- [**Classifiers**](./classifier.md) perform the task of assigning labels to the
-  flow based on the HTTP attributes of the request. However, classifiers are
-  only pertinent for HTTP or gRPC _Control Points_ and do not apply to flows
-  associated with feature _Control Points_.
-- [**FluxMeters**](./flux-meter.md) are employed to meter the flows, generating
-  metrics like latency, request counts, or other arbitrary telemetry based on
-  access logs. They transform request flux that matches certain criteria into
-  Prometheus histograms, enabling enhanced observability and control.
-- [**Samplers**](./load-ramp.md#sampler) manage load by permitting a portion of
-  flows to be accepted, while immediately dropping the remainder with a
-  forbidden status code. They are particularly useful in scenarios such as
+- [**Classifiers**](./advanced/classifier.md/) perform the task of assigning
+  labels to the flow based on the HTTP attributes of the request. However,
+  classifiers are only pertinent for HTTP or gRPC _Control Points_ and do not
+  apply to flows associated with feature _Control Points_.
+- [**FluxMeters**](./advanced/flux-meter.md) are employed to meter the flows,
+  generating metrics like latency, request counts, or other arbitrary telemetry
+  based on access logs. They transform request flux that matches certain
+  criteria into Prometheus histograms, enabling enhanced observability and
+  control.
+- [**Samplers**](./advanced/load-ramp.md#sampler) manage load by permitting a
+  portion of flows to be accepted, while immediately dropping the remainder with
+  a forbidden status code. They are particularly useful in scenarios such as
   feature rollouts.
 - [**Rate-Limiters**](./rate-limiter.md) proactively guard against abuse by
   regulating excessive requests in accordance with per-label limits.

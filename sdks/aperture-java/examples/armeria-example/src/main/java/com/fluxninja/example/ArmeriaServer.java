@@ -49,39 +49,27 @@ public class ArmeriaServer {
         };
     }
 
+    public static String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return value != null ? value : defaultValue;
+    }
+
     public static void main(String[] args) {
-        String agentHost = System.getenv("APERTURE_AGENT_ADDRESS");
-        if (agentHost == null) {
-            agentHost = DEFAULT_AGENT_ADDRESS;
-        }
-        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
-        if (agentAPIKey == null) {
-            agentAPIKey = "";
-        }
-        String appPort = System.getenv("FN_APP_PORT");
-        if (appPort == null) {
-            appPort = DEFAULT_APP_PORT;
-        }
-        String rampModeString = System.getenv("FN_ENABLE_RAMP_MODE");
-        if (rampModeString == null) {
-            rampModeString = DEFAULT_RAMP_MODE;
-        }
+        String agentHost = getEnv("APERTURE_AGENT_ADDRESS", DEFAULT_AGENT_ADDRESS);
+        String agentAPIKey = getEnv("APERTURE_AGENT_API_KEY", "");
+
+        String appPort = getEnv("APERTURE_APP_PORT", DEFAULT_APP_PORT);
+
+        String rampModeString = getEnv("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
         boolean rampMode = Boolean.parseBoolean(rampModeString);
 
-        String controlPointName = System.getenv("FN_CONTROL_POINT_NAME");
-        if (controlPointName == null) {
-            controlPointName = DEFAULT_CONTROL_POINT_NAME;
-        }
-        String insecureGrpcString = System.getenv("FN_INSECURE_GRPC");
-        if (insecureGrpcString == null) {
-            insecureGrpcString = DEFAULT_INSECURE_GRPC;
-        }
+        String controlPointName = getEnv("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
+
+        String insecureGrpcString = getEnv("APERTURE_AGENT_INSECURE", DEFAULT_INSECURE_GRPC);
+
         boolean insecureGrpc = Boolean.parseBoolean(insecureGrpcString);
 
-        String rootCertFile = System.getenv("FN_ROOT_CERTIFICATE_FILE");
-        if (rootCertFile == null) {
-            rootCertFile = DEFAULT_ROOT_CERT;
-        }
+        String rootCertFile = getEnv("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);
 
         ApertureSDK apertureSDK;
         try {

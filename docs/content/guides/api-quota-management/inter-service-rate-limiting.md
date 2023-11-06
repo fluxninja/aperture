@@ -12,6 +12,7 @@ sidebar_position: 1
 import {apertureVersion} from '../../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
+import TabItem from "@theme/TabItem";
 import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
 ```

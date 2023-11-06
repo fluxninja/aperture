@@ -6,7 +6,7 @@ keywords:
   - priority
   - queuing
   - actuators
-sidebar_position: 12
+sidebar_position: 6
 ---
 
 :::info See Also
@@ -39,9 +39,10 @@ employing distinct types of token buckets. The _Load Scheduler_ uses a token
 bucket local to each agent, which gets adjusted based on the past token rate at
 the agent. This is useful for service protection scenarios since it provides a
 robust mechanism to relatively adjust the token rate. The _Quota Scheduler_,
-uses a centralized token bucket within an [agent group](../agent-group.md). This
-is useful for scenarios involving known limits, such as third-party API rate
-limits or inter-service API quotas.
+uses a centralized token bucket within an
+[agent group](../advanced/agent-group.md). This is useful for scenarios
+involving known limits, such as third-party API rate limits or inter-service API
+quotas.
 
 ### Workload {#workload}
 

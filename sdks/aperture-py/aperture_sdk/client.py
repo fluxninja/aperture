@@ -21,6 +21,7 @@ from aperture_sdk.const import (
 )
 from aperture_sdk.flow import Flow
 from aperture_sdk.utils import TWrappedReturn, run_fn
+from grpc import AuthMetadataContext, AuthMetadataPluginCallback
 from opentelemetry import baggage, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
@@ -31,6 +32,16 @@ from opentelemetry.util import types as otel_types
 TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
 TWrappedFunction = Callable[..., TWrappedReturn]
 Labels = Dict[str, str]
+
+
+class ApertureCloudAuthMetadataPlugin(grpc.AuthMetadataPlugin):
+    def __init__(self, agent_api_key):
+        self.agent_api_key = agent_api_key
+
+    def __call__(
+        self, context: AuthMetadataContext, callback: AuthMetadataPluginCallback
+    ) -> None:
+        callback((("x-api-key", self.agent_api_key),), None)
 
 
 class ApertureClient:
@@ -71,13 +82,13 @@ class ApertureClient:
         if not credentials:
             credentials = grpc.ssl_channel_credentials()
         if agent_api_key:
+            metadata_plugin_instance = ApertureCloudAuthMetadataPlugin(agent_api_key)
+
             credentials = grpc.composite_channel_credentials(
                 credentials,
                 grpc.metadata_call_credentials(
-                    metadata_plugin=lambda _, callback: callback(
-                        (("apikey", agent_api_key),), None
-                    ),
-                    name="apikey",
+                    metadata_plugin=metadata_plugin_instance,
+                    name="x-api-key",
                 ),
             )
         otlp_exporter = OTLPSpanExporter(

@@ -34,6 +34,13 @@ At a high level, this policy works as follows:
   decreases) the token bucket fill rates based on the incoming token rate
   observed at each agent.
 
+The following PromQL query (with appropriate filters) is used as `SIGNAL` for
+the load scheduler:
+
+```promql
+sum(increase(flux_meter_sum))/sum(increase(flux_meter_count))
+```
+
 :::info
 
 See reference for the
@@ -519,7 +526,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 :::note
 
 The following configuration parameters can be
-[dynamically configured](/reference/aperturectl/dynamic-config/apply/apply.md)
+[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
 at runtime, without reloading the policy.
 
 :::

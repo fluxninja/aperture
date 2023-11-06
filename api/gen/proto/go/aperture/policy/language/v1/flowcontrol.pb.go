@@ -1048,7 +1048,7 @@ func (x *AdaptiveLoadScheduler) GetDryRunConfigKey() string {
 //
 // :::info
 //
-// See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
+// See also [_Sampler_ overview](/concepts/advanced/load-ramp.md#sampler).
 //
 // :::
 type Sampler struct {
@@ -1225,7 +1225,7 @@ func (x *LoadRamp) GetPassThroughLabelValuesConfigKey() string {
 //
 // :::info
 //
-// See also [Flux Meter overview](/concepts/flux-meter.md).
+// See also [Flux Meter overview](/concepts/advanced/flux-meter.md).
 //
 // :::
 // Example:
@@ -1260,7 +1260,7 @@ type FluxMeter struct {
 	// :::info
 	//
 	// For list of available attributes in Envoy access logs, refer
-	// [Envoy Filter](/integrations/istio/istio.md#envoy-filter)
+	// [Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
 	//
 	// :::
 	AttributeKey string `protobuf:"bytes,6,opt,name=attribute_key,json=attributeKey,proto3" json:"attribute_key,omitempty" default:"workload_duration_ms"` // @gotags: default:"workload_duration_ms"
@@ -1381,7 +1381,7 @@ func (*FluxMeter_ExponentialBucketsRange_) isFluxMeter_HistogramBuckets() {}
 //
 // :::info
 //
-// See also [Classifier overview](/concepts/classifier.md).
+// See also [Classifier overview](/concepts/advanced/classifier.md).
 //
 // :::
 // Example
@@ -1584,7 +1584,7 @@ func (*Rule_Extractor) isRule_Source() {}
 //
 // :::info
 //
-// You can use the [live-preview](/concepts/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
+// You can use the [live-preview](/concepts/advanced/classifier.md#live-previewing-requests) feature to first preview the input to the classifier before writing the labeling logic.
 //
 // :::
 //

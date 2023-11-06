@@ -15,11 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
@@ -73,11 +76,19 @@ func (w *watcher) Start() error {
 			utilruntime.Must(api.AddToScheme(scheme))
 
 			mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-				Scheme:             scheme,
-				MetricsBindAddress: "0",
-				LeaderElection:     false,
-				Namespace:          os.Getenv("APERTURE_CONTROLLER_NAMESPACE"),
-			})
+				Scheme: scheme,
+				Metrics: server.Options{
+					BindAddress: "0",
+				},
+				LeaderElection: false,
+				NewCache: func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
+					opts.DefaultNamespaces = map[string]cache.Config{
+						os.Getenv("APERTURE_CONTROLLER_NAMESPACE"): {},
+					}
+					return cache.New(config, opts)
+				},
+			},
+			)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to create Kubernetes Reconciler for Policy")
 				return nil

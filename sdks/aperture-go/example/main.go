@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
+	"google.golang.org/grpc/credentials/insecure"
 
 	aperturego "github.com/fluxninja/aperture-go/v2/sdk"
 	aperturegomiddleware "github.com/fluxninja/aperture-go/v2/sdk/middleware"
@@ -33,13 +34,16 @@ type app struct {
 }
 
 // grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcOptions() []grpc.DialOption {
+func grpcOptions(insecureMode bool) []grpc.DialOption {
 	var grpcDialOptions []grpc.DialOption
 	grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff:           backoff.DefaultConfig,
 		MinConnectTimeout: time.Second * 10,
 	}))
 	grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
+	if insecureMode {
+		grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
 
 	return grpcDialOptions
 }
@@ -50,11 +54,9 @@ func main() {
 	stdr.SetVerbosity(2)
 
 	opts := aperturego.Options{
-		Address:         getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
-		GRPCDialOptions: grpcOptions(),
-		AgentAPIKey:     getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
-		Insecure:        getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false),
-		SkipVerify:      getBoolEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false),
+		Address:     getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
+		DialOptions: grpcOptions(getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false)),
+		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.
@@ -63,7 +65,7 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	appPort := getEnvOrDefault("FN_APP_PORT", defaultAppPort)
+	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
 	mux := mux.NewRouter()
 	a := &app{

@@ -115,7 +115,8 @@ setpoint. The condition must be one of:
 
 <!-- vale off -->
 
-([AIADLoadSchedulerParameters](#a-i-a-d-load-scheduler-parameters))
+([AIADLoadSchedulerParameters](#a-i-a-d-load-scheduler-parameters),
+**required**)
 
 <!-- vale on -->
 
@@ -153,7 +154,7 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -165,7 +166,7 @@ The setpoint input to the controller.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -239,7 +240,7 @@ token rate.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -277,7 +278,7 @@ the overloaded state, up until the `max_load_multiplier` is reached.
 
 <!-- vale off -->
 
-([LoadSchedulerParameters](#load-scheduler-parameters))
+([LoadSchedulerParameters](#load-scheduler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -389,7 +390,8 @@ Output ports for the _AIMD Load Scheduler_.
 
 <!-- vale off -->
 
-([AIMDLoadSchedulerParameters](#a-i-m-d-load-scheduler-parameters))
+([AIMDLoadSchedulerParameters](#a-i-m-d-load-scheduler-parameters),
+**required**)
 
 <!-- vale on -->
 
@@ -427,7 +429,7 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -439,7 +441,7 @@ The setpoint input to the controller.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -513,7 +515,7 @@ token rate.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -525,7 +527,7 @@ Configuration parameters for the embedded Alerter.
 
 <!-- vale off -->
 
-([GradientControllerParameters](#gradient-controller-parameters))
+([GradientControllerParameters](#gradient-controller-parameters), **required**)
 
 <!-- vale on -->
 
@@ -550,7 +552,7 @@ the overloaded state, up until the `max_load_multiplier` is reached.
 
 <!-- vale off -->
 
-([LoadSchedulerParameters](#load-scheduler-parameters))
+([LoadSchedulerParameters](#load-scheduler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -624,7 +626,7 @@ Configuration key for setting dry run mode through dynamic configuration.
 
 <!-- vale off -->
 
-([AdaptiveLoadSchedulerIns](#adaptive-load-scheduler-ins))
+([AdaptiveLoadSchedulerIns](#adaptive-load-scheduler-ins), **required**)
 
 <!-- vale on -->
 
@@ -648,7 +650,8 @@ Collection of output ports for the _Adaptive Load Scheduler_ component.
 
 <!-- vale off -->
 
-([AdaptiveLoadSchedulerParameters](#adaptive-load-scheduler-parameters))
+([AdaptiveLoadSchedulerParameters](#adaptive-load-scheduler-parameters),
+**required**)
 
 <!-- vale on -->
 
@@ -686,7 +689,7 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -698,7 +701,7 @@ The setpoint input to the controller.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -774,7 +777,7 @@ Parameters for the _Adaptive Load Scheduler_ component.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -786,7 +789,7 @@ Configuration parameters for the embedded Alerter.
 
 <!-- vale off -->
 
-([GradientControllerParameters](#gradient-controller-parameters))
+([GradientControllerParameters](#gradient-controller-parameters), **required**)
 
 <!-- vale on -->
 
@@ -811,7 +814,7 @@ the overloaded state, up until the `max_load_multiplier` is reached.
 
 <!-- vale off -->
 
-([LoadSchedulerParameters](#load-scheduler-parameters))
+([LoadSchedulerParameters](#load-scheduler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -912,7 +915,7 @@ Input ports for the Alerter component.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -1353,7 +1356,7 @@ List of _Controllers_ for scaling out.
 
 <!-- vale off -->
 
-([AutoScalerScalingBackend](#auto-scaler-scaling-backend))
+([AutoScalerScalingBackend](#auto-scaler-scaling-backend), **required**)
 
 <!-- vale on -->
 
@@ -1363,7 +1366,7 @@ List of _Controllers_ for scaling out.
 
 <!-- vale off -->
 
-([AutoScalerScalingParameters](#auto-scaler-scaling-parameters))
+([AutoScalerScalingParameters](#auto-scaler-scaling-parameters), **required**)
 
 <!-- vale on -->
 
@@ -1409,7 +1412,7 @@ KubernetesReplicas defines a horizontal pod scaler for Kubernetes.
 
 <!-- vale off -->
 
-([KubernetesObjectSelector](#kubernetes-object-selector))
+([KubernetesObjectSelector](#kubernetes-object-selector), **required**)
 
 <!-- vale on -->
 
@@ -1554,7 +1557,7 @@ computation is less than one. Defaults to 10% of current scale value.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -1584,7 +1587,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -1769,7 +1772,7 @@ Set of classification rules sharing a common selector
 
 :::info
 
-See also [Classifier overview](/concepts/classifier.md).
+See also [Classifier overview](/concepts/advanced/classifier.md).
 
 ::: Example
 
@@ -1947,7 +1950,7 @@ Decider emits the binary result of comparison operator on two operands.
 
 <!-- vale off -->
 
-([Differentiator](#differentiator))
+([Differentiator](#differentiator), **DEPRECATED**)
 
 <!-- vale on -->
 
@@ -2723,7 +2726,7 @@ Output ports for the EMA component.
 
 <!-- vale off -->
 
-([EMAParameters](#e-m-a-parameters))
+([EMAParameters](#e-m-a-parameters), **required**)
 
 <!-- vale on -->
 
@@ -3082,7 +3085,7 @@ Output ports for the Extrapolator component.
 
 <!-- vale off -->
 
-([ExtrapolatorParameters](#extrapolator-parameters))
+([ExtrapolatorParameters](#extrapolator-parameters), **required**)
 
 <!-- vale on -->
 
@@ -3277,7 +3280,7 @@ to features within a service.
 
 <!-- vale off -->
 
-([AdaptiveLoadScheduler](#adaptive-load-scheduler))
+([AdaptiveLoadScheduler](#adaptive-load-scheduler), **DEPRECATED**)
 
 <!-- vale on -->
 
@@ -3444,7 +3447,7 @@ histogram created by Flux Meter measures the workload latency by default.
 
 :::info
 
-See also [Flux Meter overview](/concepts/flux-meter.md).
+See also [Flux Meter overview](/concepts/advanced/flux-meter.md).
 
 ::: Example:
 
@@ -3487,7 +3490,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/integrations/istio/istio.md#envoy-filter)
+[Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
 
 :::
 
@@ -3817,7 +3820,7 @@ Output ports of the Gradient Controller.
 
 <!-- vale off -->
 
-([GradientControllerParameters](#gradient-controller-parameters))
+([GradientControllerParameters](#gradient-controller-parameters), **required**)
 
 <!-- vale on -->
 
@@ -4307,7 +4310,7 @@ configuration using format `${ENV_VAR_NAME}`.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
 
 :::
 
@@ -5006,7 +5009,7 @@ previous step's `target_accept_percentage` to the next
 
 <!-- vale off -->
 
-([LoadRampParameters](#load-ramp-parameters))
+([LoadRampParameters](#load-ramp-parameters), **required**)
 
 <!-- vale on -->
 
@@ -5155,7 +5158,7 @@ Parameters for the _Load Ramp_ component.
 
 <!-- vale off -->
 
-([SamplerParameters](#sampler-parameters))
+([SamplerParameters](#sampler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -5285,7 +5288,7 @@ Configuration key for setting dry run mode through dynamic configuration.
 
 <!-- vale off -->
 
-([LoadSchedulerIns](#load-scheduler-ins))
+([LoadSchedulerIns](#load-scheduler-ins), **required**)
 
 <!-- vale on -->
 
@@ -5309,7 +5312,7 @@ Output ports for the LoadScheduler component.
 
 <!-- vale off -->
 
-([LoadSchedulerParameters](#load-scheduler-parameters))
+([LoadSchedulerParameters](#load-scheduler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -6108,7 +6111,7 @@ $$
 
 <!-- vale off -->
 
-([PIDControllerParameters](#p-id-controller-parameters))
+([PIDControllerParameters](#p-id-controller-parameters), **required**)
 
 <!-- vale on -->
 
@@ -6423,7 +6426,7 @@ Input ports for the PodScaler component.
 
 <!-- vale off -->
 
-([KubernetesObjectSelector](#kubernetes-object-selector))
+([KubernetesObjectSelector](#kubernetes-object-selector), **required**)
 
 <!-- vale on -->
 
@@ -6593,7 +6596,8 @@ Curve Types by Degree:
 
 <!-- vale off -->
 
-([PolynomialRangeFunctionParameters](#polynomial-range-function-parameters))
+([PolynomialRangeFunctionParameters](#polynomial-range-function-parameters),
+**required**)
 
 <!-- vale on -->
 
@@ -6855,19 +6859,19 @@ single element.
 
 :::info Usage with Flux Meter
 
-[Flux Meter](/concepts/flux-meter.md) metrics can be queried using PromQL. Flux
-Meter defines histogram type of metrics in Prometheus. Therefore, one can refer
-to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`. The particular
-Flux Meter can be identified with the `flux_meter_name` label. There are
-additional labels available on a Flux Meter such as `valid`, `flow_status`,
-`http_status_code` and `decision_type`.
+[Flux Meter](/concepts/advanced/flux-meter.md) metrics can be queried using
+PromQL. Flux Meter defines histogram type of metrics in Prometheus. Therefore,
+one can refer to `flux_meter_sum`, `flux_meter_count` and `flux_meter_bucket`.
+The particular Flux Meter can be identified with the `flux_meter_name` label.
+There are additional labels available on a Flux Meter such as `valid`,
+`flow_status`, `http_status_code` and `decision_type`.
 
 :::
 
 :::info Usage with OpenTelemetry Metrics
 
 Aperture supports OpenTelemetry metrics. See
-[reference](/integrations/metrics/metrics.md) for more details.
+[reference](/self-hosting/integrations/metrics/metrics.md) for more details.
 
 :::
 
@@ -7022,7 +7026,7 @@ Schedules the traffic based on token-bucket based quotas.
 
 <!-- vale off -->
 
-([RateLimiterIns](#rate-limiter-ins))
+([RateLimiterIns](#rate-limiter-ins), **required**)
 
 <!-- vale on -->
 
@@ -7032,7 +7036,7 @@ Schedules the traffic based on token-bucket based quotas.
 
 <!-- vale off -->
 
-([RateLimiterParameters](#rate-limiter-parameters))
+([RateLimiterParameters](#rate-limiter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -7128,7 +7132,8 @@ Output ports for the _Range Load Scheduler_.
 
 <!-- vale off -->
 
-([RangeDrivenLoadSchedulerParameters](#range-driven-load-scheduler-parameters))
+([RangeDrivenLoadSchedulerParameters](#range-driven-load-scheduler-parameters),
+**required**)
 
 <!-- vale on -->
 
@@ -7197,7 +7202,7 @@ overload state which results in _Flow_ throttling at the service.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -7271,7 +7276,7 @@ token rate.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -7296,7 +7301,8 @@ quadratic degree=3: cubic
 
 <!-- vale off -->
 
-([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint))
+([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint),
+**required**)
 
 <!-- vale on -->
 
@@ -7308,7 +7314,7 @@ Ending data-point of the throttling range
 
 <!-- vale off -->
 
-([LoadSchedulerParameters](#load-scheduler-parameters))
+([LoadSchedulerParameters](#load-scheduler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -7320,7 +7326,8 @@ Parameters for the _Load Scheduler_.
 
 <!-- vale off -->
 
-([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint))
+([RangeDrivenLoadSchedulerDatapoint](#range-driven-load-scheduler-datapoint),
+**required**)
 
 <!-- vale on -->
 
@@ -7354,7 +7361,7 @@ _Token Bucket Algorithm_.
 
 <!-- vale off -->
 
-([RateLimiterIns](#rate-limiter-ins))
+([RateLimiterIns](#rate-limiter-ins), **required**)
 
 <!-- vale on -->
 
@@ -7366,7 +7373,7 @@ Input ports for the RateLimiter component
 
 <!-- vale off -->
 
-([RateLimiterParameters](#rate-limiter-parameters))
+([RateLimiterParameters](#rate-limiter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -7415,7 +7422,7 @@ Inputs for the RateLimiter component
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -7427,7 +7434,7 @@ Capacity of the bucket to allow for bursty traffic.
 
 <!-- vale off -->
 
-([InPort](#in-port))
+([InPort](#in-port), **required**)
 
 <!-- vale on -->
 
@@ -7640,7 +7647,8 @@ Rego define a set of labels that are extracted after evaluating a Rego module.
 
 :::info
 
-You can use the [live-preview](/concepts/classifier.md#live-previewing-requests)
+You can use the
+[live-preview](/concepts/advanced/classifier.md#live-previewing-requests)
 feature to first preview the input to the classifier before writing the labeling
 logic.
 
@@ -7933,7 +7941,7 @@ Output ports for the SMA component.
 
 <!-- vale off -->
 
-([SMAParameters](#s-m-a-parameters))
+([SMAParameters](#s-m-a-parameters), **required**)
 
 <!-- vale on -->
 
@@ -8042,7 +8050,7 @@ specified percentage of flows at random or by sticky sessions.
 
 :::info
 
-See also [_Sampler_ overview](/concepts/load-ramp.md#sampler).
+See also [_Sampler_ overview](/concepts/advanced/load-ramp.md#sampler).
 
 :::
 
@@ -8064,7 +8072,7 @@ Input ports for the _Sampler_.
 
 <!-- vale off -->
 
-([SamplerParameters](#sampler-parameters))
+([SamplerParameters](#sampler-parameters), **required**)
 
 <!-- vale on -->
 
@@ -8202,7 +8210,7 @@ Selectors for the component.
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -8214,7 +8222,7 @@ Configuration for embedded Alerter.
 
 <!-- vale off -->
 
-([ScaleInControllerController](#scale-in-controller-controller))
+([ScaleInControllerController](#scale-in-controller-controller), **required**)
 
 <!-- vale on -->
 
@@ -8268,7 +8276,7 @@ Controller
 
 <!-- vale off -->
 
-([AlerterParameters](#alerter-parameters))
+([AlerterParameters](#alerter-parameters), **required**)
 
 <!-- vale on -->
 
@@ -8280,7 +8288,7 @@ Configuration for embedded Alerter.
 
 <!-- vale off -->
 
-([ScaleOutControllerController](#scale-out-controller-controller))
+([ScaleOutControllerController](#scale-out-controller-controller), **required**)
 
 <!-- vale on -->
 
@@ -8465,7 +8473,7 @@ as response latency and desired priority.
 
 <!-- vale off -->
 
-([LabelMatcher](#label-matcher))
+([LabelMatcher](#label-matcher), **required**)
 
 <!-- vale on -->
 
@@ -8734,7 +8742,7 @@ signals.
 
 <!-- vale off -->
 
-([SignalGeneratorParameters](#signal-generator-parameters))
+([SignalGeneratorParameters](#signal-generator-parameters), **required**)
 
 <!-- vale on -->
 
@@ -9287,7 +9295,7 @@ Configuration key for overriding value setting through dynamic configuration.
 
 <!-- vale off -->
 
-([ConstantSignal](#constant-signal))
+([ConstantSignal](#constant-signal), **required**)
 
 <!-- vale on -->
 
