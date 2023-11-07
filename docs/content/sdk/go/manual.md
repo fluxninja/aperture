@@ -48,12 +48,12 @@ func grpcOptions() []grpc.DialOption {
 ```
 
 ```go
-  agentAddress = "ORGANIZATION.app.fluxninja.com:443"
-  agentAPIKey = "AGENT_API_KEY"
+  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
+  agentAPIKey := "AGENT_API_KEY"
 
   opts := aperture.Options{
       Address:     agentAddress,
-      APIKey:      agentAPIKey,
+      AgentAPIKey: agentAPIKey,
       DialOptions: grpcOptions(),
   }
 
