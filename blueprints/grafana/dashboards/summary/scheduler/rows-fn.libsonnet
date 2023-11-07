@@ -95,7 +95,7 @@ function(datasourceName, policyName, componentID, extraFilters={})
       w=12
     ),
     barChartPanel(
-      'Requests in Queue Duration',
+      'Request in Queue Duration',
       datasourceName,
       query='topk(10, (sum by(workload_index) (increase(request_in_queue_duration_ms_sum{%(filters)s}[$__range])) ) / ((sum by(workload_index) (increase(request_in_queue_duration_ms_count{%(filters)s}[$__range])) )) != 0)' % { filters: stringFilters },
       x=12,

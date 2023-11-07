@@ -19,5 +19,6 @@ function(title, dsName, query, x=0, h=10, w=24, legendFormat=null, instantQuery=
   + g.panel.barGauge.standardOptions.color.withMode('palette-classic')
   + g.panel.barGauge.standardOptions.thresholds.withMode('absolute')
   + g.panel.barGauge.standardOptions.thresholds.withSteps([{ color: 'green', value: null }])
+  + g.panel.barGauge.gridPos.withX(x)
   + g.panel.barGauge.gridPos.withH(h)
   + g.panel.barGauge.gridPos.withW(w)

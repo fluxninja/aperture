@@ -24,5 +24,6 @@ function(title, dsName, query, x=0, h=6, w=6, instantQuery=false, range=true, pa
   + g.panel.stat.options.reduceOptions.withCalcs(['lastNotNull'])
   + g.panel.stat.options.reduceOptions.withFields('')
   + g.panel.stat.options.reduceOptions.withValues(false)
+  + g.panel.stat.gridPos.withX(x)
   + g.panel.stat.gridPos.withH(h)
   + g.panel.stat.gridPos.withW(w)

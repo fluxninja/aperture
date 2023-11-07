@@ -9,6 +9,7 @@ function(title, dsName, axisLabel='', unit='', x=0, h=10, w=24, query='', target
     + g.panel.timeSeries.standardOptions.withUnit(unit)
     + g.panel.timeSeries.fieldConfig.defaults.custom.withAxisLabel(axisLabel)
     + g.panel.timeSeries.fieldConfig.defaults.custom.withFillOpacity(10)
+    + g.panel.timeSeries.gridPos.withX(x)
     + g.panel.timeSeries.gridPos.withH(h)
     + g.panel.timeSeries.gridPos.withW(w)
     + g.panel.timeSeries.queryOptions.withInterval('10s');

@@ -21,5 +21,6 @@ function(title, dsName, query, x=0, h=10, w=24, legendFormat='', queryFormat='ti
   + g.panel.barChart.fieldConfig.defaults.custom.withAxisPlacement(axisPlacement)
   + g.panel.barChart.standardOptions.color.withMode('palette-classic')
   + g.panel.barChart.standardOptions.withUnit(unit)
+  + g.panel.barChart.gridPos.withX(x)
   + g.panel.barChart.gridPos.withH(h)
   + g.panel.barChart.gridPos.withW(w)
