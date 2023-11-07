@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"sync"
 	"time"
 
 	prometheusv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	prometheusmodel "github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/promql/parser"
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -18,6 +20,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
@@ -145,20 +148,22 @@ type queryScheduerIfc interface {
 type PromQL struct {
 	// Prometheus API
 	promAPI prometheusv1.API
-	// Prometheus Labels Enforcer
-	enforcer *prometheus.PrometheusEnforcer
 	// Policy read API
 	policyReadAPI iface.Policy
 	// Current error
 	err error
 	// Query Scheduler used to scheduler Prometheus query jobs. Determines the type of job to register.
 	queryScheduler queryScheduerIfc
+	// Prometheus Labels Enforcer
+	enforcer *prometheus.PrometheusEnforcer
 	// Job name for the query
 	jobName string
 	// The query to run
 	queryString string
 	// Component index
 	componentID string
+	// Metrics in the query
+	metrics []string
 	// Execute the query every ticksPerExecution ticks
 	ticksPerExecution int
 	// Current value
@@ -175,7 +180,9 @@ func (*PromQL) Type() runtime.ComponentType { return runtime.ComponentTypeSource
 
 // ShortDescription implements runtime.Component.
 func (promQL *PromQL) ShortDescription() string {
-	return fmt.Sprintf("every %s", promQL.evaluationInterval)
+	// print interval and metrics
+	metricsList := strings.Join(promQL.metrics, ", ")
+	return fmt.Sprintf("runs every %s, metrics: %v", promQL.evaluationInterval, metricsList)
 }
 
 // IsActuator implements runtime.Component.
@@ -195,10 +202,21 @@ func NewPromQLAndOptions(
 	promQLEvaluationInterval := promQLProto.EvaluationInterval.AsDuration()
 	circuitEvaluationInterval := policyReadAPI.GetEvaluationInterval()
 	ticksPerExecution := int(math.Ceil(float64(promQLEvaluationInterval) / float64(circuitEvaluationInterval)))
+
+	queryString := promQLProto.GetQueryString()
+	// Parse metric names in PromQL and save them in an array
+	metrics, warnErr := extractMetrics(queryString)
+	if warnErr != nil {
+		log.Warn().Err(warnErr).Msg("Could not parse metrics from PromQL query")
+	}
+
 	promQL := &PromQL{
-		ticksPerExecution: ticksPerExecution,
-		policyReadAPI:     policyReadAPI,
-		componentID:       componentID.String(),
+		ticksPerExecution:  ticksPerExecution,
+		policyReadAPI:      policyReadAPI,
+		componentID:        componentID.String(),
+		evaluationInterval: circuitEvaluationInterval * time.Duration(ticksPerExecution),
+		queryString:        queryString,
+		metrics:            metrics,
 		// Set err to make sure the initial runs of Execute return Invalid readings.
 		err: ErrNoQueriesReturned,
 	}
@@ -208,9 +226,6 @@ func NewPromQLAndOptions(
 
 	// Job name
 	promQL.jobName = fmt.Sprintf("Component-%s", promQL.componentID)
-
-	// Resolve metric names in PromQL to get the query string
-	promQL.queryString = promQLProto.GetQueryString()
 
 	// Invoke setup in the Policy app startup via fx.Options
 	options := fx.Options(
@@ -396,4 +411,29 @@ func (taggedQuery *TaggedQuery) ExecuteTaggedQuery(circuitAPI runtime.CircuitAPI
 // TaggedResult is the result of a ScalarQuery.
 type TaggedResult struct {
 	Value prometheusmodel.Value
+}
+
+func extractMetrics(query string) ([]string, error) {
+	expr, err := parser.ParseExpr(query)
+	if err != nil {
+		return nil, err
+	}
+
+	metrics := make(map[string]struct{})
+
+	// Walk through the PromQL expression and extract metric names
+	parser.Inspect(expr, func(node parser.Node, _ []parser.Node) error {
+		if n, ok := node.(*parser.VectorSelector); ok {
+			metrics[n.Name] = struct{}{}
+		}
+		return nil
+	})
+
+	// Convert map keys to slice
+	var result []string
+	for metric := range metrics {
+		result = append(result, metric)
+	}
+
+	return result, nil
 }

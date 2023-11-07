@@ -34,7 +34,7 @@ if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 	$SED -i "s/\bagent_group: .*/agent_group: ${agent_group}/g" "${_GEN_DIR}/values.yaml"
 	$SED -i "s/\bpolicy_name: .*/policy_name: ${new_policy_name}/g" "${_GEN_DIR}/values.yaml"
 
-	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" --values-file "${_GEN_DIR}/values.yaml" --output-dir "${_GEN_DIR}" --overwrite >&2
+	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" --values-file "${_GEN_DIR}/values.yaml" --output-dir "${_GEN_DIR}" --overwrite --verbose >&2
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
