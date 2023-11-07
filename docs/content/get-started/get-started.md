@@ -12,15 +12,6 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 ```
 
-Get stated guide will provide you quick overview on how to integrate Aperture
-with your application. Once integrated with Aperture, you are ready to enforce
-`rate limiting as a service`.
-
-Below are two different ways to get started with Aperture, ranging from
-Serverless to Self-Hosted. If you are unsure which one to choose, **we recommend
-starting with the Serverless option**, as it's the fastest way to get started
-and involves fewer teams.
-
 <Tabs>
 
 <TabItem value="Aperture for Serverless">
@@ -28,6 +19,9 @@ and involves fewer teams.
 This mode is tailored for developers who prefer to use our SDKs directly without
 delving into infrastructure components. It allows developers to focus on their
 application and requires minimal permissions to get started.
+
+![Aperture Serverless Architecture](./assets/architecture/saas-dark.svg#gh-dark-mode-only)
+![Aperture Serverless Architecture](./assets/architecture/saas-light.svg#gh-light-mode-only)
 
 1. **Sign up for an account**: Get started with Aperture by
    [creating an account](/get-started/sign-up.md), completing the simple

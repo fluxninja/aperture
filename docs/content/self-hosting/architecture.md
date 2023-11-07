@@ -63,25 +63,6 @@ an application.
 
 <Tabs>
 
-<TabItem value="Serverless">
-
-Aperture Cloud is a highly available, fully managed load management platform
-offering:
-
-1. Managed **Aperture Controller** and **Aperture Agents**.
-2. Consoles for managing Aperture policies, self-hosted **Aperture Agents** and
-   **Aperture Controllers**.
-3. Traffic analytics dashboard.
-4. Alerting system to notify about actions taken by Aperture Agents.
-5. A user-friendly Policy Builder interface for quick setup.
-
-It provides a per-project Controller and Agents.
-
-![Aperture Serverless Architecture](../assets/img/saas-dark.svg#gh-dark-mode-only)
-![Aperture Serverless Architecture](../assets/img/saas-light.svg#gh-light-mode-only)
-
-</TabItem>
-
 <TabItem value="Cloud-Hosted Controller">
 
 Here, Aperture Cloud hosts the Controller, while the Agents are self-hosted.
