@@ -5,13 +5,17 @@ functionality on fine-grained features inside service code.
 
 ## Usage
 
+```bash
+go get github.com/fluxninja/aperture-go/v2
+```
+
 ### ApertureClient Interface
 
 `ApertureClient` maintains a gRPC connection with Aperture Agent.
 
 ```go
 options := aperture.Options{
-   GRPCDialOptions: grpcOptions,
+   DialOptions: grpcOptions,
    Address:     "ORGANIZATION.app.fluxninja.com",
    AgentAPIKey: "AGENT_API_KEY",
 }
@@ -54,11 +58,8 @@ s := grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 `Flow` is created every time `ApertureClient.StartFlow` is called.
 
 ```go
-// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-flow, err := a.apertureClient.StartFlow(ctx, "awesomeFeature", labels, false)
-if err != nil {
-   log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
-}
+// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
+flow := apertureClient.StartFlow(ctx, "awesomeFeature", labels, false, 200 * time.Millisecond)
 
 // See whether flow was accepted by Aperture Agent.
 if flow.ShouldRun() {
