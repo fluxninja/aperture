@@ -4,12 +4,12 @@ local prometheusUtils = import '../../../utils/prometheus.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(datasourceName, policyName, component, extraFilters={})
-  local componentID = component.component_id;
+  local componentID = std.get(component.component, 'parent_component_id', default=component.component_id);
   local stringFilters = prometheusUtils.dictToPrometheusFilter(extraFilters { policy_name: policyName, component_id: componentID });
 
   local targets =
     [
-      g.query.prometheus.new(datasourceName, 'sum by(decision_type) (rate(rate_limiter_counter_total{ %(filters)s}[$__rate_interval]))' % { filters: stringFilters })
+      g.query.prometheus.new(datasourceName, 'sum by(decision_type) (rate(rate_limiter_counter_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
       + g.query.prometheus.withIntervalFactor(1),
     ] +
     if 'label_key' in component.component && component.component.label_key != ''
