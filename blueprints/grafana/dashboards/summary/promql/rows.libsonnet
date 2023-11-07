@@ -2,7 +2,7 @@ local portUtils = import '../../../utils/port.libsonnet';
 
 function(datasourceName, policyName, component, extraFilters={})
   [portUtils.panelsForOutPort(
-    'PromQL output - ' + component.component_description,
+    component.component_description,
     datasourceName,
     component,
     'output',

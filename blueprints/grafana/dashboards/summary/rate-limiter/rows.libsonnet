@@ -10,8 +10,7 @@ function(datasourceName, policyName, component, extraFilters={})
   local targets =
     [
       g.query.prometheus.new(datasourceName, 'sum by(decision_type) (rate(rate_limiter_counter_total{ %(filters)s}[$__rate_interval]))' % { filters: stringFilters })
-      + g.query.prometheus.withIntervalFactor(1)
-      + g.query.prometheus.withLegendFormat('Decisions'),
+      + g.query.prometheus.withIntervalFactor(1),
     ] +
     if 'label_key' in component.component && component.component.label_key != ''
     then
