@@ -1,4 +1,4 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(title, dsName, query, x=0, h=6, w=6, instantQuery=false, range=true, panelColor='green', graphMode='none', noValue='No data', unit=null)
   g.panel.stat.new(title)

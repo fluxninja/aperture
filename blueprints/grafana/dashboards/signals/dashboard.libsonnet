@@ -3,7 +3,7 @@ local defaultConfig = import '../../dashboard/default-config.libsonnet';
 local queryVariable = import '../../dashboard/variable-template.libsonnet';
 local panels = import './panels.libsonnet';
 
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(policyName, datasource, extraFilters={})
   local dashboard = base('Signals Dashboard - %s' % policyName, defaultConfig.refresh_interval);

@@ -1,7 +1,7 @@
 local timeSeriesPanel = import '../../../panels/time-series.libsonnet';
 local promUtils = import '../../../utils/prometheus.libsonnet';
 
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(policyName, infraMeterName, datasource, extraFilters) {
   local stringFilters = promUtils.dictToPrometheusFilter(extraFilters { policy_name: policyName, infra_meter_name: infraMeterName }),

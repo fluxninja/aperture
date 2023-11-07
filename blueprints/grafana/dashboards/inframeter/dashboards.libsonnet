@@ -2,7 +2,7 @@ local base = import '../../dashboard/base.libsonnet';
 local defaultConfig = import '../../dashboard/default-config.libsonnet';
 local panelLibrary = import './panel-library.libsonnet';
 
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(policyFile, policyName, datasource, extraFilters={})
   local receiverDashboard = base('Receiver Dashboard - %s' % policyName, defaultConfig.refresh_interval);

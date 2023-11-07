@@ -1,4 +1,4 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(title, dsName, query, x=0, h=10, w=24, legendFormat='', queryFormat='time_series', instantQuery=false, range=true, labelSpacing=0, axisGridshow=true, axisPlacement='hidden', mode='single', sort='sort', unit='short', description='')
   g.panel.barChart.new(title)

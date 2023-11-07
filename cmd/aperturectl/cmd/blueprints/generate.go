@@ -221,13 +221,11 @@ local bundle = import '%s/bundle.libsonnet';
 local config = std.parseYaml(importstr '%s');
 bundle(config)
 `, importPath, valuesFile))
+	// Note use this with std.trace in jsonnet code to get the trace output
+	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
 	if err != nil {
 		return nil, err
 	}
-
-	// change log.Error() to log.Info() for jsonnet trace output
-	// Note use this with std.trace in jsonnet code to get the trace output
-	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
 
 	var bundle map[string]interface{}
 	err = json.Unmarshal([]byte(bundleStr), &bundle)
@@ -496,10 +494,10 @@ func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, graph, pol
 
 	dashboardGroupFile := filepath.Join(blueprintsDir, "grafana", "dashboard_group.libsonnet")
 	dashboardsJSON, err := vm.EvaluateFile(dashboardGroupFile)
+	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
 	if err != nil {
 		return err
 	}
-	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
 
 	type dashboards struct {
 		Dashboards map[string]interface{} `json:"dashboards"`

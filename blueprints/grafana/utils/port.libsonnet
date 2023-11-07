@@ -1,6 +1,6 @@
 local timeSeriesPanel = import '../panels/time-series.libsonnet';
 local promUtils = import '../utils/prometheus.libsonnet';
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 {
   getInPort(component, portName)::

@@ -1,4 +1,4 @@
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(title, dsName, axisLabel='', unit='', x=0, h=10, w=24, query='', targets=[], description='')
   local timeseries =

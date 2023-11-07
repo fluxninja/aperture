@@ -2,7 +2,7 @@ local barFn = import './bar-gauge-panels.libsonnet';
 local statFn = import './stat-panels.libsonnet';
 local timeSeriesFn = import './time-series-panels.libsonnet';
 
-local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v9.4.0/main.libsonnet';
+local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
 function(policyName, infraMeterName, datasource, extraFilters)
 
