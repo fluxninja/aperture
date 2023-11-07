@@ -167,6 +167,24 @@ func getLocalOnlyPolicyResponse(localPolicy *policysyncv1.PolicyWrapper) *policy
 	}
 }
 
+func policyWrapperFromJSONBytes(policyName string, policyJSONBytes []byte, source policysyncv1.PolicyWrapper_Source) (*policysyncv1.PolicyWrapper, error) {
+	policyMessage, policyHash, unmarshalErr := unmarshalStoredPolicy(policyJSONBytes)
+	if unmarshalErr != nil {
+		log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
+		return nil, unmarshalErr
+	}
+
+	wrapper := policysyncv1.PolicyWrapper{
+		Policy: policyMessage,
+		CommonAttributes: &policysyncv1.CommonAttributes{
+			PolicyName: string(policyName),
+			PolicyHash: policyHash,
+		},
+		Source: source,
+	}
+	return &wrapper, nil
+}
+
 // unmarshalStoredPolicy unmarshals a policy stored in etcd or serialized by
 // crwatcher and computes its canonical hash.
 func unmarshalStoredPolicy(policyBytes []byte) (p *policylangv1.Policy, hash string, err error) {

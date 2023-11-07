@@ -74,7 +74,7 @@ type ScaleReporter struct {
 var _ runtime.Component = (*ScaleReporter)(nil)
 
 // Name implements runtime.Component.Name.
-func (*ScaleReporter) Name() string { return "ScaleReporter" }
+func (*ScaleReporter) Name() string { return "PodScaleReporter" }
 
 // Type implements runtime.Component.Type.
 func (sr *ScaleReporter) Type() runtime.ComponentType { return runtime.ComponentTypeSource }

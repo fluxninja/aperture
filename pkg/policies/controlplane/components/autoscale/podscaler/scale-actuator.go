@@ -28,7 +28,7 @@ type ScaleActuator struct {
 }
 
 // Name implements runtime.Component.
-func (*ScaleActuator) Name() string { return "ScaleActuator" }
+func (*ScaleActuator) Name() string { return "PodScaleActuator" }
 
 // Type implements runtime.Component.
 func (*ScaleActuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
@@ -68,7 +68,7 @@ func (sa *ScaleActuator) setupWriter(etcdClient *etcdclient.Client, lifecycle fx
 		OnStart: func(context.Context) error {
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			etcdClient.Delete(sa.decisionsEtcdPath)
 			return nil
 		},

@@ -126,23 +126,14 @@ func setupPoliciesNotifier(
 		}
 		switch etype {
 		case notifiers.Write:
-			policyMessage, policyHash, unmarshalErr := unmarshalStoredPolicy(bytes)
-			if unmarshalErr != nil {
-				log.Warn().Err(unmarshalErr).Msg("Failed to unmarshal policy")
-				return key, nil, unmarshalErr
-			}
-
-			wrapper := policysyncv1.PolicyWrapper{
-				Policy: policyMessage,
-				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName: string(key),
-					PolicyHash: policyHash,
-				},
-				Source: source,
+			wrapper, err := policyWrapperFromJSONBytes(string(key), bytes, source)
+			if err != nil {
+				log.Warn().Err(err).Msgf("Failed to unmarshal policy wrapper from json bytes %+v", bytes)
+				return key, nil, err
 			}
 
 			var marshalWrapErr error
-			dat, marshalWrapErr = proto.Marshal(&wrapper)
+			dat, marshalWrapErr = proto.Marshal(wrapper)
 			if marshalWrapErr != nil {
 				log.Warn().Err(marshalWrapErr).Msgf("Failed to marshal config wrapper for proto message %+v", &wrapper)
 				return key, nil, marshalWrapErr

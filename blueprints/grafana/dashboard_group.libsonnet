@@ -1,14 +1,15 @@
-local infraMetersDashboards = import 'infra_meter_dashboard.libsonnet';
-local signalsDashboard = import 'signals_dashboard.libsonnet';
-local summaryDashboard = import 'summary_dashboard.libsonnet';
+local inframeterDashboardsFn = import 'dashboards/inframeter/dashboards.libsonnet';
+local signalsDashboardFn = import 'dashboards/signals/dashboard.libsonnet';
+local summaryDashboardFn = import 'dashboards/summary/dashboard.libsonnet';
 
-function(policyFile, componentsList, policyName, datasource, extraFilters={}) {
-  local summary = summaryDashboard(componentsList, policyName, datasource, extraFilters).dashboard,
-  local signals = signalsDashboard(componentsList, policyName, datasource, extraFilters).dashboard,
-  local receivers = infraMetersDashboards(policyFile, policyName, datasource, extraFilters).dashboards,
+function(policyFile, graph, policyName, datasource, extraFilters={}) {
+  local graphObj = std.parseJson(graph),
+  local summaryDashboard = summaryDashboardFn(graphObj, policyName, datasource, extraFilters),
+  local signalsDashboard = signalsDashboardFn(policyName, datasource, extraFilters),
+  local inframeterDashboards = inframeterDashboardsFn(policyFile, policyName, datasource, extraFilters),
 
   dashboards: {
-    summary: summary,
-    signals: signals,
-  } + receivers,
+    summary: summaryDashboard,
+    signals: signalsDashboard,
+  } + inframeterDashboards,
 }

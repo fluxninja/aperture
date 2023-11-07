@@ -53,11 +53,11 @@
       "source": {
         "git": {
           "remote": "https://github.com/grafana/grafonnet.git",
-          "subdir": "gen/grafonnet-v9.4.0"
+          "subdir": "gen/grafonnet-v10.1.0"
         }
       },
-      "version": "16f374fcebd987bc1d8bc526f433a75e2e5dcb28",
-      "sum": "PFzKWPaLOx8Yp0V6kyv1n9UOHickz0/VF7goglbQ+1o="
+      "version": "9e217263ac4b922ca2e00bc5cc36ada2311bb5a6",
+      "sum": "GpXlwBysu8dnoH9oYmsJj31CCVsL+wXnbWMxq7sl5Gg="
     },
     {
       "source": {

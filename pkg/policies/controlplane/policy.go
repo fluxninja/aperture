@@ -85,15 +85,12 @@ func CompilePolicy(policyMessage *policylangv1.Policy, policyName string, regist
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal policy: %w", err)
 	}
-	policyWrapper := policysyncv1.PolicyWrapper{
-		Policy: policyMessage,
-		CommonAttributes: &policysyncv1.CommonAttributes{
-			PolicyName: policyName,
-			PolicyHash: HashStoredPolicy(policyString),
-		},
+	policyWrapper, err := policyWrapperFromJSONBytes(policyName, policyString, policysyncv1.PolicyWrapper_UNKNOWN)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create policy wrapper: %w", err)
 	}
 
-	_, circuit, _, err := compilePolicyWrapper(&policyWrapper, registry)
+	_, circuit, _, err := compilePolicyWrapper(policyWrapper, registry)
 	if err != nil {
 		return nil, err
 	}

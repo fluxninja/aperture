@@ -47,7 +47,7 @@ var _ runtime.Component = (*Actuator)(nil)
 var _ runtime.BackgroundJob = (*Actuator)(nil)
 
 // Name implements runtime.Component.
-func (*Actuator) Name() string { return "Actuator" }
+func (*Actuator) Name() string { return "LoadActuator" }
 
 // Type implements runtime.Component.
 func (*Actuator) Type() runtime.ComponentType { return runtime.ComponentTypeSink }
