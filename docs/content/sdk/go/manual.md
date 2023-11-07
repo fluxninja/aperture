@@ -12,7 +12,7 @@ keywords:
   - manual
 ---
 
-<a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go`}>Aperture Go
+<a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go/v2`}>Aperture Go
 SDK</a> can be used to manually set feature control points within a Go service.
 
 To do so, first create an instance of ApertureClient:
@@ -25,13 +25,36 @@ more information, refer to
 
 :::
 
+```bash
+go get github.com/fluxninja/aperture-go/v2
+```
+
 ```go
-  agentAddress = "ORGANIZATION.app.fluxninja.com:443"
-  agentAPIKey = "AGENT_API_KEY"
+// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
+func grpcOptions() []grpc.DialOption {
+  var grpcDialOptions []grpc.DialOption
+  grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
+    Backoff:           backoff.DefaultConfig,
+    MinConnectTimeout: time.Second * 10,
+  }))
+  grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
+  certPool, err := x509.SystemCertPool()
+  if err != nil {
+    return nil
+  }
+  grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
+  return grpcDialOptions
+}
+```
+
+```go
+  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
+  agentAPIKey := "AGENT_API_KEY"
 
   opts := aperture.Options{
-      Address:                     agentAddress,
-      APIKey:                      agentAPIKey,
+      Address:     agentAddress,
+      AgentAPIKey: agentAPIKey,
+      DialOptions: grpcOptions(),
   }
 
   // initialize Aperture Client with the provided options.
@@ -51,11 +74,8 @@ The created instance can then be used to start a flow:
 
   rampMode := false
 
-  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
-  flow, err := a.apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
-  if err != nil {
-      log.Printf("Aperture flow control got error. Returned flow defaults to Allowed. flow.ShouldRun(): %t", flow.ShouldRun())
-  }
+  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
+  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
 
   // See whether flow was accepted by Aperture Agent.
   if flow.ShouldRun() {

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"log"
 	"net"
 	"net/http"
@@ -16,6 +18,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
 	aperturego "github.com/fluxninja/aperture-go/v2/sdk"
@@ -34,7 +37,7 @@ type app struct {
 }
 
 // grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcOptions(insecureMode bool) []grpc.DialOption {
+func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 	var grpcDialOptions []grpc.DialOption
 	grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff:           backoff.DefaultConfig,
@@ -43,8 +46,17 @@ func grpcOptions(insecureMode bool) []grpc.DialOption {
 	grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
 	if insecureMode {
 		grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else if skipVerify {
+		grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: true, //nolint:gosec // For testing purposes only
+		})))
+	} else {
+		certPool, err := x509.SystemCertPool()
+		if err != nil {
+			return nil
+		}
+		grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
 	}
-
 	return grpcDialOptions
 }
 
@@ -55,7 +67,7 @@ func main() {
 
 	opts := aperturego.Options{
 		Address:     getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
-		DialOptions: grpcOptions(getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false)),
+		DialOptions: grpcOptions(getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false), getBoolEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false)),
 		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
 	}
 
