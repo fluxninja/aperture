@@ -1,6 +1,6 @@
 ---
 title: Policy
-sidebar_position: 1
+sidebar_position: 8
 sidebar_label: Policy Language
 ---
 
@@ -57,8 +57,6 @@ saturation, Aperture's circuits can detect deviations from service-level
 objectives and trigger appropriate actions to restore system stability and
 reliability. The circuit is the heart of the policy specification and is
 responsible for the logic of the control system.
-
-<DocCardList />
 
 ## Resources
 

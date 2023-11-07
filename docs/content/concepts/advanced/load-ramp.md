@@ -1,6 +1,6 @@
 ---
 title: Load Ramp
-sidebar_position: 10
+sidebar_position: 6
 ---
 
 :::info See also

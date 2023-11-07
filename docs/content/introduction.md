@@ -32,9 +32,9 @@ in a cloud application:
 ![Unified Load Management (dark)](./assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
 ![Unified Load Management (light)](./assets/img/unified-load-management-light.svg#gh-light-mode-only)
 
-Aperture's control plane is available as a managed service, [Aperture
-Cloud][cloud], or can be [self-hosted][self-hosted] within your infrastructure.
-Visit the [Architecture][architecture] page for more details.
+Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
+[self-hosted][self-hosted] within your infrastructure. Visit the
+[Architecture][architecture] page for more details.
 
 :::info Sign-up
 

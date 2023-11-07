@@ -29,7 +29,7 @@ back to the service.
 <Zoom>
 
 ```mermaid
-{@include: ./assets/gen/service/flow-lifecycle.mmd}
+{@include: ./assets/gen/flow-lifecycle/flow-lifecycle.mmd}
 ```
 
 </Zoom>

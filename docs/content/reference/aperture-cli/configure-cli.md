@@ -10,7 +10,7 @@ following as `~/.aperturectl/config`:
 
 ```toml
 [controller]
-url = "ORGANIZATION_NAME.app.fluxninja.com"
+url = "ORGANIZATION_NAME.app.fluxninja.com:443"
 project_name = "PROJECT_NAME"
 api_key = "PERSONAL_API_KEY"
 ```
