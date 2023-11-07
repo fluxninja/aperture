@@ -16,6 +16,9 @@ spec:
             fill_amount:
               constant_signal:
                 value: 2
+          out_ports:
+            accept_percentage:
+              signal_name: ACCEPT_PERCENTAGE
           parameters:
             interval: 1s
             label_key: user_id
@@ -27,6 +30,23 @@ spec:
           - agent_group: default
             control_point: ingress
             service: service-graphql-demo-app.demoapp.svc.cluster.local
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: ACCEPT_PERCENTAGE
+          rhs:
+            constant_signal:
+              value: 90
+        operator: gte
+        out_ports:
+          output:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+    - alerter:
+        in_ports:
+          alert:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+        parameters:
+          alert_name: More than 90% of requests are being rate limited
     evaluation_interval: 1s
   resources:
     flow_control:

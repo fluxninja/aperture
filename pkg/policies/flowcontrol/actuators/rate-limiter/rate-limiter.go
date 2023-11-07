@@ -216,9 +216,11 @@ var _ iface.RateLimiter = (*rateLimiter)(nil)
 
 func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rl.registry.GetLogger()
-	etcdKey := paths.AgentComponentKey(rl.lbFactory.agentGroupName,
+	etcdKey := paths.AgentComponentKey(
+		rl.lbFactory.agentGroupName,
 		rl.GetPolicyName(),
-		rl.GetComponentId())
+		rl.GetComponentId(),
+	)
 	// decision notifier
 	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {

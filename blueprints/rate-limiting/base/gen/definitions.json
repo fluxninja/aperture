@@ -55,6 +55,14 @@
             "selectors"
           ],
           "properties": {
+            "alerter": {
+              "description": "Alerter.",
+              "default": {
+                "alert_name": "More than 90% of requests are being rate limited"
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Alerter"
+            },
             "bucket_capacity": {
               "description": "Bucket capacity.",
               "default": "__REQUIRED_FIELD__",

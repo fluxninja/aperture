@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package aperture.policy.private.v1;
 
+import "aperture/flowcontrol/check/v1/check.proto";
 import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/language/v1/ports.proto";
+import "google/protobuf/duration.proto";
 
 message LoadActuator {
   message Ins {
@@ -19,4 +21,90 @@ message LoadActuator {
   repeated aperture.policy.language.v1.Selector selectors = 3;
 
   bool workload_latency_based_tokens = 4;
+}
+
+message RateLimiter {
+  message Parameters {
+    message LazySync {
+      // Enables lazy sync
+      bool enabled = 1; // @gotags: default:"false"
+
+      // Number of times to lazy sync within the `interval`.
+      uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
+    }
+
+    // Specifies which label the rate limiter should be keyed by.
+    //
+    // Rate limiting is done independently for each value of the
+    // [label](/concepts/flow-label.md) with given key.
+    // For example, to give each user a separate limit, assuming you
+    // have a _user_ flow
+    // label set up, set `label_key: "user"`.
+    // If no label key is specified, then all requests matching the
+    // selectors will be rate limited based on the global bucket.
+    string label_key = 1;
+
+    // Interval defines the time interval in which the token bucket
+    // will fill tokens specified by `fill_amount` signal.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
+
+    // Continuous fill determines whether the token bucket should be filled
+    // continuously or only on discrete intervals.
+    bool continuous_fill = 4; // @gotags: default:"true"
+
+    // Max idle time before token bucket state for a label is removed.
+    // If set to 0, the state is never removed.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
+
+    // Configuration of lazy-syncing behavior of rate limiter
+    LazySync lazy_sync = 6;
+
+    // Delays the initial filling of the token bucket.
+    // If set to false, the token bucket will start filling immediately
+    // after the first request is received. This can potentially lead to
+    // more requests being accepted than the specified rate limit during
+    // the first interval.
+    // When set to true, the token bucket will be given a chance to
+    // empty out before the filling starts. The delay is equal to the
+    // time it takes to fill the bucket.
+    bool delay_initial_fill = 7; // @gotags: default:"false"
+  }
+
+  message RequestParameters {
+    // Flow label key that will be used to override the number of tokens
+    // for this request.
+    // This is an optional parameter and takes highest precedence
+    // when assigning tokens to a request.
+    // The label value must be a valid number.
+    string tokens_label_key = 1;
+
+    // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 2;
+  }
+
+  // Inputs for the RateLimiter component
+  message Ins {
+    // Capacity of the bucket to allow for bursty traffic.
+    aperture.policy.language.v1.InPort bucket_capacity = 1; // @gotags: validate:"required"
+    // Number of tokens to fill within an `interval`.
+    aperture.policy.language.v1.InPort fill_amount = 2; // @gotags: validate:"required"
+    // PassThrough port determines whether all requests
+    aperture.policy.language.v1.InPort pass_through = 3;
+  }
+
+  // Input ports for the RateLimiter component
+  Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Parameters for the RateLimiter component
+  Parameters parameters = 2; // @gotags: validate:"required"
+
+  // Selectors for the component.
+  repeated aperture.policy.language.v1.Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+
+  // RequestParameters for the component
+  RequestParameters request_parameters = 4;
+
+  string parent_component_id = 5;
 }
