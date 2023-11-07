@@ -9,7 +9,7 @@ function(datasourceName, policyName, extraFilters={})
   local row1 = timeSeriesPanel(
     'Signal Average - ${signal_name} (${sub_circuit_id})',
     datasourceName,
-    'increase(signal_reading_sum{%(filters)s}[$__rate_interval]) / increase(signal_reading_count{%(filters)s}[$__rate_interval])' % { filters: stringFilters },
+    query='increase(signal_reading_sum{%(filters)s}[$__rate_interval]) / increase(signal_reading_count{%(filters)s}[$__rate_interval])' % { filters: stringFilters },
   );
 
   local targets = [
