@@ -5,10 +5,7 @@ import (
 )
 
 const (
-	// DefaultBlueprintsRepo is the default repository for blueprints.
-	DefaultBlueprintsRepo = "github.com/fluxninja/aperture/blueprints"
-	// LatestTag is the tag for the latest version of blueprints.
-	LatestTag = "latest"
+	blueprints = "blueprints"
 )
 
 var (

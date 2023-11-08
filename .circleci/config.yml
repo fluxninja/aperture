@@ -666,7 +666,7 @@ workflows:
             sdks/aperture-java/.* updated-aperture-java true
             sdks/aperture-py/.* updated-aperture-py true
             cmd/sdk-validator/.* updated-sdk-validator true
-            blueprints/.*|playground/tanka/.*|playground/scenarios/demo-app/manifests/.* updated-blueprints true
+            blueprints/.*|dashboards/.*|playground/tanka/.*|playground/scenarios/demo-app/manifests/.* updated-blueprints true
 
   filter-paths-pr:
     when:

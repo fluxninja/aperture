@@ -15,10 +15,8 @@ import (
 
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
-	policyv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/policy/v1alpha1"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
-	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
 
 var controllerConn utils.ControllerConn
@@ -157,7 +155,7 @@ func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprint
 	if overrideBlueprintsVersion == "" && overrideBlueprintsURI == "" {
 		blueprintsURI, ok = values["uri"].(string)
 		if !ok {
-			log.Info().Msgf("using default blueprints uri: %s@%s", DefaultBlueprintsRepo, LatestTag)
+			log.Info().Msgf("using default blueprints uri: %s@%s", utils.DefaultBlueprintsRepo, utils.LatestTag)
 		}
 	} else {
 		blueprintsURI = overrideBlueprintsURI
@@ -174,7 +172,7 @@ func Generate(valuesFile string, overrideBlueprintsURI string, overrideBlueprint
 	}
 
 	// pull
-	_, blueprintsURIRoot, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, localAllowed)
+	_, blueprintsURIRoot, blueprintsDir, err := utils.Pull(blueprintsURI, blueprintsVersion, blueprints, utils.DefaultBlueprintsRepo, skipPull, localAllowed)
 	if err != nil {
 		return nil, err
 	}
@@ -276,19 +274,14 @@ func processJsonnetOutput(blueprintsURIRoot, blueprintsDir string, bundle map[st
 func renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, outputDir, fileName, policyName string, content map[string]interface{}) error {
 	outputFilePath := filepath.Join(outputDir, fileName)
 	if strings.HasSuffix(fileName, ".yaml") {
-		yamlBytes, err := saveYAMLFile(blueprintsURIRoot, blueprintsDir, categoryName, outputFilePath, content)
+		_, err := saveYAMLFile(blueprintsURIRoot, blueprintsDir, categoryName, outputFilePath, content)
 		if err != nil {
 			return err
 		}
 
 		if strings.HasSuffix(fileName, "-cr.yaml") {
 			// prepare data
-			circuit, graph, err := processPolicy(yamlBytes, outputFilePath, policyName)
-			if err != nil {
-				return err
-			}
-
-			err = generateDashboards(blueprintsURIRoot, blueprintsDir, string(yamlBytes), graph, policyName, outputDir)
+			circuit, _, _, _, err := utils.ProcessPolicy(outputFilePath)
 			if err != nil {
 				return err
 			}
@@ -297,10 +290,6 @@ func renderOutput(blueprintsURIRoot, blueprintsDir, categoryName, outputDir, fil
 			if err != nil {
 				return err
 			}
-		}
-	} else if strings.HasSuffix(fileName, ".json") {
-		if err := saveJSONFile(outputFilePath, content); err != nil {
-			return err
 		}
 	}
 	return nil
@@ -347,20 +336,6 @@ func saveYAMLFile(blueprintsURIRoot, blueprintsDir, categoryName, outputFilePath
 	}
 
 	return yamlBytes, nil
-}
-
-func saveJSONFile(outputFilePath string, content map[string]interface{}) error {
-	jsonBytes, err := json.MarshalIndent(content, "", "    ")
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(outputFilePath, jsonBytes, 0o600)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func blueprintExists(blueprintsDir, name string) error {
@@ -434,87 +409,6 @@ func generateGraphs(circuit *circuitfactory.Circuit, outputDir string, policyPat
 
 	if err = utils.GenerateMermaidFile(circuit, mmdFilePath, depth); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func processPolicy(content []byte, policyPath string, policyName string) (*circuitfactory.Circuit, string, error) {
-	policy := &policyv1alpha1.Policy{}
-	err := yaml.Unmarshal(content, policy)
-	if err != nil || policy.Kind != "Policy" {
-		return nil, "", err
-	}
-
-	policyFile, err := utils.FetchPolicyFromCR(policyPath)
-	if err != nil {
-		return nil, "", err
-	}
-	defer os.Remove(policyFile)
-	policyBytes, err := os.ReadFile(policyFile)
-	if err != nil {
-		return nil, "", err
-	}
-	circuit, _, err := utils.CompilePolicy(policyName, policyBytes)
-	if err != nil {
-		return nil, "", err
-	}
-	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), -1)
-	if err != nil {
-		return nil, "", err
-	}
-	graphJSON, err := json.Marshal(graph)
-	if err != nil {
-		return nil, "", err
-	}
-
-	return circuit, string(graphJSON), nil
-}
-
-func generateDashboards(blueprintsURIRoot, blueprintsDir, policyFile, graph, policyName, outputDir string) error {
-	dir := filepath.Join(filepath.Dir(outputDir), "dashboards")
-	// create the directory if it does not exist
-	err := os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	buf := bytes.Buffer{}
-	vm := jsonnet.MakeVM()
-	vm.SetTraceOut(&buf)
-	vm.Importer(&jsonnet.FileImporter{
-		JPaths: []string{blueprintsURIRoot},
-	})
-
-	vm.TLAReset()
-	vm.TLAVar("policyFile", policyFile)
-	vm.TLAVar("graph", graph)
-	vm.TLAVar("policyName", policyName)
-	vm.TLAVar("datasource", "controller-prometheus")
-
-	dashboardGroupFile := filepath.Join(blueprintsDir, "grafana", "dashboard_group.libsonnet")
-	dashboardsJSON, err := vm.EvaluateFile(dashboardGroupFile)
-	log.Debug().Msgf("Jsonnet generation trace: %s", buf.String())
-	if err != nil {
-		return err
-	}
-
-	type dashboards struct {
-		Dashboards map[string]interface{} `json:"dashboards"`
-	}
-
-	var dashboardsList dashboards
-	err = json.Unmarshal([]byte(dashboardsJSON), &dashboardsList)
-	if err != nil {
-		return err
-	}
-
-	for key, val := range dashboardsList.Dashboards {
-		outputFilePath := filepath.Join(dir, fmt.Sprintf("%s-%s.json", key, policyName))
-		err = saveJSONFile(outputFilePath, val.(map[string]interface{}))
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
