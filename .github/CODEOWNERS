@@ -5,6 +5,7 @@
 /operator/                                   @FluxNinja/devops
 /playground/                                 @FluxNinja/devops
 /blueprints/                                 @FluxNinja/devops
+/dashboards/                                 @FluxNinja/devops
 /packaging/                                  @FluxNinja/devops
 /nfpm.yaml                                   @FluxNinja/devops
 /docs/tools                                  @FluxNinja/devops
