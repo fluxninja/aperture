@@ -62,17 +62,13 @@ func ParseRateLimiter(
 		componentID.String(),
 	)
 
-	policyParamsRejected := fmt.Sprintf("%s,%s=\"%s\"", policyParams, metrics.DecisionTypeLabel, metrics.DecisionTypeRejected)
 	policyParamsAccepted := fmt.Sprintf("%s,%s=\"%s\"", policyParams, metrics.DecisionTypeLabel, metrics.DecisionTypeAccepted)
 
 	acceptedPercentageQuery := fmt.Sprintf(
-		"(sum(rate(%s{%s}[30s])) / (sum(rate(%s{%s}[30s])) + sum(rate(%s{%s}[30s])))) * 100",
-		metrics.RateLimiterCounterTotalMetricName,
-		policyParamsRejected,
+		"(sum(rate(%s{%s}[30s])) / sum(rate(%s[30s]))) * 100",
 		metrics.RateLimiterCounterTotalMetricName,
 		policyParamsAccepted,
 		metrics.RateLimiterCounterTotalMetricName,
-		policyParamsRejected,
 	)
 
 	rateLimiterAnyProto, err := anypb.New(
