@@ -41,6 +41,7 @@ aperturectl is a CLI tool to interact with Aperture.
 - [aperturectl cloud](/reference/aperture-cli/aperturectl/cloud/cloud.md) - Commands to communicate with the Cloud Controller
 - [aperturectl compile](/reference/aperture-cli/aperturectl/compile/compile.md) - Compile circuit from Aperture Policy file
 - [aperturectl completion](/reference/aperture-cli/aperturectl/completion/completion.md) - Generate the autocompletion script for the specified shell
+- [aperturectl dashboard](/reference/aperture-cli/aperturectl/dashboard/dashboard.md) - Generate dashboards for Aperture
 - [aperturectl decisions](/reference/aperture-cli/aperturectl/decisions/decisions.md) - Get Aperture Decisions
 - [aperturectl discovery](/reference/aperture-cli/aperturectl/discovery/discovery.md) - Discovery integrations
 - [aperturectl dynamic-config](/reference/aperture-cli/aperturectl/dynamic-config/dynamic-config.md) - DynamicConfig of Aperture Policy related commands for the Controller

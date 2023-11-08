@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +55,7 @@ Provides a values file for a given Aperture Blueprint that can be then used to g
 		if valuesFile == "" {
 			return fmt.Errorf("--output-file must be provided")
 		}
-		_, _, blueprintsDir, err := pull(blueprintsURI, blueprintsVersion, true)
+		_, _, blueprintsDir, err := utils.Pull(blueprintsURI, blueprintsVersion, blueprints, utils.DefaultBlueprintsRepo, skipPull, true)
 		if err != nil {
 			return err
 		}
