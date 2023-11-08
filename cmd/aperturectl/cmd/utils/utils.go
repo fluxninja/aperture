@@ -510,6 +510,13 @@ func Pull(uri, version, cacheDirName, defaultRepo string, skipPull, localAllowed
 		return cacheRoot, uriRoot, "", errors.New("could not get lock on: " + uriRoot)
 	}
 
+	defer func() {
+		err = lock.Unlock()
+		if err != nil {
+			log.Error().Err(err).Msg("failed to unlock file lock")
+		}
+	}()
+
 	// pull the latest based on skipPull and whether child command is remove
 	if !skipPull {
 		err = PullSource(uriRoot, uri)
@@ -525,12 +532,6 @@ func Pull(uri, version, cacheDirName, defaultRepo string, skipPull, localAllowed
 	dir, err = filepath.EvalSymlinks(dir)
 	if err != nil {
 		return cacheRoot, uriRoot, "", err
-	}
-
-	// unlock the file lock on the uriRoot
-	err = lock.Unlock()
-	if err != nil {
-		return cacheRoot, uriRoot, dir, err
 	}
 
 	return cacheRoot, uriRoot, dir, nil
