@@ -12,35 +12,42 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 ```
 
+Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
+self-hosted within your infrastructure.
+
+The easiest way to get started with Aperture is to sign up on Aperture Cloud and
+integrate your application using SDKs.
+
+These are two main modes on how to get started with Aperture.
+
 <Tabs>
 
 <TabItem value="Aperture for Serverless">
 
-This mode is tailored for developers who prefer to use our SDKs directly without
-delving into infrastructure components. It allows developers to focus on their
-application and requires minimal permissions to get started.
+This mode is tailored for developers who prefer to use Aperture SDKs directly
+without delving into infrastructure components. It allows developers to focus on
+their application and requires minimal permissions to get started.
 
 ![Aperture Serverless Architecture](./assets/architecture/saas-dark.svg#gh-dark-mode-only)
 ![Aperture Serverless Architecture](./assets/architecture/saas-light.svg#gh-light-mode-only)
 
-1. **Sign up for an account**: Get started with Aperture by
-   [creating an account](/get-started/sign-up.md), completing the simple
-   onboarding - giving you an introduction to dashboard - and inviting your team
-   members so you can all collaborate on creating your first policy.
+1. **Sign up for an account**: Get started with Aperture by [creating an
+   account][sign-up], completing the simple onboarding - giving you an
+   introduction to dashboard - and inviting your team members so you can all
+   collaborate on creating your first policy.
 2. **Map to Cloud Agent**: Aperture Agent authenticates requests from SDK
    integrations using Agent API keys, which can be created for your project
-   within the Aperture UI; for more information, see
-   [Agent API Keys](/get-started/agent-api-keys/agent-api-keys.md) for more
-   details.
+   within the Aperture UI; for more information, see [Agent API
+   Keys][agent-api-keys] for more details.
 
    Once you have the Agent API key, you can use it to initialize the SDK.
 
 3. **Integrate the SDK**: Add the necessary lines of code to your desired
    application where you want Aperture to take action. Refer to the available
-   [SDKs](../sdk/sdk.md) for additional guidance.
+   [SDKs][sdks] for additional guidance.
 
-4. **Create Your Policy**: Deploy your first policy. See
-   [Policies](/get-started/policies/policies.md) for more details.
+4. **Create Your Policy**: Deploy your first policy. See [Policies][policies]
+   for more details.
 
 </TabItem>
 
@@ -53,25 +60,24 @@ second mode, suited for teams comfortable with hosting their own Prometheus and
 etcd instances, needs complete control over the Aperture Controller and Agent,
 ideal for situations like air-gapped environments.
 
-1. **Sign up for an account**: Get started with Aperture by
-   [creating an account](/get-started/sign-up.md), completing the simple
-   onboarding - giving you an introduction to the dashboard - and inviting your
-   team members so you can all collaborate on creating your first policy.
+1. **Sign up for an account**: Get started with Aperture by [creating an
+   account][sign-up], completing the simple onboarding - giving you an
+   introduction to the dashboard - and inviting your team members so you can all
+   collaborate on creating your first policy.
 
 2. **Set Up the Environment**: The Aperture Agent can be installed in various
-   modes. For installation steps, please refer to the following
-   [page](/self-hosting/agent/agent.md).
+   modes. For installation steps, see [Agent][agent-docs] docs under
+   self-hosting Aperture.
 
    :::info
 
-   For more details on fully self-hosted solutions, please refer to the
-   following [page](/self-hosting/self-hosting.md).
+   For more details on fully self-hosted installation, please refer to the
+   [self-hosting][self-hosting] section.
 
    :::
 
-3. **Integrate with Aperture**: Here are various
-   [Integrations](/self-hosting/integrations/integrations.md) methods with
-   Aperture
+3. **Integrate with Aperture**: Here are various [Integrations][integrations]
+   methods with Aperture
 
    - [SDKs](../sdk/sdk.md)
    - [Istio](/self-hosting/integrations/istio/istio.md)
@@ -82,16 +88,25 @@ ideal for situations like air-gapped environments.
 
 4. **Map to Aperture SaaS Controller**: Aperture Agent authenticates requests
    from integrations using Agent API keys, which can be created for your project
-   within the Aperture UI; for more information, see
-   [Agent API Keys](/get-started/agent-api-keys/agent-api-keys.md) for more
-   details.
+   within the Aperture UI; for more information, see [Agent API
+   Keys][agent-api-keys] for more details.
 
    Using the API key, you can map your integration to the Aperture Cloud. See
-   [FluxNinja Cloud Extension](/reference/fluxninja.md) for more details.
+   [FluxNinja Cloud Extension][cloud-extension] for more details.
 
-5. **Create Your Policy**: Deploy your first policy. See
-   [Policies](/get-started/policies/policies.md) for more details.
+5. **Create Your Policy**: Deploy your first policy. See [Policies][policies]
+   for more details.
 
 </TabItem>
 
 </Tabs>
+
+[cloud]: https://www.fluxninja.com/product
+[self-hosting]: /self-hosting/self-hosting.md
+[sign-up]: /get-started/sign-up.md
+[policies]: /get-started/policies/policies.md
+[cloud-extension]: /reference/fluxninja.md
+[agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md
+[agent-docs]: /self-hosting/agent/agent.md
+[integrations]: /self-hosting/integrations/integrations.md
+[sdks]: /sdk/sdk.md
