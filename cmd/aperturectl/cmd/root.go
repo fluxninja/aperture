@@ -46,6 +46,7 @@ func init() {
 	RootCmd.AddCommand(status.StatusCmd)
 	RootCmd.AddCommand(dynamicconfig.DynamicConfigCmd)
 	RootCmd.AddCommand(policy.PolicyCmd)
+	RootCmd.AddCommand(dashboardCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

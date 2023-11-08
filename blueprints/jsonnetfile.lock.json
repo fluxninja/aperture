@@ -4,92 +4,12 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/Duologic/jsonnet-libsonnet.git",
-          "subdir": ""
-        }
-      },
-      "version": "bd08bf5f0ffc156bd755b916367bceb7fbe3de03",
-      "sum": "ZYc3KrgzQIciDlQ786i2iHeqEZqjnB8KlPiX6w8Mp38="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/crdsonnet/crdsonnet.git",
-          "subdir": "crdsonnet"
-        }
-      },
-      "version": "2251d2739015ef42777fff5e37255a12674be510",
-      "sum": "wTwQnzztnOS7xo0LeH4TNcnb11bFNYgsuGSdOWwhBC4="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/crdsonnet/validate-libsonnet.git",
-          "subdir": ""
-        }
-      },
-      "version": "a78ca15fbfece3110c4807d1f059132ece01d97b",
-      "sum": "qYLH56MqvmgxE4YMNeTbuJ1XSsCpl1sumHN5x8IQv2I="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/grafana/grafonnet.git",
-          "subdir": "gen/grafonnet-v10.1.0"
-        }
-      },
-      "version": "9e217263ac4b922ca2e00bc5cc36ada2311bb5a6",
-      "sum": "GpXlwBysu8dnoH9oYmsJj31CCVsL+wXnbWMxq7sl5Gg="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/grafana/grafonnet.git",
-          "subdir": "grafonnet-base"
-        }
-      },
-      "version": "441b95e5a16ee5e511d54beb5f07e9b05f2bb5a2",
-      "sum": "5zmj5Vn/cKhKrD+jA5BfLliR4t74upkM4PfnuJC5t4M="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/grafana/jsonnet-libs.git",
-          "subdir": "grafana-builder"
-        }
-      },
-      "version": "83dbb0480412d92a27c65e3a4461efa690f7263d",
-      "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/jsonnet-libs/docsonnet.git",
-          "subdir": "doc-util"
-        }
-      },
-      "version": "fd8de9039b3c06da77d635a3a8289809a5bfb542",
-      "sum": "mFebrE9fhyAKW4zbnidcjVFupziN5LPA/Z7ii94uCzs="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/jsonnet-libs/k8s-libsonnet.git",
           "subdir": "1.24"
         }
       },
       "version": "44a9f3d21c089a01f62b22e25bdf553f488a74e8",
       "sum": "ecHj4f4rxFPcqcu6rSdypniF5xMVRG9A8k+HwD87BTg="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/jsonnet-libs/xtd.git",
-          "subdir": ""
-        }
-      },
-      "version": "0256a910ac71f0f842696d7bca0bf01ea77eb654",
-      "sum": "zBOpb1oTNvXdq9RF6yzTHill5r1YTJLBBoqyx4JYtAg="
     }
   ],
   "legacyImports": false

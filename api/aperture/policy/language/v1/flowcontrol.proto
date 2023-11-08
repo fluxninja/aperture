@@ -137,7 +137,7 @@ message RateLimiter {
     flowcontrol.check.v1.StatusCode denied_response_status_code = 2;
   }
 
-  // Inputs for the RateLimiter component
+  // Inputs for the _Rate Limiter_ component
   message Ins {
     // Capacity of the bucket to allow for bursty traffic.
     InPort bucket_capacity = 1; // @gotags: validate:"required"
@@ -147,10 +147,16 @@ message RateLimiter {
     InPort pass_through = 3;
   }
 
-  // Input ports for the RateLimiter component
+  // Outputs for the _Rate Limiter_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Load Ramp_.
+    OutPort accept_percentage = 1;
+  }
+
+  // Input ports for the _Rate Limiter_ component
   Ins in_ports = 1; // @gotags: validate:"required"
 
-  // Parameters for the RateLimiter component
+  // Parameters for the _Rate Limiter_ component
   Parameters parameters = 2; // @gotags: validate:"required"
 
   // Selectors for the component.
@@ -158,6 +164,9 @@ message RateLimiter {
 
   // RequestParameters for the component
   RequestParameters request_parameters = 4;
+
+  // Output ports for the _Rate Limiter_ component.
+  Outs out_ports = 5;
 }
 
 // _Load Scheduler_ creates a queue for flows in front of a service to provide active service protection

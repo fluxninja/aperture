@@ -89,6 +89,7 @@ following command:
 
 ```mdx-code-block
 <CodeBlock language="bash">aperturectl blueprints generate --values-file=values.yaml --output-dir=policy-gen</CodeBlock>
+<CodeBlock language="bash">aperturectl dashboard --policy-file=policy-gen/policies/rate-limiting-cr.yaml --output-dir=policy-gen</CodeBlock>
 ```
 
 The following directory structure will be generated:
@@ -208,8 +209,7 @@ Run the following command to check if the policy was created.
 The policy runtime can be visualized in [Aperture Cloud][aperture-cloud],
 Grafana or any other Prometheus compatible analytics tool. Refer to the
 Prometheus compatible metrics available from the
-[controller][controller-metrics] and [agent][agent-metrics]. Some policy
-[blueprints][blueprints] come with recommended Grafana dashboards.
+[controller][controller-metrics] and [agent][agent-metrics].
 
 ## Deleting Policies
 
@@ -240,5 +240,4 @@ kubectl delete policies.fluxninja.com rate-limiting -n aperture-controller
 
 [controller-metrics]: /reference/observability/prometheus-metrics/controller.md
 [agent-metrics]: /reference/observability/prometheus-metrics/agent.md
-[blueprints]: /reference/blueprints/blueprints.md
 [aperture-cloud]: /introduction.md

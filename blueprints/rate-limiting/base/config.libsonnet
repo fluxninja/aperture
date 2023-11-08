@@ -10,6 +10,7 @@ commonConfig {
     * @param (policy.rate_limiter.parameters.label_key: string) Flow label key to use for rate limiting. If not specified, then all requests matching the selector will be rate limited.
     * @param (policy.rate_limiter.parameters.interval: string) Fill interval e.g. "1s".
     * @param (policy.rate_limiter.request_parameters: aperture.spec.v1.RateLimiterRequestParameters) Request Parameters.
+    * @param (policy.rate_limiter.alerter: aperture.spec.v1.Alerter) Alerter.
     */
     rate_limiter: {
       bucket_capacity: '__REQUIRED_FIELD__',
@@ -20,6 +21,9 @@ commonConfig {
         interval: '__REQUIRED_FIELD__',
       },
       request_parameters: {},
+      alerter: {
+        alert_name: 'More than 90% of requests are being rate limited',
+      },
     },
   },
 

@@ -3,6 +3,7 @@ package blueprints
 import (
 	"os"
 
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,7 @@ aperturectl blueprints remove --all`,
 // RemoveRunE is the RunE function executed by the remove command.
 func RemoveRunE(cmd *cobra.Command, args []string) error {
 	skipPull = true
-	blueprintsCacheRoot, blueprintsURIRoot, _, err := pull(blueprintsURI, blueprintsVersion, true)
+	blueprintsCacheRoot, blueprintsURIRoot, _, err := utils.Pull(blueprintsURI, blueprintsVersion, blueprints, utils.DefaultBlueprintsRepo, skipPull, true)
 	if err != nil {
 		return err
 	}

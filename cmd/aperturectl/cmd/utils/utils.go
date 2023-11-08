@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/ghodss/yaml"
+	"github.com/gofrs/flock"
 	"github.com/hashicorp/go-multierror"
 	"github.com/xeipuuv/gojsonschema"
 	appsv1 "k8s.io/api/apps/v1"
@@ -28,6 +31,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/circuitfactory"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/runtime"
 )
+
+var lock *flock.Flock
 
 // GenerateDotFile generates a DOT file from the given circuit with the specified depth.
 // The depth determines how many levels of components in the tree should be expanded in the graph.
@@ -438,4 +443,118 @@ func GetYAMLString(bytes []byte) (string, error) {
 		return "", err
 	}
 	return string(yamlString), nil
+}
+
+// Pull pulls the content from the given URI and version.
+func Pull(uri, version, cacheDirName, defaultRepo string, skipPull, localAllowed bool) (string, string, string, error) {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", "", "", err
+	}
+
+	cacheRoot := filepath.Join(userHomeDir, AperturectlRootDir, cacheDirName)
+	err = os.MkdirAll(cacheRoot, os.ModePerm)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	// either the URI or version is set, not both
+	if uri != "" && version != "" {
+		return cacheRoot, "", "", errors.New("either the URI or version should be set, not both, uri: " + uri + ", version: " + version)
+	}
+
+	// set the URI
+	if uri == "" {
+		if version == "" {
+			version = LatestTag
+		}
+		uri = fmt.Sprintf("%s@%s", defaultRepo, version)
+	} else {
+		// uri can be a file or url
+		// first detect if it's a local path
+		if _, err = os.Stat(uri); err == nil {
+			if !localAllowed {
+				return cacheRoot, "", "", errors.New("local paths are not allowed as URI")
+			}
+			// path exists
+			uri, err = filepath.Abs(uri)
+			if err != nil {
+				return cacheRoot, "", "", err
+			}
+		} else {
+			// try to parse as url
+			var parsedURL *url.URL
+			parsedURL, err = url.Parse(uri)
+			if err != nil {
+				return cacheRoot, "", "", err
+			}
+			uri = parsedURL.String()
+		}
+	}
+
+	// convert the URI to a local dir name which is disk friendly
+	dirName := strings.ReplaceAll(uri, "/", "_")
+	uriRoot := filepath.Join(cacheRoot, dirName)
+	err = os.MkdirAll(uriRoot, os.ModePerm)
+	if err != nil {
+		return cacheRoot, "", "", err
+	}
+
+	// get a file lock on the uriRoot
+	lock = flock.New(filepath.Join(uriRoot, "lock"))
+	locked, err := lock.TryLockContext(context.Background(), time.Millisecond*100)
+	if err != nil {
+		return cacheRoot, uriRoot, "", err
+	}
+	if !locked {
+		return cacheRoot, uriRoot, "", errors.New("could not get lock on: " + uriRoot)
+	}
+
+	defer func() {
+		err = lock.Unlock()
+		if err != nil {
+			log.Error().Err(err).Msg("failed to unlock file lock")
+		}
+	}()
+
+	// pull the latest based on skipPull and whether child command is remove
+	if !skipPull {
+		err = PullSource(uriRoot, uri)
+		if err != nil {
+			return cacheRoot, uriRoot, "", err
+		}
+	} else {
+		log.Trace().Msg("Skipping pulling")
+	}
+
+	dir := filepath.Join(uriRoot, GetRelPath(uriRoot))
+	// resolve symlink
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		return cacheRoot, uriRoot, "", err
+	}
+
+	return cacheRoot, uriRoot, dir, nil
+}
+
+// ProcessPolicy processes the policy and returns the circuit and graph.
+func ProcessPolicy(policyPath string) (*circuitfactory.Circuit, string, string, []byte, error) {
+	policyBytes, policyName, err := GetPolicy(policyPath)
+	if err != nil {
+		return nil, "", "", nil, err
+	}
+	circuit, _, err := CompilePolicy(policyName, policyBytes)
+	if err != nil {
+		return nil, "", "", nil, err
+	}
+	graph, err := circuit.Tree.GetSubGraph(runtime.NewComponentID(runtime.RootComponentID), -1)
+	if err != nil {
+		return nil, "", "", nil, err
+	}
+	graphJSON, err := json.Marshal(graph)
+	if err != nil {
+		return nil, "", "", nil, err
+	}
+
+	return circuit, string(graphJSON), policyName, policyBytes, nil
 }
