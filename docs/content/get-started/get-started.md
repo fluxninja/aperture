@@ -35,8 +35,8 @@ their application and requires minimal permissions to get started.
    account][sign-up], completing the simple onboarding - giving you an
    introduction to the dashboard - and inviting your team members, so you can
    collaborate on load management.
-2. **Connect to Aperture Cloud"**: Aperture Cloud authenticates requests from
-   SDK integrations using Agent API keys, which can be created for your project
+2. **Connect to Aperture Cloud**: Aperture Cloud authenticates requests from SDK
+   integrations using Agent API keys, which can be created for your project
    within the Aperture UI; for more information, see [Agent API
    Keys][agent-api-keys] for more details.
 
@@ -56,7 +56,7 @@ their application and requires minimal permissions to get started.
 Aperture offers two options for infrastructure needs. The first is ideal for
 teams favoring a cloud-hosted controller and self-managed agents, eliminating
 the need to self-host Prometheus and etcd, and ensuring minimal performance
-impact. The second option, suited for teams comfortable with hosting their own
+impact. The second option, suited for teams comfortable hosting their own
 Prometheus and etcd instances, needs complete control over the Aperture
 Controller and Agent, ideal for situations like air-gapped environments.
 
