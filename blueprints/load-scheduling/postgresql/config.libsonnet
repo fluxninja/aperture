@@ -31,9 +31,4 @@ commonConfig {
       setpoint: '__REQUIRED_FIELD__',
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection for PostgreSQL',
-    variant_name: 'PostgreSQL Overload Detection',
-  },
 }

@@ -21,9 +21,4 @@ commonConfig {
       range_driven_load_scheduler: range_driven_load_scheduler,
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection',
-    variant_name: 'Service Protection',
-  },
 }

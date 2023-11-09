@@ -18,8 +18,4 @@ serviceProtectionDefaults {
       setpoint: '__REQUIRED_FIELD__',
     },
   },
-
-  dashboard+: {
-    variant_name: 'Protection with Java Gc Overload Confirmation',
-  },
 }

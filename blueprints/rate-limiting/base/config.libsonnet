@@ -26,8 +26,4 @@ commonConfig {
       },
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Rate Limiter',
-  },
 }

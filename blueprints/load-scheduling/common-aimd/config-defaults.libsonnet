@@ -25,9 +25,4 @@ commonConfig {
       aimd_load_scheduler: aimd_load_scheduler,
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection',
-    variant_name: 'Service Protection',
-  },
 }
