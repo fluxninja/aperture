@@ -1044,6 +1044,8 @@ func eventFiltersForAgent() predicate.Predicate {
 func (r *AgentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.Agent{}).
+		Owns(&appsv1.DaemonSet{}).
+		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.ConfigMap{}).
 		Owns(&corev1.Secret{}).

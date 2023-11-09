@@ -27,6 +27,7 @@ import (
 
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -799,6 +800,7 @@ func eventFiltersForController() predicate.Predicate {
 func (r *ControllerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&controllerv1alpha1.Controller{}).
+		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.ConfigMap{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.Secret{}).
