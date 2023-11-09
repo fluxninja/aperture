@@ -35,7 +35,7 @@ their application and requires minimal permissions to get started.
    account][sign-up], completing the simple onboarding - giving you an
    introduction to the dashboard - and inviting your team members, so you can
    collaborate on load management.
-2. **Connect to Aperture Cloud"**: Aperture Agent authenticates requests from
+2. **Connect to Aperture Cloud"**: Aperture Cloud authenticates requests from
    SDK integrations using Agent API keys, which can be created for your project
    within the Aperture UI; for more information, see [Agent API
    Keys][agent-api-keys] for more details.
@@ -86,7 +86,7 @@ ideal for situations like air-gapped environments.
    - [Auto Scale](/self-hosting/integrations/auto-scale/auto-scale.md)
    - [Metrics](/self-hosting/integrations/metrics/metrics.md)
 
-4. **Map to Aperture SaaS Controller**: Aperture Agent authenticates requests
+4. **Map to Aperture SaaS Controller**: Aperture Cloud authenticates requests
    from integrations using Agent API keys, which can be created for your project
    within the Aperture UI; for more information, see [Agent API
    Keys][agent-api-keys] for more details.
