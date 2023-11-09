@@ -172,9 +172,6 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 // deploymentMutate returns a mutate function that can be used to update the Deployment's spec.
 func deploymentMutate(dep *appsv1.Deployment, spec appsv1.DeploymentSpec) controllerutil.MutateFn {
 	return func() error {
-		if dep.Spec.Replicas != nil && spec.Replicas != nil {
-			*dep.Spec.Replicas = *spec.Replicas
-		}
 		dep.Spec.Selector = spec.Selector
 		dep.Spec.Strategy = spec.Strategy
 		dep.Spec.Template.Annotations = spec.Template.Annotations
