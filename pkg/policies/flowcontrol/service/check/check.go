@@ -49,7 +49,7 @@ type HandlerWithValues interface {
 // CheckRequest makes decision using collected inferred fields from authz or Handler.
 func (h *Handler) CheckRequest(ctx context.Context, requestContext iface.RequestContext) *flowcontrolv1.CheckResponse {
 	checkResponse := h.engine.ProcessRequest(ctx, requestContext)
-	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason())
+	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), h.engine.GetAgentInfo())
 	return checkResponse
 }
 

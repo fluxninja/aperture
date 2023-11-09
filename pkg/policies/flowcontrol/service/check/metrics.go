@@ -4,6 +4,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 )
@@ -12,8 +13,9 @@ import (
 type Metrics interface {
 	// CheckResponse collects metrics about Aperture Check call with DecisionType and Reason.
 	CheckResponse(
-		flowcontrolv1.CheckResponse_DecisionType,
-		flowcontrolv1.CheckResponse_RejectReason,
+		decision flowcontrolv1.CheckResponse_DecisionType,
+		rejectReason flowcontrolv1.CheckResponse_RejectReason,
+		agentInfo *agentinfo.AgentInfo,
 	)
 }
 
@@ -25,8 +27,9 @@ var _ Metrics = NopMetrics{}
 
 // CheckResponse is no-op method for NopMetrics.
 func (NopMetrics) CheckResponse(
-	flowcontrolv1.CheckResponse_DecisionType,
-	flowcontrolv1.CheckResponse_RejectReason,
+	decision flowcontrolv1.CheckResponse_DecisionType,
+	rejectReason flowcontrolv1.CheckResponse_RejectReason,
+	agentInfo *agentinfo.AgentInfo,
 ) {
 }
 
@@ -66,7 +69,7 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 			prometheus.CounterOpts{
 				Name: metrics.FlowControlDecisionsMetricName,
 				Help: "Number of aperture check decisions",
-			}, []string{metrics.FlowControlCheckDecisionTypeLabel},
+			}, []string{metrics.FlowControlCheckDecisionTypeLabel, metrics.AgentGroupLabel},
 		),
 		rejectReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
@@ -91,9 +94,13 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 func (pm *PrometheusMetrics) CheckResponse(
 	decision flowcontrolv1.CheckResponse_DecisionType,
 	rejectReason flowcontrolv1.CheckResponse_RejectReason,
+	agentInfo *agentinfo.AgentInfo,
 ) {
 	pm.checkReceivedTotal.Inc()
-	pm.checkDecision.With(prometheus.Labels{metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String()}).Inc()
+	pm.checkDecision.With(prometheus.Labels{
+		metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String(),
+		metrics.AgentGroupLabel:                   agentInfo.GetAgentGroup(),
+	}).Inc()
 	if rejectReason != flowcontrolv1.CheckResponse_REJECT_REASON_NONE {
 		pm.rejectReason.With(prometheus.Labels{metrics.FlowControlCheckRejectReasonLabel: rejectReason.Enum().String()}).Inc()
 	}
