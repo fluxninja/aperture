@@ -53,12 +53,12 @@ their application and requires minimal permissions to get started.
 
 <TabItem value="Aperture for Infrastructure">
 
-Aperture offers two modes for infrastructure needs. The first is ideal for teams
-favoring a cloud-hosted controller and self-managed agents, eliminating the need
-to self-host Prometheus and etcd, and ensuring minimal performance impact. The
-second mode, suited for teams comfortable with hosting their own Prometheus and
-etcd instances, needs complete control over the Aperture Controller and Agent,
-ideal for situations like air-gapped environments.
+Aperture offers two options for infrastructure needs. The first is ideal for
+teams favoring a cloud-hosted controller and self-managed agents, eliminating
+the need to self-host Prometheus and etcd, and ensuring minimal performance
+impact. The second option, suited for teams comfortable with hosting their own
+Prometheus and etcd instances, needs complete control over the Aperture
+Controller and Agent, ideal for situations like air-gapped environments.
 
 1. **Sign up for an account**: Get started with Aperture by [creating an
    account][sign-up], completing the simple onboarding - giving you an
