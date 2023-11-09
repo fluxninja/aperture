@@ -118,54 +118,6 @@
           }
         }
       }
-    },
-    "dashboard": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "extra_filters": {
-          "description": "Additional filters to pass to each query to Grafana datasource.",
-          "default": {},
-          "type": "object",
-          "additionalProperties": true
-        },
-        "refresh_interval": {
-          "description": "Refresh interval for dashboard panels.",
-          "default": "15s",
-          "type": "string"
-        },
-        "time_from": {
-          "description": "From time of dashboard.",
-          "default": "now-15m",
-          "type": "string"
-        },
-        "time_to": {
-          "description": "To time of dashboard.",
-          "default": "now",
-          "type": "string"
-        },
-        "title": {
-          "description": "Name of the main dashboard.",
-          "default": "Aperture Service Protection",
-          "type": "string"
-        },
-        "datasource": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "filter_regex": {
-              "description": "Datasource filter regex.",
-              "default": "",
-              "type": "string"
-            },
-            "name": {
-              "description": "Datasource name.",
-              "default": "$datasource",
-              "type": "string"
-            }
-          }
-        }
-      }
     }
   },
   "$defs": {

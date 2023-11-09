@@ -15,8 +15,4 @@ serviceProtectionDefaults {
     */
     overload_condition: '__REQUIRED_FIELD__',
   },
-
-  dashboard+: {
-    variant_name: 'PromQL Output',
-  },
 }

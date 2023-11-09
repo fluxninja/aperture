@@ -27,9 +27,4 @@ serviceProtectionDefaults {
       setpoint: '__REQUIRED_FIELD__',
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection for Elasticsearch',
-    variant_name: 'Elasticsearch Overload Detection',
-  },
 }

@@ -41,13 +41,3 @@ policy:
   resources:
     flow_control:
       classifiers: []
-
-# Configuration for the Grafana dashboard accompanying this policy.
-# Type: policies/feature-rollout/base:param:dashboard
-dashboard:
-  datasource:
-    filter_regex: ""
-    name: "$datasource"
-  refresh_interval: "5s"
-  time_from: "now-15m"
-  time_to: "now"

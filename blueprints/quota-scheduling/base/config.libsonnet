@@ -20,8 +20,4 @@ commonConfig {
       scheduler: {},
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Quota Scheduler',
-  },
 }

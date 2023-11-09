@@ -20,7 +20,4 @@ serviceProtectionDefaults {
     },
   },
 
-  dashboard+: {
-    variant_name: 'Average Latency',
-  },
 }

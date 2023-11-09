@@ -1,7 +1,7 @@
 # Blueprints Layout
 
-Every blueprint consists of three files: `main.libsonnet` `config.libsonnet` and
-`metadata.yaml`
+Every blueprint consists of three files: `bundle.libsonnet` `config.libsonnet`
+and `metadata.yaml`
 
 ## metadata.yaml
 
@@ -20,53 +20,47 @@ deprecation_message: |
 ```
 
 - `blueprint` key is currently unused, but it names this specific bundle
-- `sources` provides a list of dashboards and policies that are part of this
-  blueprint.
+- `sources` provides a list of policies that are part of this blueprint.
 - `deprecation_message` is an optional message that will be displayed in the
   generated README.md. It can be used to mark blueprints as deprecated.
 
 ### More on sources
 
-Every blueprint can be built from multiple dashboards and policies, and to
-properly generate README.md we need to know some details about what source
-libraries are used.
+Every blueprint can be built from multiple policies, and to properly generate
+README.md we need to know some details about what source libraries are used.
 
 Every item of the `sources` list is a nested object, whose top key becomes a
 section of the README.md documentation. `prefix` should match the key under
-which policy or dashboard configuration is available in `config.libsonnet` and
-`path` is a path to the library, relative to repository root.
+which policy configuration is available in `config.libsonnet` and `path` is a
+path to the library, relative to repository root.
 
-## main.libsonnet
+## bundle.libsonnet
 
 An example:
 
 ```yaml
-local blueprint = import 'policies/service-protection/average-latency.libsonnet';
+local blueprint = import './rate-limiting.libsonnet';
 
 local policy = blueprint.policy;
-local dashboard = blueprint.dashboard;
 local config = blueprint.config;
 
-{
+function(params) {
+  local c = std.mergePatch(config, params),
+
+  local p = policy(c),
   policies: {
-    [std.format('%s.yaml', $._config.common.policyName)]: policy($._config.common + $._config.policy).policyResource,
+    [std.format('%s-cr.yaml', c.policy.policy_name)]: p.policyResource,
+    [std.format('%s.yaml', c.policy.policy_name)]: p.policyDef,
   },
-  dashboards: {
-    [std.format('%s.json', $._config.common.policyName)]: dashboard($._config.common + $._config.dashboard).dashboard,
-  },
-} +
-{
-  _config:: config,
 }
 ```
 
-This file glues together all policies and dashboards that are part of the
-blueprint. The object must have two keys: `policies` and `dashboards` - other
-keys should be hidden from the generated JSON data. Both keys should be mappings
-between file names and rendered dashboards and policies.
+This file glues together all policies that are part of the blueprint. The object
+must have key: `policies` - other keys should be hidden from the generated JSON
+data. The key should be mappings between file names and rendered policies.
 
-This is used by `scripts/aperture-generate.py` to generate JSON files directly
-from blueprints.
+This is used by `blueprint-assets-generator.py` to values and definition files
+directly from blueprints.
 
 ## config.libsonnet
 
@@ -142,7 +136,7 @@ pip install -r requirements.txt
 ```
 
 To update README.md from blueprint configuration, use
-`scripts/blueprint-assets-generator.py`:
+`blueprint-assets-generator.py`:
 
 ```sh
 $ ./scripts/blueprint-assets-generator.py policies/service-protection/average-latency
