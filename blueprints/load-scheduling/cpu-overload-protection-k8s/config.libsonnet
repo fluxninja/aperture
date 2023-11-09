@@ -19,9 +19,4 @@ commonConfig {
       setpoint: '__REQUIRED_FIELD__',
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection for CPU Overload',
-    variant_name: 'CPU Overload Detection',
-  },
 }

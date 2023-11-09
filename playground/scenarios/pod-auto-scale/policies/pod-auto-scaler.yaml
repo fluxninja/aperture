@@ -51,27 +51,3 @@ policy:
     scale_out:
       enabled: true
       threshold: 0.4
-
-dashboard:
-  # Additional filters to pass to each query to Grafana datasource.
-  # Type: map[string]string
-  extra_filters: {}
-  # Refresh interval for dashboard panels.
-  # Type: string
-  refresh_interval: "15s"
-  # From time of dashboard.
-  # Type: string
-  time_from: "now-15m"
-  # To time of dashboard.
-  # Type: string
-  time_to: "now"
-  # Name of the main dashboard.
-  # Type: string
-  title: "Aperture Auto-scale"
-  datasource:
-    # Datasource filter regex.
-    # Type: string
-    filter_regex: ""
-    # Datasource name.
-    # Type: string
-    name: "$datasource"

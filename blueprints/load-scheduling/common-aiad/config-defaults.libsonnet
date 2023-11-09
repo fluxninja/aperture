@@ -20,9 +20,4 @@ commonConfig {
       },
     },
   },
-
-  dashboard+: {
-    title: 'Aperture Service Protection',
-    variant_name: 'Service Protection',
-  },
 }

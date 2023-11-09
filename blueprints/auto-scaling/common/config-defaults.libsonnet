@@ -48,10 +48,6 @@ commonConfig {
   */
   policy+: auto_scaling_defaults,
 
-  dashboard+: {
-    title: 'Aperture Auto-scale',
-  },
-
   // schema defaults are below
   promql_scale_out_controller: promql_scale_controller_defaults,
   promql_scale_in_controller: promql_scale_controller_defaults,

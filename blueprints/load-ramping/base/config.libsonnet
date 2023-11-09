@@ -117,10 +117,6 @@ local ramp_policy_base_defaults = {
 commonConfig {
   policy+: ramp_policy_base_defaults,
 
-  dashboard+: {
-    title: 'Aperture Load Ramp',
-  },
-
   // defaults for the schemas
   promql_driver: promql_driver_defaults,
   average_latency_driver: average_latency_driver_defaults,
