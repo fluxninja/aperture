@@ -169,15 +169,4 @@ If you're not using [Aperture Cloud](/reference/fluxninja.md), simply remove the
 
 :::
 
-## Applying Policies
-
-Once the
-[application is set up](/get-started/set-up-application/set-up-application.md)
-and Agents are installed, you can start creating and applying policies.
-
-[Your first policy](/get-started/policies/policies.md) section provides
-step-by-step instructions on customizing, creating, and applying policies within
-Aperture. Additionally, the [guides](/guides/guides.md) section serves as a
-valuable resource for tailoring policies to meet specific requirements.
-
 [namespace-scoped-installation]: kubernetes/namespace-scoped/namespace-scoped.md

@@ -10,9 +10,9 @@ sidebar_label: Manually setting feature control points
 import { Cards } from '@site/src/components/Cards';
 ```
 
-Control points are used to define where you want to act in code or at service
-level. It's important to understand what control points are because you will be
-using them many times in your code.
+[Control points][control-points] are used to define where you want to act in
+code or at service level. It's important to understand what control points are
+because you will be using them many times in your code.
 
 <!-- vale off -->
 
@@ -115,14 +115,18 @@ Let's create a feature control point in the following code snippet.
 ```
 
 This is how you can create a manual feature control point in your code. The
-complete code snippet is available
-[here](https://github.com/fluxninja/aperture-java/tree/main/examples/standalone-traffic-flow-example).
+complete code snippet is available [here][aperture-java-example].
 
 :::info
 
 Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs. [See all SDKs](../../sdk/sdk.md).
+your needs. [See all SDKs][sdks].
 
 :::
 
 <!-- vale off -->
+
+[control-points]: /concepts/control-point.md
+[sdks]: /sdk/sdk.md
+[aperture-java-example]:
+  https://github.com/fluxninja/aperture-java/tree/main/examples/standalone-traffic-flow-example

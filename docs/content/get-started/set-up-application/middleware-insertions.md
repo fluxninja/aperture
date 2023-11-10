@@ -81,9 +81,11 @@ public class AppController {
 :::info
 
 Aperture provides different middlewares for different java frameworks, which you
-can check out in the [Java section](../../sdk/java/java.md). There are examples
-available for each framework.
+can check out in the [Java section][sdks]. There are examples available for each
+framework.
 
 :::
 
 <!-- vale off -->
+
+[sdks]: /sdk/sdk.md
