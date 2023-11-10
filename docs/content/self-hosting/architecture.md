@@ -20,16 +20,16 @@ Agents.
 
 ## Aperture Controller {#aperture-controller}
 
-The Aperture Controller is responsible for managing agents and evaluating
-declarative load management policies. Policies define service-level objectives,
-telemetry metrics, and adjustments to make in response to metric deviations. The
-controller synchronizes policies and adjustments to the agents. The controller
-can be hosted in _Aperture Cloud or self-hosted_.
+The Aperture Controller is responsible for managing agents, evaluating and
+synchronizing declarative load management policies. These policies define
+service-level objectives, telemetry metrics, and make adjustments in response to
+metric deviations. The controller can be hosted in _Aperture Cloud or
+self-hosted_.
 
 ## Aperture Agents
 
 Agents serve as the workhorses of the platform, providing powerful flow control
-components. These include a weighted fair queuing scheduler for workload
+components. This includes a weighted fair queuing scheduler for workload
 prioritization and a distributed rate-limiter for abuse prevention.
 
 These agents are deployed adjacent to services requiring load management and
@@ -58,16 +58,15 @@ addition to flow control capabilities, Agents work with auto-scaling APIs for
 platforms such as Kubernetes, to help scale infrastructure when needed.
 
 The diagram below shows the core components of Aperture architecture for
-different modes of Controller and Agent installation and how they integrate with
-an application.
+different modes of Controller and Agent installation and various integrations.
 
 <Tabs>
 
 <TabItem value="Cloud-Hosted Controller">
 
-Here, Aperture Cloud hosts the Controller, while the Agents are self-hosted.
-This is ideal for those who prefer not to maintain their own Prometheus and etcd
-databases.
+In this mode, Aperture Cloud hosts the Controller, while the Agents are
+self-hosted. This is ideal for those who prefer not to maintain their own
+Prometheus and etcd databases.
 
 ![Aperture with Local Agents](../assets/img/local-agents-dark.svg#gh-dark-mode-only)
 ![Aperture with Local Agents](../assets/img/local-agents-light.svg#gh-light-mode-only)
@@ -75,10 +74,12 @@ databases.
 </TabItem>
 
 <TabItem value="Fully Self-Hosted">
-The self-hosted configuration of Aperture differs as it requires independent deployment of the Controller and Agents.
-Where Aperture Controller also needs its supporting databases. It uses two
-databases to store configuration, telemetry, and flow control information:
-[prometheus](https://prometheus.io) and [etcd](https://etcd.io).
+
+The fully self-hosted configuration requires independent deployment of the
+Controller and Agents. Where Aperture Controller also requires its two
+supporting databases ([prometheus](https://prometheus.io) and
+[etcd](https://etcd.io)) to store configuration, telemetry, and flow control
+information.
 
 Prometheus enables Aperture to monitor the system and detect deviations from the
 service-level objectives (SLOs) defined in the declarative policies. The
