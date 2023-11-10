@@ -29,7 +29,7 @@ self-hosted_.
 ## Aperture Agents
 
 Agents serve as the workhorses of the platform, providing powerful flow control
-components. This include a weighted fair queuing scheduler for workload
+components. This includes a weighted fair queuing scheduler for workload
 prioritization and a distributed rate-limiter for abuse prevention.
 
 These agents are deployed adjacent to services requiring load management and
