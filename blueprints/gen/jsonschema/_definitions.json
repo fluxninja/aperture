@@ -2862,7 +2862,7 @@
         },
         "out_ports": {
           "$ref": "#/definitions/QuotaSchedulerOuts",
-          "description": "Output ports for the_Quota Scheduler_component."
+          "description": "Output ports for the _Quota Scheduler_ component."
         },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiterParameters",

@@ -72,7 +72,7 @@ message QuotaScheduler {
     OutPort accept_percentage = 1;
   }
 
-  // Output ports for the_Quota Scheduler_component.
+  // Output ports for the _Quota Scheduler_ component.
   Outs out_ports = 5;
 }
 

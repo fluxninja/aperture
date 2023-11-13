@@ -7040,7 +7040,7 @@ Schedules the traffic based on token-bucket based quotas.
 
 <!-- vale on -->
 
-Output ports for the_Quota Scheduler_component.
+Output ports for the _Quota Scheduler_ component.
 
 </dd>
 <dt>rate_limiter</dt>

@@ -299,7 +299,7 @@ type QuotaScheduler struct {
 	Selectors   []*Selector             `protobuf:"bytes,2,rep,name=selectors,proto3" json:"selectors,omitempty" validate:"required,gt=0,dive"`                        // @gotags: validate:"required,gt=0,dive"
 	RateLimiter *RateLimiter_Parameters `protobuf:"bytes,3,opt,name=rate_limiter,json=rateLimiter,proto3" json:"rate_limiter,omitempty" validate:"required"` // @gotags: validate:"required"
 	Scheduler   *Scheduler              `protobuf:"bytes,4,opt,name=scheduler,proto3" json:"scheduler,omitempty"`
-	// Output ports for the_Quota Scheduler_component.
+	// Output ports for the _Quota Scheduler_ component.
 	OutPorts *QuotaScheduler_Outs `protobuf:"bytes,5,opt,name=out_ports,json=outPorts,proto3" json:"out_ports,omitempty"`
 }
 
