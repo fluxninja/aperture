@@ -135,6 +135,7 @@
   PulseGeneratorOuts: import 'pulsegeneratorouts.libsonnet',
   Query: import 'query.libsonnet',
   QuotaScheduler: import 'quotascheduler.libsonnet',
+  QuotaSchedulerOuts: import 'quotaschedulerouts.libsonnet',
   RangeDrivenLoadScheduler: import 'rangedrivenloadscheduler.libsonnet',
   RangeDrivenLoadSchedulerDatapoint: import 'rangedrivenloadschedulerdatapoint.libsonnet',
   RangeDrivenLoadSchedulerIns: import 'rangedrivenloadschedulerins.libsonnet',

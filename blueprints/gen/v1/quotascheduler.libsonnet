@@ -1,13 +1,21 @@
+local quotaschedulerouts = import './quotaschedulerouts.libsonnet';
 local ratelimiterins = import './ratelimiterins.libsonnet';
 {
   new():: {
   },
   inPorts:: ratelimiterins,
+  outPorts:: quotaschedulerouts,
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
   withInPortsMixin(in_ports):: {
     in_ports+: in_ports,
+  },
+  withOutPorts(out_ports):: {
+    out_ports: out_ports,
+  },
+  withOutPortsMixin(out_ports):: {
+    out_ports+: out_ports,
   },
   withRateLimiter(rate_limiter):: {
     rate_limiter: rate_limiter,

@@ -108,3 +108,15 @@ message RateLimiter {
 
   string parent_component_id = 5;
 }
+
+message QuotaScheduler {
+  aperture.policy.language.v1.RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+
+  repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
+
+  aperture.policy.language.v1.RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
+
+  aperture.policy.language.v1.Scheduler scheduler = 4;
+
+  string parent_component_id = 5;
+}

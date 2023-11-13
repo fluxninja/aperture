@@ -1,4 +1,4 @@
-package ratelimiter
+package quotascheduler
 
 import (
 	"context"
@@ -16,21 +16,21 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 )
 
-type rateLimiterSync struct {
-	policyReadAPI    iface.Policy
-	rateLimiterProto *policylangv1.RateLimiter
-	etcdClient       *etcdclient.Client
-	componentID      string
-	configEtcdPaths  []string
+type quotaSchedulerSync struct {
+	policyReadAPI       iface.Policy
+	quotaSchedulerProto *policylangv1.QuotaScheduler
+	etcdClient          *etcdclient.Client
+	componentID         string
+	configEtcdPaths     []string
 }
 
 // NewConfigSyncOptions creates fx options for syncing LoadScheduler objects with agent groups.
 func NewConfigSyncOptions(
-	rateLimiterProto *policylangv1.RateLimiter,
+	quotaSchedulerProto *policylangv1.QuotaScheduler,
 	componentID runtime.ComponentID,
 	policyReadAPI iface.Policy,
 ) (fx.Option, error) {
-	s := rateLimiterProto.GetSelectors()
+	s := quotaSchedulerProto.GetSelectors()
 
 	agentGroups := selectors.UniqueAgentGroups(s)
 
@@ -38,38 +38,38 @@ func NewConfigSyncOptions(
 
 	for _, agentGroup := range agentGroups {
 		etcdKey := paths.AgentComponentKey(agentGroup, policyReadAPI.GetPolicyName(), componentID.String())
-		configEtcdPath := path.Join(paths.RateLimiterConfigPath, etcdKey)
+		configEtcdPath := path.Join(paths.QuotaSchedulerConfigPath, etcdKey)
 		configEtcdPaths = append(configEtcdPaths, configEtcdPath)
 	}
 
-	limiterSync := &rateLimiterSync{
-		rateLimiterProto: rateLimiterProto,
-		policyReadAPI:    policyReadAPI,
-		configEtcdPaths:  configEtcdPaths,
-		componentID:      componentID.String(),
+	qss := &quotaSchedulerSync{
+		quotaSchedulerProto: quotaSchedulerProto,
+		policyReadAPI:       policyReadAPI,
+		configEtcdPaths:     configEtcdPaths,
+		componentID:         componentID.String(),
 	}
-	return fx.Options(fx.Invoke(limiterSync.setupSync)), nil
+	return fx.Options(fx.Invoke(qss.setupSync)), nil
 }
 
-func (rls *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
-	logger := rls.policyReadAPI.GetStatusRegistry().GetLogger()
-	rls.etcdClient = etcdClient
+func (qss *quotaSchedulerSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
+	logger := qss.policyReadAPI.GetStatusRegistry().GetLogger()
+	qss.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			wrapper := &policysyncv1.RateLimiterWrapper{
-				RateLimiter: rls.rateLimiterProto,
+			wrapper := &policysyncv1.QuotaSchedulerWrapper{
+				QuotaScheduler: qss.quotaSchedulerProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:  rls.policyReadAPI.GetPolicyName(),
-					PolicyHash:  rls.policyReadAPI.GetPolicyHash(),
-					ComponentId: rls.componentID,
+					PolicyName:  qss.policyReadAPI.GetPolicyName(),
+					PolicyHash:  qss.policyReadAPI.GetPolicyHash(),
+					ComponentId: qss.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)
 			if err != nil {
-				logger.Error().Err(err).Msg("failed to marshal rate limiter config")
+				logger.Error().Err(err).Msg("failed to marshal quota scheduler config")
 				return err
 			}
-			for _, configEtcdPath := range rls.configEtcdPaths {
+			for _, configEtcdPath := range qss.configEtcdPaths {
 				etcdClient.Put(configEtcdPath, string(dat))
 			}
 			return nil
@@ -80,7 +80,7 @@ func (rls *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle f
 					etcdClient.Delete(path)
 				}
 			}
-			deleteEtcdPath(rls.configEtcdPaths)
+			deleteEtcdPath(qss.configEtcdPaths)
 			return nil
 		},
 	})
