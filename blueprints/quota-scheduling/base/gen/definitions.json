@@ -61,7 +61,7 @@
                 "alert_name": "More than 90% of requests are being rate limited"
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Alerter"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
             },
             "bucket_capacity": {
               "description": "Bucket capacity.",

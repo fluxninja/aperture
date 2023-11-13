@@ -59,8 +59,6 @@ spec:
             signal_name: ACCEPT_PERCENTAGE_ALERT
         parameters:
           alert_name: More than 90% of requests are being rate limited
-          parameters:
-            alert_name: Quota Scheduling Event
     evaluation_interval: 1s
   resources:
     flow_control:

@@ -18,7 +18,7 @@ policy:
       classifiers: []
   rate_limiter:
     # Alerter.
-    # Type: aperture.spec.v1.Alerter
+    # Type: aperture.spec.v1.AlerterParameters
     alerter:
       alert_name: "More than 90% of requests are being rate limited"
     # Bucket capacity.
