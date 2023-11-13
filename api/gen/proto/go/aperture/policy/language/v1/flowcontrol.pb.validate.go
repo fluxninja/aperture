@@ -1545,6 +1545,8 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for DeniedResponseStatusCode
 
+	// no validation rules for WorkloadLabelKey
+
 	if len(errors) > 0 {
 		return SchedulerMultiError(errors)
 	}

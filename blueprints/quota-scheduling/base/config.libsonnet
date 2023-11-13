@@ -18,7 +18,11 @@ commonConfig {
         label_key: '',
         interval: '__REQUIRED_FIELD__',
       },
-      scheduler: {},
+      scheduler+: {
+        tokens_label_key: 'tokens',
+        priority_label_key: 'priority',
+        workload_label_key: 'workload',
+      },
       alerter: {
         alert_name: 'More than 90% of requests are being rate limited',
       },

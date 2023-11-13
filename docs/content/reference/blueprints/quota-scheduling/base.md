@@ -149,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Scheduler configuration.'
     type='Object (aperture.spec.v1.Scheduler)'
     reference='../../configuration/spec#scheduler'
-    value='{}'
+    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
 />
 
 <!-- vale on -->

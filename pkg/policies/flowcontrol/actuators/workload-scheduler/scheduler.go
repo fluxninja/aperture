@@ -538,6 +538,12 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		matchedWorkloadLabel = s.defaultWorkload.proto.Name
 	}
 
+	if s.proto.WorkloadLabelKey != "" {
+		if val, ok := labels.Get(s.proto.WorkloadLabelKey); ok {
+			matchedWorkloadLabel = val
+		}
+	}
+
 	fairnessLabel := matchedWorkloadLabel
 
 	tokens := float64(1)

@@ -26,6 +26,9 @@ spec:
               enabled: false
               num_sync: 4
           scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
             workloads:
             - label_matcher:
                 match_labels:
