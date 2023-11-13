@@ -547,6 +547,12 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		tokens = matchedWorkloadParametersProto.GetTokens()
 	}
 
+	if s.proto.WorkloadLabelKey != "" {
+		if val, ok := labels.Get(s.proto.WorkloadLabelKey); ok {
+			matchedWorkloadLabel = val
+		}
+	}
+
 	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadLabel); ok {
 		tokens = estimatedTokens
 	}
@@ -567,12 +573,6 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 					invPriority = 1 / parsedPriority
 				}
 			}
-		}
-	}
-
-	if s.proto.WorkloadLabelKey != "" {
-		if val, ok := labels.Get(s.proto.WorkloadLabelKey); ok {
-			matchedWorkloadLabel = val
 		}
 	}
 
