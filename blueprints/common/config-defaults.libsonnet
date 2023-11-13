@@ -2,6 +2,12 @@ local selectors_defaults = [{
   control_point: '__REQUIRED_FIELD__',
 }];
 
+local scheduler_defaults = {
+  tokens_label_key: 'tokens',
+  priority_label_key: 'priority',
+  workload_label_key: 'workload',
+};
+
 {
   /**
   * @param (policy.policy_name: string) Name of the policy.
@@ -20,4 +26,5 @@ local selectors_defaults = [{
 
   // defaults for the schemas
   selectors_defaults: selectors_defaults,
+  scheduler_defaults: scheduler_defaults,
 }
