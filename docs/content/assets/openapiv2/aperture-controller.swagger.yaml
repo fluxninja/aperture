@@ -3029,6 +3029,9 @@ definitions:
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
                 x-go-tag-validate: required
+            out_ports:
+                $ref: '#/definitions/QuotaSchedulerOuts'
+                description: Output ports for the _Quota Scheduler_ component.
             rate_limiter:
                 $ref: '#/definitions/RateLimiterParameters'
                 x-go-tag-validate: required
@@ -3045,6 +3048,13 @@ definitions:
             - in_ports
             - rate_limiter
             - selectors
+        type: object
+    QuotaSchedulerOuts:
+        description: Outputs for the _Quota Scheduler_ component.
+        properties:
+            accept_percentage:
+                $ref: '#/definitions/OutPort'
+                description: The percentage of flows being accepted by the _Quota Scheduler_.
         type: object
     RangeDrivenLoadScheduler:
         description: _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
@@ -3219,7 +3229,7 @@ definitions:
         properties:
             accept_percentage:
                 $ref: '#/definitions/OutPort'
-                description: The percentage of flows being accepted by the _Load Ramp_.
+                description: The percentage of flows being accepted by the _Rate Limiter_.
         type: object
     RateLimiterParameters:
         properties:
@@ -4334,7 +4344,7 @@ definitions:
                   foo = any.unpack(Foo.getDefaultInstance());
                 }
 
-            Example 3: Pack and unpack a message in Python.
+             Example 3: Pack and unpack a message in Python.
 
                 foo = Foo(...)
                 any = Any()
@@ -4344,7 +4354,7 @@ definitions:
                   any.Unpack(foo)
                   ...
 
-            Example 4: Pack and unpack a message in Go
+             Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
                  any, err := anypb.New(foo)
@@ -4364,7 +4374,7 @@ definitions:
             name "y.z".
 
             JSON
-
+            ====
             The JSON representation of an `Any` value uses the regular
             representation of the deserialized, embedded message, with an
             additional field `@type` which contains the type URL. Example:
@@ -4416,7 +4426,8 @@ definitions:
 
                     Note: this functionality is not currently available in the official
                     protobuf release, and it is not used for type URLs beginning with
-                    type.googleapis.com.
+                    type.googleapis.com. As of May 2023, there are no widely used type server
+                    implementations and no plans to implement one.
 
                     Schemes other than `http`, `https` (or the empty scheme) might be
                     used with implementation specific semantics.

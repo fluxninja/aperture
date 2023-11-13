@@ -65,6 +65,15 @@ message QuotaScheduler {
   RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
 
   Scheduler scheduler = 4;
+
+  // Outputs for the _Quota Scheduler_ component.
+  message Outs {
+    // The percentage of flows being accepted by the _Quota Scheduler_.
+    OutPort accept_percentage = 1;
+  }
+
+  // Output ports for the _Quota Scheduler_ component.
+  Outs out_ports = 5;
 }
 
 // Limits the traffic on a control point to specified rate
@@ -149,7 +158,7 @@ message RateLimiter {
 
   // Outputs for the _Rate Limiter_ component.
   message Outs {
-    // The percentage of flows being accepted by the _Load Ramp_.
+    // The percentage of flows being accepted by the _Rate Limiter_.
     OutPort accept_percentage = 1;
   }
 

@@ -7,6 +7,7 @@ import (
 
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
+	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/sampler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/iface"
@@ -70,6 +71,13 @@ func newFlowControlNestedAndOptions(
 	if proto := flowControlComponentProto.GetRateLimiter(); proto != nil {
 		rateLimiterProto = proto
 		isRateLimiter = true
+	}
+
+	quotaSchedulerProto := &policylangv1.QuotaScheduler{}
+	isQuotaScheduler := false
+	if proto := flowControlComponentProto.GetQuotaScheduler(); proto != nil {
+		quotaSchedulerProto = proto
+		isQuotaScheduler = true
 	}
 
 	// Factory parser to determine what kind of composite component to create
@@ -155,6 +163,27 @@ func newFlowControlNestedAndOptions(
 		options = append(options, configSyncOptions)
 
 		configuredComponent, nestedCircuit, err := ratelimiter.ParseRateLimiter(rateLimiterProto, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, nestedOptions)
+
+		return tree, configuredComponents, fx.Options(options...), nil
+	} else if isQuotaScheduler {
+		var options []fx.Option
+		// sync config
+		configSyncOptions, err := quotascheduler.NewConfigSyncOptions(quotaSchedulerProto, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, configSyncOptions)
+
+		configuredComponent, nestedCircuit, err := quotascheduler.ParseQuotaScheduler(quotaSchedulerProto, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}

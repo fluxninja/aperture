@@ -878,6 +878,35 @@ func (m *QuotaScheduler) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetOutPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "OutPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOutPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaSchedulerValidationError{
+				field:  "OutPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return QuotaSchedulerMultiError(errors)
 	}
@@ -4343,6 +4372,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SelectorValidationError{}
+
+// Validate checks the field values on QuotaScheduler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *QuotaScheduler_Outs) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QuotaScheduler_Outs with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QuotaScheduler_OutsMultiError, or nil if none found.
+func (m *QuotaScheduler_Outs) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuotaScheduler_Outs) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAcceptPercentage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaScheduler_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaScheduler_OutsValidationError{
+					field:  "AcceptPercentage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAcceptPercentage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaScheduler_OutsValidationError{
+				field:  "AcceptPercentage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return QuotaScheduler_OutsMultiError(errors)
+	}
+
+	return nil
+}
+
+// QuotaScheduler_OutsMultiError is an error wrapping multiple validation
+// errors returned by QuotaScheduler_Outs.ValidateAll() if the designated
+// constraints aren't met.
+type QuotaScheduler_OutsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuotaScheduler_OutsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuotaScheduler_OutsMultiError) AllErrors() []error { return m }
+
+// QuotaScheduler_OutsValidationError is the validation error returned by
+// QuotaScheduler_Outs.Validate if the designated constraints aren't met.
+type QuotaScheduler_OutsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuotaScheduler_OutsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QuotaScheduler_OutsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QuotaScheduler_OutsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QuotaScheduler_OutsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QuotaScheduler_OutsValidationError) ErrorName() string {
+	return "QuotaScheduler_OutsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QuotaScheduler_OutsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuotaScheduler_Outs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuotaScheduler_OutsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuotaScheduler_OutsValidationError{}
 
 // Validate checks the field values on RateLimiter_Parameters with the rules
 // defined in the proto definition for this message. If any rules are

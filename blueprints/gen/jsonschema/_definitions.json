@@ -2860,6 +2860,10 @@
           "$ref": "#/definitions/RateLimiterIns",
           "x-go-tag-validate": "required"
         },
+        "out_ports": {
+          "$ref": "#/definitions/QuotaSchedulerOuts",
+          "description": "Output ports for the _Quota Scheduler_ component."
+        },
         "rate_limiter": {
           "$ref": "#/definitions/RateLimiterParameters",
           "x-go-tag-validate": "required"
@@ -2878,6 +2882,17 @@
         }
       },
       "required": ["in_ports", "rate_limiter", "selectors"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "QuotaSchedulerOuts": {
+      "description": "Outputs for the _Quota Scheduler_ component.",
+      "properties": {
+        "accept_percentage": {
+          "$ref": "#/definitions/OutPort",
+          "description": "The percentage of flows being accepted by the _Quota Scheduler_."
+        }
+      },
       "type": "object",
       "additionalProperties": false
     },
@@ -3066,7 +3081,7 @@
       "properties": {
         "accept_percentage": {
           "$ref": "#/definitions/OutPort",
-          "description": "The percentage of flows being accepted by the _Load Ramp_."
+          "description": "The percentage of flows being accepted by the _Rate Limiter_."
         }
       },
       "type": "object",

@@ -8,6 +8,9 @@ uri: ../../../../../../blueprints
 policy:
   policy_name: inter-service-rate-limiting
   quota_scheduler:
+    alerter:
+      parameters:
+        alert_name: "Quota Scheduling Event"
     bucket_capacity: 500
     fill_amount: 25
     selectors:

@@ -7031,6 +7031,18 @@ Schedules the traffic based on token-bucket based quotas.
 <!-- vale on -->
 
 </dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaSchedulerOuts](#quota-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _Quota Scheduler_ component.
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -7059,6 +7071,31 @@ Schedules the traffic based on token-bucket based quotas.
 ([[]Selector](#selector), **required**)
 
 <!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### QuotaSchedulerOuts {#quota-scheduler-outs}
+
+<!-- vale on -->
+
+Outputs for the _Quota Scheduler_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Quota Scheduler_.
 
 </dd>
 </dl>
@@ -7487,7 +7524,7 @@ Outputs for the _Rate Limiter_ component.
 
 <!-- vale on -->
 
-The percentage of flows being accepted by the _Load Ramp_.
+The percentage of flows being accepted by the _Rate Limiter_.
 
 </dd>
 </dl>
