@@ -653,7 +653,7 @@ message Sampler {
     //   decision provided that the `accept_percentage` is same or higher.
     // - When label key is not specified, _Sampler_ acts as a stateless filter.
     //   Percentage of flows are selected randomly for rejection.
-    string label_key = 2;
+    string session_label_key = 2;
 
     // Selectors for the component.
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"

@@ -178,7 +178,7 @@ func (frf *samplerFactory) newSamplerOptions(
 	fr := &sampler{
 		Component:              wrapperMessage.GetCommonAttributes(),
 		proto:                  samplerProto,
-		labelKey:               samplerProto.GetParameters().GetLabelKey(),
+		labelKey:               samplerProto.GetParameters().GetSessionLabelKey(),
 		factory:                frf,
 		registry:               reg,
 		passthroughLabelValues: make(map[string]bool),
@@ -300,9 +300,9 @@ func (fr *sampler) Decide(ctx context.Context,
 		labelValue  string
 		hasLabelKey bool
 	)
-	labelKey := fr.proto.GetParameters().GetLabelKey()
+	labelKey := fr.proto.GetParameters().GetSessionLabelKey()
 	if labelKey != "" {
-		labelValue, hasLabelKey = labels.Get(fr.proto.GetParameters().GetLabelKey())
+		labelValue, hasLabelKey = labels.Get(labelKey)
 	}
 
 	// Initialize LimiterDecision

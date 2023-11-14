@@ -8387,7 +8387,7 @@ func (m *Sampler_Parameters) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for LabelKey
+	// no validation rules for SessionLabelKey
 
 	for idx, item := range m.GetSelectors() {
 		_, _ = idx, item
