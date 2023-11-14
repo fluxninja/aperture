@@ -21,6 +21,8 @@ private static final long serialVersionUID = 0L;
   }
   private CheckRequest() {
     controlPoint_ = "";
+    cacheKeys_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
   }
 
   @java.lang.Override
@@ -184,6 +186,59 @@ java.lang.String defaultValue) {
     return rampMode_;
   }
 
+  public static final int CACHE_KEYS_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private com.google.protobuf.LazyStringArrayList cacheKeys_ =
+      com.google.protobuf.LazyStringArrayList.emptyList();
+  /**
+   * <pre>
+   * Cache items to be fetched.
+   * </pre>
+   *
+   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+   * @return A list containing the cacheKeys.
+   */
+  public com.google.protobuf.ProtocolStringList
+      getCacheKeysList() {
+    return cacheKeys_;
+  }
+  /**
+   * <pre>
+   * Cache items to be fetched.
+   * </pre>
+   *
+   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+   * @return The count of cacheKeys.
+   */
+  public int getCacheKeysCount() {
+    return cacheKeys_.size();
+  }
+  /**
+   * <pre>
+   * Cache items to be fetched.
+   * </pre>
+   *
+   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+   * @param index The index of the element to return.
+   * @return The cacheKeys at the given index.
+   */
+  public java.lang.String getCacheKeys(int index) {
+    return cacheKeys_.get(index);
+  }
+  /**
+   * <pre>
+   * Cache items to be fetched.
+   * </pre>
+   *
+   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the cacheKeys at the given index.
+   */
+  public com.google.protobuf.ByteString
+      getCacheKeysBytes(int index) {
+    return cacheKeys_.getByteString(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -209,6 +264,9 @@ java.lang.String defaultValue) {
         2);
     if (rampMode_ != false) {
       output.writeBool(3, rampMode_);
+    }
+    for (int i = 0; i < cacheKeys_.size(); i++) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, cacheKeys_.getRaw(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -236,6 +294,14 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(3, rampMode_);
     }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < cacheKeys_.size(); i++) {
+        dataSize += computeStringSizeNoTag(cacheKeys_.getRaw(i));
+      }
+      size += dataSize;
+      size += 1 * getCacheKeysList().size();
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -257,6 +323,8 @@ java.lang.String defaultValue) {
         other.internalGetLabels())) return false;
     if (getRampMode()
         != other.getRampMode()) return false;
+    if (!getCacheKeysList()
+        .equals(other.getCacheKeysList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -277,6 +345,10 @@ java.lang.String defaultValue) {
     hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getRampMode());
+    if (getCacheKeysCount() > 0) {
+      hash = (37 * hash) + CACHE_KEYS_FIELD_NUMBER;
+      hash = (53 * hash) + getCacheKeysList().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -437,6 +509,8 @@ java.lang.String defaultValue) {
       controlPoint_ = "";
       internalGetMutableLabels().clear();
       rampMode_ = false;
+      cacheKeys_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
       return this;
     }
 
@@ -479,6 +553,10 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.rampMode_ = rampMode_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        cacheKeys_.makeImmutable();
+        result.cacheKeys_ = cacheKeys_;
       }
     }
 
@@ -537,6 +615,16 @@ java.lang.String defaultValue) {
       if (other.getRampMode() != false) {
         setRampMode(other.getRampMode());
       }
+      if (!other.cacheKeys_.isEmpty()) {
+        if (cacheKeys_.isEmpty()) {
+          cacheKeys_ = other.cacheKeys_;
+          bitField0_ |= 0x00000008;
+        } else {
+          ensureCacheKeysIsMutable();
+          cacheKeys_.addAll(other.cacheKeys_);
+        }
+        onChanged();
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -582,6 +670,12 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000004;
               break;
             } // case 24
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+              ensureCacheKeysIsMutable();
+              cacheKeys_.add(s);
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -826,6 +920,153 @@ java.lang.String defaultValue) {
     public Builder clearRampMode() {
       bitField0_ = (bitField0_ & ~0x00000004);
       rampMode_ = false;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.LazyStringArrayList cacheKeys_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+    private void ensureCacheKeysIsMutable() {
+      if (!cacheKeys_.isModifiable()) {
+        cacheKeys_ = new com.google.protobuf.LazyStringArrayList(cacheKeys_);
+      }
+      bitField0_ |= 0x00000008;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @return A list containing the cacheKeys.
+     */
+    public com.google.protobuf.ProtocolStringList
+        getCacheKeysList() {
+      cacheKeys_.makeImmutable();
+      return cacheKeys_;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @return The count of cacheKeys.
+     */
+    public int getCacheKeysCount() {
+      return cacheKeys_.size();
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param index The index of the element to return.
+     * @return The cacheKeys at the given index.
+     */
+    public java.lang.String getCacheKeys(int index) {
+      return cacheKeys_.get(index);
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param index The index of the value to return.
+     * @return The bytes of the cacheKeys at the given index.
+     */
+    public com.google.protobuf.ByteString
+        getCacheKeysBytes(int index) {
+      return cacheKeys_.getByteString(index);
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param index The index to set the value at.
+     * @param value The cacheKeys to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCacheKeys(
+        int index, java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureCacheKeysIsMutable();
+      cacheKeys_.set(index, value);
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param value The cacheKeys to add.
+     * @return This builder for chaining.
+     */
+    public Builder addCacheKeys(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      ensureCacheKeysIsMutable();
+      cacheKeys_.add(value);
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param values The cacheKeys to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAllCacheKeys(
+        java.lang.Iterable<java.lang.String> values) {
+      ensureCacheKeysIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, cacheKeys_);
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCacheKeys() {
+      cacheKeys_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+      bitField0_ = (bitField0_ & ~0x00000008);;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache items to be fetched.
+     * </pre>
+     *
+     * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
+     * @param value The bytes of the cacheKeys to add.
+     * @return This builder for chaining.
+     */
+    public Builder addCacheKeysBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      ensureCacheKeysIsMutable();
+      cacheKeys_.add(value);
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }

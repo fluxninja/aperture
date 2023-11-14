@@ -49,6 +49,37 @@ public final class FlowControlServiceGrpc {
     return getCheckMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest,
+      com.google.protobuf.Empty> getCacheUpdateMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "CacheUpdate",
+      requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest,
+      com.google.protobuf.Empty> getCacheUpdateMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest, com.google.protobuf.Empty> getCacheUpdateMethod;
+    if ((getCacheUpdateMethod = FlowControlServiceGrpc.getCacheUpdateMethod) == null) {
+      synchronized (FlowControlServiceGrpc.class) {
+        if ((getCacheUpdateMethod = FlowControlServiceGrpc.getCacheUpdateMethod) == null) {
+          FlowControlServiceGrpc.getCacheUpdateMethod = getCacheUpdateMethod =
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CacheUpdate"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("CacheUpdate"))
+              .build();
+        }
+      }
+    }
+    return getCacheUpdateMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -109,6 +140,13 @@ public final class FlowControlServiceGrpc {
         io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCheckMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void cacheUpdate(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheUpdateMethod(), responseObserver);
+    }
   }
 
   /**
@@ -154,6 +192,14 @@ public final class FlowControlServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void cacheUpdate(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getCacheUpdateMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -183,6 +229,13 @@ public final class FlowControlServiceGrpc {
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse check(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCheckMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.google.protobuf.Empty cacheUpdate(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getCacheUpdateMethod(), getCallOptions(), request);
     }
   }
 
@@ -215,9 +268,18 @@ public final class FlowControlServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCheckMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> cacheUpdate(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getCacheUpdateMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_CHECK = 0;
+  private static final int METHODID_CACHE_UPDATE = 1;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -239,6 +301,10 @@ public final class FlowControlServiceGrpc {
         case METHODID_CHECK:
           serviceImpl.check((com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) request,
               (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>) responseObserver);
+          break;
+        case METHODID_CACHE_UPDATE:
+          serviceImpl.cacheUpdate((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -265,6 +331,13 @@ public final class FlowControlServiceGrpc {
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>(
                 service, METHODID_CHECK)))
+        .addMethod(
+          getCacheUpdateMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheRequest,
+              com.google.protobuf.Empty>(
+                service, METHODID_CACHE_UPDATE)))
         .build();
   }
 
@@ -314,6 +387,7 @@ public final class FlowControlServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new FlowControlServiceFileDescriptorSupplier())
               .addMethod(getCheckMethod())
+              .addMethod(getCacheUpdateMethod())
               .build();
         }
       }

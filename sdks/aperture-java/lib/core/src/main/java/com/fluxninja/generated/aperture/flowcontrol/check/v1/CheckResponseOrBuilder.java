@@ -437,4 +437,58 @@ java.lang.String defaultValue);
    * @return The deniedResponseStatusCode.
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
+
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  int getCachedResponsesCount();
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  boolean containsCachedResponses(
+      java.lang.String key);
+  /**
+   * Use {@link #getCachedResponsesMap()} instead.
+   */
+  @java.lang.Deprecated
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+  getCachedResponses();
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+  getCachedResponsesMap();
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse defaultValue);
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrThrow(
+      java.lang.String key);
 }

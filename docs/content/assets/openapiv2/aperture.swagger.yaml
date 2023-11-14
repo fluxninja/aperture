@@ -778,6 +778,28 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: The value is emitted to the output port.
         type: object
+    CacheItem:
+        properties:
+            ttl:
+                type: string
+            value:
+                format: byte
+                type: string
+        type: object
+    CacheResponse:
+        properties:
+            result:
+                $ref: '#/definitions/CacheResult'
+            value:
+                format: byte
+                type: string
+        type: object
+    CacheResult:
+        default: Hit
+        enum:
+            - Hit
+            - Miss
+        type: string
     CheckHTTPRequest:
         properties:
             control_point:
@@ -859,6 +881,11 @@ definitions:
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
+            cached_responses:
+                additionalProperties:
+                    $ref: '#/definitions/CacheResponse'
+                description: Matching cached items.
+                type: object
             classifier_infos:
                 description: classifiers that were matched for this request.
                 items:

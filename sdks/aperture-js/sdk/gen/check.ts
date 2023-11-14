@@ -12,6 +12,10 @@ export interface ProtoGrpcType {
     flowcontrol: {
       check: {
         v1: {
+          CacheItem: MessageTypeDefinition
+          CacheRequest: MessageTypeDefinition
+          CacheResponse: MessageTypeDefinition
+          CacheResult: EnumTypeDefinition
           CheckRequest: MessageTypeDefinition
           CheckResponse: MessageTypeDefinition
           ClassifierInfo: MessageTypeDefinition
@@ -26,6 +30,7 @@ export interface ProtoGrpcType {
   google: {
     protobuf: {
       Duration: MessageTypeDefinition
+      Empty: MessageTypeDefinition
       Timestamp: MessageTypeDefinition
     }
   }

@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	FlowControlService_Check_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/Check"
+	FlowControlService_Check_FullMethodName       = "/aperture.flowcontrol.check.v1.FlowControlService/Check"
+	FlowControlService_CacheUpdate_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheUpdate"
 )
 
 // FlowControlServiceClient is the client API for FlowControlService service.
@@ -28,6 +30,7 @@ const (
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
+	CacheUpdate(ctx context.Context, in *CacheRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type flowControlServiceClient struct {
@@ -47,12 +50,22 @@ func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, 
 	return out, nil
 }
 
+func (c *flowControlServiceClient) CacheUpdate(ctx context.Context, in *CacheRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FlowControlService_CacheUpdate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FlowControlServiceServer is the server API for FlowControlService service.
 // All implementations should embed UnimplementedFlowControlServiceServer
 // for forward compatibility
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
+	CacheUpdate(context.Context, *CacheRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedFlowControlServiceServer should be embedded to have forward compatible implementations.
@@ -61,6 +74,9 @@ type UnimplementedFlowControlServiceServer struct {
 
 func (UnimplementedFlowControlServiceServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+}
+func (UnimplementedFlowControlServiceServer) CacheUpdate(context.Context, *CacheRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheUpdate not implemented")
 }
 
 // UnsafeFlowControlServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -92,6 +108,24 @@ func _FlowControlService_Check_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FlowControlService_CacheUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowControlServiceServer).CacheUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowControlService_CacheUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowControlServiceServer).CacheUpdate(ctx, req.(*CacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FlowControlService_ServiceDesc is the grpc.ServiceDesc for FlowControlService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +136,10 @@ var FlowControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Check",
 			Handler:    _FlowControlService_Check_Handler,
+		},
+		{
+			MethodName: "CacheUpdate",
+			Handler:    _FlowControlService_CacheUpdate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

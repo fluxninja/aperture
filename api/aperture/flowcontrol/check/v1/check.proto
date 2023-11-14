@@ -3,12 +3,14 @@ syntax = "proto3";
 package aperture.flowcontrol.check.v1;
 
 import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc CacheUpdate(CacheRequest) returns (google.protobuf.Empty) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -16,6 +18,18 @@ message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
   bool ramp_mode = 3;
+  // Cache items to be fetched.
+  repeated string cache_keys = 4;
+}
+
+message CacheRequest {
+  map<string, CacheItem> upserts = 1;
+  repeated string deletes = 2;
+}
+
+message CacheItem {
+  bytes value = 1;
+  google.protobuf.Duration ttl = 2;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -63,6 +77,18 @@ message CheckResponse {
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
+  // Matching cached items.
+  map<string, CacheResponse> cached_responses = 15;
+}
+
+enum CacheResult {
+  Hit = 0;
+  Miss = 1;
+}
+
+message CacheResponse {
+  bytes value = 1;
+  CacheResult result = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

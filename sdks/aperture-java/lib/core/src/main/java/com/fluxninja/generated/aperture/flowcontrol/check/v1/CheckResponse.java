@@ -52,6 +52,8 @@ private static final long serialVersionUID = 0L;
     switch (number) {
       case 7:
         return internalGetTelemetryFlowLabels();
+      case 15:
+        return internalGetCachedResponses();
       default:
         throw new RuntimeException(
             "Invalid map field number: " + number);
@@ -945,6 +947,101 @@ java.lang.String defaultValue) {
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
   }
 
+  public static final int CACHED_RESPONSES_FIELD_NUMBER = 15;
+  private static final class CachedResponsesDefaultEntryHolder {
+    static final com.google.protobuf.MapEntry<
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> defaultEntry =
+            com.google.protobuf.MapEntry
+            .<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>newDefaultInstance(
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CheckResponse_CachedResponsesEntry_descriptor, 
+                com.google.protobuf.WireFormat.FieldType.STRING,
+                "",
+                com.google.protobuf.WireFormat.FieldType.MESSAGE,
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance());
+  }
+  @SuppressWarnings("serial")
+  private com.google.protobuf.MapField<
+      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> cachedResponses_;
+  private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+  internalGetCachedResponses() {
+    if (cachedResponses_ == null) {
+      return com.google.protobuf.MapField.emptyMapField(
+          CachedResponsesDefaultEntryHolder.defaultEntry);
+    }
+    return cachedResponses_;
+  }
+  public int getCachedResponsesCount() {
+    return internalGetCachedResponses().getMap().size();
+  }
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  @java.lang.Override
+  public boolean containsCachedResponses(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    return internalGetCachedResponses().getMap().containsKey(key);
+  }
+  /**
+   * Use {@link #getCachedResponsesMap()} instead.
+   */
+  @java.lang.Override
+  @java.lang.Deprecated
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> getCachedResponses() {
+    return getCachedResponsesMap();
+  }
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  @java.lang.Override
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> getCachedResponsesMap() {
+    return internalGetCachedResponses().getMap();
+  }
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  @java.lang.Override
+  public /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse defaultValue) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> map =
+        internalGetCachedResponses().getMap();
+    return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+  /**
+   * <pre>
+   * Matching cached items.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrThrow(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> map =
+        internalGetCachedResponses().getMap();
+    if (!map.containsKey(key)) {
+      throw new java.lang.IllegalArgumentException();
+    }
+    return map.get(key);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -1001,6 +1098,12 @@ java.lang.String defaultValue) {
     if (deniedResponseStatusCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.Empty.getNumber()) {
       output.writeEnum(14, deniedResponseStatusCode_);
     }
+    com.google.protobuf.GeneratedMessageV3
+      .serializeStringMapTo(
+        output,
+        internalGetCachedResponses(),
+        CachedResponsesDefaultEntryHolder.defaultEntry,
+        15);
     getUnknownFields().writeTo(output);
   }
 
@@ -1075,6 +1178,16 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(14, deniedResponseStatusCode_);
     }
+    for (java.util.Map.Entry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> entry
+         : internalGetCachedResponses().getMap().entrySet()) {
+      com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+      cachedResponses__ = CachedResponsesDefaultEntryHolder.defaultEntry.newBuilderForType()
+          .setKey(entry.getKey())
+          .setValue(entry.getValue())
+          .build();
+      size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(15, cachedResponses__);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1122,6 +1235,8 @@ java.lang.String defaultValue) {
           .equals(other.getWaitTime())) return false;
     }
     if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
+    if (!internalGetCachedResponses().equals(
+        other.internalGetCachedResponses())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1177,6 +1292,10 @@ java.lang.String defaultValue) {
     }
     hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
     hash = (53 * hash) + deniedResponseStatusCode_;
+    if (!internalGetCachedResponses().getMap().isEmpty()) {
+      hash = (37 * hash) + CACHED_RESPONSES_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetCachedResponses().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -1296,6 +1415,8 @@ java.lang.String defaultValue) {
       switch (number) {
         case 7:
           return internalGetTelemetryFlowLabels();
+        case 15:
+          return internalGetCachedResponses();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -1307,6 +1428,8 @@ java.lang.String defaultValue) {
       switch (number) {
         case 7:
           return internalGetMutableTelemetryFlowLabels();
+        case 15:
+          return internalGetMutableCachedResponses();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -1390,6 +1513,7 @@ java.lang.String defaultValue) {
         waitTimeBuilder_ = null;
       }
       deniedResponseStatusCode_ = 0;
+      internalGetMutableCachedResponses().clear();
       return this;
     }
 
@@ -1496,6 +1620,10 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00001000) != 0)) {
         result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
+      }
+      if (((from_bitField0_ & 0x00002000) != 0)) {
+        result.cachedResponses_ = internalGetCachedResponses();
+        result.cachedResponses_.makeImmutable();
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -1668,6 +1796,9 @@ java.lang.String defaultValue) {
       if (other.deniedResponseStatusCode_ != 0) {
         setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
       }
+      internalGetMutableCachedResponses().mergeFrom(
+          other.internalGetCachedResponses());
+      bitField0_ |= 0x00002000;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1795,6 +1926,15 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00001000;
               break;
             } // case 112
+            case 122: {
+              com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+              cachedResponses__ = input.readMessage(
+                  CachedResponsesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableCachedResponses().getMutableMap().put(
+                  cachedResponses__.getKey(), cachedResponses__.getValue());
+              bitField0_ |= 0x00002000;
+              break;
+            } // case 122
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3990,6 +4130,161 @@ java.lang.String defaultValue) {
       bitField0_ = (bitField0_ & ~0x00001000);
       deniedResponseStatusCode_ = 0;
       onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.MapField<
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> cachedResponses_;
+    private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+        internalGetCachedResponses() {
+      if (cachedResponses_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            CachedResponsesDefaultEntryHolder.defaultEntry);
+      }
+      return cachedResponses_;
+    }
+    private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+        internalGetMutableCachedResponses() {
+      if (cachedResponses_ == null) {
+        cachedResponses_ = com.google.protobuf.MapField.newMapField(
+            CachedResponsesDefaultEntryHolder.defaultEntry);
+      }
+      if (!cachedResponses_.isMutable()) {
+        cachedResponses_ = cachedResponses_.copy();
+      }
+      bitField0_ |= 0x00002000;
+      onChanged();
+      return cachedResponses_;
+    }
+    public int getCachedResponsesCount() {
+      return internalGetCachedResponses().getMap().size();
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    @java.lang.Override
+    public boolean containsCachedResponses(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      return internalGetCachedResponses().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getCachedResponsesMap()} instead.
+     */
+    @java.lang.Override
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> getCachedResponses() {
+      return getCachedResponsesMap();
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    @java.lang.Override
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> getCachedResponsesMap() {
+      return internalGetCachedResponses().getMap();
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    @java.lang.Override
+    public /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrDefault(
+        java.lang.String key,
+        /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse defaultValue) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> map =
+          internalGetCachedResponses().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> map =
+          internalGetCachedResponses().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+    public Builder clearCachedResponses() {
+      bitField0_ = (bitField0_ & ~0x00002000);
+      internalGetMutableCachedResponses().getMutableMap()
+          .clear();
+      return this;
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    public Builder removeCachedResponses(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      internalGetMutableCachedResponses().getMutableMap()
+          .remove(key);
+      return this;
+    }
+    /**
+     * Use alternate mutation accessors instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
+        getMutableCachedResponses() {
+      bitField0_ |= 0x00002000;
+      return internalGetMutableCachedResponses().getMutableMap();
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    public Builder putCachedResponses(
+        java.lang.String key,
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse value) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      if (value == null) { throw new NullPointerException("map value"); }
+      internalGetMutableCachedResponses().getMutableMap()
+          .put(key, value);
+      bitField0_ |= 0x00002000;
+      return this;
+    }
+    /**
+     * <pre>
+     * Matching cached items.
+     * </pre>
+     *
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+     */
+    public Builder putAllCachedResponses(
+        java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse> values) {
+      internalGetMutableCachedResponses().getMutableMap()
+          .putAll(values);
+      bitField0_ |= 0x00002000;
       return this;
     }
     @java.lang.Override
