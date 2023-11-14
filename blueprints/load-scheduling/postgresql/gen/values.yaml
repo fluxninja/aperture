@@ -39,10 +39,10 @@ policy:
           - control_point: __REQUIRED_FIELD__
       max_load_multiplier: 2
       min_load_multiplier: 0
-    # Setpoint.
-    # Type: float64
-    # Required: True
-    setpoint: __REQUIRED_FIELD__
+  # Threshold of percentage connections used out of postgresql_connection_max that which point to start throttling traffic.
+  # Type: float64
+  # Required: True
+  connections_used_threshold: __REQUIRED_FIELD__
   # Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.
   # Type: postgresql
   # Required: True

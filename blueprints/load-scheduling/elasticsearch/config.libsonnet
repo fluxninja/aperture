@@ -1,6 +1,6 @@
-local serviceProtectionDefaults = import '../common-aiad/config-defaults.libsonnet';
+local configDefaults = import '../common-aiad/config-defaults.libsonnet';
 
-serviceProtectionDefaults {
+configDefaults {
   policy+: {
     /**
     * @param (policy.elasticsearch: elasticsearch) Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
@@ -12,6 +12,7 @@ serviceProtectionDefaults {
     * @schema (elasticsearch.indices: []string) Index filters that define which indices are scraped for index-level metrics.
     * @schema (elasticsearch.skip_cluster_metrics: bool) If true, cluster-level metrics will not be scraped.
     * @schema (elasticsearch.initial_delay: string) Defines how long this receiver waits before starting.
+    * @param (policy.search_queue_threshold: float64) Threshold of search thread pool tasks queued at which point to start throttling traffic.
     */
     elasticsearch: {
       username: '__REQUIRED_FIELD__',
@@ -20,11 +21,6 @@ serviceProtectionDefaults {
       agent_group: 'default',
     },
 
-    /**
-    * @param (policy.load_scheduling_core.setpoint: float64) Setpoint.
-    */
-    load_scheduling_core+: {
-      setpoint: '__REQUIRED_FIELD__',
-    },
+    search_queue_threshold: '__REQUIRED_FIELD__',
   },
 }

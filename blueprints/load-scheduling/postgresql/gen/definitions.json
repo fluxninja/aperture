@@ -19,7 +19,12 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name", "load_scheduling_core", "postgresql"],
+      "required": [
+        "policy_name",
+        "load_scheduling_core",
+        "connections_used_threshold",
+        "postgresql"
+      ],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -48,7 +53,7 @@
         "load_scheduling_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler", "setpoint"],
+          "required": ["aiad_load_scheduler"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -90,14 +95,14 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
-            },
-            "setpoint": {
-              "description": "Setpoint.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
             }
           }
+        },
+        "connections_used_threshold": {
+          "description": "Threshold of percentage connections used out of postgresql_connection_max that which point to start throttling traffic.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
         },
         "postgresql": {
           "description": "Configuration for PostgreSQL OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/postgresql for more information.",

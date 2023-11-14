@@ -24,8 +24,8 @@ policy:
       - "postgres"
     tls:
       insecure: true
+  connections_used_threshold: 40
   load_scheduling_core:
-    setpoint: 40
     aiad_load_scheduler:
       alerter:
         alert_name: AIAD Load Throttling Event
