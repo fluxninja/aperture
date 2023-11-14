@@ -1,9 +1,8 @@
 local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common-aiad/policy.libsonnet';
-local config = import './config.libsonnet';
 
 function(cfg, params={}) {
-  local updatedConfig = config + cfg,
+  local updatedConfig = cfg,
 
   local commonPolicy = commonPolicyFn(cfg, params),
 

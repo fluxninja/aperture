@@ -1,10 +1,9 @@
 local consts = import '../../consts.libsonnet';
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
-local config = import './config-defaults.libsonnet';
 
 function(cfg, params={}) {
-  local updatedConfig = config + cfg,
+  local updatedConfig = cfg,
 
   local addOverloadConfirmation = function(confirmationAccumulator, confirmation) {
     local promQLSignalName = 'PROMQL_' + std.toString(confirmationAccumulator.overload_confirmation_signals_count),
