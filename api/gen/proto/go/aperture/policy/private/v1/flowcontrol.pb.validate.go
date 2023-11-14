@@ -801,7 +801,7 @@ func (m *RateLimiter_Parameters) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for LabelKey
+	// no validation rules for LimitByLabelKey
 
 	if all {
 		switch v := interface{}(m.GetInterval()).(type) {

@@ -12,7 +12,7 @@ function(datasourceName, policyName, component, extraFilters={})
       g.query.prometheus.new(datasourceName, 'sum by(decision_type) (rate(rate_limiter_counter_total{%(filters)s}[$__rate_interval]))' % { filters: stringFilters })
       + g.query.prometheus.withIntervalFactor(1),
     ] +
-    if 'label_key' in component.component && component.component.label_key != ''
+    if 'limit_by_label_key' in component.component && component.component.limit_by_label_key != ''
     then
       portUtils.targetsForInPort(datasourceName, component, 'fill_amount', policyName, extraFilters)
     else

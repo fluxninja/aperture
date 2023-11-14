@@ -72,6 +72,12 @@ func ParseRateLimiter(
 		policyParams,
 	)
 
+	labelKey := rateLimiter.Parameters.GetLimitByLabelKey()
+	if labelKey == "" {
+		// Deprecated: Remove in v2.25.0
+		labelKey = rateLimiter.Parameters.GetLabelKey()
+	}
+
 	rateLimiterAnyProto, err := anypb.New(
 		&policyprivatev1.RateLimiter{
 			InPorts: &policyprivatev1.RateLimiter_Ins{
@@ -93,10 +99,10 @@ func ParseRateLimiter(
 			},
 			Selectors: rateLimiter.GetSelectors(),
 			Parameters: &policyprivatev1.RateLimiter_Parameters{
-				LabelKey:       rateLimiter.Parameters.GetLabelKey(),
-				Interval:       rateLimiter.Parameters.GetInterval(),
-				ContinuousFill: rateLimiter.Parameters.GetContinuousFill(),
-				MaxIdleTime:    rateLimiter.Parameters.GetMaxIdleTime(),
+				LimitByLabelKey: labelKey,
+				Interval:        rateLimiter.Parameters.GetInterval(),
+				ContinuousFill:  rateLimiter.Parameters.GetContinuousFill(),
+				MaxIdleTime:     rateLimiter.Parameters.GetMaxIdleTime(),
 				LazySync: &policyprivatev1.RateLimiter_Parameters_LazySync{
 					Enabled: rateLimiter.Parameters.GetLazySync().GetEnabled(),
 					NumSync: rateLimiter.Parameters.GetLazySync().GetNumSync(),

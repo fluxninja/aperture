@@ -60,7 +60,7 @@ policy:
       # Flow label to use for rate limiting.
       # Type: string
       # Required: True
-      label_key: user_id
+      limit_by_label_key: user_id
       lazy_sync:
         enabled: true
         num_sync: 5

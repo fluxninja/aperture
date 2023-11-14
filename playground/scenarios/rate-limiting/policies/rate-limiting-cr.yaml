@@ -21,7 +21,7 @@ spec:
               signal_name: ACCEPT_PERCENTAGE
           parameters:
             interval: 1s
-            label_key: http.request.header.user_id
+            limit_by_label_key: http.request.header.user_id
           request_parameters:
             tokens_label_key: http.request.header.tokens
           selectors:

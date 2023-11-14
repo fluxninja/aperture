@@ -288,10 +288,10 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.LabelKey) > 0 {
-		i -= len(m.LabelKey)
-		copy(dAtA[i:], m.LabelKey)
-		i = encodeVarint(dAtA, i, uint64(len(m.LabelKey)))
+	if len(m.LimitByLabelKey) > 0 {
+		i -= len(m.LimitByLabelKey)
+		copy(dAtA[i:], m.LimitByLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.LimitByLabelKey)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -633,7 +633,7 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.LabelKey)
+	l = len(m.LimitByLabelKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -1155,7 +1155,7 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LabelKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitByLabelKey", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1183,7 +1183,7 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LabelKey = string(dAtA[iNdEx:postIndex])
+			m.LimitByLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

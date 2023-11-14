@@ -1,6 +1,12 @@
 {
   new():: {
   },
+  withAdaptiveLoadScheduler(adaptive_load_scheduler):: {
+    adaptive_load_scheduler: adaptive_load_scheduler,
+  },
+  withAdaptiveLoadSchedulerMixin(adaptive_load_scheduler):: {
+    adaptive_load_scheduler+: adaptive_load_scheduler,
+  },
   withContinuousFill(continuous_fill):: {
     continuous_fill: continuous_fill,
   },
@@ -30,6 +36,12 @@
   },
   withLazySyncMixin(lazy_sync):: {
     lazy_sync+: lazy_sync,
+  },
+  withLimitByLabelKey(limit_by_label_key):: {
+    limit_by_label_key: limit_by_label_key,
+  },
+  withLimitByLabelKeyMixin(limit_by_label_key):: {
+    limit_by_label_key+: limit_by_label_key,
   },
   withMaxIdleTime(max_idle_time):: {
     max_idle_time: max_idle_time,

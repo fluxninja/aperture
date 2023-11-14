@@ -3233,6 +3233,8 @@ definitions:
         type: object
     RateLimiterParameters:
         properties:
+            adaptive_load_scheduler:
+                $ref: '#/definitions/AdaptiveLoadScheduler'
             continuous_fill:
                 default: true
                 description: |+
@@ -3264,7 +3266,7 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             label_key:
-                description: |-
+                description: |+
                     Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
@@ -3274,10 +3276,26 @@ definitions:
                     label set up, set `label_key: "user"`.
                     If no label key is specified, then all requests matching the
                     selectors will be rate limited based on the global bucket.
+                    Deprecated: v2.25.0. Use _limit_by_label_key_ instead.
+
                 type: string
+                x-deprecated: true
+                x-go-tag-validate: deprecated
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
+            limit_by_label_key:
+                description: |-
+                    Specifies which label the rate limiter should be keyed by.
+
+                    Rate limiting is done independently for each value of the
+                    [label](/concepts/flow-label.md) with given key.
+                    For example, to give each user a separate limit, assuming you
+                    have a _user_ flow
+                    label set up, set `limit_by_label_key: "user"`.
+                    If no label key is specified, then all requests matching the
+                    selectors will be rate limited based on the global bucket.
+                type: string
             max_idle_time:
                 default: 7200s
                 description: |+
