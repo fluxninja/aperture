@@ -61,7 +61,7 @@ export interface CheckResponse {
   'limiterDecisions'?: (_aperture_flowcontrol_check_v1_LimiterDecision)[];
   'waitTime'?: (_google_protobuf_Duration | null);
   'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
-  'cachedResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_CacheResponse});
+  'cachedResponse'?: (_aperture_flowcontrol_check_v1_CacheResponse | null);
 }
 
 export interface CheckResponse__Output {
@@ -78,5 +78,5 @@ export interface CheckResponse__Output {
   'limiterDecisions': (_aperture_flowcontrol_check_v1_LimiterDecision__Output)[];
   'waitTime': (_google_protobuf_Duration__Output | null);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
-  'cachedResponses': ({[key: string]: _aperture_flowcontrol_check_v1_CacheResponse__Output});
+  'cachedResponse': (_aperture_flowcontrol_check_v1_CacheResponse__Output | null);
 }

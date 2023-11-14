@@ -21,9 +21,14 @@ class FlowControlServiceStub(object):
                 request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CheckRequest.SerializeToString,
                 response_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CheckResponse.FromString,
                 )
-        self.CacheUpdate = channel.unary_unary(
-                '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpdate',
-                request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheRequest.SerializeToString,
+        self.CacheUpsert = channel.unary_unary(
+                '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert',
+                request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                )
+        self.CacheDelete = channel.unary_unary(
+                '/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete',
+                request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 )
 
@@ -39,7 +44,13 @@ class FlowControlServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CacheUpdate(self, request, context):
+    def CacheUpsert(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CacheDelete(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,9 +64,14 @@ def add_FlowControlServiceServicer_to_server(servicer, server):
                     request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CheckRequest.FromString,
                     response_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CheckResponse.SerializeToString,
             ),
-            'CacheUpdate': grpc.unary_unary_rpc_method_handler(
-                    servicer.CacheUpdate,
-                    request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheRequest.FromString,
+            'CacheUpsert': grpc.unary_unary_rpc_method_handler(
+                    servicer.CacheUpsert,
+                    request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'CacheDelete': grpc.unary_unary_rpc_method_handler(
+                    servicer.CacheDelete,
+                    request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
@@ -87,7 +103,7 @@ class FlowControlService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def CacheUpdate(request,
+    def CacheUpsert(request,
             target,
             options=(),
             channel_credentials=None,
@@ -97,8 +113,25 @@ class FlowControlService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpdate',
-            aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheRequest.SerializeToString,
+        return grpc.experimental.unary_unary(request, target, '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert',
+            aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CacheDelete(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete',
+            aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

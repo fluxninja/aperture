@@ -61,42 +61,21 @@ java.lang.String defaultValue);
 
   /**
    * <pre>
-   * Cache items to be fetched.
+   * Cache item to fetch.
    * </pre>
    *
-   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
-   * @return A list containing the cacheKeys.
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The cacheKey.
    */
-  java.util.List<java.lang.String>
-      getCacheKeysList();
+  java.lang.String getCacheKey();
   /**
    * <pre>
-   * Cache items to be fetched.
+   * Cache item to fetch.
    * </pre>
    *
-   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
-   * @return The count of cacheKeys.
-   */
-  int getCacheKeysCount();
-  /**
-   * <pre>
-   * Cache items to be fetched.
-   * </pre>
-   *
-   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
-   * @param index The index of the element to return.
-   * @return The cacheKeys at the given index.
-   */
-  java.lang.String getCacheKeys(int index);
-  /**
-   * <pre>
-   * Cache items to be fetched.
-   * </pre>
-   *
-   * <code>repeated string cache_keys = 4 [json_name = "cacheKeys"];</code>
-   * @param index The index of the value to return.
-   * @return The bytes of the cacheKeys at the given index.
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The bytes for cacheKey.
    */
   com.google.protobuf.ByteString
-      getCacheKeysBytes(int index);
+      getCacheKeyBytes();
 }

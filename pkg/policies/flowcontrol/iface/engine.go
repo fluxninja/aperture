@@ -14,6 +14,7 @@ import (
 type RequestContext struct {
 	FlowLabels   labels.Labels
 	ControlPoint string
+	CacheKey     string
 	Services     []string
 	RampMode     bool
 }

@@ -443,52 +443,25 @@ java.lang.String defaultValue);
    * Matching cached items.
    * </pre>
    *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+   * @return Whether the cachedResponse field is set.
    */
-  int getCachedResponsesCount();
+  boolean hasCachedResponse();
   /**
    * <pre>
    * Matching cached items.
    * </pre>
    *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+   * @return The cachedResponse.
    */
-  boolean containsCachedResponses(
-      java.lang.String key);
-  /**
-   * Use {@link #getCachedResponsesMap()} instead.
-   */
-  @java.lang.Deprecated
-  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
-  getCachedResponses();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponse();
   /**
    * <pre>
    * Matching cached items.
    * </pre>
    *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
    */
-  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse>
-  getCachedResponsesMap();
-  /**
-   * <pre>
-   * Matching cached items.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
-   */
-  /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrDefault(
-      java.lang.String key,
-      /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse defaultValue);
-  /**
-   * <pre>
-   * Matching cached items.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheResponse&gt; cached_responses = 15 [json_name = "cachedResponses"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponsesOrThrow(
-      java.lang.String key);
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder getCachedResponseOrBuilder();
 }

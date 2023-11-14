@@ -74,6 +74,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			ControlPoint: req.ControlPoint,
 			Services:     services,
 			RampMode:     req.RampMode,
+			CacheKey:     req.CacheKey,
 		},
 	)
 	end := time.Now()

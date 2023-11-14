@@ -86,6 +86,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
+	// cacheKey := requestContext.CacheKey
 	labelKeys := flowLabels.SortedKeys()
 
 	response = &flowcontrolv1.CheckResponse{
@@ -118,47 +119,64 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
-	limiterTypes := []struct {
-		rampComponent bool
+	type LimiterType struct {
 		limiters      map[iface.Limiter]struct{}
 		rejectReason  flowcontrolv1.CheckResponse_RejectReason
-	}{
-		{true, mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP},
-		{false, mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED},
-		{false, mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
-		{false, mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
+		rampComponent bool
 	}
 
-	for _, limiterType := range limiterTypes {
-		if limiterType.rampComponent && requestContext.RampMode && len(limiterType.limiters) == 0 {
-			// There must be at least one ramp component accepting a ramp mode flow.
-			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
-			response.RejectReason = limiterType.rejectReason
-			return
-		}
-		limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
-		for _, limiterDecision := range limiterDecisions {
-			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
-			if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
-				response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
+	runLimiters := func(limiterTypes []LimiterType) bool {
+		for _, limiterType := range limiterTypes {
+			if limiterType.rampComponent && requestContext.RampMode && len(limiterType.limiters) == 0 {
+				// There must be at least one ramp component accepting a ramp mode flow.
+				response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+				response.RejectReason = limiterType.rejectReason
+				return true
 			}
-		}
+			limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
+			for _, limiterDecision := range limiterDecisions {
+				response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
+				if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
+					response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
+				}
+			}
 
-		defer func() {
-			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-				revertRemaining(ctx, flowLabels, limiterDecisions)
-			}
-		}()
+			defer func() {
+				if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+					revertRemaining(ctx, flowLabels, limiterDecisions)
+				}
+			}()
 
-		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-			response.DecisionType = decisionType
-			response.RejectReason = limiterType.rejectReason
-			if waitTime != 0 {
-				response.WaitTime = durationpb.New(waitTime)
+			if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+				response.DecisionType = decisionType
+				response.RejectReason = limiterType.rejectReason
+				if waitTime != 0 {
+					response.WaitTime = durationpb.New(waitTime)
+				}
+				return true
 			}
-			return
 		}
+		return false
 	}
+
+	limiterTypes := []LimiterType{
+		{mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP, true},
+		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED, false},
+		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED, false},
+	}
+	rejected := runLimiters(limiterTypes)
+	if rejected {
+		return
+	}
+
+	// Lookup cache
+	/*if cacheKey != "" {
+	}*/
+
+	limiterTypes = []LimiterType{
+		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
+	}
+	runLimiters(limiterTypes)
 
 	return
 }

@@ -134,7 +134,7 @@ NotExtended: StatusCode
 NetworkAuthenticationRequired: StatusCode
 
 class CheckRequest(_message.Message):
-    __slots__ = ("control_point", "labels", "ramp_mode", "cache_keys")
+    __slots__ = ("control_point", "labels", "ramp_mode", "cache_key")
     class LabelsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -145,38 +145,39 @@ class CheckRequest(_message.Message):
     CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     RAMP_MODE_FIELD_NUMBER: _ClassVar[int]
-    CACHE_KEYS_FIELD_NUMBER: _ClassVar[int]
+    CACHE_KEY_FIELD_NUMBER: _ClassVar[int]
     control_point: str
     labels: _containers.ScalarMap[str, str]
     ramp_mode: bool
-    cache_keys: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., ramp_mode: bool = ..., cache_keys: _Optional[_Iterable[str]] = ...) -> None: ...
+    cache_key: str
+    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., ramp_mode: bool = ..., cache_key: _Optional[str] = ...) -> None: ...
 
-class CacheRequest(_message.Message):
-    __slots__ = ("upserts", "deletes")
-    class UpsertsEntry(_message.Message):
-        __slots__ = ("key", "value")
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: CacheItem
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[CacheItem, _Mapping]] = ...) -> None: ...
-    UPSERTS_FIELD_NUMBER: _ClassVar[int]
-    DELETES_FIELD_NUMBER: _ClassVar[int]
-    upserts: _containers.MessageMap[str, CacheItem]
-    deletes: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, upserts: _Optional[_Mapping[str, CacheItem]] = ..., deletes: _Optional[_Iterable[str]] = ...) -> None: ...
-
-class CacheItem(_message.Message):
-    __slots__ = ("value", "ttl")
+class CacheUpsertRequest(_message.Message):
+    __slots__ = ("control_point", "key", "value", "ttl")
+    CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TTL_FIELD_NUMBER: _ClassVar[int]
+    control_point: str
+    key: str
     value: bytes
     ttl: _duration_pb2.Duration
-    def __init__(self, value: _Optional[bytes] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, control_point: _Optional[str] = ..., key: _Optional[str] = ..., value: _Optional[bytes] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+
+class CacheDeleteRequest(_message.Message):
+    __slots__ = ("control_point", "key")
+    CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    control_point: str
+    key: str
+    def __init__(self, control_point: _Optional[str] = ..., key: _Optional[str] = ...) -> None: ...
+
+class CacheItem(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
 
 class CheckResponse(_message.Message):
-    __slots__ = ("start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time", "denied_response_status_code", "cached_responses")
+    __slots__ = ("start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time", "denied_response_status_code", "cached_response")
     class RejectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
@@ -202,13 +203,6 @@ class CheckResponse(_message.Message):
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    class CachedResponsesEntry(_message.Message):
-        __slots__ = ("key", "value")
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: CacheResponse
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[CacheResponse, _Mapping]] = ...) -> None: ...
     START_FIELD_NUMBER: _ClassVar[int]
     END_FIELD_NUMBER: _ClassVar[int]
     SERVICES_FIELD_NUMBER: _ClassVar[int]
@@ -222,7 +216,7 @@ class CheckResponse(_message.Message):
     LIMITER_DECISIONS_FIELD_NUMBER: _ClassVar[int]
     WAIT_TIME_FIELD_NUMBER: _ClassVar[int]
     DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
-    CACHED_RESPONSES_FIELD_NUMBER: _ClassVar[int]
+    CACHED_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     start: _timestamp_pb2.Timestamp
     end: _timestamp_pb2.Timestamp
     services: _containers.RepeatedScalarFieldContainer[str]
@@ -236,8 +230,8 @@ class CheckResponse(_message.Message):
     limiter_decisions: _containers.RepeatedCompositeFieldContainer[LimiterDecision]
     wait_time: _duration_pb2.Duration
     denied_response_status_code: StatusCode
-    cached_responses: _containers.MessageMap[str, CacheResponse]
-    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., cached_responses: _Optional[_Mapping[str, CacheResponse]] = ...) -> None: ...
+    cached_response: CacheResponse
+    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., cached_response: _Optional[_Union[CacheResponse, _Mapping]] = ...) -> None: ...
 
 class CacheResponse(_message.Message):
     __slots__ = ("value", "result")

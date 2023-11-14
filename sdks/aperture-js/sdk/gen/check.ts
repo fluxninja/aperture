@@ -12,10 +12,11 @@ export interface ProtoGrpcType {
     flowcontrol: {
       check: {
         v1: {
+          CacheDeleteRequest: MessageTypeDefinition
           CacheItem: MessageTypeDefinition
-          CacheRequest: MessageTypeDefinition
           CacheResponse: MessageTypeDefinition
           CacheResult: EnumTypeDefinition
+          CacheUpsertRequest: MessageTypeDefinition
           CheckRequest: MessageTypeDefinition
           CheckResponse: MessageTypeDefinition
           ClassifierInfo: MessageTypeDefinition

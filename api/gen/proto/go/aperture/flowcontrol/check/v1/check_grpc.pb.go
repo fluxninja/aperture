@@ -21,7 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	FlowControlService_Check_FullMethodName       = "/aperture.flowcontrol.check.v1.FlowControlService/Check"
-	FlowControlService_CacheUpdate_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheUpdate"
+	FlowControlService_CacheUpsert_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert"
+	FlowControlService_CacheDelete_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete"
 )
 
 // FlowControlServiceClient is the client API for FlowControlService service.
@@ -30,7 +31,8 @@ const (
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
-	CacheUpdate(ctx context.Context, in *CacheRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type flowControlServiceClient struct {
@@ -50,9 +52,18 @@ func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, 
 	return out, nil
 }
 
-func (c *flowControlServiceClient) CacheUpdate(ctx context.Context, in *CacheRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *flowControlServiceClient) CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, FlowControlService_CacheUpdate_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, FlowControlService_CacheUpsert_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FlowControlService_CacheDelete_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +76,8 @@ func (c *flowControlServiceClient) CacheUpdate(ctx context.Context, in *CacheReq
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
-	CacheUpdate(context.Context, *CacheRequest) (*emptypb.Empty, error)
+	CacheUpsert(context.Context, *CacheUpsertRequest) (*emptypb.Empty, error)
+	CacheDelete(context.Context, *CacheDeleteRequest) (*emptypb.Empty, error)
 }
 
 // UnimplementedFlowControlServiceServer should be embedded to have forward compatible implementations.
@@ -75,8 +87,11 @@ type UnimplementedFlowControlServiceServer struct {
 func (UnimplementedFlowControlServiceServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
 }
-func (UnimplementedFlowControlServiceServer) CacheUpdate(context.Context, *CacheRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CacheUpdate not implemented")
+func (UnimplementedFlowControlServiceServer) CacheUpsert(context.Context, *CacheUpsertRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheUpsert not implemented")
+}
+func (UnimplementedFlowControlServiceServer) CacheDelete(context.Context, *CacheDeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheDelete not implemented")
 }
 
 // UnsafeFlowControlServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -108,20 +123,38 @@ func _FlowControlService_Check_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FlowControlService_CacheUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CacheRequest)
+func _FlowControlService_CacheUpsert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheUpsertRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FlowControlServiceServer).CacheUpdate(ctx, in)
+		return srv.(FlowControlServiceServer).CacheUpsert(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: FlowControlService_CacheUpdate_FullMethodName,
+		FullMethod: FlowControlService_CacheUpsert_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FlowControlServiceServer).CacheUpdate(ctx, req.(*CacheRequest))
+		return srv.(FlowControlServiceServer).CacheUpsert(ctx, req.(*CacheUpsertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowControlService_CacheDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowControlServiceServer).CacheDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowControlService_CacheDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowControlServiceServer).CacheDelete(ctx, req.(*CacheDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -138,8 +171,12 @@ var FlowControlService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FlowControlService_Check_Handler,
 		},
 		{
-			MethodName: "CacheUpdate",
-			Handler:    _FlowControlService_CacheUpdate_Handler,
+			MethodName: "CacheUpsert",
+			Handler:    _FlowControlService_CacheUpsert_Handler,
+		},
+		{
+			MethodName: "CacheDelete",
+			Handler:    _FlowControlService_CacheDelete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

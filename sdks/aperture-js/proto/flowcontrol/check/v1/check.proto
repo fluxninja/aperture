@@ -10,7 +10,8 @@ import "google/protobuf/timestamp.proto";
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
-  rpc CacheUpdate(CacheRequest) returns (google.protobuf.Empty) {}
+  rpc CacheUpsert(CacheUpsertRequest) returns (google.protobuf.Empty) {}
+  rpc CacheDelete(CacheDeleteRequest) returns (google.protobuf.Empty) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -18,19 +19,23 @@ message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
   bool ramp_mode = 3;
-  // Cache items to be fetched.
-  repeated string cache_keys = 4;
+  // Cache item to fetch.
+  string cache_key = 4;
 }
 
-message CacheRequest {
-  map<string, CacheItem> upserts = 1;
-  repeated string deletes = 2;
+message CacheUpsertRequest {
+  string control_point = 1;
+  string key = 2;
+  bytes value = 3;
+  google.protobuf.Duration ttl = 4;
 }
 
-message CacheItem {
-  bytes value = 1;
-  google.protobuf.Duration ttl = 2;
+message CacheDeleteRequest {
+  string control_point = 1;
+  string key = 2;
 }
+
+message CacheItem {}
 
 // CheckResponse contains fields that represent decision made by Check call.
 message CheckResponse {
@@ -78,7 +83,7 @@ message CheckResponse {
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
   // Matching cached items.
-  map<string, CacheResponse> cached_responses = 15;
+  CacheResponse cached_response = 15;
 }
 
 enum CacheResult {
