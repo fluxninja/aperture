@@ -95,7 +95,7 @@
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
             },
             "selectors": {
-              "description": "Flow selectors to match requests against",
+              "description": "Flow selectors to match requests against.",
               "default": [
                 {
                   "control_point": "__REQUIRED_FIELD__"

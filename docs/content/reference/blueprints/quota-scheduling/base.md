@@ -160,7 +160,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <ParameterDescription
     name='policy.quota_scheduler.selectors'
-    description='Flow selectors to match requests against'
+    description='Flow selectors to match requests against.'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../configuration/spec#selector'
     value='[{"control_point": "__REQUIRED_FIELD__"}]'
