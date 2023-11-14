@@ -41,7 +41,7 @@ policy:
       priority_label_key: "priority"
       tokens_label_key: "tokens"
       workload_label_key: "workload"
-    # Flow selectors to match requests against
+    # Flow selectors to match requests against.
     # Type: []aperture.spec.v1.Selector
     # Required: True
     selectors:

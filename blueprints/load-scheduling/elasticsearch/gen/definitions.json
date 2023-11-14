@@ -19,7 +19,12 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["policy_name", "load_scheduling_core", "elasticsearch"],
+      "required": [
+        "policy_name",
+        "load_scheduling_core",
+        "elasticsearch",
+        "search_queue_threshold"
+      ],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -48,7 +53,7 @@
         "load_scheduling_core": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["aiad_load_scheduler", "setpoint"],
+          "required": ["aiad_load_scheduler"],
           "properties": {
             "dry_run": {
               "description": "Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.",
@@ -90,12 +95,6 @@
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AIADLoadSchedulerParameters"
-            },
-            "setpoint": {
-              "description": "Setpoint.",
-              "default": "__REQUIRED_FIELD__",
-              "type": "number",
-              "format": "double"
             }
           }
         },
@@ -109,6 +108,12 @@
           },
           "type": "object",
           "$ref": "#/$defs/elasticsearch"
+        },
+        "search_queue_threshold": {
+          "description": "Threshold of search thread pool tasks queued at which point to start throttling traffic.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "number",
+          "format": "double"
         }
       }
     }

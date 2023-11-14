@@ -16,6 +16,7 @@ commonConfig {
     * @schema (postgresql.tls.cert_file: string) A cerficate used for client authentication, if necessary.
     * @schema (postgresql.tls.key_file: string) An SSL key used for client authentication, if necessary.
     * @schema (postgresql.tls.ca_file: string) A set of certificate authorities used to validate the database server SSL certificate.
+    * @param (policy.connections_used_threshold: float64) Threshold of percentage connections used out of postgresql_connection_max that which point to start throttling traffic.
     */
     postgresql: {
       username: '__REQUIRED_FIELD__',
@@ -24,11 +25,6 @@ commonConfig {
       agent_group: 'default',
     },
 
-    /**
-    * @param (policy.load_scheduling_core.setpoint: float64) Setpoint.
-    */
-    load_scheduling_core+: {
-      setpoint: '__REQUIRED_FIELD__',
-    },
+    connections_used_threshold: '__REQUIRED_FIELD__',
   },
 }

@@ -12,7 +12,7 @@ function(params) {
   local updated_cfg = utils.add_kubelet_overload_confirmations(c).updated_cfg {
     policy+: {
       promql_query: promqlQuery,
-      setpoint: c.policy.load_scheduling_core.setpoint,
+      setpoint: c.policy.search_queue_threshold,
       overload_condition: 'gt',
     },
   },

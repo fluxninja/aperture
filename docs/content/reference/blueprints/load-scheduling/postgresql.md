@@ -105,6 +105,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 <!-- vale off -->
 
+<a id="policy-connections-used-threshold"></a>
+
+<ParameterDescription
+    name='policy.connections_used_threshold'
+    description='Threshold of percentage connections used out of postgresql_connection_max that which point to start throttling traffic.'
+    type='Number (double)'
+    reference=''
+    value='"__REQUIRED_FIELD__"'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-postgresql"></a>
 
 <ParameterDescription
@@ -175,20 +189,6 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
     type='Object (aperture.spec.v1.AIADLoadSchedulerParameters)'
     reference='../../configuration/spec#a-i-a-d-load-scheduler-parameters'
     value='{"alerter": {"alert_name": "AIAD Load Throttling Event"}, "load_multiplier_linear_decrement": 0.05, "load_multiplier_linear_increment": 0.025, "load_scheduler": {"selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "max_load_multiplier": 2, "min_load_multiplier": 0}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-load-scheduling-core-setpoint"></a>
-
-<ParameterDescription
-    name='policy.load_scheduling_core.setpoint'
-    description='Setpoint.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
 />
 
 <!-- vale on -->

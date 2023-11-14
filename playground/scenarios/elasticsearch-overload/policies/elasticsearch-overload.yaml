@@ -2,9 +2,9 @@
 blueprint: load-scheduling/elasticsearch
 uri: ../../../../blueprints
 policy:
-  policy_name: "service1-demoapp-elasticsearch-overload"
+  policy_name: "elasticsearch-overload"
+  search_queue_threshold: 250
   load_scheduling_core:
-    setpoint: 250
     aiad_load_scheduler:
       alerter:
         alert_name: "AIAD Load Throttling Event"
