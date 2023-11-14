@@ -116,6 +116,7 @@ if (apertureClient) {
 
     // Check if the flow is allowed by Aperture
     if (flow.ShouldRun()) {
+      // Add business logic to process incoming request
       console.log("Request accepted. Processing...");
     } else {
       console.log("Request rate-limited. Try again later.");
@@ -125,7 +126,6 @@ if (apertureClient) {
     if (flow) {
       flow.SetStatus(FlowStatusEnum.Error);
     }
-    throw e;
   } finally {
     if (flow) {
       flow.End();
