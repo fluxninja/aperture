@@ -61,7 +61,7 @@
                 "alert_name": "More than 90% of requests are being rate limited"
               },
               "type": "object",
-              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Alerter"
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
             },
             "bucket_capacity": {
               "description": "Bucket capacity.",
@@ -86,7 +86,11 @@
             },
             "scheduler": {
               "description": "Scheduler configuration.",
-              "default": {},
+              "default": {
+                "priority_label_key": "priority",
+                "tokens_label_key": "tokens",
+                "workload_label_key": "workload"
+              },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
             },

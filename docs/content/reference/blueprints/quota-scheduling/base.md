@@ -91,8 +91,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 <ParameterDescription
     name='policy.quota_scheduler.alerter'
     description='Alerter.'
-    type='Object (aperture.spec.v1.Alerter)'
-    reference='../../configuration/spec#alerter'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../configuration/spec#alerter-parameters'
     value='{"alert_name": "More than 90% of requests are being rate limited"}'
 />
 
@@ -149,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Scheduler configuration.'
     type='Object (aperture.spec.v1.Scheduler)'
     reference='../../configuration/spec#scheduler'
-    value='{}'
+    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
 />
 
 <!-- vale on -->

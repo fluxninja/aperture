@@ -9,8 +9,7 @@ policy:
   policy_name: inter-service-rate-limiting
   quota_scheduler:
     alerter:
-      parameters:
-        alert_name: "Quota Scheduling Event"
+      alert_name: "More than 90% of requests are being rate limited"
     bucket_capacity: 500
     fill_amount: 25
     selectors:

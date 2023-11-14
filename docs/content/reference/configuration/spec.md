@@ -8470,12 +8470,10 @@ This field allows you to override the default HTTP status code
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default priority for
-  this flow.
-- The value associated with this key must be a valid number. Higher numbers
-  means higher priority.
-- If this parameter is not provided, the priority for the flow will be
-  determined by the matched workload's priority.
+Key for a flow label that can be used to override the default priority for this
+flow. The value associated with this key must be a valid number. Higher numbers
+means higher priority. If this parameter is not provided, the priority for the
+flow will be determined by the matched workload's priority.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -8487,11 +8485,24 @@ This field allows you to override the default HTTP status code
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default number of tokens
-  for this request.
-- The value associated with this key must be a valid number.
-- If this parameter is not provided, the number of tokens for the flow will be
-  determined by the matched workload's token count.
+Key for a flow label that can be used to override the default number of tokens
+for this request. The value associated with this key must be a valid number. If
+this parameter is not provided, the number of tokens for the flow will be
+determined by the matched workload's token count.
+
+</dd>
+<dt>workload_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Key for a flow label that can be used to provide workloads for this request. If
+this parameter is not provided, the workloads for the flow will be determined by
+the matched workload's name in the policy.
 
 </dd>
 <dt>workloads</dt>

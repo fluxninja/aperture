@@ -4,10 +4,31 @@
 blueprint: load-ramping/base
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
+  drivers:
+    # List of drivers that compare average latency against forward, backward and reset thresholds.
+    # Type: []average_latency_driver
+    average_latency_drivers: []
+    # List of drivers that compare percentile latency against forward, backward and reset thresholds.
+    # Type: []percentile_latency_driver
+    percentile_latency_drivers: []
+    # List of promql drivers that compare results of a Prometheus query against forward, backward and reset thresholds.
+    # Type: []promql_driver
+    promql_drivers: []
+  # Kubelet metrics configuration.
+  # Type: kubelet_metrics
+  kubelet_metrics: {}
   # Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.
   # Type: aperture.spec.v1.LoadRampParameters
   # Required: True
@@ -19,3 +40,6 @@ policy:
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__
+  # Whether to start the ramp. This setting may be overridden at runtime via dynamic configuration.
+  # Type: bool
+  start: false

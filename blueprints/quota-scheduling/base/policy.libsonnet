@@ -1,6 +1,5 @@
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
-local config = import './config.libsonnet';
 
 local policy = spec.v1.Policy;
 local circuit = spec.v1.Circuit;
@@ -11,7 +10,7 @@ local alerter = spec.v1.Alerter;
 local port = spec.v1.Port;
 
 function(cfg) {
-  local params = config + cfg,
+  local params = cfg,
   local policyDef =
     policy.new()
     + policy.withResources(utils.resources(params.policy.resources).updatedResources)

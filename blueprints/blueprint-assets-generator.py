@@ -717,28 +717,11 @@ def render_sample_config_yaml(
     sample_config_path: Path,
     parameters: Blueprint,
 ):
-    # flatten_config removes the nodes which are not required
-    def flatten_config(node: ParameterNode) -> ParameterNode | None:
-        flattened = None
-        if node.parameter.param_type == "intermediate_node":
-            for child_name, child_node in node.children.items():
-                flattened_child = flatten_config(child_node)
-                if flattened_child:
-                    if not flattened:
-                        flattened = ParameterNode(node.parameter)
-                    flattened.children[child_name] = flattened_child
-
-        elif node.parameter.required:
-            flattened = node
-
-        return flattened
-
     is_dynamic_config = True
     """Render sample config YAML file from blocks"""
     sample_config_data = parameters.nested_parameters
     if os.path.basename(sample_config_path) == "values.yaml":
         is_dynamic_config = False
-        sample_config_data = flatten_config(sample_config_data)
 
     if sample_config_data:
         env = get_jinja2_environment()

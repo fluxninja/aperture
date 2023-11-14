@@ -538,8 +538,6 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		matchedWorkloadLabel = s.defaultWorkload.proto.Name
 	}
 
-	fairnessLabel := matchedWorkloadLabel
-
 	tokens := float64(1)
 	// Precedence order:
 	// 1. Label tokens
@@ -547,6 +545,12 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 	// 3. Workload tokens
 	if matchedWorkloadParametersProto.GetTokens() != 0 {
 		tokens = matchedWorkloadParametersProto.GetTokens()
+	}
+
+	if s.proto.WorkloadLabelKey != "" {
+		if val, ok := labels.Get(s.proto.WorkloadLabelKey); ok {
+			matchedWorkloadLabel = val
+		}
 	}
 
 	if estimatedTokens, ok := s.GetEstimatedTokens(matchedWorkloadLabel); ok {
@@ -612,7 +616,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		reqCtx = timeoutCtx
 	}
 
-	req := scheduler.NewRequest(fairnessLabel, tokens, invPriority)
+	req := scheduler.NewRequest(matchedWorkloadLabel, tokens, invPriority)
 
 	accepted, remaining, current := s.scheduler.Schedule(reqCtx, req)
 

@@ -4,11 +4,23 @@
 blueprint: rate-limiting/base
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   rate_limiter:
+    # Alerter.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_name: "More than 90% of requests are being rate limited"
     # Bucket capacity.
     # Type: float64
     # Required: True
@@ -23,6 +35,9 @@ policy:
     parameters:
       interval: __REQUIRED_FIELD__
       label_key: ""
+    # Request Parameters.
+    # Type: aperture.spec.v1.RateLimiterRequestParameters
+    request_parameters: {}
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     # Required: True

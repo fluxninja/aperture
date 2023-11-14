@@ -4370,15 +4370,20 @@ definitions:
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priority_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default priority for this flow.
-                    * The value associated with this key must be a valid number. Higher numbers means higher priority.
-                    * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
+                    Key for a flow label that can be used to override the default priority for this flow.
+                    The value associated with this key must be a valid number. Higher numbers means higher priority.
+                    If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
                 type: string
             tokens_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default number of tokens for this request.
-                    * The value associated with this key must be a valid number.
-                    * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+                    Key for a flow label that can be used to override the default number of tokens for this request.
+                    The value associated with this key must be a valid number.
+                    If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+                type: string
+            workload_label_key:
+                description: |-
+                    Key for a flow label that can be used to provide workloads for this request.
+                    If this parameter is not provided, the workloads for the flow will be determined by the matched workload's name in the policy.
                 type: string
             workloads:
                 description: |+
