@@ -126,9 +126,12 @@ func setupRateLimiterFactory(
 		counterVector:    counterVector,
 	}
 
-	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
+	fxDriver, err := notifiers.NewFxDriver(
+		reg,
+		prometheusRegistry,
 		config.NewProtobufUnmarshaller,
-		[]notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions})
+		[]notifiers.FxOptionsFunc{rateLimiterFactory.newRateLimiterOptions},
+	)
 	if err != nil {
 		return err
 	}
