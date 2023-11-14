@@ -2569,10 +2569,10 @@ func (m *Sampler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			dAtA[i] = 0x1a
 		}
 	}
-	if len(m.LabelKey) > 0 {
-		i -= len(m.LabelKey)
-		copy(dAtA[i:], m.LabelKey)
-		i = encodeVarint(dAtA, i, uint64(len(m.LabelKey)))
+	if len(m.SessionLabelKey) > 0 {
+		i -= len(m.SessionLabelKey)
+		copy(dAtA[i:], m.SessionLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.SessionLabelKey)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -4951,7 +4951,7 @@ func (m *Sampler_Parameters) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.LabelKey)
+	l = len(m.SessionLabelKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -11560,7 +11560,7 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LabelKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionLabelKey", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -11588,7 +11588,7 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LabelKey = string(dAtA[iNdEx:postIndex])
+			m.SessionLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

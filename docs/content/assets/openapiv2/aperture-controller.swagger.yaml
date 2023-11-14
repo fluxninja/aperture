@@ -3614,15 +3614,6 @@ definitions:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-            label_key:
-                description: |-
-                    The flow label key for identifying sessions.
-                    - When label key is specified, _Sampler_ acts as a sticky filter.
-                      The series of flows with the same value of label key get the same
-                      decision provided that the `accept_percentage` is same or higher.
-                    - When label key is not specified, _Sampler_ acts as a stateless filter.
-                      Percentage of flows are selected randomly for rejection.
-                type: string
             ramp_mode:
                 default: false
                 description: |+
@@ -3640,6 +3631,15 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
+            session_label_key:
+                description: |-
+                    The flow label key for identifying sessions.
+                    - When label key is specified, _Sampler_ acts as a sticky filter.
+                      The series of flows with the same value of label key get the same
+                      decision provided that the `accept_percentage` is same or higher.
+                    - When label key is not specified, _Sampler_ acts as a stateless filter.
+                      Percentage of flows are selected randomly for rejection.
+                type: string
         required:
             - selectors
         type: object

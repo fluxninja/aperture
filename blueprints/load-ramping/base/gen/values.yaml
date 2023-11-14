@@ -34,9 +34,9 @@ policy:
   # Required: True
   load_ramp:
     sampler:
-      label_key: ""
       selectors:
         - control_point: __REQUIRED_FIELD__
+      session_label_key: ""
     steps:
       - duration: __REQUIRED_FIELD__
         target_accept_percentage: __REQUIRED_FIELD__

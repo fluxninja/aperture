@@ -32,7 +32,7 @@ policy:
         - agent_group: default
           control_point: ingress
           service: service1-demo-app.demoapp.svc.cluster.local
-      label_key: ""
+      session_label_key: ""
     steps:
       - duration: 0s
         target_accept_percentage: 1.0

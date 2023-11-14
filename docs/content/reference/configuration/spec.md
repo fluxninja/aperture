@@ -8255,24 +8255,6 @@ This field allows you to override the default HTTP status code
 (`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
-<dt>label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The flow label key for identifying sessions.
-
-- When label key is specified, _Sampler_ acts as a sticky filter. The series of
-  flows with the same value of label key get the same decision provided that the
-  `accept_percentage` is same or higher.
-- When label key is not specified, _Sampler_ acts as a stateless filter.
-  Percentage of flows are selected randomly for rejection.
-
-</dd>
 <dt>ramp_mode</dt>
 <dd>
 
@@ -8295,6 +8277,24 @@ Ramp component can accept flows with `ramp_mode` flag set.
 <!-- vale on -->
 
 Selectors for the component.
+
+</dd>
+<dt>session_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Sampler_ acts as a sticky filter. The series of
+  flows with the same value of label key get the same decision provided that the
+  `accept_percentage` is same or higher.
+- When label key is not specified, _Sampler_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
 
 </dd>
 </dl>

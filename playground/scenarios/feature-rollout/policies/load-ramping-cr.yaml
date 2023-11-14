@@ -132,11 +132,11 @@ spec:
               signal_name: RESET
           parameters:
             sampler:
-              label_key: ""
               selectors:
               - agent_group: default
                 control_point: ingress
                 service: service1-demo-app.demoapp.svc.cluster.local
+              session_label_key: ""
             steps:
             - duration: 0s
               target_accept_percentage: 1
