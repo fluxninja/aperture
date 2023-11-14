@@ -109,7 +109,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-rampin
     description='Identify the service and flows of the feature that needs to be rolled out. And specify load ramp steps.'
     type='Object (aperture.spec.v1.LoadRampParameters)'
     reference='../../configuration/spec#load-ramp-parameters'
-    value='{"sampler": {"label_key": "", "selectors": [{"control_point": "__REQUIRED_FIELD__"}]}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
+    value='{"sampler": {"selectors": [{"control_point": "__REQUIRED_FIELD__"}], "session_label_key": ""}, "steps": [{"duration": "__REQUIRED_FIELD__", "target_accept_percentage": "__REQUIRED_FIELD__"}]}'
 />
 
 <!-- vale on -->

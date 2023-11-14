@@ -93,7 +93,7 @@ local ramp_policy_base_defaults = {
   load_ramp: {
     sampler: {
       selectors: commonConfig.selectors_defaults,
-      label_key: '',
+      session_label_key: '',
     },
     steps: [
       {

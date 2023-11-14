@@ -132,7 +132,6 @@ spec:
               signal_name: RESET
           parameters:
             sampler:
-              label_key: ""
               selectors:
               - agent_group: default
                 control_point: ingress
