@@ -15,7 +15,7 @@ policy:
         service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
     parameters:
-      label_key: http.request.header.user_id
+      limit_by_label_key: http.request.header.user_id
       interval: 1s
     request_parameters:
       tokens_label_key: http.request.header.tokens

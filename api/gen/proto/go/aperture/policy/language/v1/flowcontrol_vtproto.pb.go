@@ -542,6 +542,16 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AdaptiveLoadScheduler != nil {
+		size, err := m.AdaptiveLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.DelayInitialFill {
 		i--
 		if m.DelayInitialFill {
@@ -615,6 +625,13 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		}
 		i--
 		dAtA[i] = 0x1a
+	}
+	if len(m.LimitByLabelKey) > 0 {
+		i -= len(m.LimitByLabelKey)
+		copy(dAtA[i:], m.LimitByLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.LimitByLabelKey)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if len(m.LabelKey) > 0 {
 		i -= len(m.LabelKey)
@@ -4205,6 +4222,10 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
+	l = len(m.LimitByLabelKey)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
 	if m.Interval != nil {
 		if size, ok := interface{}(m.Interval).(interface {
 			SizeVT() int
@@ -4234,6 +4255,10 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 	}
 	if m.DelayInitialFill {
 		n += 2
+	}
+	if m.AdaptiveLoadScheduler != nil {
+		l = m.AdaptiveLoadScheduler.SizeVT()
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -6675,6 +6700,38 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 			}
 			m.LabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitByLabelKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LimitByLabelKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Interval", wireType)
@@ -6839,6 +6896,42 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			m.DelayInitialFill = bool(v != 0)
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdaptiveLoadScheduler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AdaptiveLoadScheduler == nil {
+				m.AdaptiveLoadScheduler = &AdaptiveLoadScheduler{}
+			}
+			if err := m.AdaptiveLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])

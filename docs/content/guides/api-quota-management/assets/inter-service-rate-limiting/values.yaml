@@ -15,7 +15,7 @@ policy:
     selectors:
       - control_point: some-external-api
     rate_limiter:
-      label_key: api_key
+      limit_by_label_key: api_key
       interval: 1s
       lazy_sync:
         enabled: false

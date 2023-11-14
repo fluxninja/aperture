@@ -21,10 +21,10 @@ spec:
               signal_name: ACCEPT_PERCENTAGE
           rate_limiter:
             interval: 1s
-            label_key: api_key
             lazy_sync:
               enabled: false
               num_sync: 4
+            limit_by_label_key: api_key
           scheduler:
             priority_label_key: priority
             tokens_label_key: tokens

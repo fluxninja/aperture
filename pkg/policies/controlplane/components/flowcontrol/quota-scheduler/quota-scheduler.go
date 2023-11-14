@@ -72,6 +72,12 @@ func ParseQuotaScheduler(
 		policyParams,
 	)
 
+	labelKey := quotaScheduler.RateLimiter.GetLimitByLabelKey()
+	if labelKey == "" {
+		// Deprecated: Remove in v2.25.0
+		labelKey = quotaScheduler.RateLimiter.GetLabelKey()
+	}
+
 	quotaSchedulerAnyProto, err := anypb.New(
 		&policyprivatev1.QuotaScheduler{
 			InPorts: &policylangv1.RateLimiter_Ins{
@@ -93,7 +99,7 @@ func ParseQuotaScheduler(
 			},
 			Selectors: quotaScheduler.GetSelectors(),
 			RateLimiter: &policylangv1.RateLimiter_Parameters{
-				LabelKey:       quotaScheduler.RateLimiter.GetLabelKey(),
+				LabelKey:       labelKey,
 				Interval:       quotaScheduler.RateLimiter.GetInterval(),
 				ContinuousFill: quotaScheduler.RateLimiter.GetContinuousFill(),
 				MaxIdleTime:    quotaScheduler.RateLimiter.GetMaxIdleTime(),

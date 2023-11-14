@@ -99,13 +99,9 @@ type RateLimiter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Input ports for the RateLimiter component
-	InPorts *RateLimiter_Ins `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Parameters for the RateLimiter component
-	Parameters *RateLimiter_Parameters `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Selectors for the component.
-	Selectors []*v1.Selector `protobuf:"bytes,3,rep,name=selectors,proto3" json:"selectors,omitempty" validate:"required,gt=0,dive"` // @gotags: validate:"required,gt=0,dive"
-	// RequestParameters for the component
+	InPorts           *RateLimiter_Ins               `protobuf:"bytes,1,opt,name=in_ports,json=inPorts,proto3" json:"in_ports,omitempty" validate:"required"` // @gotags: validate:"required"
+	Parameters        *RateLimiter_Parameters        `protobuf:"bytes,2,opt,name=parameters,proto3" json:"parameters,omitempty" validate:"required"`          // @gotags: validate:"required"
+	Selectors         []*v1.Selector                 `protobuf:"bytes,3,rep,name=selectors,proto3" json:"selectors,omitempty" validate:"required,gt=0,dive"`            // @gotags: validate:"required,gt=0,dive"
 	RequestParameters *RateLimiter_RequestParameters `protobuf:"bytes,4,opt,name=request_parameters,json=requestParameters,proto3" json:"request_parameters,omitempty"`
 	ParentComponentId string                         `protobuf:"bytes,5,opt,name=parent_component_id,json=parentComponentId,proto3" json:"parent_component_id,omitempty"`
 }
@@ -261,8 +257,6 @@ type LoadActuator_Ins struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Load multiplier is proportion of incoming
-	// token rate that needs to be accepted.
 	LoadMultiplier *v1.InPort `protobuf:"bytes,1,opt,name=load_multiplier,json=loadMultiplier,proto3" json:"load_multiplier,omitempty"`
 }
 
@@ -310,38 +304,12 @@ type RateLimiter_Parameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specifies which label the rate limiter should be keyed by.
-	//
-	// Rate limiting is done independently for each value of the
-	// [label](/concepts/flow-label.md) with given key.
-	// For example, to give each user a separate limit, assuming you
-	// have a _user_ flow
-	// label set up, set `label_key: "user"`.
-	// If no label key is specified, then all requests matching the
-	// selectors will be rate limited based on the global bucket.
-	LabelKey string `protobuf:"bytes,1,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty"`
-	// Interval defines the time interval in which the token bucket
-	// will fill tokens specified by `fill_amount` signal.
-	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-	Interval *durationpb.Duration `protobuf:"bytes,3,opt,name=interval,proto3" json:"interval,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Continuous fill determines whether the token bucket should be filled
-	// continuously or only on discrete intervals.
-	ContinuousFill bool `protobuf:"varint,4,opt,name=continuous_fill,json=continuousFill,proto3" json:"continuous_fill,omitempty" default:"true"` // @gotags: default:"true"
-	// Max idle time before token bucket state for a label is removed.
-	// If set to 0, the state is never removed.
-	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
-	MaxIdleTime *durationpb.Duration `protobuf:"bytes,5,opt,name=max_idle_time,json=maxIdleTime,proto3" json:"max_idle_time,omitempty" default:"7200s"` // @gotags: default:"7200s"
-	// Configuration of lazy-syncing behavior of rate limiter
-	LazySync *RateLimiter_Parameters_LazySync `protobuf:"bytes,6,opt,name=lazy_sync,json=lazySync,proto3" json:"lazy_sync,omitempty"`
-	// Delays the initial filling of the token bucket.
-	// If set to false, the token bucket will start filling immediately
-	// after the first request is received. This can potentially lead to
-	// more requests being accepted than the specified rate limit during
-	// the first interval.
-	// When set to true, the token bucket will be given a chance to
-	// empty out before the filling starts. The delay is equal to the
-	// time it takes to fill the bucket.
-	DelayInitialFill bool `protobuf:"varint,7,opt,name=delay_initial_fill,json=delayInitialFill,proto3" json:"delay_initial_fill,omitempty" default:"false"` // @gotags: default:"false"
+	LimitByLabelKey  string                           `protobuf:"bytes,1,opt,name=limit_by_label_key,json=limitByLabelKey,proto3" json:"limit_by_label_key,omitempty"`
+	Interval         *durationpb.Duration             `protobuf:"bytes,3,opt,name=interval,proto3" json:"interval,omitempty" validate:"required"`                                    // @gotags: validate:"required"
+	ContinuousFill   bool                             `protobuf:"varint,4,opt,name=continuous_fill,json=continuousFill,proto3" json:"continuous_fill,omitempty" default:"true"` // @gotags: default:"true"
+	MaxIdleTime      *durationpb.Duration             `protobuf:"bytes,5,opt,name=max_idle_time,json=maxIdleTime,proto3" json:"max_idle_time,omitempty" default:"7200s"`         // @gotags: default:"7200s"
+	LazySync         *RateLimiter_Parameters_LazySync `protobuf:"bytes,6,opt,name=lazy_sync,json=lazySync,proto3" json:"lazy_sync,omitempty"`
+	DelayInitialFill bool                             `protobuf:"varint,7,opt,name=delay_initial_fill,json=delayInitialFill,proto3" json:"delay_initial_fill,omitempty" default:"false"` // @gotags: default:"false"
 }
 
 func (x *RateLimiter_Parameters) Reset() {
@@ -376,9 +344,9 @@ func (*RateLimiter_Parameters) Descriptor() ([]byte, []int) {
 	return file_aperture_policy_private_v1_flowcontrol_proto_rawDescGZIP(), []int{1, 0}
 }
 
-func (x *RateLimiter_Parameters) GetLabelKey() string {
+func (x *RateLimiter_Parameters) GetLimitByLabelKey() string {
 	if x != nil {
-		return x.LabelKey
+		return x.LimitByLabelKey
 	}
 	return ""
 }
@@ -423,13 +391,7 @@ type RateLimiter_RequestParameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Flow label key that will be used to override the number of tokens
-	// for this request.
-	// This is an optional parameter and takes highest precedence
-	// when assigning tokens to a request.
-	// The label value must be a valid number.
-	TokensLabelKey string `protobuf:"bytes,1,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
-	// This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+	TokensLabelKey           string         `protobuf:"bytes,1,opt,name=tokens_label_key,json=tokensLabelKey,proto3" json:"tokens_label_key,omitempty"`
 	DeniedResponseStatusCode v11.StatusCode `protobuf:"varint,2,opt,name=denied_response_status_code,json=deniedResponseStatusCode,proto3,enum=aperture.flowcontrol.check.v1.StatusCode" json:"denied_response_status_code,omitempty"`
 }
 
@@ -479,18 +441,14 @@ func (x *RateLimiter_RequestParameters) GetDeniedResponseStatusCode() v11.Status
 	return v11.StatusCode(0)
 }
 
-// Inputs for the RateLimiter component
 type RateLimiter_Ins struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Capacity of the bucket to allow for bursty traffic.
 	BucketCapacity *v1.InPort `protobuf:"bytes,1,opt,name=bucket_capacity,json=bucketCapacity,proto3" json:"bucket_capacity,omitempty" validate:"required"` // @gotags: validate:"required"
-	// Number of tokens to fill within an `interval`.
-	FillAmount *v1.InPort `protobuf:"bytes,2,opt,name=fill_amount,json=fillAmount,proto3" json:"fill_amount,omitempty" validate:"required"` // @gotags: validate:"required"
-	// PassThrough port determines whether all requests
-	PassThrough *v1.InPort `protobuf:"bytes,3,opt,name=pass_through,json=passThrough,proto3" json:"pass_through,omitempty"`
+	FillAmount     *v1.InPort `protobuf:"bytes,2,opt,name=fill_amount,json=fillAmount,proto3" json:"fill_amount,omitempty" validate:"required"`             // @gotags: validate:"required"
+	PassThrough    *v1.InPort `protobuf:"bytes,3,opt,name=pass_through,json=passThrough,proto3" json:"pass_through,omitempty"`
 }
 
 func (x *RateLimiter_Ins) Reset() {
@@ -551,9 +509,7 @@ type RateLimiter_Parameters_LazySync struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Enables lazy sync
-	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"` // @gotags: default:"false"
-	// Number of times to lazy sync within the `interval`.
+	Enabled bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty" default:"false"`                // @gotags: default:"false"
 	NumSync uint32 `protobuf:"varint,2,opt,name=num_sync,json=numSync,proto3" json:"num_sync,omitempty" default:"4" validate:"gt=0"` // @gotags: default:"4" validate:"gt=0"
 }
 
@@ -644,7 +600,7 @@ var file_aperture_policy_private_v1_flowcontrol_proto_rawDesc = []byte{
 	0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65, 0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
 	0x2e, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x6e, 0x50,
 	0x6f, 0x72, 0x74, 0x52, 0x0e, 0x6c, 0x6f, 0x61, 0x64, 0x4d, 0x75, 0x6c, 0x74, 0x69, 0x70, 0x6c,
-	0x69, 0x65, 0x72, 0x22, 0xaa, 0x09, 0x0a, 0x0b, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69,
+	0x69, 0x65, 0x72, 0x22, 0xba, 0x09, 0x0a, 0x0b, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69,
 	0x74, 0x65, 0x72, 0x12, 0x46, 0x0a, 0x08, 0x69, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2b, 0x2e, 0x61, 0x70, 0x65, 0x72, 0x74, 0x75, 0x72, 0x65,
 	0x2e, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x2e, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x2e,
@@ -668,10 +624,11 @@ var file_aperture_policy_private_v1_flowcontrol_proto_rawDesc = []byte{
 	0x75, 0x65, 0x73, 0x74, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x2e,
 	0x0a, 0x13, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65,
 	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x70, 0x61, 0x72,
-	0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x1a, 0x91,
-	0x03, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x1b, 0x0a,
-	0x09, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x08, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x4b, 0x65, 0x79, 0x12, 0x35, 0x0a, 0x08, 0x69, 0x6e,
+	0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x1a, 0xa1,
+	0x03, 0x0a, 0x0a, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x12, 0x2b, 0x0a,
+	0x12, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x5f, 0x62, 0x79, 0x5f, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x5f,
+	0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x6c, 0x69, 0x6d, 0x69, 0x74,
+	0x42, 0x79, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x4b, 0x65, 0x79, 0x12, 0x35, 0x0a, 0x08, 0x69, 0x6e,
 	0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44,
 	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x08, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61,

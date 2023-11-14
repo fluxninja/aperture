@@ -41,10 +41,10 @@ spec:
               signal_name: RATE_LIMIT
           parameters:
             interval: 1s
-            label_key: http.request.header.user_id
             lazy_sync:
               enabled: true
               num_sync: 4
+            limit_by_label_key: http.request.header.user_id
           request_parameters:
             denied_response_status_code: BadRequest
           selectors:

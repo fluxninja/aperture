@@ -7538,6 +7538,16 @@ The percentage of flows being accepted by the _Rate Limiter_.
 <!-- vale on -->
 
 <dl>
+<dt>adaptive_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadScheduler](#adaptive-load-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>continuous_fill</dt>
 <dd>
 
@@ -7591,7 +7601,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string)
+(string, **DEPRECATED**)
 
 <!-- vale on -->
 
@@ -7601,7 +7611,8 @@ Rate limiting is done independently for each value of the
 [label](/concepts/flow-label.md) with given key. For example, to give each user
 a separate limit, assuming you have a _user_ flow label set up, set
 `label_key: "user"`. If no label key is specified, then all requests matching
-the selectors will be rate limited based on the global bucket.
+the selectors will be rate limited based on the global bucket. Deprecated:
+v2.25.0. Use _limit_by_label_key_ instead.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -7614,6 +7625,24 @@ the selectors will be rate limited based on the global bucket.
 <!-- vale on -->
 
 Configuration of lazy-syncing behavior of rate limiter
+
+</dd>
+<dt>limit_by_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Specifies which label the rate limiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-label.md) with given key. For example, to give each user
+a separate limit, assuming you have a _user_ flow label set up, set
+`limit_by_label_key: "user"`. If no label key is specified, then all requests
+matching the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>max_idle_time</dt>

@@ -104,7 +104,21 @@ message RateLimiter {
     // label set up, set `label_key: "user"`.
     // If no label key is specified, then all requests matching the
     // selectors will be rate limited based on the global bucket.
-    string label_key = 1;
+    // Deprecated: v2.25.0. Use _limit_by_label_key_ instead.
+    string label_key = 1; // @gotags: validate:"deprecated"
+
+    // Specifies which label the rate limiter should be keyed by.
+    //
+    // Rate limiting is done independently for each value of the
+    // [label](/concepts/flow-label.md) with given key.
+    // For example, to give each user a separate limit, assuming you
+    // have a _user_ flow
+    // label set up, set `limit_by_label_key: "user"`.
+    // If no label key is specified, then all requests matching the
+    // selectors will be rate limited based on the global bucket.
+    string limit_by_label_key = 2;
+
+    AdaptiveLoadScheduler adaptive_load_scheduler = 8;
 
     // Interval defines the time interval in which the token bucket
     // will fill tokens specified by `fill_amount` signal.

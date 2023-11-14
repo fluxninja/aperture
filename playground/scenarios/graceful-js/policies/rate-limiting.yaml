@@ -17,5 +17,5 @@ policy:
           match_labels:
             http.path: /api/rate-limit
     parameters:
-      label_key: http.request.header.user_id
+      limit_by_label_key: http.request.header.user_id
       interval: 60s

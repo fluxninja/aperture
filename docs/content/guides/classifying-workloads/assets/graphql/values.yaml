@@ -10,7 +10,7 @@ policy:
       - control_point: ingress
         service: todo-service.svc.cluster.local
     parameters:
-      label_key: user_id
+      limit_by_label_key: user_id
       interval: 1s
   resources:
     flow_control:

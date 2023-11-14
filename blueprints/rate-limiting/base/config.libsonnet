@@ -7,7 +7,7 @@ commonConfig {
     * @param (policy.rate_limiter.fill_amount: float64) Fill amount.
     * @param (policy.rate_limiter.selectors: []aperture.spec.v1.Selector) Flow selectors to match requests against
     * @param (policy.rate_limiter.parameters: aperture.spec.v1.RateLimiterParameters) Parameters.
-    * @param (policy.rate_limiter.parameters.label_key: string) Flow label key to use for rate limiting. If not specified, then all requests matching the selector will be rate limited.
+    * @param (policy.rate_limiter.parameters.limit_by_label_key: string) Flow label key to use for rate limiting. If not specified, then all requests matching the selector will be rate limited.
     * @param (policy.rate_limiter.parameters.interval: string) Fill interval e.g. "1s".
     * @param (policy.rate_limiter.request_parameters: aperture.spec.v1.RateLimiterRequestParameters) Request Parameters.
     * @param (policy.rate_limiter.alerter: aperture.spec.v1.AlerterParameters) Alerter.
@@ -17,7 +17,7 @@ commonConfig {
       fill_amount: '__REQUIRED_FIELD__',
       selectors: commonConfig.selectors_defaults,
       parameters: {
-        label_key: '',
+        limit_by_label_key: '',
         interval: '__REQUIRED_FIELD__',
       },
       request_parameters: {},

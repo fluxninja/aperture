@@ -21,10 +21,10 @@ spec:
               signal_name: ACCEPT_PERCENTAGE
           parameters:
             interval: 1s
-            label_key: user_id
             lazy_sync:
               enabled: true
               num_sync: 5
+            limit_by_label_key: user_id
           request_parameters: {}
           selectors:
           - agent_group: default

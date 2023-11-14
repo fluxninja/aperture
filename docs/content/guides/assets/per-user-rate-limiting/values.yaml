@@ -11,5 +11,5 @@ policy:
         control_point: "ingress"
         agent_group: "default"
     parameters:
-      label_key: "http.request.header.user_id"
+      limit_by_label_key: "http.request.header.user_id"
       interval: 1s
