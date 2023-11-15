@@ -10,11 +10,13 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 )
 
-const (
+var (
 	// ErrCacheKeyEmpty is the error returned when the cache key is empty.
-	ErrCacheKeyEmpty = "cache key cannot be empty"
+	ErrCacheKeyEmpty = errors.New("cache key cannot be empty")
 	// ErrCacheControlPointEmpty is the error returned when the cache control point is empty.
-	ErrCacheControlPointEmpty = "cache control_point cannot be empty"
+	ErrCacheControlPointEmpty = errors.New("cache control_point cannot be empty")
+	// ErrCacheKeyNotFound is the error returned when the key is not found in the cache. This is copied from the internal olric package.
+	ErrCacheKeyNotFound = errors.New("key not found")
 )
 
 // Cache for saving responses at flow end.
@@ -37,10 +39,10 @@ func NewCache(dc *distcache.DistCache) (iface.Cache, error) {
 // Get returns the value for the given key.
 func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, error) {
 	if key == "" {
-		return nil, errors.New(ErrCacheKeyEmpty)
+		return nil, ErrCacheKeyEmpty
 	}
 	if controlPoint == "" {
-		return nil, errors.New(ErrCacheControlPointEmpty)
+		return nil, ErrCacheControlPointEmpty
 	}
 	cacheKey := formatCacheKey(controlPoint, key)
 	getResponse, err := c.dmapCache.Get(ctx, cacheKey)
@@ -59,10 +61,10 @@ func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, erro
 // Upsert inserts or updates the value for the given key.
 func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []byte) error {
 	if key == "" {
-		return errors.New(ErrCacheKeyEmpty)
+		return ErrCacheKeyEmpty
 	}
 	if controlPoint == "" {
-		return errors.New(ErrCacheControlPointEmpty)
+		return ErrCacheControlPointEmpty
 	}
 	cacheKey := formatCacheKey(controlPoint, key)
 	return c.dmapCache.Put(ctx, cacheKey, value)
@@ -71,10 +73,10 @@ func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []by
 // Delete deletes the value for the given key.
 func (c *Cache) Delete(ctx context.Context, controlPoint, key string) error {
 	if key == "" {
-		return errors.New(ErrCacheKeyEmpty)
+		return ErrCacheKeyEmpty
 	}
 	if controlPoint == "" {
-		return errors.New(ErrCacheControlPointEmpty)
+		return ErrCacheControlPointEmpty
 	}
 	cacheKey := formatCacheKey(controlPoint, key)
 	_, err := c.dmapCache.Delete(ctx, cacheKey)

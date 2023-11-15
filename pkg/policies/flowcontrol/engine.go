@@ -184,8 +184,12 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		}
 		response.CachedValue = &flowcontrolv1.CachedValue{
 			LookupResult: flowcontrolv1.CacheLookupResult_MISS,
-			ResponseCode: flowcontrolv1.CacheResponseCode_ERROR,
 			Message:      err.Error(),
+		}
+		if err == ErrCacheKeyNotFound {
+			response.CachedValue.ResponseCode = flowcontrolv1.CacheResponseCode_SUCCESS
+		} else {
+			response.CachedValue.ResponseCode = flowcontrolv1.CacheResponseCode_ERROR
 		}
 	}
 
