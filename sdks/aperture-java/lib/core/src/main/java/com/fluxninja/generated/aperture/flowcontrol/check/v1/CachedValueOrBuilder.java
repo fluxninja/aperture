@@ -14,13 +14,36 @@ public interface CachedValueOrBuilder extends
   com.google.protobuf.ByteString getValue();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
    * @return The enum numeric value on the wire for lookupResult.
    */
   int getLookupResultValue();
   /**
-   * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
    * @return The lookupResult.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult getLookupResult();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult getLookupResult();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+   * @return The enum numeric value on the wire for responseCode.
+   */
+  int getResponseCodeValue();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+   * @return The responseCode.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getResponseCode();
+
+  /**
+   * <code>string message = 4 [json_name = "message"];</code>
+   * @return The message.
+   */
+  java.lang.String getMessage();
+  /**
+   * <code>string message = 4 [json_name = "message"];</code>
+   * @return The bytes for message.
+   */
+  com.google.protobuf.ByteString
+      getMessageBytes();
 }

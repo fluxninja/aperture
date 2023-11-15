@@ -4,29 +4,29 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf enum {@code aperture.flowcontrol.check.v1.LookupResult}
+ * Protobuf enum {@code aperture.flowcontrol.check.v1.CacheResponseCode}
  */
-public enum LookupResult
+public enum CacheResponseCode
     implements com.google.protobuf.ProtocolMessageEnum {
   /**
-   * <code>Hit = 0;</code>
+   * <code>SUCCESS = 0;</code>
    */
-  Hit(0),
+  SUCCESS(0),
   /**
-   * <code>Miss = 1;</code>
+   * <code>ERROR = 1;</code>
    */
-  Miss(1),
+  ERROR(1),
   UNRECOGNIZED(-1),
   ;
 
   /**
-   * <code>Hit = 0;</code>
+   * <code>SUCCESS = 0;</code>
    */
-  public static final int Hit_VALUE = 0;
+  public static final int SUCCESS_VALUE = 0;
   /**
-   * <code>Miss = 1;</code>
+   * <code>ERROR = 1;</code>
    */
-  public static final int Miss_VALUE = 1;
+  public static final int ERROR_VALUE = 1;
 
 
   public final int getNumber() {
@@ -43,7 +43,7 @@ public enum LookupResult
    * @deprecated Use {@link #forNumber(int)} instead.
    */
   @java.lang.Deprecated
-  public static LookupResult valueOf(int value) {
+  public static CacheResponseCode valueOf(int value) {
     return forNumber(value);
   }
 
@@ -51,23 +51,23 @@ public enum LookupResult
    * @param value The numeric wire value of the corresponding enum entry.
    * @return The enum associated with the given numeric wire value.
    */
-  public static LookupResult forNumber(int value) {
+  public static CacheResponseCode forNumber(int value) {
     switch (value) {
-      case 0: return Hit;
-      case 1: return Miss;
+      case 0: return SUCCESS;
+      case 1: return ERROR;
       default: return null;
     }
   }
 
-  public static com.google.protobuf.Internal.EnumLiteMap<LookupResult>
+  public static com.google.protobuf.Internal.EnumLiteMap<CacheResponseCode>
       internalGetValueMap() {
     return internalValueMap;
   }
   private static final com.google.protobuf.Internal.EnumLiteMap<
-      LookupResult> internalValueMap =
-        new com.google.protobuf.Internal.EnumLiteMap<LookupResult>() {
-          public LookupResult findValueByNumber(int number) {
-            return LookupResult.forNumber(number);
+      CacheResponseCode> internalValueMap =
+        new com.google.protobuf.Internal.EnumLiteMap<CacheResponseCode>() {
+          public CacheResponseCode findValueByNumber(int number) {
+            return CacheResponseCode.forNumber(number);
           }
         };
 
@@ -85,12 +85,12 @@ public enum LookupResult
   }
   public static final com.google.protobuf.Descriptors.EnumDescriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(0);
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(1);
   }
 
-  private static final LookupResult[] VALUES = values();
+  private static final CacheResponseCode[] VALUES = values();
 
-  public static LookupResult valueOf(
+  public static CacheResponseCode valueOf(
       com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
     if (desc.getType() != getDescriptor()) {
       throw new java.lang.IllegalArgumentException(
@@ -104,10 +104,10 @@ public enum LookupResult
 
   private final int value;
 
-  private LookupResult(int value) {
+  private CacheResponseCode(int value) {
     this.value = value;
   }
 
-  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.LookupResult)
+  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CacheResponseCode)
 }
 

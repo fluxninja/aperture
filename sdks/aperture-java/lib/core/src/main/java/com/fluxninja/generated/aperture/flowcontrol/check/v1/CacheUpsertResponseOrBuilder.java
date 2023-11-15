@@ -6,4 +6,27 @@ package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 public interface CacheUpsertResponseOrBuilder extends
     // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.CacheUpsertResponse)
     com.google.protobuf.MessageOrBuilder {
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode code = 1 [json_name = "code"];</code>
+   * @return The enum numeric value on the wire for code.
+   */
+  int getCodeValue();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode code = 1 [json_name = "code"];</code>
+   * @return The code.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getCode();
+
+  /**
+   * <code>string message = 2 [json_name = "message"];</code>
+   * @return The message.
+   */
+  java.lang.String getMessage();
+  /**
+   * <code>string message = 2 [json_name = "message"];</code>
+   * @return The bytes for message.
+   */
+  com.google.protobuf.ByteString
+      getMessageBytes();
 }

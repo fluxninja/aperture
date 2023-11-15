@@ -18,6 +18,8 @@ private static final long serialVersionUID = 0L;
   private CachedValue() {
     value_ = com.google.protobuf.ByteString.EMPTY;
     lookupResult_ = 0;
+    responseCode_ = 0;
+    message_ = "";
   }
 
   @java.lang.Override
@@ -54,19 +56,76 @@ private static final long serialVersionUID = 0L;
   public static final int LOOKUP_RESULT_FIELD_NUMBER = 2;
   private int lookupResult_ = 0;
   /**
-   * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
    * @return The enum numeric value on the wire for lookupResult.
    */
   @java.lang.Override public int getLookupResultValue() {
     return lookupResult_;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
    * @return The lookupResult.
    */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult getLookupResult() {
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.forNumber(lookupResult_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.UNRECOGNIZED : result;
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult getLookupResult() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.forNumber(lookupResult_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.UNRECOGNIZED : result;
+  }
+
+  public static final int RESPONSE_CODE_FIELD_NUMBER = 3;
+  private int responseCode_ = 0;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+   * @return The enum numeric value on the wire for responseCode.
+   */
+  @java.lang.Override public int getResponseCodeValue() {
+    return responseCode_;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+   * @return The responseCode.
+   */
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getResponseCode() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.forNumber(responseCode_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.UNRECOGNIZED : result;
+  }
+
+  public static final int MESSAGE_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object message_ = "";
+  /**
+   * <code>string message = 4 [json_name = "message"];</code>
+   * @return The message.
+   */
+  @java.lang.Override
+  public java.lang.String getMessage() {
+    java.lang.Object ref = message_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      message_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string message = 4 [json_name = "message"];</code>
+   * @return The bytes for message.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getMessageBytes() {
+    java.lang.Object ref = message_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      message_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
   private byte memoizedIsInitialized = -1;
@@ -86,8 +145,14 @@ private static final long serialVersionUID = 0L;
     if (!value_.isEmpty()) {
       output.writeBytes(1, value_);
     }
-    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.Hit.getNumber()) {
+    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.HIT.getNumber()) {
       output.writeEnum(2, lookupResult_);
+    }
+    if (responseCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.SUCCESS.getNumber()) {
+      output.writeEnum(3, responseCode_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, message_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -102,9 +167,16 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBytesSize(1, value_);
     }
-    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.Hit.getNumber()) {
+    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.HIT.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(2, lookupResult_);
+    }
+    if (responseCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.SUCCESS.getNumber()) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeEnumSize(3, responseCode_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, message_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -124,6 +196,9 @@ private static final long serialVersionUID = 0L;
     if (!getValue()
         .equals(other.getValue())) return false;
     if (lookupResult_ != other.lookupResult_) return false;
+    if (responseCode_ != other.responseCode_) return false;
+    if (!getMessage()
+        .equals(other.getMessage())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -139,6 +214,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getValue().hashCode();
     hash = (37 * hash) + LOOKUP_RESULT_FIELD_NUMBER;
     hash = (53 * hash) + lookupResult_;
+    hash = (37 * hash) + RESPONSE_CODE_FIELD_NUMBER;
+    hash = (53 * hash) + responseCode_;
+    hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+    hash = (53 * hash) + getMessage().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -272,6 +351,8 @@ private static final long serialVersionUID = 0L;
       bitField0_ = 0;
       value_ = com.google.protobuf.ByteString.EMPTY;
       lookupResult_ = 0;
+      responseCode_ = 0;
+      message_ = "";
       return this;
     }
 
@@ -310,6 +391,12 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.lookupResult_ = lookupResult_;
+      }
+      if (((from_bitField0_ & 0x00000004) != 0)) {
+        result.responseCode_ = responseCode_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.message_ = message_;
       }
     }
 
@@ -363,6 +450,14 @@ private static final long serialVersionUID = 0L;
       if (other.lookupResult_ != 0) {
         setLookupResultValue(other.getLookupResultValue());
       }
+      if (other.responseCode_ != 0) {
+        setResponseCodeValue(other.getResponseCodeValue());
+      }
+      if (!other.getMessage().isEmpty()) {
+        message_ = other.message_;
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -399,6 +494,16 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 16
+            case 24: {
+              responseCode_ = input.readEnum();
+              bitField0_ |= 0x00000004;
+              break;
+            } // case 24
+            case 34: {
+              message_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -450,14 +555,14 @@ private static final long serialVersionUID = 0L;
 
     private int lookupResult_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
      * @return The enum numeric value on the wire for lookupResult.
      */
     @java.lang.Override public int getLookupResultValue() {
       return lookupResult_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
      * @param value The enum numeric value on the wire for lookupResult to set.
      * @return This builder for chaining.
      */
@@ -468,20 +573,20 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
      * @return The lookupResult.
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult getLookupResult() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.forNumber(lookupResult_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult.UNRECOGNIZED : result;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult getLookupResult() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.forNumber(lookupResult_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
      * @param value The lookupResult to set.
      * @return This builder for chaining.
      */
-    public Builder setLookupResult(com.fluxninja.generated.aperture.flowcontrol.check.v1.LookupResult value) {
+    public Builder setLookupResult(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult value) {
       if (value == null) {
         throw new NullPointerException();
       }
@@ -491,12 +596,137 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.LookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
      * @return This builder for chaining.
      */
     public Builder clearLookupResult() {
       bitField0_ = (bitField0_ & ~0x00000002);
       lookupResult_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int responseCode_ = 0;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * @return The enum numeric value on the wire for responseCode.
+     */
+    @java.lang.Override public int getResponseCodeValue() {
+      return responseCode_;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * @param value The enum numeric value on the wire for responseCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setResponseCodeValue(int value) {
+      responseCode_ = value;
+      bitField0_ |= 0x00000004;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * @return The responseCode.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getResponseCode() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.forNumber(responseCode_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.UNRECOGNIZED : result;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * @param value The responseCode to set.
+     * @return This builder for chaining.
+     */
+    public Builder setResponseCode(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode value) {
+      if (value == null) {
+        throw new NullPointerException();
+      }
+      bitField0_ |= 0x00000004;
+      responseCode_ = value.getNumber();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearResponseCode() {
+      bitField0_ = (bitField0_ & ~0x00000004);
+      responseCode_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object message_ = "";
+    /**
+     * <code>string message = 4 [json_name = "message"];</code>
+     * @return The message.
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string message = 4 [json_name = "message"];</code>
+     * @return The bytes for message.
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string message = 4 [json_name = "message"];</code>
+     * @param value The message to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMessage(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      message_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string message = 4 [json_name = "message"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearMessage() {
+      message_ = getDefaultInstance().getMessage();
+      bitField0_ = (bitField0_ & ~0x00000008);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string message = 4 [json_name = "message"];</code>
+     * @param value The bytes for message to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMessageBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      message_ = value;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
