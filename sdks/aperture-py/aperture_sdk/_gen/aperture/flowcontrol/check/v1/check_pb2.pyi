@@ -8,10 +8,15 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class LookupResult(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class CacheLookupResult(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    Hit: _ClassVar[LookupResult]
-    Miss: _ClassVar[LookupResult]
+    HIT: _ClassVar[CacheLookupResult]
+    MISS: _ClassVar[CacheLookupResult]
+
+class CacheResponseCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    SUCCESS: _ClassVar[CacheResponseCode]
+    ERROR: _ClassVar[CacheResponseCode]
 
 class StatusCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -72,8 +77,10 @@ class StatusCode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     LoopDetected: _ClassVar[StatusCode]
     NotExtended: _ClassVar[StatusCode]
     NetworkAuthenticationRequired: _ClassVar[StatusCode]
-Hit: LookupResult
-Miss: LookupResult
+HIT: CacheLookupResult
+MISS: CacheLookupResult
+SUCCESS: CacheResponseCode
+ERROR: CacheResponseCode
 Empty: StatusCode
 Continue: StatusCode
 OK: StatusCode
@@ -209,12 +216,16 @@ class CheckResponse(_message.Message):
     def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., cached_value: _Optional[_Union[CachedValue, _Mapping]] = ...) -> None: ...
 
 class CachedValue(_message.Message):
-    __slots__ = ("value", "lookup_result")
+    __slots__ = ("value", "lookup_result", "response_code", "message")
     VALUE_FIELD_NUMBER: _ClassVar[int]
     LOOKUP_RESULT_FIELD_NUMBER: _ClassVar[int]
+    RESPONSE_CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
     value: bytes
-    lookup_result: LookupResult
-    def __init__(self, value: _Optional[bytes] = ..., lookup_result: _Optional[_Union[LookupResult, str]] = ...) -> None: ...
+    lookup_result: CacheLookupResult
+    response_code: CacheResponseCode
+    message: str
+    def __init__(self, value: _Optional[bytes] = ..., lookup_result: _Optional[_Union[CacheLookupResult, str]] = ..., response_code: _Optional[_Union[CacheResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
 class CacheUpsertRequest(_message.Message):
     __slots__ = ("control_point", "key", "value", "ttl")
@@ -229,8 +240,12 @@ class CacheUpsertRequest(_message.Message):
     def __init__(self, control_point: _Optional[str] = ..., key: _Optional[str] = ..., value: _Optional[bytes] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class CacheUpsertResponse(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("code", "message")
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    code: CacheResponseCode
+    message: str
+    def __init__(self, code: _Optional[_Union[CacheResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
 class CacheDeleteRequest(_message.Message):
     __slots__ = ("control_point", "key")
@@ -241,8 +256,12 @@ class CacheDeleteRequest(_message.Message):
     def __init__(self, control_point: _Optional[str] = ..., key: _Optional[str] = ...) -> None: ...
 
 class CacheDeleteResponse(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("code", "message")
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    code: CacheResponseCode
+    message: str
+    def __init__(self, code: _Optional[_Union[CacheResponseCode, str]] = ..., message: _Optional[str] = ...) -> None: ...
 
 class ClassifierInfo(_message.Message):
     __slots__ = ("policy_name", "policy_hash", "classifier_index", "error")

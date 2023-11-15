@@ -71,14 +71,21 @@ message CheckResponse {
   CachedValue cached_value = 15;
 }
 
-enum LookupResult {
-  Hit = 0;
-  Miss = 1;
+enum CacheLookupResult {
+  HIT = 0;
+  MISS = 1;
+}
+
+enum CacheResponseCode {
+  SUCCESS = 0;
+  ERROR = 1;
 }
 
 message CachedValue {
   bytes value = 1;
-  LookupResult lookup_result = 2;
+  CacheLookupResult lookup_result = 2;
+  CacheResponseCode response_code = 3;
+  string message = 4;
 }
 
 message CacheUpsertRequest {
@@ -88,14 +95,20 @@ message CacheUpsertRequest {
   google.protobuf.Duration ttl = 4;
 }
 
-message CacheUpsertResponse {}
+message CacheUpsertResponse {
+  CacheResponseCode code = 1;
+  string message = 2;
+}
 
 message CacheDeleteRequest {
   string control_point = 1;
   string key = 2;
 }
 
-message CacheDeleteResponse {}
+message CacheDeleteResponse {
+  CacheResponseCode code = 1;
+  string message = 2;
+}
 
 // ClassifierInfo describes details for each ClassifierInfo.
 message ClassifierInfo {

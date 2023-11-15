@@ -176,13 +176,16 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		if err == nil {
 			response.CachedValue = &flowcontrolv1.CachedValue{
 				Value:        cachedBytes,
-				LookupResult: flowcontrolv1.LookupResult_Hit,
+				LookupResult: flowcontrolv1.CacheLookupResult_HIT,
+				ResponseCode: flowcontrolv1.CacheResponseCode_SUCCESS,
 			}
 			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 			return
 		}
 		response.CachedValue = &flowcontrolv1.CachedValue{
-			LookupResult: flowcontrolv1.LookupResult_Miss,
+			LookupResult: flowcontrolv1.CacheLookupResult_MISS,
+			ResponseCode: flowcontrolv1.CacheResponseCode_ERROR,
+			Message:      err.Error(),
 		}
 	}
 

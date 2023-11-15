@@ -779,13 +779,39 @@ definitions:
                 description: The value is emitted to the output port.
         type: object
     CacheDeleteResponse:
+        properties:
+            code:
+                $ref: '#/definitions/CacheResponseCode'
+            message:
+                type: string
         type: object
+    CacheLookupResult:
+        default: HIT
+        enum:
+            - HIT
+            - MISS
+        type: string
+    CacheResponseCode:
+        default: SUCCESS
+        enum:
+            - SUCCESS
+            - ERROR
+        type: string
     CacheUpsertResponse:
+        properties:
+            code:
+                $ref: '#/definitions/CacheResponseCode'
+            message:
+                type: string
         type: object
     CachedValue:
         properties:
             lookup_result:
-                $ref: '#/definitions/LookupResult'
+                $ref: '#/definitions/CacheLookupResult'
+            message:
+                type: string
+            response_code:
+                $ref: '#/definitions/CacheResponseCode'
             value:
                 format: byte
                 type: string
@@ -2936,12 +2962,6 @@ definitions:
             - selectors
         title: Parameters for _Load Scheduler_ component
         type: object
-    LookupResult:
-        default: Hit
-        enum:
-            - Hit
-            - Miss
-        type: string
     MatchExpression:
         description: |-
             MatchExpression has multiple variants, exactly one should be set.
