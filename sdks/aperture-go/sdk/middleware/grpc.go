@@ -2,31 +2,45 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
-	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
-func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto.SocketAddress {
-	host, port := splitAddress(logger, addr.String())
-	protocol := checkhttpproto.SocketAddress_TCP
-	if addr.Network() == "udp" {
-		protocol = checkhttpproto.SocketAddress_UDP
+func socketAddressFromNetAddr(addr net.Addr) *checkhttpv1.SocketAddress {
+	host, port, err := net.SplitHostPort(addr.String())
+	if err != nil {
+		return nil
 	}
-	return &checkhttpproto.SocketAddress{
+
+	portU32, err := strconv.ParseUint(port, 10, 32)
+	if err != nil {
+		return nil
+	}
+
+	protocol := checkhttpv1.SocketAddress_TCP
+	if addr.Network() == "udp" {
+		protocol = checkhttpv1.SocketAddress_UDP
+	}
+	return &checkhttpv1.SocketAddress{
 		Address:  host,
 		Protocol: protocol,
-		Port:     port,
+		Port:     uint32(portU32),
 	}
 }
 
@@ -37,7 +51,10 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 	}
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, rampMode)
+		checkreq, err := prepareCheckHTTPRequestForGRPC(req, ctx, info, controlPoint, explicitLabels, rampMode)
+		if err != nil {
+			c.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
+		}
 
 		flow := c.StartHTTPFlow(ctx, checkreq, rampMode, timeout)
 		if flow.Error() != nil {
@@ -66,6 +83,70 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 			)
 		}
 	}
+}
+
+// PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, controlPoint string, explicitLabels map[string]string, rampMode bool) (*checkhttpv1.CheckHTTPRequest, error) {
+	labels := utils.LabelsFromCtx(ctx)
+
+	// override labels with explicit labels
+	for key, value := range explicitLabels {
+		labels[key] = value
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	authority := ""
+	scheme := ""
+	method := ""
+
+	if ok {
+		// override labels with labels from metadata
+		for key, value := range md {
+			labels[key] = strings.Join(value, ",")
+		}
+		getMetaValue := func(key string) string {
+			values := md.Get(key)
+			if len(values) > 0 {
+				return values[0]
+			}
+			return ""
+		}
+		authority = getMetaValue(":authority")
+		scheme = getMetaValue(":scheme")
+		method = getMetaValue(":method")
+	}
+
+	var sourceSocket *checkhttpv1.SocketAddress
+	if sourceAddr, ok := peer.FromContext(ctx); ok {
+		sourceSocket = socketAddressFromNetAddr(sourceAddr.Addr)
+	}
+	destinationSocket := &checkhttpv1.SocketAddress{
+		Address:  utils.GetLocalIP(),
+		Protocol: checkhttpv1.SocketAddress_TCP,
+		Port:     0,
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &checkhttpv1.CheckHTTPRequest{
+		Source:       sourceSocket,
+		Destination:  destinationSocket,
+		ControlPoint: controlPoint,
+		RampMode:     rampMode,
+		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
+			Method:   method,
+			Path:     info.FullMethod,
+			Host:     authority,
+			Headers:  labels,
+			Scheme:   scheme,
+			Size:     -1,
+			Protocol: "HTTP/2",
+			Body:     string(body),
+		},
+	}, nil
 }
 
 func convertHTTPStatusToGRPC(httpStatusCode int32) codes.Code {

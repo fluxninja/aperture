@@ -4,10 +4,11 @@ import (
 	"errors"
 	"time"
 
-	checkproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
+
+	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 )
 
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
@@ -18,13 +19,13 @@ type Flow interface {
 	Error() error
 	Span() trace.Span
 	End() error
-	CheckResponse() *checkproto.CheckResponse
+	CheckResponse() *checkv1.CheckResponse
 }
 
 type flow struct {
 	span          trace.Span
 	err           error
-	checkResponse *checkproto.CheckResponse
+	checkResponse *checkv1.CheckResponse
 	statusCode    FlowStatus
 	ended         bool
 	rampMode      bool
@@ -44,7 +45,7 @@ func newFlow(span trace.Span, rampMode bool) *flow {
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
 // By default, fail-open behavior is enabled. Set rampMode to disable it.
 func (f *flow) ShouldRun() bool {
-	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkproto.CheckResponse_DECISION_TYPE_ACCEPTED) {
+	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkv1.CheckResponse_DECISION_TYPE_ACCEPTED) {
 		return true
 	} else {
 		return false
@@ -52,7 +53,7 @@ func (f *flow) ShouldRun() bool {
 }
 
 // CheckResponse returns the response from the server.
-func (f *flow) CheckResponse() *checkproto.CheckResponse {
+func (f *flow) CheckResponse() *checkv1.CheckResponse {
 	return f.checkResponse
 }
 

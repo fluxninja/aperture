@@ -3,19 +3,11 @@ package aperture
 import (
 	"context"
 	"errors"
-	"log"
-	"net/url"
+	"log/slog"
 	"time"
 
-	checkgrpc "buf.build/gen/go/fluxninja/aperture/grpc/go/aperture/flowcontrol/check/v1/checkv1grpc"
-	checkhttpgrpc "buf.build/gen/go/fluxninja/aperture/grpc/go/aperture/flowcontrol/checkhttp/v1/checkhttpv1grpc"
-	checkproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/check/v1"
-	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/go-logr/logr"
-	"github.com/go-logr/stdr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/baggage"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -25,30 +17,34 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/metadata"
+
+	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
+	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
 	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, rampMode bool, timeout time.Duration) Flow
-	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
+	StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
 	Shutdown(ctx context.Context) error
-	GetLogger() logr.Logger
+	GetLogger() *slog.Logger
 	GetGRPClientConn() *grpc.ClientConn
 }
 
 type apertureClient struct {
 	grpcClientConn        *grpc.ClientConn
-	flowControlClient     checkgrpc.FlowControlServiceClient
-	flowControlHTTPClient checkhttpgrpc.FlowControlServiceHTTPClient
+	flowControlClient     checkv1.FlowControlServiceClient
+	flowControlHTTPClient checkhttpv1.FlowControlServiceHTTPClient
 	tracer                trace.Tracer
 	exporter              *otlptrace.Exporter
-	log                   logr.Logger
+	log                   *slog.Logger
 }
 
 // Options that the user can pass to Aperture in order to receive a new Client.
 // FlowControlClientConn and OTLPExporterClientConn are required.
 type Options struct {
-	Logger      *logr.Logger
+	Logger      *slog.Logger
 	Address     string
 	AgentAPIKey string
 	DialOptions []grpc.DialOption
@@ -62,11 +58,12 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 	}
 
 	if opts.AgentAPIKey != "" {
-		opts.DialOptions = append(opts.DialOptions, grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
+		dialOptions := grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
 			md := metadata.Pairs("x-api-key", opts.AgentAPIKey)
 			ctx = metadata.NewOutgoingContext(ctx, md)
 			return invoker(ctx, method, req, reply, cc, callOpts...)
-		}))
+		})
+		opts.DialOptions = append(opts.DialOptions, dialOptions)
 	}
 
 	conn, err := grpc.DialContext(ctx, opts.Address, opts.DialOptions...)
@@ -74,10 +71,7 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		return nil, err
 	}
 
-	exporter, err := otlptracegrpc.New(
-		ctx,
-		otlptracegrpc.WithGRPCConn(conn),
-	)
+	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
 		return nil, err
 	}
@@ -96,15 +90,15 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 
 	tracer := tracerProvider.Tracer(libraryName)
 
-	var logger logr.Logger
+	var logger *slog.Logger
 	if opts.Logger != nil {
-		logger = *opts.Logger
+		logger = opts.Logger
 	} else {
-		logger = stdr.New(log.Default()).WithName("aperture-go-sdk")
+		logger = slog.Default().With("name", "aperture-go-sdk")
 	}
 
-	fcClient := checkgrpc.NewFlowControlServiceClient(conn)
-	fcHTTPClient := checkhttpgrpc.NewFlowControlServiceHTTPClient(conn)
+	fcClient := checkv1.NewFlowControlServiceClient(conn)
+	fcHTTPClient := checkhttpv1.NewFlowControlServiceHTTPClient(conn)
 
 	c := &apertureClient{
 		grpcClientConn:        conn,
@@ -126,20 +120,6 @@ func (c *apertureClient) getSpan(ctx context.Context) trace.Span {
 	return span
 }
 
-// LabelsFromCtx extracts baggage labels from context.
-func LabelsFromCtx(ctx context.Context) map[string]string {
-	labels := make(map[string]string)
-	baggageCtx := baggage.FromContext(ctx)
-	for _, member := range baggageCtx.Members() {
-		value, err := url.QueryUnescape(member.Value())
-		if err != nil {
-			continue
-		}
-		labels[member.Key()] = value
-	}
-	return labels
-}
-
 // StartFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
@@ -152,14 +132,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		defer cancel()
 	}
 
-	labels := LabelsFromCtx(ctx)
+	labels := utils.LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
 	for key, value := range explicitLabels {
 		labels[key] = value
 	}
 
-	req := &checkproto.CheckRequest{
+	req := &checkv1.CheckRequest{
 		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     rampMode,
@@ -192,7 +172,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 // Return value is a HTTPFlow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
-func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow {
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -242,7 +222,7 @@ func newResource() (*resource.Resource, error) {
 }
 
 // GetLogger returns the logger used by the aperture client.
-func (c *apertureClient) GetLogger() logr.Logger {
+func (c *apertureClient) GetLogger() *slog.Logger {
 	return c.log
 }
 
