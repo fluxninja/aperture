@@ -4,38 +4,38 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf type {@code aperture.flowcontrol.check.v1.CacheItem}
+ * Protobuf type {@code aperture.flowcontrol.check.v1.CacheUpsertResponse}
  */
-public final class CacheItem extends
+public final class CacheUpsertResponse extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.CacheItem)
-    CacheItemOrBuilder {
+    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.CacheUpsertResponse)
+    CacheUpsertResponseOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use CacheItem.newBuilder() to construct.
-  private CacheItem(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use CacheUpsertResponse.newBuilder() to construct.
+  private CacheUpsertResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private CacheItem() {
+  private CacheUpsertResponse() {
   }
 
   @java.lang.Override
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new CacheItem();
+    return new CacheUpsertResponse();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor;
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheItem_fieldAccessorTable
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.Builder.class);
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.Builder.class);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -71,10 +71,10 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem)) {
+    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse)) {
       return super.equals(obj);
     }
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem) obj;
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse) obj;
 
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -92,44 +92,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(byte[] data)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -137,26 +137,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseDelimitedFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseDelimitedFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -169,7 +169,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem prototype) {
+  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -185,26 +185,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code aperture.flowcontrol.check.v1.CacheItem}
+   * Protobuf type {@code aperture.flowcontrol.check.v1.CacheUpsertResponse}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.CacheItem)
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItemOrBuilder {
+      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.CacheUpsertResponse)
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheItem_fieldAccessorTable
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.Builder.class);
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.Builder.class);
     }
 
-    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.newBuilder()
+    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.newBuilder()
     private Builder() {
 
     }
@@ -223,17 +223,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem getDefaultInstanceForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.getDefaultInstance();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse getDefaultInstanceForType() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem build() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem result = buildPartial();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse build() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -241,8 +241,8 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem buildPartial() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem(this);
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse buildPartial() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse(this);
       onBuilt();
       return result;
     }
@@ -281,16 +281,16 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem) {
-        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem)other);
+      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse) {
+        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem other) {
-      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem.getDefaultInstance()) return this;
+    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse other) {
+      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.getDefaultInstance()) return this;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -345,23 +345,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.CacheItem)
+    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.CacheUpsertResponse)
   }
 
-  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.CacheItem)
-  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.CacheUpsertResponse)
+  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem();
+    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse();
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem getDefaultInstance() {
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<CacheItem>
-      PARSER = new com.google.protobuf.AbstractParser<CacheItem>() {
+  private static final com.google.protobuf.Parser<CacheUpsertResponse>
+      PARSER = new com.google.protobuf.AbstractParser<CacheUpsertResponse>() {
     @java.lang.Override
-    public CacheItem parsePartialFrom(
+    public CacheUpsertResponse parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -380,17 +380,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<CacheItem> parser() {
+  public static com.google.protobuf.Parser<CacheUpsertResponse> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<CacheItem> getParserForType() {
+  public com.google.protobuf.Parser<CacheUpsertResponse> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheItem getDefaultInstanceForType() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

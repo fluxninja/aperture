@@ -4,9 +4,9 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf enum {@code aperture.flowcontrol.check.v1.CacheResult}
+ * Protobuf enum {@code aperture.flowcontrol.check.v1.LookupResult}
  */
-public enum CacheResult
+public enum LookupResult
     implements com.google.protobuf.ProtocolMessageEnum {
   /**
    * <code>Hit = 0;</code>
@@ -43,7 +43,7 @@ public enum CacheResult
    * @deprecated Use {@link #forNumber(int)} instead.
    */
   @java.lang.Deprecated
-  public static CacheResult valueOf(int value) {
+  public static LookupResult valueOf(int value) {
     return forNumber(value);
   }
 
@@ -51,7 +51,7 @@ public enum CacheResult
    * @param value The numeric wire value of the corresponding enum entry.
    * @return The enum associated with the given numeric wire value.
    */
-  public static CacheResult forNumber(int value) {
+  public static LookupResult forNumber(int value) {
     switch (value) {
       case 0: return Hit;
       case 1: return Miss;
@@ -59,15 +59,15 @@ public enum CacheResult
     }
   }
 
-  public static com.google.protobuf.Internal.EnumLiteMap<CacheResult>
+  public static com.google.protobuf.Internal.EnumLiteMap<LookupResult>
       internalGetValueMap() {
     return internalValueMap;
   }
   private static final com.google.protobuf.Internal.EnumLiteMap<
-      CacheResult> internalValueMap =
-        new com.google.protobuf.Internal.EnumLiteMap<CacheResult>() {
-          public CacheResult findValueByNumber(int number) {
-            return CacheResult.forNumber(number);
+      LookupResult> internalValueMap =
+        new com.google.protobuf.Internal.EnumLiteMap<LookupResult>() {
+          public LookupResult findValueByNumber(int number) {
+            return LookupResult.forNumber(number);
           }
         };
 
@@ -88,9 +88,9 @@ public enum CacheResult
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(0);
   }
 
-  private static final CacheResult[] VALUES = values();
+  private static final LookupResult[] VALUES = values();
 
-  public static CacheResult valueOf(
+  public static LookupResult valueOf(
       com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
     if (desc.getType() != getDescriptor()) {
       throw new java.lang.IllegalArgumentException(
@@ -104,10 +104,10 @@ public enum CacheResult
 
   private final int value;
 
-  private CacheResult(int value) {
+  private LookupResult(int value) {
     this.value = value;
   }
 
-  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CacheResult)
+  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.LookupResult)
 }
 

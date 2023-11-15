@@ -3,7 +3,7 @@
 
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
-public interface CacheItemOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.CacheItem)
+public interface CacheUpsertResponseOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.CacheUpsertResponse)
     com.google.protobuf.MessageOrBuilder {
 }
