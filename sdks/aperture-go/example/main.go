@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -61,10 +62,16 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 func main() {
 	ctx := context.Background()
 
+	apertureAgentAddr := getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress)
+	apertureAgentInsecure := getEnvOrDefault("APERTURE_AGENT_INSECURE", "false")
+	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
+	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
+	apertureAgentSkipVerifyBool, _ := strconv.ParseBool(apertureAgentSkipVerify)
+
 	opts := aperture.Options{
-		Address:     getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress).(string),
-		DialOptions: grpcOptions(getEnvOrDefault("APERTURE_AGENT_INSECURE", false).(bool), getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false).(bool)),
-		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", "").(string),
+		Address:     apertureAgentAddr,
+		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
+		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.
@@ -73,7 +80,7 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort).(string)
+	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
 	mux := mux.NewRouter()
 	a := &app{
@@ -135,7 +142,7 @@ func (a *app) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("Healthy"))
 }
 
-func getEnvOrDefault(envName string, defaultValue any) any {
+func getEnvOrDefault(envName string, defaultValue string) string {
 	val := os.Getenv(envName)
 	if val == "" {
 		return defaultValue
