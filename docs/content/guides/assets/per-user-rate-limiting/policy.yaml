@@ -21,12 +21,10 @@ spec:
               signal_name: ACCEPT_PERCENTAGE
           parameters:
             interval: 1s
-            limit_by_label_key: http.request.header.user_id
+            limit_by_label_key: user_id
           request_parameters: {}
           selectors:
-          - agent_group: default
-            control_point: ingress
-            service: catalog-service.prod.svc.cluster.local
+          - control_point: awesomeFeature
     - decider:
         in_ports:
           lhs:

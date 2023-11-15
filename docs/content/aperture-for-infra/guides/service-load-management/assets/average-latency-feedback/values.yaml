@@ -4,7 +4,7 @@
 # https://docs.fluxninja.com/reference/blueprints/load-scheduling/average-latency
 
 blueprint: load-scheduling/average-latency
-uri: ../../../../../../blueprints
+uri: ../../../../../../../blueprints
 policy:
   # Name of the policy.
   # Type: string

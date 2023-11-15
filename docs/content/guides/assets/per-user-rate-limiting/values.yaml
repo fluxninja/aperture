@@ -7,9 +7,7 @@ policy:
     bucket_capacity: 40
     fill_amount: 2
     selectors:
-      - service: "catalog-service.prod.svc.cluster.local"
-        control_point: "ingress"
-        agent_group: "default"
+      - control_point: "awesomeFeature"
     parameters:
-      limit_by_label_key: "http.request.header.user_id"
+      limit_by_label_key: "user_id"
       interval: 1s

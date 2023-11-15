@@ -38,11 +38,11 @@ determined by the bucket capacity.
 
 </Zoom>
 
-The diagram depicts the distribution of tokens across Agents through a global
-token bucket. Each incoming request prompts the Agents to decrement tokens from
-the bucket. If the bucket has run out of tokens, indicating that the rate limit
-has been reached, the incoming request is rejected. Conversely, if tokens are
-available in the bucket, the request is accepted. The token bucket is
+The diagram is showing how the Aperture SDK interacts with a global token bucket
+to determine whether to allow or reject a request. Each call decrements tokens
+from the bucket and if the bucket runs out of tokens, indicating that the rate
+limit has been reached, the incoming request is rejected. Conversely, if tokens
+are available in the bucket, the request is accepted. The token bucket is
 continually replenished at a predefined fill rate, up to the maximum number of
 tokens specified by the bucket capacity.
 
@@ -55,8 +55,32 @@ The following policy is based on the
 
 ## Rate Limiting with Aperture SDK
 
-The code below provides a general idea using the Aperture SDK for rate limiting
-requests based on business logic.
+The first step to use Aperture SDK is to import and set up Aperture Client:
+
+```mdx-code-block
+<Tabs>
+<TabItem value="Typescript">
+```
+
+```typescript
+import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import grpc from "@grpc/grpc-js";
+
+apertureClient = new ApertureClient({
+  address: "localhost:8080",
+  channelCredentials: grpc.credentials.createSsl(),
+});
+```
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+Start the flow with `StartFlow` by passing in a controlPoint and labels
+necessary to determine if a request should proceed. The function `ShouldRun`
+checks if the flow allows the request. The `Flow.End()` function is responsible
+for sending telemetry, and updating the specified cache entry within Aperture.
 
 ```mdx-code-block
 <Tabs>
@@ -64,51 +88,35 @@ requests based on business logic.
 ```
 
 ```typescript
-import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
-
-// Initialize the Aperture client
-const apertureClient = new ApertureClient({
-  address: "localhost:8080",
-  channelCredentials: grpc.credentials.createSsl(),
-});
-
-const labels: Record<string, string> = {
-  label_key: "http.request.header.user_id",
-  interval: "1s",
-};
-
 let flow: Flow | undefined;
 
-if (apertureClient) {
-  try {
-    // Start the flow to check rate limiting for the incoming request
-    flow = await apertureClient.StartFlow(
-      "catalog-service.prod.svc.cluster.local",
-      {
-        labels: labels,
-        grpcCallOptions: {
-          deadline: Date.now() + 1200000, // 20 minutes deadline
-        },
-      },
-    );
+try {
+  // Start the flow to check rate limiting for the incoming request
+  flow = await apertureClient.StartFlow("awesomeFeature", {
+    labels: {
+      label_key: "user_id",
+      interval: "1s",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000, // 20 minutes deadline
+    },
+  });
 
-    // Check if the flow is allowed by Aperture
-    if (flow.ShouldRun()) {
-      // Add business logic to process incoming request
-      console.log("Request accepted. Processing...");
-    } else {
-      console.log("Request rate-limited. Try again later.");
-    }
-  } catch (e) {
-    console.error("Error in flow:", e);
-    if (flow) {
-      flow.SetStatus(FlowStatusEnum.Error);
-    }
-  } finally {
-    if (flow) {
-      flow.End();
-    }
+  // Check if the flow is allowed by Aperture
+  if (flow.ShouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+  } else {
+    console.log("Request rate-limited. Try again later.");
+  }
+} catch (e) {
+  console.error("Error in flow:", e);
+  if (flow) {
+    flow.SetStatus(FlowStatusEnum.Error);
+  }
+} finally {
+  if (flow) {
+    flow.End();
   }
 }
 ```
@@ -195,6 +203,3 @@ When the policy is applied at a service, no more than 2 requests per second
 period (after an initial burst of 40 requests) are accepted for a user.
 
 ![Static Rate Limiting](./assets/per-user-rate-limiting/dashboard.png)
-
-Ready to use rate limiting within your application? Checkout our
-[SDKs](/sdk/sdk.md)

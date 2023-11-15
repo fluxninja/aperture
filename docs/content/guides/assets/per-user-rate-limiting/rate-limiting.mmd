@@ -1,14 +1,15 @@
-flowchart TD
-classDef TokenBucket fill:#F8773D, stroke:#000000,stroke-width:2px;
+flowchart LR
+classDef TokenBucket fill:#F8773D,stroke:#000000,stroke-width:2px;
 classDef Service fill:#56AE89,stroke:#000000,stroke-width:2px;
 
-
-Forward("Aperture Cloud") --> TB
-class Forward Service
-
+subgraph Cloud
 TB[\Token Bucket/]
 class TB TokenBucket
+end
+class Cloud Service
 
-SDK
-class SDK Service
-TB <-- "Counting" --> SDK
+TB <-- "counting tokens" --> SDK
+
+  subgraph "SDK"
+  end
+  class SDK Service
