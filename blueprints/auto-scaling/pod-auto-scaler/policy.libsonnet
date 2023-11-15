@@ -1,8 +1,7 @@
 local commonPolicyFn = import '../common/policy.libsonnet';
-local config = import './config.libsonnet';
 
 function(cfg) {
-  local params = config + cfg,
+  local params = cfg,
 
   local policyDef = commonPolicyFn(cfg).policyDef,
 

@@ -39,10 +39,6 @@ policy:
           - control_point: __REQUIRED_FIELD__
       max_load_multiplier: 2
       min_load_multiplier: 0
-    # Setpoint.
-    # Type: float64
-    # Required: True
-    setpoint: __REQUIRED_FIELD__
   # Configuration for Elasticsearch OpenTelemetry receiver. Refer https://docs.fluxninja.com/integrations/metrics/elasticsearch for more information.
   # Type: elasticsearch
   # Required: True
@@ -51,3 +47,7 @@ policy:
     endpoint: __REQUIRED_FIELD__
     password: __REQUIRED_FIELD__
     username: __REQUIRED_FIELD__
+  # Threshold of search thread pool tasks queued at which point to start throttling traffic.
+  # Type: float64
+  # Required: True
+  search_queue_threshold: __REQUIRED_FIELD__

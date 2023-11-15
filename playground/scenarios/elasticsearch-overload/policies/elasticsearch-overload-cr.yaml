@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: service1-demoapp-elasticsearch-overload
+  name: elasticsearch-overload
 spec:
   circuit:
     components:
@@ -44,7 +44,7 @@ spec:
           out_ports:
             output:
               signal_name: SIGNAL
-          query_string: avg(elasticsearch_node_thread_pool_tasks_queued{policy_name="service1-demoapp-elasticsearch-overload",
+          query_string: avg(elasticsearch_node_thread_pool_tasks_queued{policy_name="elasticsearch-overload",
             infra_meter_name="elasticsearch", thread_pool_name="search"})
     - variable:
         constant_output:

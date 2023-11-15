@@ -1,7 +1,6 @@
 local consts = import '../../consts.libsonnet';
 local spec = import '../../spec.libsonnet';
 local utils = import '../../utils/utils.libsonnet';
-local config = import './config-defaults.libsonnet';
 
 local component = spec.v1.Component;
 local autoScale = spec.v1.AutoScale;
@@ -19,7 +18,7 @@ local query = spec.v1.Query;
 local promQL = spec.v1.PromQL;
 
 function(cfg) {
-  local params = config + cfg,
+  local params = cfg,
 
   local scale_in_controllers = [
     scaleInController.new()

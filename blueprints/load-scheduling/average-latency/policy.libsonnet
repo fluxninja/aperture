@@ -1,9 +1,8 @@
 local spec = import '../../spec.libsonnet';
 local commonPolicyFn = import '../common-aimd/policy.libsonnet';
-local config = import './config.libsonnet';
 
 function(cfg, params={}) {
-  local updatedConfig = config + cfg + {
+  local updatedConfig = cfg {
     policy+: {
       overload_condition: 'gt',
     },
