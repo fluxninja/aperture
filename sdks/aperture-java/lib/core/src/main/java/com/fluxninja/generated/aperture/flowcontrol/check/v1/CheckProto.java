@@ -25,21 +25,6 @@ public final class CheckProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_check_v1_CheckRequest_LabelsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_CacheItem_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -50,10 +35,30 @@ public final class CheckProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_aperture_flowcontrol_check_v1_CacheResponse_descriptor;
+    internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_aperture_flowcontrol_check_v1_CacheResponse_fieldAccessorTable;
+      internal_static_aperture_flowcontrol_check_v1_CachedValue_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_aperture_flowcontrol_check_v1_ClassifierInfo_descriptor;
   static final 
@@ -105,160 +110,161 @@ public final class CheckProto {
     java.lang.String[] descriptorData = {
       "\n)aperture/flowcontrol/check/v1/check.pr" +
       "oto\022\035aperture.flowcontrol.check.v1\032\036goog" +
-      "le/protobuf/duration.proto\032\033google/proto" +
-      "buf/empty.proto\032\037google/protobuf/timesta" +
-      "mp.proto\"\371\001\n\014CheckRequest\022#\n\rcontrol_poi" +
-      "nt\030\001 \001(\tR\014controlPoint\022O\n\006labels\030\002 \003(\01327" +
-      ".aperture.flowcontrol.check.v1.CheckRequ" +
-      "est.LabelsEntryR\006labels\022\033\n\tramp_mode\030\003 \001" +
-      "(\010R\010rampMode\022\033\n\tcache_key\030\004 \001(\tR\010cacheKe" +
-      "y\0329\n\013LabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005va" +
-      "lue\030\002 \001(\tR\005value:\0028\001\"\216\001\n\022CacheUpsertRequ" +
-      "est\022#\n\rcontrol_point\030\001 \001(\tR\014controlPoint" +
-      "\022\020\n\003key\030\002 \001(\tR\003key\022\024\n\005value\030\003 \001(\014R\005value" +
-      "\022+\n\003ttl\030\004 \001(\0132\031.google.protobuf.Duration" +
-      "R\003ttl\"K\n\022CacheDeleteRequest\022#\n\rcontrol_p" +
-      "oint\030\001 \001(\tR\014controlPoint\022\020\n\003key\030\002 \001(\tR\003k" +
-      "ey\"\013\n\tCacheItem\"\324\n\n\rCheckResponse\0220\n\005sta" +
-      "rt\030\001 \001(\0132\032.google.protobuf.TimestampR\005st" +
-      "art\022,\n\003end\030\002 \001(\0132\032.google.protobuf.Times" +
-      "tampR\003end\022\032\n\010services\030\004 \003(\tR\010services\022#\n" +
-      "\rcontrol_point\030\005 \001(\tR\014controlPoint\022&\n\017fl" +
-      "ow_label_keys\030\006 \003(\tR\rflowLabelKeys\022y\n\025te" +
-      "lemetry_flow_labels\030\007 \003(\0132E.aperture.flo" +
-      "wcontrol.check.v1.CheckResponse.Telemetr" +
-      "yFlowLabelsEntryR\023telemetryFlowLabels\022^\n" +
-      "\rdecision_type\030\010 \001(\01629.aperture.flowcont" +
-      "rol.check.v1.CheckResponse.DecisionTypeR" +
-      "\014decisionType\022^\n\rreject_reason\030\t \001(\01629.a" +
+      "le/protobuf/duration.proto\032\037google/proto" +
+      "buf/timestamp.proto\"\371\001\n\014CheckRequest\022#\n\r" +
+      "control_point\030\001 \001(\tR\014controlPoint\022O\n\006lab" +
+      "els\030\002 \003(\01327.aperture.flowcontrol.check.v" +
+      "1.CheckRequest.LabelsEntryR\006labels\022\033\n\tra" +
+      "mp_mode\030\003 \001(\010R\010rampMode\022\033\n\tcache_key\030\004 \001" +
+      "(\tR\010cacheKey\0329\n\013LabelsEntry\022\020\n\003key\030\001 \001(\t" +
+      "R\003key\022\024\n\005value\030\002 \001(\tR\005value:\0028\001\"\314\n\n\rChec" +
+      "kResponse\0220\n\005start\030\001 \001(\0132\032.google.protob" +
+      "uf.TimestampR\005start\022,\n\003end\030\002 \001(\0132\032.googl" +
+      "e.protobuf.TimestampR\003end\022\032\n\010services\030\004 " +
+      "\003(\tR\010services\022#\n\rcontrol_point\030\005 \001(\tR\014co" +
+      "ntrolPoint\022&\n\017flow_label_keys\030\006 \003(\tR\rflo" +
+      "wLabelKeys\022y\n\025telemetry_flow_labels\030\007 \003(" +
+      "\0132E.aperture.flowcontrol.check.v1.CheckR" +
+      "esponse.TelemetryFlowLabelsEntryR\023teleme" +
+      "tryFlowLabels\022^\n\rdecision_type\030\010 \001(\01629.a" +
       "perture.flowcontrol.check.v1.CheckRespon" +
-      "se.RejectReasonR\014rejectReason\022X\n\020classif" +
-      "ier_infos\030\n \003(\0132-.aperture.flowcontrol.c" +
-      "heck.v1.ClassifierInfoR\017classifierInfos\022" +
-      "V\n\020flux_meter_infos\030\013 \003(\0132,.aperture.flo" +
-      "wcontrol.check.v1.FluxMeterInfoR\016fluxMet" +
-      "erInfos\022[\n\021limiter_decisions\030\014 \003(\0132..ape" +
-      "rture.flowcontrol.check.v1.LimiterDecisi" +
-      "onR\020limiterDecisions\0226\n\twait_time\030\r \001(\0132" +
-      "\031.google.protobuf.DurationR\010waitTime\022h\n\033" +
-      "denied_response_status_code\030\016 \001(\0162).aper" +
-      "ture.flowcontrol.check.v1.StatusCodeR\030de" +
-      "niedResponseStatusCode\022U\n\017cached_respons" +
-      "e\030\017 \001(\0132,.aperture.flowcontrol.check.v1." +
-      "CacheResponseR\016cachedResponse\032F\n\030Telemet" +
-      "ryFlowLabelsEntry\022\020\n\003key\030\001 \001(\tR\003key\022\024\n\005v" +
-      "alue\030\002 \001(\tR\005value:\0028\001\"\246\001\n\014RejectReason\022\026" +
-      "\n\022REJECT_REASON_NONE\020\000\022\036\n\032REJECT_REASON_" +
-      "RATE_LIMITED\020\001\022\033\n\027REJECT_REASON_NO_TOKEN" +
-      "S\020\002\022\035\n\031REJECT_REASON_NOT_SAMPLED\020\003\022\"\n\036RE" +
-      "JECT_REASON_NO_MATCHING_RAMP\020\004\"F\n\014Decisi" +
-      "onType\022\032\n\026DECISION_TYPE_ACCEPTED\020\000\022\032\n\026DE" +
-      "CISION_TYPE_REJECTED\020\001\"i\n\rCacheResponse\022" +
-      "\024\n\005value\030\001 \001(\014R\005value\022B\n\006result\030\002 \001(\0162*." +
-      "aperture.flowcontrol.check.v1.CacheResul" +
-      "tR\006result\"\355\002\n\016ClassifierInfo\022\037\n\013policy_n" +
-      "ame\030\001 \001(\tR\npolicyName\022\037\n\013policy_hash\030\002 \001" +
-      "(\tR\npolicyHash\022)\n\020classifier_index\030\003 \001(\003" +
-      "R\017classifierIndex\022I\n\005error\030\005 \001(\01623.apert" +
-      "ure.flowcontrol.check.v1.ClassifierInfo." +
-      "ErrorR\005error\"\242\001\n\005Error\022\016\n\nERROR_NONE\020\000\022\025" +
-      "\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERROR_EMPTY_RES" +
-      "ULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_RESULTSET\020\003\022" +
-      "\032\n\026ERROR_MULTI_EXPRESSION\020\004\022\034\n\030ERROR_EXP" +
-      "RESSION_NOT_MAP\020\005\"\246\014\n\017LimiterDecision\022\037\n" +
-      "\013policy_name\030\001 \001(\tR\npolicyName\022\037\n\013policy" +
-      "_hash\030\002 \001(\tR\npolicyHash\022!\n\014component_id\030" +
-      "\003 \001(\tR\013componentId\022\030\n\007dropped\030\004 \001(\010R\007dro" +
-      "pped\022T\n\006reason\030\005 \001(\0162<.aperture.flowcont" +
-      "rol.check.v1.LimiterDecision.LimiterReas" +
-      "onR\006reason\022h\n\033denied_response_status_cod" +
-      "e\030\n \001(\0162).aperture.flowcontrol.check.v1." +
-      "StatusCodeR\030deniedResponseStatusCode\0226\n\t" +
-      "wait_time\030\013 \001(\0132\031.google.protobuf.Durati" +
-      "onR\010waitTime\022l\n\021rate_limiter_info\030\024 \001(\0132" +
-      ">.aperture.flowcontrol.check.v1.LimiterD" +
-      "ecision.RateLimiterInfoH\000R\017rateLimiterIn" +
-      "fo\022n\n\023load_scheduler_info\030\025 \001(\0132<.apertu" +
-      "re.flowcontrol.check.v1.LimiterDecision." +
-      "SchedulerInfoH\000R\021loadSchedulerInfo\022_\n\014sa" +
-      "mpler_info\030\026 \001(\0132:.aperture.flowcontrol." +
-      "check.v1.LimiterDecision.SamplerInfoH\000R\013" +
-      "samplerInfo\022u\n\024quota_scheduler_info\030\027 \001(" +
-      "\0132A.aperture.flowcontrol.check.v1.Limite" +
-      "rDecision.QuotaSchedulerInfoH\000R\022quotaSch" +
-      "edulerInfo\032`\n\nTokensInfo\022\034\n\tremaining\030\001 " +
-      "\001(\001R\tremaining\022\030\n\007current\030\002 \001(\001R\007current" +
-      "\022\032\n\010consumed\030\003 \001(\001R\010consumed\032\203\001\n\017RateLim" +
-      "iterInfo\022\024\n\005label\030\001 \001(\tR\005label\022Z\n\013tokens" +
-      "_info\030\002 \001(\01329.aperture.flowcontrol.check" +
-      ".v1.LimiterDecision.TokensInfoR\ntokensIn" +
-      "fo\032\256\001\n\rSchedulerInfo\022%\n\016workload_index\030\001" +
-      " \001(\tR\rworkloadIndex\022Z\n\013tokens_info\030\002 \001(\013" +
-      "29.aperture.flowcontrol.check.v1.Limiter" +
-      "Decision.TokensInfoR\ntokensInfo\022\032\n\010prior" +
-      "ity\030\003 \001(\001R\010priority\032#\n\013SamplerInfo\022\024\n\005la" +
-      "bel\030\001 \001(\tR\005label\032\311\001\n\022QuotaSchedulerInfo\022" +
-      "\024\n\005label\030\001 \001(\tR\005label\022%\n\016workload_index\030" +
-      "\002 \001(\tR\rworkloadIndex\022Z\n\013tokens_info\030\003 \001(" +
-      "\01329.aperture.flowcontrol.check.v1.Limite" +
-      "rDecision.TokensInfoR\ntokensInfo\022\032\n\010prio" +
-      "rity\030\004 \001(\001R\010priority\"Q\n\rLimiterReason\022\036\n" +
-      "\032LIMITER_REASON_UNSPECIFIED\020\000\022 \n\034LIMITER" +
-      "_REASON_KEY_NOT_FOUND\020\001B\t\n\007details\"7\n\rFl" +
-      "uxMeterInfo\022&\n\017flux_meter_name\030\001 \001(\tR\rfl" +
-      "uxMeterName* \n\013CacheResult\022\007\n\003Hit\020\000\022\010\n\004M" +
-      "iss\020\001*\265\t\n\nStatusCode\022\t\n\005Empty\020\000\022\014\n\010Conti" +
-      "nue\020d\022\007\n\002OK\020\310\001\022\014\n\007Created\020\311\001\022\r\n\010Accepted" +
-      "\020\312\001\022 \n\033NonAuthoritativeInformation\020\313\001\022\016\n" +
-      "\tNoContent\020\314\001\022\021\n\014ResetContent\020\315\001\022\023\n\016Part" +
-      "ialContent\020\316\001\022\020\n\013MultiStatus\020\317\001\022\024\n\017Alrea" +
-      "dyReported\020\320\001\022\013\n\006IMUsed\020\342\001\022\024\n\017MultipleCh" +
-      "oices\020\254\002\022\025\n\020MovedPermanently\020\255\002\022\n\n\005Found" +
-      "\020\256\002\022\r\n\010SeeOther\020\257\002\022\020\n\013NotModified\020\260\002\022\r\n\010" +
-      "UseProxy\020\261\002\022\026\n\021TemporaryRedirect\020\263\002\022\026\n\021P" +
-      "ermanentRedirect\020\264\002\022\017\n\nBadRequest\020\220\003\022\021\n\014" +
-      "Unauthorized\020\221\003\022\024\n\017PaymentRequired\020\222\003\022\016\n" +
-      "\tForbidden\020\223\003\022\r\n\010NotFound\020\224\003\022\025\n\020MethodNo" +
-      "tAllowed\020\225\003\022\022\n\rNotAcceptable\020\226\003\022 \n\033Proxy" +
-      "AuthenticationRequired\020\227\003\022\023\n\016RequestTime" +
-      "out\020\230\003\022\r\n\010Conflict\020\231\003\022\t\n\004Gone\020\232\003\022\023\n\016Leng" +
-      "thRequired\020\233\003\022\027\n\022PreconditionFailed\020\234\003\022\024" +
-      "\n\017PayloadTooLarge\020\235\003\022\017\n\nURITooLong\020\236\003\022\031\n" +
-      "\024UnsupportedMediaType\020\237\003\022\030\n\023RangeNotSati" +
-      "sfiable\020\240\003\022\026\n\021ExpectationFailed\020\241\003\022\027\n\022Mi" +
-      "sdirectedRequest\020\245\003\022\030\n\023UnprocessableEnti" +
-      "ty\020\246\003\022\013\n\006Locked\020\247\003\022\025\n\020FailedDependency\020\250" +
-      "\003\022\024\n\017UpgradeRequired\020\252\003\022\031\n\024PreconditionR" +
-      "equired\020\254\003\022\024\n\017TooManyRequests\020\255\003\022 \n\033Requ" +
-      "estHeaderFieldsTooLarge\020\257\003\022\030\n\023InternalSe" +
-      "rverError\020\364\003\022\023\n\016NotImplemented\020\365\003\022\017\n\nBad" +
-      "Gateway\020\366\003\022\027\n\022ServiceUnavailable\020\367\003\022\023\n\016G" +
-      "atewayTimeout\020\370\003\022\034\n\027HTTPVersionNotSuppor" +
-      "ted\020\371\003\022\032\n\025VariantAlsoNegotiates\020\372\003\022\030\n\023In" +
-      "sufficientStorage\020\373\003\022\021\n\014LoopDetected\020\374\003\022" +
-      "\020\n\013NotExtended\020\376\003\022\"\n\035NetworkAuthenticati" +
-      "onRequired\020\377\0032\262\002\n\022FlowControlService\022d\n\005" +
-      "Check\022+.aperture.flowcontrol.check.v1.Ch" +
-      "eckRequest\032,.aperture.flowcontrol.check." +
-      "v1.CheckResponse\"\000\022Z\n\013CacheUpsert\0221.aper" +
-      "ture.flowcontrol.check.v1.CacheUpsertReq" +
-      "uest\032\026.google.protobuf.Empty\"\000\022Z\n\013CacheD" +
-      "elete\0221.aperture.flowcontrol.check.v1.Ca" +
-      "cheDeleteRequest\032\026.google.protobuf.Empty" +
-      "\"\000B\263\002\n5com.fluxninja.generated.aperture." +
-      "flowcontrol.check.v1B\nCheckProtoP\001ZWgith" +
-      "ub.com/fluxninja/aperture/v2/api/gen/pro" +
-      "to/go/aperture/flowcontrol/check/v1;chec" +
-      "kv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check.V" +
-      "1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Aper" +
-      "ture\\Flowcontrol\\Check\\V1\\GPBMetadata\352\002 " +
-      "Aperture::Flowcontrol::Check::V1b\006proto3"
+      "se.DecisionTypeR\014decisionType\022^\n\rreject_" +
+      "reason\030\t \001(\01629.aperture.flowcontrol.chec" +
+      "k.v1.CheckResponse.RejectReasonR\014rejectR" +
+      "eason\022X\n\020classifier_infos\030\n \003(\0132-.apertu" +
+      "re.flowcontrol.check.v1.ClassifierInfoR\017" +
+      "classifierInfos\022V\n\020flux_meter_infos\030\013 \003(" +
+      "\0132,.aperture.flowcontrol.check.v1.FluxMe" +
+      "terInfoR\016fluxMeterInfos\022[\n\021limiter_decis" +
+      "ions\030\014 \003(\0132..aperture.flowcontrol.check." +
+      "v1.LimiterDecisionR\020limiterDecisions\0226\n\t" +
+      "wait_time\030\r \001(\0132\031.google.protobuf.Durati" +
+      "onR\010waitTime\022h\n\033denied_response_status_c" +
+      "ode\030\016 \001(\0162).aperture.flowcontrol.check.v" +
+      "1.StatusCodeR\030deniedResponseStatusCode\022M" +
+      "\n\014cached_value\030\017 \001(\0132*.aperture.flowcont" +
+      "rol.check.v1.CachedValueR\013cachedValue\032F\n" +
+      "\030TelemetryFlowLabelsEntry\022\020\n\003key\030\001 \001(\tR\003" +
+      "key\022\024\n\005value\030\002 \001(\tR\005value:\0028\001\"\246\001\n\014Reject" +
+      "Reason\022\026\n\022REJECT_REASON_NONE\020\000\022\036\n\032REJECT" +
+      "_REASON_RATE_LIMITED\020\001\022\033\n\027REJECT_REASON_" +
+      "NO_TOKENS\020\002\022\035\n\031REJECT_REASON_NOT_SAMPLED" +
+      "\020\003\022\"\n\036REJECT_REASON_NO_MATCHING_RAMP\020\004\"F" +
+      "\n\014DecisionType\022\032\n\026DECISION_TYPE_ACCEPTED" +
+      "\020\000\022\032\n\026DECISION_TYPE_REJECTED\020\001\"u\n\013Cached" +
+      "Value\022\024\n\005value\030\001 \001(\014R\005value\022P\n\rlookup_re" +
+      "sult\030\002 \001(\0162+.aperture.flowcontrol.check." +
+      "v1.LookupResultR\014lookupResult\"\216\001\n\022CacheU" +
+      "psertRequest\022#\n\rcontrol_point\030\001 \001(\tR\014con" +
+      "trolPoint\022\020\n\003key\030\002 \001(\tR\003key\022\024\n\005value\030\003 \001" +
+      "(\014R\005value\022+\n\003ttl\030\004 \001(\0132\031.google.protobuf" +
+      ".DurationR\003ttl\"\025\n\023CacheUpsertResponse\"K\n" +
+      "\022CacheDeleteRequest\022#\n\rcontrol_point\030\001 \001" +
+      "(\tR\014controlPoint\022\020\n\003key\030\002 \001(\tR\003key\"\025\n\023Ca" +
+      "cheDeleteResponse\"\355\002\n\016ClassifierInfo\022\037\n\013" +
+      "policy_name\030\001 \001(\tR\npolicyName\022\037\n\013policy_" +
+      "hash\030\002 \001(\tR\npolicyHash\022)\n\020classifier_ind" +
+      "ex\030\003 \001(\003R\017classifierIndex\022I\n\005error\030\005 \001(\016" +
+      "23.aperture.flowcontrol.check.v1.Classif" +
+      "ierInfo.ErrorR\005error\"\242\001\n\005Error\022\016\n\nERROR_" +
+      "NONE\020\000\022\025\n\021ERROR_EVAL_FAILED\020\001\022\031\n\025ERROR_E" +
+      "MPTY_RESULTSET\020\002\022\035\n\031ERROR_AMBIGUOUS_RESU" +
+      "LTSET\020\003\022\032\n\026ERROR_MULTI_EXPRESSION\020\004\022\034\n\030E" +
+      "RROR_EXPRESSION_NOT_MAP\020\005\"\246\014\n\017LimiterDec" +
+      "ision\022\037\n\013policy_name\030\001 \001(\tR\npolicyName\022\037" +
+      "\n\013policy_hash\030\002 \001(\tR\npolicyHash\022!\n\014compo" +
+      "nent_id\030\003 \001(\tR\013componentId\022\030\n\007dropped\030\004 " +
+      "\001(\010R\007dropped\022T\n\006reason\030\005 \001(\0162<.aperture." +
+      "flowcontrol.check.v1.LimiterDecision.Lim" +
+      "iterReasonR\006reason\022h\n\033denied_response_st" +
+      "atus_code\030\n \001(\0162).aperture.flowcontrol.c" +
+      "heck.v1.StatusCodeR\030deniedResponseStatus" +
+      "Code\0226\n\twait_time\030\013 \001(\0132\031.google.protobu" +
+      "f.DurationR\010waitTime\022l\n\021rate_limiter_inf" +
+      "o\030\024 \001(\0132>.aperture.flowcontrol.check.v1." +
+      "LimiterDecision.RateLimiterInfoH\000R\017rateL" +
+      "imiterInfo\022n\n\023load_scheduler_info\030\025 \001(\0132" +
+      "<.aperture.flowcontrol.check.v1.LimiterD" +
+      "ecision.SchedulerInfoH\000R\021loadSchedulerIn" +
+      "fo\022_\n\014sampler_info\030\026 \001(\0132:.aperture.flow" +
+      "control.check.v1.LimiterDecision.Sampler" +
+      "InfoH\000R\013samplerInfo\022u\n\024quota_scheduler_i" +
+      "nfo\030\027 \001(\0132A.aperture.flowcontrol.check.v" +
+      "1.LimiterDecision.QuotaSchedulerInfoH\000R\022" +
+      "quotaSchedulerInfo\032`\n\nTokensInfo\022\034\n\trema" +
+      "ining\030\001 \001(\001R\tremaining\022\030\n\007current\030\002 \001(\001R" +
+      "\007current\022\032\n\010consumed\030\003 \001(\001R\010consumed\032\203\001\n" +
+      "\017RateLimiterInfo\022\024\n\005label\030\001 \001(\tR\005label\022Z" +
+      "\n\013tokens_info\030\002 \001(\01329.aperture.flowcontr" +
+      "ol.check.v1.LimiterDecision.TokensInfoR\n" +
+      "tokensInfo\032\256\001\n\rSchedulerInfo\022%\n\016workload" +
+      "_index\030\001 \001(\tR\rworkloadIndex\022Z\n\013tokens_in" +
+      "fo\030\002 \001(\01329.aperture.flowcontrol.check.v1" +
+      ".LimiterDecision.TokensInfoR\ntokensInfo\022" +
+      "\032\n\010priority\030\003 \001(\001R\010priority\032#\n\013SamplerIn" +
+      "fo\022\024\n\005label\030\001 \001(\tR\005label\032\311\001\n\022QuotaSchedu" +
+      "lerInfo\022\024\n\005label\030\001 \001(\tR\005label\022%\n\016workloa" +
+      "d_index\030\002 \001(\tR\rworkloadIndex\022Z\n\013tokens_i" +
+      "nfo\030\003 \001(\01329.aperture.flowcontrol.check.v" +
+      "1.LimiterDecision.TokensInfoR\ntokensInfo" +
+      "\022\032\n\010priority\030\004 \001(\001R\010priority\"Q\n\rLimiterR" +
+      "eason\022\036\n\032LIMITER_REASON_UNSPECIFIED\020\000\022 \n" +
+      "\034LIMITER_REASON_KEY_NOT_FOUND\020\001B\t\n\007detai" +
+      "ls\"7\n\rFluxMeterInfo\022&\n\017flux_meter_name\030\001" +
+      " \001(\tR\rfluxMeterName*!\n\014LookupResult\022\007\n\003H" +
+      "it\020\000\022\010\n\004Miss\020\001*\265\t\n\nStatusCode\022\t\n\005Empty\020\000" +
+      "\022\014\n\010Continue\020d\022\007\n\002OK\020\310\001\022\014\n\007Created\020\311\001\022\r\n" +
+      "\010Accepted\020\312\001\022 \n\033NonAuthoritativeInformat" +
+      "ion\020\313\001\022\016\n\tNoContent\020\314\001\022\021\n\014ResetContent\020\315" +
+      "\001\022\023\n\016PartialContent\020\316\001\022\020\n\013MultiStatus\020\317\001" +
+      "\022\024\n\017AlreadyReported\020\320\001\022\013\n\006IMUsed\020\342\001\022\024\n\017M" +
+      "ultipleChoices\020\254\002\022\025\n\020MovedPermanently\020\255\002" +
+      "\022\n\n\005Found\020\256\002\022\r\n\010SeeOther\020\257\002\022\020\n\013NotModifi" +
+      "ed\020\260\002\022\r\n\010UseProxy\020\261\002\022\026\n\021TemporaryRedirec" +
+      "t\020\263\002\022\026\n\021PermanentRedirect\020\264\002\022\017\n\nBadReque" +
+      "st\020\220\003\022\021\n\014Unauthorized\020\221\003\022\024\n\017PaymentRequi" +
+      "red\020\222\003\022\016\n\tForbidden\020\223\003\022\r\n\010NotFound\020\224\003\022\025\n" +
+      "\020MethodNotAllowed\020\225\003\022\022\n\rNotAcceptable\020\226\003" +
+      "\022 \n\033ProxyAuthenticationRequired\020\227\003\022\023\n\016Re" +
+      "questTimeout\020\230\003\022\r\n\010Conflict\020\231\003\022\t\n\004Gone\020\232" +
+      "\003\022\023\n\016LengthRequired\020\233\003\022\027\n\022PreconditionFa" +
+      "iled\020\234\003\022\024\n\017PayloadTooLarge\020\235\003\022\017\n\nURITooL" +
+      "ong\020\236\003\022\031\n\024UnsupportedMediaType\020\237\003\022\030\n\023Ran" +
+      "geNotSatisfiable\020\240\003\022\026\n\021ExpectationFailed" +
+      "\020\241\003\022\027\n\022MisdirectedRequest\020\245\003\022\030\n\023Unproces" +
+      "sableEntity\020\246\003\022\013\n\006Locked\020\247\003\022\025\n\020FailedDep" +
+      "endency\020\250\003\022\024\n\017UpgradeRequired\020\252\003\022\031\n\024Prec" +
+      "onditionRequired\020\254\003\022\024\n\017TooManyRequests\020\255" +
+      "\003\022 \n\033RequestHeaderFieldsTooLarge\020\257\003\022\030\n\023I" +
+      "nternalServerError\020\364\003\022\023\n\016NotImplemented\020" +
+      "\365\003\022\017\n\nBadGateway\020\366\003\022\027\n\022ServiceUnavailabl" +
+      "e\020\367\003\022\023\n\016GatewayTimeout\020\370\003\022\034\n\027HTTPVersion" +
+      "NotSupported\020\371\003\022\032\n\025VariantAlsoNegotiates" +
+      "\020\372\003\022\030\n\023InsufficientStorage\020\373\003\022\021\n\014LoopDet" +
+      "ected\020\374\003\022\020\n\013NotExtended\020\376\003\022\"\n\035NetworkAut" +
+      "henticationRequired\020\377\0032\352\002\n\022FlowControlSe" +
+      "rvice\022d\n\005Check\022+.aperture.flowcontrol.ch" +
+      "eck.v1.CheckRequest\032,.aperture.flowcontr" +
+      "ol.check.v1.CheckResponse\"\000\022v\n\013CacheUpse" +
+      "rt\0221.aperture.flowcontrol.check.v1.Cache" +
+      "UpsertRequest\0322.aperture.flowcontrol.che" +
+      "ck.v1.CacheUpsertResponse\"\000\022v\n\013CacheDele" +
+      "te\0221.aperture.flowcontrol.check.v1.Cache" +
+      "DeleteRequest\0322.aperture.flowcontrol.che" +
+      "ck.v1.CacheDeleteResponse\"\000B\263\002\n5com.flux" +
+      "ninja.generated.aperture.flowcontrol.che" +
+      "ck.v1B\nCheckProtoP\001ZWgithub.com/fluxninj" +
+      "a/aperture/v2/api/gen/proto/go/aperture/" +
+      "flowcontrol/check/v1;checkv1\242\002\003AFC\252\002\035Ape" +
+      "rture.Flowcontrol.Check.V1\312\002\035Aperture\\Fl" +
+      "owcontrol\\Check\\V1\342\002)Aperture\\Flowcontro" +
+      "l\\Check\\V1\\GPBMetadata\352\002 Aperture::Flowc" +
+      "ontrol::Check::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.protobuf.DurationProto.getDescriptor(),
-          com.google.protobuf.EmptyProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
         });
     internal_static_aperture_flowcontrol_check_v1_CheckRequest_descriptor =
@@ -273,50 +279,56 @@ public final class CheckProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_CheckRequest_LabelsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor,
-        new java.lang.String[] { "ControlPoint", "Key", "Value", "Ttl", });
-    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor,
-        new java.lang.String[] { "ControlPoint", "Key", });
-    internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_aperture_flowcontrol_check_v1_CacheItem_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_CacheItem_descriptor,
-        new java.lang.String[] { });
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor,
-        new java.lang.String[] { "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", "DeniedResponseStatusCode", "CachedResponse", });
+        new java.lang.String[] { "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", "DeniedResponseStatusCode", "CachedValue", });
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_descriptor =
       internal_static_aperture_flowcontrol_check_v1_CheckResponse_descriptor.getNestedTypes().get(0);
     internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_CheckResponse_TelemetryFlowLabelsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_aperture_flowcontrol_check_v1_CacheResponse_descriptor =
-      getDescriptor().getMessageTypes().get(5);
-    internal_static_aperture_flowcontrol_check_v1_CacheResponse_fieldAccessorTable = new
+    internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_aperture_flowcontrol_check_v1_CachedValue_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_aperture_flowcontrol_check_v1_CacheResponse_descriptor,
-        new java.lang.String[] { "Value", "Result", });
-    internal_static_aperture_flowcontrol_check_v1_ClassifierInfo_descriptor =
+        internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor,
+        new java.lang.String[] { "Value", "LookupResult", });
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_descriptor,
+        new java.lang.String[] { "ControlPoint", "Key", "Value", "Ttl", });
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor,
+        new java.lang.String[] { });
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_aperture_flowcontrol_check_v1_CacheDeleteRequest_descriptor,
+        new java.lang.String[] { "ControlPoint", "Key", });
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_descriptor =
       getDescriptor().getMessageTypes().get(6);
+    internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_descriptor,
+        new java.lang.String[] { });
+    internal_static_aperture_flowcontrol_check_v1_ClassifierInfo_descriptor =
+      getDescriptor().getMessageTypes().get(7);
     internal_static_aperture_flowcontrol_check_v1_ClassifierInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_ClassifierInfo_descriptor,
         new java.lang.String[] { "PolicyName", "PolicyHash", "ClassifierIndex", "Error", });
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_aperture_flowcontrol_check_v1_LimiterDecision_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_descriptor,
@@ -352,13 +364,12 @@ public final class CheckProto {
         internal_static_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo_descriptor,
         new java.lang.String[] { "Label", "WorkloadIndex", "TokensInfo", "Priority", });
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_aperture_flowcontrol_check_v1_FluxMeterInfo_descriptor,
         new java.lang.String[] { "FluxMeterName", });
     com.google.protobuf.DurationProto.getDescriptor();
-    com.google.protobuf.EmptyProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
   }
 

@@ -70,6 +70,7 @@ func (e *Engine) GetAgentInfo() *agentinfo.AgentInfo {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
+	cache         iface.Cache
 	agentInfo     *agentinfo.AgentInfo
 	fluxMeters    map[iface.FluxMeterID]iface.FluxMeter
 	schedulers    map[iface.LimiterID]iface.Scheduler
@@ -86,7 +87,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	// cacheKey := requestContext.CacheKey
+	cacheKey := requestContext.CacheKey
 	labelKeys := flowLabels.SortedKeys()
 
 	response = &flowcontrolv1.CheckResponse{
@@ -170,8 +171,20 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 
 	// Lookup cache
-	/*if cacheKey != "" {
-	}*/
+	if cacheKey != "" && e.cache != nil {
+		cachedBytes, err := e.cache.Get(ctx, controlPoint, cacheKey)
+		if err == nil {
+			response.CachedValue = &flowcontrolv1.CachedValue{
+				Value:        cachedBytes,
+				LookupResult: flowcontrolv1.LookupResult_Hit,
+			}
+			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+			return
+		}
+		response.CachedValue = &flowcontrolv1.CachedValue{
+			LookupResult: flowcontrolv1.LookupResult_Miss,
+		}
+	}
 
 	limiterTypes = []LimiterType{
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
@@ -518,4 +531,9 @@ func (e *Engine) unregister(key string, selectorsProto []*policylangv1.Selector)
 	}
 
 	return nil
+}
+
+// RegisterCache .
+func (e *Engine) RegisterCache(cache iface.Cache) {
+	e.cache = cache
 }
