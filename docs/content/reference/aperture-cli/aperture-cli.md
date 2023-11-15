@@ -16,12 +16,12 @@ policies.
 
 :::note
 
-If _not_ using Aperture Cloud, a [Self-Hosted][Self-Hosting] Aperture Controller
+If _not_ using Aperture Cloud, a [Self-Hosted][aperture-for-infra] Aperture Controller
 and Agent needs to be installed.
 
 :::
 
-[Self-Hosting]: /self-hosting/self-hosting.md
+[aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';

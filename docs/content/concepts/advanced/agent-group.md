@@ -39,9 +39,9 @@ details.
 
 - **Efficient Management**: Agent groups facilitate the efficient management of
   multiple Agents within complex environments, such as
-  [sidecar](/self-hosting/agent/kubernetes/operator/sidecar.md) or multi-cluster
-  installations. They enable scaling of Aperture configuration to meet the
-  demands of intricate setups.
+  [sidecar](/aperture-for-infra/agent/kubernetes/operator/sidecar.md) or
+  multi-cluster installations. They enable scaling of Aperture configuration to
+  meet the demands of intricate setups.
 
 - **State Synchronization**: An agent group defines the scope of agent-to-agent
   synchronization. Agents within the same group form a peer-to-peer network to

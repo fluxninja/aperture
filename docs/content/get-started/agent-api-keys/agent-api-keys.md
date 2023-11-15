@@ -32,5 +32,5 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 ![API Keys](./assets/api-keys.gif "Creating API Keys for sudhanshu-demo-docs project")
 
 [sign-up]: /get-started/sign-up.md
-[Agents]: /self-hosting/agent/agent.md
-[Controllers]: /self-hosting/controller/controller.md
+[Agents]: /aperture-for-infra/agent/agent.md
+[Controllers]: /aperture-for-infra/controller/controller.md

@@ -67,12 +67,12 @@ Controller and Agent, ideal for situations like air-gapped environments.
 
 2. **Set Up the Environment**: The Aperture Agent can be installed in various
    modes. For installation steps, see [Agent][agent-docs] docs under
-   self-hosting Aperture.
+   aperture-for-infra Aperture.
 
    :::info
 
    For more details on fully self-hosted installation, please refer to the
-   [self-hosting][self-hosting] section.
+   [aperture-for-infra][aperture-for-infra] section.
 
    :::
 
@@ -80,11 +80,11 @@ Controller and Agent, ideal for situations like air-gapped environments.
    methods with Aperture
 
    - [SDKs](../sdk/sdk.md)
-   - [Istio](/self-hosting/integrations/istio/istio.md)
-   - [Gateways](/self-hosting/integrations/gateway/gateway.md)
-   - [Consul](/self-hosting/integrations/consul/consul.md)
-   - [Auto Scale](/self-hosting/integrations/auto-scale/auto-scale.md)
-   - [Metrics](/self-hosting/integrations/metrics/metrics.md)
+   - [Istio](/aperture-for-infra/integrations/istio/istio.md)
+   - [Gateways](/aperture-for-infra/integrations/gateway/gateway.md)
+   - [Consul](/aperture-for-infra/integrations/consul/consul.md)
+   - [Auto Scale](/aperture-for-infra/integrations/auto-scale/auto-scale.md)
+   - [Metrics](/aperture-for-infra/integrations/metrics/metrics.md)
 
 4. **Map to Aperture SaaS Controller**: Aperture Cloud authenticates requests
    from integrations using Agent API keys, which can be created for your project
@@ -102,11 +102,11 @@ Controller and Agent, ideal for situations like air-gapped environments.
 </Tabs>
 
 [cloud]: https://www.fluxninja.com/product
-[self-hosting]: /self-hosting/self-hosting.md
+[aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /get-started/sign-up.md
 [policies]: /get-started/policies/policies.md
 [cloud-extension]: /reference/fluxninja.md
 [agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md
-[agent-docs]: /self-hosting/agent/agent.md
-[integrations]: /self-hosting/integrations/integrations.md
+[agent-docs]: /aperture-for-infra/agent/agent.md
+[integrations]: /aperture-for-infra/integrations/integrations.md
 [sdks]: /sdk/sdk.md

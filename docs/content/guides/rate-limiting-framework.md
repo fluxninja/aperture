@@ -145,7 +145,7 @@ a service.
 
 #### Static service limits {#static-service-limits}
 
-[Static limits are useful](/guides/api-quota-management/inter-service-rate-limiting.md)
+[Static limits are useful](aperture-for-infra/guides/api-quota-management/inter-service-rate-limiting.md)
 when enforcing an agreed-upon quota. With the help of
 **[Quota Scheduler Blueprint](/reference/blueprints/quota-scheduling/base.md)**
 static service limits can be implemented easily.
@@ -164,7 +164,7 @@ Use-cases of static rate limits include:
 
 #### Adaptive service limits {#adaptive-service-limits}
 
-[Adaptive service limits](/guides/service-load-management/service-load-management.md)
+[Adaptive service limits](aperture-for-infra/guides/service-load-management/service-load-management.md)
 regulate the overall load on a service based on service health signals such as
 database connections, queue sizes, response latency, error rates and so on to
 protect the service against overloads. With the help of
@@ -199,7 +199,7 @@ Use-cases of adaptive service limits include:
   degradation.
 
 Checkout Aperture implemented use cases of adaptive service limits
-[here](/guides/service-load-management/service-load-management.md).
+[here](aperture-for-infra/guides/service-load-management/service-load-management.md).
 
 ## Summary {#summary}
 

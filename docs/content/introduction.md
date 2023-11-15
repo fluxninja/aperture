@@ -63,9 +63,9 @@ To sign-up to Aperture Cloud, [click here][sign-up].
   adjusts the rate of requests based on live service health, thereby mitigating
   potential service disruptions and ensuring optimal performance under all load
   conditions. Refer to the
-  [Service Load Management](guides/service-load-management/service-load-management.md)
+  [Service Load Management](aperture-for-infra/guides/service-load-management/service-load-management.md)
   and
-  [Database Load Management](guides/database-load-management/database-load-management.md)
+  [Database Load Management](aperture-for-infra/guides/database-load-management/database-load-management.md)
   guides for more details.
 - 🎯 [**Workload Prioritization**](concepts/scheduler/scheduler.md): Safeguard
   crucial user experience pathways and ensure prioritized access to external
@@ -103,5 +103,5 @@ beneficial.
 
 [cloud]: https://www.fluxninja.com/product
 [sign-up]: https://app.fluxninja.com/sign-up
-[architecture]: /self-hosting/architecture.md
-[self-hosted]: /self-hosting/self-hosting.md
+[architecture]: /aperture-for-infra/architecture.md
+[self-hosted]: /aperture-for-infra/aperture-for-infra.md

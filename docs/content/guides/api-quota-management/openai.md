@@ -60,7 +60,7 @@ consisting of two main components:
 Before you begin with this guide, verify the prerequisites are fulfilled.
 
 - Aperture is installed and running. If not, follow the
-  [get started guide](../../get-started/get-started.md).
+  [get started guide](/get-started/get-started.md).
 - `aperturectl` is installed and configured. If not, head over to
   [Set up CLI (aperturectl) guide](../../reference/aperture-cli/aperture-cli.md).
 
@@ -363,25 +363,6 @@ policy:
   <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
     <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (Aperture Cloud)" />
   </TabItem>
-  <TabItem value="aperturectl (self-hosted controller)" label="aperturectl (self-hosted controller)">
-```
-
-Pass the `--kube` flag with `aperturectl` to directly apply the generated policy
-on a Kubernetes cluster in the namespace where the Aperture Controller is
-installed.
-
-```mdx-code-block
-  <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (self-hosted controller)" policyName="gpt-4-tpm" />
-</TabItem>
-<TabItem value="kubectl (self-hosted controller)" label="kubectl (self-hosted controller)">
-```
-
-Apply the generated policy YAML (Kubernetes Custom Resource) with `kubectl`.
-
-```mdx-code-block
-  <TabContent valuesFile="gpt-4-tpm" tabValue="kubectl (self-hosted controller)" policyName="gpt-4-tpm" />
-</TabItem>
-
 </Tabs>
 ```
 
