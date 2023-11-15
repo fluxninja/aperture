@@ -23,9 +23,17 @@ import (
 	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
+// StartFlowRequest represents the request parameters for starting a flow.
+type StartFlowRequest struct {
+	ControlPoint string
+	Labels       map[string]string
+	RampMode     bool
+	Timeout      time.Duration
+}
+
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, controlPoint string, labels map[string]string, rampMode bool, timeout time.Duration) Flow
+	StartFlow(ctx context.Context, req StartFlowRequest) Flow
 	StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() *slog.Logger
@@ -124,30 +132,30 @@ func (c *apertureClient) getSpan(ctx context.Context) trace.Span {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, explicitLabels map[string]string, rampMode bool, timeout time.Duration) Flow {
+func (c *apertureClient) StartFlow(ctx context.Context, req StartFlowRequest) Flow {
 	// if timeout is not 0, then create a new context with timeout
-	if timeout != 0 {
+	if req.Timeout != 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, timeout)
+		ctx, cancel = context.WithTimeout(ctx, req.Timeout)
 		defer cancel()
 	}
 
 	labels := utils.LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
-	for key, value := range explicitLabels {
+	for key, value := range req.Labels {
 		labels[key] = value
 	}
 
-	req := &checkv1.CheckRequest{
-		ControlPoint: controlPoint,
+	checkReq := &checkv1.CheckRequest{
+		ControlPoint: req.ControlPoint,
 		Labels:       labels,
-		RampMode:     rampMode,
+		RampMode:     req.RampMode,
 	}
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(span, rampMode)
+	f := newFlow(span, req.RampMode)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
@@ -158,7 +166,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, exp
 		return f
 	}
 
-	res, err := c.flowControlClient.Check(ctx, req)
+	res, err := c.flowControlClient.Check(ctx, checkReq)
 	if err != nil {
 		f.err = err
 	} else {
