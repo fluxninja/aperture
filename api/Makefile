@@ -25,6 +25,11 @@ buf-generate:
 
 	@#generate sdk flowcontrol stubs and copy them over
 
+	@#golang
+	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
+	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
+	@cp -R gen/proto/go/aperture/flowcontrol/checkhttp ../sdks/aperture-go/gen/proto/flowcontrol/
+
 	@#java
 	@rm -rf ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/*
 	@cp -R gen/proto/java/com/fluxninja/generated/aperture/flowcontrol/check ../sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/aperture/flowcontrol/

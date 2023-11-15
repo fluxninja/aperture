@@ -1,12 +1,19 @@
 package middleware
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
 // HTTPMiddleware is the interface for the HTTP middleware.
@@ -51,7 +58,10 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels, m.rampMode)
+		req, err := prepareCheckHTTPRequestForHTTP(r, m.controlPoint, m.labels, m.rampMode)
+		if err != nil {
+			m.client.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
+		}
 
 		flow := m.client.StartHTTPFlow(r.Context(), req, m.rampMode, m.timeout)
 		if flow.Error() != nil {
@@ -88,4 +98,72 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 	})
+}
+
+func prepareCheckHTTPRequestForHTTP(req *http.Request, controlPoint string, explicitLabels map[string]string, rampMode bool) (*checkhttpv1.CheckHTTPRequest, error) {
+	labels := utils.LabelsFromCtx(req.Context())
+
+	// override labels with explicit labels
+	for key, value := range explicitLabels {
+		labels[key] = value
+	}
+
+	// override labels with labels from headers
+	for key, value := range req.Header {
+		if strings.HasPrefix(key, ":") {
+			continue
+		}
+		labels[key] = strings.Join(value, ",")
+	}
+
+	// We know that the protocol is TCP because Golang's http package doesn't support UDP
+	// TODO: Should we support `httpu`?
+	protocol := checkhttpv1.SocketAddress_TCP
+
+	sourceHost, sourcePort, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	sourcePortU32, err := strconv.ParseUint(sourcePort, 10, 32)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Figure out if we can narrow down the port or figure out the host in a better way
+	destinationPort := uint32(0)
+	destinationHost := utils.GetLocalIP()
+
+	body := req.Body
+	defer body.Close()
+	bodyBytes, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+	req.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	return &checkhttpv1.CheckHTTPRequest{
+		Source: &checkhttpv1.SocketAddress{
+			Address:  sourceHost,
+			Protocol: protocol,
+			Port:     uint32(sourcePortU32),
+		},
+		Destination: &checkhttpv1.SocketAddress{
+			Address:  destinationHost,
+			Protocol: protocol,
+			Port:     destinationPort,
+		},
+		ControlPoint: controlPoint,
+		RampMode:     rampMode,
+		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
+			Method:   req.Method,
+			Path:     req.URL.Path,
+			Host:     req.Host,
+			Headers:  labels,
+			Scheme:   req.URL.Scheme,
+			Size:     req.ContentLength,
+			Protocol: req.Proto,
+			Body:     string(bodyBytes),
+		},
+	}, nil
 }
