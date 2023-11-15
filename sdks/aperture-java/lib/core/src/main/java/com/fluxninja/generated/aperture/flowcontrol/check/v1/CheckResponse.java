@@ -945,42 +945,42 @@ java.lang.String defaultValue) {
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode.UNRECOGNIZED : result;
   }
 
-  public static final int CACHED_RESPONSE_FIELD_NUMBER = 15;
-  private com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse cachedResponse_;
+  public static final int CACHED_VALUE_FIELD_NUMBER = 15;
+  private com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue cachedValue_;
   /**
    * <pre>
-   * Matching cached items.
+   * Matching cached value.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
-   * @return Whether the cachedResponse field is set.
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * @return Whether the cachedValue field is set.
    */
   @java.lang.Override
-  public boolean hasCachedResponse() {
+  public boolean hasCachedValue() {
     return ((bitField0_ & 0x00000008) != 0);
   }
   /**
    * <pre>
-   * Matching cached items.
+   * Matching cached value.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
-   * @return The cachedResponse.
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * @return The cachedValue.
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponse() {
-    return cachedResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance() : cachedResponse_;
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getCachedValue() {
+    return cachedValue_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance() : cachedValue_;
   }
   /**
    * <pre>
-   * Matching cached items.
+   * Matching cached value.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder getCachedResponseOrBuilder() {
-    return cachedResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance() : cachedResponse_;
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder getCachedValueOrBuilder() {
+    return cachedValue_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance() : cachedValue_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -1040,7 +1040,7 @@ java.lang.String defaultValue) {
       output.writeEnum(14, deniedResponseStatusCode_);
     }
     if (((bitField0_ & 0x00000008) != 0)) {
-      output.writeMessage(15, getCachedResponse());
+      output.writeMessage(15, getCachedValue());
     }
     getUnknownFields().writeTo(output);
   }
@@ -1118,7 +1118,7 @@ java.lang.String defaultValue) {
     }
     if (((bitField0_ & 0x00000008) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(15, getCachedResponse());
+        .computeMessageSize(15, getCachedValue());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -1167,10 +1167,10 @@ java.lang.String defaultValue) {
           .equals(other.getWaitTime())) return false;
     }
     if (deniedResponseStatusCode_ != other.deniedResponseStatusCode_) return false;
-    if (hasCachedResponse() != other.hasCachedResponse()) return false;
-    if (hasCachedResponse()) {
-      if (!getCachedResponse()
-          .equals(other.getCachedResponse())) return false;
+    if (hasCachedValue() != other.hasCachedValue()) return false;
+    if (hasCachedValue()) {
+      if (!getCachedValue()
+          .equals(other.getCachedValue())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -1227,9 +1227,9 @@ java.lang.String defaultValue) {
     }
     hash = (37 * hash) + DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER;
     hash = (53 * hash) + deniedResponseStatusCode_;
-    if (hasCachedResponse()) {
-      hash = (37 * hash) + CACHED_RESPONSE_FIELD_NUMBER;
-      hash = (53 * hash) + getCachedResponse().hashCode();
+    if (hasCachedValue()) {
+      hash = (37 * hash) + CACHED_VALUE_FIELD_NUMBER;
+      hash = (53 * hash) + getCachedValue().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -1393,7 +1393,7 @@ java.lang.String defaultValue) {
         getFluxMeterInfosFieldBuilder();
         getLimiterDecisionsFieldBuilder();
         getWaitTimeFieldBuilder();
-        getCachedResponseFieldBuilder();
+        getCachedValueFieldBuilder();
       }
     }
     @java.lang.Override
@@ -1445,10 +1445,10 @@ java.lang.String defaultValue) {
         waitTimeBuilder_ = null;
       }
       deniedResponseStatusCode_ = 0;
-      cachedResponse_ = null;
-      if (cachedResponseBuilder_ != null) {
-        cachedResponseBuilder_.dispose();
-        cachedResponseBuilder_ = null;
+      cachedValue_ = null;
+      if (cachedValueBuilder_ != null) {
+        cachedValueBuilder_.dispose();
+        cachedValueBuilder_ = null;
       }
       return this;
     }
@@ -1558,9 +1558,9 @@ java.lang.String defaultValue) {
         result.deniedResponseStatusCode_ = deniedResponseStatusCode_;
       }
       if (((from_bitField0_ & 0x00002000) != 0)) {
-        result.cachedResponse_ = cachedResponseBuilder_ == null
-            ? cachedResponse_
-            : cachedResponseBuilder_.build();
+        result.cachedValue_ = cachedValueBuilder_ == null
+            ? cachedValue_
+            : cachedValueBuilder_.build();
         to_bitField0_ |= 0x00000008;
       }
       result.bitField0_ |= to_bitField0_;
@@ -1734,8 +1734,8 @@ java.lang.String defaultValue) {
       if (other.deniedResponseStatusCode_ != 0) {
         setDeniedResponseStatusCodeValue(other.getDeniedResponseStatusCodeValue());
       }
-      if (other.hasCachedResponse()) {
-        mergeCachedResponse(other.getCachedResponse());
+      if (other.hasCachedValue()) {
+        mergeCachedValue(other.getCachedValue());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -1866,7 +1866,7 @@ java.lang.String defaultValue) {
             } // case 112
             case 122: {
               input.readMessage(
-                  getCachedResponseFieldBuilder().getBuilder(),
+                  getCachedValueFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00002000;
               break;
@@ -4069,50 +4069,50 @@ java.lang.String defaultValue) {
       return this;
     }
 
-    private com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse cachedResponse_;
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue cachedValue_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder> cachedResponseBuilder_;
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder> cachedValueBuilder_;
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
-     * @return Whether the cachedResponse field is set.
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+     * @return Whether the cachedValue field is set.
      */
-    public boolean hasCachedResponse() {
+    public boolean hasCachedValue() {
       return ((bitField0_ & 0x00002000) != 0);
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
-     * @return The cachedResponse.
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+     * @return The cachedValue.
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse getCachedResponse() {
-      if (cachedResponseBuilder_ == null) {
-        return cachedResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance() : cachedResponse_;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getCachedValue() {
+      if (cachedValueBuilder_ == null) {
+        return cachedValue_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance() : cachedValue_;
       } else {
-        return cachedResponseBuilder_.getMessage();
+        return cachedValueBuilder_.getMessage();
       }
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public Builder setCachedResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse value) {
-      if (cachedResponseBuilder_ == null) {
+    public Builder setCachedValue(com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue value) {
+      if (cachedValueBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        cachedResponse_ = value;
+        cachedValue_ = value;
       } else {
-        cachedResponseBuilder_.setMessage(value);
+        cachedValueBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00002000;
       onChanged();
@@ -4120,17 +4120,17 @@ java.lang.String defaultValue) {
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public Builder setCachedResponse(
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.Builder builderForValue) {
-      if (cachedResponseBuilder_ == null) {
-        cachedResponse_ = builderForValue.build();
+    public Builder setCachedValue(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder builderForValue) {
+      if (cachedValueBuilder_ == null) {
+        cachedValue_ = builderForValue.build();
       } else {
-        cachedResponseBuilder_.setMessage(builderForValue.build());
+        cachedValueBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00002000;
       onChanged();
@@ -4138,24 +4138,24 @@ java.lang.String defaultValue) {
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public Builder mergeCachedResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse value) {
-      if (cachedResponseBuilder_ == null) {
+    public Builder mergeCachedValue(com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue value) {
+      if (cachedValueBuilder_ == null) {
         if (((bitField0_ & 0x00002000) != 0) &&
-          cachedResponse_ != null &&
-          cachedResponse_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance()) {
-          getCachedResponseBuilder().mergeFrom(value);
+          cachedValue_ != null &&
+          cachedValue_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance()) {
+          getCachedValueBuilder().mergeFrom(value);
         } else {
-          cachedResponse_ = value;
+          cachedValue_ = value;
         }
       } else {
-        cachedResponseBuilder_.mergeFrom(value);
+        cachedValueBuilder_.mergeFrom(value);
       }
-      if (cachedResponse_ != null) {
+      if (cachedValue_ != null) {
         bitField0_ |= 0x00002000;
         onChanged();
       }
@@ -4163,67 +4163,67 @@ java.lang.String defaultValue) {
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public Builder clearCachedResponse() {
+    public Builder clearCachedValue() {
       bitField0_ = (bitField0_ & ~0x00002000);
-      cachedResponse_ = null;
-      if (cachedResponseBuilder_ != null) {
-        cachedResponseBuilder_.dispose();
-        cachedResponseBuilder_ = null;
+      cachedValue_ = null;
+      if (cachedValueBuilder_ != null) {
+        cachedValueBuilder_.dispose();
+        cachedValueBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.Builder getCachedResponseBuilder() {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder getCachedValueBuilder() {
       bitField0_ |= 0x00002000;
       onChanged();
-      return getCachedResponseFieldBuilder().getBuilder();
+      return getCachedValueFieldBuilder().getBuilder();
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder getCachedResponseOrBuilder() {
-      if (cachedResponseBuilder_ != null) {
-        return cachedResponseBuilder_.getMessageOrBuilder();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder getCachedValueOrBuilder() {
+      if (cachedValueBuilder_ != null) {
+        return cachedValueBuilder_.getMessageOrBuilder();
       } else {
-        return cachedResponse_ == null ?
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.getDefaultInstance() : cachedResponse_;
+        return cachedValue_ == null ?
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance() : cachedValue_;
       }
     }
     /**
      * <pre>
-     * Matching cached items.
+     * Matching cached value.
      * </pre>
      *
-     * <code>.aperture.flowcontrol.check.v1.CacheResponse cached_response = 15 [json_name = "cachedResponse"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder> 
-        getCachedResponseFieldBuilder() {
-      if (cachedResponseBuilder_ == null) {
-        cachedResponseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseOrBuilder>(
-                getCachedResponse(),
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder> 
+        getCachedValueFieldBuilder() {
+      if (cachedValueBuilder_ == null) {
+        cachedValueBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder>(
+                getCachedValue(),
                 getParentForChildren(),
                 isClean());
-        cachedResponse_ = null;
+        cachedValue_ = null;
       }
-      return cachedResponseBuilder_;
+      return cachedValueBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

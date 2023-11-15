@@ -3,15 +3,14 @@ syntax = "proto3";
 package aperture.flowcontrol.check.v1;
 
 import "google/protobuf/duration.proto";
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 // FlowControlService is used to perform Flow Control operations.
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
-  rpc CacheUpsert(CacheUpsertRequest) returns (google.protobuf.Empty) {}
-  rpc CacheDelete(CacheDeleteRequest) returns (google.protobuf.Empty) {}
+  rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
+  rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -22,20 +21,6 @@ message CheckRequest {
   // Cache item to fetch.
   string cache_key = 4;
 }
-
-message CacheUpsertRequest {
-  string control_point = 1;
-  string key = 2;
-  bytes value = 3;
-  google.protobuf.Duration ttl = 4;
-}
-
-message CacheDeleteRequest {
-  string control_point = 1;
-  string key = 2;
-}
-
-message CacheItem {}
 
 // CheckResponse contains fields that represent decision made by Check call.
 message CheckResponse {
@@ -82,19 +67,35 @@ message CheckResponse {
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
-  // Matching cached items.
-  CacheResponse cached_response = 15;
+  // Matching cached value.
+  CachedValue cached_value = 15;
 }
 
-enum CacheResult {
+enum LookupResult {
   Hit = 0;
   Miss = 1;
 }
 
-message CacheResponse {
+message CachedValue {
   bytes value = 1;
-  CacheResult result = 2;
+  LookupResult lookup_result = 2;
 }
+
+message CacheUpsertRequest {
+  string control_point = 1;
+  string key = 2;
+  bytes value = 3;
+  google.protobuf.Duration ttl = 4;
+}
+
+message CacheUpsertResponse {}
+
+message CacheDeleteRequest {
+  string control_point = 1;
+  string key = 2;
+}
+
+message CacheDeleteResponse {}
 
 // ClassifierInfo describes details for each ClassifierInfo.
 message ClassifierInfo {

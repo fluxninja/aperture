@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -31,8 +30,8 @@ const (
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
-	CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*CacheUpsertResponse, error)
+	CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*CacheDeleteResponse, error)
 }
 
 type flowControlServiceClient struct {
@@ -52,8 +51,8 @@ func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, 
 	return out, nil
 }
 
-func (c *flowControlServiceClient) CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *flowControlServiceClient) CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*CacheUpsertResponse, error) {
+	out := new(CacheUpsertResponse)
 	err := c.cc.Invoke(ctx, FlowControlService_CacheUpsert_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -61,8 +60,8 @@ func (c *flowControlServiceClient) CacheUpsert(ctx context.Context, in *CacheUps
 	return out, nil
 }
 
-func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*CacheDeleteResponse, error) {
+	out := new(CacheDeleteResponse)
 	err := c.cc.Invoke(ctx, FlowControlService_CacheDelete_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -76,8 +75,8 @@ func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDel
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
-	CacheUpsert(context.Context, *CacheUpsertRequest) (*emptypb.Empty, error)
-	CacheDelete(context.Context, *CacheDeleteRequest) (*emptypb.Empty, error)
+	CacheUpsert(context.Context, *CacheUpsertRequest) (*CacheUpsertResponse, error)
+	CacheDelete(context.Context, *CacheDeleteRequest) (*CacheDeleteResponse, error)
 }
 
 // UnimplementedFlowControlServiceServer should be embedded to have forward compatible implementations.
@@ -87,10 +86,10 @@ type UnimplementedFlowControlServiceServer struct {
 func (UnimplementedFlowControlServiceServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
 }
-func (UnimplementedFlowControlServiceServer) CacheUpsert(context.Context, *CacheUpsertRequest) (*emptypb.Empty, error) {
+func (UnimplementedFlowControlServiceServer) CacheUpsert(context.Context, *CacheUpsertRequest) (*CacheUpsertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CacheUpsert not implemented")
 }
-func (UnimplementedFlowControlServiceServer) CacheDelete(context.Context, *CacheDeleteRequest) (*emptypb.Empty, error) {
+func (UnimplementedFlowControlServiceServer) CacheDelete(context.Context, *CacheDeleteRequest) (*CacheDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CacheDelete not implemented")
 }
 

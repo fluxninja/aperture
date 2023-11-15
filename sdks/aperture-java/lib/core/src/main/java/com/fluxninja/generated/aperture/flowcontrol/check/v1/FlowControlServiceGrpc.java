@@ -50,28 +50,28 @@ public final class FlowControlServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest,
-      com.google.protobuf.Empty> getCacheUpsertMethod;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> getCacheUpsertMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "CacheUpsert",
       requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest.class,
-      responseType = com.google.protobuf.Empty.class,
+      responseType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest,
-      com.google.protobuf.Empty> getCacheUpsertMethod() {
-    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest, com.google.protobuf.Empty> getCacheUpsertMethod;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> getCacheUpsertMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> getCacheUpsertMethod;
     if ((getCacheUpsertMethod = FlowControlServiceGrpc.getCacheUpsertMethod) == null) {
       synchronized (FlowControlServiceGrpc.class) {
         if ((getCacheUpsertMethod = FlowControlServiceGrpc.getCacheUpsertMethod) == null) {
           FlowControlServiceGrpc.getCacheUpsertMethod = getCacheUpsertMethod =
-              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest, com.google.protobuf.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CacheUpsert"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.google.protobuf.Empty.getDefaultInstance()))
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.getDefaultInstance()))
               .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("CacheUpsert"))
               .build();
         }
@@ -81,28 +81,28 @@ public final class FlowControlServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest,
-      com.google.protobuf.Empty> getCacheDeleteMethod;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> getCacheDeleteMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "CacheDelete",
       requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest.class,
-      responseType = com.google.protobuf.Empty.class,
+      responseType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest,
-      com.google.protobuf.Empty> getCacheDeleteMethod() {
-    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest, com.google.protobuf.Empty> getCacheDeleteMethod;
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> getCacheDeleteMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> getCacheDeleteMethod;
     if ((getCacheDeleteMethod = FlowControlServiceGrpc.getCacheDeleteMethod) == null) {
       synchronized (FlowControlServiceGrpc.class) {
         if ((getCacheDeleteMethod = FlowControlServiceGrpc.getCacheDeleteMethod) == null) {
           FlowControlServiceGrpc.getCacheDeleteMethod = getCacheDeleteMethod =
-              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest, com.google.protobuf.Empty>newBuilder()
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CacheDelete"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.google.protobuf.Empty.getDefaultInstance()))
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse.getDefaultInstance()))
               .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("CacheDelete"))
               .build();
         }
@@ -175,14 +175,14 @@ public final class FlowControlServiceGrpc {
     /**
      */
     default void cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request,
-        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheUpsertMethod(), responseObserver);
     }
 
     /**
      */
     default void cacheDelete(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request,
-        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheDeleteMethod(), responseObserver);
     }
   }
@@ -234,7 +234,7 @@ public final class FlowControlServiceGrpc {
     /**
      */
     public void cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request,
-        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCacheUpsertMethod(), getCallOptions()), request, responseObserver);
     }
@@ -242,7 +242,7 @@ public final class FlowControlServiceGrpc {
     /**
      */
     public void cacheDelete(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request,
-        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCacheDeleteMethod(), getCallOptions()), request, responseObserver);
     }
@@ -279,14 +279,14 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
-    public com.google.protobuf.Empty cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request) {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCacheUpsertMethod(), getCallOptions(), request);
     }
 
     /**
      */
-    public com.google.protobuf.Empty cacheDelete(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request) {
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse cacheDelete(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCacheDeleteMethod(), getCallOptions(), request);
     }
@@ -324,7 +324,7 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> cacheUpsert(
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> cacheUpsert(
         com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCacheUpsertMethod(), getCallOptions()), request);
@@ -332,7 +332,7 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> cacheDelete(
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> cacheDelete(
         com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCacheDeleteMethod(), getCallOptions()), request);
@@ -366,11 +366,11 @@ public final class FlowControlServiceGrpc {
           break;
         case METHODID_CACHE_UPSERT:
           serviceImpl.cacheUpsert((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest) request,
-              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse>) responseObserver);
           break;
         case METHODID_CACHE_DELETE:
           serviceImpl.cacheDelete((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest) request,
-              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -402,14 +402,14 @@ public final class FlowControlServiceGrpc {
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest,
-              com.google.protobuf.Empty>(
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse>(
                 service, METHODID_CACHE_UPSERT)))
         .addMethod(
           getCacheDeleteMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
             new MethodHandlers<
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest,
-              com.google.protobuf.Empty>(
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse>(
                 service, METHODID_CACHE_DELETE)))
         .build();
   }

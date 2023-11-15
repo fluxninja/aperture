@@ -46,4 +46,6 @@ type Engine interface {
 
 	RegisterLabelPreview(l LabelPreview) error
 	UnregisterLabelPreview(l LabelPreview) error
+
+	RegisterCache(c Cache)
 }

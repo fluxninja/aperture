@@ -778,20 +778,18 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: The value is emitted to the output port.
         type: object
-    CacheResponse:
+    CacheDeleteResponse:
+        type: object
+    CacheUpsertResponse:
+        type: object
+    CachedValue:
         properties:
-            result:
-                $ref: '#/definitions/CacheResult'
+            lookup_result:
+                $ref: '#/definitions/LookupResult'
             value:
                 format: byte
                 type: string
         type: object
-    CacheResult:
-        default: Hit
-        enum:
-            - Hit
-            - Miss
-        type: string
     CheckHTTPRequest:
         properties:
             control_point:
@@ -873,9 +871,9 @@ definitions:
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
-            cached_response:
-                $ref: '#/definitions/CacheResponse'
-                description: Matching cached items.
+            cached_value:
+                $ref: '#/definitions/CachedValue'
+                description: Matching cached value.
             classifier_infos:
                 description: classifiers that were matched for this request.
                 items:
@@ -2938,6 +2936,12 @@ definitions:
             - selectors
         title: Parameters for _Load Scheduler_ component
         type: object
+    LookupResult:
+        default: Hit
+        enum:
+            - Hit
+            - Miss
+        type: string
     MatchExpression:
         description: |-
             MatchExpression has multiple variants, exactly one should be set.

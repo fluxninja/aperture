@@ -3,7 +3,6 @@
 import grpc
 
 from . import check_pb2 as aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2
-from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
 class FlowControlServiceStub(object):
@@ -24,12 +23,12 @@ class FlowControlServiceStub(object):
         self.CacheUpsert = channel.unary_unary(
                 '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert',
                 request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                response_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertResponse.FromString,
                 )
         self.CacheDelete = channel.unary_unary(
                 '/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete',
                 request_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                response_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteResponse.FromString,
                 )
 
 
@@ -67,12 +66,12 @@ def add_FlowControlServiceServicer_to_server(servicer, server):
             'CacheUpsert': grpc.unary_unary_rpc_method_handler(
                     servicer.CacheUpsert,
                     request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                    response_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertResponse.SerializeToString,
             ),
             'CacheDelete': grpc.unary_unary_rpc_method_handler(
                     servicer.CacheDelete,
                     request_deserializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                    response_serializer=aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -115,7 +114,7 @@ class FlowControlService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert',
             aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertRequest.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheUpsertResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -132,6 +131,6 @@ class FlowControlService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete',
             aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteRequest.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            aperture_dot_flowcontrol_dot_check_dot_v1_dot_check__pb2.CacheDeleteResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
