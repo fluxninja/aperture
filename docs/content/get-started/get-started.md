@@ -73,7 +73,7 @@ Controller and Agent, ideal for situations like air-gapped environments.
    :::info
 
    For more details on fully self-hosted installation, please refer to the
-   [aperture-for-infra][aperture-for-infra] section.
+   [Self-hosted][Self-hosted] section.
 
    :::
 
@@ -104,7 +104,7 @@ Controller and Agent, ideal for situations like air-gapped environments.
 </Tabs>
 
 [cloud]: https://www.fluxninja.com/product
-[aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
+[Self-hosted]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /get-started/sign-up.md
 [policies]: /get-started/policies/policies.md
 [cloud-extension]: /reference/fluxninja.md

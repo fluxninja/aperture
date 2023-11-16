@@ -96,15 +96,15 @@ Kubernetes Objects which will be created by following steps are listed
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `AGENT_API_KEY` with the API key linked to the project. If an API key has not
-   been created, generate a new one through the Aperture Cloud UI. Refer to
-   [Agent API Keys][agent-api-keys] for additional information.
+   `AGENT_API_KEY` with the API key linked to the project. The API Key can by
+   found by navigating to the **`Aperture`** tab in the side bar menu, and then
+   clicking on the **`Aperture Agent API Keys`** tab in top bar.
 
    :::note
 
    If you are using a Self-Hosted Aperture Controller, modify the above
    configuration as explained in
-   [aperture-for-infra: Agent Configuration](/aperture-for-infra/agent/agent.md#agent-self-hosted-controller).
+   [Self-hosted: Agent Configuration](/aperture-for-infra/agent/agent.md#agent-self-hosted-controller).
 
    :::
 
@@ -225,15 +225,15 @@ Kubernetes Objects which will be created by following steps are listed
       ```
 
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-      `AGENT_API_KEY` with the API key linked to the project. If an API key has
-      not been created, generate a new one through the Aperture Cloud UI. Refer
-      to [Agent API Keys][agent-api-keys] for additional information.
+      `AGENT_API_KEY` with the API key linked to the project. The API Key can by
+      found by navigating to the **`Aperture`** tab in the side bar menu, and
+      then clicking on the **`Aperture Agent API Keys`** tab in top bar.
 
       :::note
 
       If you are using a Self-Hosted Aperture Controller, modify the above
       configuration as explained in
-      [aperture-for-infra: Agent Configuration](/aperture-for-infra/agent/agent.md#agent-self-hosted-controller).
+      [Self-hosted: Agent Configuration](/aperture-for-infra/agent/agent.md#agent-self-hosted-controller).
 
       :::
 
@@ -405,5 +405,3 @@ following these steps:
    ```bash
    kubectl delete crd agents.fluxninja.com
    ```
-
-[agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md

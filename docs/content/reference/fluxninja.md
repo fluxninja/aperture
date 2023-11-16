@@ -53,7 +53,7 @@ export const CloudExtensionConfig = ({children, component}) => (
 ```
 
 This extension enables [Aperture Cloud][] integration for
-[self-hosted][aperture-for-infra] Aperture Agents and Controllers. It enriches logs
+[self-hosted][Self-hosted] Aperture Agents and Controllers. It enriches logs
 and traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
 periodic heartbeats to Aperture Cloud to track health and configuration. This
@@ -64,8 +64,8 @@ Aperture Cloud Controller.
 
 ## Aperture Cloud Controller {#cloud-controller}
 
-Without the [Aperture Controller][], [self-hosted][aperture-for-infra-agent] Aperture
-Agents won't be able to work. While it's possible to [self-host][aperture-for-infra]
+Without the [Aperture Controller][], [self-hosted][Self-hosted-agent] Aperture
+Agents won't be able to work. While it's possible to [self-host][Self-hosted]
 Aperture Controller, Aperture Cloud Controller can be used instead.
 
 Aperture Cloud Controller is an [Aperture Controller][] hosted by Aperture
@@ -125,8 +125,8 @@ How various components interact with the extension:
 
 - [Flow labels](/concepts/flow-label.md#extension)
 
-[aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
-[aperture-for-infra-agent]: /aperture-for-infra/agent/agent.md
+[Self-hosted]: /aperture-for-infra/aperture-for-infra.md
+[Self-hosted-agent]: /aperture-for-infra/agent/agent.md
 [aperture cloud]: /introduction.md
 [aperture controller]: /aperture-for-infra/architecture.md#aperture-controller
 [aperture agent]: /aperture-for-infra/architecture.md#aperture-agent
