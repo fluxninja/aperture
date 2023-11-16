@@ -19,7 +19,7 @@ import {BashTab, TabContent} from './blueprintsComponents.js';
 
 :::note Note to Developers
 
-For implementing rate limiting using Aperture SDKs, please refer to our
+For implementing rate limiting using Aperture SDKs refer to the
 developer-centric [Rate Limiting Guide](/guides/per-user-rate-limiting.md).
 
 :::
