@@ -17,10 +17,11 @@ import {BashTab, TabContent} from './blueprintsComponents.js';
 
 ## Overview
 
-Rate limiting is a crucial defense against resource abuse. In modern application
-environments, where load can fluctuate, rate limiting is essential to manage
-situations where user requests exceed the system's capacity,safeguarding against
-service overloads and ensuring fairness among users.
+Rate limiting is a critical strategy for managing the load on an API. By
+imposing restrictions on the number of requests a unique consumer can make
+within a specific time frame, rate limiting prevents a small set of users from
+monopolizing the majority of resources on a service, ensuring fair access for
+all API consumers.
 
 Aperture implements this strategy through its high-performance, distributed rate
 limiter. This system enforces per-key limits based on fine-grained labels,
@@ -78,9 +79,10 @@ apertureClient = new ApertureClient({
 ```
 
 Start the flow with `StartFlow` by passing in a controlPoint and labels
-necessary to determine if a request should proceed. The function `ShouldRun`
-checks if the flow allows the request. The `Flow.End()` function is responsible
-for sending telemetry, and updating the specified cache entry within Aperture.
+necessary to determine if a request should proceed. The function
+`Flow.ShouldRun()` checks if the flow allows the request. The `Flow.End()`
+function is responsible for sending telemetry, and updating the specified cache
+entry within Aperture.
 
 ```mdx-code-block
 <Tabs>
@@ -130,12 +132,8 @@ try {
 
 This policy is based on the
 [Rate Limiting](/reference/blueprints/rate-limiting/base.md) blueprint. It
-applies a rate limiter to the **`ingress`** control point on the service
-**`catalog-service.prod.svc.cluster.local`** and identifies unique users by
-referencing the **`user_id`** header present in the HTTP traffic. Provided by
-the Envoy proxy, this header can be located under the label key
-**`http.request.header.user_id`** (see [Flow Labels](/concepts/flow-label.md)
-for more information).
+applies a rate limiter to the **`awesomeFeature`** and identifies unique users
+by referencing the **`user_id`**.
 
 Each user is allowed **`2`** requests every **`1s`** (1 second) period. A burst
 of up to **`40`** requests is allowed. This means that the user can send up to

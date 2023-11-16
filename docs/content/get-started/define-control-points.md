@@ -8,6 +8,8 @@ sidebar_label: Define Control Points
 
 ```mdx-code-block
 import { Cards } from '@site/src/components/Cards';
+import Tabs from '@theme/Tabs';
+import TabItem from "@theme/TabItem";
 ```
 
 [Control points][control-points] are used to define where you want to act in
@@ -85,6 +87,11 @@ in the code snippet below. These labels will be used while defining a policy.
 
 Let's create a feature control point in the following code snippet.
 
+```mdx-code-block
+<Tabs>
+<TabItem value="TypeScript">
+```
+
 ```typescript
 let flow: Flow | undefined;
 
@@ -121,8 +128,13 @@ if (apertureClient) {
 }
 ```
 
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
 This is how you can create a feature control point in your code. The complete
-code snippet is available
+example is available
 [here](https://github.com/fluxninja/aperture-js/tree/main/example).
 
 :::info
@@ -136,5 +148,3 @@ your needs. [See all SDKs][sdks].
 
 [control-points]: /concepts/control-point.md
 [sdks]: /sdk/sdk.md
-[aperture-java-example]:
-  https://github.com/fluxninja/aperture-java/tree/main/examples/standalone-traffic-flow-example

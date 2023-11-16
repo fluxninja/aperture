@@ -37,8 +37,9 @@ their application and requires minimal permissions to get started.
    collaborate on load management.
 2. **Connect to Aperture Cloud**: Aperture Cloud authenticates requests from SDK
    integrations using Agent API keys, which can be created for your project
-   within the Aperture UI; for more information, see [Agent API
-   Keys][agent-api-keys] for more details.
+   within the Aperture UI; navigate to the **`Aperture`** tab in the sidebar
+   menu. From there, select **`Aperture Agent Keys`** in the top bar and copy
+   the key below.
 
    Once you have the Agent API key, you can use it to initialize the SDK.
 
@@ -87,9 +88,10 @@ Controller and Agent, ideal for situations like air-gapped environments.
    - [Metrics](/aperture-for-infra/integrations/metrics/metrics.md)
 
 4. **Map to Aperture SaaS Controller**: Aperture Cloud authenticates requests
-   from integrations using Agent API keys, which can be created for your project
-   within the Aperture UI; for more information, see [Agent API
-   Keys][agent-api-keys] for more details.
+   from integrations using Agent API keys, which are created for your project
+   within the Aperture UI; navigate to the **`Aperture`** tab in the sidebar
+   menu. From there, select **`Aperture Agent Keys`** in the top bar and copy
+   the key below.
 
    Using the API key, you can map your integration to the Aperture Cloud. See
    [FluxNinja Cloud Extension][cloud-extension] for more details.
@@ -106,7 +108,6 @@ Controller and Agent, ideal for situations like air-gapped environments.
 [sign-up]: /get-started/sign-up.md
 [policies]: /get-started/policies/policies.md
 [cloud-extension]: /reference/fluxninja.md
-[agent-api-keys]: /get-started/agent-api-keys/agent-api-keys.md
 [agent-docs]: /aperture-for-infra/agent/agent.md
 [integrations]: /aperture-for-infra/integrations/integrations.md
 [sdks]: /sdk/sdk.md
