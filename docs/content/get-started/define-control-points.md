@@ -77,7 +77,7 @@ execution flow of the API and can reject the request based on the policy defined
 in Aperture. The [Create Your First Policy](./policies/policies.md) section
 showcases how to define policy in Aperture. The code snippet below shows how to
 wrap your [Control Point](/concepts/control-point.md) within the `StartFlow`
-call and passing [labels](/concepts/flow-label.md) that will be matched with
+call and pass [labels](/concepts/flow-label.md) that will be matched with
 policy. The function `Flow.ShouldRun()` checks if the flow allows the request.
 The `Flow.End()` function is responsible for sending telemetry, and updating the
 specified cache entry within Aperture.

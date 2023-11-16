@@ -39,9 +39,7 @@ export const apertureClient = new ApertureClient({
 The created instance can then be used to start a flow:
 
 ```javascript
-let flow: Flow | undefined;
-
-flow = await apertureClient.StartFlow("feature-name", {
+const flow = await apertureClient.StartFlow("feature-name", {
   labels: {
     label_key: "user_id",
     interval: "1s",
@@ -59,8 +57,6 @@ if (flow.ShouldRun()) {
 }
 
 flow.End();
-
-console.log(e);
 ```
 
 For more context on using the Aperture JavaScript SDK to set feature control

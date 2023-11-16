@@ -39,11 +39,11 @@ determined by the bucket capacity.
 
 </Zoom>
 
-The diagram is showing how the Aperture SDK interacts with a global token bucket
-to determine whether to allow or reject a request. Each call decrements tokens
-from the bucket and if the bucket runs out of tokens, indicating that the rate
-limit has been reached, the incoming request is rejected. Conversely, if tokens
-are available in the bucket, the request is accepted. The token bucket is
+The diagram shows how the Aperture SDK interacts with a global token bucket to
+determine whether to allow or reject a request. Each call decrements tokens from
+the bucket and if the bucket runs out of tokens, indicating that the rate limit
+has been reached, the incoming request is rejected. Conversely, if tokens are
+available in the bucket, the request is accepted. The token bucket is
 continually replenished at a predefined fill rate, up to the maximum number of
 tokens specified by the bucket capacity.
 

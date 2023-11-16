@@ -120,7 +120,7 @@ Kubernetes Objects which will be created by following steps are listed
    `AGENT_API_KEY` with the API key linked to the project. If an API key has not
    been created, generate a new one through the Aperture Cloud UI. Navigate to
    the **`Aperture`** tab in the sidebar menu and then select
-   **`Aperture Agent Keys`** in the top bar. From there you can either copy the
+   **`Aperture Agent Keys`** in the top bar. From there, you can either copy the
    existing key or create a new one by clicking on **`Create Agent API Key`**.
 
    :::note
@@ -294,7 +294,7 @@ Kubernetes Objects which will be created by following steps are listed
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
       `AGENT_API_KEY` with the API key linked to the project. Navigate to the
       **`Aperture`** tab in the sidebar menu and then select
-      **`Aperture Agent Keys`** in the top bar. From there you can either copy
+      **`Aperture Agent Keys`** in the top bar. From there, you can either copy
       the existing key or create a new one by clicking on
       **`Create Agent API Key`**.
 
