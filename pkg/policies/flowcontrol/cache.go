@@ -8,6 +8,7 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"go.uber.org/fx"
 )
 
 var (
@@ -15,6 +16,8 @@ var (
 	ErrCacheKeyEmpty = errors.New("cache key cannot be empty")
 	// ErrCacheControlPointEmpty is the error returned when the cache control point is empty.
 	ErrCacheControlPointEmpty = errors.New("cache control_point cannot be empty")
+	// ErrCacheNotReady is the error returned when the cache is not ready to be used.
+	ErrCacheNotReady = errors.New("cache is not ready")
 	// ErrCacheKeyNotFound is the error returned when the key is not found in the cache. This is copied from the internal olric package.
 	ErrCacheKeyNotFound = errors.New("key not found")
 )
@@ -28,16 +31,27 @@ type Cache struct {
 var _ iface.Cache = (*Cache)(nil)
 
 // NewCache creates a new cache.
-func NewCache(dc *distcache.DistCache) (iface.Cache, error) {
-	dmapCache, err := dc.NewDMap("control_point_cache", olricconfig.DMap{})
-	if err != nil {
-		return nil, err
-	}
-	return &Cache{dmapCache: dmapCache}, nil
+func NewCache(dc *distcache.DistCache, lc fx.Lifecycle) (iface.Cache, error) {
+	cache := &Cache{}
+	lc.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			dmapCache, err := dc.NewDMap("control_point_cache", olricconfig.DMap{})
+			if err != nil {
+				return err
+			}
+			cache.dmapCache = dmapCache
+			return nil
+		},
+	})
+	return cache, nil
 }
 
 // Get returns the value for the given key.
 func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, error) {
+	err := c.Ready()
+	if err != nil {
+		return nil, err
+	}
 	if key == "" {
 		return nil, ErrCacheKeyEmpty
 	}
@@ -60,6 +74,10 @@ func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, erro
 
 // Upsert inserts or updates the value for the given key.
 func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []byte) error {
+	err := c.Ready()
+	if err != nil {
+		return err
+	}
 	if key == "" {
 		return ErrCacheKeyEmpty
 	}
@@ -72,6 +90,10 @@ func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []by
 
 // Delete deletes the value for the given key.
 func (c *Cache) Delete(ctx context.Context, controlPoint, key string) error {
+	err := c.Ready()
+	if err != nil {
+		return err
+	}
 	if key == "" {
 		return ErrCacheKeyEmpty
 	}
@@ -79,8 +101,16 @@ func (c *Cache) Delete(ctx context.Context, controlPoint, key string) error {
 		return ErrCacheControlPointEmpty
 	}
 	cacheKey := formatCacheKey(controlPoint, key)
-	_, err := c.dmapCache.Delete(ctx, cacheKey)
+	_, err = c.dmapCache.Delete(ctx, cacheKey)
 	return err
+}
+
+// Ready returns nil if the cache is ready to be used.
+func (c *Cache) Ready() error {
+	if c.dmapCache == nil {
+		return ErrCacheNotReady
+	}
+	return nil
 }
 
 // formatCacheKey returns the cache key for the given control point and key.
