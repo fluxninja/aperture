@@ -59,16 +59,9 @@ import grpc from "@grpc/grpc-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
-  address:
-    process.env.APERTURE_AGENT_ADDRESS !== undefined
-      ? process.env.APERTURE_AGENT_ADDRESS
-      : "localhost:8089",
-  agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
-  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
-  channelCredentials:
-    process.env.APERTURE_AGENT_INSECURE !== undefined
-      ? grpc.credentials.createInsecure()
-      : grpc.credentials.createSsl(),
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  agentAPIKey: "AGENT_API_KEY",
+  channelCredentials: grpc.credentials.createSsl(),
 });
 ```
 
@@ -82,8 +75,12 @@ wherever you want in your code. Before executing the business logic of a
 specific API, you can create a feature control point that can control the
 execution flow of the API and can reject the request based on the policy defined
 in Aperture. The [Create Your First Policy](./policies/policies.md) section
-showcases how to define policy in Aperture. For now, some labels have been added
-in the code snippet below. These labels will be used while defining a policy.
+showcases how to define policy in Aperture. The code snippet below shows how to
+wrap your [Control Point](/concepts/control-point.md) within the `StartFlow`
+call and passing [labels](/concepts/flow-label.md) that will be matched with
+policy. The function `Flow.ShouldRun()` checks if the flow allows the request.
+The `Flow.End()` function is responsible for sending telemetry, and updating the
+specified cache entry within Aperture.
 
 Let's create a feature control point in the following code snippet.
 
@@ -95,35 +92,32 @@ Let's create a feature control point in the following code snippet.
 ```typescript
 let flow: Flow | undefined;
 
-if (apertureClient) {
-  try {
-    // Start the flow to check rate limiting for the incoming request
-    flow = await apertureClient.StartFlow("archimedes-service", {
-      labels: {
-        label_key: "api_key",
-        interval: "60",
-      },
-      grpcCallOptions: {
-        deadline: Date.now() + 1200000, // 20 minutes deadline
-      },
-    });
+try {
+  // Start the flow to check rate limiting for the incoming request
+  flow = await apertureClient.StartFlow("archimedes-service", {
+    labels: {
+      label_key: "api_key",
+      interval: "60",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000, // 20 minutes deadline
+    },
+  });
 
-    // Check if the flow is allowed by Aperture
-    if (flow.ShouldRun()) {
-      // Add business logic to process incoming request
-      console.log("Request accepted. Processing...");
-    } else {
-      console.log("Request rate-limited. Try again later.");
-    }
-  } catch (e) {
-    console.error("Error in flow:", e);
-    if (flow) {
-      flow.SetStatus(FlowStatusEnum.Error);
-    }
-  } finally {
-    if (flow) {
-      flow.End();
-    }
+  // Check if the flow is allowed by Aperture
+  if (flow.ShouldRun()) {
+    // Add business logic to process incoming request
+  } else {
+    // Handle flow rejection
+  }
+} catch (e) {
+  console.error("Error in flow:", e);
+  if (flow) {
+    flow.SetStatus(FlowStatusEnum.Error);
+  }
+} finally {
+  if (flow) {
+    flow.End();
   }
 }
 ```
@@ -135,7 +129,7 @@ if (apertureClient) {
 
 This is how you can create a feature control point in your code. The complete
 example is available
-[here](https://github.com/fluxninja/aperture-js/tree/main/example).
+[here](https://github.com/fluxninja/aperture-js/blob/main/example/routes/use_aperture.ts).
 
 :::info
 

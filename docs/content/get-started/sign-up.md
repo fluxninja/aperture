@@ -23,7 +23,7 @@ set up an organization and a project for you.
 
 1. For sign up, head over to
    [Aperture Cloud](https://app.fluxninja.com/sign-up).
-2. There are two ways you can sign up --
+2. There are two ways you can sign up:
 
    - Using your Google account
    - Using your email address.

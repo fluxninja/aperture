@@ -38,11 +38,6 @@ rate dictates the sustained requests per second (RPS) permitted for a key, while
 transient overages over the fill rate are accommodated for brief periods, as
 determined by the bucket capacity.
 
-This intricate system of rate-limiting plays a pivotal role in maintaining the
-integrity of a service. It effectively safeguards against excessive usage that
-could potentially result in API abuse, while simultaneously ensuring optimal
-performance and resource allocation.
-
 <Zoom>
 
 ```mermaid

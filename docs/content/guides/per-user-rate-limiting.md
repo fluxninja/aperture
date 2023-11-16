@@ -68,7 +68,8 @@ import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
 
 apertureClient = new ApertureClient({
-  address: "localhost:8080",
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  agentAPIKey: "AGENT_API_KEY",
   channelCredentials: grpc.credentials.createSsl(),
 });
 ```

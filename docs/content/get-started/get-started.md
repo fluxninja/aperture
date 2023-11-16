@@ -36,10 +36,9 @@ their application and requires minimal permissions to get started.
    introduction to the dashboard - and inviting your team members, so you can
    collaborate on load management.
 2. **Connect to Aperture Cloud**: Aperture Cloud authenticates requests from SDK
-   integrations using Agent API keys, which can be created for your project
-   within the Aperture UI; navigate to the **`Aperture`** tab in the sidebar
-   menu. From there, select **`Aperture Agent Keys`** in the top bar and copy
-   the key below.
+   integrations using Agent API keys, which can be copied within the Aperture
+   UI; more information on where to find and use the Agent API Keys is provided
+   in the [Define Control Points][define-control-points] section.
 
    Once you have the Agent API key, you can use it to initialize the SDK.
 
@@ -67,13 +66,13 @@ Controller and Agent, ideal for situations like air-gapped environments.
    collaborate on load management.
 
 2. **Set Up the Environment**: The Aperture Agent can be installed in various
-   modes. For installation steps, see [Agent][agent-docs] docs under
-   aperture-for-infra Aperture.
+   modes. For installation steps, see [Agent][agent-docs] docs under [Aperture
+   For Infra section][aperture-for-infra].
 
    :::info
 
    For more details on fully self-hosted installation, please refer to the
-   [Self-hosted][Self-hosted] section.
+   [Self-hosted][aperture-for-infra] section.
 
    :::
 
@@ -90,8 +89,9 @@ Controller and Agent, ideal for situations like air-gapped environments.
 4. **Map to Aperture SaaS Controller**: Aperture Cloud authenticates requests
    from integrations using Agent API keys, which are created for your project
    within the Aperture UI; navigate to the **`Aperture`** tab in the sidebar
-   menu. From there, select **`Aperture Agent Keys`** in the top bar and copy
-   the key below.
+   menu and then select **`Aperture Agent Keys`** in the top bar. From there you
+   can either copy the existing key or create a new one by clicking on
+   **`Create Agent API Key`**.
 
    Using the API key, you can map your integration to the Aperture Cloud. See
    [FluxNinja Cloud Extension][cloud-extension] for more details.
@@ -104,10 +104,11 @@ Controller and Agent, ideal for situations like air-gapped environments.
 </Tabs>
 
 [cloud]: https://www.fluxninja.com/product
-[Self-hosted]: /aperture-for-infra/aperture-for-infra.md
+[aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /get-started/sign-up.md
 [policies]: /get-started/policies/policies.md
 [cloud-extension]: /reference/fluxninja.md
 [agent-docs]: /aperture-for-infra/agent/agent.md
 [integrations]: /aperture-for-infra/integrations/integrations.md
 [sdks]: /sdk/sdk.md
+[define-control-points]: /get-started/define-control-points.md
