@@ -78,11 +78,12 @@ apertureClient = new ApertureClient({
 </Tabs>
 ```
 
-Start the flow with `StartFlow` by passing in a controlPoint and labels
-necessary to determine if a request should proceed. The function
-`Flow.ShouldRun()` checks if the flow allows the request. The `Flow.End()`
-function is responsible for sending telemetry, and updating the specified cache
-entry within Aperture.
+Start the flow with `StartFlow` by passing in a
+[Control Point](/concepts/control-point.md) and
+[labels](/concepts/flow-label.md) necessary to determine if a request should
+proceed. The function `Flow.ShouldRun()` checks if the flow allows the request.
+The `Flow.End()` function is responsible for sending telemetry, and updating the
+specified cache entry within Aperture.
 
 ```mdx-code-block
 <Tabs>
