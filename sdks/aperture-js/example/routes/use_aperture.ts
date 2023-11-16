@@ -11,7 +11,7 @@ export const apertureClient = new ApertureClient({
       : "localhost:8089",
   agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
   // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
-  channelCredentials:
+  channelOptions:
     process.env.APERTURE_AGENT_INSECURE !== undefined
       ? grpc.credentials.createInsecure()
       : grpc.credentials.createSsl(),
@@ -35,7 +35,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       },
       rampMode: false,
     })
-    .then((flow) => {
+    .then((flow: { ShouldRun: () => any; SetStatus: (arg0: any) => void; End: () => void; }) => {
       const endTimestamp = Date.now();
       console.log(`Flow took ${endTimestamp - startTimestamp}ms`);
       // See whether flow was accepted by Aperture Agent.
@@ -54,7 +54,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       // Status set using SetStatus() informs whether the feature captured by the Flow was successful or resulted in an error.
       flow.End();
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.log(e);
       res.send(`Error occurred: ${e}`);
     });

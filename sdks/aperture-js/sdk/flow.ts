@@ -1,5 +1,4 @@
 import { Span } from "@opentelemetry/api";
-
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
@@ -12,10 +11,15 @@ import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
-
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import { CacheResponseCode } from "./gen/aperture/flowcontrol/check/v1/CacheResponseCode.js";
+import type { CacheDeleteResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteResponse";
+import type { CacheUpsertResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertResponse";
+import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
+import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
+import { Duration } from "@grpc/grpc-js/build/src/duration.js";
 
 export const FlowStatusEnum = {
   OK: "OK",
@@ -29,9 +33,12 @@ export class Flow {
   private status: FlowStatus = FlowStatusEnum.OK;
 
   constructor(
+    private fcsClient: FlowControlServiceClient,
+    private controlPoint: string,
     private span: Span,
     startDate: number,
     private rampMode: boolean = false,
+    private cacheKey: string | null = null,
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {
@@ -43,8 +50,7 @@ export class Flow {
   ShouldRun() {
     if (
       (!this.rampMode && this.checkResponse === null) ||
-      this.checkResponse?.decisionType ===
-        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+      (this.checkResponse?.decisionType === _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED)
     ) {
       return true;
     } else {
@@ -54,6 +60,66 @@ export class Flow {
 
   SetStatus(status: FlowStatus) {
     this.status = status;
+  }
+
+  async SetCachedValue(value: Buffer, ttl: Duration) {
+    if (!this.cacheKey) {
+      return Promise.reject(new Error("No cache key"));
+    }
+
+    const key = this.cacheKey;
+    return new Promise<CacheUpsertResponse__Output | undefined>((resolve, reject) => {
+      const cacheUpsertRequest: CacheUpsertRequest = {
+        controlPoint: this.controlPoint,
+        key: key,
+        value: value,
+        ttl: ttl,
+      }
+      this.fcsClient.CacheUpsert(cacheUpsertRequest, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  }
+
+  async DeleteCachedValue() {
+    if (!this.cacheKey) {
+      return Promise.reject(new Error("No cache key"));
+    }
+
+    const key = this.cacheKey;
+    return new Promise<CacheDeleteResponse__Output | undefined>((resolve, reject) => {
+      const cacheDeleteRequest: CacheDeleteRequest = {
+        controlPoint: this.controlPoint,
+        key: key,
+      }
+      this.fcsClient.CacheDelete(cacheDeleteRequest, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  }
+
+  CachedValue() {
+    if (this.checkResponse?.cachedValue) {
+      return this.checkResponse.cachedValue.value;
+    }
+    return null;
+  }
+
+  CacheError() {
+    if (this.checkResponse?.cachedValue) {
+      if (this.checkResponse.cachedValue.responseCode === CacheResponseCode.ERROR) {
+        return this.checkResponse.cachedValue.message;
+      }
+    }
+    return null;
   }
 
   Error() {
@@ -80,15 +146,11 @@ export class Flow {
       // PR: https://github.com/protobufjs/protobuf.js/pull/1258
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this.checkResponse as any;
-      localCheckResponse.start = this.protoTimestampToJSON(
-        this.checkResponse.start,
-      );
-      localCheckResponse.end = this.protoTimestampToJSON(
-        this.checkResponse.end,
-      );
-      localCheckResponse.waitTime = this.protoDurationToJSON(
-        this.checkResponse.waitTime,
-      );
+
+      localCheckResponse.start = this.protoTimestampToJSON(this.checkResponse.start);
+      localCheckResponse.end = this.protoTimestampToJSON(this.checkResponse.end);
+      localCheckResponse.waitTime = this.protoDurationToJSON(this.checkResponse.waitTime);
+
       // Walk through individual decisions and convert waitTime fields,
       // then add to localCheckResponse, preserving immutability.
       if (this.checkResponse.limiterDecisions) {
@@ -102,22 +164,16 @@ export class Flow {
         );
         localCheckResponse.limiterDecisions = decisions;
       }
-      this.span.setAttribute(
-        CHECK_RESPONSE_LABEL,
-        JSON.stringify(localCheckResponse),
-      );
+
+      this.span.setAttribute(CHECK_RESPONSE_LABEL, JSON.stringify(localCheckResponse));
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
-
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
-
     this.span.end();
   }
 
-  private protoTimestampToJSON(
-    timestamp: _google_protobuf_Timestamp__Output | null,
-  ) {
+  private protoTimestampToJSON(timestamp: _google_protobuf_Timestamp__Output | null) {
     if (timestamp) {
       return new Date(
         Number(timestamp.seconds) * 1000 + timestamp.nanos / 1000000,
@@ -126,9 +182,7 @@ export class Flow {
     return timestamp;
   }
 
-  private protoDurationToJSON(
-    duration: _google_protobuf_Duration__Output | null,
-  ) {
+  private protoDurationToJSON(duration: _google_protobuf_Duration__Output | null) {
     if (duration) {
       return `${duration.seconds}.${duration.nanos}s`;
     }

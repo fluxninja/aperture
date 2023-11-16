@@ -13,7 +13,6 @@ import { serializeError } from "serialize-error";
 import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-
 import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
@@ -23,6 +22,7 @@ export interface FlowParams {
   rampMode?: boolean;
   grpcCallOptions?: grpc.CallOptions;
   tryConnect?: boolean;
+  cacheKey?: string;
 }
 
 export class ApertureClient {
@@ -108,13 +108,12 @@ export class ApertureClient {
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(span, startDate, params.rampMode, response, err));
+        resolve(new Flow(this.fcsClient, controlPoint, span, startDate, params.rampMode, params.cacheKey, response, err));
       };
 
       try {
         // check connection state
-        // if not ready, return flow with fail-to-wire semantics
-        // if ready, call check
+        // if not ready, return flow with fail-to-wire semantics; else, call check
         if (params.tryConnect === undefined || params.tryConnect == false) {
           const state = this.fcsClient.getChannel().getConnectivityState(true);
           if (
@@ -147,6 +146,7 @@ export class ApertureClient {
           controlPoint: controlPoint,
           labels: mergedLabels,
           rampMode: params.rampMode,
+          cacheKey: params.cacheKey,
         };
 
         const cb: grpc.requestCallback<CheckResponse__Output> = (
