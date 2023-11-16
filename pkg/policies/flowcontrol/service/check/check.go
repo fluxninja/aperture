@@ -91,7 +91,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 
 // CacheUpsert is the CacheUpsert method of Flow Control service updates the cache with the given key and value.
 func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
-	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value)
+	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value, req.Ttl.AsDuration())
 	if err != nil {
 		return &flowcontrolv1.CacheUpsertResponse{
 			Code:    flowcontrolv1.CacheResponseCode_ERROR,
