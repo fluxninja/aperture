@@ -1,5 +1,5 @@
 ---
-title: Aperture for Infra
+title: Aperture for Infrastructure
 sidebar_position: 6
 keywords:
   - self-hosted
