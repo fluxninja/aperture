@@ -56,7 +56,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
     })
     .catch((e: unknown) => {
       console.log(e);
-      res.send(`Error occurred: ${e}`);
+      res.status(500).send(`Error occurred: ${e}`);
     });
 });
 
