@@ -115,7 +115,7 @@ agent:
       secretKeyRef:
         name: aperture-agent-apikey
         key: apiKey
-      value: API_KEY
+      value: "AGENT_API_KEY"
 ```
 
 The values above assume that you have installed the
@@ -133,7 +133,7 @@ release name. If your setup is different, adjust these endpoints accordingly.
 fluxninja:
   enable_cloud_controller: false
   endpoint: "ORGANIZATION_NAME.app.fluxninja.com:443"
-  api_key: API_KEY
+  api_key: "AGENT_API_KEY"
 etcd:
   endpoints: ["http://etcd:2379"]
 prometheus:

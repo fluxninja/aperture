@@ -92,14 +92,14 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: AGENT_API_KEY
+         value: "AGENT_API_KEY"
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
    `AGENT_API_KEY` with the API key linked to the project. Navigate to the
-   **`Aperture`** tab in the sidebar menu and then select
-   **`Aperture Agent Keys`** in the top bar. From there, you can either copy the
-   existing key or create a new one by clicking on **`Create Agent API Key`**.
+   **`Aperture`** tab in the sidebar menu and then select **`Agent API Keys`**
+   in the top bar. From there, you can either copy the existing key or create a
+   new one by clicking on **`Create Agent API Key`**.
 
    :::note
 
@@ -142,7 +142,7 @@ Kubernetes Objects which will be created by following steps are listed
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: AGENT_API_KEY
+         value: "AGENT_API_KEY"
    ```
 
    <Tabs groupId="setup" queryString>
@@ -222,13 +222,13 @@ Kubernetes Objects which will be created by following steps are listed
             secretKeyRef:
               name: aperture-agent-apikey
               key: apiKey
-            value: AGENT_API_KEY
+            value: "AGENT_API_KEY"
       ```
 
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
       `AGENT_API_KEY` with the API key linked to the project. The API Key can by
       found by navigating to the **`Aperture`** tab in the side bar menu, and
-      then clicking on the **`Aperture Agent API Keys`** tab in top bar.
+      then clicking on the **`Agent API Keys`** tab in top bar.
 
       :::note
 

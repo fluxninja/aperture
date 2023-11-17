@@ -21,8 +21,8 @@ and managed experience.
 **Aperture for Infrastructure**: For those who prefer control over their
 infrastructure, Aperture can be self-hosted. This allows full integration within
 your existing infrastructure, providing greater customization and control. To
-begin, the most straightforward approach is to sign up on Aperture Cloud and
-utilize the provided SDKs for integrating your application.
+begin, the most straightforward approach is to sign up on Aperture Cloud and use
+the provided SDKs for integrating your application.
 
 <Tabs>
 

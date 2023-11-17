@@ -95,14 +95,14 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: AGENT_API_KEY
+         value: "AGENT_API_KEY"
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
    `AGENT_API_KEY` with the API key linked to the project. Navigate to the
-   **`Aperture`** tab in the sidebar menu and then select
-   **`Aperture Agent Keys`** in the top bar. From there, you can either copy the
-   existing key or create a new one by clicking on **`Create Agent API Key`**.
+   **`Aperture`** tab in the sidebar menu and then select **`Agent API Keys`**
+   in the top bar. From there, you can either copy the existing key or create a
+   new one by clicking on **`Create Agent API Key`**.
 
    :::note
 
@@ -146,7 +146,7 @@ your cluster.
          secretKeyRef:
            name: aperture-agent-apikey
            key: apiKey
-         value: AGENT_API_KEY
+         value: "AGENT_API_KEY"
    ```
 
    <Tabs groupId="setup" queryString>
