@@ -26,6 +26,6 @@ generate-aperturectl-docs:
 generate-otel-docs:
 	@echo generating metrics docs
 	@./tools/otel_collectors/generate_otel_docs.sh
-	@git add ./content/self-hosting/integrations/metrics
+	@git add ./content/aperture-for-infra/integrations/metrics
 
 .PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs generate-otel-docs

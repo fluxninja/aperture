@@ -1468,7 +1468,7 @@ definitions:
                     :::info
 
                     For list of available attributes in Envoy access logs, refer
-                    [Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
+                    [Envoy Filter](/aperture-for-infra/integrations/istio/istio.md#envoy-filter)
 
                     :::
 
@@ -1840,7 +1840,7 @@ definitions:
 
             :::info
 
-            See also [Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
+            See also [Get Started / Setup Integrations / Metrics](/aperture-for-infra/integrations/metrics/metrics.md).
 
             :::
         properties:
@@ -2888,7 +2888,7 @@ definitions:
 
                     :::info Usage with OpenTelemetry Metrics
 
-                    Aperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.
+                    Aperture supports OpenTelemetry metrics. See [reference](/aperture-for-infra/integrations/metrics/metrics.md) for more details.
 
                     :::
                 type: string
