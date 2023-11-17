@@ -88,11 +88,8 @@ Let's create a feature control point in the following code snippet.
 ```
 
 ```typescript
-let flow: Flow | undefined;
-
-try {
-  // Start the flow to check rate limiting for the incoming request
-  flow = await apertureClient.StartFlow("archimedes-service", {
+async function handleFlow() {
+  const flow = await apertureClient.StartFlow("archimedes-service", {
     labels: {
       label_key: "api_key",
       interval: "60",
@@ -102,18 +99,13 @@ try {
     },
   });
 
-  // Check if the flow is allowed by Aperture
   if (flow.ShouldRun()) {
-    // Add business logic to process incoming request
+    // Do Actual Work
   } else {
     // Handle flow rejection
-  }
-} catch (e) {
-  console.error("Error in flow:", e);
-  if (flow) {
     flow.SetStatus(FlowStatusEnum.Error);
   }
-} finally {
+
   if (flow) {
     flow.End();
   }

@@ -64,7 +64,7 @@ The first step to use Aperture SDK is to import and set up Aperture Client:
 ```
 
 ```typescript
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
@@ -89,14 +89,11 @@ specified cache entry within Aperture.
 <TabItem value="TypeScript">
 ```
 
-```typescript
-let flow: Flow | undefined;
-
-try {
-  // Start the flow to check rate limiting for the incoming request
-  flow = await apertureClient.StartFlow("awesomeFeature", {
+```javascript
+async function handleFlow() {
+  const flow = await apertureClient.StartFlow("awesomeFeature", {
     labels: {
-      label_key: "user_id",
+      label_key: "some_user_id",
       interval: "1s",
     },
     grpcCallOptions: {
@@ -104,19 +101,15 @@ try {
     },
   });
 
-  // Check if the flow is allowed by Aperture
   if (flow.ShouldRun()) {
     // Add business logic to process incoming request
     console.log("Request accepted. Processing...");
   } else {
     console.log("Request rate-limited. Try again later.");
-  }
-} catch (e) {
-  console.error("Error in flow:", e);
-  if (flow) {
+    // Handle flow rejection
     flow.SetStatus(FlowStatusEnum.Error);
   }
-} finally {
+
   if (flow) {
     flow.End();
   }

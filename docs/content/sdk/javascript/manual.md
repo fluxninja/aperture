@@ -26,7 +26,7 @@ more information, refer to
 :::
 
 ```javascript
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
@@ -37,24 +37,28 @@ export const apertureClient = new ApertureClient({
 The created instance can then be used to start a flow:
 
 ```javascript
-const flow = await apertureClient.StartFlow("feature-name", {
-  labels: {
-    label_key: "user_id",
-    interval: "1s",
-  },
-  grpcCallOptions: {
-    deadline: Date.now() + 1200000, // 20 minutes deadline
-  },
-});
+async function handleFlow() {
+  const flow = await apertureClient.StartFlow("feature-name", {
+    labels: {
+      label_key: "some_user_id",
+      interval: "60",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000, // 20 minutes deadline
+    },
+  });
 
-if (flow.ShouldRun()) {
-  // Do actual work
-} else {
-  // handle flow rejection
-  flow.SetStatus(FlowStatus.Error);
+  if (flow.ShouldRun()) {
+    // Do Actual Work
+  } else {
+    // Handle flow rejection
+    flow.SetStatus(FlowStatusEnum.Error);
+  }
+
+  if (flow) {
+    flow.End();
+  }
 }
-
-flow.End();
 ```
 
 For more context on using the Aperture JavaScript SDK to set feature control
