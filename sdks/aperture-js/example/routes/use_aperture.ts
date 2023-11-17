@@ -8,7 +8,7 @@ export const apertureClient = new ApertureClient({
   address:
     process.env.APERTURE_AGENT_ADDRESS !== undefined
       ? process.env.APERTURE_AGENT_ADDRESS
-      : "localhost:8080",
+      : "localhost:8089",
   agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
   // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
   channelCredentials:
