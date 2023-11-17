@@ -12,17 +12,13 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 ```
 
-Aperture offers two primary modes for integration:
+Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
+self-hosted within your infrastructure.
 
-**Aperture Serverless**: This is a managed service option. You can easily get
-started by signing up for [Aperture Cloud][cloud], which offers a streamlined
-and managed experience.
+The easiest way to get started with Aperture is to sign up on Aperture Cloud and
+integrate your application using SDKs.
 
-**Aperture for Infrastructure**: For those who prefer control over their
-infrastructure, Aperture can be self-hosted. This allows full integration within
-your existing infrastructure, providing greater customization and control. To
-begin, the most straightforward approach is to sign up on Aperture Cloud and use
-the provided SDKs for integrating your application.
+These are two main modes on how to get started with Aperture.
 
 <Tabs>
 
