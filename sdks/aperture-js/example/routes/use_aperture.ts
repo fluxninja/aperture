@@ -1,6 +1,6 @@
 import express from "express";
 
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
+import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
 
 // Create aperture client
@@ -33,9 +33,8 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       grpcCallOptions: {
         deadline: Date.now() + 30000,
       },
-      rampMode: false,
     })
-    .then((flow) => {
+    .then((flow: Flow) => {
       const endTimestamp = Date.now();
       console.log(`Flow took ${endTimestamp - startTimestamp}ms`);
       // See whether flow was accepted by Aperture Agent.
@@ -54,9 +53,9 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       // Status set using SetStatus() informs whether the feature captured by the Flow was successful or resulted in an error.
       flow.End();
     })
-    .catch((e) => {
+    .catch((e: unknown) => {
       console.log(e);
-      res.send(`Error occurred: ${e}`);
+      res.status(500).send(`Error occurred: ${e}`);
     });
 });
 

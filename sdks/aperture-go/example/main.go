@@ -94,7 +94,16 @@ func main() {
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(middleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 2000*time.Millisecond).Handle)
+
+	middlewareParams := aperture.MiddlewareParams{
+		Timeout: 2000 * time.Millisecond,
+	}
+
+	m, err := middleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams)
+	if err != nil {
+		log.Fatalf("failed to create HTTP middleware: %v", err)
+	}
+	superRouter.Use(m.Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)

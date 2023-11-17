@@ -2,8 +2,8 @@ package aperture
 
 import (
 	"context"
-	"errors"
 	"log/slog"
+	"regexp"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -15,7 +15,6 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/metadata"
 
 	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
@@ -23,18 +22,37 @@ import (
 	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
-// StartFlowRequest represents the request parameters for starting a flow.
-type StartFlowRequest struct {
-	ControlPoint string
-	Labels       map[string]string
-	RampMode     bool
-	Timeout      time.Duration
+// Options that the user can pass to Aperture in order to receive a new Client.
+// FlowControlClientConn and OTLPExporterClientConn are required.
+type Options struct {
+	Logger      *slog.Logger
+	Address     string
+	AgentAPIKey string
+	DialOptions []grpc.DialOption
+}
+
+// MiddlewareParams is the interface for the middleware params.
+type MiddlewareParams struct {
+	IgnoredPaths         []string
+	IgnoredPathsCompiled []*regexp.Regexp // New field for the compiled regex patterns
+	FlowParams           FlowParams
+	Timeout              time.Duration
+}
+
+// FlowParams is a struct that contains parameters for StartFlow call.
+type FlowParams struct {
+	// Labels are the labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+	Labels map[string]string
+	// CallOptions are the grpc call options that get passed to Aperture Agent via flowcontrolv1.Check call.
+	CallOptions []grpc.CallOption
+	// If RampMode is set to true, then flow must be accepted by at least 1 LoadRamp component.
+	RampMode bool
 }
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, req StartFlowRequest) Flow
-	StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow
+	StartFlow(ctx context.Context, controlPoint string, flowParams FlowParams) Flow
+	StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, middlewareParams MiddlewareParams) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() *slog.Logger
 	GetGRPClientConn() *grpc.ClientConn
@@ -47,15 +65,6 @@ type apertureClient struct {
 	tracer                trace.Tracer
 	exporter              *otlptrace.Exporter
 	log                   *slog.Logger
-}
-
-// Options that the user can pass to Aperture in order to receive a new Client.
-// FlowControlClientConn and OTLPExporterClientConn are required.
-type Options struct {
-	Logger      *slog.Logger
-	Address     string
-	AgentAPIKey string
-	DialOptions []grpc.DialOption
 }
 
 // NewClient returns a new Client that can be used to perform Check calls.
@@ -132,41 +141,29 @@ func (c *apertureClient) getSpan(ctx context.Context) trace.Span {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, req StartFlowRequest) Flow {
-	// if timeout is not 0, then create a new context with timeout
-	if req.Timeout != 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, req.Timeout)
-		defer cancel()
-	}
-
+func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flowParams FlowParams) Flow {
 	labels := utils.LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
-	for key, value := range req.Labels {
+	for key, value := range flowParams.Labels {
 		labels[key] = value
 	}
 
-	checkReq := &checkv1.CheckRequest{
-		ControlPoint: req.ControlPoint,
+	req := &checkv1.CheckRequest{
+		ControlPoint: controlPoint,
 		Labels:       labels,
-		RampMode:     req.RampMode,
+		RampMode:     flowParams.RampMode,
 	}
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(span, req.RampMode)
+	f := newFlow(span, flowParams.RampMode)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
 
-	if c.grpcClientConn.GetState() != connectivity.Ready {
-		f.err = errors.New("grpc client connection is not ready")
-		return f
-	}
-
-	res, err := c.flowControlClient.Check(ctx, checkReq)
+	res, err := c.flowControlClient.Check(ctx, req, flowParams.CallOptions...)
 	if err != nil {
 		f.err = err
 	} else {
@@ -178,23 +175,21 @@ func (c *apertureClient) StartFlow(ctx context.Context, req StartFlowRequest) Fl
 
 // StartHTTPFlow takes a control point name and labels that get passed to Aperture Agent via flowcontrolhttp.CheckHTTP call.
 // Return value is a HTTPFlow.
-// The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartHTTPFlow fails, calling HTTPFlow.ShouldRun() on returned HTTPFlow returns as true.
-func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, rampMode bool, timeout time.Duration) HTTPFlow {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
+func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, middlewareParams MiddlewareParams) HTTPFlow {
 	span := c.getSpan(ctx)
 
-	f := newHTTPFlow(span, rampMode)
+	f := newHTTPFlow(span, middlewareParams.FlowParams)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
 	)
 
-	if c.grpcClientConn.GetState() != connectivity.Ready {
-		f.err = errors.New("grpc client connection is not ready")
-		return f
+	// create a timeoutCtx if middlewareParams.Timeout is set
+	if middlewareParams.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, middlewareParams.Timeout)
+		defer cancel()
 	}
 
 	res, err := c.flowControlHTTPClient.CheckHTTP(ctx, request)
