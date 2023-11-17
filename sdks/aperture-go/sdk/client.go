@@ -46,8 +46,6 @@ type MiddlewareParams struct {
 type FlowParams struct {
 	// Labels are the labels that get passed to Aperture Agent via flowcontrolv1.Check call.
 	Labels map[string]string
-	// ControlPoint is the name of the control point.
-	ControlPoint string
 	// CallOptions are the grpc call options that get passed to Aperture Agent via flowcontrolv1.Check call.
 	CallOptions []grpc.CallOption
 	// If RampMode is set to true, then flow must be accepted by at least 1 LoadRamp component.
@@ -56,7 +54,7 @@ type FlowParams struct {
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
 type Client interface {
-	StartFlow(ctx context.Context, flowParams FlowParams) Flow
+	StartFlow(ctx context.Context, controlPoint string, flowParams FlowParams) Flow
 	StartHTTPFlow(ctx context.Context, request *checkhttpproto.CheckHTTPRequest, middlewareParams MiddlewareParams) HTTPFlow
 	Shutdown(ctx context.Context) error
 	GetLogger() logr.Logger
@@ -162,7 +160,7 @@ func LabelsFromCtx(ctx context.Context) map[string]string {
 // Return value is a Flow.
 // The call returns immediately in case connection with Aperture Agent is not established.
 // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-func (c *apertureClient) StartFlow(ctx context.Context, flowParams FlowParams) Flow {
+func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flowParams FlowParams) Flow {
 	labels := LabelsFromCtx(ctx)
 
 	// Explicit labels override baggage
@@ -171,7 +169,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, flowParams FlowParams) F
 	}
 
 	req := &checkproto.CheckRequest{
-		ControlPoint: flowParams.ControlPoint,
+		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
 	}

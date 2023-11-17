@@ -94,12 +94,9 @@ func main() {
 
 	middlewareParams := aperturego.MiddlewareParams{
 		Timeout: 2000 * time.Millisecond,
-		FlowParams: aperturego.FlowParams{
-			ControlPoint: "awesomeFeature",
-		},
 	}
 
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, middlewareParams).Handle)
+	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams).Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)

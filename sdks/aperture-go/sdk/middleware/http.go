@@ -14,13 +14,15 @@ type HTTPMiddleware interface {
 
 type httpMiddleware struct {
 	client           aperture.Client
+	controlPoint     string
 	middlewareParams aperture.MiddlewareParams
 }
 
 // NewHTTPMiddleware creates a new HTTPMiddleware struct.
-func NewHTTPMiddleware(client aperture.Client, middlewareParams aperture.MiddlewareParams) HTTPMiddleware {
+func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) HTTPMiddleware {
 	return &httpMiddleware{
 		client:           client,
+		controlPoint:     controlPoint,
 		middlewareParams: middlewareParams,
 	}
 }
@@ -38,7 +40,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.middlewareParams.FlowParams)
+		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.middlewareParams.FlowParams)
 
 		flow := m.client.StartHTTPFlow(r.Context(), req, m.middlewareParams)
 		if flow.Error() != nil {

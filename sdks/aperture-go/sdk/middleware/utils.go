@@ -66,7 +66,7 @@ func getLocalIP(logger logr.Logger) string {
 }
 
 // PrepareCheckHTTPRequestForHTTP takes a http.Request, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(req.Context())
 
 	// override labels with explicit labels
@@ -107,7 +107,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, flowP
 			Protocol: protocol,
 			Port:     destinationPort,
 		},
-		ControlPoint: flowParams.ControlPoint,
+		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
@@ -123,7 +123,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, flowP
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels
@@ -171,7 +171,7 @@ func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 	return &checkhttpproto.CheckHTTPRequest{
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
-		ControlPoint: flowParams.ControlPoint,
+		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   method,
