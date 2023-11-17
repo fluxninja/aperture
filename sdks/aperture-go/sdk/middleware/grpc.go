@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"regexp"
 
 	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
@@ -29,12 +30,31 @@ func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto
 	}
 }
 
+// NewGRPCMiddleware takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func NewGRPCMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (grpc.UnaryServerInterceptor, error) {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, err
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
+	}
+
+	return GRPCUnaryInterceptor(client, controlPoint, middlewareParams), nil
+}
+
 // GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
 func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		// If the path is ignored, skip the middleware
-		if middlewareParams.IgnoredPaths != nil {
-			for _, ignoredPath := range middlewareParams.IgnoredPaths {
+		if middlewareParams.IgnoredPathsCompiled != nil {
+			for _, ignoredPath := range middlewareParams.IgnoredPathsCompiled {
 				if ignoredPath.MatchString(info.FullMethod) {
 					return handler(ctx, req)
 				}
