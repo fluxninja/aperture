@@ -42,9 +42,9 @@ configure the Aperture SDK for your application.
 :::note Required
 
 In the organization created within Aperture Cloud, navigate to the
-**`Aperture`** tab in the sidebar menu. From there, select
-**`Aperture Agent Keys`** in the top bar. This is where you can find and copy
-the **`AGENT_API_KEY`** and use it in the SDK as follows:
+**`Aperture`** tab in the sidebar menu. From there, select **`Agent API Keys`**
+in the top bar. This is where you can find and copy the **`AGENT_API_KEY`** and
+use it in the SDK as follows:
 
 :::
 
