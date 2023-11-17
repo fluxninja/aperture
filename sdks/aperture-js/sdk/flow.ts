@@ -15,11 +15,10 @@ import {
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { CacheResponseCode } from "./gen/aperture/flowcontrol/check/v1/CacheResponseCode.js";
 import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
 import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
 import { Duration } from "@grpc/grpc-js/build/src/duration.js";
-import { SetCachedValueResponse, DeleteCachedValueResponse } from "./cache.js";
+import { CachedValueResponse, SetCachedValueResponse, DeleteCachedValueResponse, } from "./cache.js";
 
 export const FlowStatusEnum = {
   OK: "OK",
@@ -110,19 +109,14 @@ export class Flow {
   }
 
   CachedValue() {
-    if (this.checkResponse?.cachedValue) {
-      return this.checkResponse.cachedValue.value;
-    }
-    return null;
-  }
-
-  CacheError() {
-    if (this.checkResponse?.cachedValue) {
-      if (this.checkResponse.cachedValue.responseCode === CacheResponseCode.ERROR) {
-        return this.checkResponse.cachedValue.message;
-      }
-    }
-    return null;
+    const resp: CachedValueResponse = {
+      error: this.error ?? null,
+      lookupResult: this.checkResponse?.cachedValue?.lookupResult.toString() ?? null,
+      code: this.checkResponse?.cachedValue?.responseCode.toString() ?? null,
+      message: this.checkResponse?.cachedValue?.message ?? null,
+      value: this.checkResponse?.cachedValue?.value ?? null,
+    };
+    return resp;
   }
 
   Error() {
