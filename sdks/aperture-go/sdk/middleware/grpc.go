@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -44,19 +44,43 @@ func socketAddressFromNetAddr(addr net.Addr) *checkhttpv1.SocketAddress {
 	}
 }
 
-// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string, rampMode bool, timeout time.Duration) grpc.UnaryServerInterceptor {
-	if explicitLabels == nil {
-		explicitLabels = make(map[string]string)
+// NewGRPCMiddleware takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func NewGRPCMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (grpc.UnaryServerInterceptor, error) {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, err
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
 	}
 
+	return GRPCUnaryInterceptor(client, controlPoint, middlewareParams), nil
+}
+
+// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq, err := prepareCheckHTTPRequestForGRPC(req, ctx, info, controlPoint, explicitLabels, rampMode)
+		// If the path is ignored, skip the middleware
+		if middlewareParams.IgnoredPathsCompiled != nil {
+			for _, ignoredPath := range middlewareParams.IgnoredPathsCompiled {
+				if ignoredPath.MatchString(info.FullMethod) {
+					return handler(ctx, req)
+				}
+			}
+		}
+
+		checkReq, err := prepareCheckHTTPRequestForGRPC(req, ctx, info, controlPoint, middlewareParams.FlowParams)
 		if err != nil {
 			c.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
 		}
 
-		flow := c.StartHTTPFlow(ctx, checkreq, rampMode, timeout)
+		flow := c.StartHTTPFlow(ctx, checkReq, middlewareParams)
 		if flow.Error() != nil {
 			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
@@ -71,26 +95,24 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 			}
 		}()
 
-		if flow.ShouldRun() {
-			// Simulate work being done
-			resp, err := handler(ctx, req)
-			return resp, err
-		} else {
+		if !flow.ShouldRun() {
 			rejectResp := flow.CheckResponse().GetDeniedResponse()
 			return nil, status.Error(
 				convertHTTPStatusToGRPC(rejectResp.GetStatus()),
 				fmt.Sprintf("Aperture rejected the request: %v", rejectResp.GetBody()),
 			)
 		}
+
+		return handler(ctx, req)
 	}
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, controlPoint string, explicitLabels map[string]string, rampMode bool) (*checkhttpv1.CheckHTTPRequest, error) {
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, controlPoint string, flowParams aperture.FlowParams) (*checkhttpv1.CheckHTTPRequest, error) {
 	labels := utils.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels
-	for key, value := range explicitLabels {
+	for key, value := range flowParams.Labels {
 		labels[key] = value
 	}
 
@@ -135,7 +157,7 @@ func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
-		RampMode:     rampMode,
+		RampMode:     flowParams.RampMode,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     info.FullMethod,

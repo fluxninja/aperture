@@ -1,5 +1,5 @@
 import express from "express";
-import { ApertureClient, FlowStatusEnum, Flow } from "@fluxninja/aperture-js";
+import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
 
 // Create aperture client
@@ -70,7 +70,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
     })
     .catch((e: any) => {
       console.log(e);
-      res.send(`Error occurred: ${e}`);
+      res.status(500).send(`Error occurred: ${e}`);
     });
 });
 
