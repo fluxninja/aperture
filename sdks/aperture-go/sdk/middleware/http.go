@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"regexp"
@@ -62,12 +63,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			}
 		}
 
-		// req, err := prepareCheckHTTPRequestForHTTP(r, m.controlPoint, m.labels, m.rampMode)
-
-		req, err := prepareCheckHTTPRequestForHTTP(r, m.controlPoint, m.middlewareParams.FlowParams)
-		if err != nil {
-			m.client.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
-		}
+		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.middlewareParams.FlowParams)
 
 		flow := m.client.StartHTTPFlow(r.Context(), req, m.middlewareParams)
 		if flow.Error() != nil {
@@ -105,7 +101,7 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 	})
 }
 
-func prepareCheckHTTPRequestForHTTP(req *http.Request, controlPoint string, flowParams aperture.FlowParams) (*checkhttpv1.CheckHTTPRequest, error) {
+func prepareCheckHTTPRequestForHTTP(req *http.Request, logger *slog.Logger, controlPoint string, flowParams aperture.FlowParams) *checkhttpv1.CheckHTTPRequest {
 	labels := utils.LabelsFromCtx(req.Context())
 
 	// override labels with explicit labels
@@ -127,25 +123,20 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, controlPoint string, flow
 
 	sourceHost, sourcePort, err := net.SplitHostPort(req.RemoteAddr)
 	if err != nil {
-		return nil, err
+		logger.Error("Failed to parse source address", "error", err)
 	}
 
 	sourcePortU32, err := strconv.ParseUint(sourcePort, 10, 32)
 	if err != nil {
-		return nil, err
+		logger.Error("Failed to parse source port", "error", err)
 	}
 
 	// TODO: Figure out if we can narrow down the port or figure out the host in a better way
 	destinationPort := uint32(0)
 	destinationHost := utils.GetLocalIP()
 
-	body := req.Body
-	defer body.Close()
-	bodyBytes, err := io.ReadAll(body)
-	if err != nil {
-		return nil, err
-	}
-	req.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	var b bytes.Buffer
+	req.Body = io.NopCloser(io.TeeReader(req.Body, &b))
 
 	return &checkhttpv1.CheckHTTPRequest{
 		Source: &checkhttpv1.SocketAddress{
@@ -168,7 +159,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, controlPoint string, flow
 			Scheme:   req.URL.Scheme,
 			Size:     req.ContentLength,
 			Protocol: req.Proto,
-			Body:     string(bodyBytes),
+			Body:     b.String(),
 		},
-	}, nil
+	}
 }

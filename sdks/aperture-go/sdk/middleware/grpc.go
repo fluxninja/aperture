@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"regexp"
@@ -75,10 +76,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 			}
 		}
 
-		checkReq, err := prepareCheckHTTPRequestForGRPC(ctx, req, info, controlPoint, middlewareParams.FlowParams)
-		if err != nil {
-			c.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
-		}
+		checkReq := prepareCheckHTTPRequestForGRPC(ctx, req, c.GetLogger(), info.FullMethod, controlPoint, middlewareParams.FlowParams)
 
 		flow := c.StartHTTPFlow(ctx, checkReq, middlewareParams)
 		if flow.Error() != nil {
@@ -108,7 +106,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, controlPoint string, flowParams aperture.FlowParams) (*checkhttpv1.CheckHTTPRequest, error) {
+func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, logger *slog.Logger, fullMethod string, controlPoint string, flowParams aperture.FlowParams) *checkhttpv1.CheckHTTPRequest {
 	labels := utils.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels
@@ -150,7 +148,7 @@ func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, info *
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return nil, err
+		logger.Error("Failed to marshal request body", "error", err)
 	}
 
 	return &checkhttpv1.CheckHTTPRequest{
@@ -160,7 +158,7 @@ func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, info *
 		RampMode:     flowParams.RampMode,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   method,
-			Path:     info.FullMethod,
+			Path:     fullMethod,
 			Host:     authority,
 			Headers:  labels,
 			Scheme:   scheme,
@@ -168,7 +166,7 @@ func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, info *
 			Protocol: "HTTP/2",
 			Body:     string(body),
 		},
-	}, nil
+	}
 }
 
 func convertHTTPStatusToGRPC(httpStatusCode int32) codes.Code {
