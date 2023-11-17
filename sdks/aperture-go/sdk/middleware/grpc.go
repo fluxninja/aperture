@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"time"
+	"regexp"
 
 	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"github.com/go-logr/logr"
@@ -30,16 +30,40 @@ func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto
 	}
 }
 
-// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string, rampMode bool, timeout time.Duration) grpc.UnaryServerInterceptor {
-	if explicitLabels == nil {
-		explicitLabels = make(map[string]string)
+// NewGRPCMiddleware takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func NewGRPCMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (grpc.UnaryServerInterceptor, error) {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, err
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
 	}
 
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, rampMode)
+	return GRPCUnaryInterceptor(client, controlPoint, middlewareParams), nil
+}
 
-		flow := c.StartHTTPFlow(ctx, checkreq, rampMode, timeout)
+// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		// If the path is ignored, skip the middleware
+		if middlewareParams.IgnoredPathsCompiled != nil {
+			for _, ignoredPath := range middlewareParams.IgnoredPathsCompiled {
+				if ignoredPath.MatchString(info.FullMethod) {
+					return handler(ctx, req)
+				}
+			}
+		}
+
+		checkReq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, middlewareParams.FlowParams)
+
+		flow := c.StartHTTPFlow(ctx, checkReq, middlewareParams)
 		if flow.Error() != nil {
 			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
@@ -54,17 +78,15 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 			}
 		}()
 
-		if flow.ShouldRun() {
-			// Simulate work being done
-			resp, err := handler(ctx, req)
-			return resp, err
-		} else {
+		if !flow.ShouldRun() {
 			rejectResp := flow.CheckResponse().GetDeniedResponse()
 			return nil, status.Error(
 				convertHTTPStatusToGRPC(rejectResp.GetStatus()),
 				fmt.Sprintf("Aperture rejected the request: %v", rejectResp.GetBody()),
 			)
 		}
+
+		return handler(ctx, req)
 	}
 }
 

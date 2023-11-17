@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"time"
 
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
@@ -15,45 +14,50 @@ type HTTPMiddleware interface {
 }
 
 type httpMiddleware struct {
-	client       aperture.Client
-	controlPoint string
-	labels       map[string]string
-	ignoredPaths *[]regexp.Regexp
-	rampMode     bool
-	timeout      time.Duration
+	client           aperture.Client
+	controlPoint     string
+	middlewareParams aperture.MiddlewareParams
 }
 
 // NewHTTPMiddleware creates a new HTTPMiddleware struct.
-func NewHTTPMiddleware(client aperture.Client, controlPoint string, labels map[string]string, ignoredPaths *[]regexp.Regexp, rampMode bool, timeout time.Duration) HTTPMiddleware {
-	if labels == nil {
-		labels = make(map[string]string)
+func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (HTTPMiddleware, error) {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, err
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
 	}
+
 	return &httpMiddleware{
-		client:       client,
-		controlPoint: controlPoint,
-		labels:       labels,
-		ignoredPaths: ignoredPaths,
-		rampMode:     rampMode,
-		timeout:      timeout,
-	}
+		client:           client,
+		controlPoint:     controlPoint,
+		middlewareParams: middlewareParams,
+	}, nil
 }
 
 // Handle takes a http.Handler and returns a new http.Handler with the middleware applied.
 func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the path is ignored, skip the middleware
-		if m.ignoredPaths != nil {
-			for _, ignoredPath := range *m.ignoredPaths {
-				if ignoredPath.MatchString(r.URL.Path) {
+		if m.middlewareParams.IgnoredPathsCompiled != nil {
+			for _, compiledPattern := range m.middlewareParams.IgnoredPathsCompiled {
+				if compiledPattern.MatchString(r.URL.Path) {
 					next.ServeHTTP(w, r)
 					return
 				}
 			}
 		}
 
-		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.labels, m.rampMode)
+		req := prepareCheckHTTPRequestForHTTP(r, m.client.GetLogger(), m.controlPoint, m.middlewareParams.FlowParams)
 
-		flow := m.client.StartHTTPFlow(r.Context(), req, m.rampMode, m.timeout)
+		flow := m.client.StartHTTPFlow(r.Context(), req, m.middlewareParams)
 		if flow.Error() != nil {
 			m.client.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
@@ -69,7 +73,6 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 		}()
 
 		if flow.ShouldRun() {
-			// Simulate work being done
 			next.ServeHTTP(w, r)
 		} else {
 			resp := flow.CheckResponse().GetDeniedResponse()

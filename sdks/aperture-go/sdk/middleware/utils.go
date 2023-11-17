@@ -66,11 +66,11 @@ func getLocalIP(logger logr.Logger) string {
 }
 
 // PrepareCheckHTTPRequestForHTTP takes a http.Request, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, explicitLabels map[string]string, rampMode bool) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, controlPoint string, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(req.Context())
 
 	// override labels with explicit labels
-	for key, value := range explicitLabels {
+	for key, value := range flowParams.Labels {
 		labels[key] = value
 	}
 
@@ -108,7 +108,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 			Port:     destinationPort,
 		},
 		ControlPoint: controlPoint,
-		RampMode:     rampMode,
+		RampMode:     flowParams.RampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
 			Path:     req.URL.Path,
@@ -123,11 +123,11 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger logr.Logger, contr
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, explicitLabels map[string]string, rampMode bool) *checkhttpproto.CheckHTTPRequest {
+func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, logger logr.Logger, controlPoint string, flowParams aperture.FlowParams) *checkhttpproto.CheckHTTPRequest {
 	labels := aperture.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels
-	for key, value := range explicitLabels {
+	for key, value := range flowParams.Labels {
 		labels[key] = value
 	}
 
@@ -172,7 +172,7 @@ func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *
 		Source:       sourceSocket,
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
-		RampMode:     rampMode,
+		RampMode:     flowParams.RampMode,
 		Request: &checkhttpproto.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     info.FullMethod,
