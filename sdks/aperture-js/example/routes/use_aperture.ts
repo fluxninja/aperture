@@ -28,8 +28,7 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
 
   // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow and an error if any.
   apertureClient
-    .StartFlow({
-      controlPoint: "awesomeFeature",
+    .StartFlow("awesomeFeature", {
       labels: labels,
       grpcCallOptions: {
         deadline: Date.now() + 30000,
