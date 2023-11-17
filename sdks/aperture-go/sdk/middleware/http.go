@@ -20,16 +20,14 @@ type httpMiddleware struct {
 }
 
 // NewHTTPMiddleware creates a new HTTPMiddleware struct.
-func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) HTTPMiddleware {
+func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (HTTPMiddleware, error) {
 	// Precompile the regex patterns for ignored paths
 	if middlewareParams.IgnoredPaths != nil {
 		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
 		for i, pattern := range middlewareParams.IgnoredPaths {
 			compiledPattern, err := regexp.Compile(pattern)
 			if err != nil {
-				// Handle or log the error according to your error handling policy
-				// For example, you could log the error and continue without the problematic pattern
-				// Or you could return an error and fail the creation of the middleware
+				return nil, err
 			} else {
 				compiledIgnoredPaths[i] = compiledPattern
 			}
@@ -41,7 +39,7 @@ func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewarePa
 		client:           client,
 		controlPoint:     controlPoint,
 		middlewareParams: middlewareParams,
-	}
+	}, nil
 }
 
 // Handle takes a http.Handler and returns a new http.Handler with the middleware applied.

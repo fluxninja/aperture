@@ -96,7 +96,11 @@ func main() {
 		Timeout: 2000 * time.Millisecond,
 	}
 
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams).Handle)
+	m, err := aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams)
+	if err != nil {
+		log.Fatalf("failed to create HTTP middleware: %v", err)
+	}
+	superRouter.Use(m.Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
