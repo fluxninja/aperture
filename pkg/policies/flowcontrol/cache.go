@@ -3,6 +3,7 @@ package flowcontrol
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -73,7 +74,7 @@ func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, erro
 }
 
 // Upsert inserts or updates the value for the given key.
-func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []byte) error {
+func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []byte, ttl time.Duration) error {
 	err := c.Ready()
 	if err != nil {
 		return err
@@ -85,7 +86,7 @@ func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []by
 		return ErrCacheControlPointEmpty
 	}
 	cacheKey := formatCacheKey(controlPoint, key)
-	return c.dmapCache.Put(ctx, cacheKey, value)
+	return c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
 }
 
 // Delete deletes the value for the given key.
