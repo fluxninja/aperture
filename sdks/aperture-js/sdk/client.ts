@@ -18,6 +18,7 @@ import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
 export interface FlowParams {
+  controlPoint: string;
   labels?: Record<string, string>;
   rampMode?: boolean;
   grpcCallOptions?: grpc.CallOptions;
@@ -94,10 +95,7 @@ export class ApertureClient {
   // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
   // Return value is a Flow.
   // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
-  async StartFlow(
-    controlPoint: string,
-    params: FlowParams = {},
-  ): Promise<Flow> {
+  async StartFlow(params: FlowParams): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       if (params.rampMode === undefined) {
         params.rampMode = false;
@@ -122,7 +120,7 @@ export class ApertureClient {
         let mergedLabels = { ...params.labels, ...labelsBaggage };
 
         const request: CheckRequest = {
-          controlPoint: controlPoint,
+          controlPoint: params.controlPoint,
           labels: mergedLabels,
           rampMode: params.rampMode,
         };
