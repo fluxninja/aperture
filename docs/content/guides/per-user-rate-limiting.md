@@ -65,12 +65,10 @@ The first step to use Aperture SDK is to import and set up Aperture Client:
 
 ```typescript
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
 
 apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "AGENT_API_KEY",
-  channelCredentials: grpc.credentials.createSsl(),
 });
 ```
 

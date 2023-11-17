@@ -55,13 +55,11 @@ the **`AGENT_API_KEY`** and use it in the SDK as follows:
 
 ```typescript
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "AGENT_API_KEY",
-  channelCredentials: grpc.credentials.createSsl(),
 });
 ```
 

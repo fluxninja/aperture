@@ -27,12 +27,10 @@ more information, refer to
 
 ```javascript
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
 
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "AGENT_API_KEY",
-  channelCredentials: grpc.credentials.createSsl(),
 });
 ```
 
