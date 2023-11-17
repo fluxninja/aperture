@@ -37,9 +37,10 @@ type Options struct {
 
 // MiddlewareParams is the interface for the middleware params.
 type MiddlewareParams struct {
-	IgnoredPaths []regexp.Regexp
-	FlowParams   FlowParams
-	Timeout      time.Duration
+	IgnoredPaths         []string
+	IgnoredPathsCompiled []*regexp.Regexp // New field for the compiled regex patterns
+	FlowParams           FlowParams
+	Timeout              time.Duration
 }
 
 // FlowParams is a struct that contains parameters for StartFlow call.

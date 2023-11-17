@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
@@ -20,6 +21,22 @@ type httpMiddleware struct {
 
 // NewHTTPMiddleware creates a new HTTPMiddleware struct.
 func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) HTTPMiddleware {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				// Handle or log the error according to your error handling policy
+				// For example, you could log the error and continue without the problematic pattern
+				// Or you could return an error and fail the creation of the middleware
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
+	}
+
 	return &httpMiddleware{
 		client:           client,
 		controlPoint:     controlPoint,
@@ -31,9 +48,9 @@ func NewHTTPMiddleware(client aperture.Client, controlPoint string, middlewarePa
 func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the path is ignored, skip the middleware
-		if m.middlewareParams.IgnoredPaths != nil {
-			for _, ignoredPath := range m.middlewareParams.IgnoredPaths {
-				if ignoredPath.MatchString(r.URL.Path) {
+		if m.middlewareParams.IgnoredPathsCompiled != nil {
+			for _, compiledPattern := range m.middlewareParams.IgnoredPathsCompiled {
+				if compiledPattern.MatchString(r.URL.Path) {
 					next.ServeHTTP(w, r)
 					return
 				}
