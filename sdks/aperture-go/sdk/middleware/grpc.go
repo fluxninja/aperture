@@ -78,15 +78,15 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 			}
 		}()
 
-		if flow.ShouldRun() {
-			return handler(ctx, req)
-		} else {
+		if !flow.ShouldRun() {
 			rejectResp := flow.CheckResponse().GetDeniedResponse()
 			return nil, status.Error(
 				convertHTTPStatusToGRPC(rejectResp.GetStatus()),
 				fmt.Sprintf("Aperture rejected the request: %v", rejectResp.GetBody()),
 			)
 		}
+
+		return handler(ctx, req)
 	}
 }
 
