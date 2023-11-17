@@ -7,6 +7,7 @@ import {
   SOURCE_LABEL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
+import grpc from "@grpc/grpc-js";
 import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
@@ -15,11 +16,10 @@ import type { Duration__Output as _google_protobuf_Duration__Output } from "./ge
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 import { CacheResponseCode } from "./gen/aperture/flowcontrol/check/v1/CacheResponseCode.js";
-import type { CacheDeleteResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteResponse";
-import type { CacheUpsertResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertResponse";
 import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
 import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
 import { Duration } from "@grpc/grpc-js/build/src/duration.js";
+import { SetCachedValueResponse, DeleteCachedValueResponse } from "./cache.js";
 
 export const FlowStatusEnum = {
   OK: "OK",
@@ -34,6 +34,7 @@ export class Flow {
 
   constructor(
     private fcsClient: FlowControlServiceClient,
+    private grpcCallOptions: grpc.CallOptions,
     private controlPoint: string,
     private span: Span,
     startDate: number,
@@ -68,19 +69,20 @@ export class Flow {
     }
 
     const key = this.cacheKey;
-    return new Promise<CacheUpsertResponse__Output | undefined>((resolve, reject) => {
+    return new Promise<SetCachedValueResponse | undefined>((resolve) => {
       const cacheUpsertRequest: CacheUpsertRequest = {
         controlPoint: this.controlPoint,
         key: key,
         value: value,
         ttl: ttl,
       }
-      this.fcsClient.CacheUpsert(cacheUpsertRequest, (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
+      this.fcsClient.CacheUpsert(cacheUpsertRequest, this.grpcCallOptions, (err, res) => {
+        const resp: SetCachedValueResponse = {
+          error: err ?? null,
+          code: res?.code.toString() ?? null,
+          message: res?.message ?? null,
+        };
+        resolve(resp);
       });
     });
   }
@@ -91,17 +93,18 @@ export class Flow {
     }
 
     const key = this.cacheKey;
-    return new Promise<CacheDeleteResponse__Output | undefined>((resolve, reject) => {
+    return new Promise<DeleteCachedValueResponse | undefined>((resolve, reject) => {
       const cacheDeleteRequest: CacheDeleteRequest = {
         controlPoint: this.controlPoint,
         key: key,
       }
-      this.fcsClient.CacheDelete(cacheDeleteRequest, (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
+      this.fcsClient.CacheDelete(cacheDeleteRequest, this.grpcCallOptions, (err, res) => {
+        const resp: DeleteCachedValueResponse = {
+          error: err ?? null,
+          code: res?.code.toString() ?? null,
+          message: res?.message ?? null,
+        };
+        resolve(resp);
       });
     });
   }

@@ -108,7 +108,7 @@ export class ApertureClient {
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(this.fcsClient, controlPoint, span, startDate, params.rampMode, params.cacheKey, response, err));
+        resolve(new Flow(this.fcsClient, params.grpcCallOptions ?? {}, controlPoint, span, startDate, params.rampMode, params.cacheKey, response, err));
       };
 
       try {
@@ -149,10 +149,8 @@ export class ApertureClient {
           cacheKey: params.cacheKey,
         };
 
-        const cb: grpc.requestCallback<CheckResponse__Output> = (
-          err: any,
-          response: any,
-        ) => {
+        const cb: grpc.requestCallback<CheckResponse__Output> = (err: any, response: any) => {
+          console.log("response: ", response);
           resolveFlow(err ? null : response, err);
           return;
         };
