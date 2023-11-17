@@ -3490,7 +3490,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
+[Envoy Filter](/aperture-for-infra/integrations/istio/istio.md#envoy-filter)
 
 :::
 
@@ -4310,7 +4310,7 @@ configuration using format `${ENV_VAR_NAME}`.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/aperture-for-infra/integrations/metrics/metrics.md).
 
 :::
 
@@ -6871,7 +6871,8 @@ There are additional labels available on a Flux Meter such as `valid`,
 :::info Usage with OpenTelemetry Metrics
 
 Aperture supports OpenTelemetry metrics. See
-[reference](/self-hosting/integrations/metrics/metrics.md) for more details.
+[reference](/aperture-for-infra/integrations/metrics/metrics.md) for more
+details.
 
 :::
 

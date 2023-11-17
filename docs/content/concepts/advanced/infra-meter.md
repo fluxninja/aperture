@@ -92,4 +92,4 @@ are present by default on metrics collected by an _Infra Meter_:
 
 [reference]: /reference/configuration/spec.md#infra-meter
 [promql]: /reference/configuration/spec.md#prom-q-l
-[integration]: /self-hosting/integrations/metrics/metrics.md
+[integration]: /aperture-for-infra/integrations/metrics/metrics.md

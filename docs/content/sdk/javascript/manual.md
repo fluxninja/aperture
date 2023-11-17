@@ -21,11 +21,13 @@ To do so, first create an instance of ApertureClient:
 
 You can create an Agent API key for your project in the Aperture Cloud UI. For
 more information, refer to
-[Agent API Keys](/get-started/agent-api-keys/agent-api-keys.md).
+[Define Control Points](/get-started/define-control-points.md).
 
 :::
 
 ```javascript
+import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
+
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "AGENT_API_KEY",
@@ -35,25 +37,28 @@ export const apertureClient = new ApertureClient({
 The created instance can then be used to start a flow:
 
 ```javascript
-// do some business logic to collect labels
-var labelsMap = new Map().set("key", "value");
-var rampMode = false;
-
-apertureClient
-  .StartFlow("feature-name", labelsMap, rampMode)
-  .then((flow) => {
-    if (flow.ShouldRun()) {
-      // Do actual work
-    } else {
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(FlowStatus.Error);
-    }
-    flow.End();
-  })
-  .catch((e) => {
-    console.log(e);
-    res.send(`Error occurred: ${e}`);
+async function handleFlow() {
+  const flow = await apertureClient.StartFlow("feature-name", {
+    labels: {
+      label_key: "some_user_id",
+      interval: "60",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000, // 20 minutes deadline
+    },
   });
+
+  if (flow.ShouldRun()) {
+    // Do Actual Work
+  } else {
+    // Handle flow rejection
+    flow.SetStatus(FlowStatusEnum.Error);
+  }
+
+  if (flow) {
+    flow.End();
+  }
+}
 ```
 
 For more context on using the Aperture JavaScript SDK to set feature control

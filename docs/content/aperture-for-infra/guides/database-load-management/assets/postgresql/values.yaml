@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../../../../../blueprints/load-scheduling/postgresql/gen/definitions.json
+
+blueprint: load-scheduling/postgresql
+uri: ../../../../../../../blueprints
+policy:
+  policy_name: postgres-connections
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - agent_group: default
+              service: service1-demo-app.demoapp.svc.cluster.local
+              control_point: ingress
+          rules:
+            user_type:
+              extractor:
+                from: request.http.headers.user-type
+  postgresql:
+    agent_group: default
+    endpoint: postgresql.postgresql.svc.cluster.local:5432
+    username: postgres
+    password: secretpassword
+    databases:
+      - "postgres"
+    tls:
+      insecure: true
+  connections_used_threshold: 40
+  load_scheduling_core:
+    aiad_load_scheduler:
+      alerter:
+        alert_name: AIAD Load Throttling Event
+      load_multiplier_linear_decrement: 0.2
+      load_multiplier_linear_increment: 0.05
+      load_scheduler:
+        workload_latency_based_tokens: true
+        selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+        scheduler:
+          workloads:
+            - label_matcher:
+                match_labels:
+                  user_type: "guest"
+              parameters:
+                priority: 50.0
+              name: "guest"
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: "subscriber"
+              parameters:
+                priority: 250.0
+              name: "subscriber"
+    dry_run: false
