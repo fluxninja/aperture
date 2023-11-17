@@ -39,7 +39,7 @@ type FluxNinjaExtensionConfig struct {
 	// Aperture Cloud Controller, for example configures remote etcd endpoint and disables
 	// local Prometheus OTel pipelines.
 	//
-	// Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md) Aperture Controller.
+	// Disable this flag only if using [Self-Hosted](/aperture-for-infra/aperture-for-infra.md) Aperture Controller.
 	EnableCloudController bool `json:"enable_cloud_controller" default:"false"`
 	// Interval between each heartbeat.
 	HeartbeatInterval config.Duration `json:"heartbeat_interval" validate:"gte=0s" default:"5s"`
