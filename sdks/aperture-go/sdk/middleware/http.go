@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 )
@@ -15,7 +14,6 @@ type HTTPMiddleware interface {
 
 type httpMiddleware struct {
 	client           aperture.Client
-	ignoredPaths     *[]regexp.Regexp
 	middlewareParams aperture.MiddlewareParams
 }
 
@@ -31,8 +29,8 @@ func NewHTTPMiddleware(client aperture.Client, middlewareParams aperture.Middlew
 func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// If the path is ignored, skip the middleware
-		if m.ignoredPaths != nil {
-			for _, ignoredPath := range *m.ignoredPaths {
+		if m.middlewareParams.IgnoredPaths != nil {
+			for _, ignoredPath := range m.middlewareParams.IgnoredPaths {
 				if ignoredPath.MatchString(r.URL.Path) {
 					next.ServeHTTP(w, r)
 					return
@@ -58,7 +56,6 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 		}()
 
 		if flow.ShouldRun() {
-			// Simulate work being done
 			next.ServeHTTP(w, r)
 		} else {
 			resp := flow.CheckResponse().GetDeniedResponse()

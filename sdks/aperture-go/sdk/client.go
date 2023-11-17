@@ -37,7 +37,7 @@ type Options struct {
 
 // MiddlewareParams is the interface for the middleware params.
 type MiddlewareParams struct {
-	IgnoredPaths *[]regexp.Regexp
+	IgnoredPaths []regexp.Regexp
 	FlowParams   FlowParams
 	Timeout      time.Duration
 }
