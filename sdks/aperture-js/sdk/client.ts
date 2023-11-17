@@ -127,7 +127,6 @@ export class ApertureClient {
         };
 
         const cb: grpc.requestCallback<CheckResponse__Output> = (err: any, response: any) => {
-          console.log("response: ", response);
           resolveFlow(err ? null : response, err);
           return;
         };
