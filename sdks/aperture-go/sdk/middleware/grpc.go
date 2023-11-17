@@ -75,7 +75,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 			}
 		}
 
-		checkReq, err := prepareCheckHTTPRequestForGRPC(req, ctx, info, controlPoint, middlewareParams.FlowParams)
+		checkReq, err := prepareCheckHTTPRequestForGRPC(ctx, req, info, controlPoint, middlewareParams.FlowParams)
 		if err != nil {
 			c.GetLogger().Error("Failed to prepare CheckHTTP request.", "error", err)
 		}
@@ -108,7 +108,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 }
 
 // PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
-func prepareCheckHTTPRequestForGRPC(req interface{}, ctx context.Context, info *grpc.UnaryServerInfo, controlPoint string, flowParams aperture.FlowParams) (*checkhttpv1.CheckHTTPRequest, error) {
+func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, controlPoint string, flowParams aperture.FlowParams) (*checkhttpv1.CheckHTTPRequest, error) {
 	labels := utils.LabelsFromCtx(ctx)
 
 	// override labels with explicit labels

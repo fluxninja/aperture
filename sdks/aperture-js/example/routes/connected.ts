@@ -4,7 +4,7 @@ import { apertureClient } from "./use_aperture.js";
 
 export const connectedRouter = express.Router();
 
-connectedRouter.get("/", function (_: express.Request, res:express.Response) {
+connectedRouter.get("/", function (_: express.Request, res: express.Response) {
   try {
     let clientState = apertureClient.GetState();
     if (clientState != grpc.connectivityState.READY) {
