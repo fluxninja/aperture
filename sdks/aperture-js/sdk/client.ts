@@ -37,11 +37,11 @@ export class ApertureClient {
   constructor({
     address,
     agentAPIKey,
-    channelCredentials,
+    channelCredentials = grpc.credentials.createSsl(),
     channelOptions = {},
   }: {
     address: string;
-    channelCredentials: ChannelCredentials;
+    channelCredentials?: ChannelCredentials;
     channelOptions?: ChannelOptions;
     agentAPIKey?: string;
   }) {
