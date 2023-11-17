@@ -33,7 +33,6 @@ apertureRoute.get("/", function (_: express.Request, res: express.Response) {
       grpcCallOptions: {
         deadline: Date.now() + 30000,
       },
-      rampMode: false,
     })
     .then((flow) => {
       const endTimestamp = Date.now();
