@@ -30,6 +30,7 @@ SDKs</a> available for popular languages, such as :-
 - [Java][java]
 - [JavaScript][javascript]
 - [Python][python]
+- [.NET][dotnet]
 
 Aperture SDK allows you to manually wrap any function call or code snippet
 inside the service code as a feature control point. Every invocation of the
@@ -56,6 +57,7 @@ control points with less code changes:
 [java]: ./java/manual.md
 [javascript]: ./javascript/manual.md
 [python]: ./python/manual.md
+[dotnet]: ./dotnet/manual.md
 [netty]: ./java/netty.md#netty-handler
 [tomcat]: ./java/tomcat.md#tomcat-filter
 [spring-boot]: ./java/springboot.md#spring-boot-filter

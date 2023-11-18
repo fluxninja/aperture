@@ -661,6 +661,7 @@ workflows:
             playground/resources/demo-app/.* updated-demo-app true
             playground/resources/java-demo-app/.* updated-java-demo-app true
             playground/scenarios/service-protection-rl-escalation/policies/.*-cr.yaml updated-playground-policies true
+            sdks/aperture-csharp/.* updated-aperture-csharp true
             sdks/aperture-go/.* updated-aperture-go true
             sdks/aperture-js/.* updated-aperture-js true
             sdks/aperture-java/.* updated-aperture-java true

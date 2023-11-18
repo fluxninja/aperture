@@ -1,0 +1,13 @@
+version: v1
+managed:
+  enabled: true
+# Plugins limit is 10 per file, so they cannot be moved to buf.gen.aperture-langs.yaml
+plugins:
+  - plugin: buf.build/grpc/csharp:v1.59.1
+    out: gen/proto/csharp
+    opt:
+      - base_namespace=
+  - plugin: buf.build/protocolbuffers/csharp:v24.4
+    out: gen/proto/csharp
+    opt:
+      - base_namespace=
