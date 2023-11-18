@@ -1,12 +1,14 @@
 package aperture
 
 import (
+	"context"
 	"errors"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 )
@@ -16,6 +18,9 @@ import (
 type Flow interface {
 	ShouldRun() bool
 	SetStatus(status FlowStatus)
+	CachedValue() GetCachedValueResponse
+	SetCachedValue(ctx context.Context, value []byte, ttl time.Duration) SetCachedValueResponse
+	DeleteCachedValue(ctx context.Context) DeleteCachedValueResponse
 	Error() error
 	Span() trace.Span
 	End() error
@@ -23,22 +28,26 @@ type Flow interface {
 }
 
 type flow struct {
-	span          trace.Span
-	err           error
-	checkResponse *checkv1.CheckResponse
-	statusCode    FlowStatus
-	ended         bool
-	rampMode      bool
+	flowControlClient checkv1.FlowControlServiceClient
+	span              trace.Span
+	err               error
+	checkResponse     *checkv1.CheckResponse
+	statusCode        FlowStatus
+	ended             bool
+	rampMode          bool
+	cacheKey          string
 }
 
 // newFlow creates a new flow with default field values.
-func newFlow(span trace.Span, rampMode bool) *flow {
+func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, cacheKey string) *flow {
 	return &flow{
-		span:          span,
-		checkResponse: nil,
-		statusCode:    OK,
-		ended:         false,
-		rampMode:      rampMode,
+		flowControlClient: flowControlClient,
+		span:              span,
+		checkResponse:     nil,
+		statusCode:        OK,
+		ended:             false,
+		rampMode:          rampMode,
+		cacheKey:          cacheKey,
 	}
 }
 
@@ -61,6 +70,85 @@ func (f *flow) CheckResponse() *checkv1.CheckResponse {
 // If not set explicitly, defaults to FlowStatus.OK.
 func (f *flow) SetStatus(statusCode FlowStatus) {
 	f.statusCode = statusCode
+}
+
+// GetCachedValueResponse is the response returned by CachedValue method.
+type GetCachedValueResponse struct {
+	Value        []byte
+	LookupResult string
+	ResponseCode string
+	Message      string
+}
+
+// CachedValue returns the cached value for the flow.
+func (f *flow) CachedValue() GetCachedValueResponse {
+	cachedValue := f.checkResponse.GetCachedValue()
+	resp := GetCachedValueResponse{}
+	if cachedValue != nil {
+		resp.Value = cachedValue.Value
+		resp.LookupResult = cachedValue.LookupResult.String()
+		resp.ResponseCode = cachedValue.ResponseCode.String()
+		resp.Message = cachedValue.Message
+	}
+	return resp
+}
+
+// SetCachedValueResponse is the response returned by SetCachedValue method.
+type SetCachedValueResponse struct {
+	Error        error
+	ResponseCode string
+	Message      string
+}
+
+// SetCachedValue sets the cached value for the flow.
+func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Duration) SetCachedValueResponse {
+	resp := SetCachedValueResponse{}
+
+	if f.cacheKey == "" {
+		resp.Message = "cache key not set"
+	}
+
+	ttlProto := durationpb.New(ttl)
+
+	cacheUpsertResponse, err := f.flowControlClient.CacheUpsert(ctx, &checkv1.CacheUpsertRequest{
+		ControlPoint: f.checkResponse.ControlPoint,
+		Key:          f.cacheKey,
+		Value:        value,
+		Ttl:          ttlProto,
+	})
+
+	resp.Error = err
+	resp.Message = cacheUpsertResponse.GetMessage()
+	resp.ResponseCode = cacheUpsertResponse.GetCode().String()
+
+	return resp
+}
+
+// DeleteCachedValueResponse is the response returned by DeleteCachedValue method.
+type DeleteCachedValueResponse struct {
+	Error        error
+	ResponseCode string
+	Message      string
+}
+
+// DeleteCachedValue deletes the cached value for the flow.
+func (f *flow) DeleteCachedValue(ctx context.Context) DeleteCachedValueResponse {
+	resp := DeleteCachedValueResponse{}
+
+	if f.cacheKey == "" {
+		resp.Message = "cache key not set"
+	}
+
+	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
+		ControlPoint: f.checkResponse.ControlPoint,
+		Key:          f.cacheKey,
+	})
+
+	resp.Error = err
+	resp.Message = cacheDeleteResponse.GetMessage()
+	resp.ResponseCode = cacheDeleteResponse.GetCode().String()
+
+	return resp
 }
 
 // Error returns the error that occurred during the flow.

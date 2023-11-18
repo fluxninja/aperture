@@ -47,6 +47,8 @@ type FlowParams struct {
 	CallOptions []grpc.CallOption
 	// If RampMode is set to true, then flow must be accepted by at least 1 LoadRamp component.
 	RampMode bool
+	// CacheKey is the key that is used to cache data along with the flow.
+	CacheKey string
 }
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -153,11 +155,12 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
+		CacheKey:     flowParams.CacheKey,
 	}
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(span, flowParams.RampMode)
+	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.CacheKey)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
