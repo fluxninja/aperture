@@ -28,7 +28,7 @@ more information, refer to
 
 :::
 
-```csharp
+```cpp
 var sdk = ApertureSdk
     .Builder()
     .SetAddress("ORGANIZATION.app.fluxninja.com:443")
@@ -38,7 +38,7 @@ var sdk = ApertureSdk
 
 The created instance can then be used to start a flow:
 
-```csharp
+```cpp
 // do some business logic to collect labels
 
 var labels = new Dictionary<string, string>();
