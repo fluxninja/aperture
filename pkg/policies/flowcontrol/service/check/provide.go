@@ -36,7 +36,7 @@ type ConstructorIn struct {
 	ServiceGetter servicegetter.ServiceGetter
 	Metrics       Metrics
 	EngineAPI     iface.Engine
-	Cache         iface.Cache
+	Cache         iface.Cache `optional:"true"`
 }
 
 // ProvideHandler provides a Flow Control Handler.

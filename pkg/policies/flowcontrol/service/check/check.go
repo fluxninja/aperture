@@ -91,6 +91,12 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 
 // CacheUpsert is the CacheUpsert method of Flow Control service updates the cache with the given key and value.
 func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
+	if h.cache == nil {
+		return &flowcontrolv1.CacheUpsertResponse{
+			Code:    flowcontrolv1.CacheResponseCode_ERROR,
+			Message: "cache is not enabled",
+		}, nil
+	}
 	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value, req.Ttl.AsDuration())
 	if err != nil {
 		return &flowcontrolv1.CacheUpsertResponse{
@@ -106,6 +112,12 @@ func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpser
 
 // CacheDelete is the CacheDelete method of Flow Control service deletes the cache entry with the given key.
 func (h *Handler) CacheDelete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
+	if h.cache == nil {
+		return &flowcontrolv1.CacheDeleteResponse{
+			Code:    flowcontrolv1.CacheResponseCode_ERROR,
+			Message: "cache is not enabled",
+		}, nil
+	}
 	err := h.cache.Delete(ctx, req.ControlPoint, req.Key)
 	if err != nil {
 		return &flowcontrolv1.CacheDeleteResponse{
