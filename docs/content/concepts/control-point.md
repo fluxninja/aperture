@@ -39,8 +39,8 @@ frameworks.
 The integration with Envoy uses the External Authorization API. In such a setup,
 the control point can be used to identify a specific filter chain in Envoy. If
 insertion is achieved using the
-[Istio integration](/self-hosting/integrations/istio/istio.md), the default
-filter configuration designates `ingress` and `egress` control points as
+[Istio integration](/aperture-for-infra/integrations/istio/istio.md), the
+default filter configuration designates `ingress` and `egress` control points as
 identified by
 [PatchContext](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext)
 of Istio's EnvoyFilter CRD.

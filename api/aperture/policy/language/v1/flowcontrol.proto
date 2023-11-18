@@ -824,7 +824,7 @@ message FluxMeter {
   // :::info
   //
   // For list of available attributes in Envoy access logs, refer
-  // [Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
+  // [Envoy Filter](/aperture-for-infra/integrations/istio/istio.md#envoy-filter)
   //
   // :::
   //

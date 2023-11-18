@@ -301,4 +301,4 @@ label_matcher:
 [load-scheduler]: ./scheduler/load-scheduler.md
 [classifier]: ./advanced/classifier.md
 [label-matcher]: /reference/configuration/spec.md#label-matcher
-[gateway]: /self-hosting/integrations/gateway/gateway.md
+[gateway]: /aperture-for-infra/integrations/gateway/gateway.md

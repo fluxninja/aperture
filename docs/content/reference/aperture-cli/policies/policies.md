@@ -137,7 +137,7 @@ Run the following command to check if the policy was created.
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="self-hosting" label="Self Hosting">
+<TabItem value="aperture-for-infra" label="Self Hosting">
 ```
 
 ```mdx-code-block
@@ -146,7 +146,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Operator](/self-hosting/controller/kubernetes/operator/operator.md),
+[Kubernetes using Operator](/aperture-for-infra/controller/kubernetes/operator/operator.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -165,7 +165,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Kubernetes using Namespace-scoped](/self-hosting/controller/kubernetes/namespace-scoped/namespace-scoped.md),
+[Kubernetes using Namespace-scoped](/aperture-for-infra/controller/kubernetes/namespace-scoped/namespace-scoped.md),
 you can apply the policy using the following command:
 
 ```mdx-code-block
@@ -184,7 +184,7 @@ Run the following command to check if the policy was created.
 ```
 
 If the Aperture Controller is deployed on
-[Docker](/self-hosting/controller/docker.md), you can apply the policy using the
+[Docker](/aperture-for-infra/controller/docker.md), you can apply the policy using the
 following command:
 
 ```mdx-code-block

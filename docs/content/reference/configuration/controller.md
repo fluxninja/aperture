@@ -16,7 +16,7 @@ sidebar_label: Controller
 :::info
 
 See also
-[Aperture Controller installation](/self-hosting/controller/controller.md).
+[Aperture Controller installation](/aperture-for-infra/controller/controller.md).
 
 :::
 
@@ -1005,8 +1005,8 @@ Enabling this flag configures various agent components to point to the Aperture
 Cloud Controller, for example configures remote etcd endpoint and disables local
 Prometheus OTel pipelines.
 
-Disable this flag only if using [Self-Hosted](/self-hosting/self-hosting.md)
-Aperture Controller.
+Disable this flag only if using
+[Self-Hosted](/aperture-for-infra/aperture-for-infra.md) Aperture Controller.
 
 </dd>
 <dt>endpoint</dt>
