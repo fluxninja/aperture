@@ -437,4 +437,31 @@ java.lang.String defaultValue);
    * @return The deniedResponseStatusCode.
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.StatusCode getDeniedResponseStatusCode();
+
+  /**
+   * <pre>
+   * Matching cached value.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * @return Whether the cachedValue field is set.
+   */
+  boolean hasCachedValue();
+  /**
+   * <pre>
+   * Matching cached value.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * @return The cachedValue.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getCachedValue();
+  /**
+   * <pre>
+   * Matching cached value.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder getCachedValueOrBuilder();
 }

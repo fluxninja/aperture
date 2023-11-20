@@ -69,16 +69,25 @@ export const apertureClient = new ApertureClient({
 ```
 
 Once you have configured Aperture SDK, you can create a feature control point
-wherever you want in your code. Before executing the business logic of a
-specific API, you can create a feature control point that can control the
-execution flow of the API and can reject the request based on the policy defined
-in Aperture. The [Create Your First Policy](./policies/policies.md) section
-showcases how to define policy in Aperture. The code snippet below shows how to
-wrap your [Control Point](/concepts/control-point.md) within the `StartFlow`
-call and pass [labels](/concepts/flow-label.md) that will be matched with
-policy. The function `Flow.ShouldRun()` checks if the flow allows the request.
-The `Flow.End()` function is responsible for sending telemetry, and updating the
-specified cache entry within Aperture.
+anywhere within your code. Before executing the business logic of a specific
+API, you can create a feature control point that can control the execution flow
+of the API and can reject the request based on the policy defined in Aperture.
+The [Create Your First Policy](./policies/policies.md) section showcases how to
+define policy in Aperture.
+
+The code snippet below shows how to wrap your
+[Control Point](/concepts/control-point.md) within the `StartFlow` call and pass
+[labels](/concepts/flow-label.md) and `cacheKey` to Aperture Agents.
+
+- The function `Flow.ShouldRun()` checks if the flow allows the request.
+- The `Flow.End()` function is responsible for sending telemetry, and updating
+  the specified cache entry within Aperture.
+- The `flow.CachedValue().GetLookupStatus()` function returns the status of the
+  cache lookup. The status can be `Hit` or `Miss`.
+- If the status is `Hit`, the `flow.CachedValue().GetValue()` function returns
+  the cached response.
+- The `flow.SetCachedValue()` function is responsible for setting the response
+  in Aperture cache with the specified TTL (time to live).
 
 Let's create a feature control point in the following code snippet.
 
@@ -88,19 +97,41 @@ Let's create a feature control point in the following code snippet.
 ```
 
 ```typescript
-async function handleFlow() {
+async function handleRequest(req, res) {
   const flow = await apertureClient.StartFlow("archimedes-service", {
     labels: {
-      label_key: "api_key",
-      interval: "60",
+      api_key: "some_api_key",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 1200000, // 20 minutes deadline
+      deadline: Date.now() + 300, // ms
     },
+    rampMode: false,
+    cacheKey: "cache",
   });
 
   if (flow.ShouldRun()) {
-    // Do Actual Work
+    // Check if the response is cached in Aperture from a previous request
+    if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
+      res.send({ message: flow.CachedValue().GetValue()?.toString() });
+    } else {
+      // Do Actual Work
+      // After completing the work, you can return store the response in cache and return it, for example:
+      const resString = "foo";
+
+      // create a new buffer
+      const buffer = Buffer.from(resString);
+
+      // set cache value
+      const setResult = await flow.SetCachedValue(buffer, {
+        seconds: 30,
+        nanos: 0,
+      });
+      if (setResult?.error) {
+        console.log(`Error setting cache value: ${setResult.error}`);
+      }
+
+      res.send({ message: resString });
+    }
   } else {
     // Handle flow rejection
     flow.SetStatus(FlowStatusEnum.Error);

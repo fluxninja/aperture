@@ -1,0 +1,27 @@
+version: 2.1
+
+parameters:
+  updated-sdk:
+    type: boolean
+    default: false
+
+jobs:
+  say-hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+
+workflows:
+  version: 2
+
+  say-hello:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-sdk >>
+    jobs:
+      - say-hello

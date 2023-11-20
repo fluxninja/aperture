@@ -23,6 +23,7 @@ type Handler struct {
 	serviceGetter servicegetter.ServiceGetter
 	metrics       Metrics
 	engine        iface.Engine
+	cache         iface.Cache
 }
 
 // NewHandler creates a flowcontrol Handler.
@@ -30,11 +31,13 @@ func NewHandler(
 	serviceGetter servicegetter.ServiceGetter,
 	metrics Metrics,
 	engine iface.Engine,
+	cache iface.Cache,
 ) *Handler {
 	return &Handler{
 		serviceGetter: serviceGetter,
 		metrics:       metrics,
 		engine:        engine,
+		cache:         cache,
 	}
 }
 
@@ -74,6 +77,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			ControlPoint: req.ControlPoint,
 			Services:     services,
 			RampMode:     req.RampMode,
+			CacheKey:     req.CacheKey,
 		},
 	)
 	end := time.Now()
@@ -83,4 +87,46 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	// add control point type
 	resp.TelemetryFlowLabels[otelconsts.ApertureControlPointTypeLabel] = otelconsts.FeatureControlPoint
 	return resp, nil
+}
+
+// CacheUpsert is the CacheUpsert method of Flow Control service updates the cache with the given key and value.
+func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
+	if h.cache == nil {
+		return &flowcontrolv1.CacheUpsertResponse{
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           "cache is not enabled",
+		}, nil
+	}
+	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value, req.Ttl.AsDuration())
+	if err != nil {
+		return &flowcontrolv1.CacheUpsertResponse{
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           err.Error(),
+		}, nil
+	}
+
+	return &flowcontrolv1.CacheUpsertResponse{
+		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
+	}, nil
+}
+
+// CacheDelete is the CacheDelete method of Flow Control service deletes the cache entry with the given key.
+func (h *Handler) CacheDelete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
+	if h.cache == nil {
+		return &flowcontrolv1.CacheDeleteResponse{
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           "cache is not enabled",
+		}, nil
+	}
+	err := h.cache.Delete(ctx, req.ControlPoint, req.Key)
+	if err != nil {
+		return &flowcontrolv1.CacheDeleteResponse{
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           err.Error(),
+		}, nil
+	}
+
+	return &flowcontrolv1.CacheDeleteResponse{
+		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
+	}, nil
 }

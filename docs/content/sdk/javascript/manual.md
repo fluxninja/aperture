@@ -37,14 +37,13 @@ export const apertureClient = new ApertureClient({
 The created instance can then be used to start a flow:
 
 ```javascript
-async function handleFlow() {
+async function handleRequest(req, res) {
   const flow = await apertureClient.StartFlow("feature-name", {
     labels: {
       label_key: "some_user_id",
-      interval: "60",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 1200000, // 20 minutes deadline
+      deadline: Date.now() + 300, // ms
     },
   });
 

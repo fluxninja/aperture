@@ -14,6 +14,7 @@ import (
 type RequestContext struct {
 	FlowLabels   labels.Labels
 	ControlPoint string
+	CacheKey     string
 	Services     []string
 	RampMode     bool
 }
@@ -45,4 +46,6 @@ type Engine interface {
 
 	RegisterLabelPreview(l LabelPreview) error
 	UnregisterLabelPreview(l LabelPreview) error
+
+	RegisterCache(c Cache)
 }

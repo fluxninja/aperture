@@ -6,6 +6,7 @@ import type { FluxMeterInfo as _aperture_flowcontrol_check_v1_FluxMeterInfo, Flu
 import type { LimiterDecision as _aperture_flowcontrol_check_v1_LimiterDecision, LimiterDecision__Output as _aperture_flowcontrol_check_v1_LimiterDecision__Output } from '../../../../aperture/flowcontrol/check/v1/LimiterDecision';
 import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
+import type { CachedValue as _aperture_flowcontrol_check_v1_CachedValue, CachedValue__Output as _aperture_flowcontrol_check_v1_CachedValue__Output } from '../../../../aperture/flowcontrol/check/v1/CachedValue';
 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
@@ -60,6 +61,7 @@ export interface CheckResponse {
   'limiterDecisions'?: (_aperture_flowcontrol_check_v1_LimiterDecision)[];
   'waitTime'?: (_google_protobuf_Duration | null);
   'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
+  'cachedValue'?: (_aperture_flowcontrol_check_v1_CachedValue | null);
 }
 
 export interface CheckResponse__Output {
@@ -76,4 +78,5 @@ export interface CheckResponse__Output {
   'limiterDecisions': (_aperture_flowcontrol_check_v1_LimiterDecision__Output)[];
   'waitTime': (_google_protobuf_Duration__Output | null);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
+  'cachedValue': (_aperture_flowcontrol_check_v1_CachedValue__Output | null);
 }

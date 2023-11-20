@@ -23,7 +23,7 @@
     "@fluxninja-tools/graceful-js": "0.2.0",
     "@mui/lab": "^5.0.0-alpha.134",
     "@mui/material": "5.13.2",
-    "axios": "1.4.0",
+    "axios": "1.6.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.14.1"

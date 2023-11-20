@@ -26,6 +26,11 @@ buf-generate:
 
 	@#generate sdk flowcontrol stubs and copy them over
 
+	@#golang
+	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
+	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
+	@cp -R gen/proto/go/aperture/flowcontrol/checkhttp ../sdks/aperture-go/gen/proto/flowcontrol/
+
 	@#csharp
 	@rm -rf ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
 	@cp -R gen/proto/csharp/Aperture/Flowcontrol/Check ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
