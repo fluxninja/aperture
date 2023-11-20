@@ -4,29 +4,29 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf enum {@code aperture.flowcontrol.check.v1.CacheLookupResult}
+ * Protobuf enum {@code aperture.flowcontrol.check.v1.CacheOperationStatus}
  */
-public enum CacheLookupResult
+public enum CacheOperationStatus
     implements com.google.protobuf.ProtocolMessageEnum {
   /**
-   * <code>HIT = 0;</code>
+   * <code>SUCCESS = 0;</code>
    */
-  HIT(0),
+  SUCCESS(0),
   /**
-   * <code>MISS = 1;</code>
+   * <code>ERROR = 1;</code>
    */
-  MISS(1),
+  ERROR(1),
   UNRECOGNIZED(-1),
   ;
 
   /**
-   * <code>HIT = 0;</code>
+   * <code>SUCCESS = 0;</code>
    */
-  public static final int HIT_VALUE = 0;
+  public static final int SUCCESS_VALUE = 0;
   /**
-   * <code>MISS = 1;</code>
+   * <code>ERROR = 1;</code>
    */
-  public static final int MISS_VALUE = 1;
+  public static final int ERROR_VALUE = 1;
 
 
   public final int getNumber() {
@@ -43,7 +43,7 @@ public enum CacheLookupResult
    * @deprecated Use {@link #forNumber(int)} instead.
    */
   @java.lang.Deprecated
-  public static CacheLookupResult valueOf(int value) {
+  public static CacheOperationStatus valueOf(int value) {
     return forNumber(value);
   }
 
@@ -51,23 +51,23 @@ public enum CacheLookupResult
    * @param value The numeric wire value of the corresponding enum entry.
    * @return The enum associated with the given numeric wire value.
    */
-  public static CacheLookupResult forNumber(int value) {
+  public static CacheOperationStatus forNumber(int value) {
     switch (value) {
-      case 0: return HIT;
-      case 1: return MISS;
+      case 0: return SUCCESS;
+      case 1: return ERROR;
       default: return null;
     }
   }
 
-  public static com.google.protobuf.Internal.EnumLiteMap<CacheLookupResult>
+  public static com.google.protobuf.Internal.EnumLiteMap<CacheOperationStatus>
       internalGetValueMap() {
     return internalValueMap;
   }
   private static final com.google.protobuf.Internal.EnumLiteMap<
-      CacheLookupResult> internalValueMap =
-        new com.google.protobuf.Internal.EnumLiteMap<CacheLookupResult>() {
-          public CacheLookupResult findValueByNumber(int number) {
-            return CacheLookupResult.forNumber(number);
+      CacheOperationStatus> internalValueMap =
+        new com.google.protobuf.Internal.EnumLiteMap<CacheOperationStatus>() {
+          public CacheOperationStatus findValueByNumber(int number) {
+            return CacheOperationStatus.forNumber(number);
           }
         };
 
@@ -85,12 +85,12 @@ public enum CacheLookupResult
   }
   public static final com.google.protobuf.Descriptors.EnumDescriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(0);
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(1);
   }
 
-  private static final CacheLookupResult[] VALUES = values();
+  private static final CacheOperationStatus[] VALUES = values();
 
-  public static CacheLookupResult valueOf(
+  public static CacheOperationStatus valueOf(
       com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
     if (desc.getType() != getDescriptor()) {
       throw new java.lang.IllegalArgumentException(
@@ -104,10 +104,10 @@ public enum CacheLookupResult
 
   private final int value;
 
-  private CacheLookupResult(int value) {
+  private CacheOperationStatus(int value) {
     this.value = value;
   }
 
-  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CacheLookupResult)
+  // @@protoc_insertion_point(enum_scope:aperture.flowcontrol.check.v1.CacheOperationStatus)
 }
 

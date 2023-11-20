@@ -8,25 +8,25 @@ public interface CacheDeleteResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode code = 1 [json_name = "code"];</code>
-   * @return The enum numeric value on the wire for code.
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
+   * @return The enum numeric value on the wire for operationStatus.
    */
-  int getCodeValue();
+  int getOperationStatusValue();
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode code = 1 [json_name = "code"];</code>
-   * @return The code.
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
+   * @return The operationStatus.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getCode();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus();
 
   /**
-   * <code>string message = 2 [json_name = "message"];</code>
-   * @return The message.
+   * <code>string error = 2 [json_name = "error"];</code>
+   * @return The error.
    */
-  java.lang.String getMessage();
+  java.lang.String getError();
   /**
-   * <code>string message = 2 [json_name = "message"];</code>
-   * @return The bytes for message.
+   * <code>string error = 2 [json_name = "error"];</code>
+   * @return The bytes for error.
    */
   com.google.protobuf.ByteString
-      getMessageBytes();
+      getErrorBytes();
 }

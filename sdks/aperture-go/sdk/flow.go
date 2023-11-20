@@ -72,40 +72,26 @@ func (f *flow) SetStatus(statusCode FlowStatus) {
 	f.statusCode = statusCode
 }
 
-// GetCachedValueResponse is the response returned by CachedValue method.
-type GetCachedValueResponse struct {
-	Value        []byte
-	LookupResult string
-	ResponseCode string
-	Message      string
-}
-
 // CachedValue returns the cached value for the flow.
 func (f *flow) CachedValue() GetCachedValueResponse {
+  if f.err != nil {
+    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, f.err)
+  }
+  if f.checkResponse == nil {
+    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("check response is nil"))
+  }
 	cachedValue := f.checkResponse.GetCachedValue()
-	resp := GetCachedValueResponse{}
-	if cachedValue != nil {
-		resp.Value = cachedValue.Value
-		resp.LookupResult = cachedValue.LookupResult.String()
-		resp.ResponseCode = cachedValue.ResponseCode.String()
-		resp.Message = cachedValue.Message
-	}
-	return resp
-}
+  if cachedValue == nil {
+    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("cached value is nil"))
+  }
 
-// SetCachedValueResponse is the response returned by SetCachedValue method.
-type SetCachedValueResponse struct {
-	Error        error
-	ResponseCode string
-	Message      string
+  return newGetCachedValueResponse(cachedValue.Value, convertCacheLookupStatus(cachedValue.LookupStatus), convertCacheOperationStatus(cachedValue.OperationStatus), nil)
 }
 
 // SetCachedValue sets the cached value for the flow.
 func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Duration) SetCachedValueResponse {
-	resp := SetCachedValueResponse{}
-
 	if f.cacheKey == "" {
-		resp.Message = "cache key not set"
+    return newSetCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
 	}
 
 	ttlProto := durationpb.New(ttl)
@@ -116,39 +102,28 @@ func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Durati
 		Value:        value,
 		Ttl:          ttlProto,
 	})
+  if err != nil {
+    return newSetCachedValueResponse(OperationStatusError, err)
+  }
 
-	resp.Error = err
-	resp.Message = cacheUpsertResponse.GetMessage()
-	resp.ResponseCode = cacheUpsertResponse.GetCode().String()
-
-	return resp
-}
-
-// DeleteCachedValueResponse is the response returned by DeleteCachedValue method.
-type DeleteCachedValueResponse struct {
-	Error        error
-	ResponseCode string
-	Message      string
+	return newSetCachedValueResponse(convertCacheOperationStatus(cacheUpsertResponse.GetOperationStatus()), convertCacheError(cacheUpsertResponse.GetError()))
 }
 
 // DeleteCachedValue deletes the cached value for the flow.
 func (f *flow) DeleteCachedValue(ctx context.Context) DeleteCachedValueResponse {
-	resp := DeleteCachedValueResponse{}
-
 	if f.cacheKey == "" {
-		resp.Message = "cache key not set"
+    return newDeleteCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
 	}
 
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
 		ControlPoint: f.checkResponse.ControlPoint,
 		Key:          f.cacheKey,
 	})
+  if err != nil {
+    return newDeleteCachedValueResponse(OperationStatusError, err)
+  }
 
-	resp.Error = err
-	resp.Message = cacheDeleteResponse.GetMessage()
-	resp.ResponseCode = cacheDeleteResponse.GetCode().String()
-
-	return resp
+	return newDeleteCachedValueResponse(convertCacheOperationStatus(cacheDeleteResponse.GetOperationStatus()), convertCacheError(cacheDeleteResponse.GetError()))
 }
 
 // Error returns the error that occurred during the flow.

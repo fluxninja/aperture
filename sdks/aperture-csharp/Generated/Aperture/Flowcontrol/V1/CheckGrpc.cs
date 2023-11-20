@@ -52,6 +52,14 @@ namespace Aperture.Flowcontrol.Check.V1 {
     static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CheckRequest> __Marshaller_aperture_flowcontrol_check_v1_CheckRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CheckRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CheckResponse> __Marshaller_aperture_flowcontrol_check_v1_CheckResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CheckResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest> __Marshaller_aperture_flowcontrol_check_v1_CacheUpsertRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse> __Marshaller_aperture_flowcontrol_check_v1_CacheUpsertResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest> __Marshaller_aperture_flowcontrol_check_v1_CacheDeleteRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse> __Marshaller_aperture_flowcontrol_check_v1_CacheDeleteResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Aperture.Flowcontrol.Check.V1.CheckRequest, global::Aperture.Flowcontrol.Check.V1.CheckResponse> __Method_Check = new grpc::Method<global::Aperture.Flowcontrol.Check.V1.CheckRequest, global::Aperture.Flowcontrol.Check.V1.CheckResponse>(
@@ -60,6 +68,22 @@ namespace Aperture.Flowcontrol.Check.V1 {
         "Check",
         __Marshaller_aperture_flowcontrol_check_v1_CheckRequest,
         __Marshaller_aperture_flowcontrol_check_v1_CheckResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest, global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse> __Method_CacheUpsert = new grpc::Method<global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest, global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CacheUpsert",
+        __Marshaller_aperture_flowcontrol_check_v1_CacheUpsertRequest,
+        __Marshaller_aperture_flowcontrol_check_v1_CacheUpsertResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest, global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse> __Method_CacheDelete = new grpc::Method<global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest, global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "CacheDelete",
+        __Marshaller_aperture_flowcontrol_check_v1_CacheDeleteRequest,
+        __Marshaller_aperture_flowcontrol_check_v1_CacheDeleteResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -79,6 +103,18 @@ namespace Aperture.Flowcontrol.Check.V1 {
       /// <returns>The response to send back to the client (wrapped by a task).</returns>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       public virtual global::System.Threading.Tasks.Task<global::Aperture.Flowcontrol.Check.V1.CheckResponse> Check(global::Aperture.Flowcontrol.Check.V1.CheckRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse> CacheUpsert(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::System.Threading.Tasks.Task<global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse> CacheDelete(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -160,6 +196,46 @@ namespace Aperture.Flowcontrol.Check.V1 {
       {
         return CallInvoker.AsyncUnaryCall(__Method_Check, null, options, request);
       }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse CacheUpsert(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CacheUpsert(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse CacheUpsert(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CacheUpsert, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse> CacheUpsertAsync(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CacheUpsertAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse> CacheUpsertAsync(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CacheUpsert, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse CacheDelete(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CacheDelete(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse CacheDelete(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_CacheDelete, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse> CacheDeleteAsync(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return CacheDeleteAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse> CacheDeleteAsync(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_CacheDelete, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
       protected override FlowControlServiceClient NewInstance(ClientBaseConfiguration configuration)
@@ -174,7 +250,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public static grpc::ServerServiceDefinition BindService(FlowControlServiceBase serviceImpl)
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
-          .AddMethod(__Method_Check, serviceImpl.Check).Build();
+          .AddMethod(__Method_Check, serviceImpl.Check)
+          .AddMethod(__Method_CacheUpsert, serviceImpl.CacheUpsert)
+          .AddMethod(__Method_CacheDelete, serviceImpl.CacheDelete).Build();
     }
 
     /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the service binding logic.
@@ -185,6 +263,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public static void BindService(grpc::ServiceBinderBase serviceBinder, FlowControlServiceBase serviceImpl)
     {
       serviceBinder.AddMethod(__Method_Check, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Aperture.Flowcontrol.Check.V1.CheckRequest, global::Aperture.Flowcontrol.Check.V1.CheckResponse>(serviceImpl.Check));
+      serviceBinder.AddMethod(__Method_CacheUpsert, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest, global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse>(serviceImpl.CacheUpsert));
+      serviceBinder.AddMethod(__Method_CacheDelete, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest, global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse>(serviceImpl.CacheDelete));
     }
 
   }

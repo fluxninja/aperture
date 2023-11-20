@@ -334,20 +334,20 @@ func (m *CachedValue) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarint(dAtA, i, uint64(len(m.Message)))
+	if len(m.Error) > 0 {
+		i -= len(m.Error)
+		copy(dAtA[i:], m.Error)
+		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
 		dAtA[i] = 0x22
 	}
-	if m.ResponseCode != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.ResponseCode))
+	if m.OperationStatus != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.LookupResult != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.LookupResult))
+	if m.LookupStatus != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.LookupStatus))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -467,15 +467,15 @@ func (m *CacheUpsertResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarint(dAtA, i, uint64(len(m.Message)))
+	if len(m.Error) > 0 {
+		i -= len(m.Error)
+		copy(dAtA[i:], m.Error)
+		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.Code != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.Code))
+	if m.OperationStatus != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -559,15 +559,15 @@ func (m *CacheDeleteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarint(dAtA, i, uint64(len(m.Message)))
+	if len(m.Error) > 0 {
+		i -= len(m.Error)
+		copy(dAtA[i:], m.Error)
+		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.Code != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.Code))
+	if m.OperationStatus != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -1322,13 +1322,13 @@ func (m *CachedValue) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.LookupResult != 0 {
-		n += 1 + sov(uint64(m.LookupResult))
+	if m.LookupStatus != 0 {
+		n += 1 + sov(uint64(m.LookupStatus))
 	}
-	if m.ResponseCode != 0 {
-		n += 1 + sov(uint64(m.ResponseCode))
+	if m.OperationStatus != 0 {
+		n += 1 + sov(uint64(m.OperationStatus))
 	}
-	l = len(m.Message)
+	l = len(m.Error)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -1374,10 +1374,10 @@ func (m *CacheUpsertResponse) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Code != 0 {
-		n += 1 + sov(uint64(m.Code))
+	if m.OperationStatus != 0 {
+		n += 1 + sov(uint64(m.OperationStatus))
 	}
-	l = len(m.Message)
+	l = len(m.Error)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -1409,10 +1409,10 @@ func (m *CacheDeleteResponse) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Code != 0 {
-		n += 1 + sov(uint64(m.Code))
+	if m.OperationStatus != 0 {
+		n += 1 + sov(uint64(m.OperationStatus))
 	}
-	l = len(m.Message)
+	l = len(m.Error)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -2602,9 +2602,9 @@ func (m *CachedValue) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LookupResult", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LookupStatus", wireType)
 			}
-			m.LookupResult = 0
+			m.LookupStatus = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -2614,16 +2614,16 @@ func (m *CachedValue) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.LookupResult |= CacheLookupResult(b&0x7F) << shift
+				m.LookupStatus |= CacheLookupStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ResponseCode", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
-			m.ResponseCode = 0
+			m.OperationStatus = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -2633,14 +2633,14 @@ func (m *CachedValue) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ResponseCode |= CacheResponseCode(b&0x7F) << shift
+				m.OperationStatus |= CacheOperationStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2668,7 +2668,7 @@ func (m *CachedValue) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Message = string(dAtA[iNdEx:postIndex])
+			m.Error = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2916,9 +2916,9 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
-			m.Code = 0
+			m.OperationStatus = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -2928,14 +2928,14 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Code |= CacheResponseCode(b&0x7F) << shift
+				m.OperationStatus |= CacheOperationStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2963,7 +2963,7 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Message = string(dAtA[iNdEx:postIndex])
+			m.Error = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3133,9 +3133,9 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
-			m.Code = 0
+			m.OperationStatus = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -3145,14 +3145,14 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Code |= CacheResponseCode(b&0x7F) << shift
+				m.OperationStatus |= CacheOperationStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3180,7 +3180,7 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Message = string(dAtA[iNdEx:postIndex])
+			m.Error = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

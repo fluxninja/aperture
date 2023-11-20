@@ -93,20 +93,20 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
 	if h.cache == nil {
 		return &flowcontrolv1.CacheUpsertResponse{
-			Code:    flowcontrolv1.CacheResponseCode_ERROR,
-			Message: "cache is not enabled",
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           "cache is not enabled",
 		}, nil
 	}
 	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value, req.Ttl.AsDuration())
 	if err != nil {
 		return &flowcontrolv1.CacheUpsertResponse{
-			Code:    flowcontrolv1.CacheResponseCode_ERROR,
-			Message: err.Error(),
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           err.Error(),
 		}, nil
 	}
 
 	return &flowcontrolv1.CacheUpsertResponse{
-		Code: flowcontrolv1.CacheResponseCode_SUCCESS,
+		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
 	}, nil
 }
 
@@ -114,19 +114,19 @@ func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpser
 func (h *Handler) CacheDelete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
 	if h.cache == nil {
 		return &flowcontrolv1.CacheDeleteResponse{
-			Code:    flowcontrolv1.CacheResponseCode_ERROR,
-			Message: "cache is not enabled",
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           "cache is not enabled",
 		}, nil
 	}
 	err := h.cache.Delete(ctx, req.ControlPoint, req.Key)
 	if err != nil {
 		return &flowcontrolv1.CacheDeleteResponse{
-			Code:    flowcontrolv1.CacheResponseCode_ERROR,
-			Message: err.Error(),
+			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+			Error:           err.Error(),
 		}, nil
 	}
 
 	return &flowcontrolv1.CacheDeleteResponse{
-		Code: flowcontrolv1.CacheResponseCode_SUCCESS,
+		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
 	}, nil
 }

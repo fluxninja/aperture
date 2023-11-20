@@ -1,4 +1,16 @@
+import grpc from "@grpc/grpc-js";
+import { Duration } from "@grpc/grpc-js/build/src/duration.js";
 import { Span } from "@opentelemetry/api";
+import {
+  CachedValueResponse,
+  ConvertCacheError,
+  ConvertCacheLookupStatus,
+  ConvertCacheOperationStatus,
+  DeleteCachedValueResponse,
+  LookupStatus,
+  OperationStatus,
+  SetCachedValueResponse,
+} from "./cache.js";
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
@@ -7,18 +19,15 @@ import {
   SOURCE_LABEL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
-import grpc from "@grpc/grpc-js";
+import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
+import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
 import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
-import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
-import { Duration } from "@grpc/grpc-js/build/src/duration.js";
-import { CachedValueResponse, SetCachedValueResponse, DeleteCachedValueResponse, } from "./cache.js";
 
 export const FlowStatusEnum = {
   OK: "OK",
@@ -50,7 +59,8 @@ export class Flow {
   ShouldRun() {
     if (
       (!this.rampMode && this.checkResponse === null) ||
-      (this.checkResponse?.decisionType === _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED)
+      this.checkResponse?.decisionType ===
+        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -74,15 +84,23 @@ export class Flow {
         key: key,
         value: value,
         ttl: ttl,
-      }
-      this.fcsClient.CacheUpsert(cacheUpsertRequest, this.grpcCallOptions, (err, res) => {
-        const resp: SetCachedValueResponse = {
-          error: err ?? null,
-          code: res?.code.toString() ?? null,
-          message: res?.message ?? null,
-        };
-        resolve(resp);
-      });
+      };
+      this.fcsClient.CacheUpsert(
+        cacheUpsertRequest,
+        this.grpcCallOptions,
+        (err, res) => {
+          if (err) {
+            const resp = new SetCachedValueResponse(err, OperationStatus.Error);
+            resolve(resp);
+            return;
+          }
+          const resp = new SetCachedValueResponse(
+            ConvertCacheError(res?.error),
+            ConvertCacheOperationStatus(res?.operationStatus),
+          );
+          resolve(resp);
+        },
+      );
     });
   }
 
@@ -92,30 +110,54 @@ export class Flow {
     }
 
     const key = this.cacheKey;
-    return new Promise<DeleteCachedValueResponse | undefined>((resolve, reject) => {
-      const cacheDeleteRequest: CacheDeleteRequest = {
-        controlPoint: this.controlPoint,
-        key: key,
-      }
-      this.fcsClient.CacheDelete(cacheDeleteRequest, this.grpcCallOptions, (err, res) => {
-        const resp: DeleteCachedValueResponse = {
-          error: err ?? null,
-          code: res?.code.toString() ?? null,
-          message: res?.message ?? null,
+    return new Promise<DeleteCachedValueResponse | undefined>(
+      (resolve, reject) => {
+        const cacheDeleteRequest: CacheDeleteRequest = {
+          controlPoint: this.controlPoint,
+          key: key,
         };
-        resolve(resp);
-      });
-    });
+        this.fcsClient.CacheDelete(
+          cacheDeleteRequest,
+          this.grpcCallOptions,
+          (err, res) => {
+            if (err) {
+              const resp = new DeleteCachedValueResponse(
+                err,
+                OperationStatus.Error,
+              );
+              resolve(resp);
+              return;
+            }
+            const resp = new DeleteCachedValueResponse(
+              ConvertCacheError(res?.error),
+              ConvertCacheOperationStatus(res?.operationStatus),
+            );
+            resolve(resp);
+          },
+        );
+      },
+    );
   }
 
   CachedValue() {
-    const resp: CachedValueResponse = {
-      error: this.error ?? null,
-      lookupResult: this.checkResponse?.cachedValue?.lookupResult.toString() ?? null,
-      code: this.checkResponse?.cachedValue?.responseCode.toString() ?? null,
-      message: this.checkResponse?.cachedValue?.message ?? null,
-      value: this.checkResponse?.cachedValue?.value ?? null,
-    };
+    if (this.error) {
+      // invoke constructor of CachedValueResponse
+      const resp = new CachedValueResponse(
+        LookupStatus.Miss,
+        OperationStatus.Error,
+        this.error,
+        null,
+      );
+      return resp;
+    }
+    const resp = new CachedValueResponse(
+      ConvertCacheLookupStatus(this.checkResponse?.cachedValue?.lookupStatus),
+      ConvertCacheOperationStatus(
+        this.checkResponse?.cachedValue?.operationStatus,
+      ),
+      ConvertCacheError(this.checkResponse?.cachedValue?.error),
+      this.checkResponse?.cachedValue?.value ?? null,
+    );
     return resp;
   }
 
@@ -144,9 +186,15 @@ export class Flow {
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this.checkResponse as any;
 
-      localCheckResponse.start = this.protoTimestampToJSON(this.checkResponse.start);
-      localCheckResponse.end = this.protoTimestampToJSON(this.checkResponse.end);
-      localCheckResponse.waitTime = this.protoDurationToJSON(this.checkResponse.waitTime);
+      localCheckResponse.start = this.protoTimestampToJSON(
+        this.checkResponse.start,
+      );
+      localCheckResponse.end = this.protoTimestampToJSON(
+        this.checkResponse.end,
+      );
+      localCheckResponse.waitTime = this.protoDurationToJSON(
+        this.checkResponse.waitTime,
+      );
 
       // Walk through individual decisions and convert waitTime fields,
       // then add to localCheckResponse, preserving immutability.
@@ -162,7 +210,10 @@ export class Flow {
         localCheckResponse.limiterDecisions = decisions;
       }
 
-      this.span.setAttribute(CHECK_RESPONSE_LABEL, JSON.stringify(localCheckResponse));
+      this.span.setAttribute(
+        CHECK_RESPONSE_LABEL,
+        JSON.stringify(localCheckResponse),
+      );
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
@@ -170,7 +221,9 @@ export class Flow {
     this.span.end();
   }
 
-  private protoTimestampToJSON(timestamp: _google_protobuf_Timestamp__Output | null) {
+  private protoTimestampToJSON(
+    timestamp: _google_protobuf_Timestamp__Output | null,
+  ) {
     if (timestamp) {
       return new Date(
         Number(timestamp.seconds) * 1000 + timestamp.nanos / 1000000,
@@ -179,7 +232,9 @@ export class Flow {
     return timestamp;
   }
 
-  private protoDurationToJSON(duration: _google_protobuf_Duration__Output | null) {
+  private protoDurationToJSON(
+    duration: _google_protobuf_Duration__Output | null,
+  ) {
     if (duration) {
       return `${duration.seconds}.${duration.nanos}s`;
     }

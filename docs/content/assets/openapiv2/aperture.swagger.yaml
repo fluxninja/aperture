@@ -780,18 +780,18 @@ definitions:
         type: object
     CacheDeleteResponse:
         properties:
-            code:
-                $ref: '#/definitions/CacheResponseCode'
-            message:
+            error:
                 type: string
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
         type: object
-    CacheLookupResult:
+    CacheLookupStatus:
         default: HIT
         enum:
             - HIT
             - MISS
         type: string
-    CacheResponseCode:
+    CacheOperationStatus:
         default: SUCCESS
         enum:
             - SUCCESS
@@ -799,19 +799,19 @@ definitions:
         type: string
     CacheUpsertResponse:
         properties:
-            code:
-                $ref: '#/definitions/CacheResponseCode'
-            message:
+            error:
                 type: string
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
         type: object
     CachedValue:
         properties:
-            lookup_result:
-                $ref: '#/definitions/CacheLookupResult'
-            message:
+            error:
                 type: string
-            response_code:
-                $ref: '#/definitions/CacheResponseCode'
+            lookup_status:
+                $ref: '#/definitions/CacheLookupStatus'
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
             value:
                 format: byte
                 type: string

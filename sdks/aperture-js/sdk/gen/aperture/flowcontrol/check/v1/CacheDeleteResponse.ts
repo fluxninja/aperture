@@ -1,13 +1,13 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
-import type { CacheResponseCode as _aperture_flowcontrol_check_v1_CacheResponseCode, CacheResponseCode__Output as _aperture_flowcontrol_check_v1_CacheResponseCode__Output } from '../../../../aperture/flowcontrol/check/v1/CacheResponseCode';
+import type { CacheOperationStatus as _aperture_flowcontrol_check_v1_CacheOperationStatus, CacheOperationStatus__Output as _aperture_flowcontrol_check_v1_CacheOperationStatus__Output } from '../../../../aperture/flowcontrol/check/v1/CacheOperationStatus';
 
 export interface CacheDeleteResponse {
-  'code'?: (_aperture_flowcontrol_check_v1_CacheResponseCode);
-  'message'?: (string);
+  'operationStatus'?: (_aperture_flowcontrol_check_v1_CacheOperationStatus);
+  'error'?: (string);
 }
 
 export interface CacheDeleteResponse__Output {
-  'code': (_aperture_flowcontrol_check_v1_CacheResponseCode__Output);
-  'message': (string);
+  'operationStatus': (_aperture_flowcontrol_check_v1_CacheOperationStatus__Output);
+  'error': (string);
 }

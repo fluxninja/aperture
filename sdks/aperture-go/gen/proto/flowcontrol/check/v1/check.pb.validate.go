@@ -494,11 +494,11 @@ func (m *CachedValue) validate(all bool) error {
 
 	// no validation rules for Value
 
-	// no validation rules for LookupResult
+	// no validation rules for LookupStatus
 
-	// no validation rules for ResponseCode
+	// no validation rules for OperationStatus
 
-	// no validation rules for Message
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return CachedValueMultiError(errors)
@@ -736,9 +736,9 @@ func (m *CacheUpsertResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Code
+	// no validation rules for OperationStatus
 
-	// no validation rules for Message
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return CacheUpsertResponseMultiError(errors)
@@ -948,9 +948,9 @@ func (m *CacheDeleteResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Code
+	// no validation rules for OperationStatus
 
-	// no validation rules for Message
+	// no validation rules for Error
 
 	if len(errors) > 0 {
 		return CacheDeleteResponseMultiError(errors)

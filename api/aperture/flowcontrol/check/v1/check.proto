@@ -71,21 +71,21 @@ message CheckResponse {
   CachedValue cached_value = 15;
 }
 
-enum CacheLookupResult {
+enum CacheLookupStatus {
   HIT = 0;
   MISS = 1;
 }
 
-enum CacheResponseCode {
+enum CacheOperationStatus {
   SUCCESS = 0;
   ERROR = 1;
 }
 
 message CachedValue {
   bytes value = 1;
-  CacheLookupResult lookup_result = 2;
-  CacheResponseCode response_code = 3;
-  string message = 4;
+  CacheLookupStatus lookup_status = 2;
+  CacheOperationStatus operation_status = 3;
+  string error = 4;
 }
 
 message CacheUpsertRequest {
@@ -96,8 +96,8 @@ message CacheUpsertRequest {
 }
 
 message CacheUpsertResponse {
-  CacheResponseCode code = 1;
-  string message = 2;
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
 }
 
 message CacheDeleteRequest {
@@ -106,8 +106,8 @@ message CacheDeleteRequest {
 }
 
 message CacheDeleteResponse {
-  CacheResponseCode code = 1;
-  string message = 2;
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

@@ -175,21 +175,21 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		cachedBytes, err := e.cache.Get(ctx, controlPoint, cacheKey)
 		if err == nil {
 			response.CachedValue = &flowcontrolv1.CachedValue{
-				Value:        cachedBytes,
-				LookupResult: flowcontrolv1.CacheLookupResult_HIT,
-				ResponseCode: flowcontrolv1.CacheResponseCode_SUCCESS,
+				Value:           cachedBytes,
+				LookupStatus:    flowcontrolv1.CacheLookupStatus_HIT,
+				OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
 			}
 			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 			return
 		}
 		response.CachedValue = &flowcontrolv1.CachedValue{
-			LookupResult: flowcontrolv1.CacheLookupResult_MISS,
-			Message:      err.Error(),
+			LookupStatus: flowcontrolv1.CacheLookupStatus_MISS,
+			Error:        err.Error(),
 		}
 		if err == ErrCacheKeyNotFound {
-			response.CachedValue.ResponseCode = flowcontrolv1.CacheResponseCode_SUCCESS
+			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
 		} else {
-			response.CachedValue.ResponseCode = flowcontrolv1.CacheResponseCode_ERROR
+			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
 		}
 	}
 

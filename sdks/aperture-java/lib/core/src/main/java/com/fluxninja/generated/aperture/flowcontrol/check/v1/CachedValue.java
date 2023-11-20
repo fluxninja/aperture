@@ -17,9 +17,9 @@ private static final long serialVersionUID = 0L;
   }
   private CachedValue() {
     value_ = com.google.protobuf.ByteString.EMPTY;
-    lookupResult_ = 0;
-    responseCode_ = 0;
-    message_ = "";
+    lookupStatus_ = 0;
+    operationStatus_ = 0;
+    error_ = "";
   }
 
   @java.lang.Override
@@ -53,75 +53,75 @@ private static final long serialVersionUID = 0L;
     return value_;
   }
 
-  public static final int LOOKUP_RESULT_FIELD_NUMBER = 2;
-  private int lookupResult_ = 0;
+  public static final int LOOKUP_STATUS_FIELD_NUMBER = 2;
+  private int lookupStatus_ = 0;
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-   * @return The enum numeric value on the wire for lookupResult.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+   * @return The enum numeric value on the wire for lookupStatus.
    */
-  @java.lang.Override public int getLookupResultValue() {
-    return lookupResult_;
+  @java.lang.Override public int getLookupStatusValue() {
+    return lookupStatus_;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-   * @return The lookupResult.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+   * @return The lookupStatus.
    */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult getLookupResult() {
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.forNumber(lookupResult_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.UNRECOGNIZED : result;
-  }
-
-  public static final int RESPONSE_CODE_FIELD_NUMBER = 3;
-  private int responseCode_ = 0;
-  /**
-   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-   * @return The enum numeric value on the wire for responseCode.
-   */
-  @java.lang.Override public int getResponseCodeValue() {
-    return responseCode_;
-  }
-  /**
-   * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-   * @return The responseCode.
-   */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getResponseCode() {
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.forNumber(responseCode_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.UNRECOGNIZED : result;
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus getLookupStatus() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.forNumber(lookupStatus_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.UNRECOGNIZED : result;
   }
 
-  public static final int MESSAGE_FIELD_NUMBER = 4;
+  public static final int OPERATION_STATUS_FIELD_NUMBER = 3;
+  private int operationStatus_ = 0;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+   * @return The enum numeric value on the wire for operationStatus.
+   */
+  @java.lang.Override public int getOperationStatusValue() {
+    return operationStatus_;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+   * @return The operationStatus.
+   */
+  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.forNumber(operationStatus_);
+    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
+  }
+
+  public static final int ERROR_FIELD_NUMBER = 4;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object message_ = "";
+  private volatile java.lang.Object error_ = "";
   /**
-   * <code>string message = 4 [json_name = "message"];</code>
-   * @return The message.
+   * <code>string error = 4 [json_name = "error"];</code>
+   * @return The error.
    */
   @java.lang.Override
-  public java.lang.String getMessage() {
-    java.lang.Object ref = message_;
+  public java.lang.String getError() {
+    java.lang.Object ref = error_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      message_ = s;
+      error_ = s;
       return s;
     }
   }
   /**
-   * <code>string message = 4 [json_name = "message"];</code>
-   * @return The bytes for message.
+   * <code>string error = 4 [json_name = "error"];</code>
+   * @return The bytes for error.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getMessageBytes() {
-    java.lang.Object ref = message_;
+      getErrorBytes() {
+    java.lang.Object ref = error_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      message_ = b;
+      error_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -145,14 +145,14 @@ private static final long serialVersionUID = 0L;
     if (!value_.isEmpty()) {
       output.writeBytes(1, value_);
     }
-    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.HIT.getNumber()) {
-      output.writeEnum(2, lookupResult_);
+    if (lookupStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.HIT.getNumber()) {
+      output.writeEnum(2, lookupStatus_);
     }
-    if (responseCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.SUCCESS.getNumber()) {
-      output.writeEnum(3, responseCode_);
+    if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
+      output.writeEnum(3, operationStatus_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, message_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, error_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -167,16 +167,16 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBytesSize(1, value_);
     }
-    if (lookupResult_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.HIT.getNumber()) {
+    if (lookupStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.HIT.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, lookupResult_);
+        .computeEnumSize(2, lookupStatus_);
     }
-    if (responseCode_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.SUCCESS.getNumber()) {
+    if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(3, responseCode_);
+        .computeEnumSize(3, operationStatus_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, message_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, error_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -195,10 +195,10 @@ private static final long serialVersionUID = 0L;
 
     if (!getValue()
         .equals(other.getValue())) return false;
-    if (lookupResult_ != other.lookupResult_) return false;
-    if (responseCode_ != other.responseCode_) return false;
-    if (!getMessage()
-        .equals(other.getMessage())) return false;
+    if (lookupStatus_ != other.lookupStatus_) return false;
+    if (operationStatus_ != other.operationStatus_) return false;
+    if (!getError()
+        .equals(other.getError())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -212,12 +212,12 @@ private static final long serialVersionUID = 0L;
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + VALUE_FIELD_NUMBER;
     hash = (53 * hash) + getValue().hashCode();
-    hash = (37 * hash) + LOOKUP_RESULT_FIELD_NUMBER;
-    hash = (53 * hash) + lookupResult_;
-    hash = (37 * hash) + RESPONSE_CODE_FIELD_NUMBER;
-    hash = (53 * hash) + responseCode_;
-    hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
-    hash = (53 * hash) + getMessage().hashCode();
+    hash = (37 * hash) + LOOKUP_STATUS_FIELD_NUMBER;
+    hash = (53 * hash) + lookupStatus_;
+    hash = (37 * hash) + OPERATION_STATUS_FIELD_NUMBER;
+    hash = (53 * hash) + operationStatus_;
+    hash = (37 * hash) + ERROR_FIELD_NUMBER;
+    hash = (53 * hash) + getError().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -350,9 +350,9 @@ private static final long serialVersionUID = 0L;
       super.clear();
       bitField0_ = 0;
       value_ = com.google.protobuf.ByteString.EMPTY;
-      lookupResult_ = 0;
-      responseCode_ = 0;
-      message_ = "";
+      lookupStatus_ = 0;
+      operationStatus_ = 0;
+      error_ = "";
       return this;
     }
 
@@ -390,13 +390,13 @@ private static final long serialVersionUID = 0L;
         result.value_ = value_;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.lookupResult_ = lookupResult_;
+        result.lookupStatus_ = lookupStatus_;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.responseCode_ = responseCode_;
+        result.operationStatus_ = operationStatus_;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.message_ = message_;
+        result.error_ = error_;
       }
     }
 
@@ -447,14 +447,14 @@ private static final long serialVersionUID = 0L;
       if (other.getValue() != com.google.protobuf.ByteString.EMPTY) {
         setValue(other.getValue());
       }
-      if (other.lookupResult_ != 0) {
-        setLookupResultValue(other.getLookupResultValue());
+      if (other.lookupStatus_ != 0) {
+        setLookupStatusValue(other.getLookupStatusValue());
       }
-      if (other.responseCode_ != 0) {
-        setResponseCodeValue(other.getResponseCodeValue());
+      if (other.operationStatus_ != 0) {
+        setOperationStatusValue(other.getOperationStatusValue());
       }
-      if (!other.getMessage().isEmpty()) {
-        message_ = other.message_;
+      if (!other.getError().isEmpty()) {
+        error_ = other.error_;
         bitField0_ |= 0x00000008;
         onChanged();
       }
@@ -490,17 +490,17 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 10
             case 16: {
-              lookupResult_ = input.readEnum();
+              lookupStatus_ = input.readEnum();
               bitField0_ |= 0x00000002;
               break;
             } // case 16
             case 24: {
-              responseCode_ = input.readEnum();
+              operationStatus_ = input.readEnum();
               bitField0_ |= 0x00000004;
               break;
             } // case 24
             case 34: {
-              message_ = input.readStringRequireUtf8();
+              error_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000008;
               break;
             } // case 34
@@ -553,179 +553,179 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private int lookupResult_ = 0;
+    private int lookupStatus_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-     * @return The enum numeric value on the wire for lookupResult.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+     * @return The enum numeric value on the wire for lookupStatus.
      */
-    @java.lang.Override public int getLookupResultValue() {
-      return lookupResult_;
+    @java.lang.Override public int getLookupStatusValue() {
+      return lookupStatus_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-     * @param value The enum numeric value on the wire for lookupResult to set.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+     * @param value The enum numeric value on the wire for lookupStatus to set.
      * @return This builder for chaining.
      */
-    public Builder setLookupResultValue(int value) {
-      lookupResult_ = value;
+    public Builder setLookupStatusValue(int value) {
+      lookupStatus_ = value;
       bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-     * @return The lookupResult.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+     * @return The lookupStatus.
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult getLookupResult() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.forNumber(lookupResult_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult.UNRECOGNIZED : result;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus getLookupStatus() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.forNumber(lookupStatus_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
-     * @param value The lookupResult to set.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
+     * @param value The lookupStatus to set.
      * @return This builder for chaining.
      */
-    public Builder setLookupResult(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResult value) {
+    public Builder setLookupStatus(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus value) {
       if (value == null) {
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000002;
-      lookupResult_ = value.getNumber();
+      lookupStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupResult lookup_result = 2 [json_name = "lookupResult"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearLookupResult() {
+    public Builder clearLookupStatus() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      lookupResult_ = 0;
+      lookupStatus_ = 0;
       onChanged();
       return this;
     }
 
-    private int responseCode_ = 0;
+    private int operationStatus_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-     * @return The enum numeric value on the wire for responseCode.
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * @return The enum numeric value on the wire for operationStatus.
      */
-    @java.lang.Override public int getResponseCodeValue() {
-      return responseCode_;
+    @java.lang.Override public int getOperationStatusValue() {
+      return operationStatus_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-     * @param value The enum numeric value on the wire for responseCode to set.
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * @param value The enum numeric value on the wire for operationStatus to set.
      * @return This builder for chaining.
      */
-    public Builder setResponseCodeValue(int value) {
-      responseCode_ = value;
+    public Builder setOperationStatusValue(int value) {
+      operationStatus_ = value;
       bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-     * @return The responseCode.
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * @return The operationStatus.
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode getResponseCode() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.forNumber(responseCode_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode.UNRECOGNIZED : result;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.forNumber(operationStatus_);
+      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
-     * @param value The responseCode to set.
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * @param value The operationStatus to set.
      * @return This builder for chaining.
      */
-    public Builder setResponseCode(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheResponseCode value) {
+    public Builder setOperationStatus(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus value) {
       if (value == null) {
         throw new NullPointerException();
       }
       bitField0_ |= 0x00000004;
-      responseCode_ = value.getNumber();
+      operationStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheResponseCode response_code = 3 [json_name = "responseCode"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearResponseCode() {
+    public Builder clearOperationStatus() {
       bitField0_ = (bitField0_ & ~0x00000004);
-      responseCode_ = 0;
+      operationStatus_ = 0;
       onChanged();
       return this;
     }
 
-    private java.lang.Object message_ = "";
+    private java.lang.Object error_ = "";
     /**
-     * <code>string message = 4 [json_name = "message"];</code>
-     * @return The message.
+     * <code>string error = 4 [json_name = "error"];</code>
+     * @return The error.
      */
-    public java.lang.String getMessage() {
-      java.lang.Object ref = message_;
+    public java.lang.String getError() {
+      java.lang.Object ref = error_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        message_ = s;
+        error_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string message = 4 [json_name = "message"];</code>
-     * @return The bytes for message.
+     * <code>string error = 4 [json_name = "error"];</code>
+     * @return The bytes for error.
      */
     public com.google.protobuf.ByteString
-        getMessageBytes() {
-      java.lang.Object ref = message_;
+        getErrorBytes() {
+      java.lang.Object ref = error_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        message_ = b;
+        error_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string message = 4 [json_name = "message"];</code>
-     * @param value The message to set.
+     * <code>string error = 4 [json_name = "error"];</code>
+     * @param value The error to set.
      * @return This builder for chaining.
      */
-    public Builder setMessage(
+    public Builder setError(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      message_ = value;
+      error_ = value;
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>string message = 4 [json_name = "message"];</code>
+     * <code>string error = 4 [json_name = "error"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearMessage() {
-      message_ = getDefaultInstance().getMessage();
+    public Builder clearError() {
+      error_ = getDefaultInstance().getError();
       bitField0_ = (bitField0_ & ~0x00000008);
       onChanged();
       return this;
     }
     /**
-     * <code>string message = 4 [json_name = "message"];</code>
-     * @param value The bytes for message to set.
+     * <code>string error = 4 [json_name = "error"];</code>
+     * @param value The bytes for error to set.
      * @return This builder for chaining.
      */
-    public Builder setMessageBytes(
+    public Builder setErrorBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      message_ = value;
+      error_ = value;
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
