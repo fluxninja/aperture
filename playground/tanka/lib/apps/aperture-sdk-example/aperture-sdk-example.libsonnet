@@ -26,8 +26,7 @@ local defaults = {
     },
     app_port: 8080,
     agent: {
-      host: 'aperture-agent.aperture-agent.svc.cluster.local',
-      port: 8080,
+      address: 'aperture-agent.aperture-agent.svc.cluster.local:8080',
     },
   },
 };
@@ -45,8 +44,8 @@ function(values={}, environment={}) {
       ])
       + container.withEnvMap({
         APERTURE_APP_PORT: std.toString(_values.app_port),
-        APERTURE_AGENT_HOST: _values.agent.host,
-        APERTURE_AGENT_PORT: std.toString(_values.agent.port),
+        APERTURE_AGENT_ADDRESS: _values.agent.address,
+        APERTURE_AGENT_INSECURE: 'true',
       }),
     ])
     + deployment.metadata.withNamespace(_environment.namespace)
