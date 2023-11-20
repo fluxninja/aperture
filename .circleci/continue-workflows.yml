@@ -1284,7 +1284,7 @@ workflows:
           dockerfile: Dockerfile
           docker-image: aperture-csharp-example
           remote-repo: fluxninja/aperture-csharp
-          remote-repo-fingerprint: "5c:5a:cc:d8:51:30:a3:7c:42:91:5f:28:19:ec:e8:ce"
+          remote-repo-fingerprint: "fb:dc:4c:74:ad:08:9c:cb:c0:81:72:82:ed:14:e7:96"
 
   aperture-go:
     when:
