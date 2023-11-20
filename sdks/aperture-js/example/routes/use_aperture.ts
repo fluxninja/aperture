@@ -1,5 +1,5 @@
 import express from "express";
-import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
+import { ApertureClient, Flow, FlowStatusEnum, LookupStatus } from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
 
 
@@ -39,26 +39,27 @@ apertureRoute.get("/", async (_: express.Request, res: express.Response) => {
 
     if (flow.ShouldRun()) {
       await sleep(200);
-      console.log("Work done!");
+
+      if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
+        console.log("Cache hit:", flow.CachedValue().GetValue()?.toString());
+      } else {
+        console.log("Cache miss:", flow.CachedValue().GetOperationStatus(), flow.CachedValue().GetError()?.message);
+        const resString = "awesomeString";
+
+        // create a new buffer
+        const buffer = Buffer.from(resString);
+
+        // set cache value
+        const setResult = await flow.SetCachedValue(buffer, { seconds: 30, nanos: 0 })
+        if (setResult?.error) {
+          console.log(`Error setting cache value: ${setResult.error}`);
+        }
+      }
+
       res.sendStatus(202);
     } else {
       flow.SetStatus(FlowStatusEnum.Error);
       res.sendStatus(403);
-    }
-
-    // create a new buffer
-    const buffer = Buffer.from("awesomeString");
-
-    // set cache value
-    const setResult = await flow.SetCachedValue(buffer, { seconds: 30, nanos: 0 })
-    if (setResult?.error) {
-      console.log(`Error setting cache value: ${setResult.error}`);
-    }
-
-    // delete cache value
-    const deleteResult = await flow.DeleteCachedValue()
-    if (deleteResult?.error) {
-      console.log(`Error deleting cache value: ${deleteResult.error}`);
     }
   } catch (e) {
     console.log(e);
