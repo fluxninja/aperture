@@ -15,7 +15,7 @@ commonConfig {
       fill_amount: '__REQUIRED_FIELD__',
       selectors: commonConfig.selectors_defaults,
       parameters: {
-        limit_by_label_key: '',
+        limit_by_label_key: 'limit_key',
         interval: '__REQUIRED_FIELD__',
       },
       request_parameters: {},

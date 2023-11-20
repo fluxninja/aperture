@@ -34,7 +34,7 @@ policy:
     # Required: True
     rate_limiter:
       interval: __REQUIRED_FIELD__
-      limit_by_label_key: ""
+      limit_by_label_key: "limit_key"
     # Scheduler configuration.
     # Type: aperture.spec.v1.Scheduler
     scheduler:
