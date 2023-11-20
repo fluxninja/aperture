@@ -1,9 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
-import com.fluxninja.aperture.sdk.ApertureSDK;
-import com.fluxninja.aperture.sdk.Flow;
-import com.fluxninja.aperture.sdk.FlowDecision;
-import com.fluxninja.aperture.sdk.FlowStatus;
+import com.fluxninja.aperture.sdk.*;
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.RpcClient;
 import com.linecorp.armeria.client.SimpleDecoratingRpcClient;
@@ -53,7 +50,14 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
     @Override
     public RpcResponse execute(ClientRequestContext ctx, RpcRequest req) throws Exception {
         Map<String, String> labels = RpcUtils.labelsFromRequest(req);
-        Flow flow = this.apertureSDK.startFlow(this.controlPointName, labels, false, flowTimeout);
+
+        FeatureFlowParameters params =
+                FeatureFlowParameters.newBuilder("awesomeFeature")
+                        .setExplicitLabels(labels)
+                        .setRampMode(this.rampMode)
+                        .setFlowTimeout(this.flowTimeout)
+                        .build();
+        Flow flow = this.apertureSDK.startFlow(params);
 
         FlowDecision flowDecision = flow.getDecision();
         boolean flowAccepted =
