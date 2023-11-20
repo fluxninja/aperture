@@ -69,16 +69,16 @@ export const apertureClient = new ApertureClient({
 ```
 
 Once you have configured Aperture SDK, you can create a feature control point
-wherever you want in your code. Before executing the business logic of a
-specific API, you can create a feature control point that can control the
-execution flow of the API and can reject the request based on the policy defined
-in Aperture. The [Create Your First Policy](./policies/policies.md) section
-showcases how to define policy in Aperture. The code snippet below shows how to
-wrap your [Control Point](/concepts/control-point.md) within the `StartFlow`
-call and pass [labels](/concepts/flow-label.md) that will be matched with
-policy. The function `Flow.ShouldRun()` checks if the flow allows the request.
-The `Flow.End()` function is responsible for sending telemetry, and updating the
-specified cache entry within Aperture.
+anywhere within your code. Before executing the business logic of a specific
+API, you can create a feature control point that can control the execution flow
+of the API and can reject the request based on the policy defined in Aperture.
+The [Create Your First Policy](./policies/policies.md) section showcases how to
+define policy in Aperture. The code snippet below shows how to wrap your
+[Control Point](/concepts/control-point.md) within the `StartFlow` call and pass
+[labels](/concepts/flow-label.md) to Aperture Agents. The function
+`Flow.ShouldRun()` checks if the flow allows the request. The `Flow.End()`
+function is responsible for sending telemetry, and updating the specified cache
+entry within Aperture.
 
 Let's create a feature control point in the following code snippet.
 
@@ -88,19 +88,20 @@ Let's create a feature control point in the following code snippet.
 ```
 
 ```typescript
-async function handleFlow() {
+async function handleRequest(req, res) {
   const flow = await apertureClient.StartFlow("archimedes-service", {
     labels: {
-      label_key: "api_key",
-      interval: "60",
+      api_key: "some_api_key",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 1200000, // 20 minutes deadline
+      deadline: Date.now() + 300, // ms
     },
   });
 
   if (flow.ShouldRun()) {
     // Do Actual Work
+    // After completing the work, you can return a response, for example:
+    res.send({ message: "foo" });
   } else {
     // Handle flow rejection
     flow.SetStatus(FlowStatusEnum.Error);
