@@ -83,7 +83,7 @@ export class CachedValueResponse {
 
 export class SetCachedValueResponse {
   error: Error | null;
-  operationStatus: string | null;
+  operationStatus: OperationStatus;
 
   constructor(error: Error | null, operationStatus: OperationStatus) {
     this.error = error;
@@ -94,14 +94,14 @@ export class SetCachedValueResponse {
     return this.error;
   }
 
-  GetOperationStatus(): string | null {
+  GetOperationStatus(): OperationStatus {
     return this.operationStatus;
   }
 }
 
 export class DeleteCachedValueResponse {
   error: Error | null;
-  operationStatus: string | null;
+  operationStatus: OperationStatus;
 
   constructor(error: Error | null, operationStatus: OperationStatus) {
     this.error = error;
@@ -112,7 +112,7 @@ export class DeleteCachedValueResponse {
     return this.error;
   }
 
-  GetOperationStatus(): string | null {
+  GetOperationStatus(): OperationStatus {
     return this.operationStatus;
   }
 }
