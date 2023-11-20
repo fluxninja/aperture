@@ -54,11 +54,7 @@ func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
 // By default, fail-open behavior is enabled. Set rampMode to disable it.
 func (f *flow) ShouldRun() bool {
-	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkv1.CheckResponse_DECISION_TYPE_ACCEPTED) {
-		return true
-	} else {
-		return false
-	}
+	return (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.DecisionType == checkv1.CheckResponse_DECISION_TYPE_ACCEPTED)
 }
 
 // CheckResponse returns the response from the server.
@@ -74,24 +70,24 @@ func (f *flow) SetStatus(statusCode FlowStatus) {
 
 // CachedValue returns the cached value for the flow.
 func (f *flow) CachedValue() GetCachedValueResponse {
-  if f.err != nil {
-    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, f.err)
-  }
-  if f.checkResponse == nil {
-    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("check response is nil"))
-  }
+	if f.err != nil {
+		return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, f.err)
+	}
+	if f.checkResponse == nil {
+		return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("check response is nil"))
+	}
 	cachedValue := f.checkResponse.GetCachedValue()
-  if cachedValue == nil {
-    return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("cached value is nil"))
-  }
+	if cachedValue == nil {
+		return newGetCachedValueResponse(nil, LookupStatusMiss, OperationStatusError, errors.New("cached value is nil"))
+	}
 
-  return newGetCachedValueResponse(cachedValue.Value, convertCacheLookupStatus(cachedValue.LookupStatus), convertCacheOperationStatus(cachedValue.OperationStatus), nil)
+	return newGetCachedValueResponse(cachedValue.Value, convertCacheLookupStatus(cachedValue.LookupStatus), convertCacheOperationStatus(cachedValue.OperationStatus), nil)
 }
 
 // SetCachedValue sets the cached value for the flow.
 func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Duration) SetCachedValueResponse {
 	if f.cacheKey == "" {
-    return newSetCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
+		return newSetCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
 	}
 
 	ttlProto := durationpb.New(ttl)
@@ -102,9 +98,9 @@ func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Durati
 		Value:        value,
 		Ttl:          ttlProto,
 	})
-  if err != nil {
-    return newSetCachedValueResponse(OperationStatusError, err)
-  }
+	if err != nil {
+		return newSetCachedValueResponse(OperationStatusError, err)
+	}
 
 	return newSetCachedValueResponse(convertCacheOperationStatus(cacheUpsertResponse.GetOperationStatus()), convertCacheError(cacheUpsertResponse.GetError()))
 }
@@ -112,16 +108,16 @@ func (f *flow) SetCachedValue(ctx context.Context, value []byte, ttl time.Durati
 // DeleteCachedValue deletes the cached value for the flow.
 func (f *flow) DeleteCachedValue(ctx context.Context) DeleteCachedValueResponse {
 	if f.cacheKey == "" {
-    return newDeleteCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
+		return newDeleteCachedValueResponse(OperationStatusError, ErrCacheKeyNotSet)
 	}
 
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
 		ControlPoint: f.checkResponse.ControlPoint,
 		Key:          f.cacheKey,
 	})
-  if err != nil {
-    return newDeleteCachedValueResponse(OperationStatusError, err)
-  }
+	if err != nil {
+		return newDeleteCachedValueResponse(OperationStatusError, err)
+	}
 
 	return newDeleteCachedValueResponse(convertCacheOperationStatus(cacheDeleteResponse.GetOperationStatus()), convertCacheError(cacheDeleteResponse.GetError()))
 }
