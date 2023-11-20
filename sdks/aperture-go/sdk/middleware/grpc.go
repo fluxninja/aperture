@@ -2,44 +2,83 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
-	"time"
+	"regexp"
+	"strconv"
+	"strings"
 
-	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
-func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto.SocketAddress {
-	host, port := splitAddress(logger, addr.String())
-	protocol := checkhttpproto.SocketAddress_TCP
-	if addr.Network() == "udp" {
-		protocol = checkhttpproto.SocketAddress_UDP
+func socketAddressFromNetAddr(addr net.Addr) *checkhttpv1.SocketAddress {
+	host, port, err := net.SplitHostPort(addr.String())
+	if err != nil {
+		return nil
 	}
-	return &checkhttpproto.SocketAddress{
+
+	portU32, err := strconv.ParseUint(port, 10, 32)
+	if err != nil {
+		return nil
+	}
+
+	protocol := checkhttpv1.SocketAddress_TCP
+	if addr.Network() == "udp" {
+		protocol = checkhttpv1.SocketAddress_UDP
+	}
+	return &checkhttpv1.SocketAddress{
 		Address:  host,
 		Protocol: protocol,
-		Port:     port,
+		Port:     uint32(portU32),
 	}
 }
 
-// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
-func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels map[string]string, rampMode bool, timeout time.Duration) grpc.UnaryServerInterceptor {
-	if explicitLabels == nil {
-		explicitLabels = make(map[string]string)
+// NewGRPCMiddleware takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func NewGRPCMiddleware(client aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) (grpc.UnaryServerInterceptor, error) {
+	// Precompile the regex patterns for ignored paths
+	if middlewareParams.IgnoredPaths != nil {
+		compiledIgnoredPaths := make([]*regexp.Regexp, len(middlewareParams.IgnoredPaths))
+		for i, pattern := range middlewareParams.IgnoredPaths {
+			compiledPattern, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, err
+			} else {
+				compiledIgnoredPaths[i] = compiledPattern
+			}
+		}
+		middlewareParams.IgnoredPathsCompiled = compiledIgnoredPaths
 	}
 
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		checkreq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, explicitLabels, rampMode)
+	return GRPCUnaryInterceptor(client, controlPoint, middlewareParams), nil
+}
 
-		flow := c.StartHTTPFlow(ctx, checkreq, rampMode, timeout)
+// GRPCUnaryInterceptor takes a control point name and creates a UnaryInterceptor which can be used with gRPC server.
+func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewareParams aperture.MiddlewareParams) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		// If the path is ignored, skip the middleware
+		if middlewareParams.IgnoredPathsCompiled != nil {
+			for _, ignoredPath := range middlewareParams.IgnoredPathsCompiled {
+				if ignoredPath.MatchString(info.FullMethod) {
+					return handler(ctx, req)
+				}
+			}
+		}
+
+		checkReq := prepareCheckHTTPRequestForGRPC(ctx, req, c.GetLogger(), info.FullMethod, controlPoint, middlewareParams.FlowParams)
+
+		flow := c.StartHTTPFlow(ctx, checkReq, middlewareParams)
 		if flow.Error() != nil {
 			c.GetLogger().Info("Aperture flow control got error. Returned flow defaults to Allowed.", "flow.Error()", flow.Error().Error(), "flow.ShouldRun()", flow.ShouldRun())
 		}
@@ -54,17 +93,79 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, explicitLabels
 			}
 		}()
 
-		if flow.ShouldRun() {
-			// Simulate work being done
-			resp, err := handler(ctx, req)
-			return resp, err
-		} else {
+		if !flow.ShouldRun() {
 			rejectResp := flow.CheckResponse().GetDeniedResponse()
 			return nil, status.Error(
 				convertHTTPStatusToGRPC(rejectResp.GetStatus()),
 				fmt.Sprintf("Aperture rejected the request: %v", rejectResp.GetBody()),
 			)
 		}
+
+		return handler(ctx, req)
+	}
+}
+
+// PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
+func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, logger *slog.Logger, fullMethod string, controlPoint string, flowParams aperture.FlowParams) *checkhttpv1.CheckHTTPRequest {
+	labels := utils.LabelsFromCtx(ctx)
+
+	// override labels with explicit labels
+	for key, value := range flowParams.Labels {
+		labels[key] = value
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	authority := ""
+	scheme := ""
+	method := ""
+
+	if ok {
+		// override labels with labels from metadata
+		for key, value := range md {
+			labels[key] = strings.Join(value, ",")
+		}
+		getMetaValue := func(key string) string {
+			values := md.Get(key)
+			if len(values) > 0 {
+				return values[0]
+			}
+			return ""
+		}
+		authority = getMetaValue(":authority")
+		scheme = getMetaValue(":scheme")
+		method = getMetaValue(":method")
+	}
+
+	var sourceSocket *checkhttpv1.SocketAddress
+	if sourceAddr, ok := peer.FromContext(ctx); ok {
+		sourceSocket = socketAddressFromNetAddr(sourceAddr.Addr)
+	}
+	destinationSocket := &checkhttpv1.SocketAddress{
+		Address:  utils.GetLocalIP(),
+		Protocol: checkhttpv1.SocketAddress_TCP,
+		Port:     0,
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		logger.Error("Failed to marshal request body", "error", err)
+	}
+
+	return &checkhttpv1.CheckHTTPRequest{
+		Source:       sourceSocket,
+		Destination:  destinationSocket,
+		ControlPoint: controlPoint,
+		RampMode:     flowParams.RampMode,
+		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
+			Method:   method,
+			Path:     fullMethod,
+			Host:     authority,
+			Headers:  labels,
+			Scheme:   scheme,
+			Size:     -1,
+			Protocol: "HTTP/2",
+			Body:     string(body),
+		},
 	}
 }
 

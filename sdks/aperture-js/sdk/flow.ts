@@ -1,5 +1,16 @@
+import grpc from "@grpc/grpc-js";
+import { Duration } from "@grpc/grpc-js/build/src/duration.js";
 import { Span } from "@opentelemetry/api";
-
+import {
+  CachedValueResponse,
+  ConvertCacheError,
+  ConvertCacheLookupStatus,
+  ConvertCacheOperationStatus,
+  DeleteCachedValueResponse,
+  LookupStatus,
+  OperationStatus,
+  SetCachedValueResponse,
+} from "./cache.js";
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
@@ -8,13 +19,14 @@ import {
   SOURCE_LABEL,
   WORKLOAD_START_TIMESTAMP_LABEL,
 } from "./consts.js";
+import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
+import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
 import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
-
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
 export const FlowStatusEnum = {
@@ -29,9 +41,13 @@ export class Flow {
   private status: FlowStatus = FlowStatusEnum.OK;
 
   constructor(
+    private fcsClient: FlowControlServiceClient,
+    private grpcCallOptions: grpc.CallOptions,
+    private controlPoint: string,
     private span: Span,
     startDate: number,
     private rampMode: boolean = false,
+    private cacheKey: string | null = null,
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {
@@ -54,6 +70,95 @@ export class Flow {
 
   SetStatus(status: FlowStatus) {
     this.status = status;
+  }
+
+  async SetCachedValue(value: Buffer, ttl: Duration) {
+    if (!this.cacheKey) {
+      return Promise.reject(new Error("No cache key"));
+    }
+
+    const key = this.cacheKey;
+    return new Promise<SetCachedValueResponse | undefined>((resolve) => {
+      const cacheUpsertRequest: CacheUpsertRequest = {
+        controlPoint: this.controlPoint,
+        key: key,
+        value: value,
+        ttl: ttl,
+      };
+      this.fcsClient.CacheUpsert(
+        cacheUpsertRequest,
+        this.grpcCallOptions,
+        (err, res) => {
+          if (err) {
+            const resp = new SetCachedValueResponse(err, OperationStatus.Error);
+            resolve(resp);
+            return;
+          }
+          const resp = new SetCachedValueResponse(
+            ConvertCacheError(res?.error),
+            ConvertCacheOperationStatus(res?.operationStatus),
+          );
+          resolve(resp);
+        },
+      );
+    });
+  }
+
+  async DeleteCachedValue() {
+    if (!this.cacheKey) {
+      return Promise.reject(new Error("No cache key"));
+    }
+
+    const key = this.cacheKey;
+    return new Promise<DeleteCachedValueResponse | undefined>(
+      (resolve, reject) => {
+        const cacheDeleteRequest: CacheDeleteRequest = {
+          controlPoint: this.controlPoint,
+          key: key,
+        };
+        this.fcsClient.CacheDelete(
+          cacheDeleteRequest,
+          this.grpcCallOptions,
+          (err, res) => {
+            if (err) {
+              const resp = new DeleteCachedValueResponse(
+                err,
+                OperationStatus.Error,
+              );
+              resolve(resp);
+              return;
+            }
+            const resp = new DeleteCachedValueResponse(
+              ConvertCacheError(res?.error),
+              ConvertCacheOperationStatus(res?.operationStatus),
+            );
+            resolve(resp);
+          },
+        );
+      },
+    );
+  }
+
+  CachedValue() {
+    if (this.error) {
+      // invoke constructor of CachedValueResponse
+      const resp = new CachedValueResponse(
+        LookupStatus.Miss,
+        OperationStatus.Error,
+        this.error,
+        null,
+      );
+      return resp;
+    }
+    const resp = new CachedValueResponse(
+      ConvertCacheLookupStatus(this.checkResponse?.cachedValue?.lookupStatus),
+      ConvertCacheOperationStatus(
+        this.checkResponse?.cachedValue?.operationStatus,
+      ),
+      ConvertCacheError(this.checkResponse?.cachedValue?.error),
+      this.checkResponse?.cachedValue?.value ?? null,
+    );
+    return resp;
   }
 
   Error() {
@@ -80,6 +185,7 @@ export class Flow {
       // PR: https://github.com/protobufjs/protobuf.js/pull/1258
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this.checkResponse as any;
+
       localCheckResponse.start = this.protoTimestampToJSON(
         this.checkResponse.start,
       );
@@ -89,6 +195,7 @@ export class Flow {
       localCheckResponse.waitTime = this.protoDurationToJSON(
         this.checkResponse.waitTime,
       );
+
       // Walk through individual decisions and convert waitTime fields,
       // then add to localCheckResponse, preserving immutability.
       if (this.checkResponse.limiterDecisions) {
@@ -102,6 +209,7 @@ export class Flow {
         );
         localCheckResponse.limiterDecisions = decisions;
       }
+
       this.span.setAttribute(
         CHECK_RESPONSE_LABEL,
         JSON.stringify(localCheckResponse),
@@ -109,9 +217,7 @@ export class Flow {
     }
 
     this.span.setAttribute(FLOW_STATUS_LABEL, this.status);
-
     this.span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
-
     this.span.end();
   }
 

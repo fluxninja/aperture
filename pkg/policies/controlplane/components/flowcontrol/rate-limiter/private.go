@@ -65,14 +65,13 @@ func NewRateLimiterAndOptions(
 		decision:          &policysyncv1.RateLimiterDecision{},
 		policyReadAPI:     policyReadAPI,
 		decisionEtcdPaths: decisionEtcdPaths,
-		componentID:       componentID.String(),
+		componentID:       rateLimiterProto.GetParentComponentId(),
 	}
 	return rl, fx.Options(fx.Invoke(rl.setup)), nil
 }
 
 func (rl *rateLimiter) setup(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
 	rl.etcdClient = etcdClient
-
 	lifecycle.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
 			deleteEtcdPath := func(paths []string) {
@@ -80,7 +79,6 @@ func (rl *rateLimiter) setup(etcdClient *etcdclient.Client, lifecycle fx.Lifecyc
 					etcdClient.Delete(path)
 				}
 			}
-
 			deleteEtcdPath(rl.decisionEtcdPaths)
 			return nil
 		},

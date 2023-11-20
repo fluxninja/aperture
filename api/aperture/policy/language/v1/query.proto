@@ -43,7 +43,7 @@ message PromQL {
   //
   // :::info Usage with OpenTelemetry Metrics
   //
-  // Aperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.
+  // Aperture supports OpenTelemetry metrics. See [reference](/aperture-for-infra/integrations/metrics/metrics.md) for more details.
   //
   // :::
   string query_string = 2;

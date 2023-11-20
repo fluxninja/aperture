@@ -16,13 +16,19 @@ spec:
             fill_amount:
               constant_signal:
                 value: 25
+          out_ports:
+            accept_percentage:
+              signal_name: ACCEPT_PERCENTAGE
           rate_limiter:
             interval: 1s
-            label_key: http.request.header.api_key
             lazy_sync:
               enabled: false
               num_sync: 4
+            limit_by_label_key: http.request.header.api_key
           scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
             workloads:
             - label_matcher:
                 match_labels:
@@ -40,6 +46,23 @@ spec:
           - agent_group: default
             control_point: ingress
             service: service1-demo-app.demoapp.svc.cluster.local
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: ACCEPT_PERCENTAGE
+          rhs:
+            constant_signal:
+              value: 90
+        operator: gte
+        out_ports:
+          output:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+    - alerter:
+        in_ports:
+          alert:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+        parameters:
+          alert_name: More than 90% of requests are being rate limited
     evaluation_interval: 1s
   resources:
     flow_control:

@@ -336,6 +336,49 @@ func (m *FlowControl_Private) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+func (m *QuotaScheduler_Outs) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QuotaScheduler_Outs) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *QuotaScheduler_Outs) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.AcceptPercentage != nil {
+		size, err := m.AcceptPercentage.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *QuotaScheduler) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -365,6 +408,16 @@ func (m *QuotaScheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.OutPorts != nil {
+		size, err := m.OutPorts.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.Scheduler != nil {
 		size, err := m.Scheduler.MarshalToSizedBufferVT(dAtA[:i])
@@ -489,6 +542,16 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AdaptiveLoadScheduler != nil {
+		size, err := m.AdaptiveLoadScheduler.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.DelayInitialFill {
 		i--
 		if m.DelayInitialFill {
@@ -562,6 +625,13 @@ func (m *RateLimiter_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error
 		}
 		i--
 		dAtA[i] = 0x1a
+	}
+	if len(m.LimitByLabelKey) > 0 {
+		i -= len(m.LimitByLabelKey)
+		copy(dAtA[i:], m.LimitByLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.LimitByLabelKey)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if len(m.LabelKey) > 0 {
 		i -= len(m.LabelKey)
@@ -1196,6 +1266,13 @@ func (m *Scheduler) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.WorkloadLabelKey) > 0 {
+		i -= len(m.WorkloadLabelKey)
+		copy(dAtA[i:], m.WorkloadLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.WorkloadLabelKey)))
+		i--
+		dAtA[i] = 0x52
 	}
 	if m.DeniedResponseStatusCode != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.DeniedResponseStatusCode))
@@ -2492,10 +2569,10 @@ func (m *Sampler_Parameters) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			dAtA[i] = 0x1a
 		}
 	}
-	if len(m.LabelKey) > 0 {
-		i -= len(m.LabelKey)
-		copy(dAtA[i:], m.LabelKey)
-		i = encodeVarint(dAtA, i, uint64(len(m.LabelKey)))
+	if len(m.SessionLabelKey) > 0 {
+		i -= len(m.SessionLabelKey)
+		copy(dAtA[i:], m.SessionLabelKey)
+		i = encodeVarint(dAtA, i, uint64(len(m.SessionLabelKey)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -4073,6 +4150,20 @@ func (m *FlowControl_Private) SizeVT() (n int) {
 	}
 	return n
 }
+func (m *QuotaScheduler_Outs) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AcceptPercentage != nil {
+		l = m.AcceptPercentage.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *QuotaScheduler) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -4095,6 +4186,10 @@ func (m *QuotaScheduler) SizeVT() (n int) {
 	}
 	if m.Scheduler != nil {
 		l = m.Scheduler.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.OutPorts != nil {
+		l = m.OutPorts.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -4127,6 +4222,10 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
+	l = len(m.LimitByLabelKey)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
 	if m.Interval != nil {
 		if size, ok := interface{}(m.Interval).(interface {
 			SizeVT() int
@@ -4156,6 +4255,10 @@ func (m *RateLimiter_Parameters) SizeVT() (n int) {
 	}
 	if m.DelayInitialFill {
 		n += 2
+	}
+	if m.AdaptiveLoadScheduler != nil {
+		l = m.AdaptiveLoadScheduler.SizeVT()
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -4410,6 +4513,10 @@ func (m *Scheduler) SizeVT() (n int) {
 	}
 	if m.DeniedResponseStatusCode != 0 {
 		n += 1 + sov(uint64(m.DeniedResponseStatusCode))
+	}
+	l = len(m.WorkloadLabelKey)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -4844,7 +4951,7 @@ func (m *Sampler_Parameters) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.LabelKey)
+	l = len(m.SessionLabelKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -6126,6 +6233,93 @@ func (m *FlowControl) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *QuotaScheduler_Outs) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflow
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QuotaScheduler_Outs: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QuotaScheduler_Outs: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AcceptPercentage", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AcceptPercentage == nil {
+				m.AcceptPercentage = &OutPort{}
+			}
+			if err := m.AcceptPercentage.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *QuotaScheduler) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -6294,6 +6488,42 @@ func (m *QuotaScheduler) UnmarshalVT(dAtA []byte) error {
 				m.Scheduler = &Scheduler{}
 			}
 			if err := m.Scheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OutPorts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.OutPorts == nil {
+				m.OutPorts = &QuotaScheduler_Outs{}
+			}
+			if err := m.OutPorts.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -6470,6 +6700,38 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 			}
 			m.LabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitByLabelKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LimitByLabelKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Interval", wireType)
@@ -6634,6 +6896,42 @@ func (m *RateLimiter_Parameters) UnmarshalVT(dAtA []byte) error {
 				}
 			}
 			m.DelayInitialFill = bool(v != 0)
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdaptiveLoadScheduler", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AdaptiveLoadScheduler == nil {
+				m.AdaptiveLoadScheduler = &AdaptiveLoadScheduler{}
+			}
+			if err := m.AdaptiveLoadScheduler.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -8257,6 +8555,38 @@ func (m *Scheduler) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WorkloadLabelKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WorkloadLabelKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skip(dAtA[iNdEx:])
@@ -11230,7 +11560,7 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LabelKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionLabelKey", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -11258,7 +11588,7 @@ func (m *Sampler_Parameters) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LabelKey = string(dAtA[iNdEx:postIndex])
+			m.SessionLabelKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

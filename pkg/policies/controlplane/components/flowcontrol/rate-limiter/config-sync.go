@@ -51,17 +51,17 @@ func NewConfigSyncOptions(
 	return fx.Options(fx.Invoke(limiterSync.setupSync)), nil
 }
 
-func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
-	logger := limiterSync.policyReadAPI.GetStatusRegistry().GetLogger()
-	limiterSync.etcdClient = etcdClient
+func (rls *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lifecycle fx.Lifecycle) {
+	logger := rls.policyReadAPI.GetStatusRegistry().GetLogger()
+	rls.etcdClient = etcdClient
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			wrapper := &policysyncv1.RateLimiterWrapper{
-				RateLimiter: limiterSync.rateLimiterProto,
+				RateLimiter: rls.rateLimiterProto,
 				CommonAttributes: &policysyncv1.CommonAttributes{
-					PolicyName:  limiterSync.policyReadAPI.GetPolicyName(),
-					PolicyHash:  limiterSync.policyReadAPI.GetPolicyHash(),
-					ComponentId: limiterSync.componentID,
+					PolicyName:  rls.policyReadAPI.GetPolicyName(),
+					PolicyHash:  rls.policyReadAPI.GetPolicyHash(),
+					ComponentId: rls.componentID,
 				},
 			}
 			dat, err := proto.Marshal(wrapper)
@@ -69,7 +69,7 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 				logger.Error().Err(err).Msg("failed to marshal rate limiter config")
 				return err
 			}
-			for _, configEtcdPath := range limiterSync.configEtcdPaths {
+			for _, configEtcdPath := range rls.configEtcdPaths {
 				etcdClient.Put(configEtcdPath, string(dat))
 			}
 			return nil
@@ -80,8 +80,7 @@ func (limiterSync *rateLimiterSync) setupSync(etcdClient *etcdclient.Client, lif
 					etcdClient.Delete(path)
 				}
 			}
-
-			deleteEtcdPath(limiterSync.configEtcdPaths)
+			deleteEtcdPath(rls.configEtcdPaths)
 			return nil
 		},
 	})

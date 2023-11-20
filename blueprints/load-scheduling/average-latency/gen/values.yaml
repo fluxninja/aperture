@@ -4,11 +4,28 @@
 blueprint: load-scheduling/average-latency
 
 policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
   # Name of the policy.
   # Type: string
   # Required: True
   policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
   load_scheduling_core:
+    # Default configuration for setting dry run mode on Load Scheduler. In dry run mode, the Load Scheduler acts as a passthrough and does not throttle flows. This config can be updated at runtime without restarting the policy.
+    # Type: bool
+    dry_run: false
+    # Overload confirmation signals from kubelet.
+    # Type: kubelet_overload_confirmations
+    kubelet_overload_confirmations: {}
+    # List of overload confirmation criteria. Load scheduler can throttle flows when all of the specified overload confirmation criteria are met.
+    # Type: []overload_confirmation
+    overload_confirmations: []
     # Parameters for AIMD throttling strategy.
     # Type: aperture.spec.v1.AIMDLoadSchedulerParameters
     # Required: True
@@ -31,3 +48,12 @@ policy:
     flux_meter:
       selectors:
         - control_point: __REQUIRED_FIELD__
+    # Tolerance factor beyond which the service is considered to be in overloaded state. E.g. if the long-term average of latency is L and if the tolerance is T, then the service is considered to be in an overloaded state if the short-term average of latency is more than L*T.
+    # Type: float64
+    latency_tolerance_multiplier: 1.25
+    # Interval for long-term latency query, i.e., how far back in time the query is run. The value should be a string representing the duration in seconds.
+    # Type: string
+    long_term_query_interval: "1800s"
+    # Periodic interval for long-term latency query, i.e., how often the query is run. The value should be a string representing the duration in seconds.
+    # Type: string
+    long_term_query_periodic_interval: "30s"

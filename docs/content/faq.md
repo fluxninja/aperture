@@ -93,8 +93,9 @@ Controller][aperture-cloud-controller] instead of deploying your own.
 
 Yes, the Aperture Agent can be deployed in a non-containerized environment. The
 Aperture Agent is a binary that can be run on the
-[Supported Linux platforms](/self-hosting/supported-platforms.md). The
-installation steps are available [here](/self-hosting/agent/bare-metal.md).
+[Supported Linux platforms](/aperture-for-infra/supported-platforms.md). The
+installation steps are available
+[here](/aperture-for-infra/agent/bare-metal.md).
 
 Note: Aperture Cloud also provides a hosted Agent for SDK integration, allowing
 you to use it by API instead of deploying your own Aperture Agents.
@@ -107,11 +108,11 @@ With the following setup:
 
 - 1 node Kubernetes cluster
 - 1 Aperture Agent installed as a
-  [DaemonSet](/self-hosting/agent/kubernetes/operator/daemonset.md)
+  [DaemonSet](/aperture-for-infra/agent/kubernetes/operator/daemonset.md)
 - 1 policy with a [rate limiter][rate-limiter], a [load
   scheduler][load-scheduler] and a [flux meter][flux-meter]
 - 3 services in `demoapp` namespace instrumented using
-  [Istio Integration](/self-hosting/integrations/istio/istio.md)
+  [Istio Integration](/aperture-for-infra/integrations/istio/istio.md)
 - 5000 RPS at constant arrival rate over 30 minutes
 
 The following results were observed:
@@ -126,5 +127,5 @@ The following results were observed:
 [flux-meter]: /concepts/advanced/flux-meter.md
 [classifier]: /concepts/advanced/classifier.md
 [flow-label]: /concepts/flow-label.md
-[aperture-controller]: /self-hosting/architecture.md#aperture-controller
+[aperture-controller]: /aperture-for-infra/architecture.md#aperture-controller
 [aperture-cloud-controller]: /reference/fluxninja.md#cloud-controller

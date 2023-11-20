@@ -52,7 +52,7 @@ policy:
             fill_amount:
               signal_name: RATE_LIMIT
           parameters:
-            label_key: http.request.header.user_id
+            limit_by_label_key: http.request.header.user_id
             interval: 1s
   # Additional resources.
   # Type: aperture.spec.v1.Resources

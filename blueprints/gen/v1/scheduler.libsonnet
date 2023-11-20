@@ -31,6 +31,12 @@
   withTokensLabelKeyMixin(tokens_label_key):: {
     tokens_label_key+: tokens_label_key,
   },
+  withWorkloadLabelKey(workload_label_key):: {
+    workload_label_key: workload_label_key,
+  },
+  withWorkloadLabelKeyMixin(workload_label_key):: {
+    workload_label_key+: workload_label_key,
+  },
   withWorkloads(workloads):: {
     workloads:
       if std.isArray(workloads)

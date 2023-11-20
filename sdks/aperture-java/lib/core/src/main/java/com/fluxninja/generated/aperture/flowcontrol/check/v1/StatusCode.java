@@ -593,7 +593,7 @@ public enum StatusCode
   }
   public static final com.google.protobuf.Descriptors.EnumDescriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(0);
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.getDescriptor().getEnumTypes().get(2);
   }
 
   private static final StatusCode[] VALUES = values();

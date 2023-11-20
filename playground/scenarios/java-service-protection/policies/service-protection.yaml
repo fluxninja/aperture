@@ -53,7 +53,7 @@ policy:
                 match_labels:
                   user_type: crawler
           parameters:
-            label_key: user_id
+            limit_by_label_key: user_id
             interval: 1s
   # Additional resources.
   # Type: aperture.spec.v1.Resources

@@ -23,7 +23,7 @@ policy:
     # Required: True
     parameters:
       interval: 1s
-      label_key: "http.request.header.user_type"
+      limit_by_label_key: "http.request.header.user_type"
     # Flow selectors to match requests against
     # Type: []aperture.spec.v1.Selector
     # Required: True

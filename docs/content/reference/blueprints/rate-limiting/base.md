@@ -91,8 +91,8 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
 <ParameterDescription
     name='policy.rate_limiter.alerter'
     description='Alerter.'
-    type='Object (aperture.spec.v1.Alerter)'
-    reference='../../configuration/spec#alerter'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../configuration/spec#alerter-parameters'
     value='{"alert_name": "More than 90% of requests are being rate limited"}'
 />
 
@@ -135,7 +135,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     description='Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../configuration/spec#rate-limiter-parameters'
-    value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'
+    value='{"interval": "__REQUIRED_FIELD__", "limit_by_label_key": ""}'
 />
 
 <!-- vale on -->

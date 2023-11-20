@@ -1468,7 +1468,7 @@ definitions:
                     :::info
 
                     For list of available attributes in Envoy access logs, refer
-                    [Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
+                    [Envoy Filter](/aperture-for-infra/integrations/istio/istio.md#envoy-filter)
 
                     :::
 
@@ -1840,7 +1840,7 @@ definitions:
 
             :::info
 
-            See also [Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
+            See also [Get Started / Setup Integrations / Metrics](/aperture-for-infra/integrations/metrics/metrics.md).
 
             :::
         properties:
@@ -2888,7 +2888,7 @@ definitions:
 
                     :::info Usage with OpenTelemetry Metrics
 
-                    Aperture supports OpenTelemetry metrics. See [reference](/self-hosting/integrations/metrics/metrics.md) for more details.
+                    Aperture supports OpenTelemetry metrics. See [reference](/aperture-for-infra/integrations/metrics/metrics.md) for more details.
 
                     :::
                 type: string
@@ -2943,6 +2943,9 @@ definitions:
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
                 x-go-tag-validate: required
+            out_ports:
+                $ref: '#/definitions/QuotaSchedulerOuts'
+                description: Output ports for the _Quota Scheduler_ component.
             rate_limiter:
                 $ref: '#/definitions/RateLimiterParameters'
                 x-go-tag-validate: required
@@ -2959,6 +2962,13 @@ definitions:
             - in_ports
             - rate_limiter
             - selectors
+        type: object
+    QuotaSchedulerOuts:
+        description: Outputs for the _Quota Scheduler_ component.
+        properties:
+            accept_percentage:
+                $ref: '#/definitions/OutPort'
+                description: The percentage of flows being accepted by the _Quota Scheduler_.
         type: object
     RangeDrivenLoadScheduler:
         description: _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
@@ -3133,10 +3143,12 @@ definitions:
         properties:
             accept_percentage:
                 $ref: '#/definitions/OutPort'
-                description: The percentage of flows being accepted by the _Load Ramp_.
+                description: The percentage of flows being accepted by the _Rate Limiter_.
         type: object
     RateLimiterParameters:
         properties:
+            adaptive_load_scheduler:
+                $ref: '#/definitions/AdaptiveLoadScheduler'
             continuous_fill:
                 default: true
                 description: |+
@@ -3168,7 +3180,7 @@ definitions:
                 type: string
                 x-go-tag-validate: required
             label_key:
-                description: |-
+                description: |+
                     Specifies which label the rate limiter should be keyed by.
 
                     Rate limiting is done independently for each value of the
@@ -3178,10 +3190,26 @@ definitions:
                     label set up, set `label_key: "user"`.
                     If no label key is specified, then all requests matching the
                     selectors will be rate limited based on the global bucket.
+                    Deprecated: v2.25.0. Use _limit_by_label_key_ instead.
+
                 type: string
+                x-deprecated: true
+                x-go-tag-validate: deprecated
             lazy_sync:
                 $ref: '#/definitions/RateLimiterParametersLazySync'
                 title: Configuration of lazy-syncing behavior of rate limiter
+            limit_by_label_key:
+                description: |-
+                    Specifies which label the rate limiter should be keyed by.
+
+                    Rate limiting is done independently for each value of the
+                    [label](/concepts/flow-label.md) with given key.
+                    For example, to give each user a separate limit, assuming you
+                    have a _user_ flow
+                    label set up, set `limit_by_label_key: "user"`.
+                    If no label key is specified, then all requests matching the
+                    selectors will be rate limited based on the global bucket.
+                type: string
             max_idle_time:
                 default: 7200s
                 description: |+
@@ -3500,15 +3528,6 @@ definitions:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-            label_key:
-                description: |-
-                    The flow label key for identifying sessions.
-                    - When label key is specified, _Sampler_ acts as a sticky filter.
-                      The series of flows with the same value of label key get the same
-                      decision provided that the `accept_percentage` is same or higher.
-                    - When label key is not specified, _Sampler_ acts as a stateless filter.
-                      Percentage of flows are selected randomly for rejection.
-                type: string
             ramp_mode:
                 default: false
                 description: |+
@@ -3526,6 +3545,15 @@ definitions:
                 minItems: 1
                 type: array
                 x-go-tag-validate: required,gt=0,dive
+            session_label_key:
+                description: |-
+                    The flow label key for identifying sessions.
+                    - When label key is specified, _Sampler_ acts as a sticky filter.
+                      The series of flows with the same value of label key get the same
+                      decision provided that the `accept_percentage` is same or higher.
+                    - When label key is not specified, _Sampler_ acts as a stateless filter.
+                      Percentage of flows are selected randomly for rejection.
+                type: string
         required:
             - selectors
         type: object
@@ -3609,15 +3637,20 @@ definitions:
                 description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             priority_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default priority for this flow.
-                    * The value associated with this key must be a valid number. Higher numbers means higher priority.
-                    * If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
+                    Key for a flow label that can be used to override the default priority for this flow.
+                    The value associated with this key must be a valid number. Higher numbers means higher priority.
+                    If this parameter is not provided, the priority for the flow will be determined by the matched workload's priority.
                 type: string
             tokens_label_key:
                 description: |-
-                    * Key for a flow label that can be used to override the default number of tokens for this request.
-                    * The value associated with this key must be a valid number.
-                    * If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+                    Key for a flow label that can be used to override the default number of tokens for this request.
+                    The value associated with this key must be a valid number.
+                    If this parameter is not provided, the number of tokens for the flow will be determined by the matched workload's token count.
+                type: string
+            workload_label_key:
+                description: |-
+                    Key for a flow label that can be used to provide workloads for this request.
+                    If this parameter is not provided, the workloads for the flow will be determined by the matched workload's name in the policy.
                 type: string
             workloads:
                 description: |+

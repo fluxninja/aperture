@@ -55,7 +55,7 @@ policy:
             denied_response_status_code: BadRequest
           parameters:
             interval: "1s"
-            label_key: http.request.header.user_id
+            limit_by_label_key: http.request.header.user_id
             lazy_sync:
               enabled: true
               num_sync: 4

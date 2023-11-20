@@ -7,12 +7,6 @@
   withDeniedResponseStatusCodeMixin(denied_response_status_code):: {
     denied_response_status_code+: denied_response_status_code,
   },
-  withLabelKey(label_key):: {
-    label_key: label_key,
-  },
-  withLabelKeyMixin(label_key):: {
-    label_key+: label_key,
-  },
   withRampMode(ramp_mode):: {
     ramp_mode: ramp_mode,
   },
@@ -27,5 +21,11 @@
   },
   withSelectorsMixin(selectors):: {
     selectors+: selectors,
+  },
+  withSessionLabelKey(session_label_key):: {
+    session_label_key: session_label_key,
+  },
+  withSessionLabelKeyMixin(session_label_key):: {
+    session_label_key+: session_label_key,
   },
 }

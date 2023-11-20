@@ -3490,7 +3490,7 @@ meter is read.
 :::info
 
 For list of available attributes in Envoy access logs, refer
-[Envoy Filter](/self-hosting/integrations/istio/istio.md#envoy-filter)
+[Envoy Filter](/aperture-for-infra/integrations/istio/istio.md#envoy-filter)
 
 :::
 
@@ -4310,7 +4310,7 @@ configuration using format `${ENV_VAR_NAME}`.
 :::info
 
 See also
-[Get Started / Setup Integrations / Metrics](/self-hosting/integrations/metrics/metrics.md).
+[Get Started / Setup Integrations / Metrics](/aperture-for-infra/integrations/metrics/metrics.md).
 
 :::
 
@@ -6871,7 +6871,8 @@ There are additional labels available on a Flux Meter such as `valid`,
 :::info Usage with OpenTelemetry Metrics
 
 Aperture supports OpenTelemetry metrics. See
-[reference](/self-hosting/integrations/metrics/metrics.md) for more details.
+[reference](/aperture-for-infra/integrations/metrics/metrics.md) for more
+details.
 
 :::
 
@@ -7031,6 +7032,18 @@ Schedules the traffic based on token-bucket based quotas.
 <!-- vale on -->
 
 </dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([QuotaSchedulerOuts](#quota-scheduler-outs))
+
+<!-- vale on -->
+
+Output ports for the _Quota Scheduler_ component.
+
+</dd>
 <dt>rate_limiter</dt>
 <dd>
 
@@ -7059,6 +7072,31 @@ Schedules the traffic based on token-bucket based quotas.
 ([[]Selector](#selector), **required**)
 
 <!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### QuotaSchedulerOuts {#quota-scheduler-outs}
+
+<!-- vale on -->
+
+Outputs for the _Quota Scheduler_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Quota Scheduler_.
 
 </dd>
 </dl>
@@ -7487,7 +7525,7 @@ Outputs for the _Rate Limiter_ component.
 
 <!-- vale on -->
 
-The percentage of flows being accepted by the _Load Ramp_.
+The percentage of flows being accepted by the _Rate Limiter_.
 
 </dd>
 </dl>
@@ -7501,6 +7539,16 @@ The percentage of flows being accepted by the _Load Ramp_.
 <!-- vale on -->
 
 <dl>
+<dt>adaptive_load_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([AdaptiveLoadScheduler](#adaptive-load-scheduler))
+
+<!-- vale on -->
+
+</dd>
 <dt>continuous_fill</dt>
 <dd>
 
@@ -7554,7 +7602,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-(string)
+(string, **DEPRECATED**)
 
 <!-- vale on -->
 
@@ -7564,7 +7612,8 @@ Rate limiting is done independently for each value of the
 [label](/concepts/flow-label.md) with given key. For example, to give each user
 a separate limit, assuming you have a _user_ flow label set up, set
 `label_key: "user"`. If no label key is specified, then all requests matching
-the selectors will be rate limited based on the global bucket.
+the selectors will be rate limited based on the global bucket. Deprecated:
+v2.25.0. Use _limit_by_label_key_ instead.
 
 </dd>
 <dt>lazy_sync</dt>
@@ -7577,6 +7626,24 @@ the selectors will be rate limited based on the global bucket.
 <!-- vale on -->
 
 Configuration of lazy-syncing behavior of rate limiter
+
+</dd>
+<dt>limit_by_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Specifies which label the rate limiter should be keyed by.
+
+Rate limiting is done independently for each value of the
+[label](/concepts/flow-label.md) with given key. For example, to give each user
+a separate limit, assuming you have a _user_ flow label set up, set
+`limit_by_label_key: "user"`. If no label key is specified, then all requests
+matching the selectors will be rate limited based on the global bucket.
 
 </dd>
 <dt>max_idle_time</dt>
@@ -8189,24 +8256,6 @@ This field allows you to override the default HTTP status code
 (`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
-<dt>label_key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The flow label key for identifying sessions.
-
-- When label key is specified, _Sampler_ acts as a sticky filter. The series of
-  flows with the same value of label key get the same decision provided that the
-  `accept_percentage` is same or higher.
-- When label key is not specified, _Sampler_ acts as a stateless filter.
-  Percentage of flows are selected randomly for rejection.
-
-</dd>
 <dt>ramp_mode</dt>
 <dd>
 
@@ -8229,6 +8278,24 @@ Ramp component can accept flows with `ramp_mode` flag set.
 <!-- vale on -->
 
 Selectors for the component.
+
+</dd>
+<dt>session_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The flow label key for identifying sessions.
+
+- When label key is specified, _Sampler_ acts as a sticky filter. The series of
+  flows with the same value of label key get the same decision provided that the
+  `accept_percentage` is same or higher.
+- When label key is not specified, _Sampler_ acts as a stateless filter.
+  Percentage of flows are selected randomly for rejection.
 
 </dd>
 </dl>
@@ -8433,12 +8500,10 @@ This field allows you to override the default HTTP status code
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default priority for
-  this flow.
-- The value associated with this key must be a valid number. Higher numbers
-  means higher priority.
-- If this parameter is not provided, the priority for the flow will be
-  determined by the matched workload's priority.
+Key for a flow label that can be used to override the default priority for this
+flow. The value associated with this key must be a valid number. Higher numbers
+means higher priority. If this parameter is not provided, the priority for the
+flow will be determined by the matched workload's priority.
 
 </dd>
 <dt>tokens_label_key</dt>
@@ -8450,11 +8515,24 @@ This field allows you to override the default HTTP status code
 
 <!-- vale on -->
 
-- Key for a flow label that can be used to override the default number of tokens
-  for this request.
-- The value associated with this key must be a valid number.
-- If this parameter is not provided, the number of tokens for the flow will be
-  determined by the matched workload's token count.
+Key for a flow label that can be used to override the default number of tokens
+for this request. The value associated with this key must be a valid number. If
+this parameter is not provided, the number of tokens for the flow will be
+determined by the matched workload's token count.
+
+</dd>
+<dt>workload_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Key for a flow label that can be used to provide workloads for this request. If
+this parameter is not provided, the workloads for the flow will be determined by
+the matched workload's name in the policy.
 
 </dd>
 <dt>workloads</dt>

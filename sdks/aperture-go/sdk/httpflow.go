@@ -4,12 +4,13 @@ import (
 	"errors"
 	"time"
 
-	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 )
 
 // HTTPFlow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
@@ -20,26 +21,26 @@ type HTTPFlow interface {
 	Error() error
 	Span() trace.Span
 	End() error
-	CheckResponse() *checkhttpproto.CheckHTTPResponse
+	CheckResponse() *checkhttpv1.CheckHTTPResponse
 }
 
 type httpflow struct {
 	span          trace.Span
-	checkResponse *checkhttpproto.CheckHTTPResponse
+	err           error
+	checkResponse *checkhttpv1.CheckHTTPResponse
+	flowParams    FlowParams
 	statusCode    FlowStatus
 	ended         bool
-	rampMode      bool
-	err           error
 }
 
 // newFlow creates a new flow with default field values.
-func newHTTPFlow(span trace.Span, rampMode bool) *httpflow {
+func newHTTPFlow(span trace.Span, flowParams FlowParams) *httpflow {
 	return &httpflow{
 		span:          span,
 		checkResponse: nil,
 		statusCode:    OK,
 		ended:         false,
-		rampMode:      rampMode,
+		flowParams:    flowParams,
 		err:           nil,
 	}
 }
@@ -47,7 +48,7 @@ func newHTTPFlow(span trace.Span, rampMode bool) *httpflow {
 // ShouldRun returns whether the Flow was allowed to run by Aperture Agent.
 // By default, fail-open behavior is enabled. Set rampMode to disable it.
 func (f *httpflow) ShouldRun() bool {
-	if (!f.rampMode && f.checkResponse == nil) || (f.checkResponse.Status.Code == int32(code.Code_OK)) {
+	if (!f.flowParams.RampMode && f.checkResponse == nil) || (f.checkResponse.Status.Code == int32(code.Code_OK)) {
 		return true
 	} else {
 		return false
@@ -55,7 +56,7 @@ func (f *httpflow) ShouldRun() bool {
 }
 
 // CheckResponse returns the response from the server.
-func (f *httpflow) CheckResponse() *checkhttpproto.CheckHTTPResponse {
+func (f *httpflow) CheckResponse() *checkhttpv1.CheckHTTPResponse {
 	return f.checkResponse
 }
 

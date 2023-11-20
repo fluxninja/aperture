@@ -4,7 +4,7 @@
   "needs": ["istio", "elasticsearch"],
   "aperture_policies": [
     {
-      "policy_name": "service1-demoapp-elasticsearch-overload",
+      "policy_name": "elasticsearch-overload",
       "values_file": "policies/elasticsearch-overload.yaml"
     }
   ],

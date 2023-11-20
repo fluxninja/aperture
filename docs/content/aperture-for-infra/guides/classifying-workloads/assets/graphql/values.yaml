@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../../../../../../blueprints/rate-limiting/base/gen/definitions.json
+blueprint: rate-limiting/base
+uri: ../../../../../../../blueprints
+policy:
+  policy_name: "graphql-rate-limiting"
+  rate_limiter:
+    bucket_capacity: 40
+    fill_amount: 2
+    selectors:
+      - control_point: ingress
+        service: todo-service.svc.cluster.local
+    parameters:
+      limit_by_label_key: user_id
+      interval: 1s
+  resources:
+    flow_control:
+      classifiers:
+        - selectors:
+            - control_point: ingress
+              service: todo-service.svc.cluster.local
+          rego:
+            labels:
+              user_id:
+                telemetry: true
+            module: |
+              package graphql_example
+              import future.keywords.if
+              query_ast := graphql.parse_query(input.parsed_body.query)
+              claims := payload if {
+                io.jwt.verify_hs256(bearer_token, "secret")
+                [_, payload, _] := io.jwt.decode(bearer_token)
+              }
+              bearer_token := t if {
+                v := input.attributes.request.http.headers.authorization
+                startswith(v, "Bearer ")
+                t := substring(v, count("Bearer "), -1)
+              }
+              queryIsCreateTodo if {
+                some operation
+                walk(query_ast, [_, operation])
+                operation.Name == "createTodo"
+                count(operation.SelectionSet) > 0
+                some selection
+                walk(operation.SelectionSet, [_, selection])
+                selection.Name == "createTodo"
+              }
+              user_id := u if {
+                queryIsCreateTodo
+                u := claims.userID
+              }

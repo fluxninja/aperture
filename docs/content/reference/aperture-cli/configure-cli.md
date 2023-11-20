@@ -34,6 +34,6 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 :::
 
-[self-hosted]: /self-hosting/self-hosting.md
+[self-hosted]: /aperture-for-infra/aperture-for-infra.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
 [api-keys]: /reference/aperture-cli/personal-api-keys.md

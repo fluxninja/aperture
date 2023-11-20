@@ -1,24 +1,15 @@
 flowchart LR
-classDef TokenBucket fill:#F8773D, stroke:#000000,stroke-width:2px;
-classDef Agent fill:#56AE89,stroke:#000000,stroke-width:2px;
-classDef Signal fill:#EFEEED,stroke:#000000,stroke-width:1px;
+classDef TokenBucket fill:#F8773D,stroke:#000000,stroke-width:2px;
 classDef Service fill:#56AE89,stroke:#000000,stroke-width:2px;
 
-Forward("Bucket Capacity") --> TB
-Reset("Fill Amount") --> TB
-
+subgraph Cloud
 TB[\Token Bucket/]
 class TB TokenBucket
+end
+class Cloud Service
 
-TB <-- "Counting" --> Agents
+TB <-- "counting tokens" --> SDK
 
-subgraph " "
-Client -- "req/s" --> Agents
-class Client Service
-  subgraph "Agents"
+  subgraph "SDK"
   end
-  class Agents Agent
-  Agents --> Server
-  Agents --> Server
-  class Server Service
-  end
+  class SDK Service

@@ -86,6 +86,20 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <!-- vale off -->
 
+<a id="policy-quota-scheduler-alerter"></a>
+
+<ParameterDescription
+    name='policy.quota_scheduler.alerter'
+    description='Alerter.'
+    type='Object (aperture.spec.v1.AlerterParameters)'
+    reference='../../configuration/spec#alerter-parameters'
+    value='{"alert_name": "More than 90% of requests are being rate limited"}'
+/>
+
+<!-- vale on -->
+
+<!-- vale off -->
+
 <a id="policy-quota-scheduler-bucket-capacity"></a>
 
 <ParameterDescription
@@ -121,7 +135,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Rate Limiter Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../configuration/spec#rate-limiter-parameters'
-    value='{"interval": "__REQUIRED_FIELD__", "label_key": ""}'
+    value='{"interval": "__REQUIRED_FIELD__", "limit_by_label_key": ""}'
 />
 
 <!-- vale on -->
@@ -135,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Scheduler configuration.'
     type='Object (aperture.spec.v1.Scheduler)'
     reference='../../configuration/spec#scheduler'
-    value='{}'
+    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
 />
 
 <!-- vale on -->
@@ -146,7 +160,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <ParameterDescription
     name='policy.quota_scheduler.selectors'
-    description='Flow selectors to match requests against'
+    description='Flow selectors to match requests against.'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../configuration/spec#selector'
     value='[{"control_point": "__REQUIRED_FIELD__"}]'

@@ -9,20 +9,19 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/go-logr/stdr"
 	"github.com/gorilla/mux"
-	"github.com/spf13/cast"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
-	aperturego "github.com/fluxninja/aperture-go/v2/sdk"
-	aperturegomiddleware "github.com/fluxninja/aperture-go/v2/sdk/middleware"
+	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	"github.com/fluxninja/aperture-go/v2/sdk/middleware"
 )
 
 const (
@@ -33,7 +32,7 @@ const (
 // app struct contains the server and the Aperture client.
 type app struct {
 	server         *http.Server
-	apertureClient aperturego.Client
+	apertureClient aperture.Client
 }
 
 // grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
@@ -63,16 +62,20 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 func main() {
 	ctx := context.Background()
 
-	stdr.SetVerbosity(2)
+	apertureAgentAddr := getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress)
+	apertureAgentInsecure := getEnvOrDefault("APERTURE_AGENT_INSECURE", "false")
+	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
+	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
+	apertureAgentSkipVerifyBool, _ := strconv.ParseBool(apertureAgentSkipVerify)
 
-	opts := aperturego.Options{
-		Address:     getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress),
-		DialOptions: grpcOptions(getBoolEnvOrDefault("APERTURE_AGENT_INSECURE", false), getBoolEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", false)),
+	opts := aperture.Options{
+		Address:     apertureAgentAddr,
+		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
 		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.
-	apertureClient, err := aperturego.NewClient(ctx, opts)
+	apertureClient, err := aperture.NewClient(ctx, opts)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -91,7 +94,16 @@ func main() {
 	// Adding the http middleware to be executed before the actual business logic execution.
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
-	superRouter.Use(aperturegomiddleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", nil, nil, false, 2000*time.Millisecond).Handle)
+
+	middlewareParams := aperture.MiddlewareParams{
+		Timeout: 2000 * time.Millisecond,
+	}
+
+	m, err := middleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams)
+	if err != nil {
+		log.Fatalf("failed to create HTTP middleware: %v", err)
+	}
+	superRouter.Use(m.Handle)
 
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
@@ -139,15 +151,7 @@ func (a *app) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("Healthy"))
 }
 
-func getBoolEnvOrDefault(envName string, defaultValue bool) bool {
-	val := os.Getenv(envName)
-	if val == "" {
-		return defaultValue
-	}
-	return cast.ToBool(val)
-}
-
-func getEnvOrDefault(envName, defaultValue string) string {
+func getEnvOrDefault(envName string, defaultValue string) string {
 	val := os.Getenv(envName)
 	if val == "" {
 		return defaultValue

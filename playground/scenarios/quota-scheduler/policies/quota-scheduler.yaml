@@ -15,7 +15,7 @@ policy:
         service: service1-demo-app.demoapp.svc.cluster.local
         control_point: ingress
     rate_limiter:
-      label_key: http.request.header.api_key
+      limit_by_label_key: http.request.header.api_key
       interval: 1s
       lazy_sync:
         enabled: false

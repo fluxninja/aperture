@@ -27,4 +27,5 @@ HEALTHCHECK --interval=5s --timeout=60s --retries=3 --start-period=5s \
 # uncomment to enable grpc debug logging
 #ENV GRPC_VERBOSITY=DEBUG
 #ENV GRPC_TRACE=all
+ENV APERTURE_AGENT_INSECURE=true
 CMD [ "node", "./example/dist/example.js" ]

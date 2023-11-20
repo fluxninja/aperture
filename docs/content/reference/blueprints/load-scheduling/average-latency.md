@@ -52,7 +52,7 @@ component that is used within this blueprint.
 :::info
 
 See the use-case
-[Adaptive Service Protection with Average Latency Feedback](/guides/service-load-management/service-load-management.md)
+[Adaptive Service Protection with Average Latency Feedback](/aperture-for-infra/guides/service-load-management/service-load-management.md)
 to see this blueprint in use.
 
 :::
