@@ -1,6 +1,7 @@
 package com.fluxninja.example;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.FeatureFlowParameters;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import io.grpc.ConnectivityState;
@@ -91,11 +92,15 @@ public class App {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
+        FeatureFlowParameters params =
+                FeatureFlowParameters.newBuilder("awesomeFeature")
+                        .setExplicitLabels(labels)
+                        .setRampMode(false)
+                        .setFlowTimeout(Duration.ofMillis(1000))
+                        .build();
         // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a
         // Flow.
-        Flow flow =
-                this.apertureSDK.startFlow(
-                        this.featureName, labels, false, Duration.ofMillis(1000));
+        Flow flow = this.apertureSDK.startFlow(params);
 
         // See whether flow was accepted by Aperture Agent.
         try {

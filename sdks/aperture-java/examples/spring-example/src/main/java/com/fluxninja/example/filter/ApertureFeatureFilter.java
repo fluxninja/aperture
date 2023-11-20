@@ -1,6 +1,7 @@
 package com.fluxninja.example.filter;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.FeatureFlowParameters;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import java.io.IOException;
@@ -28,9 +29,13 @@ public class ApertureFeatureFilter implements Filter {
         // do some business logic to collect labels
         labels.put("user", "kenobi");
 
-        Flow flow =
-                this.apertureSDK.startFlow(
-                        "awesomeFeature", labels, this.rampMode, Duration.ofMillis(1000));
+        FeatureFlowParameters params =
+                FeatureFlowParameters.newBuilder("awesomeFeature")
+                        .setExplicitLabels(labels)
+                        .setRampMode(this.rampMode)
+                        .setFlowTimeout(Duration.ofMillis(1000))
+                        .build();
+        Flow flow = this.apertureSDK.startFlow(params);
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 

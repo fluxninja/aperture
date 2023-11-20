@@ -17,7 +17,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,18 +69,11 @@ public final class ApertureSDK {
      * Starts a new flow, asking the Aperture Agent to accept or reject it based on provided labels.
      * Additional labels will be extracted from current Baggage context.
      *
-     * @param controlPoint Name of the control point
-     * @param explicitLabels Labels sent to Aperture Agent
-     * @param rampMode Whether the flow should require ramp component match
-     * @param flowTimeout timeout for connection to Aperture Agent. Set to 0 to block until response
-     *     is received.
+     * @param parameters Flow parameters that can be built using {@link
+     *     FeatureFlowParameters.Builder}
      * @return A Flow object
      */
-    public Flow startFlow(
-            String controlPoint,
-            Map<String, String> explicitLabels,
-            Boolean rampMode,
-            Duration flowTimeout) {
+    public Flow startFlow(FeatureFlowParameters parameters) {
         Map<String, String> labels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -98,15 +90,15 @@ public final class ApertureSDK {
             labels.put(entry.getKey(), value);
         }
 
-        if (explicitLabels != null) {
-            labels.putAll(explicitLabels);
+        if (parameters.getExplicitLabels() != null) {
+            labels.putAll(parameters.getExplicitLabels());
         }
 
         CheckRequest req =
                 CheckRequest.newBuilder()
-                        .setControlPoint(controlPoint)
+                        .setControlPoint(parameters.getControlPoint())
                         .putAllLabels(labels)
-                        .setRampMode(rampMode)
+                        .setRampMode(parameters.getRampMode())
                         .build();
 
         Span span =
@@ -118,12 +110,13 @@ public final class ApertureSDK {
 
         CheckResponse res = null;
         try {
-            if (flowTimeout.isZero()) {
+            if (parameters.getFlowTimeout().isZero()) {
                 res = this.flowControlClient.check(req);
             } else {
                 res =
                         this.flowControlClient
-                                .withDeadlineAfter(flowTimeout.toNanos(), TimeUnit.NANOSECONDS)
+                                .withDeadlineAfter(
+                                        parameters.getFlowTimeout().toNanos(), TimeUnit.NANOSECONDS)
                                 .check(req);
             }
         } catch (StatusRuntimeException e) {
@@ -131,7 +124,7 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new Flow(res, span, false, rampMode);
+        return new Flow(res, span, false, parameters.getRampMode());
     }
 
     /**

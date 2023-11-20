@@ -53,7 +53,13 @@ The created instance can then be used to start a flow:
 
     Boolean rampMode = false;
 
-    Flow flow = apertureSDK.startFlow("featureName", labels, rampMode);
+    FeatureFlowParameters params = FeatureFlowParameters.newBuilder("featureName")
+        .setExplicitLabels(labels)
+        .setRampMode(rampMode)
+        .setFlowTimeout(Duration.ofMillis(1000))
+        .build();
+
+    Flow flow = apertureSDK.startFlow(params);
     if (flow.shouldRun()) {
         // do actual work
     } else {
