@@ -70,6 +70,7 @@ func (e *Engine) GetAgentInfo() *agentinfo.AgentInfo {
 // (1) Get schedulers given a service, control point and set of labels.
 // (2) Get flux meter histogram given a metric id.
 type Engine struct {
+	cache         iface.Cache
 	agentInfo     *agentinfo.AgentInfo
 	fluxMeters    map[iface.FluxMeterID]iface.FluxMeter
 	schedulers    map[iface.LimiterID]iface.Scheduler
@@ -86,6 +87,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
+	cacheKey := requestContext.CacheKey
 	labelKeys := flowLabels.SortedKeys()
 
 	response = &flowcontrolv1.CheckResponse{
@@ -118,47 +120,83 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 	response.FluxMeterInfos = fluxMeterProtos
 
-	limiterTypes := []struct {
-		rampComponent bool
+	type LimiterType struct {
 		limiters      map[iface.Limiter]struct{}
 		rejectReason  flowcontrolv1.CheckResponse_RejectReason
-	}{
-		{true, mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP},
-		{false, mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED},
-		{false, mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED},
-		{false, mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS},
+		rampComponent bool
 	}
 
-	for _, limiterType := range limiterTypes {
-		if limiterType.rampComponent && requestContext.RampMode && len(limiterType.limiters) == 0 {
-			// There must be at least one ramp component accepting a ramp mode flow.
-			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
-			response.RejectReason = limiterType.rejectReason
+	runLimiters := func(limiterTypes []LimiterType) bool {
+		for _, limiterType := range limiterTypes {
+			if limiterType.rampComponent && requestContext.RampMode && len(limiterType.limiters) == 0 {
+				// There must be at least one ramp component accepting a ramp mode flow.
+				response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED
+				response.RejectReason = limiterType.rejectReason
+				return true
+			}
+			limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
+			for _, limiterDecision := range limiterDecisions {
+				response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
+				if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
+					response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
+				}
+			}
+
+			defer func() {
+				if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+					revertRemaining(ctx, flowLabels, limiterDecisions)
+				}
+			}()
+
+			if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
+				response.DecisionType = decisionType
+				response.RejectReason = limiterType.rejectReason
+				if waitTime != 0 {
+					response.WaitTime = durationpb.New(waitTime)
+				}
+				return true
+			}
+		}
+		return false
+	}
+
+	limiterTypes := []LimiterType{
+		{mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP, true},
+		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED, false},
+		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED, false},
+	}
+	rejected := runLimiters(limiterTypes)
+	if rejected {
+		return
+	}
+
+	// Lookup cache
+	if cacheKey != "" && e.cache != nil {
+		cachedBytes, err := e.cache.Get(ctx, controlPoint, cacheKey)
+		if err == nil {
+			response.CachedValue = &flowcontrolv1.CachedValue{
+				Value:           cachedBytes,
+				LookupStatus:    flowcontrolv1.CacheLookupStatus_HIT,
+				OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
+			}
+			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 			return
 		}
-		limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
-		for _, limiterDecision := range limiterDecisions {
-			response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
-			if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
-				response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
-			}
+		response.CachedValue = &flowcontrolv1.CachedValue{
+			LookupStatus: flowcontrolv1.CacheLookupStatus_MISS,
+			Error:        err.Error(),
 		}
-
-		defer func() {
-			if response.DecisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-				revertRemaining(ctx, flowLabels, limiterDecisions)
-			}
-		}()
-
-		if decisionType == flowcontrolv1.CheckResponse_DECISION_TYPE_REJECTED {
-			response.DecisionType = decisionType
-			response.RejectReason = limiterType.rejectReason
-			if waitTime != 0 {
-				response.WaitTime = durationpb.New(waitTime)
-			}
-			return
+		if err == ErrCacheKeyNotFound {
+			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+		} else {
+			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
 		}
 	}
+
+	limiterTypes = []LimiterType{
+		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
+	}
+	runLimiters(limiterTypes)
 
 	return
 }
@@ -500,4 +538,9 @@ func (e *Engine) unregister(key string, selectorsProto []*policylangv1.Selector)
 	}
 
 	return nil
+}
+
+// RegisterCache .
+func (e *Engine) RegisterCache(cache iface.Cache) {
+	e.cache = cache
 }

@@ -58,4 +58,24 @@ java.lang.String defaultValue);
    * @return The rampMode.
    */
   boolean getRampMode();
+
+  /**
+   * <pre>
+   * Cache item to fetch.
+   * </pre>
+   *
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The cacheKey.
+   */
+  java.lang.String getCacheKey();
+  /**
+   * <pre>
+   * Cache item to fetch.
+   * </pre>
+   *
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The bytes for cacheKey.
+   */
+  com.google.protobuf.ByteString
+      getCacheKeyBytes();
 }

@@ -36,13 +36,14 @@ type ConstructorIn struct {
 	ServiceGetter servicegetter.ServiceGetter
 	Metrics       Metrics
 	EngineAPI     iface.Engine
+	Cache         iface.Cache `optional:"true"`
 }
 
 // ProvideHandler provides a Flow Control Handler.
 func ProvideHandler(
 	in ConstructorIn,
 ) (flowcontrolv1.FlowControlServiceServer, HandlerWithValues, error) {
-	h := NewHandler(in.ServiceGetter, in.Metrics, in.EngineAPI)
+	h := NewHandler(in.ServiceGetter, in.Metrics, in.EngineAPI, in.Cache)
 
 	// Note: Returning the same handler twice as different interfaces – once as
 	// a handler to be registered on gRPC server and once for consumption by

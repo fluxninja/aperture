@@ -2,31 +2,46 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 
-	checkhttpproto "buf.build/gen/go/fluxninja/aperture/protocolbuffers/go/aperture/flowcontrol/checkhttp/v1"
-	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
+	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
+	"github.com/fluxninja/aperture-go/v2/sdk/utils"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
-func socketAddressFromNetAddr(logger logr.Logger, addr net.Addr) *checkhttpproto.SocketAddress {
-	host, port := splitAddress(logger, addr.String())
-	protocol := checkhttpproto.SocketAddress_TCP
-	if addr.Network() == "udp" {
-		protocol = checkhttpproto.SocketAddress_UDP
+func socketAddressFromNetAddr(addr net.Addr) *checkhttpv1.SocketAddress {
+	host, port, err := net.SplitHostPort(addr.String())
+	if err != nil {
+		return nil
 	}
-	return &checkhttpproto.SocketAddress{
+
+	portU32, err := strconv.ParseUint(port, 10, 32)
+	if err != nil {
+		return nil
+	}
+
+	protocol := checkhttpv1.SocketAddress_TCP
+	if addr.Network() == "udp" {
+		protocol = checkhttpv1.SocketAddress_UDP
+	}
+	return &checkhttpv1.SocketAddress{
 		Address:  host,
 		Protocol: protocol,
-		Port:     port,
+		Port:     uint32(portU32),
 	}
 }
 
@@ -61,7 +76,7 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 			}
 		}
 
-		checkReq := prepareCheckHTTPRequestForGRPC(req, ctx, info, c.GetLogger(), controlPoint, middlewareParams.FlowParams)
+		checkReq := prepareCheckHTTPRequestForGRPC(ctx, req, c.GetLogger(), info.FullMethod, controlPoint, middlewareParams.FlowParams)
 
 		flow := c.StartHTTPFlow(ctx, checkReq, middlewareParams)
 		if flow.Error() != nil {
@@ -87,6 +102,70 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 		}
 
 		return handler(ctx, req)
+	}
+}
+
+// PrepareCheckHTTPRequestForGRPC takes a gRPC request, context, unary server-info, logger and Control Point to use in Aperture policy for preparing the flowcontrolhttp.CheckHTTPRequest and returns it.
+func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, logger *slog.Logger, fullMethod string, controlPoint string, flowParams aperture.FlowParams) *checkhttpv1.CheckHTTPRequest {
+	labels := utils.LabelsFromCtx(ctx)
+
+	// override labels with explicit labels
+	for key, value := range flowParams.Labels {
+		labels[key] = value
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	authority := ""
+	scheme := ""
+	method := ""
+
+	if ok {
+		// override labels with labels from metadata
+		for key, value := range md {
+			labels[key] = strings.Join(value, ",")
+		}
+		getMetaValue := func(key string) string {
+			values := md.Get(key)
+			if len(values) > 0 {
+				return values[0]
+			}
+			return ""
+		}
+		authority = getMetaValue(":authority")
+		scheme = getMetaValue(":scheme")
+		method = getMetaValue(":method")
+	}
+
+	var sourceSocket *checkhttpv1.SocketAddress
+	if sourceAddr, ok := peer.FromContext(ctx); ok {
+		sourceSocket = socketAddressFromNetAddr(sourceAddr.Addr)
+	}
+	destinationSocket := &checkhttpv1.SocketAddress{
+		Address:  utils.GetLocalIP(),
+		Protocol: checkhttpv1.SocketAddress_TCP,
+		Port:     0,
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		logger.Error("Failed to marshal request body", "error", err)
+	}
+
+	return &checkhttpv1.CheckHTTPRequest{
+		Source:       sourceSocket,
+		Destination:  destinationSocket,
+		ControlPoint: controlPoint,
+		RampMode:     flowParams.RampMode,
+		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
+			Method:   method,
+			Path:     fullMethod,
+			Host:     authority,
+			Headers:  labels,
+			Scheme:   scheme,
+			Size:     -1,
+			Protocol: "HTTP/2",
+			Body:     string(body),
+		},
 	}
 }
 

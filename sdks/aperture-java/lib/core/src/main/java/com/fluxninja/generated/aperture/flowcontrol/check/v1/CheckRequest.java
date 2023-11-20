@@ -21,6 +21,7 @@ private static final long serialVersionUID = 0L;
   }
   private CheckRequest() {
     controlPoint_ = "";
+    cacheKey_ = "";
   }
 
   @java.lang.Override
@@ -184,6 +185,53 @@ java.lang.String defaultValue) {
     return rampMode_;
   }
 
+  public static final int CACHE_KEY_FIELD_NUMBER = 4;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object cacheKey_ = "";
+  /**
+   * <pre>
+   * Cache item to fetch.
+   * </pre>
+   *
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The cacheKey.
+   */
+  @java.lang.Override
+  public java.lang.String getCacheKey() {
+    java.lang.Object ref = cacheKey_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      cacheKey_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * Cache item to fetch.
+   * </pre>
+   *
+   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+   * @return The bytes for cacheKey.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getCacheKeyBytes() {
+    java.lang.Object ref = cacheKey_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      cacheKey_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -209,6 +257,9 @@ java.lang.String defaultValue) {
         2);
     if (rampMode_ != false) {
       output.writeBool(3, rampMode_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(cacheKey_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, cacheKey_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -236,6 +287,9 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(3, rampMode_);
     }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(cacheKey_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, cacheKey_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -257,6 +311,8 @@ java.lang.String defaultValue) {
         other.internalGetLabels())) return false;
     if (getRampMode()
         != other.getRampMode()) return false;
+    if (!getCacheKey()
+        .equals(other.getCacheKey())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -277,6 +333,8 @@ java.lang.String defaultValue) {
     hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getRampMode());
+    hash = (37 * hash) + CACHE_KEY_FIELD_NUMBER;
+    hash = (53 * hash) + getCacheKey().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -437,6 +495,7 @@ java.lang.String defaultValue) {
       controlPoint_ = "";
       internalGetMutableLabels().clear();
       rampMode_ = false;
+      cacheKey_ = "";
       return this;
     }
 
@@ -479,6 +538,9 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.rampMode_ = rampMode_;
+      }
+      if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.cacheKey_ = cacheKey_;
       }
     }
 
@@ -537,6 +599,11 @@ java.lang.String defaultValue) {
       if (other.getRampMode() != false) {
         setRampMode(other.getRampMode());
       }
+      if (!other.getCacheKey().isEmpty()) {
+        cacheKey_ = other.cacheKey_;
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -582,6 +649,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000004;
               break;
             } // case 24
+            case 34: {
+              cacheKey_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 34
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -826,6 +898,98 @@ java.lang.String defaultValue) {
     public Builder clearRampMode() {
       bitField0_ = (bitField0_ & ~0x00000004);
       rampMode_ = false;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object cacheKey_ = "";
+    /**
+     * <pre>
+     * Cache item to fetch.
+     * </pre>
+     *
+     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+     * @return The cacheKey.
+     */
+    public java.lang.String getCacheKey() {
+      java.lang.Object ref = cacheKey_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        cacheKey_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Cache item to fetch.
+     * </pre>
+     *
+     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+     * @return The bytes for cacheKey.
+     */
+    public com.google.protobuf.ByteString
+        getCacheKeyBytes() {
+      java.lang.Object ref = cacheKey_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        cacheKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * Cache item to fetch.
+     * </pre>
+     *
+     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+     * @param value The cacheKey to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCacheKey(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      cacheKey_ = value;
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache item to fetch.
+     * </pre>
+     *
+     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCacheKey() {
+      cacheKey_ = getDefaultInstance().getCacheKey();
+      bitField0_ = (bitField0_ & ~0x00000008);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Cache item to fetch.
+     * </pre>
+     *
+     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
+     * @param value The bytes for cacheKey to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCacheKeyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      cacheKey_ = value;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }

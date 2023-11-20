@@ -121,6 +121,18 @@ func (mr *MockEngineMockRecorder) ProcessRequest(ctx, requestContext interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessRequest", reflect.TypeOf((*MockEngine)(nil).ProcessRequest), ctx, requestContext)
 }
 
+// RegisterCache mocks base method.
+func (m *MockEngine) RegisterCache(c iface.Cache) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RegisterCache", c)
+}
+
+// RegisterCache indicates an expected call of RegisterCache.
+func (mr *MockEngineMockRecorder) RegisterCache(c interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterCache", reflect.TypeOf((*MockEngine)(nil).RegisterCache), c)
+}
+
 // RegisterFluxMeter mocks base method.
 func (m *MockEngine) RegisterFluxMeter(fm iface.FluxMeter) error {
 	m.ctrl.T.Helper()

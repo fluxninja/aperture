@@ -9,6 +9,8 @@ import "google/protobuf/timestamp.proto";
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
+  rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -16,6 +18,8 @@ message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
   bool ramp_mode = 3;
+  // Cache item to fetch.
+  string cache_key = 4;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -63,6 +67,47 @@ message CheckResponse {
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
+  // Matching cached value.
+  CachedValue cached_value = 15;
+}
+
+enum CacheLookupStatus {
+  HIT = 0;
+  MISS = 1;
+}
+
+enum CacheOperationStatus {
+  SUCCESS = 0;
+  ERROR = 1;
+}
+
+message CachedValue {
+  bytes value = 1;
+  CacheLookupStatus lookup_status = 2;
+  CacheOperationStatus operation_status = 3;
+  string error = 4;
+}
+
+message CacheUpsertRequest {
+  string control_point = 1;
+  string key = 2;
+  bytes value = 3;
+  google.protobuf.Duration ttl = 4;
+}
+
+message CacheUpsertResponse {
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
+}
+
+message CacheDeleteRequest {
+  string control_point = 1;
+  string key = 2;
+}
+
+message CacheDeleteResponse {
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

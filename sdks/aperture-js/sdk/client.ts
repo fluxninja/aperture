@@ -20,6 +20,8 @@ export interface FlowParams {
   labels?: Record<string, string>;
   rampMode?: boolean;
   grpcCallOptions?: grpc.CallOptions;
+  tryConnect?: boolean;
+  cacheKey?: string;
 }
 
 export class ApertureClient {
@@ -102,7 +104,7 @@ export class ApertureClient {
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(span, startDate, params.rampMode, response, err));
+        resolve(new Flow(this.fcsClient, params.grpcCallOptions ?? {}, controlPoint, span, startDate, params.rampMode, params.cacheKey, response, err));
       };
 
       try {
@@ -121,12 +123,10 @@ export class ApertureClient {
           controlPoint: controlPoint,
           labels: mergedLabels,
           rampMode: params.rampMode,
+          cacheKey: params.cacheKey,
         };
 
-        const cb: grpc.requestCallback<CheckResponse__Output> = (
-          err: any,
-          response: any,
-        ) => {
+        const cb: grpc.requestCallback<CheckResponse__Output> = (err: any, response: any) => {
           resolveFlow(err ? null : response, err);
           return;
         };
