@@ -7,8 +7,9 @@
   <a href="https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1eunlrkhh-10P1HUkmBfVJX3qrSLRk~g">
     <img alt="Slack Community" src="https://img.shields.io/badge/Join%20Our%20Community-Slack-brightgreen?style=for-the-badge&logo=slack">
   </a>
-<!-- ADD A CIRCLECI BUILD STATUS HERE AFTER THE PIPELINE PASSES FOR THE FIRST TIME -->
-<!-- ADD A NUGET LINK HERE AFTER THE SDK IS FIRST RELEASED -->
+  <a href="https://dl.circleci.com/status-badge/img/gh/fluxninja/aperture-csharp/tree/main.svg?style=svg&circle-token=8856f24535ae25f74f91d036ec323a06e867b9de">
+    <img alt="Build Status" src="https://img.shields.io/circleci/build/github/fluxninja/aperture-csharp/main?token=8856f24535ae25f74f91d036ec323a06e867b9de&style=for-the-badge&logo=circleci">
+  </a>
 </p>
 
 # C# SDK for FluxNinja Aperture
