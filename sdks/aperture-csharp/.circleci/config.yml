@@ -1,0 +1,64 @@
+version: 2.1
+
+# this allows to use CircleCI's dynamic configuration feature
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering@0.1.3
+  continuation: circleci/continuation@0.3.1
+
+jobs:
+  say-hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
+
+workflows:
+  version: 2
+  filter-paths-main:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches:
+              &is_not_empty_tag {
+                value: << pipeline.git.tag >>,
+                pattern: "^.+$",
+              }
+        - not: &scheduled
+            equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    jobs:
+      - path-filtering/filter: &path_filtering_job
+          base-revision: << pipeline.git.base_revision >>
+          config-path: .circleci/continue-workflows.yml
+          mapping: |
+            (Core/.*|Example/.*|Generated/.*|ApertureSDK.*) updated-sdk true
+
+  filter-paths-pr:
+    when:
+      and:
+        - not:
+            equal: [main, << pipeline.git.branch >>]
+        - not:
+            matches: *is_not_empty_tag
+        - not: *scheduled
+    jobs:
+      - path-filtering/filter:
+          <<: *path_filtering_job
+          base-revision: main
+
+  say-hello-workflow:
+    when:
+      matches:
+        { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
+    jobs:
+      - say-hello:
+          filters:
+            branches:
+              ignore: /.+/
+            tags:
+              only: /^releases\/.*$/
