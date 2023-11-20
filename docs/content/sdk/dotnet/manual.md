@@ -24,8 +24,8 @@ To do so, first create an instance of ApertureClient:
 
 You can create an Agent API key for your project in the Aperture Cloud UI for a
 given organization by navigating to the **`Aperture`** tab in the sidebar menu.
-From there, select the **`Agent API Keys`** in the top bar. This is where you
-can find and copy the **`AGENT_API_KEY`** or create a new key.
+From there, select **`Agent API Keys`** in the top bar. This is where you can
+find and copy the **`AGENT_API_KEY`** or create a new key.
 
 :::
 
