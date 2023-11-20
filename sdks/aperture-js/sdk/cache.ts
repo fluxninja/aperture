@@ -40,7 +40,7 @@ export function ConvertCacheOperationStatus(
 export function ConvertCacheError(
   error: string | null | undefined,
 ): Error | null {
-  if (error === null || error === undefined) {
+  if (!error) {
     return null;
   }
   return new Error(error);
