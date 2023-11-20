@@ -9,21 +9,42 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
-import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
-import { Flow } from "./flow.js";
-import { fcs } from "./utils.js";
+import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest";
+import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService";
+import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts";
+import { Flow } from "./flow";
+import { checkv1 } from "./utils";
 
+/**
+ * Represents the parameters for a flow.
+ */
 export interface FlowParams {
+  /**
+   * Optional labels for the flow.
+   */
   labels?: Record<string, string>;
+  /**
+   * Specifies whether the flow should use ramp mode.
+   */
   rampMode?: boolean;
+  /**
+   * Additional gRPC call options for the flow.
+   */
   grpcCallOptions?: grpc.CallOptions;
+  /**
+   * Specifies whether to try connecting to the flow.
+   */
   tryConnect?: boolean;
+  /**
+   * The cache key for the flow.
+   */
   cacheKey?: string;
 }
 
+/**
+ * Represents the Aperture Client used for interacting with the Aperture Agent.
+ */
 export class ApertureClient {
   private readonly fcsClient: FlowControlServiceClient;
 
@@ -33,6 +54,14 @@ export class ApertureClient {
 
   private readonly tracer: Tracer;
 
+  /**
+   * Constructs a new instance of the ApertureClient.
+   * @param address The address of the Aperture Agent.
+   * @param agentAPIKey The API key for the Aperture Agent (optional).
+   * @param channelCredentials The credentials for the gRPC channel (optional).
+   * @param channelOptions The options for the gRPC channel (optional).
+   * @throws Error if the address is not provided.
+   */
   constructor({
     address,
     agentAPIKey,
@@ -61,7 +90,7 @@ export class ApertureClient {
       );
     }
 
-    this.fcsClient = new fcs.FlowControlService(
+    this.fcsClient = new checkv1.FlowControlService(
       address,
       channelCredentials,
       channelOptions,
@@ -92,9 +121,15 @@ export class ApertureClient {
     kickChannel();
   }
 
-  // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
-  // Return value is a Flow.
-  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+  /**
+   * Starts a new flow with the specified control point and parameters.
+   * StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+   * Return value is a Flow.
+   * The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+   * @param controlPoint The control point for the flow.
+   * @param params The parameters for the flow.
+   * @returns A promise that resolves to a Flow object.
+   */
   async StartFlow(controlPoint: string, params: FlowParams): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       if (params.rampMode === undefined) {
@@ -142,6 +177,9 @@ export class ApertureClient {
     });
   }
 
+  /**
+   * Shuts down the ApertureClient.
+   */
   Shutdown() {
     this.fcsClient.getChannel().close();
     this.exporter.shutdown();
@@ -149,6 +187,10 @@ export class ApertureClient {
     return;
   }
 
+  /**
+   * Gets the current state of the gRPC channel.
+   * @returns The connectivity state of the channel.
+   */
   GetState() {
     return this.fcsClient.getChannel().getConnectivityState(true);
   }
