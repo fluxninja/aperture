@@ -945,11 +945,11 @@ FluxNinjaExtensionConfig is the configuration for
 
 <!-- vale off -->
 
-(string, **DEPRECATED**)
+(string)
 
 <!-- vale on -->
 
-Deprecated: v3.0.0. Use AgentAPIKey instead
+API Key for this agent. If this key is not set, the extension won't be enabled.
 
 </dd>
 <dt>agent_api_key</dt>
@@ -957,11 +957,11 @@ Deprecated: v3.0.0. Use AgentAPIKey instead
 
 <!-- vale off -->
 
-(string)
+(string, **DEPRECATED**)
 
 <!-- vale on -->
 
-API Key for this agent. If this key is not set, the extension won't be enabled.
+Deprecated: v3.0.0. Use APIKey instead
 
 </dd>
 <dt>controller_id</dt>

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /** A builder for configuring an {@link ApertureSDK}. */
 public final class ApertureSDKBuilder {
     private String address;
-    private String agentAPIKey;
+    private String apiKey;
     private boolean useHttpsInOtlpExporter = false;
     private boolean insecureGrpc = true;
     private String certFile;
@@ -63,11 +63,11 @@ public final class ApertureSDKBuilder {
     /**
      * Set API key to be used when connecting to Aperture Agent.
      *
-     * @param agentAPIKey API key to be used when connecting to Aperture Agent.
+     * @param apiKey API key to be used when connecting to Aperture Agent.
      * @return the builder object.
      */
-    public ApertureSDKBuilder setAgentAPIKey(String agentAPIKey) {
-        this.agentAPIKey = agentAPIKey;
+    public ApertureSDKBuilder setAPIKey(String apiKey) {
+        this.apiKey = apiKey;
         return this;
     }
 
@@ -224,7 +224,7 @@ public final class ApertureSDKBuilder {
         FlowControlServiceHTTPGrpc.FlowControlServiceHTTPBlockingStub httpFlowControlClient =
                 FlowControlServiceHTTPGrpc.newBlockingStub(channel);
 
-        String agentAPIKey = this.agentAPIKey;
+        String agentAPIKey = this.apiKey;
         // If agentAPIKey is not empty, add it to the request metadata
         if (agentAPIKey != null && !agentAPIKey.isEmpty()) {
             Metadata metadata = new Metadata();

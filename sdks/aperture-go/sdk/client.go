@@ -27,7 +27,7 @@ import (
 type Options struct {
 	Logger      *slog.Logger
 	Address     string
-	AgentAPIKey string
+	APIKey      string
 	DialOptions []grpc.DialOption
 }
 
@@ -76,9 +76,9 @@ func NewClient(ctx context.Context, opts Options) (Client, error) {
 		opts.DialOptions = []grpc.DialOption{}
 	}
 
-	if opts.AgentAPIKey != "" {
+	if opts.APIKey != "" {
 		dialOptions := grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, callOpts ...grpc.CallOption) error {
-			md := metadata.Pairs("x-api-key", opts.AgentAPIKey)
+			md := metadata.Pairs("x-api-key", opts.APIKey)
 			ctx = metadata.NewOutgoingContext(ctx, md)
 			return invoker(ctx, method, req, reply, cc, callOpts...)
 		})

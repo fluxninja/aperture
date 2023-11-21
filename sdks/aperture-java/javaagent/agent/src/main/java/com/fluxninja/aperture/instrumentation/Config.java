@@ -14,7 +14,7 @@ public class Config {
     public static final String CONFIG_FILENAME_PROPERTY = "aperture.javaagent.config.file";
 
     public static final String AGENT_ADDRESS_PROPERTY = "aperture.agent.address";
-    public static final String AGENT_API_KEY_PROPERTY = "aperture.agent.api.key";
+    public static final String API_KEY_PROPERTY = "aperture.api.key";
     public static final String RAMP_MODE_PROPERTY = "aperture.javaagent.enable.ramp.mode";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
@@ -27,7 +27,7 @@ public class Config {
             "aperture.javaagent.root.certificate";
 
     private static final String AGENT_ADDRESS_DEFAULT_VALUE = "localhost:8080";
-    private static final String AGENT_API_KEY_DEFAULT_VALUE = "";
+    private static final String API_KEY_DEFAULT_VALUE = "";
     private static final String RAMP_MODE_PROPERTY_DEFAULT_VALUE = "false";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String IGNORED_PATHS_DEFAULT_VALUE = "";
@@ -39,7 +39,7 @@ public class Config {
             new ArrayList<String>() {
                 {
                     add(AGENT_ADDRESS_PROPERTY);
-                    add(AGENT_API_KEY_PROPERTY);
+                    add(API_KEY_PROPERTY);
                     add(RAMP_MODE_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
                     add(CONTROL_POINT_NAME_PROPERTY);
@@ -109,9 +109,7 @@ public class Config {
                     builder.setAddress(
                                     config.getProperty(
                                             AGENT_ADDRESS_PROPERTY, AGENT_ADDRESS_DEFAULT_VALUE))
-                            .setAgentAPIKey(
-                                    config.getProperty(
-                                            AGENT_API_KEY_PROPERTY, AGENT_API_KEY_DEFAULT_VALUE))
+                            .setAPIKey(config.getProperty(API_KEY_PROPERTY, API_KEY_DEFAULT_VALUE))
                             .addIgnoredPaths(
                                     config.getProperty(
                                             IGNORED_PATHS_PROPERTY, IGNORED_PATHS_DEFAULT_VALUE))

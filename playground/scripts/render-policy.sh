@@ -6,7 +6,7 @@ aperturectl=$2
 blueprints_uri=$3
 policy_name=$4
 values_file=$5
-api_key=${6:-}
+access_token=${6:-}
 endpoint=${7:-}
 agent_group=${8:-default}
 action=${9:-apply}
@@ -28,7 +28,7 @@ _GEN_DIR="${base_dir}/_gen"
 mkdir -p "${_GEN_DIR}"
 trap 'rm -rf -- "$_GEN_DIR"' EXIT
 
-if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
+if [[ "${access_token}" != '' && "${endpoint}" != '' ]]; then
 	cp "${values_file}" "${_GEN_DIR}/values.yaml"
 	new_policy_name=${policy_name}-${agent_group}
 	$SED -i "s/\bagent_group: .*/agent_group: ${agent_group}/g" "${_GEN_DIR}/values.yaml"
@@ -38,9 +38,9 @@ if [[ "${api_key}" != '' && "${endpoint}" != '' ]]; then
 
 	rendered_policy="${_GEN_DIR}/policies/${new_policy_name}-cr.yaml"
 	if [[ "${action}" == "apply" ]]; then
-		"${aperturectl}" cloud policy apply --file "${rendered_policy}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" -f -s >&2
+		"${aperturectl}" cloud policy apply --file "${rendered_policy}" --controller "${endpoint}" --access-token "${access_token}" "${skipverify}" --project-name "${project_name}" -f -s >&2
 	else
-		"${aperturectl}" cloud policy delete --policy "${new_policy_name}" --controller "${endpoint}" --api-key "${api_key}" "${skipverify}" --project-name "${project_name}" || exit 0 >&2
+		"${aperturectl}" cloud policy delete --policy "${new_policy_name}" --controller "${endpoint}" --access-token "${access_token}" "${skipverify}" --project-name "${project_name}" || exit 0 >&2
 	fi
 else
 	"${aperturectl}" blueprints generate --uri "${blueprints_uri}" \

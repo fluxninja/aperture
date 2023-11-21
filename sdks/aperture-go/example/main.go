@@ -71,7 +71,7 @@ func main() {
 	opts := aperture.Options{
 		Address:     apertureAgentAddr,
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
-		AgentAPIKey: getEnvOrDefault("APERTURE_AGENT_API_KEY", ""),
+		APIKey:      getEnvOrDefault("APERTURE_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.

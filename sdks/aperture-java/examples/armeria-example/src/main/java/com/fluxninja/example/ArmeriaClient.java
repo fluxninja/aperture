@@ -22,9 +22,9 @@ public class ArmeriaClient {
         if (agentAddress == null) {
             agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
-        if (agentAPIKey == null) {
-            agentAPIKey = "";
+        String apiKey = System.getenv("APERTURE_API_KEY");
+        if (apiKey == null) {
+            apiKey = "";
         }
         String rampModeString = System.getenv("APERTURE_ENABLE_RAMP_MODE");
         if (rampModeString == null) {
@@ -52,7 +52,7 @@ public class ArmeriaClient {
             apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentAddress)
-                            .setAgentAPIKey(agentAPIKey)
+                            .setAPIKey(apiKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

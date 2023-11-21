@@ -79,7 +79,7 @@ agent:
 By following these instructions, you will have deployed the Aperture Agent into
 your cluster.
 
-1. Configure the Aperture Cloud endpoint and Agent Key parameters in the Agent.
+1. Configure the Aperture Cloud endpoint and API Key parameters in the Agent.
    Update the `values.yaml` file and pass it with the `install` command:
 
    ```yaml
@@ -93,16 +93,16 @@ your cluster.
        fluxNinjaExtension:
          create: true
          secretKeyRef:
-           name: aperture-agent-apikey
+           name: aperture-apikey
            key: apiKey
-         value: "AGENT_API_KEY"
+         value: "API_KEY"
    ```
 
    Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-   `AGENT_API_KEY` with the API key linked to the project. Navigate to the
-   **`Aperture`** tab in the sidebar menu and then select **`Agent API Keys`**
-   in the top bar. From there, you can either copy the existing key or create a
-   new one by clicking on **`Create Agent API Key`**.
+   `API_KEY` with the API key linked to the project. Navigate to the
+   **`Aperture`** tab in the sidebar menu and then select **`API Keys`** in the
+   top bar. From there, you can either copy the existing key or create a new one
+   by clicking on **`Create API Key`**.
 
    :::note
 
@@ -144,9 +144,9 @@ your cluster.
        fluxNinjaExtension:
          create: true
          secretKeyRef:
-           name: aperture-agent-apikey
+           name: aperture-apikey
            key: apiKey
-         value: "AGENT_API_KEY"
+         value: "API_KEY"
    ```
 
    <Tabs groupId="setup" queryString>

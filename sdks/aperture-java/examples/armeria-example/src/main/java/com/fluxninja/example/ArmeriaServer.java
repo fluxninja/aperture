@@ -56,7 +56,7 @@ public class ArmeriaServer {
 
     public static void main(String[] args) {
         String agentHost = getEnv("APERTURE_AGENT_ADDRESS", DEFAULT_AGENT_ADDRESS);
-        String agentAPIKey = getEnv("APERTURE_AGENT_API_KEY", "");
+        String apiKey = getEnv("APERTURE_API_KEY", "");
 
         String appPort = getEnv("APERTURE_APP_PORT", DEFAULT_APP_PORT);
 
@@ -76,7 +76,7 @@ public class ArmeriaServer {
             apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentHost)
-                            .setAgentAPIKey(agentAPIKey)
+                            .setAPIKey(apiKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

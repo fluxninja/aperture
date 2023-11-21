@@ -19,7 +19,7 @@ Use this command to query information about active Flow Control integrations
 ### Options
 
 ```
-      --api-key string        Aperture Cloud User API Key to be used when using Cloud Controller
+      --access-token string   User Access Token to be used while connecting to Aperture Cloud
       --config string         Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string     Address of Aperture Cloud Controller
   -h, --help                  help for flow-control

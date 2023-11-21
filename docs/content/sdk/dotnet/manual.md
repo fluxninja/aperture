@@ -20,12 +20,12 @@ to manually set feature control points within a .NET service.
 
 To do so, first create an instance of ApertureClient:
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI for a
-given organization by navigating to the **`Aperture`** tab in the sidebar menu.
-From there, select **`Agent API Keys`** in the top bar. This is where you can
-find and copy the **`AGENT_API_KEY`** or create a new key.
+You can create an API key for your project in the Aperture Cloud UI for a given
+organization by navigating to the **`Aperture`** tab in the sidebar menu. From
+there, select **`API Keys`** in the top bar. This is where you can find and copy
+the **`API_KEY`** or create a new key.
 
 :::
 
@@ -33,7 +33,7 @@ find and copy the **`AGENT_API_KEY`** or create a new key.
 var sdk = ApertureSdk
     .Builder()
     .SetAddress("ORGANIZATION.app.fluxninja.com:443")
-    .SetAgentApiKey("AGENT_API_KEY")
+    .SetAgentApiKey("API_KEY")
     .Build();
 ```
 
