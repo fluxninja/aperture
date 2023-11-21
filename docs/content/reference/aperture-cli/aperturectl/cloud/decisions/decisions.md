@@ -31,8 +31,8 @@ aperturectl cloud decisions [flags]
 ### Options
 
 ```
+      --access-token string    User Access Token to be used while connecting to Aperture Cloud
       --all                    Get all decisions
-      --api-key string         Aperture Cloud User API Key to be used when using Cloud Controller
       --config string          Path to the Aperture config file. Defaults to '~/.aperturectl/config' or $APERTURE_CONFIG
       --controller string      Address of Aperture Cloud Controller
       --decision-type string   Type of the decision to get (load_scheduler, rate_limiter, quota_scheduler, pod_scaler, sampler)

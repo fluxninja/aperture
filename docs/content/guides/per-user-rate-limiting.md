@@ -68,7 +68,7 @@ import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
 
 apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
-  agentAPIKey: "AGENT_API_KEY",
+  apiKey: "API_KEY",
 });
 ```
 

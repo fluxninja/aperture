@@ -10,7 +10,7 @@ public sealed class ApertureSdkBuilder
 {
     private readonly ILog _logger = LogManager.GetLogger(typeof(ApertureSdkBuilder));
     private string? _address;
-    private string _agentApiKey = "";
+    private string _apiKey = "";
     private ChannelCredentials _channelCredentials = new SslCredentials();
     private string _otlpExporterHeaders = "";
     private bool _useHttpsInOtlpExporter = true;
@@ -22,9 +22,9 @@ public sealed class ApertureSdkBuilder
         return this;
     }
 
-    public ApertureSdkBuilder SetAgentApiKey(string agentApiKey)
+    public ApertureSdkBuilder SetApiKey(string apiKey)
     {
-        _agentApiKey = agentApiKey;
+        _apiKey = apiKey;
         return this;
     }
 
@@ -71,6 +71,6 @@ public sealed class ApertureSdkBuilder
 
         var tracer = tracerProvider!.GetTracer(Constants.LIBRARY_NAME);
 
-        return new ApertureSdk(flowControlClient, tracer, _agentApiKey);
+        return new ApertureSdk(flowControlClient, tracer, _apiKey);
     }
 }

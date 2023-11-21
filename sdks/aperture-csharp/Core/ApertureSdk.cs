@@ -10,7 +10,7 @@ namespace ApertureSDK.Core;
 
 public class ApertureSdk : IApertureSdk
 {
-    private readonly string? _agentApiKey;
+    private readonly string? _apiKey;
     private readonly FlowControlService.FlowControlServiceClient _flowControlClient;
     private readonly ILog _logger = LogManager.GetLogger(typeof(ApertureSdk));
     private readonly Tracer _tracer;
@@ -18,11 +18,11 @@ public class ApertureSdk : IApertureSdk
     public ApertureSdk(
         FlowControlService.FlowControlServiceClient flowControlClient,
         Tracer tracer,
-        string agentApiKey)
+        string apiKey)
     {
         _flowControlClient = flowControlClient;
         _tracer = tracer;
-        _agentApiKey = agentApiKey;
+        _apiKey = apiKey;
     }
 
     public IFlow StartFlow(FeatureFlowParams parameters)
@@ -67,10 +67,10 @@ public class ApertureSdk : IApertureSdk
         {
             var opts = new CallOptions();
             if (flowTimeout != TimeSpan.Zero) opts = opts.WithDeadline(DateTime.UtcNow.Add(flowTimeout));
-            if (_agentApiKey != null)
+            if (_apiKey != null)
             {
                 var headers = new Metadata();
-                headers.Add("x-api-key", _agentApiKey);
+                headers.Add("x-api-key", _apiKey);
                 opts = opts.WithHeaders(headers);
             }
 

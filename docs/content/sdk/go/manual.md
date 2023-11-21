@@ -17,10 +17,10 @@ SDK</a> can be used to manually set feature control points within a Go service.
 
 To do so, first create an instance of ApertureClient:
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::
@@ -49,11 +49,11 @@ func grpcOptions() []grpc.DialOption {
 
 ```go
   agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-  agentAPIKey := "AGENT_API_KEY"
+  apiKey := "API_KEY"
 
   opts := aperture.Options{
       Address:     agentAddress,
-      AgentAPIKey: agentAPIKey,
+      APIKey: apiKey,
       DialOptions: grpcOptions(),
   }
 

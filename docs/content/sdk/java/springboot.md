@@ -18,10 +18,10 @@ keywords:
 contains Aperture Filter that can be registered in Spring Boot application to
 automatically set traffic control points for relevant services:
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::
@@ -52,7 +52,7 @@ public class AppController {
         registrationBean.addUrlPatterns("/super");
 
         registrationBean.addInitParameter("agent_address", "ORGANIZATION.app.fluxninja.com:443");
-        registrationBean.addInitParameter("agent_api_key", "AGENT_API_KEY");
+        registrationBean.addInitParameter("api_key", "API_KEY");
 
         return registrationBean;
     }

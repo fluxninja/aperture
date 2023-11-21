@@ -70,7 +70,7 @@ public class ApertureFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentAddress;
-        String agentAPIKey;
+        String apiKey;
         String initControlPointName;
         String timeoutMs;
         boolean insecureGrpc;
@@ -79,7 +79,7 @@ public class ApertureFilter implements Filter {
         boolean ignoredPathsRegex;
         try {
             agentAddress = filterConfig.getInitParameter("agent_address");
-            agentAPIKey = filterConfig.getInitParameter("agent_api_key");
+            apiKey = filterConfig.getInitParameter("api_key");
             initControlPointName = filterConfig.getInitParameter("control_point_name");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
@@ -107,7 +107,7 @@ public class ApertureFilter implements Filter {
 
         ApertureSDKBuilder builder = ApertureSDK.builder();
         builder.setAddress(agentAddress);
-        builder.setAgentAPIKey(agentAPIKey);
+        builder.setAPIKey(apiKey);
         builder.useInsecureGrpc(insecureGrpc);
         if (rootCertificateFile != null && !rootCertificateFile.isEmpty()) {
             try {

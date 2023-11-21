@@ -12,13 +12,14 @@ following as `~/.aperturectl/config`:
 [controller]
 url = "ORGANIZATION_NAME.app.fluxninja.com:443"
 project_name = "PROJECT_NAME"
-api_key = "PERSONAL_API_KEY"
+access_token = "PERSONAL_ACCESS_TOKEN"
 ```
 
 Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
-`PERSONAL_API_KEY` with the Personal API key linked to the user. If a Personal
-API key has not been created, generate a new one through the Aperture Cloud UI.
-Refer to [Personal API Keys][api-keys] for additional information.
+`PERSONAL_ACCESS_TOKEN` with the Personal Access Token linked to the user. If a
+Personal Access Token has not been created, generate a new one through the
+Aperture Cloud UI. Refer to [Personal Access Tokens][access-tokens] for
+additional information.
 
 :::info
 
@@ -36,4 +37,4 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 [self-hosted]: /aperture-for-infra/aperture-for-infra.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
-[api-keys]: /reference/aperture-cli/personal-api-keys.md
+[access-tokens]: /reference/aperture-cli/personal-access-tokens.md

@@ -16,10 +16,10 @@ keywords:
 All requests handled by an Armeria application can have Aperture SDK calls
 automatically added into them using [Aperture Instrumentation Agent][javaagent].
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::
@@ -53,7 +53,7 @@ the `ignoredPaths` field of the SDK, as shown in the following code:
 ```java
 ApertureSDK sdk = ApertureSDK.builder()
         .setAddress("ORGANIZATION.app.fluxninja.com:443")
-        .setAgentAPIKey("AGENT_API_KEY")
+        .setAPIKey("API_KEY")
         ...
         .addIgnoredPaths("/healthz,/metrics")
         ...
