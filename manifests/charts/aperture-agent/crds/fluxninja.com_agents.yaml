@@ -1165,11 +1165,11 @@ spec:
                     description: FluxNinja extension configuration.
                     properties:
                       agent_api_key:
-                        description: API Key for this agent. If this key is not set,
-                          the extension won't be enabled.
+                        description: 'Deprecated: v3.0.0. Use APIKey instead'
                         type: string
                       api_key:
-                        description: 'Deprecated: v3.0.0. Use AgentAPIKey instead'
+                        description: API Key for this agent. If this key is not set,
+                          the extension won't be enabled.
                         type: string
                       client:
                         description: Client configuration.

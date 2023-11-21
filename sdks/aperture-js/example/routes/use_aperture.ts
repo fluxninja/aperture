@@ -1,7 +1,11 @@
 import express from "express";
-import { ApertureClient, Flow, FlowStatusEnum, LookupStatus } from "@fluxninja/aperture-js";
+import {
+  ApertureClient,
+  Flow,
+  FlowStatusEnum,
+  LookupStatus,
+} from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
-
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
@@ -9,7 +13,7 @@ export const apertureClient = new ApertureClient({
     process.env.APERTURE_AGENT_ADDRESS !== undefined
       ? process.env.APERTURE_AGENT_ADDRESS
       : "localhost:8089",
-  agentAPIKey: process.env.APERTURE_AGENT_API_KEY || undefined,
+  apiKey: process.env.APERTURE_API_KEY || undefined,
   // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
   channelCredentials:
     process.env.APERTURE_AGENT_INSECURE !== undefined
@@ -43,14 +47,21 @@ apertureRoute.get("/", async (_: express.Request, res: express.Response) => {
       if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
         console.log("Cache hit:", flow.CachedValue().GetValue()?.toString());
       } else {
-        console.log("Cache miss:", flow.CachedValue().GetOperationStatus(), flow.CachedValue().GetError()?.message);
+        console.log(
+          "Cache miss:",
+          flow.CachedValue().GetOperationStatus(),
+          flow.CachedValue().GetError()?.message,
+        );
         const resString = "awesomeString";
 
         // create a new buffer
         const buffer = Buffer.from(resString);
 
         // set cache value
-        const setResult = await flow.SetCachedValue(buffer, { seconds: 30, nanos: 0 })
+        const setResult = await flow.SetCachedValue(buffer, {
+          seconds: 30,
+          nanos: 0,
+        });
         if (setResult?.error) {
           console.log(`Error setting cache value: ${setResult.error}`);
         }

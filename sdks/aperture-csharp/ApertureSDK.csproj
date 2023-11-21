@@ -1,6 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <PackageId>ApertureSDK</PackageId>
+        <Version>2.23.1</Version>
+        <Authors>FluxNinja Team</Authors>
+        <Company>FluxNinja</Company>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <PackageReadmeFile>README_SIMPLE.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -34,6 +43,8 @@
 
     <ItemGroup>
         <None Remove="Examples\**"/>
+        <None Include="LICENSE.txt" Pack="true" PackagePath=""/>
+        <None Include="README_SIMPLE.md" Pack="true" PackagePath=""/>
     </ItemGroup>
 
 </Project>

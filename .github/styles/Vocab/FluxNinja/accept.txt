@@ -120,3 +120,4 @@ Serverless
 onboarding
 Duolingo
 [Ww]avepool
+APIKey

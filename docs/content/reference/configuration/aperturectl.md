@@ -55,4 +55,4 @@ environment variable to switch between different projects and organizations.
 [toml]: https://toml.io/
 [configure-aperturectl]: /reference/aperture-cli/configure-cli.md
 [cloud-controller]: /reference/fluxninja.md#cloud-controller
-[api-keys]: /reference/aperture-cli/personal-api-keys.md
+[api-keys]: /reference/aperture-cli/personal-access-tokens.md

@@ -27,8 +27,8 @@ var _ = DescribeTable("FN Extension OTel", func(
 ) {
 	cfg := map[string]interface{}{
 		"fluxninja": map[string]interface{}{
-			"agent_api_key": "deadbeef",
-			"endpoint":      "http://localhost:1234",
+			"api_key":  "deadbeef",
+			"endpoint": "http://localhost:1234",
 		},
 	}
 	marshalledCfg, err := json.Marshal(cfg)

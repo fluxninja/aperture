@@ -35,13 +35,13 @@ Labels = Dict[str, str]
 
 
 class ApertureCloudAuthMetadataPlugin(grpc.AuthMetadataPlugin):
-    def __init__(self, agent_api_key):
-        self.agent_api_key = agent_api_key
+    def __init__(self, api_key):
+        self.api_key = api_key
 
     def __call__(
         self, context: AuthMetadataContext, callback: AuthMetadataPluginCallback
     ) -> None:
-        callback((("x-api-key", self.agent_api_key),), None)
+        callback((("x-api-key", self.api_key),), None)
 
 
 class ApertureClient:
@@ -71,7 +71,7 @@ class ApertureClient:
     def new_client(
         cls: Type[TApertureClient],
         address: str,
-        agent_api_key: Optional[str] = None,
+        api_key: Optional[str] = None,
         insecure: bool = False,
         grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
         credentials: Optional[grpc.ChannelCredentials] = None,
@@ -81,8 +81,8 @@ class ApertureClient:
             raise ValueError("Address must be provided")
         if not credentials:
             credentials = grpc.ssl_channel_credentials()
-        if agent_api_key:
-            metadata_plugin_instance = ApertureCloudAuthMetadataPlugin(agent_api_key)
+        if api_key:
+            metadata_plugin_instance = ApertureCloudAuthMetadataPlugin(api_key)
 
             credentials = grpc.composite_channel_credentials(
                 credentials,

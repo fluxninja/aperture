@@ -39,12 +39,12 @@ development experience.
    includes an introduction to the dashboard — and inviting your team members.
    This will enable you to collaborate effectively on load management policies.
 2. **Connect to Aperture Cloud**: In Aperture Cloud, authentication for SDK
-   integrations is handled using Agent API keys. These keys can be conveniently
+   integrations is handled using API keys. These keys can be conveniently
    obtained from the Aperture user interface. For more detailed information on
-   locating and utilizing these Agent API Keys, please refer to the [Define
-   Control Points][define-control-points] section. After acquiring the Agent API
-   key, it becomes the crucial element for initializing the SDK in your
-   application, allowing for a seamless integration process.
+   locating and utilizing these API Keys, please refer to the [Define Control
+   Points][define-control-points] section. After acquiring the API key, it
+   becomes the crucial element for initializing the SDK in your application,
+   allowing for a seamless integration process.
 
 3. **Integrate the SDK**: Integrate Aperture into your application by adding the
    necessary lines of code at the points where you want Aperture to act. For
@@ -92,13 +92,12 @@ Controller and Agent, ideal for situations like air-gapped environments.
    - [Metrics](/aperture-for-infra/integrations/metrics/metrics.md)
 
 4. **Map to Aperture SaaS Controller**: Aperture Cloud authenticates requests
-   from integrations using Agent API keys, which are created for your project
-   within the Aperture UI; navigate to the **`Aperture`** tab in the sidebar
-   menu and then select **`Agent API Keys`** in the top bar. From there you can
-   either copy the existing key or create a new one by clicking on
-   **`Create Agent API Key`**. Copy the API key and save it in a secure
-   location. This key will be used during the configuration of
-   [Self-hosted][aperture-for-infra] Agents.
+   from integrations using API keys, which are created for your project within
+   the Aperture UI; navigate to the **`Aperture`** tab in the sidebar menu and
+   then select **`API Keys`** in the top bar. From there, you can either copy
+   the existing key or create a new one by clicking on **`Create API Key`**.
+   Copy the API key and save it in a secure location. This key will be used
+   during the configuration of [Self-hosted][aperture-for-infra] Agents.
 
    :::info
 

@@ -233,10 +233,10 @@ func addFluxNinjaExporter(config *otelconfig.Config,
 	grpcClientConfig *grpcclient.GRPCClientConfig,
 	httpClientConfig *httpclient.HTTPClientConfig,
 ) {
-	apiKey := extensionConfig.AgentAPIKey
+	apiKey := extensionConfig.APIKey
 	if apiKey == "" {
-		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
-		apiKey = extensionConfig.APIKey
+		//nolint:staticcheck // SA1019 read AgentAPIKey config for backward compatibility
+		apiKey = extensionConfig.AgentAPIKey
 	}
 	cfg := map[string]interface{}{
 		"endpoint": extensionConfig.Endpoint,

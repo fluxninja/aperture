@@ -28,7 +28,7 @@ export const ExtensionConfig = ({children, component}) => (
       secretKeyRef:
         name: aperture-${component}-apikey
         key: apiKey
-      value: "AGENT_API_KEY"
+      value: "API_KEY"
 `}</CodeBlock>
 );
 ```
@@ -45,16 +45,16 @@ export const CloudExtensionConfig = ({children, component}) => (
     fluxNinjaExtension:
       create: true
       secretKeyRef:
-        name: aperture-agent-apikey
+        name: aperture-apikey
         key: apiKey
-      value: "AGENT_API_KEY"
+      value: "API_KEY"
 `}</CodeBlock>
 );
 ```
 
 This extension enables [Aperture Cloud][] integration for
-[self-hosted][Self-hosted] Aperture Agents and Controllers. It enriches logs
-and traces collected by Aperture and sends them to Aperture Cloud. This data is
+[self-hosted][Self-hosted] Aperture Agents and Controllers. It enriches logs and
+traces collected by Aperture and sends them to Aperture Cloud. This data is
 batched and rolled up to optimize bandwidth usage. The extension also sends
 periodic heartbeats to Aperture Cloud to track health and configuration. This
 allows you to monitor your policies and analyze flows in Aperture Cloud.
@@ -100,8 +100,8 @@ installation of the Aperture Controller or Agent:
   </TabItem>
 </Tabs>
 
-Replace the values of `ORGANIZATION_NAME` and `AGENT_KEY` with the actual values
-of the organization on Aperture Cloud and Agent Key generated on it.
+Replace the values of `ORGANIZATION_NAME` and `API_KEY` with the actual values
+of the organization on Aperture Cloud and API Key generated on it.
 
 :::note
 

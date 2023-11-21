@@ -17,10 +17,10 @@ points within a Python service.
 
 To do so, first create an instance of ApertureClient:
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::
@@ -28,7 +28,7 @@ more information, refer to
 ```python
   from aperture_sdk import ApertureClient
 
-  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", agent_api_key="AGENT_API_KEY")
+  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
 ```
 
 The created instance can then be used to start a flow:

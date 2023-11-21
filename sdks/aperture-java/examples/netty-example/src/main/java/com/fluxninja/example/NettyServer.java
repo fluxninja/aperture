@@ -22,9 +22,9 @@ public class NettyServer {
         if (agentAddress == null) {
             agentAddress = DEFAULT_AGENT_ADDRESS;
         }
-        String agentAPIKey = System.getenv("APERTURE_AGENT_API_KEY");
-        if (agentAPIKey == null) {
-            agentAPIKey = "";
+        String apiKey = System.getenv("APERTURE_API_KEY");
+        if (apiKey == null) {
+            apiKey = "";
         }
         String appPort = System.getenv("APERTURE_APP_PORT");
         if (appPort == null) {
@@ -66,7 +66,7 @@ public class NettyServer {
                     .childHandler(
                             new ServerInitializer(
                                     agentAddress,
-                                    agentAPIKey,
+                                    apiKey,
                                     rampMode,
                                     flowTimeout,
                                     controlPointName,

@@ -53,7 +53,7 @@ system properties or environment variables:
 | :------------------------------------- | :------------------------------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
 | aperture.javaagent.config.file         | APERTURE_JAVAAGENT_CONFIG_FILE         |                | Path to a file containing configuration properties                                                                                           |
 | aperture.agent.address                 | APERTURE_AGENT_ADDRESS                 | localhost:8080 | Address of Aperture Agent to connect to                                                                                                      |
-| aperture.agent.api.key                 | APERTURE_AGENT_API_KEY                 |                | API Key to connect with FluxNinja Cloud Agent                                                                                                |
+| aperture.api.key                       | APERTURE_API_KEY                       |                | API Key to connect with FluxNinja Cloud Agent                                                                                                |
 | aperture.control.point.name            | APERTURE_CONTROL_POINT_NAME            |                | (Required) Name of the control point this agent represents                                                                                   |
 | aperture.javaagent.enable.ramp.mode    | APERTURE_JAVAAGENT_ENABLE_RAMP_MODE    | false          | Sets the ramp mode of flows started by the client. <br /> If set to true, all flows will require at least one ramp component to accept them. |
 | aperture.javaagent.insecure.grpc       | APERTURE_JAVAAGENT_INSECURE_GRPC       | true           | Whether gRPC connection to Aperture Agent should be over plaintext                                                                           |
@@ -69,7 +69,7 @@ Example invocation with commandline-set properties:
 ```sh
 java -javaagent:path/to/javaagent.jar \
 -Daperture.agent.address="ORGANIZATION.app.fluxninja.com:443" \
--Daperture.agent.api,key="API_KEY" \
+-Daperture.api,key="API_KEY" \
 -Daperture.control.point.name="awesomeFeature" \
 -Daperture.javaagent.ignored.paths="/healthz,/connected" \
 -jar path/to/application.jar
@@ -87,7 +87,7 @@ The `/config.properties` file:
 
 ```properties
 aperture.agent.address=ORGANIZATION.app.fluxninja.com:443
-aperture.agent.api.key=API_KEY
+aperture.api.key=API_KEY
 aperture.control.point.name=awesomeFeature
 aperture.javaagent.ignored.paths=/healthz,/connected
 ```
