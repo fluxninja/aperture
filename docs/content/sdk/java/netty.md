@@ -16,10 +16,10 @@ keywords:
 All Netty pipelines can have an Aperture Handler automatically added into them
 using [Aperture Instrumentation Agent][javaagent].
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::

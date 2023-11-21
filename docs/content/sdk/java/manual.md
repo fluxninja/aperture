@@ -21,23 +21,23 @@ can be used to manually set feature control points within a Java service.
 
 To do so, first create an instance of ApertureSDK:
 
-:::info Agent API Key
+:::info API Key
 
-You can create an Agent API key for your project in the Aperture Cloud UI. For
-more information, refer to
+You can create an API key for your project in the Aperture Cloud UI. For more
+information, refer to
 [Define Control Points](/get-started/define-control-points.md).
 
 :::
 
 ```java
     String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
-    String agentAPIKey = "AGENT_API_KEY";
+    String agentAPIKey = "API_KEY";
 
     ApertureSDK apertureSDK;
 
     apertureSDK = ApertureSDK.builder()
             .setAddress(agentAddress)
-            .setAgentAPIKey(agentAPIKey)
+            .setAPIKey(agentAPIKey)
             .setFlowTimeout(Duration.ofMillis(1000))
             .build();
 ```

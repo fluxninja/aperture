@@ -26,7 +26,7 @@ public class SpringBootApp {
 
     public static void main(String[] args) {
         getEnvOrDefault("APERTURE_AGENT_ADDRESS", DEFAULT_AGENT_ADDRESS);
-        getEnvOrDefault("APERTURE_AGENT_API_KEY", "");
+        getEnvOrDefault("APERTURE_API_KEY", "");
         getEnvOrDefault("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
         getEnvOrDefault("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
         getEnvOrDefault("APERTURE_GRPC_TIMEOUT_MS", DEFAULT_GRPC_TIMEOUT_MS);

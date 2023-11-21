@@ -27,10 +27,10 @@ type FluxNinjaExtensionConfig struct {
 	// For connecting to Aperture Cloud Controller, the `endpoint` should be a `grpc/http2` address.
 	// For self-hosted controller, the HTTP protocol address can start with `http(s)://`.
 	Endpoint string `json:"endpoint" validate:"omitempty,hostname_port|url|fqdn"`
-	// Deprecated: v3.0.0. Use AgentAPIKey instead
-	APIKey string `json:"api_key" validate:"deprecated"`
 	// API Key for this agent. If this key is not set, the extension won't be enabled.
-	AgentAPIKey string `json:"agent_api_key"`
+	APIKey string `json:"api_key"`
+	// Deprecated: v3.0.0. Use APIKey instead
+	AgentAPIKey string `json:"agent_api_key" validate:"deprecated"`
 	// Installation mode describes on which underlying platform the Agent or the Controller is being run.
 	InstallationMode string `json:"installation_mode" validate:"oneof=KUBERNETES_SIDECAR KUBERNETES_DAEMONSET LINUX_BARE_METAL CLOUD_AGENT" default:"LINUX_BARE_METAL"`
 	// Whether to connect to [Aperture Cloud Controller](/reference/fluxninja.md).

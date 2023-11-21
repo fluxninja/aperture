@@ -85,10 +85,10 @@ func newHeartbeats(
 	flowControlPoints *cache.Cache[selectors.TypedControlPointID],
 	autoscalek8sControlPoints autoscalek8sdiscovery.AutoScaleControlPoints,
 ) *Heartbeats {
-	apiKey := extensionConfig.AgentAPIKey
+	apiKey := extensionConfig.APIKey
 	if apiKey == "" {
-		//nolint:staticcheck // SA1019 read APIKey config for backward compatibility
-		apiKey = extensionConfig.APIKey
+		//nolint:staticcheck // SA1019 read AgentAPIKey config for backward compatibility
+		apiKey = extensionConfig.AgentAPIKey
 	}
 	return &Heartbeats{
 		heartbeatsAddr:            extensionConfig.Endpoint,
@@ -285,7 +285,7 @@ func (h *Heartbeats) newHeartbeat(
 func (h *Heartbeats) sendSingleHeartbeat(jobCtxt context.Context) (proto.Message, error) {
 	report := h.newHeartbeat(jobCtxt)
 
-	// Add agent key value to metadata
+	// Add api key value to metadata
 	md := metadata.Pairs("x-api-key", h.apiKey)
 	ctx := metadata.NewOutgoingContext(jobCtxt, md)
 	_, err := h.heartbeatsClient.Report(ctx, report)

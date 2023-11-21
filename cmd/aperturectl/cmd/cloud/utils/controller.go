@@ -28,8 +28,10 @@ import (
 // ControllerConfig is the config file structure for Aperture Cloud Controller.
 type ControllerConfig struct {
 	// When changing fields, remember to update docs/content/reference/configuration/aperturectl.md.
-	URL         string `toml:"url"`
+	URL string `toml:"url"`
+	// Deprecated: v3.0.0, use access_token instead.
 	APIKey      string `toml:"api_key"`
+	AccessToken string `toml:"access_token"`
 	ProjectName string `toml:"project_name"`
 }
 
@@ -45,7 +47,7 @@ type ControllerConn struct {
 	controllerAddr string
 	allowInsecure  bool
 	skipVerify     bool
-	apiKey         string
+	accessToken    string
 	config         string
 	projectName    string
 
@@ -74,10 +76,10 @@ func (c *ControllerConn) InitFlags(flags *flag.FlagSet) {
 		"Skip TLS certificate verification while connecting to controller",
 	)
 	flags.StringVar(
-		&c.apiKey,
-		"api-key",
+		&c.accessToken,
+		"access-token",
 		"",
-		"Aperture Cloud User API Key to be used when using Cloud Controller",
+		"User Access Token to be used while connecting to Aperture Cloud",
 	)
 	flags.StringVar(
 		&c.projectName,
@@ -111,11 +113,11 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 		}
 	}
 
-	if c.config == "" && (c.controllerAddr == "" || c.apiKey == "" || c.projectName == "") {
-		return errors.New("missing required flag(s): --controller, --api-key, --project-name, --config")
+	if c.config == "" && (c.controllerAddr == "" || c.accessToken == "" || c.projectName == "") {
+		return errors.New("missing required flag(s): --controller, --access-token, --project-name, --config")
 	}
 
-	if c.config != "" && (c.controllerAddr == "" || c.apiKey == "" || c.projectName == "") {
+	if c.config != "" && (c.controllerAddr == "" || c.accessToken == "" || c.projectName == "") {
 		var err error
 		c.config, err = filepath.Abs(c.config)
 		if err != nil {
@@ -137,8 +139,8 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.url'", c.config)
 		}
 
-		if config.Controller.APIKey == "" && c.apiKey == "" {
-			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.api_key'", c.config)
+		if config.Controller.AccessToken == "" && config.Controller.APIKey == "" && c.accessToken == "" {
+			return fmt.Errorf("invalid config file '%s'. Missing key 'controller.access_token'", c.config)
 		}
 
 		if config.Controller.ProjectName == "" && c.projectName == "" {
@@ -153,8 +155,12 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 			c.controllerAddr = config.Controller.URL
 		}
 
-		if c.apiKey == "" {
-			c.apiKey = config.Controller.APIKey
+		if c.accessToken == "" {
+			if config.Controller.AccessToken != "" {
+				c.accessToken = config.Controller.AccessToken
+			} else {
+				c.accessToken = config.Controller.APIKey
+			}
 		}
 	}
 
@@ -277,7 +283,7 @@ func (c *ControllerConn) cloudControllerInterceptor(
 	invoker grpc.UnaryInvoker,
 	opts ...grpc.CallOption,
 ) error {
-	md := metadata.Pairs("Authorization", fmt.Sprintf("Bearer %s", c.apiKey), "projectName", c.projectName)
+	md := metadata.Pairs("Authorization", fmt.Sprintf("Bearer %s", c.accessToken), "projectName", c.projectName)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	return invoker(ctx, method, req, reply, cc, opts...)
 }

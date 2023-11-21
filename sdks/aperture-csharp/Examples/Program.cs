@@ -10,7 +10,7 @@ XmlConfigurator.Configure();
 var log = LogManager.GetLogger("AppLogger");
 
 var agentAddress = Environment.GetEnvironmentVariable("APERTURE_AGENT_ADDRESS") ?? "localhost:8089";
-var agentApiKey = Environment.GetEnvironmentVariable("APERTURE_AGENT_API_KEY") ?? "";
+var apiKey = Environment.GetEnvironmentVariable("APERTURE_API_KEY") ?? "";
 var insecureGrpcString = Environment.GetEnvironmentVariable("APERTURE_AGENT_INSECURE") ?? "true";
 var featureName = Environment.GetEnvironmentVariable("APERTURE_FEATURE_NAME") ?? "awesome-feature";
 var appPort = Environment.GetEnvironmentVariable("APERTURE_APP_PORT") ?? "8080";
@@ -18,7 +18,7 @@ var appPort = Environment.GetEnvironmentVariable("APERTURE_APP_PORT") ?? "8080";
 var builder = ApertureSdk
     .Builder()
     .SetAddress(agentAddress)
-    .SetAgentApiKey(agentApiKey);
+    .SetApiKey(apiKey);
 
 if (bool.Parse(insecureGrpcString))
     builder

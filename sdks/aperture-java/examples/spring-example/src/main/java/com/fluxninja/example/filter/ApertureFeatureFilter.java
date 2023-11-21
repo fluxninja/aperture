@@ -58,12 +58,12 @@ public class ApertureFeatureFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         String agentAddress;
-        String agentAPIKey;
+        String apiKey;
         boolean insecureGrpc;
         String rootCertificateFile;
         try {
             agentAddress = filterConfig.getInitParameter("agent_address");
-            agentAPIKey = filterConfig.getInitParameter("agent_api_key");
+            apiKey = filterConfig.getInitParameter("api_key");
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
             this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
@@ -75,7 +75,7 @@ public class ApertureFeatureFilter implements Filter {
             this.apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentAddress)
-                            .setAgentAPIKey(agentAPIKey)
+                            .setAPIKey(apiKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertificateFile)
                             .build();

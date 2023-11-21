@@ -44,7 +44,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
             sdk =
                     ApertureSDK.builder()
                             .setAddress(this.agentAddress)
-                            .setAgentAPIKey(this.agentAPIKey)
+                            .setAPIKey(this.agentAPIKey)
                             .useInsecureGrpc(insecureGrpc)
                             .setRootCertificateFile(rootCertFile)
                             .build();

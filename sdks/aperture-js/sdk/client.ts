@@ -35,26 +35,26 @@ export class ApertureClient {
 
   constructor({
     address,
-    agentAPIKey,
+    apiKey,
     channelCredentials = grpc.credentials.createSsl(),
     channelOptions = {},
   }: {
     address: string;
     channelCredentials?: ChannelCredentials;
     channelOptions?: ChannelOptions;
-    agentAPIKey?: string;
+    apiKey?: string;
   }) {
     if (!address) {
       throw new Error("address is required");
     }
 
-    if (agentAPIKey) {
+    if (apiKey) {
       channelCredentials = grpc.credentials.combineChannelCredentials(
         channelCredentials,
         grpc.credentials.createFromMetadataGenerator(
           (_params: any, callback: any) => {
             const metadata = new grpc.Metadata();
-            metadata.add("x-api-key", agentAPIKey);
+            metadata.add("x-api-key", apiKey);
             callback(null, metadata);
           },
         ),
@@ -104,7 +104,19 @@ export class ApertureClient {
       let startDate = Date.now();
 
       const resolveFlow = (response: any, err: any) => {
-        resolve(new Flow(this.fcsClient, params.grpcCallOptions ?? {}, controlPoint, span, startDate, params.rampMode, params.cacheKey, response, err));
+        resolve(
+          new Flow(
+            this.fcsClient,
+            params.grpcCallOptions ?? {},
+            controlPoint,
+            span,
+            startDate,
+            params.rampMode,
+            params.cacheKey,
+            response,
+            err,
+          ),
+        );
       };
 
       try {
@@ -126,7 +138,10 @@ export class ApertureClient {
           cacheKey: params.cacheKey,
         };
 
-        const cb: grpc.requestCallback<CheckResponse__Output> = (err: any, response: any) => {
+        const cb: grpc.requestCallback<CheckResponse__Output> = (
+          err: any,
+          response: any,
+        ) => {
           resolveFlow(err ? null : response, err);
           return;
         };

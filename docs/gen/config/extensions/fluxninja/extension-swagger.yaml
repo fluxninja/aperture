@@ -90,17 +90,17 @@ definitions:
     FluxNinjaExtensionConfig:
         properties:
             agent_api_key:
-                description: API Key for this agent. If this key is not set, the extension won't be enabled.
-                type: string
-                x-go-name: AgentAPIKey
-                x-go-tag-json: agent_api_key
-            api_key:
-                description: 'Deprecated: v3.0.0. Use AgentAPIKey instead'
+                description: 'Deprecated: v3.0.0. Use APIKey instead'
                 type: string
                 x-deprecated: true
+                x-go-name: AgentAPIKey
+                x-go-tag-json: agent_api_key
+                x-go-tag-validate: deprecated
+            api_key:
+                description: API Key for this agent. If this key is not set, the extension won't be enabled.
+                type: string
                 x-go-name: APIKey
                 x-go-tag-json: api_key
-                x-go-tag-validate: deprecated
             client:
                 $ref: '#/definitions/ClientConfig'
                 description: Client configuration.

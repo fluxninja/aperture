@@ -103,7 +103,7 @@ spec:
             - name: APERTURE_AGENT_SERVICE_DISCOVERY_KUBERNETES_ENABLED
               value: "false"
             {{- if or (and .Values.agent.secrets.fluxNinjaExtension .Values.agent.secrets.fluxNinjaExtension.create) (and .Values.agent.secrets.fluxNinjaExtension .Values.agent.secrets.fluxNinjaExtension.secretKeyRef .Values.agent.secrets.fluxNinjaExtension.secretKeyRef.name) }}
-            - name: APERTURE_AGENT_FLUXNINJA_AGENT_API_KEY
+            - name: APERTURE_AGENT_FLUXNINJA_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "agent.apiSecret.name" (dict "agent" .Values.agent "context" . $ ) }}

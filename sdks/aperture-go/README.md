@@ -17,7 +17,7 @@ go get github.com/fluxninja/aperture-go/v2
 options := aperture.Options{
    DialOptions: grpcOptions,
    Address:     "ORGANIZATION.app.fluxninja.com",
-   AgentAPIKey: "AGENT_API_KEY",
+   APIKey: "API_KEY",
 }
 
 // initialize Aperture Client with the provided options.
