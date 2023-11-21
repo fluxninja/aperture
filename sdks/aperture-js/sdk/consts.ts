@@ -1,3 +1,13 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+
+export const PROTO_PATH = path.resolve(
+    path.dirname(__filename),
+    "../proto/flowcontrol/check/v1/check.proto",
+);
+
 // The name of the library.
 export const LIBRARY_NAME = "@fluxninja/aperture-js";
 // The version of the library.

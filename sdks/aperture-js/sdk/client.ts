@@ -9,12 +9,12 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest";
-import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService";
-import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts";
-import { Flow } from "./flow";
-import { checkv1 } from "./utils";
+import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
+import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
+import { Flow } from "./flow.js";
+import { fcs } from "./utils.js";
 
 /**
  * Represents the parameters for a flow.
@@ -105,7 +105,7 @@ export class ApertureClient {
       );
     }
 
-    this.fcsClient = new checkv1.FlowControlService(
+    this.fcsClient = new fcs.FlowControlService(
       address,
       channelCredentials,
       channelOptions,

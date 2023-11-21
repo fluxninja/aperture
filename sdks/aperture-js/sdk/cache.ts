@@ -1,5 +1,5 @@
-import { CacheLookupStatus } from "./gen/aperture/flowcontrol/check/v1/CacheLookupStatus";
-import { CacheOperationStatus } from "./gen/aperture/flowcontrol/check/v1/CacheOperationStatus";
+import { CacheLookupStatus } from "./gen/aperture/flowcontrol/check/v1/CacheLookupStatus.js";
+import { CacheOperationStatus } from "./gen/aperture/flowcontrol/check/v1/CacheOperationStatus.js";
 
 /**
  * Represents the status of a lookup operation in the cache.

@@ -70,7 +70,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:80](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L80)
+[client.ts:80](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L80)
 
 ## Properties
 
@@ -80,7 +80,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:66](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L66)
+[client.ts:66](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L66)
 
 ---
 
@@ -90,7 +90,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:64](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L64)
+[client.ts:64](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L64)
 
 ---
 
@@ -100,7 +100,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:70](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L70)
+[client.ts:70](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L70)
 
 ---
 
@@ -110,7 +110,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:68](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L68)
+[client.ts:68](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L68)
 
 ## Methods
 
@@ -124,7 +124,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:238](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L238)
+[client.ts:238](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L238)
 
 ---
 
@@ -142,7 +142,7 @@ The connectivity state of the channel.
 
 #### Defined in
 
-[client.ts:234](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L234)
+[client.ts:234](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L234)
 
 ---
 
@@ -158,7 +158,7 @@ Shuts down the ApertureClient.
 
 #### Defined in
 
-[client.ts:223](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L223)
+[client.ts:223](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L223)
 
 ---
 
@@ -199,5 +199,5 @@ apertureClient.StartFlow("awesomeFeature", {
 
 #### Defined in
 
-[client.ts:158](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L158)
+[client.ts:158](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L158)
 ```

@@ -48,7 +48,7 @@ Creates a new CachedValueResponse instance.
 
 #### Defined in
 
-[cache.ts:84](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L84)
+[cache.ts:84](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L84)
 
 ## Properties
 
@@ -58,7 +58,7 @@ Creates a new CachedValueResponse instance.
 
 #### Defined in
 
-[cache.ts:74](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L74)
+[cache.ts:74](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L74)
 
 ---
 
@@ -68,7 +68,7 @@ Creates a new CachedValueResponse instance.
 
 #### Defined in
 
-[cache.ts:72](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L72)
+[cache.ts:72](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L72)
 
 ---
 
@@ -78,7 +78,7 @@ Creates a new CachedValueResponse instance.
 
 #### Defined in
 
-[cache.ts:73](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L73)
+[cache.ts:73](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L73)
 
 ---
 
@@ -88,7 +88,7 @@ Creates a new CachedValueResponse instance.
 
 #### Defined in
 
-[cache.ts:75](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L75)
+[cache.ts:75](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L75)
 
 ## Methods
 
@@ -106,7 +106,7 @@ The error, or null if no error occurred.
 
 #### Defined in
 
-[cache.ts:116](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L116)
+[cache.ts:116](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L116)
 
 ---
 
@@ -124,7 +124,7 @@ The lookup status.
 
 #### Defined in
 
-[cache.ts:100](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L100)
+[cache.ts:100](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L100)
 
 ---
 
@@ -142,7 +142,7 @@ The operation status.
 
 #### Defined in
 
-[cache.ts:108](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L108)
+[cache.ts:108](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L108)
 
 ---
 
@@ -160,4 +160,4 @@ The cached value, or null if no value is available.
 
 #### Defined in
 
-[cache.ts:124](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L124)
+[cache.ts:124](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L124)

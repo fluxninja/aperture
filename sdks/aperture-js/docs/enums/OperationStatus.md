@@ -19,7 +19,7 @@ Represents the status of an operation.
 
 #### Defined in
 
-[cache.ts:35](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L35)
+[cache.ts:35](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L35)
 
 ---
 
@@ -29,4 +29,4 @@ Represents the status of an operation.
 
 #### Defined in
 
-[cache.ts:34](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L34)
+[cache.ts:34](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L34)

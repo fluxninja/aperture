@@ -42,7 +42,7 @@ Creates a new instance of SetCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:141](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L141)
+[cache.ts:141](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L141)
 
 ## Properties
 
@@ -52,7 +52,7 @@ Creates a new instance of SetCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:133](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L133)
+[cache.ts:133](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L133)
 
 ---
 
@@ -62,7 +62,7 @@ Creates a new instance of SetCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:134](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L134)
+[cache.ts:134](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L134)
 
 ## Methods
 
@@ -80,7 +80,7 @@ The error that occurred during the operation, or null if no error occurred.
 
 #### Defined in
 
-[cache.ts:150](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L150)
+[cache.ts:150](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L150)
 
 ---
 
@@ -98,4 +98,4 @@ The status of the operation.
 
 #### Defined in
 
-[cache.ts:158](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L158)
+[cache.ts:158](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L158)

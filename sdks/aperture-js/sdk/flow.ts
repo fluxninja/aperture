@@ -1,5 +1,5 @@
 import grpc from "@grpc/grpc-js";
-import { Duration } from "@grpc/grpc-js/build/src/duration";
+import { Duration } from "@grpc/grpc-js/build/src/duration.js";
 import { Span } from "@opentelemetry/api";
 import {
   CachedValueResponse,
@@ -10,7 +10,7 @@ import {
   LookupStatus,
   OperationStatus,
   SetCachedValueResponse,
-} from "./cache";
+} from "./cache.js";
 import {
   CHECK_RESPONSE_LABEL,
   FLOW_END_TIMESTAMP_LABEL,
@@ -18,14 +18,14 @@ import {
   FLOW_STATUS_LABEL,
   SOURCE_LABEL,
   WORKLOAD_START_TIMESTAMP_LABEL,
-} from "./consts";
-import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest";
+} from "./consts.js";
+import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
 import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
 import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
-} from "./gen/aperture/flowcontrol/check/v1/CheckResponse";
-import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService";
+} from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
+import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
