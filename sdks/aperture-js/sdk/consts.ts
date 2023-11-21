@@ -9,7 +9,7 @@ export const PROTO_PATH = path.resolve(
 );
 
 export const LIBRARY_NAME = "@fluxninjutsu/aperture-js";
-export const LIBRARY_VERSION = "2.3.3";
+export const LIBRARY_VERSION = "2.3.4";
 
 // Label to hold source of flow.
 export const SOURCE_LABEL = "aperture.source";

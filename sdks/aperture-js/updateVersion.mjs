@@ -16,13 +16,16 @@ const constsPath = path.join(__dirname, "sdk", "consts.ts");
 let constsFileContents = fs.readFileSync(constsPath, "utf8");
 
 // Regular expression to match the version string in consts.ts
-const versionRegEx = /export const LIBRARY_VERSION = '.*';/;
+const versionRegEx = /export const LIBRARY_VERSION = ".*";/;
 
 // Replace the version string with the current version
 constsFileContents = constsFileContents.replace(
   versionRegEx,
-  `export const LIBRARY_VERSION = '${currentVersion}';`,
+  `export const LIBRARY_VERSION = "${currentVersion}";`,
 );
+
+console.log(constsPath)
+console.log(constsFileContents)
 
 // Write the changes to consts.ts
 fs.writeFileSync(constsPath, constsFileContents, "utf8");
