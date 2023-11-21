@@ -114,7 +114,7 @@ func (c *ControllerConn) PreRunE(_ *cobra.Command, _ []string) error {
 	}
 
 	if c.config == "" && (c.controllerAddr == "" || c.accessToken == "" || c.projectName == "") {
-		return errors.New("missing required flag(s): --controller, --api-key, --project-name, --config")
+		return errors.New("missing required flag(s): --controller, --access-token, --project-name, --config")
 	}
 
 	if c.config != "" && (c.controllerAddr == "" || c.accessToken == "" || c.projectName == "") {

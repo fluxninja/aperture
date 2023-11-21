@@ -18,7 +18,7 @@ your user in the Aperture Cloud UI.
 
 You have [signed up][sign-up] on Aperture Cloud and created an organization.
 
-## Create API Keys
+## Create Personal Access Tokens
 
 1. In the Aperture Cloud UI, navigate to your organization. _Personal Access
    Tokens are user-specific per organization. You need to create a new Access
