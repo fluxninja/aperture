@@ -1202,7 +1202,7 @@ var _ = Describe("Tests for secretName", func() {
 				},
 			}
 
-			expected := fmt.Sprintf("%s-apikey", AppName)
+			expected := fmt.Sprintf("%s-agent-apikey", AppName)
 
 			result := SecretName(AppName, "agent", &instance.Spec.Secrets.FluxNinjaExtension)
 			Expect(result).To(Equal(expected))
