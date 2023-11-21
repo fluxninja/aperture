@@ -13,10 +13,8 @@ keywords:
   - manual
 ---
 
-<!-- ADD NUGET LINK AFTER PUBLISHING -->
-
-[Aperture C# SDK](https://www.github.com/fluxninja/aperture-csharp) can be used
-to manually set feature control points within a .NET service.
+[Aperture C# SDK](https://www.nuget.org/packages/ApertureSDK/) can be used to
+manually set feature control points within a .NET service.
 
 To do so, first create an instance of ApertureClient:
 
