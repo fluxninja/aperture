@@ -1,5 +1,4 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) /
-DeleteCachedValueResponse
+[@fluxninja/aperture-js](../README.md) / DeleteCachedValueResponse
 
 # Class: DeleteCachedValueResponse
 
@@ -43,7 +42,7 @@ Creates a new instance of DeleteCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:175](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L175)
+[cache.ts:175](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L175)
 
 ## Properties
 
@@ -53,7 +52,7 @@ Creates a new instance of DeleteCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:167](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L167)
+[cache.ts:167](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L167)
 
 ---
 
@@ -63,7 +62,7 @@ Creates a new instance of DeleteCachedValueResponse.
 
 #### Defined in
 
-[cache.ts:168](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L168)
+[cache.ts:168](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L168)
 
 ## Methods
 
@@ -81,7 +80,7 @@ The error object or null if no error occurred.
 
 #### Defined in
 
-[cache.ts:184](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L184)
+[cache.ts:184](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L184)
 
 ---
 
@@ -99,4 +98,4 @@ The operation status.
 
 #### Defined in
 
-[cache.ts:192](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L192)
+[cache.ts:192](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L192)

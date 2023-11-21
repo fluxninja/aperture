@@ -1,4 +1,4 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) / Flow
+[@fluxninja/aperture-js](../README.md) / Flow
 
 # Class: Flow
 
@@ -66,7 +66,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:53](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L53)
+[flow.ts:53](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L53)
 
 ## Properties
 
@@ -76,7 +76,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:60](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L60)
+[flow.ts:60](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L60)
 
 ---
 
@@ -86,7 +86,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:61](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L61)
+[flow.ts:61](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L61)
 
 ---
 
@@ -96,7 +96,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:56](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L56)
+[flow.ts:56](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L56)
 
 ---
 
@@ -106,7 +106,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:50](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L50)
+[flow.ts:50](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L50)
 
 ---
 
@@ -116,7 +116,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:62](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L62)
+[flow.ts:62](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L62)
 
 ---
 
@@ -126,7 +126,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:54](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L54)
+[flow.ts:54](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L54)
 
 ---
 
@@ -136,7 +136,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:55](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L55)
+[flow.ts:55](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L55)
 
 ---
 
@@ -146,7 +146,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:59](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L59)
+[flow.ts:59](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L59)
 
 ---
 
@@ -156,7 +156,7 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:57](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L57)
+[flow.ts:57](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L57)
 
 ---
 
@@ -166,18 +166,18 @@ Represents a flow in the SDK.
 
 #### Defined in
 
-[flow.ts:58](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L58)
+[flow.ts:58](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L58)
 
 ---
 
 ### status
 
-• `Private` **status**: [`FlowStatus`](../modules.md#flowstatus) =
+• `Private` **status**: [`FlowStatus`](../README.md#flowstatus) =
 `FlowStatusEnum.OK`
 
 #### Defined in
 
-[flow.ts:51](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L51)
+[flow.ts:51](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L51)
 
 ## Methods
 
@@ -195,7 +195,7 @@ The cached value response.
 
 #### Defined in
 
-[flow.ts:174](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L174)
+[flow.ts:174](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L174)
 
 ---
 
@@ -213,7 +213,7 @@ The check response object.
 
 #### Defined in
 
-[flow.ts:208](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L208)
+[flow.ts:208](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L208)
 
 ---
 
@@ -233,7 +233,7 @@ A promise that resolves to the response of the cache delete operation.
 
 #### Defined in
 
-[flow.ts:135](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L135)
+[flow.ts:135](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L135)
 
 ---
 
@@ -249,7 +249,7 @@ Ends the flow and performs necessary cleanup.
 
 #### Defined in
 
-[flow.ts:223](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L223)
+[flow.ts:223](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L223)
 
 ---
 
@@ -267,7 +267,7 @@ The error object.
 
 #### Defined in
 
-[flow.ts:200](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L200)
+[flow.ts:200](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L200)
 
 ---
 
@@ -294,7 +294,7 @@ A promise that resolves to the response of the cache upsert operation.
 
 #### Defined in
 
-[flow.ts:99](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L99)
+[flow.ts:99](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L99)
 
 ---
 
@@ -306,9 +306,9 @@ Sets the status of the flow.
 
 #### Parameters
 
-| Name     | Type                                     | Description        |
-| :------- | :--------------------------------------- | :----------------- |
-| `status` | [`FlowStatus`](../modules.md#flowstatus) | The status to set. |
+| Name     | Type                                    | Description        |
+| :------- | :-------------------------------------- | :----------------- |
+| `status` | [`FlowStatus`](../README.md#flowstatus) | The status to set. |
 
 #### Returns
 
@@ -316,7 +316,7 @@ Sets the status of the flow.
 
 #### Defined in
 
-[flow.ts:89](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L89)
+[flow.ts:89](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L89)
 
 ---
 
@@ -335,7 +335,7 @@ A boolean value indicating whether the flow should run.
 
 #### Defined in
 
-[flow.ts:73](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L73)
+[flow.ts:73](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L73)
 
 ---
 
@@ -353,7 +353,7 @@ The span object.
 
 #### Defined in
 
-[flow.ts:216](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L216)
+[flow.ts:216](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L216)
 
 ---
 
@@ -373,7 +373,7 @@ The span object.
 
 #### Defined in
 
-[flow.ts:282](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L282)
+[flow.ts:282](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L282)
 
 ---
 
@@ -393,4 +393,4 @@ The span object.
 
 #### Defined in
 
-[flow.ts:271](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/flow.ts#L271)
+[flow.ts:271](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/flow.ts#L271)

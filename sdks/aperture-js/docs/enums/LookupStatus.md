@@ -1,4 +1,4 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) / LookupStatus
+[@fluxninja/aperture-js](../README.md) / LookupStatus
 
 # Enumeration: LookupStatus
 
@@ -19,7 +19,7 @@ Represents the status of a lookup operation in the cache.
 
 #### Defined in
 
-[cache.ts:8](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L8)
+[cache.ts:8](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L8)
 
 ---
 
@@ -29,4 +29,4 @@ Represents the status of a lookup operation in the cache.
 
 #### Defined in
 
-[cache.ts:9](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L9)
+[cache.ts:9](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L9)

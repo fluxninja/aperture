@@ -44,6 +44,21 @@ export interface FlowParams {
 
 /**
  * Represents the Aperture Client used for interacting with the Aperture Agent.
+ * @example
+ * ```ts
+ *const apertureClient = new ApertureClient({
+ *  address:
+ *    process.env.APERTURE_AGENT_ADDRESS !== undefined
+ *      ? process.env.APERTURE_AGENT_ADDRESS
+ *      : "localhost:8089",
+ *  apiKey: process.env.APERTURE_API_KEY || undefined,
+ *  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+ *  channelCredentials:
+ *    process.env.APERTURE_AGENT_INSECURE !== undefined
+ *      ? grpc.credentials.createInsecure()
+ *      : grpc.credentials.createSsl(),
+ *});
+ * ```
  */
 export class ApertureClient {
   private readonly fcsClient: FlowControlServiceClient;
@@ -129,6 +144,16 @@ export class ApertureClient {
    * @param controlPoint The control point for the flow.
    * @param params The parameters for the flow.
    * @returns A promise that resolves to a Flow object.
+   * @example
+   * ```ts
+   *apertureClient.StartFlow("awesomeFeature", {
+   *  labels: labels,
+   *  grpcCallOptions: {
+   *    deadline: Date.now() + 30000,
+   *  },
+   *  rampMode: false,
+   *  cacheKey: "cache",
+   *});
    */
   async StartFlow(controlPoint: string, params: FlowParams): Promise<Flow> {
     return new Promise<Flow>((resolve) => {

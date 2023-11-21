@@ -1,9 +1,25 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) /
-ApertureClient
+[@fluxninja/aperture-js](../README.md) / ApertureClient
 
 # Class: ApertureClient
 
 Represents the Aperture Client used for interacting with the Aperture Agent.
+
+**`Example`**
+
+```ts
+const apertureClient = new ApertureClient({
+  address:
+    process.env.APERTURE_AGENT_ADDRESS !== undefined
+      ? process.env.APERTURE_AGENT_ADDRESS
+      : "localhost:8089",
+  apiKey: process.env.APERTURE_API_KEY || undefined,
+  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+  channelCredentials:
+    process.env.APERTURE_AGENT_INSECURE !== undefined
+      ? grpc.credentials.createInsecure()
+      : grpc.credentials.createSsl(),
+});
+```
 
 ## Table of contents
 
@@ -40,7 +56,7 @@ Constructs a new instance of the ApertureClient.
 | :---------------------- | :------------------- |
 | `«destructured»`        | `Object`             |
 | › `address`             | `string`             |
-| › `agentAPIKey?`        | `string`             |
+| › `apiKey?`             | `string`             |
 | › `channelCredentials?` | `ChannelCredentials` |
 | › `channelOptions?`     | `ChannelOptions`     |
 
@@ -54,7 +70,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:65](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L65)
+[client.ts:80](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L80)
 
 ## Properties
 
@@ -64,7 +80,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:51](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L51)
+[client.ts:66](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L66)
 
 ---
 
@@ -74,7 +90,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:49](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L49)
+[client.ts:64](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L64)
 
 ---
 
@@ -84,7 +100,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:55](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L55)
+[client.ts:70](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L70)
 
 ---
 
@@ -94,7 +110,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:53](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L53)
+[client.ts:68](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L68)
 
 ## Methods
 
@@ -108,7 +124,7 @@ Error if the address is not provided.
 
 #### Defined in
 
-[client.ts:198](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L198)
+[client.ts:238](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L238)
 
 ---
 
@@ -126,7 +142,7 @@ The connectivity state of the channel.
 
 #### Defined in
 
-[client.ts:194](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L194)
+[client.ts:234](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L234)
 
 ---
 
@@ -142,7 +158,7 @@ Shuts down the ApertureClient.
 
 #### Defined in
 
-[client.ts:183](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L183)
+[client.ts:223](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L223)
 
 ---
 
@@ -169,6 +185,19 @@ returns as true.
 
 A promise that resolves to a Flow object.
 
+**`Example`**
+
+```ts
+apertureClient.StartFlow("awesomeFeature", {
+ labels: labels,
+ grpcCallOptions: {
+   deadline: Date.now() + 30000,
+ },
+ rampMode: false,
+ cacheKey: "cache",
+});
+
 #### Defined in
 
-[client.ts:133](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L133)
+[client.ts:158](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L158)
+```

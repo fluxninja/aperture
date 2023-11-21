@@ -1,5 +1,5 @@
 import grpc from "@grpc/grpc-js";
-import { Duration } from "@grpc/grpc-js/build/src/duration.js";
+import { Duration } from "@grpc/grpc-js/build/src/duration";
 import { Span } from "@opentelemetry/api";
 import {
   CachedValueResponse,

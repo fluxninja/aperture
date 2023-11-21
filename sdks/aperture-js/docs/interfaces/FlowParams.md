@@ -1,4 +1,4 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) / FlowParams
+[@fluxninja/aperture-js](../README.md) / FlowParams
 
 # Interface: FlowParams
 
@@ -24,7 +24,7 @@ The cache key for the flow.
 
 #### Defined in
 
-[client.ts:42](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L42)
+[client.ts:42](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L42)
 
 ---
 
@@ -36,7 +36,7 @@ Additional gRPC call options for the flow.
 
 #### Defined in
 
-[client.ts:34](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L34)
+[client.ts:34](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L34)
 
 ---
 
@@ -48,7 +48,7 @@ Optional labels for the flow.
 
 #### Defined in
 
-[client.ts:26](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L26)
+[client.ts:26](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L26)
 
 ---
 
@@ -60,7 +60,7 @@ Specifies whether the flow should use ramp mode.
 
 #### Defined in
 
-[client.ts:30](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L30)
+[client.ts:30](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L30)
 
 ---
 
@@ -72,4 +72,4 @@ Specifies whether to try connecting to the flow.
 
 #### Defined in
 
-[client.ts:38](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/client.ts#L38)
+[client.ts:38](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/client.ts#L38)

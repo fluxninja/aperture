@@ -22,6 +22,8 @@
     "lightHighlightTheme": "github-light",
     "entryPointStrategy": "expand",
     "out": "docs",
-    "plugin": ["typedoc-plugin-markdown"]
+    "plugin": ["typedoc-plugin-markdown"],
+    "readme": "none",
+    "theme": "default"
   }
 }

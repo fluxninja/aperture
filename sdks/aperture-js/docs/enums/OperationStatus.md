@@ -1,5 +1,4 @@
-[@fluxninja/aperture-js](../README.md) / [Exports](../modules.md) /
-OperationStatus
+[@fluxninja/aperture-js](../README.md) / OperationStatus
 
 # Enumeration: OperationStatus
 
@@ -20,7 +19,7 @@ Represents the status of an operation.
 
 #### Defined in
 
-[cache.ts:35](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L35)
+[cache.ts:35](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L35)
 
 ---
 
@@ -30,4 +29,4 @@ Represents the status of an operation.
 
 #### Defined in
 
-[cache.ts:34](https://github.com/fluxninja/aperture/blob/c4fc8958b/sdks/aperture-js/sdk/cache.ts#L34)
+[cache.ts:34](https://github.com/fluxninja/aperture/blob/5ab1329aa/sdks/aperture-js/sdk/cache.ts#L34)
