@@ -229,7 +229,9 @@ Kubernetes Objects which will be created by following steps are listed
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
       `API_KEY` with the API key linked to the project. The API Key can be found
       by navigating to the **`Aperture`** tab in the sidebar menu, and then
-      clicking on the **`API Keys`** tab in the top bar.
+      clicking on the **`API Keys`** tab in the top bar. For detailed
+      instructions on locating API Keys, please refer to the [API
+      Keys][api-keys] section.
 
       :::note
 

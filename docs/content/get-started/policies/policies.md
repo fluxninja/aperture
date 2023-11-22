@@ -61,4 +61,4 @@ project
 
 [blueprints]: /reference/blueprints/blueprints.md
 [policies]: /concepts/advanced/policy.md
-[signed up]: /get-started/sign-up.md
+[signed up]: /reference/cloud-ui/sign-up.md

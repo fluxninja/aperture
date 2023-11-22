@@ -33,7 +33,7 @@ These are two main modes on how to get started with Aperture.
 1. **Connect to Aperture Cloud**: In Aperture Cloud, authentication for SDK
    integrations is handled using API keys. These keys can be found in the
    Aperture Cloud UI. For detailed instructions on locating API Keys, please
-   refer to the [API Keys][api-key] section.
+   refer to the [API Keys][api-keys] section.
 
 2. **Define Control Points**: Check out the [Define Control
    Points][define-control-points] and learn how to use Aperture within your
@@ -78,7 +78,7 @@ within your infrastructure, making it perfect for air-gapped environments.
    be found within the Aperture Cloud UI. Copy the API key and save it in a
    secure location. This key will be used during the configuration of
    [Self-hosted][aperture-for-infra] Agents. For detailed instructions on
-   locating API Keys, please refer to the [API Keys][api-key] section.
+   locating API Keys, please refer to the [API Keys][api-keys] section.
 
    :::info
 
@@ -102,6 +102,5 @@ within your infrastructure, making it perfect for air-gapped environments.
 [agent-docs]: /aperture-for-infra/agent/agent.md
 [integrations]: /aperture-for-infra/integrations/integrations.md
 [sdks]: /sdk/sdk.md
-[define-control-points]: /get-started/define-control-points.md
-[api-key]: /reference/cloud-ui/api-keys.md
+[api-keys]: /reference/cloud-ui/api-keys.md
 [define-control-points]: /get-started/define-control-points.md
