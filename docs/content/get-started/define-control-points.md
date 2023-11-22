@@ -44,7 +44,8 @@ configure the Aperture SDK for your application.
 In the organization created within Aperture Cloud, navigate to the
 **`Aperture`** tab in the sidebar menu. From there, select **`API Keys`** in the
 top bar. This is where you can find and copy the **`API_KEY`** and use it in the
-SDK as follows:
+SDK. For detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -163,3 +164,4 @@ your needs. [See all SDKs][sdks].
 
 [control-points]: /concepts/control-point.md
 [sdks]: /sdk/sdk.md
+[api-keys]: /reference/cloud-ui/api-keys.md
