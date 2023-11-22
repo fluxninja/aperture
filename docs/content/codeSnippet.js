@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import CodeBlock from "@theme/CodeBlock";
 
 const CodeSnippet = ({ lang, snippetName }) => {
   const [code, setCode] = useState("");
-
   useEffect(() => {
     const fetchSnippet = async () => {
       try {
@@ -18,11 +16,7 @@ const CodeSnippet = ({ lang, snippetName }) => {
     fetchSnippet();
   }, [lang, snippetName]);
 
-  return (
-    <SyntaxHighlighter language={lang} style={dark}>
-      {code}
-    </SyntaxHighlighter>
-  );
+  return <CodeBlock language={lang}>{code}</CodeBlock>;
 };
 
 export default CodeSnippet;
