@@ -32,4 +32,3 @@ You have [signed up][sign-up] on Aperture Cloud and created a project.
 [Agents]: /aperture-for-infra/agent/agent.md
 [Controllers]: /aperture-for-infra/controller/controller.md
 [sign-up]: /reference/cloud-ui/sign-up.md
-
