@@ -170,8 +170,8 @@ func daemonsetForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *r
 func daemonsetMutate(dms *appsv1.DaemonSet, spec appsv1.DaemonSetSpec) controllerutil.MutateFn {
 	return func() error {
 		dms.Spec.Selector = spec.Selector
-		dms.Spec.Template.Annotations = spec.Template.Annotations
-		dms.Spec.Template.Labels = spec.Template.Labels
+		dms.Spec.Template.Annotations = controllers.SyncMaps(spec.Template.Annotations, dms.Spec.Template.Annotations)
+		dms.Spec.Template.Labels = controllers.SyncMaps(spec.Template.Labels, dms.Spec.Template.Labels)
 		dms.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
 		dms.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets
 		dms.Spec.Template.Spec.NodeSelector = spec.Template.Spec.NodeSelector
