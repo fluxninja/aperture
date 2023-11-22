@@ -17,6 +17,8 @@ limitations under the License.
 package agent
 
 import (
+	"fmt"
+
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -664,6 +666,10 @@ var _ = Describe("Test DaemonSet Mutate", func() {
 		err := daemonsetMutate(dms, expected.Spec)()
 
 		Expect(err).NotTo(HaveOccurred())
+		fmt.Println(dms.Spec.Template.Annotations)
+		fmt.Println(expected.Spec.Template.Annotations)
+		fmt.Println(dms.Spec.Template.Labels)
+		fmt.Println(expected.Spec.Template.Labels)
 		Expect(dms).To(Equal(expected))
 	})
 })
