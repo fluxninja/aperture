@@ -20,9 +20,9 @@ automatically set traffic control points for relevant services:
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI. For more
-information, refer to
-[Define Control Points](/get-started/define-control-points.md).
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the
+[API Keys](/reference/cloud-ui/api-keys.md) section.
 
 :::
 

@@ -3,7 +3,7 @@ title: Personal Access Tokens
 keywords:
   - Personal-Access-Tokens
   - aperture-cloud
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 ```mdx-code-block
@@ -31,4 +31,4 @@ You have [signed up][sign-up] on Aperture Cloud and created an organization.
 ![Access Tokens](./assets/personal-api-keys.gif "Creating Personal Access Tokens")
 
 [configure aperturectl]: /reference/aperture-cli/aperture-cli.md
-[sign-up]: /get-started/sign-up.md
+[sign-up]: /reference/cloud-ui/sign-up.md

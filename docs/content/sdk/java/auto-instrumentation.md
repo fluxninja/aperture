@@ -31,9 +31,9 @@ found [here][aperture-javaagent].
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI. For more
-information, refer to
-[Define Control Points](/get-started/define-control-points.md).
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -107,3 +107,4 @@ aperture.javaagent.ignored.paths=/health,/connected
 
 [aperture-javaagent]:
   https://repo1.maven.org/maven2/com/fluxninja/aperture/aperture-javaagent
+[api-keys]: /reference/cloud-ui/api-keys.md

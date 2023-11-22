@@ -23,9 +23,9 @@ To do so, first create an instance of ApertureSDK:
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI. For more
-information, refer to
-[Define Control Points](/get-started/define-control-points.md).
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -74,3 +74,4 @@ to the [example app][example] available in the repository.
 
 [example]:
   https://github.com/fluxninja/aperture-java/blob/releases/aperture-java/v2.1.0/examples/standalone-example/src/main/java/com/fluxninja/example/App.java
+[api-keys]: /reference/cloud-ui/api-keys.md

@@ -37,4 +37,4 @@ file nor flags are needed at all. Otherwise, you need the `--controller` flag.
 
 [self-hosted]: /aperture-for-infra/aperture-for-infra.md
 [aperturectl-config]: /reference/configuration/aperturectl.md
-[access-tokens]: /reference/aperture-cli/personal-access-tokens.md
+[access-tokens]: /reference/cloud-ui/personal-access-tokens.md
