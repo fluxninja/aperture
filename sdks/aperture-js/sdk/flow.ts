@@ -29,13 +29,23 @@ import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/Fl
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
+
+/**
+ * Enum representing the status of a flow.
+ */
 export const FlowStatusEnum = {
   OK: "OK",
   Error: "Error",
 } as const;
 
+/**
+ * Represents the status of a flow.
+ */
 export type FlowStatus = (typeof FlowStatusEnum)[keyof typeof FlowStatusEnum];
 
+/**
+ * Represents a flow in the SDK.
+ */
 export class Flow {
   private ended: boolean = false;
   private status: FlowStatus = FlowStatusEnum.OK;
@@ -45,22 +55,26 @@ export class Flow {
     private grpcCallOptions: grpc.CallOptions,
     private controlPoint: string,
     private span: Span,
-    startDate: number,
+    private startDate: number,
     private rampMode: boolean = false,
     private cacheKey: string | null = null,
     private checkResponse: CheckResponse__Output | null = null,
     private error: Error | null = null,
   ) {
     span.setAttribute(SOURCE_LABEL, "sdk");
-    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, startDate);
+    span.setAttribute(FLOW_START_TIMESTAMP_LABEL, this.startDate);
     span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
   }
 
+  /**
+   * Determines whether the flow should run based on the check response and ramp mode.
+   * @returns A boolean value indicating whether the flow should run.
+   */
   ShouldRun() {
     if (
       (!this.rampMode && this.checkResponse === null) ||
       this.checkResponse?.decisionType ===
-        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+      _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -68,10 +82,20 @@ export class Flow {
     }
   }
 
+  /**
+   * Sets the status of the flow.
+   * @param status The status to set.
+   */
   SetStatus(status: FlowStatus) {
     this.status = status;
   }
 
+  /**
+   * Sets the cached value for the flow.
+   * @param value The value to set.
+   * @param ttl The time-to-live for the cached value.
+   * @returns A promise that resolves to the response of the cache upsert operation.
+   */
   async SetCachedValue(value: Buffer, ttl: Duration) {
     if (!this.cacheKey) {
       return Promise.reject(new Error("No cache key"));
@@ -104,6 +128,10 @@ export class Flow {
     });
   }
 
+  /**
+   * Deletes the cached value for the flow.
+   * @returns A promise that resolves to the response of the cache delete operation.
+   */
   async DeleteCachedValue() {
     if (!this.cacheKey) {
       return Promise.reject(new Error("No cache key"));
@@ -139,6 +167,10 @@ export class Flow {
     );
   }
 
+  /**
+   * Gets the cached value for the flow.
+   * @returns The cached value response.
+   */
   CachedValue() {
     if (this.error) {
       // invoke constructor of CachedValueResponse
@@ -161,18 +193,33 @@ export class Flow {
     return resp;
   }
 
+  /**
+   * Gets the error associated with the flow.
+   * @returns The error object.
+   */
   Error() {
     return this.error;
   }
 
+  /**
+   * Gets the check response of the flow.
+   * @returns The check response object.
+   */
   CheckResponse() {
     return this.checkResponse;
   }
 
+  /**
+   * Gets the span associated with the flow.
+   * @returns The span object.
+   */
   Span() {
     return this.span;
   }
 
+  /**
+   * Ends the flow and performs necessary cleanup.
+   */
   End() {
     if (this.ended) {
       return;
