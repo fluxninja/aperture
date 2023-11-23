@@ -25,7 +25,7 @@ Let's see how to create a policy in Aperture Cloud.
 Before beginning, ensure you've [signed up][] and created an organization and
 project
 
-1. To create & deploy a policy, head over to the policies dashboard. click on
+1. To create & deploy a policy, head over to the policies dashboard. Click on
    **Create Policy** button. ![Policies Dashboard](./assets/1-create-policy.png)
 2. Now, you will be directed to use case selection page. Select the use case for
    which you want to create a Policy.

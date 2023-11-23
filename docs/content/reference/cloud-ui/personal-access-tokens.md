@@ -27,7 +27,7 @@ You have [signed up][sign-up] on Aperture Cloud and created an organization.
 
    ![Settings](./assets/personal-access-keys/settings.png)
 
-3. Switch to **Personal Access Tokens** tab and Click **New Personal Access
+3. Switch to the **Personal Access Tokens** tab and Click **New Personal Access
    Token**.
 
    ![Personal Access Tokens Tab](./assets/personal-access-keys/personal-access-token-tab.png)
