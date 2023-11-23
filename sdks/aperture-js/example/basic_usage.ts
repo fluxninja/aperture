@@ -1,20 +1,18 @@
-import {
-  ApertureClient,
-  FlowStatusEnum,
-  LookupStatus,
-} from "@fluxninja/aperture-js";
-
-import { Request, Response } from "express";
-
 // START: clientConstructor
+
+import { ApertureClient } from "@fluxninja/aperture-js";
+
 // Create aperture client
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "API_KEY",
 });
-// END
+// END: clientConstructor
 
 // START: handleRequest
+import { FlowStatusEnum, LookupStatus } from "@fluxninja/aperture-js";
+import { Request, Response } from "express";
+
 async function handleRequest(req: Request, res: Response) {
   const flow = await apertureClient.StartFlow("archimedes-service", {
     labels: {
@@ -38,6 +36,7 @@ async function handleRequest(req: Request, res: Response) {
       // create a new buffer
       const buffer = Buffer.from(resString);
 
+      // START: setCache
       // set cache value
       const setResult = await flow.SetCachedValue(buffer, {
         seconds: 30,
@@ -46,6 +45,7 @@ async function handleRequest(req: Request, res: Response) {
       if (setResult?.error) {
         console.log(`Error setting cache value: ${setResult.error}`);
       }
+      // END: setCache
 
       res.send({ message: resString });
     }
@@ -58,4 +58,4 @@ async function handleRequest(req: Request, res: Response) {
 
   flow.End();
 }
-// END
+// END: handleRequest

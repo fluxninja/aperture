@@ -80,38 +80,64 @@ func processFile(filePath string) ([]Snippet, error) {
 		return nil, err
 	}
 
-	var startPattern, endPattern string
-	switch filepath.Ext(filePath) {
-	case ".py":
-		startPattern, endPattern = `# START: (\w+)`, `# END`
-	case ".ts", ".java":
-		startPattern, endPattern = `// START: (\w+)`, `// END`
-	case ".go":
-		startPattern, endPattern = `// START: (\w+)`, `// END`
+	lang := filepath.Ext(filePath)[1:]
+	startPattern := `(?m)^\s*// START: (\w+)`
+	endPattern := `(?m)^\s*// END: (\w+)`
+
+	if lang == "py" {
+		startPattern = `(?m)^\s*# START: (\w+)`
+		endPattern = `(?m)^\s*# END: (\w+)`
 	}
 
-	return extractSnippets(string(content), startPattern, endPattern, filepath.Ext(filePath)[1:]), nil
+	return extractSnippets(string(content), startPattern, endPattern, lang), nil
 }
 
-// extractSnippets extracts snippets from the given content based on start and end patterns.
 func extractSnippets(content, startPattern, endPattern, lang string) []Snippet {
 	var snippets []Snippet
 	startRegexp := regexp.MustCompile(startPattern)
 	endRegexp := regexp.MustCompile(endPattern)
 
-	startIndexes := startRegexp.FindAllStringSubmatchIndex(content, -1)
-	endIndexes := endRegexp.FindAllIndex([]byte(content), -1)
+	type snippetMarker struct {
+		name  string
+		index int
+	}
 
-	for i, start := range startIndexes {
-		if i < len(endIndexes) {
-			snippetName := content[start[2]:start[3]]
-			snippetCode := content[start[1]:endIndexes[i][0]]
+	snippetStack := make([]snippetMarker, 0)
+	lines := strings.Split(content, "\n")
+
+	for i, line := range lines {
+		if startMatches := startRegexp.FindStringSubmatch(line); startMatches != nil {
+			// Push new snippet start onto the stack
+			snippetName := startMatches[1]
+			snippetStack = append(snippetStack, snippetMarker{index: i, name: snippetName})
+		} else if endMatches := endRegexp.FindStringSubmatch(line); endMatches != nil {
+			// Process snippet end
+			endName := endMatches[1]
+			if len(snippetStack) == 0 || snippetStack[len(snippetStack)-1].name != endName {
+				fmt.Printf("Error: Unmatched end marker '%s' at line %d", endName, i+1)
+				os.Exit(1)
+			}
+
+			startMarker := snippetStack[len(snippetStack)-1]
+			snippetStack = snippetStack[:len(snippetStack)-1]
+
+			// Extract snippet from startMarker.index to current line
+			snippetCode := strings.Join(lines[startMarker.index+1:i], "\n")
+			snippetCode = startRegexp.ReplaceAllString(snippetCode, "") // Remove start comments
+			snippetCode = endRegexp.ReplaceAllString(snippetCode, "")   // Remove end comments
+
 			snippets = append(snippets, Snippet{
 				Language: lang,
-				Name:     snippetName,
+				Name:     startMarker.name,
 				Code:     strings.TrimSpace(snippetCode),
 			})
 		}
+	}
+
+	// Check if there are any unmatched Start markers left in the stack
+	if len(snippetStack) > 0 {
+		fmt.Printf("Error: Unmatched start marker %s\n", snippetStack[len(snippetStack)-1].name)
+		os.Exit(1)
 	}
 
 	return snippets

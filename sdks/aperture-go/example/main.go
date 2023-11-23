@@ -82,7 +82,7 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	// END
+	// END: clientConstructor
 
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
