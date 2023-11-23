@@ -5,7 +5,7 @@ import { ApertureClient } from "@fluxninja/aperture-js";
 // Create aperture client
 export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
-  agentAPIKey: "API_KEY",
+  apiKey: "API_KEY",
 });
 // END: clientConstructor
 
