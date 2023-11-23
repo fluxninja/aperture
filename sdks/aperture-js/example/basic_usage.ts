@@ -19,7 +19,7 @@ async function handleRequest(req: Request, res: Response) {
       api_key: "some_api_key",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 300, // ms
+      deadline: Date.now() + 300, // 300ms deadline
     },
     cacheKey: "cache", // optional, in case caching is needed
   });
