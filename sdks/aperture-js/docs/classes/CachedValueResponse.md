@@ -28,87 +28,62 @@ Represents a response from a cached value lookup.
 
 ### constructor
 
-• **new CachedValueResponse**(`lookupStatus`, `operationStatus`, `error`,
-`value`): [`CachedValueResponse`](CachedValueResponse.md)
+• **new CachedValueResponse**(`lookupStatus`, `operationStatus`, `error`, `value`): [`CachedValueResponse`](CachedValueResponse.md)
 
 Creates a new CachedValueResponse instance.
 
 #### Parameters
 
-| Name              | Type                                             | Description               |
-| :---------------- | :----------------------------------------------- | :------------------------ |
-| `lookupStatus`    | [`LookupStatus`](../enums/LookupStatus.md)       | The lookup status.        |
-| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The operation status.     |
-| `error`           | `null` \| `Error`                                | The error, if any.        |
-| `value`           | `null` \| `Buffer`                               | The cached value, if any. |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `lookupStatus` | [`LookupStatus`](../enums/LookupStatus.md) | The lookup status. |
+| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The operation status. |
+| `error` | ``null`` \| `Error` | The error, if any. |
+| `value` | ``null`` \| `Buffer` | The cached value, if any. |
 
 #### Returns
 
 [`CachedValueResponse`](CachedValueResponse.md)
 
-#### Defined in
-
-[cache.ts:84](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L84)
-
 ## Properties
 
 ### error
 
-• **error**: `null` \| `Error`
+• **error**: ``null`` \| `Error`
 
-#### Defined in
-
-[cache.ts:74](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L74)
-
----
+___
 
 ### lookupStatus
 
 • **lookupStatus**: [`LookupStatus`](../enums/LookupStatus.md)
 
-#### Defined in
-
-[cache.ts:72](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L72)
-
----
+___
 
 ### operationStatus
 
 • **operationStatus**: [`OperationStatus`](../enums/OperationStatus.md)
 
-#### Defined in
-
-[cache.ts:73](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L73)
-
----
+___
 
 ### value
 
-• **value**: `null` \| `Buffer`
-
-#### Defined in
-
-[cache.ts:75](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L75)
+• **value**: ``null`` \| `Buffer`
 
 ## Methods
 
 ### GetError
 
-▸ **GetError**(): `null` \| `Error`
+▸ **GetError**(): ``null`` \| `Error`
 
 Gets the error, if any.
 
 #### Returns
 
-`null` \| `Error`
+``null`` \| `Error`
 
 The error, or null if no error occurred.
 
-#### Defined in
-
-[cache.ts:116](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L116)
-
----
+___
 
 ### GetLookupStatus
 
@@ -122,11 +97,7 @@ Gets the lookup status.
 
 The lookup status.
 
-#### Defined in
-
-[cache.ts:100](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L100)
-
----
+___
 
 ### GetOperationStatus
 
@@ -140,24 +111,16 @@ Gets the operation status.
 
 The operation status.
 
-#### Defined in
-
-[cache.ts:108](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L108)
-
----
+___
 
 ### GetValue
 
-▸ **GetValue**(): `null` \| `Buffer`
+▸ **GetValue**(): ``null`` \| `Buffer`
 
 Gets the cached value, if any.
 
 #### Returns
 
-`null` \| `Buffer`
+``null`` \| `Buffer`
 
 The cached value, or null if no value is available.
-
-#### Defined in
-
-[cache.ts:124](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L124)

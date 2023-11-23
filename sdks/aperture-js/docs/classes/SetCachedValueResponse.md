@@ -24,65 +24,48 @@ Represents the response of setting a cached value.
 
 ### constructor
 
-• **new SetCachedValueResponse**(`error`, `operationStatus`):
-[`SetCachedValueResponse`](SetCachedValueResponse.md)
+• **new SetCachedValueResponse**(`error`, `operationStatus`): [`SetCachedValueResponse`](SetCachedValueResponse.md)
 
 Creates a new instance of SetCachedValueResponse.
 
 #### Parameters
 
-| Name              | Type                                             | Description                                           |
-| :---------------- | :----------------------------------------------- | :---------------------------------------------------- |
-| `error`           | `null` \| `Error`                                | The error that occurred during the operation, if any. |
-| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The status of the operation.                          |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `error` | ``null`` \| `Error` | The error that occurred during the operation, if any. |
+| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The status of the operation. |
 
 #### Returns
 
 [`SetCachedValueResponse`](SetCachedValueResponse.md)
 
-#### Defined in
-
-[cache.ts:141](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L141)
-
 ## Properties
 
 ### error
 
-• **error**: `null` \| `Error`
+• **error**: ``null`` \| `Error`
 
-#### Defined in
-
-[cache.ts:133](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L133)
-
----
+___
 
 ### operationStatus
 
 • **operationStatus**: [`OperationStatus`](../enums/OperationStatus.md)
 
-#### Defined in
-
-[cache.ts:134](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L134)
-
 ## Methods
 
 ### GetError
 
-▸ **GetError**(): `null` \| `Error`
+▸ **GetError**(): ``null`` \| `Error`
 
 Gets the error that occurred during the operation.
 
 #### Returns
 
-`null` \| `Error`
+``null`` \| `Error`
 
 The error that occurred during the operation, or null if no error occurred.
 
-#### Defined in
-
-[cache.ts:150](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L150)
-
----
+___
 
 ### GetOperationStatus
 
@@ -95,7 +78,3 @@ Gets the status of the operation.
 [`OperationStatus`](../enums/OperationStatus.md)
 
 The status of the operation.
-
-#### Defined in
-
-[cache.ts:158](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L158)

@@ -24,65 +24,48 @@ Represents the response of deleting a cached value.
 
 ### constructor
 
-• **new DeleteCachedValueResponse**(`error`, `operationStatus`):
-[`DeleteCachedValueResponse`](DeleteCachedValueResponse.md)
+• **new DeleteCachedValueResponse**(`error`, `operationStatus`): [`DeleteCachedValueResponse`](DeleteCachedValueResponse.md)
 
 Creates a new instance of DeleteCachedValueResponse.
 
 #### Parameters
 
-| Name              | Type                                             | Description                                                  |
-| :---------------- | :----------------------------------------------- | :----------------------------------------------------------- |
-| `error`           | `null` \| `Error`                                | The error that occurred during the delete operation, if any. |
-| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The status of the delete operation.                          |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `error` | ``null`` \| `Error` | The error that occurred during the delete operation, if any. |
+| `operationStatus` | [`OperationStatus`](../enums/OperationStatus.md) | The status of the delete operation. |
 
 #### Returns
 
 [`DeleteCachedValueResponse`](DeleteCachedValueResponse.md)
 
-#### Defined in
-
-[cache.ts:175](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L175)
-
 ## Properties
 
 ### error
 
-• **error**: `null` \| `Error`
+• **error**: ``null`` \| `Error`
 
-#### Defined in
-
-[cache.ts:167](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L167)
-
----
+___
 
 ### operationStatus
 
 • **operationStatus**: [`OperationStatus`](../enums/OperationStatus.md)
 
-#### Defined in
-
-[cache.ts:168](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L168)
-
 ## Methods
 
 ### GetError
 
-▸ **GetError**(): `null` \| `Error`
+▸ **GetError**(): ``null`` \| `Error`
 
 Gets the error that occurred during the delete operation, if any.
 
 #### Returns
 
-`null` \| `Error`
+``null`` \| `Error`
 
 The error object or null if no error occurred.
 
-#### Defined in
-
-[cache.ts:184](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L184)
-
----
+___
 
 ### GetOperationStatus
 
@@ -95,7 +78,3 @@ Gets the status of the delete operation.
 [`OperationStatus`](../enums/OperationStatus.md)
 
 The operation status.
-
-#### Defined in
-
-[cache.ts:192](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L192)

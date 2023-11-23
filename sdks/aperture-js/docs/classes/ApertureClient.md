@@ -8,16 +8,16 @@ Represents the Aperture Client used for interacting with the Aperture Agent.
 
 ```ts
 const apertureClient = new ApertureClient({
-  address:
-    process.env.APERTURE_AGENT_ADDRESS !== undefined
-      ? process.env.APERTURE_AGENT_ADDRESS
-      : "localhost:8089",
-  apiKey: process.env.APERTURE_API_KEY || undefined,
-  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
-  channelCredentials:
-    process.env.APERTURE_AGENT_INSECURE !== undefined
-      ? grpc.credentials.createInsecure()
-      : grpc.credentials.createSsl(),
+ address:
+   process.env.APERTURE_AGENT_ADDRESS !== undefined
+     ? process.env.APERTURE_AGENT_ADDRESS
+     : "localhost:8089",
+ apiKey: process.env.APERTURE_API_KEY || undefined,
+ // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+ channelCredentials:
+   process.env.APERTURE_AGENT_INSECURE !== undefined
+     ? grpc.credentials.createInsecure()
+     : grpc.credentials.createSsl(),
 });
 ```
 
@@ -45,20 +45,19 @@ const apertureClient = new ApertureClient({
 
 ### constructor
 
-• **new ApertureClient**(`«destructured»`):
-[`ApertureClient`](ApertureClient.md)
+• **new ApertureClient**(`«destructured»`): [`ApertureClient`](ApertureClient.md)
 
 Constructs a new instance of the ApertureClient.
 
 #### Parameters
 
-| Name                    | Type                 |
-| :---------------------- | :------------------- |
-| `«destructured»`        | `Object`             |
-| › `address`             | `string`             |
-| › `apiKey?`             | `string`             |
+| Name | Type |
+| :------ | :------ |
+| `«destructured»` | `Object` |
+| › `address` | `string` |
+| › `apiKey?` | `string` |
 | › `channelCredentials?` | `ChannelCredentials` |
-| › `channelOptions?`     | `ChannelOptions`     |
+| › `channelOptions?` | `ChannelOptions` |
 
 #### Returns
 
@@ -68,49 +67,29 @@ Constructs a new instance of the ApertureClient.
 
 Error if the address is not provided.
 
-#### Defined in
-
-[client.ts:80](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L80)
-
 ## Properties
 
 ### exporter
 
 • `Private` `Readonly` **exporter**: `OTLPTraceExporter`
 
-#### Defined in
-
-[client.ts:66](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L66)
-
----
+___
 
 ### fcsClient
 
 • `Private` `Readonly` **fcsClient**: `FlowControlServiceClient`
 
-#### Defined in
-
-[client.ts:64](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L64)
-
----
+___
 
 ### tracer
 
 • `Private` `Readonly` **tracer**: `Tracer`
 
-#### Defined in
-
-[client.ts:70](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L70)
-
----
+___
 
 ### tracerProvider
 
 • `Private` `Readonly` **tracerProvider**: `NodeTracerProvider`
-
-#### Defined in
-
-[client.ts:68](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L68)
 
 ## Methods
 
@@ -122,11 +101,7 @@ Error if the address is not provided.
 
 `IResource`
 
-#### Defined in
-
-[client.ts:238](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L238)
-
----
+___
 
 ### GetState
 
@@ -140,11 +115,7 @@ Gets the current state of the gRPC channel.
 
 The connectivity state of the channel.
 
-#### Defined in
-
-[client.ts:234](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L234)
-
----
+___
 
 ### Shutdown
 
@@ -156,28 +127,23 @@ Shuts down the ApertureClient.
 
 `void`
 
-#### Defined in
-
-[client.ts:223](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L223)
-
----
+___
 
 ### StartFlow
 
 ▸ **StartFlow**(`controlPoint`, `params`): `Promise`\<[`Flow`](Flow.md)\>
 
-Starts a new flow with the specified control point and parameters. StartFlow
-takes a control point and labels that get passed to Aperture Agent via
-flowcontrolv1.Check call. Return value is a Flow. The default semantics are
-fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow
-returns as true.
+Starts a new flow with the specified control point and parameters.
+StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+Return value is a Flow.
+The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
 
 #### Parameters
 
-| Name           | Type                                        | Description                     |
-| :------------- | :------------------------------------------ | :------------------------------ |
-| `controlPoint` | `string`                                    | The control point for the flow. |
-| `params`       | [`FlowParams`](../interfaces/FlowParams.md) | The parameters for the flow.    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `controlPoint` | `string` | The control point for the flow. |
+| `params` | [`FlowParams`](../interfaces/FlowParams.md) | The parameters for the flow. |
 
 #### Returns
 
@@ -196,8 +162,3 @@ apertureClient.StartFlow("awesomeFeature", {
  rampMode: false,
  cacheKey: "cache",
 });
-
-#### Defined in
-
-[client.ts:158](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L158)
-```

@@ -39,14 +39,9 @@
 
 ### FlowStatus
 
-Ƭ **FlowStatus**: typeof [`FlowStatusEnum`](README.md#flowstatusenum)[keyof
-typeof [`FlowStatusEnum`](README.md#flowstatusenum)]
+Ƭ **FlowStatus**: typeof [`FlowStatusEnum`](README.md#flowstatusenum)[keyof typeof [`FlowStatusEnum`](README.md#flowstatusenum)]
 
 Represents the status of a flow.
-
-#### Defined in
-
-[flow.ts:44](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/flow.ts#L44)
 
 ## Variables
 
@@ -58,54 +53,44 @@ Enum representing the status of a flow.
 
 #### Type declaration
 
-| Name    | Type      |
-| :------ | :-------- |
-| `Error` | `"Error"` |
-| `OK`    | `"OK"`    |
-
-#### Defined in
-
-[flow.ts:36](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/flow.ts#L36)
+| Name | Type |
+| :------ | :------ |
+| `Error` | ``"Error"`` |
+| `OK` | ``"OK"`` |
 
 ## Functions
 
 ### ConvertCacheError
 
-▸ **ConvertCacheError**(`error`): `Error` \| `null`
+▸ **ConvertCacheError**(`error`): `Error` \| ``null``
 
 Converts a cache error string into an Error object.
 
 #### Parameters
 
-| Name    | Type                    | Description             |
-| :------ | :---------------------- | :---------------------- |
+| Name | Type | Description |
+| :------ | :------ | :------ |
 | `error` | `undefined` \| `string` | The cache error string. |
 
 #### Returns
 
-`Error` \| `null`
+`Error` \| ``null``
 
-The Error object representing the cache error, or null if the error string is
-empty.
+The Error object representing the cache error, or null if the error string is empty.
 
-#### Defined in
-
-[cache.ts:61](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L61)
-
----
+___
 
 ### ConvertCacheLookupStatus
 
-▸ **ConvertCacheLookupStatus**(`status`):
-[`LookupStatus`](enums/LookupStatus.md)
+▸ **ConvertCacheLookupStatus**(`status`): [`LookupStatus`](enums/LookupStatus.md)
 
 Converts the cache lookup status to a lookup status.
 
 #### Parameters
 
-| Name     | Type                                         | Description                         |
-| :------- | :------------------------------------------- | :---------------------------------- |
-| `status` | `undefined` \| `null` \| `CacheLookupStatus` | The cache lookup status to convert. |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `status` | `undefined` \| ``null`` \| `CacheLookupStatus` | The cache lookup status to convert. |
 
 #### Returns
 
@@ -113,23 +98,18 @@ Converts the cache lookup status to a lookup status.
 
 The converted lookup status.
 
-#### Defined in
-
-[cache.ts:17](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L17)
-
----
+___
 
 ### ConvertCacheOperationStatus
 
-▸ **ConvertCacheOperationStatus**(`status`):
-[`OperationStatus`](enums/OperationStatus.md)
+▸ **ConvertCacheOperationStatus**(`status`): [`OperationStatus`](enums/OperationStatus.md)
 
 Converts a cache operation status to an operation status.
 
 #### Parameters
 
-| Name     | Type                                  | Description                            |
-| :------- | :------------------------------------ | :------------------------------------- |
+| Name | Type | Description |
+| :------ | :------ | :------ |
 | `status` | `undefined` \| `CacheOperationStatus` | The cache operation status to convert. |
 
 #### Returns
@@ -137,7 +117,3 @@ Converts a cache operation status to an operation status.
 [`OperationStatus`](enums/OperationStatus.md)
 
 The converted operation status.
-
-#### Defined in
-
-[cache.ts:43](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L43)

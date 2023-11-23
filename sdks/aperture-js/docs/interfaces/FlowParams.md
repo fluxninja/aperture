@@ -22,11 +22,7 @@ Represents the parameters for a flow.
 
 The cache key for the flow.
 
-#### Defined in
-
-[client.ts:42](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L42)
-
----
+___
 
 ### grpcCallOptions
 
@@ -34,11 +30,7 @@ The cache key for the flow.
 
 Additional gRPC call options for the flow.
 
-#### Defined in
-
-[client.ts:34](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L34)
-
----
+___
 
 ### labels
 
@@ -46,11 +38,7 @@ Additional gRPC call options for the flow.
 
 Optional labels for the flow.
 
-#### Defined in
-
-[client.ts:26](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L26)
-
----
+___
 
 ### rampMode
 
@@ -58,18 +46,10 @@ Optional labels for the flow.
 
 Specifies whether the flow should use ramp mode.
 
-#### Defined in
-
-[client.ts:30](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L30)
-
----
+___
 
 ### tryConnect
 
 • `Optional` **tryConnect**: `boolean`
 
 Specifies whether to try connecting to the flow.
-
-#### Defined in
-
-[client.ts:38](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/client.ts#L38)

@@ -15,18 +15,10 @@ Represents the status of an operation.
 
 ### Error
 
-• **Error** = `"ERROR"`
+• **Error** = ``"ERROR"``
 
-#### Defined in
-
-[cache.ts:35](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L35)
-
----
+___
 
 ### Success
 
-• **Success** = `"SUCCESS"`
-
-#### Defined in
-
-[cache.ts:34](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L34)
+• **Success** = ``"SUCCESS"``

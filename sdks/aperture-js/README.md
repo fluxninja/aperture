@@ -67,10 +67,6 @@ typeof [`FlowStatusEnum`](README.md#flowstatusenum)]
 
 Represents the status of a flow.
 
-#### Defined in
-
-[flow.ts:44](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/flow.ts#L44)
-
 ## Variables
 
 ### FlowStatusEnum
@@ -85,10 +81,6 @@ Enum representing the status of a flow.
 | :------ | :-------- |
 | `Error` | `"Error"` |
 | `OK`    | `"OK"`    |
-
-#### Defined in
-
-[flow.ts:36](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/flow.ts#L36)
 
 ## Functions
 
@@ -111,10 +103,6 @@ Converts a cache error string into an Error object.
 The Error object representing the cache error, or null if the error string is
 empty.
 
-#### Defined in
-
-[cache.ts:61](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L61)
-
 ---
 
 ### ConvertCacheLookupStatus
@@ -136,10 +124,6 @@ Converts the cache lookup status to a lookup status.
 
 The converted lookup status.
 
-#### Defined in
-
-[cache.ts:17](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L17)
-
 ---
 
 ### ConvertCacheOperationStatus
@@ -160,7 +144,3 @@ Converts a cache operation status to an operation status.
 [`OperationStatus`](docs/enums/OperationStatus.md)
 
 The converted operation status.
-
-#### Defined in
-
-[cache.ts:43](https://github.com/fluxninja/aperture/blob/a92f6b393/sdks/aperture-js/sdk/cache.ts#L43)

@@ -25,6 +25,7 @@
     "plugin": ["typedoc-plugin-markdown"],
     "readme": "none",
     "theme": "default",
-    "disableSources": "true"
+    "disableSources": true,
+    "githubPages": false
   }
 }
