@@ -24,11 +24,17 @@ You have [signed up][sign-up] on Aperture Cloud and created an organization.
    Tokens are user-specific per organization. You need to create a new Access
    Token for each organization._
 2. Now, from the left sidebar, click **Settings**.
-3. Click **Personal Access Tokens** tab.
-4. Click **New Personal Access Token**.
-5. Copy the Access Token and save it in a secure location.
 
-![Access Tokens](./assets/personal-api-keys.gif "Creating Personal Access Tokens")
+   ![Settings](./assets/personal-access-keys/settings.png)
+
+3. Switch to the **Personal Access Tokens** tab and Click **New Personal Access
+   Token**.
+
+   ![Personal Access Tokens Tab](./assets/personal-access-keys/personal-access-token-tab.png)
+
+4. Copy the Access Token and save it in a secure location.
+
+   ![New Personal Access Token](./assets/personal-access-keys/new-personal-access-token.png)
 
 [configure aperturectl]: /reference/aperture-cli/aperture-cli.md
 [sign-up]: /reference/cloud-ui/sign-up.md
