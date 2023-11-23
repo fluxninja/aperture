@@ -1,6 +1,6 @@
 {
   "name": "@fluxninja/aperture-js",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "Flow control SDK that interfaces with FluxNinja Aperture Agents",
   "main": "./lib/index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "grpc-client": "npm run build && node ./lib/client.js",
     "example": "cd example && npm run build && node ./dist/example.js",
     "prepublishOnly": "npm run build",
-    "local:publish": "npx local-package-publisher -p"
+    "local:publish": "npx local-package-publisher -p",
+    "docs": "./node_modules/.bin/typedoc; ./scripts/docs_to_readme.sh"
   },
   "homepage": "https://fluxninja.com/",
   "repository": "https://github.com/fluxninja/aperture-js",
@@ -43,6 +44,8 @@
     "npm": ">=8.19.3"
   },
   "devDependencies": {
+    "typedoc": "^0.25.3",
+    "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "4.9.5"
   },
   "publishConfig": {

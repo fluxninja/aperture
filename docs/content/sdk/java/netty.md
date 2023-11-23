@@ -18,9 +18,9 @@ using [Aperture Instrumentation Agent][javaagent].
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI. For more
-information, refer to
-[Define Control Points](/get-started/define-control-points.md).
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -87,3 +87,4 @@ the [example app][netty-example] available in the repository.
 [netty-example]:
   https://github.com/fluxninja/aperture-java/blob/releases/aperture-java/v2.1.0/examples/netty-example/src/main/java/com/fluxninja/example/ServerInitializer.java
 [javaagent]: /sdk/java/auto-instrumentation.md
+[api-keys]: /reference/cloud-ui/api-keys.md

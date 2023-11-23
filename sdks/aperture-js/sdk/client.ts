@@ -16,14 +16,50 @@ import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
 import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
+/**
+ * Represents the parameters for a flow.
+ */
 export interface FlowParams {
+  /**
+   * Optional labels for the flow.
+   */
   labels?: Record<string, string>;
+  /**
+   * Specifies whether the flow should use ramp mode.
+   */
   rampMode?: boolean;
+  /**
+   * Additional gRPC call options for the flow.
+   */
   grpcCallOptions?: grpc.CallOptions;
+  /**
+   * Specifies whether to try connecting to the flow.
+   */
   tryConnect?: boolean;
+  /**
+   * The cache key for the flow.
+   */
   cacheKey?: string;
 }
 
+/**
+ * Represents the Aperture Client used for interacting with the Aperture Agent.
+ * @example
+ * ```ts
+ *const apertureClient = new ApertureClient({
+ *  address:
+ *    process.env.APERTURE_AGENT_ADDRESS !== undefined
+ *      ? process.env.APERTURE_AGENT_ADDRESS
+ *      : "localhost:8089",
+ *  apiKey: process.env.APERTURE_API_KEY || undefined,
+ *  // if process.env.APERTURE_AGENT_INSECURE set channelCredentials to insecure
+ *  channelCredentials:
+ *    process.env.APERTURE_AGENT_INSECURE !== undefined
+ *      ? grpc.credentials.createInsecure()
+ *      : grpc.credentials.createSsl(),
+ *});
+ * ```
+ */
 export class ApertureClient {
   private readonly fcsClient: FlowControlServiceClient;
 
@@ -33,6 +69,14 @@ export class ApertureClient {
 
   private readonly tracer: Tracer;
 
+  /**
+   * Constructs a new instance of the ApertureClient.
+   * @param address The address of the Aperture Agent.
+   * @param agentAPIKey The API key for the Aperture Agent (optional).
+   * @param channelCredentials The credentials for the gRPC channel (optional).
+   * @param channelOptions The options for the gRPC channel (optional).
+   * @throws Error if the address is not provided.
+   */
   constructor({
     address,
     apiKey,
@@ -92,9 +136,25 @@ export class ApertureClient {
     kickChannel();
   }
 
-  // StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
-  // Return value is a Flow.
-  // The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+  /**
+   * Starts a new flow with the specified control point and parameters.
+   * StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+   * Return value is a Flow.
+   * The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+   * @param controlPoint The control point for the flow.
+   * @param params The parameters for the flow.
+   * @returns A promise that resolves to a Flow object.
+   * @example
+   * ```ts
+   *apertureClient.StartFlow("awesomeFeature", {
+   *  labels: labels,
+   *  grpcCallOptions: {
+   *    deadline: Date.now() + 30000,
+   *  },
+   *  rampMode: false,
+   *  cacheKey: "cache",
+   *});
+   */
   async StartFlow(controlPoint: string, params: FlowParams): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       if (params.rampMode === undefined) {
@@ -157,6 +217,9 @@ export class ApertureClient {
     });
   }
 
+  /**
+   * Shuts down the ApertureClient.
+   */
   Shutdown() {
     this.fcsClient.getChannel().close();
     this.exporter.shutdown();
@@ -164,6 +227,10 @@ export class ApertureClient {
     return;
   }
 
+  /**
+   * Gets the current state of the gRPC channel.
+   * @returns The connectivity state of the channel.
+   */
   GetState() {
     return this.fcsClient.getChannel().getConnectivityState(true);
   }

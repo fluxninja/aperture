@@ -1046,3 +1046,16 @@ func localControllerNamespaceFromEndpoint(endpoint string) string {
 
 	return subdomains[1]
 }
+
+// SyncMaps syncs the dst map with the src map.
+func SyncMaps(src, dst map[string]string) map[string]string {
+	if dst == nil && src != nil {
+		dst = map[string]string{}
+	}
+
+	for k, v := range src {
+		dst[k] = v
+	}
+
+	return dst
+}

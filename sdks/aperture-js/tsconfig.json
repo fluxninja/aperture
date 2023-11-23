@@ -15,5 +15,17 @@
     "declarationDir": "./@types"
   },
   "include": ["sdk"],
-  "exclude": ["node_modules", "proto", "@types", "lib", "example"]
+  "exclude": ["node_modules", "proto", "@types", "lib", "example"],
+  "typedocOptions": {
+    "entryPoints": ["sdk/index.ts"],
+    "darkHighlightTheme": "github-dark",
+    "lightHighlightTheme": "github-light",
+    "entryPointStrategy": "expand",
+    "out": "docs",
+    "plugin": ["typedoc-plugin-markdown"],
+    "readme": "none",
+    "theme": "default",
+    "disableSources": true,
+    "githubPages": false
+  }
 }

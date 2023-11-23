@@ -93,7 +93,7 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@2.8.8
-        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen|sdks/aperture-js/docs/.*)
         types_or:
           [
             sh,
@@ -176,6 +176,13 @@ repos:
         files: "^cmd/aperturectl/.*"
         pass_filenames: false
         description: "Generate CLI docs"
+      - id: generate-aperturejs-docs
+        name: "Generate aperture-js docs"
+        entry: "./scripts/precommit/generate_aperturejs_docs.sh"
+        language: script
+        files: "^sdks/aperture-js/sdk/.*|^sdks/aperture-js/proto/.*"
+        pass_filenames: false
+        description: "Generate aperturejs docs"
       - id: generate-blueprints
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
@@ -242,7 +249,7 @@ repos:
         args:
           - "-L inport,atleast,iteraction"
           - "--ignore-words=./.github/styles/Vocab/FluxNinja/accept.txt"
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json|sdks/aperture-js/example/package-lock.json)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|sdks/aperture-js/docs/.*|sdks/aperture-js/README.md|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json|sdks/aperture-js/example/package-lock.json)$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.7.1
     hooks:
