@@ -20,10 +20,9 @@ To do so, first create an instance of ApertureClient:
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI for a given
-organization by navigating to the **`Aperture`** tab in the sidebar menu. From
-there, select **`API Keys`** in the top bar. This is where you can find and copy
-the **`API_KEY`** or create a new key.
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -68,3 +67,4 @@ For more context on using the Aperture C# SDK to set feature control points,
 refer to the [example app][example] available in the repository.
 
 [example]: https://github.com/fluxninja/aperture-csharp/tree/main/Examples
+[api-keys]: /reference/cloud-ui/api-keys.md

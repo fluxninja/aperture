@@ -3,7 +3,7 @@ title: Sign Up
 keywords:
   - sign-up
   - aperture-cloud
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 ```mdx-code-block
@@ -86,9 +86,5 @@ set up an organization and a project for you.
     the Aperture Cloud UI.
 
     ![Final Step](./assets/sign-up/thats-all.png)
-
-## Aperture Cloud
-
-![Aperture Cloud](./assets/sign-up/console-view.png)
 
 [plans]: https://www.fluxninja.com/pricing

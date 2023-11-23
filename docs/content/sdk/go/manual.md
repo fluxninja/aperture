@@ -19,9 +19,9 @@ To do so, first create an instance of ApertureClient:
 
 :::info API Key
 
-You can create an API key for your project in the Aperture Cloud UI. For more
-information, refer to
-[Define Control Points](/get-started/define-control-points.md).
+You can create an API key for your project in the Aperture Cloud UI. For
+detailed instructions on locating API Keys, please refer to the [API
+Keys][api-keys] section.
 
 :::
 
@@ -109,3 +109,4 @@ useful for endpoints like `/healthz`:
 ```
 
 [example]: https://github.com/fluxninja/aperture-go/tree/main/example
+[api-keys]: /reference/cloud-ui/api-keys.md

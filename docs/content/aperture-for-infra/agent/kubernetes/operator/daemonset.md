@@ -99,7 +99,8 @@ Kubernetes Objects which will be created by following steps are listed
    `API_KEY` with the API key linked to the project. Navigate to the
    **`Aperture`** tab in the sidebar menu and then select **`API Keys`** in the
    top bar. From there, you can either copy the existing key or create a new one
-   by clicking on **`Create API Key`**.
+   by clicking on **`Create API Key`**. For detailed instructions on locating
+   API Keys, please refer to the [API Keys][api-keys] section.
 
    :::note
 
@@ -228,7 +229,9 @@ Kubernetes Objects which will be created by following steps are listed
       Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
       `API_KEY` with the API key linked to the project. The API Key can be found
       by navigating to the **`Aperture`** tab in the sidebar menu, and then
-      clicking on the **`API Keys`** tab in the top bar.
+      clicking on the **`API Keys`** tab in the top bar. For detailed
+      instructions on locating API Keys, please refer to the [API
+      Keys][api-keys] section.
 
       :::note
 
@@ -406,3 +409,5 @@ following these steps:
    ```bash
    kubectl delete crd agents.fluxninja.com
    ```
+
+[api-keys]: /reference/cloud-ui/api-keys.md
