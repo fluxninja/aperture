@@ -1,0 +1,81 @@
+name: Release Aperture JS SDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        type: choice
+        description: 'Version Type'
+        required: true
+        options:
+          - major
+          - minor
+          - patch
+        default: minor
+
+concurrency:
+  cancel-in-progress: false
+  group: ${{ github.repository }}-release-aperture-js
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Configure Git Name and Email
+        run: |
+          git config --global user.name "FluxNinja Ops"
+          git config --global user.email ops@fluxninja.com
+
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+  
+      - name: Install GitHub CLI
+        run: |
+          brew install gh
+
+      - name: Check diff and Create Release
+        run: |
+          # Fetch all tags
+          git fetch --tags
+
+          # Get the latest tag name
+          latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+          # Get diff between latest tag and current commit
+          diff=$(git log $latestTag..HEAD --oneline)
+
+          # If there is no diff, exit
+          if [ -z "$diff" ]; then
+            echo "No changes since $latestTag."
+            exit 0
+          fi
+
+          # Update the version in package.json and commit it
+          npm version "${{ github.event.inputs.version_type }}" --no-git-tag-version --no-commit-hooks
+
+          newVersion=$(node -p -e "require('./package.json').version")
+
+          # Create a stable release branch
+          git checkout -b "stable/v${newVersion}"
+          git commit -am "Bump version to ${newVersion}"
+
+          # Create a new tag and push it to origin
+          git tag -a "releases/aperture-js/v${newVersion}" -m "Release v${newVersion}"
+
+          # Push the branch and tag to origin
+          git push origin "stable/v${newVersion}"
+          git push origin "releases/aperture-js/v${newVersion}"
+
+          # Create a new release
+          gh release create "releases/aperture-js/v${newVersion}" --title "Release v${newVersion}" --target "stable/v${newVersion}" --generate-notes --latest --verify-tag

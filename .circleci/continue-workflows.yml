@@ -1329,7 +1329,7 @@ workflows:
           dockerfile: example/Dockerfile
           docker-image: aperture-py-example
           remote-repo: fluxninja/aperture-py
-          remote-repo-fingerprint: "0b:a2:a7:de:46:d5:e8:c7:46:1e:49:29:e3:6e:e8:a8"
+          remote-repo-fingerprint: "e4:7f:65:57:02:24:ec:b3:fb:a5:1d:5a:0e:bb:99:3a"
 
   # Verify that libs and java agent can be built with Java 8+
   # Verify that lib, java agent and examples can be built with Java 17+
