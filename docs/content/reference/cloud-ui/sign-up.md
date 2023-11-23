@@ -63,13 +63,13 @@ set up an organization and a project for you.
 6. By default, Aperture Cloud creates one project for you. You can create more
    later on. Enter your project name and description, click **Next**.
 
-   ![Create Project](./assets/sign-up/project-name.png)
+   ![Create Project](./assets/sign-up/create-project.png)
 
 7. Each project has a user group associated with it. Only the users in the user
    group will have access to the project. You can add users to the user group by
    entering their email address, in the next step.
 
-   ![Add Users](./assets/sign-up/usergroups.png)
+   ![Add Users](./assets/sign-up/create-usergroup.png)
 
 8. You are added by default to the user group created in the previous step, but
    you can invite more users by entering their email addresses and assigning
@@ -78,11 +78,7 @@ set up an organization and a project for you.
 
    ![Add Users](./assets/sign-up/invite-members.png)
 
-9. Now, you can install Aperture using the instructions provided.
-
-   ![Install Aperture](./assets/sign-up/install-aperture.png)
-
-10. To start using Aperture Cloud. Click **Finish**. You will be redirected to
+9. To start using Aperture Cloud. Click **Finish**. You will be redirected to
     the Aperture Cloud UI.
 
     ![Final Step](./assets/sign-up/thats-all.png)
