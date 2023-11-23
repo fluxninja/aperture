@@ -64,20 +64,18 @@ jobs:
           versionType="${{ github.event.inputs.version_type }}"
           if [ "$versionType" = "major" ]; then
             newVersion=$(echo $version | awk -F. '{$1 = $1 + 1;} 1' | sed 's/ /./g')
-          else if [ "$versionType" = "minor" ]; then
+          elif [ "$versionType" = "minor" ]; then
             newVersion=$(echo $version | awk -F. '{$2 = $2 + 1;} 1' | sed 's/ /./g')
-          else if [ "$versionType" = "patch" ]; then
+          elif [ "$versionType" = "patch" ]; then
             newVersion=$(echo $version | awk -F. '{$3 = $3 + 1;} 1' | sed 's/ /./g')
           else
             echo "Invalid version type."
             exit 1
           fi
-          fi
-          fi
 
           # Create a new tag and push it to the remote repository
-          git tag -a "v$version" -m "Release v$version"
-          git push origin "v$version"
+          git tag -a "v$newVersion" -m "Release v$newVersion"
+          git push origin "v$newVersion"
 
           # Create a new release
-          gh release create "v$version" --title "Release v${newVersion}" --generate-notes --latest --verify-tag
+          gh release create "v$newVersion" --title "Release v${newVersion}" --generate-notes --latest --verify-tag

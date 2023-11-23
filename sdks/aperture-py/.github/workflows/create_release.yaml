@@ -64,15 +64,13 @@ jobs:
           versionType="${{ github.event.inputs.version_type }}"
           if [ "$versionType" = "major" ]; then
             newVersion=$(echo $version | awk -F. '{$1 = $1 + 1;} 1' | sed 's/ /./g')
-          else if [ "$versionType" = "minor" ]; then
+          elif [ "$versionType" = "minor" ]; then
             newVersion=$(echo $version | awk -F. '{$2 = $2 + 1;} 1' | sed 's/ /./g')
-          else if [ "$versionType" = "patch" ]; then
+          elif [ "$versionType" = "patch" ]; then
             newVersion=$(echo $version | awk -F. '{$3 = $3 + 1;} 1' | sed 's/ /./g')
           else
             echo "Invalid version type."
             exit 1
-          fi
-          fi
           fi
 
           # Replace the version in the pyproject.toml file
