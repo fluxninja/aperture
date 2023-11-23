@@ -25,3 +25,6 @@ echo -e "\n# API Reference\n$(cat README.md.tmp)" >> README.md
 
 # Remove temporary file
 rm README.md.tmp README.md-e README.md.tmp-e
+
+# Format README.md
+prettier --write README.md

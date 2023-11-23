@@ -24,6 +24,7 @@
     "out": "docs",
     "plugin": ["typedoc-plugin-markdown"],
     "readme": "none",
-    "theme": "default"
+    "theme": "default",
+    "disableSources": "true"
   }
 }
