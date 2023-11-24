@@ -103,8 +103,7 @@ your cluster.
    **`Aperture`** tab in the sidebar menu and then select **`API Keys`** in the
    top bar. From there, you can either copy the existing key or create a new one
    by clicking on **`Create API Key`**. For detailed instructions on locating
-   API Keys, please refer to the [API Keys](/reference/cloud-ui/api-keys.md)
-   section.
+   API Keys, refer to the [API Keys](/reference/cloud-ui/api-keys.md) section.
 
    :::note
 
@@ -271,8 +270,8 @@ Use the same `values.yaml` file created as part of the
    </TabItem>
    </Tabs>
 
-2. If you have installed the chart in some other namespace than `default`,
-   execute the commands below:
+2. If you have installed the chart in some other namespace than `default`, run
+   the commands below:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="Helm" label="Helm">

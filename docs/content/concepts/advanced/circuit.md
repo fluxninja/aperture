@@ -52,7 +52,7 @@ emitted by the component. Any [looping signals][looping-signals] are saved and
 consumed by the circuit in the next tick.
 
 _Circuit_ runtime provides highly predictable execution semantics. Any timed
-operations like [_PromQL_][promql-reference] queries are synchronized to execute
+operations such as [_PromQL_][promql-reference] queries are synchronized to run
 on multiples of ticks. For _PromQL_ queries, this ensures that all the queries
 that fire in the same tick return results together in a future tick.
 

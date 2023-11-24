@@ -18,8 +18,8 @@ import {apertureVersion, apertureVersionWithOutV} from '../../../../apertureVers
 
 :::info
 
-This method requires access to create cluster level resources like ClusterRole,
-ClusterRoleBinding, CustomResourceDefinition and so on.
+This method requires access to create cluster level resources such as
+ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
 [Namespace-scoped Installation](/aperture-for-infra/agent/kubernetes/namespace-scoped/namespace-scoped.md)
@@ -230,8 +230,8 @@ Kubernetes Objects which will be created by following steps are listed
       `API_KEY` with the API key linked to the project. The API Key can be found
       by navigating to the **`Aperture`** tab in the sidebar menu, and then
       clicking on the **`API Keys`** tab in the top bar. For detailed
-      instructions on locating API Keys, please refer to the [API
-      Keys][api-keys] section.
+      instructions on locating API Keys, refer to the [API Keys][api-keys]
+      section.
 
       :::note
 
@@ -373,7 +373,7 @@ following these steps:
       </Tabs>
 
 3. If you have installed the chart in some other namespace than the `default`,
-   execute the following commands:
+   run the following commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="aperturectl" label="aperturectl">

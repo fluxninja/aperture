@@ -10,7 +10,7 @@ import Zoom from 'react-medium-image-zoom';
 A flow is the fundamental unit of work from the perspective of an Aperture
 agent. It could be an API call, a feature, or even a database query. A flow in
 Aperture is similar to [OpenTelemetry span][span]. Each flow is annotated with a
-set of **Flow Labels**, which are key-value pairs. For instance, if a flow is
+set of **Flow Labels**, which are key-value pairs. For example, if a flow is
 tagged with `user_tier:gold`, then `user_tier` is the label key and `gold` is
 the label value.
 

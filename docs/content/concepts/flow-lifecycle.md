@@ -50,10 +50,10 @@ components for that stage.
   classifiers are only pertinent for HTTP or gRPC _Control Points_ and do not
   apply to flows associated with feature _Control Points_.
 - [**FluxMeters**](./advanced/flux-meter.md) are employed to meter the flows,
-  generating metrics like latency, request counts, or other arbitrary telemetry
-  based on access logs. They transform request flux that matches certain
-  criteria into Prometheus histograms, enabling enhanced observability and
-  control.
+  generating metrics such as latency, request counts, or other arbitrary
+  telemetry based on access logs. They transform request flux that matches
+  certain criteria into Prometheus histograms, enabling enhanced observability
+  and control.
 - [**Samplers**](./advanced/load-ramp.md#sampler) manage load by permitting a
   portion of flows to be accepted, while immediately dropping the remainder with
   a forbidden status code. They are particularly useful in scenarios such as

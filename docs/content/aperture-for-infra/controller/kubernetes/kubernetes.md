@@ -122,7 +122,7 @@ and can result in unpredictable behavior.
 
    :::info
 
-   This method requires access to create cluster level resources like
+   This method requires access to create cluster level resources such as
    ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
    Use the [Namespace-scoped Installation][namespace-scoped-installation] if you
