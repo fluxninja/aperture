@@ -19,8 +19,8 @@ it.
 
 :::info
 
-This method requires access to create cluster level resources like ClusterRole,
-ClusterRoleBinding, CustomResourceDefinition and so on.
+This method requires access to create cluster level resources such as
+ClusterRole, ClusterRoleBinding, CustomResourceDefinition and so on.
 
 Use the
 [Namespace-scoped Installation](/aperture-for-infra/agent/kubernetes/namespace-scoped/namespace-scoped.md)
