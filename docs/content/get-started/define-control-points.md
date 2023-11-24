@@ -50,19 +50,16 @@ Keys][api-keys] section.
 :::
 
 ```mdx-code-block
+import CodeSnippet from '../codeSnippet.js'
+
 <Tabs>
 <TabItem value="TypeScript">
 ```
 
-```typescript
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-
-// Create aperture client
-export const apertureClient = new ApertureClient({
-  address: "ORGANIZATION.app.fluxninja.com:443",
-  agentAPIKey: "API_KEY",
-});
-```
+<CodeSnippet
+    lang="ts"
+    snippetName="clientConstructor"
+ />
 
 ```mdx-code-block
 </TabItem>
@@ -97,52 +94,10 @@ Let's create a feature control point in the following code snippet.
 <TabItem value="TypeScript">
 ```
 
-```typescript
-async function handleRequest(req, res) {
-  const flow = await apertureClient.StartFlow("archimedes-service", {
-    labels: {
-      api_key: "some_api_key",
-    },
-    grpcCallOptions: {
-      deadline: Date.now() + 300, // ms
-    },
-    rampMode: false,
-    cacheKey: "cache",
-  });
-
-  if (flow.ShouldRun()) {
-    // Check if the response is cached in Aperture from a previous request
-    if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
-      res.send({ message: flow.CachedValue().GetValue()?.toString() });
-    } else {
-      // Do Actual Work
-      // After completing the work, you can return store the response in cache and return it, for example:
-      const resString = "foo";
-
-      // create a new buffer
-      const buffer = Buffer.from(resString);
-
-      // set cache value
-      const setResult = await flow.SetCachedValue(buffer, {
-        seconds: 30,
-        nanos: 0,
-      });
-      if (setResult?.error) {
-        console.log(`Error setting cache value: ${setResult.error}`);
-      }
-
-      res.send({ message: resString });
-    }
-  } else {
-    // Handle flow rejection
-    flow.SetStatus(FlowStatusEnum.Error);
-  }
-
-  if (flow) {
-    flow.End();
-  }
-}
-```
+<CodeSnippet
+    lang="ts"
+    snippetName="handleRequest"
+ />
 
 ```mdx-code-block
 </TabItem>
