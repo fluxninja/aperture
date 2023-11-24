@@ -58,6 +58,12 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 		flowcontrolv1.CheckResponse_RejectReason_name[int32(checkResponse.RejectReason)],
 	)
 
+	// Cache
+	if checkResponse.CachedValue != nil {
+		attributes.PutStr(otelconsts.ApertureCacheLookupStatusLabel, checkResponse.CachedValue.LookupStatus.String())
+		attributes.PutStr(otelconsts.ApertureCacheOperationStatusLabel, checkResponse.CachedValue.OperationStatus.String())
+	}
+
 	// Note: Sorted alphabetically to help sorting attributes in rollupprocessor.key at least a bit.
 	droppingLoadSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingLoadSchedulersLabel)
 	droppingQuotaSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingQuotaSchedulersLabel)

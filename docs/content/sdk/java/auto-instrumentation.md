@@ -32,8 +32,8 @@ found [here][aperture-javaagent].
 :::info API Key
 
 You can create an API key for your project in the Aperture Cloud UI. For
-detailed instructions on locating API Keys, please refer to the [API
-Keys][api-keys] section.
+detailed instructions on locating API Keys, refer to the [API Keys][api-keys]
+section.
 
 :::
 
