@@ -59,7 +59,7 @@ generated metrics to Prometheus.
 
 The default metric tracked by _Flux Meter_ is the flow's workload duration in
 milliseconds. The _Flux Meter_ might be configured to track any arbitrary metric
-from OpenTelemetry attributes on the span or log streams. For instance, any of
+from OpenTelemetry attributes on the span or log streams. For example, any of
 the metrics defined in the Envoy [access log
 specification][envoy-access-log-spec] might be used by _Flux Meter_.
 

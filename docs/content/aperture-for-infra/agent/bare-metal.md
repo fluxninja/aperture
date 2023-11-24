@@ -25,7 +25,7 @@ is [supported](../supported-platforms.md).
 ## Download {#agent-download}
 
 The Aperture Agent can be installed using packages made for your system's
-package manager, like `dpkg` or `rpm`.
+package manager, such as `dpkg` or `rpm`.
 
 To install Aperture Agent, first download the package for your manager from the
 [Releases Page](https://github.com/fluxninja/aperture/releases/latest).
