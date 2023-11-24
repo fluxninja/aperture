@@ -455,7 +455,8 @@ jobs:
               version_type="major"
             fi
 
-            GITHUB_TOKEN=${GITHUB_ACTIONS_TOKEN} gh workflow run create_release.yaml -R fluxninja/<< parameters.repo >> -f version_type="${version_type}"
+            export GH_TOKEN=${GITHUB_ACTIONS_TOKEN}
+            gh workflow run create_release.yaml -R fluxninja/<< parameters.repo >> -f version_type="${version_type}"
 
   latest-release:
     executor: python-cimg-executor
