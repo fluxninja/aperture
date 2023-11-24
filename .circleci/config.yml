@@ -425,6 +425,38 @@ jobs:
             tar -czvf $HOME/aperture-lua.tar.gz .
             gh release upload ${VERSION} "$HOME/aperture-lua.tar.gz" --repo=fluxninja/aperture
 
+  release-sdk:
+    parameters:
+      repo:
+        type: string
+        description: Repository to release
+    executor: base-cimg-executor
+    steps:
+      - checkout
+      - run: *install-gh-cli
+      - run: *set_version
+      - run:
+          name: Trigger GH action to release SDK
+          command: |
+            vless="${VERSION:1}"
+
+            # Skip for rc releases
+            if [[ "${vless}" == *"-rc."* ]]; then
+              echo "Skipping release of ${vless}"
+              exit 0
+            fi
+
+            version_type="patch"
+            if [[ "${vless}" == *".0" ]]; then
+              version_type="minor"
+            fi
+
+            if [[ "${vless}" == *".0.0" ]]; then
+              version_type="major"
+            fi
+
+            GITHUB_TOKEN=${GITHUB_ACTIONS_TOKEN} gh workflow run create_release.yaml -R fluxninja/<< parameters.repo >> -f version_type="${version_type}"
+
   latest-release:
     executor: python-cimg-executor
     steps:
@@ -792,6 +824,30 @@ workflows:
           filters: *release_aperture_filters
           name: aperture-publish-lua-module
           requires: *release_required
+
+      - release-sdk:
+          name: release-sdk-go
+          filters: *release_aperture_filters
+          requires: *release_required
+          repo: aperture-go
+
+      - release-sdk:
+          name: release-sdk-js
+          filters: *release_aperture_filters
+          requires: *release_required
+          repo: aperture-js
+
+      - release-sdk:
+          name: release-sdk-py
+          filters: *release_aperture_filters
+          requires: *release_required
+          repo: aperture-py
+
+      - release-sdk:
+          name: release-sdk-java
+          filters: *release_aperture_filters
+          requires: *release_required
+          repo: aperture-java
 
   helm-release:
     when:
