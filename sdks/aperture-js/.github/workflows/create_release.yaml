@@ -45,6 +45,8 @@ jobs:
           brew install gh
 
       - name: Check diff and Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Fetch all tags
           git fetch --tags
