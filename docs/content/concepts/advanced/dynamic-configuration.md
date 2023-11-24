@@ -20,7 +20,6 @@ as `*_config_key` in the components that support dynamic configuration updates.
 
 :::
 
-
 Some actuation components can be switched between normal and dry run modes at
 runtime through dynamic configuration. Certain blueprints use
 [_Variable_](/reference/configuration/spec.md#variable) type components to
