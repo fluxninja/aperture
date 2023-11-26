@@ -440,28 +440,82 @@ java.lang.String defaultValue);
 
   /**
    * <pre>
-   * Matching cached value.
+   * Matching result cache.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
-   * @return Whether the cachedValue field is set.
+   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
+   * @return Whether the resultCache field is set.
    */
-  boolean hasCachedValue();
+  boolean hasResultCache();
   /**
    * <pre>
-   * Matching cached value.
+   * Matching result cache.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
-   * @return The cachedValue.
+   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
+   * @return The resultCache.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getCachedValue();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getResultCache();
   /**
    * <pre>
-   * Matching cached value.
+   * Matching result cache.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder getCachedValueOrBuilder();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponseOrBuilder getResultCacheOrBuilder();
+
+  /**
+   * <pre>
+   * Matching state cache.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
+   */
+  int getStateCacheCount();
+  /**
+   * <pre>
+   * Matching state cache.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
+   */
+  boolean containsStateCache(
+      java.lang.String key);
+  /**
+   * Use {@link #getStateCacheMap()} instead.
+   */
+  @java.lang.Deprecated
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse>
+  getStateCache();
+  /**
+   * <pre>
+   * Matching state cache.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
+   */
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse>
+  getStateCacheMap();
+  /**
+   * <pre>
+   * Matching state cache.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
+   */
+  /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getStateCacheOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse defaultValue);
+  /**
+   * <pre>
+   * Matching state cache.
+   * </pre>
+   *
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getStateCacheOrThrow(
+      java.lang.String key);
 }

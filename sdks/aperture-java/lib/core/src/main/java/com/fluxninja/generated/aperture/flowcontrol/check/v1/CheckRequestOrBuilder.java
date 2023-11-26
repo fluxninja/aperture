@@ -61,21 +61,62 @@ java.lang.String defaultValue);
 
   /**
    * <pre>
-   * Cache item to fetch.
+   * Key for result cache that needs to be fetched.
    * </pre>
    *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The cacheKey.
+   * <code>string result_cache_key = 4 [json_name = "resultCacheKey"];</code>
+   * @return The resultCacheKey.
    */
-  java.lang.String getCacheKey();
+  java.lang.String getResultCacheKey();
   /**
    * <pre>
-   * Cache item to fetch.
+   * Key for result cache that needs to be fetched.
    * </pre>
    *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The bytes for cacheKey.
+   * <code>string result_cache_key = 4 [json_name = "resultCacheKey"];</code>
+   * @return The bytes for resultCacheKey.
    */
   com.google.protobuf.ByteString
-      getCacheKeyBytes();
+      getResultCacheKeyBytes();
+
+  /**
+   * <pre>
+   * Keys for state cache entries that need to be fetched.
+   * </pre>
+   *
+   * <code>repeated string state_cache_keys = 5 [json_name = "stateCacheKeys"];</code>
+   * @return A list containing the stateCacheKeys.
+   */
+  java.util.List<java.lang.String>
+      getStateCacheKeysList();
+  /**
+   * <pre>
+   * Keys for state cache entries that need to be fetched.
+   * </pre>
+   *
+   * <code>repeated string state_cache_keys = 5 [json_name = "stateCacheKeys"];</code>
+   * @return The count of stateCacheKeys.
+   */
+  int getStateCacheKeysCount();
+  /**
+   * <pre>
+   * Keys for state cache entries that need to be fetched.
+   * </pre>
+   *
+   * <code>repeated string state_cache_keys = 5 [json_name = "stateCacheKeys"];</code>
+   * @param index The index of the element to return.
+   * @return The stateCacheKeys at the given index.
+   */
+  java.lang.String getStateCacheKeys(int index);
+  /**
+   * <pre>
+   * Keys for state cache entries that need to be fetched.
+   * </pre>
+   *
+   * <code>repeated string state_cache_keys = 5 [json_name = "stateCacheKeys"];</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the stateCacheKeys at the given index.
+   */
+  com.google.protobuf.ByteString
+      getStateCacheKeysBytes(int index);
 }

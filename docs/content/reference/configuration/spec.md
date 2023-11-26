@@ -4774,59 +4774,6 @@ to a string.
 
 <!-- vale off -->
 
-### K8sLabelMatcherRequirement {#k8s-label-matcher-requirement}
-
-<!-- vale on -->
-
-Label selector requirement which is a selector that contains values, a key, and
-an operator that relates the key and values.
-
-<dl>
-<dt>key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Label key that the selector applies to.
-
-</dd>
-<dt>operator</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, one of: `In | NotIn | Exists | DoesNotExists`)
-
-<!-- vale on -->
-
-Logical operator which represents a key's relationship to a set of values. Valid
-operators are In, NotIn, Exists and DoesNotExist.
-
-</dd>
-<dt>values</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-An array of string values that relates to the key by an operator. If the
-operator is In or NotIn, the values array must be non-empty. If the operator is
-Exists or DoesNotExist, the values array must be empty.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### KubernetesObjectSelector {#kubernetes-object-selector}
 
 <!-- vale on -->
@@ -4927,20 +4874,6 @@ operator. An empty label matcher always matches.
 <!-- vale on -->
 
 An arbitrary expression to be evaluated on the labels.
-
-</dd>
-<dt>match_expressions</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]K8sLabelMatcherRequirement](#k8s-label-matcher-requirement))
-
-<!-- vale on -->
-
-List of Kubernetes-style label matcher requirements.
-
-Note: The requirements are combined using the logical AND operator.
 
 </dd>
 <dt>match_labels</dt>

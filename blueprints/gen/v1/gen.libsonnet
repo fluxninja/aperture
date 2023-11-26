@@ -83,7 +83,6 @@
   InverterOuts: import 'inverterouts.libsonnet',
   JSONExtractor: import 'jsonextractor.libsonnet',
   JWTExtractor: import 'jwtextractor.libsonnet',
-  K8sLabelMatcherRequirement: import 'k8slabelmatcherrequirement.libsonnet',
   KubernetesObjectSelector: import 'kubernetesobjectselector.libsonnet',
   LabelMatcher: import 'labelmatcher.libsonnet',
   LoadRamp: import 'loadramp.libsonnet',

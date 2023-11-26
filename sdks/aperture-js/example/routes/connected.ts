@@ -6,7 +6,7 @@ export const connectedRouter = express.Router();
 
 connectedRouter.get("/", function (_: express.Request, res: express.Response) {
   try {
-    let clientState = apertureClient.GetState();
+    let clientState = apertureClient.getState();
     if (clientState !== grpc.connectivityState.READY) {
       res.status(503).send("Unavailable");
     } else {

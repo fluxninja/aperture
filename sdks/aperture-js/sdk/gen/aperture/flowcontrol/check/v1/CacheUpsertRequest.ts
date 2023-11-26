@@ -1,17 +1,15 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
-import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
+import type { CacheEntry as _aperture_flowcontrol_check_v1_CacheEntry, CacheEntry__Output as _aperture_flowcontrol_check_v1_CacheEntry__Output } from '../../../../aperture/flowcontrol/check/v1/CacheEntry';
 
 export interface CacheUpsertRequest {
   'controlPoint'?: (string);
-  'key'?: (string);
-  'value'?: (Buffer | Uint8Array | string);
-  'ttl'?: (_google_protobuf_Duration | null);
+  'resultCacheEntry'?: (_aperture_flowcontrol_check_v1_CacheEntry | null);
+  'stateCacheEntries'?: ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry});
 }
 
 export interface CacheUpsertRequest__Output {
   'controlPoint': (string);
-  'key': (string);
-  'value': (Buffer);
-  'ttl': (_google_protobuf_Duration__Output | null);
+  'resultCacheEntry': (_aperture_flowcontrol_check_v1_CacheEntry__Output | null);
+  'stateCacheEntries': ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry__Output});
 }

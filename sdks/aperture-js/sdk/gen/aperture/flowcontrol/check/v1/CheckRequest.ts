@@ -5,12 +5,14 @@ export interface CheckRequest {
   'controlPoint'?: (string);
   'labels'?: ({[key: string]: string});
   'rampMode'?: (boolean);
-  'cacheKey'?: (string);
+  'resultCacheKey'?: (string);
+  'stateCacheKeys'?: (string)[];
 }
 
 export interface CheckRequest__Output {
   'controlPoint': (string);
   'labels': ({[key: string]: string});
   'rampMode': (boolean);
-  'cacheKey': (string);
+  'resultCacheKey': (string);
+  'stateCacheKeys': (string)[];
 }

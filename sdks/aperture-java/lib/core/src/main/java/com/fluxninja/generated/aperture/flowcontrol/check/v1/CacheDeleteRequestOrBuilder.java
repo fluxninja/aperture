@@ -20,14 +20,39 @@ public interface CacheDeleteRequestOrBuilder extends
       getControlPointBytes();
 
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The key.
+   * <code>string result_cache_key = 2 [json_name = "resultCacheKey"];</code>
+   * @return The resultCacheKey.
    */
-  java.lang.String getKey();
+  java.lang.String getResultCacheKey();
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The bytes for key.
+   * <code>string result_cache_key = 2 [json_name = "resultCacheKey"];</code>
+   * @return The bytes for resultCacheKey.
    */
   com.google.protobuf.ByteString
-      getKeyBytes();
+      getResultCacheKeyBytes();
+
+  /**
+   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * @return A list containing the stateCacheKeys.
+   */
+  java.util.List<java.lang.String>
+      getStateCacheKeysList();
+  /**
+   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * @return The count of stateCacheKeys.
+   */
+  int getStateCacheKeysCount();
+  /**
+   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * @param index The index of the element to return.
+   * @return The stateCacheKeys at the given index.
+   */
+  java.lang.String getStateCacheKeys(int index);
+  /**
+   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the stateCacheKeys at the given index.
+   */
+  com.google.protobuf.ByteString
+      getStateCacheKeysBytes(int index);
 }

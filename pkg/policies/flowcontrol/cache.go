@@ -48,7 +48,7 @@ func NewCache(dc *distcache.DistCache, lc fx.Lifecycle) (iface.Cache, error) {
 }
 
 // Get returns the value for the given key.
-func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, error) {
+func (c *Cache) Get(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) ([]byte, error) {
 	err := c.Ready()
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, erro
 	if controlPoint == "" {
 		return nil, ErrCacheControlPointEmpty
 	}
-	cacheKey := formatCacheKey(controlPoint, key)
+	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	getResponse, err := c.dmapCache.Get(ctx, cacheKey)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (c *Cache) Get(ctx context.Context, controlPoint, key string) ([]byte, erro
 }
 
 // Upsert inserts or updates the value for the given key.
-func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []byte, ttl time.Duration) error {
+func (c *Cache) Upsert(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string, value []byte, ttl time.Duration) error {
 	err := c.Ready()
 	if err != nil {
 		return err
@@ -85,12 +85,12 @@ func (c *Cache) Upsert(ctx context.Context, controlPoint, key string, value []by
 	if controlPoint == "" {
 		return ErrCacheControlPointEmpty
 	}
-	cacheKey := formatCacheKey(controlPoint, key)
+	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	return c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
 }
 
 // Delete deletes the value for the given key.
-func (c *Cache) Delete(ctx context.Context, controlPoint, key string) error {
+func (c *Cache) Delete(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) error {
 	err := c.Ready()
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (c *Cache) Delete(ctx context.Context, controlPoint, key string) error {
 	if controlPoint == "" {
 		return ErrCacheControlPointEmpty
 	}
-	cacheKey := formatCacheKey(controlPoint, key)
+	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	_, err = c.dmapCache.Delete(ctx, cacheKey)
 	return err
 }
@@ -115,6 +115,6 @@ func (c *Cache) Ready() error {
 }
 
 // formatCacheKey returns the cache key for the given control point and key.
-func formatCacheKey(controlPoint, key string) string {
-	return "@controlpoint:" + controlPoint + "/key:" + key
+func formatCacheKey(controlPoint string, cacheType iface.CacheType, key string) string {
+	return "@controlpoint:" + controlPoint + "/type:" + cacheType.String() + "/key:" + key
 }

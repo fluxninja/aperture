@@ -780,10 +780,22 @@ definitions:
         type: object
     CacheDeleteResponse:
         properties:
-            error:
+            result_cache_response:
+                $ref: '#/definitions/KeyDeleteResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyDeleteResponse'
+                type: object
+        type: object
+    CacheEntry:
+        properties:
+            key:
                 type: string
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
+            ttl:
+                type: string
+            value:
+                format: byte
+                type: string
         type: object
     CacheLookupStatus:
         default: HIT
@@ -799,22 +811,12 @@ definitions:
         type: string
     CacheUpsertResponse:
         properties:
-            error:
-                type: string
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
-        type: object
-    CachedValue:
-        properties:
-            error:
-                type: string
-            lookup_status:
-                $ref: '#/definitions/CacheLookupStatus'
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
-            value:
-                format: byte
-                type: string
+            result_cache_response:
+                $ref: '#/definitions/KeyUpsertResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyUpsertResponse'
+                type: object
         type: object
     CheckHTTPRequest:
         properties:
@@ -897,9 +899,6 @@ definitions:
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
-            cached_value:
-                $ref: '#/definitions/CachedValue'
-                description: Matching cached value.
             classifier_infos:
                 description: classifiers that were matched for this request.
                 items:
@@ -941,6 +940,9 @@ definitions:
             reject_reason:
                 $ref: '#/definitions/CheckResponseRejectReason'
                 description: reject_reason contains the reason for the rejection.
+            result_cache:
+                $ref: '#/definitions/KeyLookupResponse'
+                description: Matching result cache.
             services:
                 items:
                     type: string
@@ -950,6 +952,11 @@ definitions:
                 format: date-time
                 title: start timestamp
                 type: string
+            state_cache:
+                additionalProperties:
+                    $ref: '#/definitions/KeyLookupResponse'
+                description: Matching state cache.
+                type: object
             telemetry_flow_labels:
                 additionalProperties:
                     type: string
@@ -2504,38 +2511,37 @@ definitions:
             - from
         title: Parse the attribute as JWT and read the payload
         type: object
-    K8sLabelMatcherRequirement:
-        description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+    KeyDeleteResponse:
         properties:
+            error:
+                type: string
             key:
-                description: |+
-                    Label key that the selector applies to.
-
                 type: string
-                x-go-tag-validate: required
-            operator:
-                description: |+
-                    Logical operator which represents a key's relationship to a set of values.
-                    Valid operators are In, NotIn, Exists and DoesNotExist.
-
-                enum:
-                    - In
-                    - NotIn
-                    - Exists
-                    - DoesNotExists
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
+        type: object
+    KeyLookupResponse:
+        properties:
+            error:
                 type: string
-                x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
-                x-oneof: In | NotIn | Exists | DoesNotExists
-            values:
-                description: |-
-                    An array of string values that relates to the key by an operator.
-                    If the operator is In or NotIn, the values array must be non-empty.
-                    If the operator is Exists or DoesNotExist, the values array must be empty.
-                items:
-                    type: string
-                type: array
-        required:
-            - key
+            key:
+                type: string
+            lookup_status:
+                $ref: '#/definitions/CacheLookupStatus'
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
+            value:
+                format: byte
+                type: string
+        type: object
+    KeyUpsertResponse:
+        properties:
+            error:
+                type: string
+            key:
+                type: string
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
         type: object
     KubernetesObjectSelector:
         description: |-
@@ -2591,15 +2597,6 @@ definitions:
             expression:
                 $ref: '#/definitions/MatchExpression'
                 description: An arbitrary expression to be evaluated on the labels.
-            match_expressions:
-                description: |-
-                    List of Kubernetes-style label matcher requirements.
-
-                    Note: The requirements are combined using the logical AND operator.
-                items:
-                    $ref: '#/definitions/K8sLabelMatcherRequirement'
-                    type: object
-                type: array
             match_labels:
                 additionalProperties:
                     type: string

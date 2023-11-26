@@ -87,7 +87,6 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	cacheKey := requestContext.CacheKey
 	labelKeys := flowLabels.SortedKeys()
 
 	response = &flowcontrolv1.CheckResponse{
@@ -95,6 +94,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		FlowLabelKeys: labelKeys,
 		Services:      services,
 		ControlPoint:  controlPoint,
+		StateCache:    make(map[string]*flowcontrolv1.KeyLookupResponse, 0),
 	}
 
 	mmr := e.getMatches(controlPoint, services, flowLabels)
@@ -170,27 +170,76 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	// Lookup cache
-	if cacheKey != "" && e.cache != nil {
-		cachedBytes, err := e.cache.Get(ctx, controlPoint, cacheKey)
-		if err == nil {
-			response.CachedValue = &flowcontrolv1.CachedValue{
-				Value:           cachedBytes,
-				LookupStatus:    flowcontrolv1.CacheLookupStatus_HIT,
-				OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
+	type Lookup struct {
+		lookupResponse *flowcontrolv1.KeyLookupResponse
+		key            string
+		cacheType      iface.CacheType
+	}
+
+	// define a wait group to wait for all the lookups to complete
+	var wg sync.WaitGroup
+
+	execLookup := func(lookup *Lookup) func() {
+		return func() {
+			defer wg.Done()
+			cachedValue := lookup.lookupResponse
+			cachedBytes, err := e.cache.Get(ctx, controlPoint, lookup.cacheType, lookup.key)
+			if err == nil {
+				cachedValue.Value = cachedBytes
+				cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+				return
 			}
-			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
-			return
+			cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
+			cachedValue.Error = err.Error()
+			if err == ErrCacheKeyNotFound {
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+			} else {
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+			}
 		}
-		response.CachedValue = &flowcontrolv1.CachedValue{
-			LookupStatus: flowcontrolv1.CacheLookupStatus_MISS,
-			Error:        err.Error(),
+	}
+
+	if e.cache != nil {
+		var lookups []*Lookup
+		// define a lookup struct to hold the cache key and the cached value
+		if requestContext.ResultCacheKey != "" {
+			response.ResultCache = &flowcontrolv1.KeyLookupResponse{
+				Key: requestContext.ResultCacheKey,
+			}
+			lookups = append(lookups, &Lookup{
+				key:            requestContext.ResultCacheKey,
+				lookupResponse: response.ResultCache,
+				cacheType:      iface.Result,
+			})
 		}
-		if err == ErrCacheKeyNotFound {
-			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
-		} else {
-			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+		for _, stateCacheKey := range requestContext.StateCacheKeys {
+			lookupResponse := &flowcontrolv1.KeyLookupResponse{
+				Key: stateCacheKey,
+			}
+			response.StateCache[stateCacheKey] = lookupResponse
+			lookups = append(lookups, &Lookup{
+				key:            stateCacheKey,
+				lookupResponse: lookupResponse,
+				cacheType:      iface.State,
+			})
 		}
+
+		for i, lookup := range lookups {
+			wg.Add(1)
+			if i == len(lookups)-1 {
+				execLookup(lookup)()
+				continue
+			}
+			panichandler.Go(execLookup(lookup))
+		}
+	}
+	wg.Wait()
+
+	// Check if result cache is hit
+	if response.ResultCache != nil && response.ResultCache.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
+		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+		return
 	}
 
 	limiterTypes = []LimiterType{
