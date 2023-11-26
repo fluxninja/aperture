@@ -20,7 +20,7 @@ setting baggage or directly as arguments to the `startFlow()` call.
 ## Defining a Classifier
 
 To define a _Classifier_, it needs to be added as a resource in a
-[policy][policies]. Like any other flow control component, a _Classifier_ is
+[policy][policies]. Such as any other flow control component, a _Classifier_ is
 applied only to the flows matching the specified [selectors][selector]
 
 A _Classifier_ defines a set of rules to create new flow labels based on request
@@ -233,7 +233,7 @@ extractors include:
 
 Keys of flow labels created by extractors must be valid [Rego][rego] identifiers
 (alphanumeric characters and underscore are allowed; also, label name cannot be
-a [Rego keyword][rego-kw], like `if` or `default`).
+a [Rego keyword][rego-kw], such as `if` or `default`).
 
 :::
 

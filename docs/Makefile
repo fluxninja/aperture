@@ -28,4 +28,9 @@ generate-otel-docs:
 	@./tools/otel_collectors/generate_otel_docs.sh
 	@git add ./content/aperture-for-infra/integrations/metrics
 
-.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs generate-otel-docs
+generate-code-snippets:
+	@echo generating code snippets
+	@go run ./tools/sdk/generate-code-snippets.go
+	@git add ./content/code-snippets.json
+
+.PHONY: generate-config-markdown generate-mermaid generate-jsonnet generate-aperturectl-docs generate-otel-docs generate-code-snippets

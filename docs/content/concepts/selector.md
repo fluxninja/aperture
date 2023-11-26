@@ -161,7 +161,7 @@ An example flow:
 ### DaemonSet deployment of Aperture Agents
 
 In this installation mode, control points alone might not be sufficient to
-identify flows. For instance, in the case of Envoy interception, the default
+identify flows. For example, in the case of Envoy interception, the default
 Envoy Filter assigns `ingress` and `egress` as the control points to all
 listener chains, depending on whether they are for ingress or egress traffic. In
 this case, the service parameter can be used to distinguish among flows

@@ -9,8 +9,8 @@ keywords:
 In Aperture, a service represents a collection of entities that deliver a common
 functionality, such as checkout or billing in an e-commerce example, or provide
 a specific service, such as a database or a search service. It maps to the
-concept of services in platforms like Kubernetes or Consul. Services in Aperture
-are typically referred to by their fully qualified domain names (FQDN).
+concept of services in platforms such as Kubernetes or Consul. Services in
+Aperture are typically referred to by their fully qualified domain names (FQDN).
 
 ## Service Discovery
 
@@ -33,8 +33,8 @@ reliable identification of services during flow control decision-making.
 
 Upon receiving a flow control decision request from an entity, Aperture uses the
 IP address to service mapping to identify the service name(s). The service
-name(s) along with flow labels determine which flow control components to
-execute. Refer to [Selector concept](/concepts/selector.md) for more details.
+name(s) along with flow labels determine which flow control components to run.
+Refer to [Selector concept](/concepts/selector.md) for more details.
 
 :::note
 

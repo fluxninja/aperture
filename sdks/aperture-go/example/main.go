@@ -68,6 +68,8 @@ func main() {
 	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
 	apertureAgentSkipVerifyBool, _ := strconv.ParseBool(apertureAgentSkipVerify)
 
+	// START: clientConstructor
+
 	opts := aperture.Options{
 		Address:     apertureAgentAddr,
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
@@ -79,6 +81,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
+
+	// END: clientConstructor
 
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
