@@ -36,8 +36,30 @@ issue or error.
 
 <!-- vale on -->
 
-Let's create a feature control point in code. To begin with, you need to
-configure the Aperture SDK for your application.
+Let's create a feature control point in code. To begin, you first need to
+install the Aperture SDK([See all SDKs][sdks]) for your chosen application
+language.
+
+### Install Aperture SDK
+
+The following code snippets are in the TypeScript language. To install the SDK,
+run the following command:
+
+```mdx-code-block
+<Tabs>
+<TabItem value="TypeScript">
+```
+
+```bash
+npm install @fluxninja/aperture-js
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
+
+### Define Aperture Client
 
 :::note Required
 
@@ -65,6 +87,8 @@ import CodeSnippet from '../codeSnippet.js'
 </TabItem>
 </Tabs>
 ```
+
+### Create Feature Control Point
 
 Once you have configured Aperture SDK, you can create a feature control point
 anywhere within your code. Before executing the business logic of a specific
@@ -107,13 +131,6 @@ Let's create a feature control point in the following code snippet.
 This is how you can create a feature control point in your code. The complete
 example is available
 [here](https://github.com/fluxninja/aperture-js/blob/main/example/routes/use_aperture.ts).
-
-:::info
-
-Aperture SDKs are available for multiple languages, you choose the one that fits
-your needs. [See all SDKs][sdks].
-
-:::
 
 <!-- vale off -->
 
