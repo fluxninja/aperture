@@ -2,10 +2,11 @@
 import asyncio
 import logging
 import os
+from datetime import timedelta
 from typing import Optional
 
 import grpc
-from aperture_sdk import ApertureClient
+from aperture_sdk import ApertureClient, FlowParams
 from quart import Quart
 
 default_agent_address = "localhost:8089"
@@ -21,10 +22,14 @@ aperture_client = ApertureClient.new_client(
 
 logging.basicConfig(level=logging.DEBUG)
 
+flow_params = FlowParams(
+    check_timeout=timedelta(seconds=200),
+)
+
 
 @app.get("/super")
 @aperture_client.decorate(
-    "awesomeFeature", on_reject=lambda: ("Flow was rejected", 503)
+    "awesomeFeature", params=flow_params, on_reject=lambda: ("Flow was rejected", 503)
 )
 async def super_handler():
     # Simulate work being done
