@@ -54,8 +54,36 @@ installation instructions [here][sdks].
 
 Install the Aperture SDK in your project directory
 
+```mdx-code-block
+<Tabs>
+<TabItem value="TypeScript">
+```
+
 ```bash
 npm i @fluxninja/aperture-js
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
+```
+
+```bash
+go get github.com/fluxninja/aperture-go/v2
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Python">
+```
+
+```bash
+pip install aperture-py
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 Configure the Aperture SDK for in your application with the API key and the
@@ -207,7 +235,7 @@ Deploy your first policy. See [Policies][policies] for more details.
 [cloud]: https://www.fluxninja.com/product
 [aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /reference/cloud-ui/sign-up.md
-[policies]: /get-started/policies/policies.md
+[policies]: /reference/cloud-ui/policies/policies.md
 [cloud-extension]: /reference/fluxninja.md
 [agent-docs]: /aperture-for-infra/agent/agent.md
 [integrations]: /aperture-for-infra/integrations/integrations.md

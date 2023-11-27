@@ -24,4 +24,5 @@ example of how a Policy object could look like (look for `Generated Policy`).
 Such a Policy can be then applied with regular `kubectl apply`.
 
 [generate]: /reference/aperture-cli/aperturectl/blueprints/generate/generate.md
-[generating-policies]: /get-started/policies/policies.md#generating-policies
+[generating-policies]:
+  /reference/cloud-ui/policies/policies.md#generating-policies
