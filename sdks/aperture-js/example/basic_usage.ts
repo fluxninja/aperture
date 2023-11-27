@@ -17,6 +17,7 @@ async function handleRequest(req: Request, res: Response) {
   const flow = await apertureClient.startFlow("archimedes-service", {
     labels: {
       user: "user1",
+      tier: "premium",
     },
     grpcCallOptions: {
       deadline: Date.now() + 300, // 300ms deadline
