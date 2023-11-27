@@ -7,21 +7,21 @@ import (
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
-	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol"
+	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // CacheHandler is a handler for cache-family of functions.
 type CacheHandler struct {
-	cache      *flowcontrol.Cache
+	cache      iface.Cache
 	agentGroup string
 }
 
 // NewCacheHandler creates a new CacheHandler.
 func NewCacheHandler(
-	cache *flowcontrol.Cache,
-	agentInfo agentinfo.AgentInfo,
+	cache iface.Cache,
+	agentInfo *agentinfo.AgentInfo,
 ) (*CacheHandler, error) {
 	return &CacheHandler{
 		cache:      cache,
