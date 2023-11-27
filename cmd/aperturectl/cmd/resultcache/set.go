@@ -16,8 +16,24 @@ func init() {
 	SetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
 	SetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
 	SetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
-	SetCommand.Flags().StringVarP(&value, "value", "v", "", "Value")
+	SetCommand.Flags().StringVarP(&value, "value", "", "", "Value")
 	SetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600000, "TTL in milliseconds")
+	err := SetCommand.MarkFlagRequired("agent-group")
+	if err != nil {
+		panic(err)
+	}
+	err = SetCommand.MarkFlagRequired("control-point")
+	if err != nil {
+		panic(err)
+	}
+	err = SetCommand.MarkFlagRequired("key")
+	if err != nil {
+		panic(err)
+	}
+	err = SetCommand.MarkFlagRequired("value")
+	if err != nil {
+		panic(err)
+	}
 }
 
 var SetCommand = &cobra.Command{

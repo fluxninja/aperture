@@ -129,11 +129,21 @@ func ParseResultCacheLookup(client IntrospectionClient, input CacheLookupInput) 
 		return err
 	}
 
-	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
-	if err != nil {
-		return err
+	if resp.ResultCacheResponse == nil {
+		fmt.Fprintf(os.Stderr, "Could not get answer")
+		return nil
 	}
-	os.Stdout.Write(samplesJSON)
+	if resp.ResultCacheResponse.Error != "" {
+		fmt.Fprintf(os.Stderr, "Error: %s", resp.ResultCacheResponse.Error)
+		return nil
+	}
+	if resp.ResultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_MISS {
+		fmt.Fprintf(os.Stderr, "Cache miss")
+		return nil
+	}
+
+	val := string(resp.ResultCacheResponse.Value)
+	fmt.Fprintf(os.Stdout, "%s\n", val)
 
 	return nil
 }

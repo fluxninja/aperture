@@ -9,6 +9,18 @@ func init() {
 	DeleteCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
 	DeleteCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
 	DeleteCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
+	err := DeleteCommand.MarkFlagRequired("agent-group")
+	if err != nil {
+		panic(err)
+	}
+	err = DeleteCommand.MarkFlagRequired("control-point")
+	if err != nil {
+		panic(err)
+	}
+	err = DeleteCommand.MarkFlagRequired("key")
+	if err != nil {
+		panic(err)
+	}
 }
 
 var DeleteCommand = &cobra.Command{

@@ -119,6 +119,13 @@ func (c *Cache) ready() error {
 
 // Lookup looks up the cache for the given CacheLookupRequest.
 func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
+	response := &flowcontrolv1.CacheLookupResponse{
+		StateCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
+	}
+	if request == nil {
+		return response
+	}
+
 	type Lookup struct {
 		lookupResponse *flowcontrolv1.KeyLookupResponse
 		key            string
@@ -131,25 +138,22 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 	execLookup := func(lookup *Lookup) func() {
 		return func() {
 			defer wg.Done()
-			cachedValue := lookup.lookupResponse
+			lookupResponse := lookup.lookupResponse
 			cachedBytes, err := c.get(ctx, request.ControlPoint, lookup.cacheType, lookup.key)
 			if err == nil {
-				cachedValue.Value = cachedBytes
-				cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
-				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+				lookupResponse.Value = cachedBytes
+				lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
+				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
 				return
 			}
-			cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
-			cachedValue.Error = err.Error()
+			lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
+			lookupResponse.Error = err.Error()
 			if err == ErrCacheKeyNotFound {
-				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
 			} else {
-				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
 			}
 		}
-	}
-	response := &flowcontrolv1.CacheLookupResponse{
-		StateCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
 	}
 	var lookups []*Lookup
 	// define a lookup struct to hold the cache key and the cached value
@@ -220,11 +224,13 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 	var upsertRequests []*UpsertRequest
 	if req.ResultCacheEntry != nil && req.ResultCacheEntry.Key != "" {
 		wg.Add(1)
+		upsertResponse := &flowcontrolv1.KeyUpsertResponse{}
+		response.ResultCacheResponse = upsertResponse
 		upsertRequests = append(upsertRequests, &UpsertRequest{
 			key:            req.ResultCacheEntry.Key,
 			cacheType:      iface.Result,
 			entry:          req.ResultCacheEntry,
-			upsertResponse: response.ResultCacheResponse,
+			upsertResponse: upsertResponse,
 		})
 	}
 

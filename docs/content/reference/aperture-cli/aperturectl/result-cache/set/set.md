@@ -28,7 +28,7 @@ aperturectl result-cache set [flags]
   -h, --help                   help for set
   -k, --key string             Key
   -t, --ttl int                TTL in milliseconds (default 600000)
-  -v, --value string           Value
+      --value string           Value
 ```
 
 ### Options inherited from parent commands

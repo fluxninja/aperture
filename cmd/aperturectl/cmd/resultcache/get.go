@@ -15,6 +15,18 @@ func init() {
 	GetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
 	GetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
 	GetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
+	err := GetCommand.MarkFlagRequired("agent-group")
+	if err != nil {
+		panic(err)
+	}
+	err = GetCommand.MarkFlagRequired("control-point")
+	if err != nil {
+		panic(err)
+	}
+	err = GetCommand.MarkFlagRequired("key")
+	if err != nil {
+		panic(err)
+	}
 }
 
 var GetCommand = &cobra.Command{
