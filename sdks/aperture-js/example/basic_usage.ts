@@ -16,7 +16,7 @@ import { Request, Response } from "express";
 async function handleRequest(req: Request, res: Response) {
   const flow = await apertureClient.startFlow("archimedes-service", {
     labels: {
-      api_key: "some_api_key",
+      user: "user1",
     },
     grpcCallOptions: {
       deadline: Date.now() + 300, // 300ms deadline
