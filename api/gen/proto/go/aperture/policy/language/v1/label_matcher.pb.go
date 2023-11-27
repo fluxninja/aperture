@@ -112,7 +112,7 @@ type K8SLabelMatcherRequirement struct {
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Logical operator which represents a key's relationship to a set of values.
 	// Valid operators are In, NotIn, Exists and DoesNotExist.
-	Operator string `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=In NotIn Exists DoesNotExists"` // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+	Operator string `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=In NotIn Exists DoesNotExist"` // @gotags: validate:"oneof=In NotIn Exists DoesNotExist"
 	// An array of string values that relates to the key by an operator.
 	// If the operator is In or NotIn, the values array must be non-empty.
 	// If the operator is Exists or DoesNotExist, the values array must be empty.

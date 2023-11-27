@@ -36,7 +36,7 @@ message K8sLabelMatcherRequirement {
 
   // Logical operator which represents a key's relationship to a set of values.
   // Valid operators are In, NotIn, Exists and DoesNotExist.
-  string operator = 2; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+  string operator = 2; // @gotags: validate:"oneof=In NotIn Exists DoesNotExist"
 
   // An array of string values that relates to the key by an operator.
   // If the operator is In or NotIn, the values array must be non-empty.
