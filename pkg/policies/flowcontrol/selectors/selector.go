@@ -3,6 +3,7 @@
 package selectors
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -101,7 +102,9 @@ func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
 		case metav1.LabelSelectorOpDoesNotExist:
 			reqExprs = append(reqExprs, mm.Not(mm.LabelExists(req.Key)))
 		default:
-			log.Panic().Msg("unknown match expression operator")
+			message := fmt.Sprintf("unknown match expression operator: %v", req.Operator)
+			log.Error().Msg(message)
+			return nil, errors.New(message)
 		}
 	}
 
