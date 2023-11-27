@@ -1,4 +1,4 @@
-package statecache
+package resultcache
 
 import (
 	"time"
@@ -13,18 +13,18 @@ var (
 )
 
 func init() {
-	GetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
-	GetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
-	GetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
-	GetCommand.Flags().StringVarP(&value, "value", "v", "", "Value")
-	GetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600000, "TTL in milliseconds")
+	SetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
+	SetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
+	SetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
+	SetCommand.Flags().StringVarP(&value, "value", "v", "", "Value")
+	SetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600000, "TTL in milliseconds")
 }
 
 var SetCommand = &cobra.Command{
 	Use:   "set",
-	Short: "Set a state cache entry",
-	Long:  `Set a state cache entry`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Short: "Set a result cache entry",
+	Long:  `Set a result cache entry`,
+	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {
 			return err
