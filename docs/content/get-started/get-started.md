@@ -55,7 +55,7 @@ installation instructions [here][sdks].
 Install the Aperture SDK in your project directory
 
 ```mdx-code-block
-<Tabs>
+<Tabs groupId="language" queryString>
 <TabItem value="TypeScript">
 ```
 
@@ -89,6 +89,11 @@ pip install aperture-py
 Configure the Aperture SDK for in your application with the API key and the
 address of the Aperture Cloud.
 
+```mdx-code-block
+<Tabs groupId="language" queryString>
+<TabItem value="TypeScript">
+```
+
 ```typescript
 import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
 
@@ -97,6 +102,61 @@ export const apertureClient = new ApertureClient({
   address: "ORGANIZATION.app.fluxninja.com:443",
   agentAPIKey: "API_KEY",
 });
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
+```
+
+```go
+// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
+func grpcOptions() []grpc.DialOption {
+  var grpcDialOptions []grpc.DialOption
+  grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
+    Backoff:           backoff.DefaultConfig,
+    MinConnectTimeout: time.Second * 10,
+  }))
+  grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
+  certPool, err := x509.SystemCertPool()
+  if err != nil {
+    return nil
+  }
+  grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
+  return grpcDialOptions
+}
+
+// Create aperture client
+  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
+  apiKey := "API_KEY"
+
+  opts := aperture.Options{
+      Address:     agentAddress,
+      APIKey: apiKey,
+      DialOptions: grpcOptions(),
+  }
+
+  // initialize Aperture Client with the provided options.
+  apertureClient, err := aperture.NewClient(ctx, opts)
+  if err != nil {
+      log.Fatalf("failed to create client: %v", err)
+  }
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Python">
+```
+
+```python
+  from aperture_sdk import ApertureClient
+
+  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 **Define a Control Point**
@@ -121,6 +181,11 @@ The code snippet below shows how to wrap your
   in Aperture cache with the specified TTL (time to live).
 
 Let's create a feature control point in the following code snippet.
+
+```mdx-code-block
+<Tabs groupId="language" queryString>
+<TabItem value="TypeScript">
+```
 
 ```typescript
 async function handleRequest(req, res) {
@@ -167,6 +232,70 @@ async function handleRequest(req, res) {
     flow.End();
   }
 }
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
+```
+
+```go
+  // business logic produces labels
+  labels := map[string]string{
+      "key": "value",
+  }
+
+  rampMode := false
+
+  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
+  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
+
+  // See whether flow was accepted by Aperture Agent.
+  if flow.ShouldRun() {
+      // do actual work
+  } else {
+      // handle flow rejection by Aperture Agent
+      flow.SetStatus(aperture.Error)
+  }
+  _ = flow.End()
+
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Python">
+```
+
+```python
+  # business logic produces labels
+  labels = {
+      "key": "value",
+  }
+
+  # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
+  # It returns a Flow or raises an error if any.
+  flow = aperture_client.start_flow(
+    control_point="AwesomeFeature",
+    explicit_labels=labels,
+    check_timeout=timedelta(seconds=200),
+  )
+
+  # Check if flow check was successful.
+  if not flow.success:
+      logger.info("Flow check failed - will fail-open")
+
+  # See whether flow was accepted by Aperture Agent.
+  if flow.should_run():
+      # do actual work
+  else:
+      # handle flow rejection by Aperture Agent
+      flow.set_status(FlowStatus.Error)
+  flow.end()
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 This is how you can create a feature control point in your code. The complete
