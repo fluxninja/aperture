@@ -4,9 +4,13 @@ package selectors
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/utils"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	mm "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 
@@ -76,6 +80,31 @@ func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
 		reqExprs = append(reqExprs, mm.LabelEquals(k, v))
 	}
 
+	for _, req := range lm.GetMatchExpressions() {
+		switch metav1.LabelSelectorOperator(req.Operator) {
+		case metav1.LabelSelectorOpIn:
+			matchExpr, err := mm.LabelMatchesRegex(req.Key, valuesRegex(req.Values))
+			if err != nil {
+				// should not happen as we're in control of the regex, but who knows
+				return nil, err
+			}
+			reqExprs = append(reqExprs, matchExpr)
+		case metav1.LabelSelectorOpNotIn:
+			matchExpr, err := mm.LabelMatchesRegex(req.Key, valuesRegex(req.Values))
+			if err != nil {
+				// should not happen as we're in control of the regex, but who knows
+				return nil, err
+			}
+			reqExprs = append(reqExprs, mm.Not(matchExpr))
+		case metav1.LabelSelectorOpExists:
+			reqExprs = append(reqExprs, mm.LabelExists(req.Key))
+		case metav1.LabelSelectorOpDoesNotExist:
+			reqExprs = append(reqExprs, mm.Not(mm.LabelExists(req.Key)))
+		default:
+			log.Panic().Msg("unknown match expression operator")
+		}
+	}
+
 	if protoExpr := lm.GetExpression(); protoExpr != nil {
 		expr, err := MMExprFromProto(protoExpr)
 		if err != nil {
@@ -132,4 +161,13 @@ func mmExprsFromProtoList(list *policylangv1.MatchExpression_List) ([]mm.Expr, e
 		exprs = append(exprs, expr)
 	}
 	return exprs, nil
+}
+
+// valuesRegex returns regex expression that'll match any of given values.
+func valuesRegex(values []string) string {
+	escaped := make([]string, 0, len(values))
+	for _, v := range values {
+		escaped = append(escaped, regexp.QuoteMeta(v))
+	}
+	return "^(" + strings.Join(escaped, "|") + ")$"
 }

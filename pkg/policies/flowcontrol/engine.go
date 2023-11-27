@@ -169,14 +169,17 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	// Lookup cache
-	response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
-	resultCacheResponse := response.CacheLookupResponse.ResultCacheResponse
+	// Could be nil during unit tests
+	if e.cache != nil {
+		// Lookup cache
+		response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
+		resultCacheResponse := response.CacheLookupResponse.ResultCacheResponse
 
-	// Check if result cache is hit
-	if resultCacheResponse != nil && resultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
-		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
-		return
+		// Check if result cache is hit
+		if resultCacheResponse != nil && resultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
+			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+			return
+		}
 	}
 
 	limiterTypes = []LimiterType{

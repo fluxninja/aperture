@@ -20,8 +20,28 @@ message LabelMatcher {
   // Note: The requirements are combined using the logical AND operator.
   map<string, string> match_labels = 1;
 
+  // List of Kubernetes-style label matcher requirements.
+  //
+  // Note: The requirements are combined using the logical AND operator.
+  repeated K8sLabelMatcherRequirement match_expressions = 2;
+
   // An arbitrary expression to be evaluated on the labels.
   MatchExpression expression = 3;
+}
+
+// Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+message K8sLabelMatcherRequirement {
+  // Label key that the selector applies to.
+  string key = 1; // @gotags: validate:"required"
+
+  // Logical operator which represents a key's relationship to a set of values.
+  // Valid operators are In, NotIn, Exists and DoesNotExist.
+  string operator = 2; // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+
+  // An array of string values that relates to the key by an operator.
+  // If the operator is In or NotIn, the values array must be non-empty.
+  // If the operator is Exists or DoesNotExist, the values array must be empty.
+  repeated string values = 3;
 }
 
 // MatchExpression has multiple variants, exactly one should be set.

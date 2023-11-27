@@ -10,6 +10,7 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	"github.com/fluxninja/aperture/v2/pkg/log"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"go.uber.org/fx"
@@ -147,11 +148,14 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 				return
 			}
 			lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
-			lookupResponse.Error = err.Error()
-			if err == ErrCacheKeyNotFound {
+			log.Info().Err(err).Msg("error")
+			if err.Error() == ErrCacheKeyNotFound.Error() {
+				log.Info().Msg("key not found")
 				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
 			} else {
+				log.Info().Msg("some other error")
 				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+				lookupResponse.Error = err.Error()
 			}
 		}
 	}
@@ -193,6 +197,13 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 
 // Upsert upserts the cache for the given CacheUpsertRequest.
 func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse {
+	response := &flowcontrolv1.CacheUpsertResponse{
+		StateCacheResponses: make(map[string]*flowcontrolv1.KeyUpsertResponse),
+	}
+	if req == nil {
+		return response
+	}
+
 	type UpsertRequest struct {
 		entry          *flowcontrolv1.CacheEntry
 		upsertResponse *flowcontrolv1.KeyUpsertResponse
@@ -209,6 +220,10 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 			key := upsertRequest.key
 			value := upsertRequest.entry.Value
 			ttl := upsertRequest.entry.Ttl.AsDuration()
+			// Default and Cap TTL to one week
+			if ttl == 0 || (ttl > time.Hour*24*7) {
+				ttl = time.Hour * 24 * 7
+			}
 			err := c.upsert(ctx, req.ControlPoint, cacheType, key, value, ttl)
 			if err != nil {
 				upsertRequest.upsertResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
@@ -218,8 +233,6 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 			}
 		}
 	}
-
-	response := &flowcontrolv1.CacheUpsertResponse{}
 
 	var upsertRequests []*UpsertRequest
 	if req.ResultCacheEntry != nil && req.ResultCacheEntry.Key != "" {
@@ -265,6 +278,14 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 
 // Delete deletes the cache for the given CacheDeleteRequest.
 func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) *flowcontrolv1.CacheDeleteResponse {
+	response := &flowcontrolv1.CacheDeleteResponse{
+		StateCacheResponses: make(map[string]*flowcontrolv1.KeyDeleteResponse),
+	}
+
+	if req == nil {
+		return response
+	}
+
 	type DeleteRequest struct {
 		deleteResponse *flowcontrolv1.KeyDeleteResponse
 		key            string
@@ -288,15 +309,15 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 		}
 	}
 
-	response := &flowcontrolv1.CacheDeleteResponse{}
-
 	var deleteRequests []*DeleteRequest
 	if req.ResultCacheKey != "" {
 		wg.Add(1)
+		deleteResponse := &flowcontrolv1.KeyDeleteResponse{}
+		response.ResultCacheResponse = deleteResponse
 		deleteRequests = append(deleteRequests, &DeleteRequest{
 			cacheType:      iface.Result,
 			key:            req.ResultCacheKey,
-			deleteResponse: response.ResultCacheResponse,
+			deleteResponse: deleteResponse,
 		})
 	}
 

@@ -148,6 +148,41 @@ func ParseResultCacheLookup(client IntrospectionClient, input CacheLookupInput) 
 	return nil
 }
 
+func ParseStateCacheLookup(client IntrospectionClient, input CacheLookupInput) error {
+	resp, err := client.CacheLookup(
+		context.Background(),
+		&cmdv1.GlobalCacheLookupRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheLookupRequest{
+				ControlPoint:   input.ControlPoint,
+				StateCacheKeys: []string{input.Key},
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	if resp.StateCacheResponses == nil || resp.StateCacheResponses[input.Key] == nil {
+		fmt.Fprintf(os.Stderr, "Could not get answer")
+		return nil
+	}
+	lookupResponse := resp.StateCacheResponses[input.Key]
+	if lookupResponse.Error != "" {
+		fmt.Fprintf(os.Stderr, "Error: %s", lookupResponse.Error)
+		return nil
+	}
+	if lookupResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_MISS {
+		fmt.Fprintf(os.Stderr, "Cache miss")
+		return nil
+	}
+
+	val := string(lookupResponse.Value)
+	fmt.Fprintf(os.Stdout, "%s\n", val)
+
+	return nil
+}
+
 type CacheUpsertInput struct {
 	AgentGroup   string
 	ControlPoint string
@@ -184,6 +219,36 @@ func ParseResultCacheUpsert(client IntrospectionClient, input CacheUpsertInput) 
 	return nil
 }
 
+func ParseStateCacheUpsert(client IntrospectionClient, input CacheUpsertInput) error {
+	resp, err := client.CacheUpsert(
+		context.Background(),
+		&cmdv1.GlobalCacheUpsertRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheUpsertRequest{
+				ControlPoint: input.ControlPoint,
+				StateCacheEntries: map[string]*flowcontrolv1.CacheEntry{
+					input.Key: {
+						Key:   input.Key,
+						Value: []byte(input.Value),
+						Ttl:   durationpb.New(input.TTL),
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	os.Stdout.Write(samplesJSON)
+
+	return nil
+}
+
 type CacheDeleteInput struct {
 	AgentGroup   string
 	ControlPoint string
@@ -198,6 +263,30 @@ func ParseResultCacheDelete(client IntrospectionClient, input CacheDeleteInput) 
 			Request: &flowcontrolv1.CacheDeleteRequest{
 				ControlPoint:   input.ControlPoint,
 				ResultCacheKey: input.Key,
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	os.Stdout.Write(samplesJSON)
+
+	return nil
+}
+
+func ParseStateCacheDelete(client IntrospectionClient, input CacheDeleteInput) error {
+	resp, err := client.CacheDelete(
+		context.Background(),
+		&cmdv1.GlobalCacheDeleteRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheDeleteRequest{
+				ControlPoint:   input.ControlPoint,
+				StateCacheKeys: []string{input.Key},
 			},
 		},
 	)

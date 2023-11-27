@@ -1908,6 +1908,33 @@
       "type": "object",
       "additionalProperties": false
     },
+    "K8sLabelMatcherRequirement": {
+      "description": "Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.",
+      "properties": {
+        "key": {
+          "description": "Label key that the selector applies to.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required"
+        },
+        "operator": {
+          "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
+          "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
+          "type": "string",
+          "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
+          "x-oneof": "In | NotIn | Exists | DoesNotExists"
+        },
+        "values": {
+          "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["key"],
+      "type": "object",
+      "additionalProperties": false
+    },
     "KubernetesObjectSelector": {
       "description": "Describes which pods a control or observability\ncomponent should apply to.",
       "properties": {
@@ -1948,6 +1975,14 @@
         "expression": {
           "$ref": "#/definitions/MatchExpression",
           "description": "An arbitrary expression to be evaluated on the labels."
+        },
+        "match_expressions": {
+          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.",
+          "items": {
+            "$ref": "#/definitions/K8sLabelMatcherRequirement",
+            "type": "object"
+          },
+          "type": "array"
         },
         "match_labels": {
           "additionalProperties": {
