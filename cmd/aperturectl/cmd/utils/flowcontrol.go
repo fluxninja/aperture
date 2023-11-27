@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	"text/tabwriter"
+	"time"
 
 	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 )
 
@@ -53,10 +56,10 @@ func ParseControlPoints(client IntrospectionClient) error {
 
 type PreviewInput struct {
 	AgentGroup    string
-	IsHTTPPreview bool
-	NumSamples    int
 	Service       string
 	ControlPoint  string
+	NumSamples    int
+	IsHTTPPreview bool
 }
 
 // ParsePreview parses the preview.
@@ -101,6 +104,102 @@ func ParsePreview(client IntrospectionClient, input PreviewInput) error {
 		}
 		os.Stdout.Write(samplesJSON)
 	}
+
+	return nil
+}
+
+type CacheLookupInput struct {
+	AgentGroup   string
+	ControlPoint string
+	Key          string
+}
+
+func ParseResultCacheLookup(client IntrospectionClient, input CacheLookupInput) error {
+	resp, err := client.CacheLookup(
+		context.Background(),
+		&cmdv1.GlobalCacheLookupRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheLookupRequest{
+				ControlPoint:   input.ControlPoint,
+				ResultCacheKey: input.Key,
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	os.Stdout.Write(samplesJSON)
+
+	return nil
+}
+
+type CacheUpsertInput struct {
+	AgentGroup   string
+	ControlPoint string
+	Key          string
+	Value        string
+	TTL          time.Duration
+}
+
+func ParseResultCacheUpsert(client IntrospectionClient, input CacheUpsertInput) error {
+	resp, err := client.CacheUpsert(
+		context.Background(),
+		&cmdv1.GlobalCacheUpsertRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheUpsertRequest{
+				ControlPoint: input.ControlPoint,
+				ResultCacheEntry: &flowcontrolv1.CacheEntry{
+					Key:   input.Key,
+					Value: []byte(input.Value),
+					Ttl:   durationpb.New(input.TTL),
+				},
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	os.Stdout.Write(samplesJSON)
+
+	return nil
+}
+
+type CacheDeleteInput struct {
+	AgentGroup   string
+	ControlPoint string
+	Key          string
+}
+
+func ParseResultCacheDelete(client IntrospectionClient, input CacheDeleteInput) error {
+	resp, err := client.CacheDelete(
+		context.Background(),
+		&cmdv1.GlobalCacheDeleteRequest{
+			AgentGroup: input.AgentGroup,
+			Request: &flowcontrolv1.CacheDeleteRequest{
+				ControlPoint:   input.ControlPoint,
+				ResultCacheKey: input.Key,
+			},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	samplesJSON, err := protojson.MarshalOptions{Multiline: true}.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	os.Stdout.Write(samplesJSON)
 
 	return nil
 }

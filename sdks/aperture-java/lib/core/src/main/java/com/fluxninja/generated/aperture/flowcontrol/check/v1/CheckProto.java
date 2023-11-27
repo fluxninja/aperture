@@ -347,15 +347,15 @@ public final class CheckProto {
       "ontrolService\022d\n\005Check\022+.aperture.flowco" +
       "ntrol.check.v1.CheckRequest\032,.aperture.f" +
       "lowcontrol.check.v1.CheckResponse\"\000\022v\n\013C" +
+      "acheLookup\0221.aperture.flowcontrol.check." +
+      "v1.CacheLookupRequest\0322.aperture.flowcon" +
+      "trol.check.v1.CacheLookupResponse\"\000\022v\n\013C" +
       "acheUpsert\0221.aperture.flowcontrol.check." +
       "v1.CacheUpsertRequest\0322.aperture.flowcon" +
       "trol.check.v1.CacheUpsertResponse\"\000\022v\n\013C" +
       "acheDelete\0221.aperture.flowcontrol.check." +
       "v1.CacheDeleteRequest\0322.aperture.flowcon" +
-      "trol.check.v1.CacheDeleteResponse\"\000\022v\n\013C" +
-      "acheLookup\0221.aperture.flowcontrol.check." +
-      "v1.CacheLookupRequest\0322.aperture.flowcon" +
-      "trol.check.v1.CacheLookupResponse\"\000B\263\002\n5" +
+      "trol.check.v1.CacheDeleteResponse\"\000B\263\002\n5" +
       "com.fluxninja.generated.aperture.flowcon" +
       "trol.check.v1B\nCheckProtoP\001ZWgithub.com/" +
       "fluxninja/aperture/v2/api/gen/proto/go/a" +

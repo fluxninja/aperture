@@ -114,8 +114,8 @@ func SendRequests[RespValue any, Resp ExactMessage[RespValue]](ctx context.Conte
 }
 
 // SendRequest allows consumers of the etcd transport to send single request to agents.
-func SendRequest[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportServer, client string, msg proto.Message) (*RespValue, error) {
-	resp, err := t.SendRequest(ctx, client, msg)
+func SendRequest[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportServer, agentName string, msg proto.Message) (*RespValue, error) {
+	resp, err := t.SendRequest(ctx, agentName, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func SendRequest[RespValue any, Resp ExactMessage[RespValue]](ctx context.Contex
 }
 
 // SendRequest sends a request to etcd, supposed to be consumed by an agent.
-func (t *EtcdTransportServer) SendRequest(ctx context.Context, client string, msg proto.Message) (*Response, error) {
+func (t *EtcdTransportServer) SendRequest(ctx context.Context, agentName string, msg proto.Message) (*Response, error) {
 	anyreq, err := anypb.New(msg)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -142,7 +142,7 @@ func (t *EtcdTransportServer) SendRequest(ctx context.Context, client string, ms
 
 	req := Request{
 		ID:     uuid.NewString(),
-		Client: client,
+		Client: agentName,
 		Data:   rawReq,
 	}
 

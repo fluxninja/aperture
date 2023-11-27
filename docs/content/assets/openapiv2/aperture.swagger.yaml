@@ -778,6 +778,17 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: The value is emitted to the output port.
         type: object
+    CacheDeleteRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_key:
+                type: string
+            state_cache_keys:
+                items:
+                    type: string
+                type: array
+        type: object
     CacheDeleteResponse:
         properties:
             result_cache_response:
@@ -831,6 +842,17 @@ definitions:
             - SUCCESS
             - ERROR
         type: string
+    CacheUpsertRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_entry:
+                $ref: '#/definitions/CacheEntry'
+            state_cache_entries:
+                additionalProperties:
+                    $ref: '#/definitions/CacheEntry'
+                type: object
+        type: object
     CacheUpsertResponse:
         properties:
             result_cache_response:

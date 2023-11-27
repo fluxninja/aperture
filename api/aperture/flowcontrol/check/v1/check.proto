@@ -9,9 +9,9 @@ import "google/protobuf/timestamp.proto";
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc CacheLookup(CacheLookupRequest) returns (CacheLookupResponse) {}
   rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
   rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
-  rpc CacheLookup(CacheLookupRequest) returns (CacheLookupResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.

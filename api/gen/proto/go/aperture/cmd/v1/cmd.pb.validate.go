@@ -2914,3 +2914,402 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PreviewHTTPRequestsControllerResponseValidationError{}
+
+// Validate checks the field values on GlobalCacheLookupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GlobalCacheLookupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GlobalCacheLookupRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GlobalCacheLookupRequestMultiError, or nil if none found.
+func (m *GlobalCacheLookupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GlobalCacheLookupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GlobalCacheLookupRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GlobalCacheLookupRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GlobalCacheLookupRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AgentGroup
+
+	if len(errors) > 0 {
+		return GlobalCacheLookupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GlobalCacheLookupRequestMultiError is an error wrapping multiple validation
+// errors returned by GlobalCacheLookupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GlobalCacheLookupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GlobalCacheLookupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GlobalCacheLookupRequestMultiError) AllErrors() []error { return m }
+
+// GlobalCacheLookupRequestValidationError is the validation error returned by
+// GlobalCacheLookupRequest.Validate if the designated constraints aren't met.
+type GlobalCacheLookupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GlobalCacheLookupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GlobalCacheLookupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GlobalCacheLookupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GlobalCacheLookupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GlobalCacheLookupRequestValidationError) ErrorName() string {
+	return "GlobalCacheLookupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GlobalCacheLookupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGlobalCacheLookupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GlobalCacheLookupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GlobalCacheLookupRequestValidationError{}
+
+// Validate checks the field values on GlobalCacheUpsertRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GlobalCacheUpsertRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GlobalCacheUpsertRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GlobalCacheUpsertRequestMultiError, or nil if none found.
+func (m *GlobalCacheUpsertRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GlobalCacheUpsertRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GlobalCacheUpsertRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GlobalCacheUpsertRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GlobalCacheUpsertRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AgentGroup
+
+	if len(errors) > 0 {
+		return GlobalCacheUpsertRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GlobalCacheUpsertRequestMultiError is an error wrapping multiple validation
+// errors returned by GlobalCacheUpsertRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GlobalCacheUpsertRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GlobalCacheUpsertRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GlobalCacheUpsertRequestMultiError) AllErrors() []error { return m }
+
+// GlobalCacheUpsertRequestValidationError is the validation error returned by
+// GlobalCacheUpsertRequest.Validate if the designated constraints aren't met.
+type GlobalCacheUpsertRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GlobalCacheUpsertRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GlobalCacheUpsertRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GlobalCacheUpsertRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GlobalCacheUpsertRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GlobalCacheUpsertRequestValidationError) ErrorName() string {
+	return "GlobalCacheUpsertRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GlobalCacheUpsertRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGlobalCacheUpsertRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GlobalCacheUpsertRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GlobalCacheUpsertRequestValidationError{}
+
+// Validate checks the field values on GlobalCacheDeleteRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GlobalCacheDeleteRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GlobalCacheDeleteRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GlobalCacheDeleteRequestMultiError, or nil if none found.
+func (m *GlobalCacheDeleteRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GlobalCacheDeleteRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GlobalCacheDeleteRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GlobalCacheDeleteRequestValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GlobalCacheDeleteRequestValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for AgentGroup
+
+	if len(errors) > 0 {
+		return GlobalCacheDeleteRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GlobalCacheDeleteRequestMultiError is an error wrapping multiple validation
+// errors returned by GlobalCacheDeleteRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GlobalCacheDeleteRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GlobalCacheDeleteRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GlobalCacheDeleteRequestMultiError) AllErrors() []error { return m }
+
+// GlobalCacheDeleteRequestValidationError is the validation error returned by
+// GlobalCacheDeleteRequest.Validate if the designated constraints aren't met.
+type GlobalCacheDeleteRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GlobalCacheDeleteRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GlobalCacheDeleteRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GlobalCacheDeleteRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GlobalCacheDeleteRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GlobalCacheDeleteRequestValidationError) ErrorName() string {
+	return "GlobalCacheDeleteRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GlobalCacheDeleteRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGlobalCacheDeleteRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GlobalCacheDeleteRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GlobalCacheDeleteRequestValidationError{}
