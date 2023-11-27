@@ -2522,10 +2522,10 @@ definitions:
                     - In
                     - NotIn
                     - Exists
-                    - DoesNotExists
+                    - DoesNotExist
                 type: string
-                x-go-tag-validate: oneof=In NotIn Exists DoesNotExists
-                x-oneof: In | NotIn | Exists | DoesNotExists
+                x-go-tag-validate: required,oneof=In NotIn Exists DoesNotExist
+                x-oneof: In | NotIn | Exists | DoesNotExist
             values:
                 description: |-
                     An array of string values that relates to the key by an operator.
@@ -2536,6 +2536,7 @@ definitions:
                 type: array
         required:
             - key
+            - operator
         type: object
     KubernetesObjectSelector:
         description: |-
@@ -2592,14 +2593,16 @@ definitions:
                 $ref: '#/definitions/MatchExpression'
                 description: An arbitrary expression to be evaluated on the labels.
             match_expressions:
-                description: |-
+                description: |+
                     List of Kubernetes-style label matcher requirements.
 
                     Note: The requirements are combined using the logical AND operator.
+
                 items:
                     $ref: '#/definitions/K8sLabelMatcherRequirement'
                     type: object
                 type: array
+                x-go-tag-validate: dive
             match_labels:
                 additionalProperties:
                     type: string
