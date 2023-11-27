@@ -1918,10 +1918,10 @@
         },
         "operator": {
           "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
-          "enum": ["In", "NotIn", "Exists", "DoesNotExists"],
+          "enum": ["In", "NotIn", "Exists", "DoesNotExist"],
           "type": "string",
-          "x-go-tag-validate": "oneof=In NotIn Exists DoesNotExists",
-          "x-oneof": "In | NotIn | Exists | DoesNotExists"
+          "x-go-tag-validate": "required,oneof=In NotIn Exists DoesNotExist",
+          "x-oneof": "In | NotIn | Exists | DoesNotExist"
         },
         "values": {
           "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
@@ -1931,7 +1931,7 @@
           "type": "array"
         }
       },
-      "required": ["key"],
+      "required": ["key", "operator"],
       "type": "object",
       "additionalProperties": false
     },
@@ -1977,12 +1977,13 @@
           "description": "An arbitrary expression to be evaluated on the labels."
         },
         "match_expressions": {
-          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.",
+          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\n\n",
           "items": {
             "$ref": "#/definitions/K8sLabelMatcherRequirement",
             "type": "object"
           },
-          "type": "array"
+          "type": "array",
+          "x-go-tag-validate": "dive"
         },
         "match_labels": {
           "additionalProperties": {

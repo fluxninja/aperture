@@ -44,7 +44,7 @@ type LabelMatcher struct {
 	// List of Kubernetes-style label matcher requirements.
 	//
 	// Note: The requirements are combined using the logical AND operator.
-	MatchExpressions []*K8SLabelMatcherRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty"`
+	MatchExpressions []*K8SLabelMatcherRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// An arbitrary expression to be evaluated on the labels.
 	Expression *MatchExpression `protobuf:"bytes,3,opt,name=expression,proto3" json:"expression,omitempty"`
 }
@@ -112,7 +112,7 @@ type K8SLabelMatcherRequirement struct {
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Logical operator which represents a key's relationship to a set of values.
 	// Valid operators are In, NotIn, Exists and DoesNotExist.
-	Operator string `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty" validate:"oneof=In NotIn Exists DoesNotExists"` // @gotags: validate:"oneof=In NotIn Exists DoesNotExists"
+	Operator string `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty" validate:"required,oneof=In NotIn Exists DoesNotExist"` // @gotags: validate:"required,oneof=In NotIn Exists DoesNotExist"
 	// An array of string values that relates to the key by an operator.
 	// If the operator is In or NotIn, the values array must be non-empty.
 	// If the operator is Exists or DoesNotExist, the values array must be empty.
