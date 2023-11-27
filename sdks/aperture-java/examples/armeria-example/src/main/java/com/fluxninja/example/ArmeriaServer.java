@@ -22,6 +22,8 @@ public class ArmeriaServer {
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
+    // START: createConnectedHTTPService
+
     public static HttpService createHelloHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -30,6 +32,7 @@ public class ArmeriaServer {
             }
         };
     }
+    // END: createConnectedHTTPService
 
     public static HttpService createHealthService() {
         return new AbstractHttpService() {
@@ -71,6 +74,7 @@ public class ArmeriaServer {
 
         String rootCertFile = getEnv("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);
 
+        // START: createApertureSDK
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
@@ -84,12 +88,15 @@ public class ArmeriaServer {
             e.printStackTrace();
             return;
         }
+        // END: createApertureSDK
+
         ServerBuilder serverBuilder = Server.builder();
         serverBuilder.http(Integer.parseInt(appPort));
         serverBuilder.service("/notsuper", createHelloHTTPService());
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
 
+        // START: decorateService
         ApertureHTTPService decoratedService =
                 createHelloHTTPService()
                         .decorate(
@@ -99,6 +106,7 @@ public class ArmeriaServer {
                                         rampMode,
                                         Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
+        // END: decorateService
 
         Server server = serverBuilder.build();
         CompletableFuture<Void> future = server.start();

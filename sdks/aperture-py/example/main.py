@@ -8,6 +8,7 @@ import grpc
 from aperture_sdk import ApertureClient
 from quart import Quart
 
+# START: clientConstructor
 default_agent_address = "localhost:8089"
 
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
@@ -20,6 +21,8 @@ aperture_client = ApertureClient.new_client(
 )
 
 logging.basicConfig(level=logging.DEBUG)
+
+# END: clientConstructor
 
 
 @app.get("/super")
