@@ -17,7 +17,7 @@ import {
 } from "./consts.js";
 import type { CacheDeleteRequest } from "./gen/aperture/flowcontrol/check/v1/CacheDeleteRequest.js";
 import { CacheLookupStatus } from "./gen/aperture/flowcontrol/check/v1/CacheLookupStatus.js";
-import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest";
+import type { CacheUpsertRequest } from "./gen/aperture/flowcontrol/check/v1/CacheUpsertRequest.js";
 import {
   CheckResponse__Output,
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
