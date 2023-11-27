@@ -6,7 +6,7 @@ import type { FluxMeterInfo as _aperture_flowcontrol_check_v1_FluxMeterInfo, Flu
 import type { LimiterDecision as _aperture_flowcontrol_check_v1_LimiterDecision, LimiterDecision__Output as _aperture_flowcontrol_check_v1_LimiterDecision__Output } from '../../../../aperture/flowcontrol/check/v1/LimiterDecision';
 import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
-import type { KeyLookupResponse as _aperture_flowcontrol_check_v1_KeyLookupResponse, KeyLookupResponse__Output as _aperture_flowcontrol_check_v1_KeyLookupResponse__Output } from '../../../../aperture/flowcontrol/check/v1/KeyLookupResponse';
+import type { CacheLookupResponse as _aperture_flowcontrol_check_v1_CacheLookupResponse, CacheLookupResponse__Output as _aperture_flowcontrol_check_v1_CacheLookupResponse__Output } from '../../../../aperture/flowcontrol/check/v1/CacheLookupResponse';
 
 // Original file: proto/flowcontrol/check/v1/check.proto
 
@@ -61,8 +61,7 @@ export interface CheckResponse {
   'limiterDecisions'?: (_aperture_flowcontrol_check_v1_LimiterDecision)[];
   'waitTime'?: (_google_protobuf_Duration | null);
   'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
-  'resultCache'?: (_aperture_flowcontrol_check_v1_KeyLookupResponse | null);
-  'stateCache'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyLookupResponse});
+  'cacheLookupResponse'?: (_aperture_flowcontrol_check_v1_CacheLookupResponse | null);
 }
 
 export interface CheckResponse__Output {
@@ -79,6 +78,5 @@ export interface CheckResponse__Output {
   'limiterDecisions': (_aperture_flowcontrol_check_v1_LimiterDecision__Output)[];
   'waitTime': (_google_protobuf_Duration__Output | null);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
-  'resultCache': (_aperture_flowcontrol_check_v1_KeyLookupResponse__Output | null);
-  'stateCache': ({[key: string]: _aperture_flowcontrol_check_v1_KeyLookupResponse__Output});
+  'cacheLookupResponse': (_aperture_flowcontrol_check_v1_CacheLookupResponse__Output | null);
 }

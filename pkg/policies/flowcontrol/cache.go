@@ -3,11 +3,14 @@ package flowcontrol
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"go.uber.org/fx"
 )
@@ -47,9 +50,9 @@ func NewCache(dc *distcache.DistCache, lc fx.Lifecycle) (iface.Cache, error) {
 	return cache, nil
 }
 
-// Get returns the value for the given key.
-func (c *Cache) Get(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) ([]byte, error) {
-	err := c.Ready()
+// get returns the value for the given key.
+func (c *Cache) get(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) ([]byte, error) {
+	err := c.ready()
 	if err != nil {
 		return nil, err
 	}
@@ -73,9 +76,9 @@ func (c *Cache) Get(ctx context.Context, controlPoint string, cacheType iface.Ca
 	return cachedBytes, nil
 }
 
-// Upsert inserts or updates the value for the given key.
-func (c *Cache) Upsert(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string, value []byte, ttl time.Duration) error {
-	err := c.Ready()
+// upsert inserts or updates the value for the given key.
+func (c *Cache) upsert(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string, value []byte, ttl time.Duration) error {
+	err := c.ready()
 	if err != nil {
 		return err
 	}
@@ -89,9 +92,9 @@ func (c *Cache) Upsert(ctx context.Context, controlPoint string, cacheType iface
 	return c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
 }
 
-// Delete deletes the value for the given key.
-func (c *Cache) Delete(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) error {
-	err := c.Ready()
+// delete deletes the value for the given key.
+func (c *Cache) delete(ctx context.Context, controlPoint string, cacheType iface.CacheType, key string) error {
+	err := c.ready()
 	if err != nil {
 		return err
 	}
@@ -106,12 +109,215 @@ func (c *Cache) Delete(ctx context.Context, controlPoint string, cacheType iface
 	return err
 }
 
-// Ready returns nil if the cache is ready to be used.
-func (c *Cache) Ready() error {
+// ready returns nil if the cache is ready to be used.
+func (c *Cache) ready() error {
 	if c.dmapCache == nil {
 		return ErrCacheNotReady
 	}
 	return nil
+}
+
+// Lookup looks up the cache for the given CacheLookupRequest.
+func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
+	type Lookup struct {
+		lookupResponse *flowcontrolv1.KeyLookupResponse
+		key            string
+		cacheType      iface.CacheType
+	}
+
+	// define a wait group to wait for all the lookups to complete
+	var wg sync.WaitGroup
+
+	execLookup := func(lookup *Lookup) func() {
+		return func() {
+			defer wg.Done()
+			cachedValue := lookup.lookupResponse
+			cachedBytes, err := c.get(ctx, request.ControlPoint, lookup.cacheType, lookup.key)
+			if err == nil {
+				cachedValue.Value = cachedBytes
+				cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+				return
+			}
+			cachedValue.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
+			cachedValue.Error = err.Error()
+			if err == ErrCacheKeyNotFound {
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+			} else {
+				cachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+			}
+		}
+	}
+	response := &flowcontrolv1.CacheLookupResponse{
+		StateCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
+	}
+	var lookups []*Lookup
+	// define a lookup struct to hold the cache key and the cached value
+	if request.ResultCacheKey != "" {
+		response.ResultCacheResponse = &flowcontrolv1.KeyLookupResponse{
+			Key: request.ResultCacheKey,
+		}
+		lookups = append(lookups, &Lookup{
+			key:            request.ResultCacheKey,
+			lookupResponse: response.ResultCacheResponse,
+			cacheType:      iface.Result,
+		})
+	}
+	for _, stateCacheKey := range request.StateCacheKeys {
+		lookupResponse := &flowcontrolv1.KeyLookupResponse{
+			Key: stateCacheKey,
+		}
+		response.StateCacheResponses[stateCacheKey] = lookupResponse
+		lookups = append(lookups, &Lookup{
+			key:            stateCacheKey,
+			lookupResponse: lookupResponse,
+			cacheType:      iface.State,
+		})
+	}
+
+	for i, lookup := range lookups {
+		wg.Add(1)
+		if i == len(lookups)-1 {
+			execLookup(lookup)()
+			continue
+		}
+		panichandler.Go(execLookup(lookup))
+	}
+	wg.Wait()
+	return response
+}
+
+// Upsert upserts the cache for the given CacheUpsertRequest.
+func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse {
+	type UpsertRequest struct {
+		entry          *flowcontrolv1.CacheEntry
+		upsertResponse *flowcontrolv1.KeyUpsertResponse
+		key            string
+		cacheType      iface.CacheType
+	}
+
+	wg := sync.WaitGroup{}
+
+	execCacheUpsert := func(upsertRequest *UpsertRequest) func() {
+		return func() {
+			defer wg.Done()
+			cacheType := upsertRequest.cacheType
+			key := upsertRequest.key
+			value := upsertRequest.entry.Value
+			ttl := upsertRequest.entry.Ttl.AsDuration()
+			err := c.upsert(ctx, req.ControlPoint, cacheType, key, value, ttl)
+			if err != nil {
+				upsertRequest.upsertResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+				upsertRequest.upsertResponse.Error = err.Error()
+			} else {
+				upsertRequest.upsertResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+			}
+		}
+	}
+
+	response := &flowcontrolv1.CacheUpsertResponse{}
+
+	var upsertRequests []*UpsertRequest
+	if req.ResultCacheEntry != nil && req.ResultCacheEntry.Key != "" {
+		wg.Add(1)
+		upsertRequests = append(upsertRequests, &UpsertRequest{
+			key:            req.ResultCacheEntry.Key,
+			cacheType:      iface.Result,
+			entry:          req.ResultCacheEntry,
+			upsertResponse: response.ResultCacheResponse,
+		})
+	}
+
+	// iterate over the state cache entries map
+	for key, stateCacheEntry := range req.StateCacheEntries {
+		if key == "" {
+			continue
+		}
+		wg.Add(1)
+		upsertResponse := &flowcontrolv1.KeyUpsertResponse{}
+		response.StateCacheResponses[key] = upsertResponse
+		// set the state cache entry key
+		upsertRequests = append(upsertRequests, &UpsertRequest{
+			key:            key,
+			cacheType:      iface.State,
+			entry:          stateCacheEntry,
+			upsertResponse: upsertResponse,
+		})
+	}
+
+	for i, upsertRequest := range upsertRequests {
+		if i == len(upsertRequests)-1 {
+			execCacheUpsert(upsertRequest)()
+			continue
+		}
+		go execCacheUpsert(upsertRequest)()
+	}
+	wg.Wait()
+
+	return response
+}
+
+// Delete deletes the cache for the given CacheDeleteRequest.
+func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) *flowcontrolv1.CacheDeleteResponse {
+	type DeleteRequest struct {
+		deleteResponse *flowcontrolv1.KeyDeleteResponse
+		key            string
+		cacheType      iface.CacheType
+	}
+
+	wg := sync.WaitGroup{}
+
+	execCacheDelete := func(deleteRequest *DeleteRequest) func() {
+		return func() {
+			defer wg.Done()
+			cacheType := deleteRequest.cacheType
+			key := deleteRequest.key
+			err := c.delete(ctx, req.ControlPoint, cacheType, key)
+			if err != nil {
+				deleteRequest.deleteResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+				deleteRequest.deleteResponse.Error = err.Error()
+			} else {
+				deleteRequest.deleteResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+			}
+		}
+	}
+
+	response := &flowcontrolv1.CacheDeleteResponse{}
+
+	var deleteRequests []*DeleteRequest
+	if req.ResultCacheKey != "" {
+		wg.Add(1)
+		deleteRequests = append(deleteRequests, &DeleteRequest{
+			cacheType:      iface.Result,
+			key:            req.ResultCacheKey,
+			deleteResponse: response.ResultCacheResponse,
+		})
+	}
+
+	for _, stateCacheKey := range req.StateCacheKeys {
+		if stateCacheKey == "" {
+			continue
+		}
+		wg.Add(1)
+		deleteResponse := &flowcontrolv1.KeyDeleteResponse{}
+		response.StateCacheResponses[stateCacheKey] = deleteResponse
+		deleteRequests = append(deleteRequests, &DeleteRequest{
+			cacheType:      iface.State,
+			key:            stateCacheKey,
+			deleteResponse: deleteResponse,
+		})
+	}
+
+	for i, deleteRequest := range deleteRequests {
+		if i == len(deleteRequests)-1 {
+			execCacheDelete(deleteRequest)()
+			continue
+		}
+		go execCacheDelete(deleteRequest)()
+	}
+	wg.Wait()
+
+	return response
 }
 
 // formatCacheKey returns the cache key for the given control point and key.

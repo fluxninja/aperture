@@ -101,10 +101,10 @@ func (f *flow) ResultCache() KeyLookupResponse {
 	if f.checkResponse == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("check response is nil"))
 	}
-	lookupResponse := f.checkResponse.GetResultCache()
-	if lookupResponse == nil {
+	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetResultCacheResponse() == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("result cache is nil"))
 	}
+	lookupResponse := f.checkResponse.CacheLookupResponse.GetResultCacheResponse()
 
 	return newKeyLookupResponse(lookupResponse.Value, convertCacheLookupStatus(lookupResponse.LookupStatus), convertCacheError(lookupResponse.Error))
 }
@@ -164,11 +164,10 @@ func (f *flow) StateCache(key string) KeyLookupResponse {
 	if f.checkResponse == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("check response is nil"))
 	}
-	lookupResponseMap := f.checkResponse.GetStateCache()
-	if lookupResponseMap == nil {
+	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetStateCacheResponses() == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("state cache is nil"))
 	}
-
+	lookupResponseMap := f.checkResponse.CacheLookupResponse.GetStateCacheResponses()
 	lookupResponse, ok := lookupResponseMap[key]
 	if !ok {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("unknown state cache key"))

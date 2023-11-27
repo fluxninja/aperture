@@ -154,11 +154,13 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 	}
 
 	req := &checkv1.CheckRequest{
-		ControlPoint:   controlPoint,
-		Labels:         labels,
-		RampMode:       flowParams.RampMode,
-		ResultCacheKey: flowParams.ResultCacheKey,
-		StateCacheKeys: flowParams.StateCacheKeys,
+		ControlPoint: controlPoint,
+		Labels:       labels,
+		RampMode:     flowParams.RampMode,
+		CacheLookupRequest: &checkv1.CacheLookupRequest{
+			ResultCacheKey: flowParams.ResultCacheKey,
+			StateCacheKeys: flowParams.StateCacheKeys,
+		},
 	}
 
 	span := c.getSpan(ctx)

@@ -63,7 +63,34 @@ func (m *CheckRequest) validate(all bool) error {
 
 	// no validation rules for RampMode
 
-	// no validation rules for ResultCacheKey
+	if all {
+		switch v := interface{}(m.GetCacheLookupRequest()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CheckRequestValidationError{
+					field:  "CacheLookupRequest",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CheckRequestValidationError{
+					field:  "CacheLookupRequest",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheLookupRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckRequestValidationError{
+				field:  "CacheLookupRequest",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return CheckRequestMultiError(errors)
@@ -364,11 +391,11 @@ func (m *CheckResponse) validate(all bool) error {
 	// no validation rules for DeniedResponseStatusCode
 
 	if all {
-		switch v := interface{}(m.GetResultCache()).(type) {
+		switch v := interface{}(m.GetCacheLookupResponse()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, CheckResponseValidationError{
-					field:  "ResultCache",
+					field:  "CacheLookupResponse",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -376,65 +403,19 @@ func (m *CheckResponse) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, CheckResponseValidationError{
-					field:  "ResultCache",
+					field:  "CacheLookupResponse",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetResultCache()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetCacheLookupResponse()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CheckResponseValidationError{
-				field:  "ResultCache",
+				field:  "CacheLookupResponse",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	{
-		sorted_keys := make([]string, len(m.GetStateCache()))
-		i := 0
-		for key := range m.GetStateCache() {
-			sorted_keys[i] = key
-			i++
-		}
-		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
-		for _, key := range sorted_keys {
-			val := m.GetStateCache()[key]
-			_ = val
-
-			// no validation rules for StateCache[key]
-
-			if all {
-				switch v := interface{}(val).(type) {
-				case interface{ ValidateAll() error }:
-					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, CheckResponseValidationError{
-							field:  fmt.Sprintf("StateCache[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				case interface{ Validate() error }:
-					if err := v.Validate(); err != nil {
-						errors = append(errors, CheckResponseValidationError{
-							field:  fmt.Sprintf("StateCache[%v]", key),
-							reason: "embedded message failed validation",
-							cause:  err,
-						})
-					}
-				}
-			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
-				if err := v.Validate(); err != nil {
-					return CheckResponseValidationError{
-						field:  fmt.Sprintf("StateCache[%v]", key),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
-				}
-			}
-
 		}
 	}
 
@@ -1614,6 +1595,289 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = KeyDeleteResponseValidationError{}
+
+// Validate checks the field values on CacheLookupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CacheLookupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CacheLookupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CacheLookupRequestMultiError, or nil if none found.
+func (m *CacheLookupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CacheLookupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ControlPoint
+
+	// no validation rules for ResultCacheKey
+
+	if len(errors) > 0 {
+		return CacheLookupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// CacheLookupRequestMultiError is an error wrapping multiple validation errors
+// returned by CacheLookupRequest.ValidateAll() if the designated constraints
+// aren't met.
+type CacheLookupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CacheLookupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CacheLookupRequestMultiError) AllErrors() []error { return m }
+
+// CacheLookupRequestValidationError is the validation error returned by
+// CacheLookupRequest.Validate if the designated constraints aren't met.
+type CacheLookupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CacheLookupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CacheLookupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CacheLookupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CacheLookupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CacheLookupRequestValidationError) ErrorName() string {
+	return "CacheLookupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CacheLookupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCacheLookupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CacheLookupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CacheLookupRequestValidationError{}
+
+// Validate checks the field values on CacheLookupResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CacheLookupResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CacheLookupResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CacheLookupResponseMultiError, or nil if none found.
+func (m *CacheLookupResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CacheLookupResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetResultCacheResponse()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CacheLookupResponseValidationError{
+					field:  "ResultCacheResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CacheLookupResponseValidationError{
+					field:  "ResultCacheResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetResultCacheResponse()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CacheLookupResponseValidationError{
+				field:  "ResultCacheResponse",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	{
+		sorted_keys := make([]string, len(m.GetStateCacheResponses()))
+		i := 0
+		for key := range m.GetStateCacheResponses() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetStateCacheResponses()[key]
+			_ = val
+
+			// no validation rules for StateCacheResponses[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, CacheLookupResponseValidationError{
+							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, CacheLookupResponseValidationError{
+							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return CacheLookupResponseValidationError{
+						field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return CacheLookupResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CacheLookupResponseMultiError is an error wrapping multiple validation
+// errors returned by CacheLookupResponse.ValidateAll() if the designated
+// constraints aren't met.
+type CacheLookupResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CacheLookupResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CacheLookupResponseMultiError) AllErrors() []error { return m }
+
+// CacheLookupResponseValidationError is the validation error returned by
+// CacheLookupResponse.Validate if the designated constraints aren't met.
+type CacheLookupResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CacheLookupResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CacheLookupResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CacheLookupResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CacheLookupResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CacheLookupResponseValidationError) ErrorName() string {
+	return "CacheLookupResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CacheLookupResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCacheLookupResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CacheLookupResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CacheLookupResponseValidationError{}
 
 // Validate checks the field values on ClassifierInfo with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

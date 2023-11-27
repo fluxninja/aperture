@@ -11,6 +11,7 @@ service FlowControlService {
   rpc Check(CheckRequest) returns (CheckResponse) {}
   rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
   rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
+  rpc CacheLookup(CacheLookupRequest) returns (CacheLookupResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -18,10 +19,7 @@ message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
   bool ramp_mode = 3;
-  // Key for result cache that needs to be fetched.
-  string result_cache_key = 4;
-  // Keys for state cache entries that need to be fetched.
-  repeated string state_cache_keys = 5;
+  CacheLookupRequest cache_lookup_request = 4;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -69,10 +67,8 @@ message CheckResponse {
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
-  // Matching result cache.
-  KeyLookupResponse result_cache = 15;
-  // Matching state cache.
-  map<string, KeyLookupResponse> state_cache = 16;
+  // CacheLookupResponse contains the result of the cache lookup.
+  CacheLookupResponse cache_lookup_response = 15;
 }
 
 message KeyLookupResponse {
@@ -131,6 +127,19 @@ message KeyDeleteResponse {
   string key = 1;
   CacheOperationStatus operation_status = 2;
   string error = 3;
+}
+
+message CacheLookupRequest {
+  string control_point = 1;
+  // Key for result cache that needs to be fetched.
+  string result_cache_key = 2;
+  // Keys for state cache entries that need to be fetched.
+  repeated string state_cache_keys = 3;
+}
+
+message CacheLookupResponse {
+  KeyLookupResponse result_cache_response = 1;
+  map<string, KeyLookupResponse> state_cache_responses = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

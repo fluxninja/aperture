@@ -15,6 +15,8 @@ export interface ProtoGrpcType {
           CacheDeleteRequest: MessageTypeDefinition
           CacheDeleteResponse: MessageTypeDefinition
           CacheEntry: MessageTypeDefinition
+          CacheLookupRequest: MessageTypeDefinition
+          CacheLookupResponse: MessageTypeDefinition
           CacheLookupStatus: EnumTypeDefinition
           CacheOperationStatus: EnumTypeDefinition
           CacheUpsertRequest: MessageTypeDefinition

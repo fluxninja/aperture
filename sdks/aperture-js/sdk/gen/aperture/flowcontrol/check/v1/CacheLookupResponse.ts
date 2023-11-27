@@ -1,20 +1,13 @@
 // Original file: proto/flowcontrol/check/v1/check.proto
 
-import type { CacheLookupStatus as _aperture_flowcontrol_check_v1_CacheLookupStatus, CacheLookupStatus__Output as _aperture_flowcontrol_check_v1_CacheLookupStatus__Output } from '../../../../aperture/flowcontrol/check/v1/CacheLookupStatus';
-import type { CacheOperationStatus as _aperture_flowcontrol_check_v1_CacheOperationStatus, CacheOperationStatus__Output as _aperture_flowcontrol_check_v1_CacheOperationStatus__Output } from '../../../../aperture/flowcontrol/check/v1/CacheOperationStatus';
+import type { KeyLookupResponse as _aperture_flowcontrol_check_v1_KeyLookupResponse, KeyLookupResponse__Output as _aperture_flowcontrol_check_v1_KeyLookupResponse__Output } from '../../../../aperture/flowcontrol/check/v1/KeyLookupResponse';
 
 export interface CacheLookupResponse {
-  'key'?: (string);
-  'value'?: (Buffer | Uint8Array | string);
-  'lookupStatus'?: (_aperture_flowcontrol_check_v1_CacheLookupStatus);
-  'operationStatus'?: (_aperture_flowcontrol_check_v1_CacheOperationStatus);
-  'error'?: (string);
+  'resultCacheResponse'?: (_aperture_flowcontrol_check_v1_KeyLookupResponse | null);
+  'stateCacheResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyLookupResponse});
 }
 
 export interface CacheLookupResponse__Output {
-  'key': (string);
-  'value': (Buffer);
-  'lookupStatus': (_aperture_flowcontrol_check_v1_CacheLookupStatus__Output);
-  'operationStatus': (_aperture_flowcontrol_check_v1_CacheOperationStatus__Output);
-  'error': (string);
+  'resultCacheResponse': (_aperture_flowcontrol_check_v1_KeyLookupResponse__Output | null);
+  'stateCacheResponses': ({[key: string]: _aperture_flowcontrol_check_v1_KeyLookupResponse__Output});
 }

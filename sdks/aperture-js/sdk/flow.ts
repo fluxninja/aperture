@@ -259,7 +259,9 @@ export class _Flow implements Flow {
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
       return resp;
     }
-    if (!this._checkResponse?.resultCache?.key) {
+    const resultCacheResponse =
+      this._checkResponse?.cacheLookupResponse?.resultCacheResponse;
+    if (!resultCacheResponse?.key) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
@@ -269,9 +271,9 @@ export class _Flow implements Flow {
       return resp;
     }
     const resp = new _KeyLookupResponse(
-      convertCacheLookupStatus(this._checkResponse?.resultCache?.lookupStatus),
-      convertCacheError(this._checkResponse?.resultCache?.error),
-      this._checkResponse?.resultCache?.value ?? null,
+      convertCacheLookupStatus(resultCacheResponse?.lookupStatus),
+      convertCacheError(resultCacheResponse?.error),
+      resultCacheResponse?.value ?? null,
     );
     return resp;
   }
@@ -286,7 +288,7 @@ export class _Flow implements Flow {
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
       return resp;
     }
-    if (!this._checkResponse?.stateCache) {
+    if (!this._checkResponse?.cacheLookupResponse?.stateCacheResponses) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
@@ -296,7 +298,11 @@ export class _Flow implements Flow {
       return resp;
     }
     // if key is not found in state cache dict, return miss
-    if (!this._checkResponse?.stateCache?.hasOwnProperty(key)) {
+    if (
+      !this._checkResponse?.cacheLookupResponse?.stateCacheResponses?.hasOwnProperty(
+        key,
+      )
+    ) {
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
         new Error("Unknown state cache key"),
@@ -305,7 +311,8 @@ export class _Flow implements Flow {
       return resp;
     }
 
-    const lookupResp = this._checkResponse?.stateCache?.[key];
+    const lookupResp =
+      this._checkResponse?.cacheLookupResponse?.stateCacheResponses?.[key];
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(lookupResp?.lookupStatus),
       convertCacheError(lookupResp?.error),

@@ -797,6 +797,28 @@ definitions:
                 format: byte
                 type: string
         type: object
+    CacheLookupRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_key:
+                description: Key for result cache that needs to be fetched.
+                type: string
+            state_cache_keys:
+                description: Keys for state cache entries that need to be fetched.
+                items:
+                    type: string
+                type: array
+        type: object
+    CacheLookupResponse:
+        properties:
+            result_cache_response:
+                $ref: '#/definitions/KeyLookupResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyLookupResponse'
+                type: object
+        type: object
     CacheLookupStatus:
         default: HIT
         enum:
@@ -899,6 +921,9 @@ definitions:
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
+            cache_lookup_response:
+                $ref: '#/definitions/CacheLookupResponse'
+                description: CacheLookupResponse contains the result of the cache lookup.
             classifier_infos:
                 description: classifiers that were matched for this request.
                 items:
@@ -940,9 +965,6 @@ definitions:
             reject_reason:
                 $ref: '#/definitions/CheckResponseRejectReason'
                 description: reject_reason contains the reason for the rejection.
-            result_cache:
-                $ref: '#/definitions/KeyLookupResponse'
-                description: Matching result cache.
             services:
                 items:
                     type: string
@@ -952,11 +974,6 @@ definitions:
                 format: date-time
                 title: start timestamp
                 type: string
-            state_cache:
-                additionalProperties:
-                    $ref: '#/definitions/KeyLookupResponse'
-                description: Matching state cache.
-                type: object
             telemetry_flow_labels:
                 additionalProperties:
                     type: string

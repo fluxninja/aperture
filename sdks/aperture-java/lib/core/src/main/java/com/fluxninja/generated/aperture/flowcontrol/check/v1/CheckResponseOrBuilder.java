@@ -440,82 +440,28 @@ java.lang.String defaultValue);
 
   /**
    * <pre>
-   * Matching result cache.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
-   * @return Whether the resultCache field is set.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
+   * @return Whether the cacheLookupResponse field is set.
    */
-  boolean hasResultCache();
+  boolean hasCacheLookupResponse();
   /**
    * <pre>
-   * Matching result cache.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
-   * @return The resultCache.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
+   * @return The cacheLookupResponse.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getResultCache();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse getCacheLookupResponse();
   /**
    * <pre>
-   * Matching result cache.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.KeyLookupResponse result_cache = 15 [json_name = "resultCache"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponseOrBuilder getResultCacheOrBuilder();
-
-  /**
-   * <pre>
-   * Matching state cache.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
-   */
-  int getStateCacheCount();
-  /**
-   * <pre>
-   * Matching state cache.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
-   */
-  boolean containsStateCache(
-      java.lang.String key);
-  /**
-   * Use {@link #getStateCacheMap()} instead.
-   */
-  @java.lang.Deprecated
-  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse>
-  getStateCache();
-  /**
-   * <pre>
-   * Matching state cache.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
-   */
-  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse>
-  getStateCacheMap();
-  /**
-   * <pre>
-   * Matching state cache.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
-   */
-  /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getStateCacheOrDefault(
-      java.lang.String key,
-      /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse defaultValue);
-  /**
-   * <pre>
-   * Matching state cache.
-   * </pre>
-   *
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyLookupResponse&gt; state_cache = 16 [json_name = "stateCache"];</code>
-   */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse getStateCacheOrThrow(
-      java.lang.String key);
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponseOrBuilder getCacheLookupResponseOrBuilder();
 }

@@ -200,7 +200,10 @@ export class ApertureClient {
           controlPoint: controlPoint,
           labels: mergedLabels,
           rampMode: params.rampMode,
-          resultCacheKey: params.resultCacheKey,
+          cacheLookupRequest: {
+            resultCacheKey: params.resultCacheKey,
+            stateCacheKeys: params.stateCacheKeys,
+          },
         };
 
         const cb: grpc.requestCallback<CheckResponse__Output> = (
