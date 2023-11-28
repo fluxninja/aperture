@@ -51,7 +51,7 @@ var SetCommand = &cobra.Command{
 			ControlPoint: controlPoint,
 			Key:          key,
 			Value:        value,
-			TTL:          time.Duration(time.Duration(ttl) * time.Millisecond),
+			TTL:          time.Duration(ttl) * time.Millisecond,
 		}
 
 		return utils.ParseResultCacheUpsert(client, input)
