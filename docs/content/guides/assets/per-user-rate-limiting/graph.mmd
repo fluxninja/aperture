@@ -20,12 +20,18 @@ root.1rhs[rhs]
 end
 subgraph root.1_outports[ ]
 style root.1_outports fill:none,stroke:none
+root.1output[output]
 end
 end
 root.1_rhs_FakeConstantout((90.00))
 subgraph root.2[<center>Alerter<br/>More than 90% of requests a...</center>]
+subgraph root.2_inports[ ]
+style root.2_inports fill:none,stroke:none
+root.2signal[signal]
+end
 end
 root.0accept_percentage --> |ACCEPT_PERCENTAGE| root.1lhs
 root.0_bucket_capacity_FakeConstantout --> root.0bucket_capacity
 root.0_fill_amount_FakeConstantout --> root.0fill_amount
+root.1output --> |ACCEPT_PERCENTAGE_ALERT| root.2signal
 root.1_rhs_FakeConstantout --> root.1rhs

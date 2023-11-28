@@ -48,7 +48,7 @@ function(cfg) {
           component.withAlerter(
             alerter.new()
             + alerter.withInPorts({
-              alert: port.withSignalName('ACCEPT_PERCENTAGE_ALERT'),
+              signal: port.withSignalName('ACCEPT_PERCENTAGE_ALERT'),
             })
             + alerter.withParameters(params.policy.rate_limiter.alerter)
           ),
