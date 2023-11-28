@@ -59,7 +59,7 @@ jobs:
             exit 0
           fi
 
-          # Fetch the version from the pyproject.toml file
+          # Fetch the version from the tag
           version=$(echo $latestTag | grep -oP '(?<=v)\d+\.\d+\.\d+')
           
           # Get the version type

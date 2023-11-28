@@ -63,10 +63,24 @@ jobs:
             exit 0
           fi
 
-          # Update the version in package.json and commit it
-          npm version "${{ github.event.inputs.version_type }}" --no-git-tag-version --no-commit-hooks
+          # Fetch the version from the tag
+          version=$(echo $latestTag | grep -oP '(?<=v)\d+\.\d+\.\d+')
+          
+          # Get the version type
+          versionType="${{ github.event.inputs.version_type }}"
+          if [ "$versionType" = "major" ]; then
+            newVersion=$(echo $version | awk -F. '{$1 = $1 + 1; $2 = 0; $3 = 0} 1' | sed 's/ /./g')
+          elif [ "$versionType" = "minor" ]; then
+            newVersion=$(echo $version | awk -F. '{$2 = $2 + 1; $3 = 0} 1' | sed 's/ /./g')
+          elif [ "$versionType" = "patch" ]; then
+            newVersion=$(echo $version | awk -F. '{$3 = $3 + 1;} 1' | sed 's/ /./g')
+          else
+            echo "Invalid version type."
+            exit 1
+          fi
 
-          newVersion=$(node -p -e "require('./package.json').version")
+          # Update the version in package.json and commit it
+          npm version "$newVersion" --no-git-tag-version --no-commit-hooks
 
           # Create a stable release branch
           git checkout -b "stable/v${newVersion}"
