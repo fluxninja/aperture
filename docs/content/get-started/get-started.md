@@ -19,13 +19,13 @@ self-hosted within your infrastructure.
 
 <!-- markdownlint-disable -->
 
-## Step 1. Sign up to Aperture Cloud
+## 1. Sign up to Aperture Cloud
 
 For signing up, head over to
 [Aperture Cloud](https://app.fluxninja.com/sign-up). For detailed instructions,
 please refer to our [step-by-step][sign-up] guide.
 
-## Step 2. Select Your Mode
+## 2. Pick your Integration
 
 These are two main modes on how to get started with Aperture.
 
@@ -33,26 +33,22 @@ These are two main modes on how to get started with Aperture.
 
 <TabItem value="Aperture Serverless">
 
-The Serverless mode is the quickest way to get started with using Aperture SDKs.
+The Serverless mode is the quickest way to start using Aperture.
 
 ![Aperture Serverless Architecture](./assets/architecture/saas-dark.svg#gh-dark-mode-only)
 ![Aperture Serverless Architecture](./assets/architecture/saas-light.svg#gh-light-mode-only)
 
-## Step 3. Get your API key
+## 3. Get your API key
 
 In Aperture Cloud, authentication for SDK integrations is handled using API
 keys. These keys can be found in the Aperture Cloud UI. For detailed
 instructions on locating API Keys, please refer to the [API Keys][api-keys]
 section.
 
-## Step 4. Grab the SDK and define Control Points
-
-**Install the SDK**
+## 4. Install SDK and Define Control Points
 
 Aperture provides SDKs for various languages. You can find the SDKs and
 installation instructions [here][sdks].
-
-Install the Aperture SDK in your project directory
 
 ```mdx-code-block
 <Tabs groupId="language" queryString>
@@ -60,7 +56,7 @@ Install the Aperture SDK in your project directory
 ```
 
 ```bash
-npm i @fluxninja/aperture-js
+npm install @fluxninja/aperture-js
 ```
 
 ```mdx-code-block
@@ -86,8 +82,8 @@ pip install aperture-py
 </Tabs>
 ```
 
-Configure the Aperture SDK for in your application with the API key and the
-address of the Aperture Cloud.
+Connect to Aperture Cloud by creating an Aperture Client with your
+organization's address and API Key.
 
 ```mdx-code-block
 <Tabs groupId="language" queryString>
@@ -161,24 +157,11 @@ aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.
 
 **Define a Control Point**
 
-Once you have configured Aperture SDK, you can create a feature control point
-anywhere within your code. Before executing the business logic of a specific
-API, you can create a feature control point that can control the execution flow
-of the API and can reject the request based on the policy defined in Aperture.
-
-The code snippet below shows how to wrap your
-[Control Point](/concepts/control-point.md) within the `StartFlow` call and pass
-[labels](/concepts/flow-label.md) and `cacheKey` to Aperture Agents.
-
-- The function `Flow.ShouldRun()` checks if the flow allows the request.
-- The `Flow.End()` function is responsible for sending telemetry, and updating
-  the specified cache entry within Aperture.
-- The `flow.CachedValue().GetLookupStatus()` function returns the status of the
-  cache lookup. The status can be `Hit` or `Miss`.
-- If the status is `Hit`, the `flow.CachedValue().GetValue()` function returns
-  the cached response.
-- The `flow.SetCachedValue()` function is responsible for setting the response
-  in Aperture cache with the specified TTL (time to live).
+Once the SDK is connected to Aperture Cloud, you can create a feature control
+point anywhere within your code. For instance, before executing the business
+logic of a specific API, you can create a feature control point that can control
+the execution flow of the API and can reject the request based on the policy
+defined in Aperture.
 
 Let's create a feature control point in the following code snippet.
 
@@ -233,6 +216,21 @@ async function handleRequest(req, res) {
   }
 }
 ```
+
+The code snippet below shows how to wrap your
+[Control Point](/concepts/control-point.md) within the `StartFlow` call while
+also passing [labels](/concepts/flow-label.md) and `cacheKey` to Aperture
+Agents.
+
+- The function `Flow.ShouldRun()` checks if the flow allows the request.
+- The `Flow.End()` function is responsible for sending telemetry, and updating
+  the specified cache entry within Aperture.
+- The `flow.CachedValue().GetLookupStatus()` function returns the status of the
+  cache lookup. The status can be `Hit` or `Miss`.
+- If the status is `Hit`, the `flow.CachedValue().GetValue()` function returns
+  the cached response.
+- The `flow.SetCachedValue()` function is responsible for setting the response
+  in Aperture cache with the specified TTL (time to live).
 
 ```mdx-code-block
 </TabItem>
@@ -302,9 +300,18 @@ This is how you can create a feature control point in your code. The complete
 example is available
 [here](https://github.com/fluxninja/aperture-js/blob/main/example/routes/use_aperture.ts).
 
-## Step 5. Create Your Policy
+## 5. Create Your Policy
 
-Deploy your first policy. See [Policies][policies] for more details.
+Within the Aperture UI, navigate to the policy in tab in the sidebar menu, and
+click on the `Create Policy` button in the top right corner. There you can pick
+the blueprint that best aligns with your needs. After a few clicks, you'll be
+directed to a screen where you can input the necessary parameters to generate
+the policy.
+
+![Rate Limiter Blueprint](./assets/rate_limiter_blueprint.png)
+
+For more details on how to create a policy, follow our [step-by-step
+guide][policies].
 
 </TabItem>
 <TabItem value="Aperture for Infrastructure">
@@ -314,7 +321,7 @@ option includes a cloud-hosted controller and self-managed agents to ensure
 minimal performance impact. The second option involves hosting Aperture entirely
 within your infrastructure, making it perfect for air-gapped environments.
 
-## Step 3. Set Up the Environment
+## 3. Set Up the Environment
 
 The Aperture Agent can be installed in various modes. For installation steps,
 see [Agent][agent-docs] docs under [Aperture For Infra
@@ -327,7 +334,7 @@ For more details on fully self-hosted installation, please refer to the
 
 :::
 
-## Step 4. Integrate with Aperture
+## 4. Integrate with Aperture
 
 Here are various [Integrations][integrations] methods with Aperture
 
@@ -338,7 +345,7 @@ Here are various [Integrations][integrations] methods with Aperture
 - [Auto Scale](/aperture-for-infra/integrations/auto-scale/auto-scale.md)
 - [Metrics](/aperture-for-infra/integrations/metrics/metrics.md)
 
-## Step 5. Map to Aperture SaaS Controller
+## 5. Map to Aperture SaaS Controller
 
 Aperture Cloud authenticates requests from integrations using API keys, which
 are created for your project and can be found within the Aperture Cloud UI. Copy
@@ -354,9 +361,10 @@ Using the API key, you can map your integration to the Aperture Cloud. See
 
 :::
 
-## Step 6. Create Your Policy
+## 6. Create Your Policy
 
-Deploy your first policy. See [Policies][policies] for more details.
+For more details on how to create a policy, follow our [step-by-step
+guide][policies].
 
 </TabItem>
 </Tabs>
@@ -364,7 +372,7 @@ Deploy your first policy. See [Policies][policies] for more details.
 [cloud]: https://www.fluxninja.com/product
 [aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /reference/cloud-ui/sign-up.md
-[policies]: /reference/cloud-ui/policies/policies.md
+[policies]: /reference/cloud-ui/policies/policy-creation.md
 [cloud-extension]: /reference/fluxninja.md
 [agent-docs]: /aperture-for-infra/agent/agent.md
 [integrations]: /aperture-for-infra/integrations/integrations.md
