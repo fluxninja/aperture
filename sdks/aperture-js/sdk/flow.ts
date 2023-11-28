@@ -261,7 +261,7 @@ export class _Flow implements Flow {
     }
     const resultCacheResponse =
       this._checkResponse?.cacheLookupResponse?.resultCacheResponse;
-    if (!resultCacheResponse?.key) {
+    if (!resultCacheResponse) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
