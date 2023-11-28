@@ -127,20 +127,20 @@ func grpcOptions() []grpc.DialOption {
 }
 
 // Create aperture client
-  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-  apiKey := "API_KEY"
+agentAddress := "ORGANIZATION.app.fluxninja.com:443"
+apiKey := "API_KEY"
 
-  opts := aperture.Options{
-      Address:     agentAddress,
-      APIKey: apiKey,
-      DialOptions: grpcOptions(),
-  }
+opts := aperture.Options{
+    Address:     agentAddress,
+    APIKey: apiKey,
+    DialOptions: grpcOptions(),
+}
 
-  // initialize Aperture Client with the provided options.
-  apertureClient, err := aperture.NewClient(ctx, opts)
-  if err != nil {
-      log.Fatalf("failed to create client: %v", err)
-  }
+// initialize Aperture Client with the provided options.
+apertureClient, err := aperture.NewClient(ctx, opts)
+if err != nil {
+    log.Fatalf("failed to create client: %v", err)
+}
 ```
 
 ```mdx-code-block
@@ -149,9 +149,9 @@ func grpcOptions() []grpc.DialOption {
 ```
 
 ```python
-  from aperture_sdk import ApertureClient
+from aperture_sdk import ApertureClient
 
-  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
+aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
 ```
 
 ```mdx-code-block
