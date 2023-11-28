@@ -70,7 +70,7 @@ jobs:
 
           # Create a stable release branch
           git checkout -b "stable/v${newVersion}"
-          git commit -am "Bump version to ${newVersion}"
+          git commit --allow-empty -am "Bump version to ${newVersion}"
 
           # Create a new tag and push it to origin
           git tag -a "releases/aperture-js/v${newVersion}" -m "Release v${newVersion}"
