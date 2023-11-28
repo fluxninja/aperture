@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	FlowControlService_Check_FullMethodName       = "/aperture.flowcontrol.check.v1.FlowControlService/Check"
+	FlowControlService_CacheLookup_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheLookup"
 	FlowControlService_CacheUpsert_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert"
 	FlowControlService_CacheDelete_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete"
 )
@@ -30,6 +31,7 @@ const (
 type FlowControlServiceClient interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
+	CacheLookup(ctx context.Context, in *CacheLookupRequest, opts ...grpc.CallOption) (*CacheLookupResponse, error)
 	CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*CacheUpsertResponse, error)
 	CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*CacheDeleteResponse, error)
 }
@@ -45,6 +47,15 @@ func NewFlowControlServiceClient(cc grpc.ClientConnInterface) FlowControlService
 func (c *flowControlServiceClient) Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error) {
 	out := new(CheckResponse)
 	err := c.cc.Invoke(ctx, FlowControlService_Check_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowControlServiceClient) CacheLookup(ctx context.Context, in *CacheLookupRequest, opts ...grpc.CallOption) (*CacheLookupResponse, error) {
+	out := new(CacheLookupResponse)
+	err := c.cc.Invoke(ctx, FlowControlService_CacheLookup_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +86,7 @@ func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDel
 type FlowControlServiceServer interface {
 	// Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
+	CacheLookup(context.Context, *CacheLookupRequest) (*CacheLookupResponse, error)
 	CacheUpsert(context.Context, *CacheUpsertRequest) (*CacheUpsertResponse, error)
 	CacheDelete(context.Context, *CacheDeleteRequest) (*CacheDeleteResponse, error)
 }
@@ -85,6 +97,9 @@ type UnimplementedFlowControlServiceServer struct {
 
 func (UnimplementedFlowControlServiceServer) Check(context.Context, *CheckRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+}
+func (UnimplementedFlowControlServiceServer) CacheLookup(context.Context, *CacheLookupRequest) (*CacheLookupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheLookup not implemented")
 }
 func (UnimplementedFlowControlServiceServer) CacheUpsert(context.Context, *CacheUpsertRequest) (*CacheUpsertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CacheUpsert not implemented")
@@ -118,6 +133,24 @@ func _FlowControlService_Check_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FlowControlServiceServer).Check(ctx, req.(*CheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowControlService_CacheLookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheLookupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowControlServiceServer).CacheLookup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowControlService_CacheLookup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowControlServiceServer).CacheLookup(ctx, req.(*CacheLookupRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,6 +201,10 @@ var FlowControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Check",
 			Handler:    _FlowControlService_Check_Handler,
+		},
+		{
+			MethodName: "CacheLookup",
+			Handler:    _FlowControlService_CacheLookup_Handler,
 		},
 		{
 			MethodName: "CacheUpsert",

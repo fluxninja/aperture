@@ -87,7 +87,6 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
 	flowLabels := requestContext.FlowLabels
-	cacheKey := requestContext.CacheKey
 	labelKeys := flowLabels.SortedKeys()
 
 	response = &flowcontrolv1.CheckResponse{
@@ -170,26 +169,16 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	// Lookup cache
-	if cacheKey != "" && e.cache != nil {
-		cachedBytes, err := e.cache.Get(ctx, controlPoint, cacheKey)
-		if err == nil {
-			response.CachedValue = &flowcontrolv1.CachedValue{
-				Value:           cachedBytes,
-				LookupStatus:    flowcontrolv1.CacheLookupStatus_HIT,
-				OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
-			}
+	// Could be nil during unit tests
+	if e.cache != nil {
+		// Lookup cache
+		response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
+		resultCacheResponse := response.CacheLookupResponse.ResultCacheResponse
+
+		// Check if result cache is hit
+		if resultCacheResponse != nil && resultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
 			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
 			return
-		}
-		response.CachedValue = &flowcontrolv1.CachedValue{
-			LookupStatus: flowcontrolv1.CacheLookupStatus_MISS,
-			Error:        err.Error(),
-		}
-		if err == ErrCacheKeyNotFound {
-			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
-		} else {
-			response.CachedValue.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
 		}
 	}
 

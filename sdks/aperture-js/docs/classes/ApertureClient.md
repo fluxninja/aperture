@@ -27,19 +27,11 @@ const apertureClient = new ApertureClient({
 
 - [constructor](ApertureClient.md#constructor)
 
-### Properties
-
-- [exporter](ApertureClient.md#exporter)
-- [fcsClient](ApertureClient.md#fcsclient)
-- [tracer](ApertureClient.md#tracer)
-- [tracerProvider](ApertureClient.md#tracerprovider)
-
 ### Methods
 
-- [#newResource](ApertureClient.md##newresource)
-- [GetState](ApertureClient.md#getstate)
-- [Shutdown](ApertureClient.md#shutdown)
-- [StartFlow](ApertureClient.md#startflow)
+- [getState](ApertureClient.md#getstate)
+- [shutdown](ApertureClient.md#shutdown)
+- [startFlow](ApertureClient.md#startflow)
 
 ## Constructors
 
@@ -67,45 +59,11 @@ Constructs a new instance of the ApertureClient.
 
 Error if the address is not provided.
 
-## Properties
-
-### exporter
-
-• `Private` `Readonly` **exporter**: `OTLPTraceExporter`
-
-___
-
-### fcsClient
-
-• `Private` `Readonly` **fcsClient**: `FlowControlServiceClient`
-
-___
-
-### tracer
-
-• `Private` `Readonly` **tracer**: `Tracer`
-
-___
-
-### tracerProvider
-
-• `Private` `Readonly` **tracerProvider**: `NodeTracerProvider`
-
 ## Methods
 
-### #newResource
+### getState
 
-▸ **#newResource**(): `IResource`
-
-#### Returns
-
-`IResource`
-
-___
-
-### GetState
-
-▸ **GetState**(): `ConnectivityState`
+▸ **getState**(): `ConnectivityState`
 
 Gets the current state of the gRPC channel.
 
@@ -117,9 +75,9 @@ The connectivity state of the channel.
 
 ___
 
-### Shutdown
+### shutdown
 
-▸ **Shutdown**(): `void`
+▸ **shutdown**(): `void`
 
 Shuts down the ApertureClient.
 
@@ -129,9 +87,9 @@ Shuts down the ApertureClient.
 
 ___
 
-### StartFlow
+### startFlow
 
-▸ **StartFlow**(`controlPoint`, `params`): `Promise`\<[`Flow`](Flow.md)\>
+▸ **startFlow**(`controlPoint`, `params`): `Promise`\<[`Flow`](../interfaces/Flow.md)\>
 
 Starts a new flow with the specified control point and parameters.
 StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
@@ -147,7 +105,7 @@ The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldR
 
 #### Returns
 
-`Promise`\<[`Flow`](Flow.md)\>
+`Promise`\<[`Flow`](../interfaces/Flow.md)\>
 
 A promise that resolves to a Flow object.
 

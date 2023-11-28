@@ -16,8 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private CacheUpsertResponse() {
-    operationStatus_ = 0;
-    error_ = "";
   }
 
   @java.lang.Override
@@ -32,6 +30,18 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
   }
 
+  @SuppressWarnings({"rawtypes"})
+  @java.lang.Override
+  protected com.google.protobuf.MapField internalGetMapField(
+      int number) {
+    switch (number) {
+      case 2:
+        return internalGetStateCacheResponses();
+      default:
+        throw new RuntimeException(
+            "Invalid map field number: " + number);
+    }
+  }
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
@@ -40,61 +50,110 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.Builder.class);
   }
 
-  public static final int OPERATION_STATUS_FIELD_NUMBER = 1;
-  private int operationStatus_ = 0;
+  private int bitField0_;
+  public static final int RESULT_CACHE_RESPONSE_FIELD_NUMBER = 1;
+  private com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse resultCacheResponse_;
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-   * @return The enum numeric value on the wire for operationStatus.
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   * @return Whether the resultCacheResponse field is set.
    */
-  @java.lang.Override public int getOperationStatusValue() {
-    return operationStatus_;
+  @java.lang.Override
+  public boolean hasResultCacheResponse() {
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-   * @return The operationStatus.
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   * @return The resultCacheResponse.
    */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.forNumber(operationStatus_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getResultCacheResponse() {
+    return resultCacheResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance() : resultCacheResponse_;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder getResultCacheResponseOrBuilder() {
+    return resultCacheResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance() : resultCacheResponse_;
   }
 
-  public static final int ERROR_FIELD_NUMBER = 2;
+  public static final int STATE_CACHE_RESPONSES_FIELD_NUMBER = 2;
+  private static final class StateCacheResponsesDefaultEntryHolder {
+    static final com.google.protobuf.MapEntry<
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> defaultEntry =
+            com.google.protobuf.MapEntry
+            .<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>newDefaultInstance(
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_StateCacheResponsesEntry_descriptor, 
+                com.google.protobuf.WireFormat.FieldType.STRING,
+                "",
+                com.google.protobuf.WireFormat.FieldType.MESSAGE,
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance());
+  }
   @SuppressWarnings("serial")
-  private volatile java.lang.Object error_ = "";
-  /**
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The error.
-   */
-  @java.lang.Override
-  public java.lang.String getError() {
-    java.lang.Object ref = error_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      error_ = s;
-      return s;
+  private com.google.protobuf.MapField<
+      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> stateCacheResponses_;
+  private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+  internalGetStateCacheResponses() {
+    if (stateCacheResponses_ == null) {
+      return com.google.protobuf.MapField.emptyMapField(
+          StateCacheResponsesDefaultEntryHolder.defaultEntry);
     }
+    return stateCacheResponses_;
+  }
+  public int getStateCacheResponsesCount() {
+    return internalGetStateCacheResponses().getMap().size();
   }
   /**
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The bytes for error.
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getErrorBytes() {
-    java.lang.Object ref = error_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      error_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
+  public boolean containsStateCacheResponses(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    return internalGetStateCacheResponses().getMap().containsKey(key);
+  }
+  /**
+   * Use {@link #getStateCacheResponsesMap()} instead.
+   */
+  @java.lang.Override
+  @java.lang.Deprecated
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> getStateCacheResponses() {
+    return getStateCacheResponsesMap();
+  }
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   */
+  @java.lang.Override
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> getStateCacheResponsesMap() {
+    return internalGetStateCacheResponses().getMap();
+  }
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   */
+  @java.lang.Override
+  public /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getStateCacheResponsesOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse defaultValue) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> map =
+        internalGetStateCacheResponses().getMap();
+    return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getStateCacheResponsesOrThrow(
+      java.lang.String key) {
+    if (key == null) { throw new NullPointerException("map key"); }
+    java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> map =
+        internalGetStateCacheResponses().getMap();
+    if (!map.containsKey(key)) {
+      throw new java.lang.IllegalArgumentException();
     }
+    return map.get(key);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -111,12 +170,15 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
-      output.writeEnum(1, operationStatus_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(1, getResultCacheResponse());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, error_);
-    }
+    com.google.protobuf.GeneratedMessageV3
+      .serializeStringMapTo(
+        output,
+        internalGetStateCacheResponses(),
+        StateCacheResponsesDefaultEntryHolder.defaultEntry,
+        2);
     getUnknownFields().writeTo(output);
   }
 
@@ -126,12 +188,19 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
+    if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(1, operationStatus_);
+        .computeMessageSize(1, getResultCacheResponse());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, error_);
+    for (java.util.Map.Entry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> entry
+         : internalGetStateCacheResponses().getMap().entrySet()) {
+      com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+      stateCacheResponses__ = StateCacheResponsesDefaultEntryHolder.defaultEntry.newBuilderForType()
+          .setKey(entry.getKey())
+          .setValue(entry.getValue())
+          .build();
+      size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, stateCacheResponses__);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -148,9 +217,13 @@ private static final long serialVersionUID = 0L;
     }
     com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse) obj;
 
-    if (operationStatus_ != other.operationStatus_) return false;
-    if (!getError()
-        .equals(other.getError())) return false;
+    if (hasResultCacheResponse() != other.hasResultCacheResponse()) return false;
+    if (hasResultCacheResponse()) {
+      if (!getResultCacheResponse()
+          .equals(other.getResultCacheResponse())) return false;
+    }
+    if (!internalGetStateCacheResponses().equals(
+        other.internalGetStateCacheResponses())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -162,10 +235,14 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + OPERATION_STATUS_FIELD_NUMBER;
-    hash = (53 * hash) + operationStatus_;
-    hash = (37 * hash) + ERROR_FIELD_NUMBER;
-    hash = (53 * hash) + getError().hashCode();
+    if (hasResultCacheResponse()) {
+      hash = (37 * hash) + RESULT_CACHE_RESPONSE_FIELD_NUMBER;
+      hash = (53 * hash) + getResultCacheResponse().hashCode();
+    }
+    if (!internalGetStateCacheResponses().getMap().isEmpty()) {
+      hash = (37 * hash) + STATE_CACHE_RESPONSES_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetStateCacheResponses().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -275,6 +352,28 @@ private static final long serialVersionUID = 0L;
       return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertResponse_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 2:
+          return internalGetStateCacheResponses();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
+    @SuppressWarnings({"rawtypes"})
+    protected com.google.protobuf.MapField internalGetMutableMapField(
+        int number) {
+      switch (number) {
+        case 2:
+          return internalGetMutableStateCacheResponses();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -285,20 +384,30 @@ private static final long serialVersionUID = 0L;
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getResultCacheResponseFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      operationStatus_ = 0;
-      error_ = "";
+      resultCacheResponse_ = null;
+      if (resultCacheResponseBuilder_ != null) {
+        resultCacheResponseBuilder_.dispose();
+        resultCacheResponseBuilder_ = null;
+      }
+      internalGetMutableStateCacheResponses().clear();
       return this;
     }
 
@@ -332,12 +441,18 @@ private static final long serialVersionUID = 0L;
 
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse result) {
       int from_bitField0_ = bitField0_;
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.operationStatus_ = operationStatus_;
+        result.resultCacheResponse_ = resultCacheResponseBuilder_ == null
+            ? resultCacheResponse_
+            : resultCacheResponseBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.error_ = error_;
+        result.stateCacheResponses_ = internalGetStateCacheResponses();
+        result.stateCacheResponses_.makeImmutable();
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -384,14 +499,12 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse other) {
       if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse.getDefaultInstance()) return this;
-      if (other.operationStatus_ != 0) {
-        setOperationStatusValue(other.getOperationStatusValue());
+      if (other.hasResultCacheResponse()) {
+        mergeResultCacheResponse(other.getResultCacheResponse());
       }
-      if (!other.getError().isEmpty()) {
-        error_ = other.error_;
-        bitField0_ |= 0x00000002;
-        onChanged();
-      }
+      internalGetMutableStateCacheResponses().mergeFrom(
+          other.internalGetStateCacheResponses());
+      bitField0_ |= 0x00000002;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -418,13 +531,19 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 8: {
-              operationStatus_ = input.readEnum();
+            case 10: {
+              input.readMessage(
+                  getResultCacheResponseFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
-            } // case 8
+            } // case 10
             case 18: {
-              error_ = input.readStringRequireUtf8();
+              com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+              stateCacheResponses__ = input.readMessage(
+                  StateCacheResponsesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableStateCacheResponses().getMutableMap().put(
+                  stateCacheResponses__.getKey(), stateCacheResponses__.getValue());
               bitField0_ |= 0x00000002;
               break;
             } // case 18
@@ -445,128 +564,251 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private int operationStatus_ = 0;
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse resultCacheResponse_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder> resultCacheResponseBuilder_;
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-     * @return The enum numeric value on the wire for operationStatus.
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     * @return Whether the resultCacheResponse field is set.
      */
-    @java.lang.Override public int getOperationStatusValue() {
-      return operationStatus_;
+    public boolean hasResultCacheResponse() {
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-     * @param value The enum numeric value on the wire for operationStatus to set.
-     * @return This builder for chaining.
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     * @return The resultCacheResponse.
      */
-    public Builder setOperationStatusValue(int value) {
-      operationStatus_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getResultCacheResponse() {
+      if (resultCacheResponseBuilder_ == null) {
+        return resultCacheResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance() : resultCacheResponse_;
+      } else {
+        return resultCacheResponseBuilder_.getMessage();
+      }
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-     * @return The operationStatus.
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
      */
-    @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.forNumber(operationStatus_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-     * @param value The operationStatus to set.
-     * @return This builder for chaining.
-     */
-    public Builder setOperationStatus(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus value) {
-      if (value == null) {
-        throw new NullPointerException();
+    public Builder setResultCacheResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse value) {
+      if (resultCacheResponseBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        resultCacheResponse_ = value;
+      } else {
+        resultCacheResponseBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
-      operationStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-     * @return This builder for chaining.
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
      */
-    public Builder clearOperationStatus() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      operationStatus_ = 0;
+    public Builder setResultCacheResponse(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.Builder builderForValue) {
+      if (resultCacheResponseBuilder_ == null) {
+        resultCacheResponse_ = builderForValue.build();
+      } else {
+        resultCacheResponseBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     */
+    public Builder mergeResultCacheResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse value) {
+      if (resultCacheResponseBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          resultCacheResponse_ != null &&
+          resultCacheResponse_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance()) {
+          getResultCacheResponseBuilder().mergeFrom(value);
+        } else {
+          resultCacheResponse_ = value;
+        }
+      } else {
+        resultCacheResponseBuilder_.mergeFrom(value);
+      }
+      if (resultCacheResponse_ != null) {
+        bitField0_ |= 0x00000001;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     */
+    public Builder clearResultCacheResponse() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      resultCacheResponse_ = null;
+      if (resultCacheResponseBuilder_ != null) {
+        resultCacheResponseBuilder_.dispose();
+        resultCacheResponseBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.Builder getResultCacheResponseBuilder() {
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return getResultCacheResponseFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder getResultCacheResponseOrBuilder() {
+      if (resultCacheResponseBuilder_ != null) {
+        return resultCacheResponseBuilder_.getMessageOrBuilder();
+      } else {
+        return resultCacheResponse_ == null ?
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.getDefaultInstance() : resultCacheResponse_;
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder> 
+        getResultCacheResponseFieldBuilder() {
+      if (resultCacheResponseBuilder_ == null) {
+        resultCacheResponseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder>(
+                getResultCacheResponse(),
+                getParentForChildren(),
+                isClean());
+        resultCacheResponse_ = null;
+      }
+      return resultCacheResponseBuilder_;
     }
 
-    private java.lang.Object error_ = "";
-    /**
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return The error.
-     */
-    public java.lang.String getError() {
-      java.lang.Object ref = error_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        error_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
+    private com.google.protobuf.MapField<
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> stateCacheResponses_;
+    private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+        internalGetStateCacheResponses() {
+      if (stateCacheResponses_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            StateCacheResponsesDefaultEntryHolder.defaultEntry);
       }
+      return stateCacheResponses_;
     }
-    /**
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return The bytes for error.
-     */
-    public com.google.protobuf.ByteString
-        getErrorBytes() {
-      java.lang.Object ref = error_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        error_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
+    private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+        internalGetMutableStateCacheResponses() {
+      if (stateCacheResponses_ == null) {
+        stateCacheResponses_ = com.google.protobuf.MapField.newMapField(
+            StateCacheResponsesDefaultEntryHolder.defaultEntry);
       }
-    }
-    /**
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @param value The error to set.
-     * @return This builder for chaining.
-     */
-    public Builder setError(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      error_ = value;
+      if (!stateCacheResponses_.isMutable()) {
+        stateCacheResponses_ = stateCacheResponses_.copy();
+      }
       bitField0_ |= 0x00000002;
       onChanged();
-      return this;
+      return stateCacheResponses_;
+    }
+    public int getStateCacheResponsesCount() {
+      return internalGetStateCacheResponses().getMap().size();
     }
     /**
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @return This builder for chaining.
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
      */
-    public Builder clearError() {
-      error_ = getDefaultInstance().getError();
+    @java.lang.Override
+    public boolean containsStateCacheResponses(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      return internalGetStateCacheResponses().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getStateCacheResponsesMap()} instead.
+     */
+    @java.lang.Override
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> getStateCacheResponses() {
+      return getStateCacheResponsesMap();
+    }
+    /**
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     */
+    @java.lang.Override
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> getStateCacheResponsesMap() {
+      return internalGetStateCacheResponses().getMap();
+    }
+    /**
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     */
+    @java.lang.Override
+    public /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getStateCacheResponsesOrDefault(
+        java.lang.String key,
+        /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse defaultValue) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> map =
+          internalGetStateCacheResponses().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getStateCacheResponsesOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> map =
+          internalGetStateCacheResponses().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+    public Builder clearStateCacheResponses() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      onChanged();
+      internalGetMutableStateCacheResponses().getMutableMap()
+          .clear();
       return this;
     }
     /**
-     * <code>string error = 2 [json_name = "error"];</code>
-     * @param value The bytes for error to set.
-     * @return This builder for chaining.
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
      */
-    public Builder setErrorBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      error_ = value;
+    public Builder removeStateCacheResponses(
+        java.lang.String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      internalGetMutableStateCacheResponses().getMutableMap()
+          .remove(key);
+      return this;
+    }
+    /**
+     * Use alternate mutation accessors instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+        getMutableStateCacheResponses() {
       bitField0_ |= 0x00000002;
-      onChanged();
+      return internalGetMutableStateCacheResponses().getMutableMap();
+    }
+    /**
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     */
+    public Builder putStateCacheResponses(
+        java.lang.String key,
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse value) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      if (value == null) { throw new NullPointerException("map value"); }
+      internalGetMutableStateCacheResponses().getMutableMap()
+          .put(key, value);
+      bitField0_ |= 0x00000002;
+      return this;
+    }
+    /**
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     */
+    public Builder putAllStateCacheResponses(
+        java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse> values) {
+      internalGetMutableStateCacheResponses().getMutableMap()
+          .putAll(values);
+      bitField0_ |= 0x00000002;
       return this;
     }
     @java.lang.Override

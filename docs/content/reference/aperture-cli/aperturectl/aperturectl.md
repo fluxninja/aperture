@@ -48,5 +48,7 @@ aperturectl is a CLI tool to interact with Aperture.
 - [aperturectl flow-control](/reference/aperture-cli/aperturectl/flow-control/flow-control.md) - Flow Control integrations
 - [aperturectl install](/reference/aperture-cli/aperturectl/install/install.md) - Install Aperture components
 - [aperturectl policy](/reference/aperture-cli/aperturectl/policy/policy.md) - Aperture Policy related commands for the Controller
+- [aperturectl result-cache](/reference/aperture-cli/aperturectl/result-cache/result-cache.md) - Result Cache related commands
+- [aperturectl state-cache](/reference/aperture-cli/aperturectl/state-cache/state-cache.md) - State Cache related commands
 - [aperturectl status](/reference/aperture-cli/aperturectl/status/status.md) - Get Jobs status
 - [aperturectl uninstall](/reference/aperture-cli/aperturectl/uninstall/uninstall.md) - Uninstall Aperture components

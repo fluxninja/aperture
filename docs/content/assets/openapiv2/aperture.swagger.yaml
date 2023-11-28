@@ -778,12 +778,57 @@ definitions:
                 $ref: '#/definitions/OutPort'
                 description: The value is emitted to the output port.
         type: object
+    CacheDeleteRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_key:
+                type: string
+            state_cache_keys:
+                items:
+                    type: string
+                type: array
+        type: object
     CacheDeleteResponse:
         properties:
-            error:
+            result_cache_response:
+                $ref: '#/definitions/KeyDeleteResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyDeleteResponse'
+                type: object
+        type: object
+    CacheEntry:
+        properties:
+            key:
                 type: string
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
+            ttl:
+                type: string
+            value:
+                format: byte
+                type: string
+        type: object
+    CacheLookupRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_key:
+                description: Key for result cache that needs to be fetched.
+                type: string
+            state_cache_keys:
+                description: Keys for state cache entries that need to be fetched.
+                items:
+                    type: string
+                type: array
+        type: object
+    CacheLookupResponse:
+        properties:
+            result_cache_response:
+                $ref: '#/definitions/KeyLookupResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyLookupResponse'
+                type: object
         type: object
     CacheLookupStatus:
         default: HIT
@@ -797,24 +842,25 @@ definitions:
             - SUCCESS
             - ERROR
         type: string
+    CacheUpsertRequest:
+        properties:
+            control_point:
+                type: string
+            result_cache_entry:
+                $ref: '#/definitions/CacheEntry'
+            state_cache_entries:
+                additionalProperties:
+                    $ref: '#/definitions/CacheEntry'
+                type: object
+        type: object
     CacheUpsertResponse:
         properties:
-            error:
-                type: string
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
-        type: object
-    CachedValue:
-        properties:
-            error:
-                type: string
-            lookup_status:
-                $ref: '#/definitions/CacheLookupStatus'
-            operation_status:
-                $ref: '#/definitions/CacheOperationStatus'
-            value:
-                format: byte
-                type: string
+            result_cache_response:
+                $ref: '#/definitions/KeyUpsertResponse'
+            state_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyUpsertResponse'
+                type: object
         type: object
     CheckHTTPRequest:
         properties:
@@ -897,9 +943,9 @@ definitions:
     CheckResponse:
         description: CheckResponse contains fields that represent decision made by Check call.
         properties:
-            cached_value:
-                $ref: '#/definitions/CachedValue'
-                description: Matching cached value.
+            cache_lookup_response:
+                $ref: '#/definitions/CacheLookupResponse'
+                description: CacheLookupResponse contains the result of the cache lookup.
             classifier_infos:
                 description: classifiers that were matched for this request.
                 items:
@@ -2537,6 +2583,38 @@ definitions:
         required:
             - key
             - operator
+        type: object
+    KeyDeleteResponse:
+        properties:
+            error:
+                type: string
+            key:
+                type: string
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
+        type: object
+    KeyLookupResponse:
+        properties:
+            error:
+                type: string
+            key:
+                type: string
+            lookup_status:
+                $ref: '#/definitions/CacheLookupStatus'
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
+            value:
+                format: byte
+                type: string
+        type: object
+    KeyUpsertResponse:
+        properties:
+            error:
+                type: string
+            key:
+                type: string
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
         type: object
     KubernetesObjectSelector:
         description: |-

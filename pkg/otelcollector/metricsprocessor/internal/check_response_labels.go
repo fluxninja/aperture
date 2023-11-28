@@ -59,9 +59,10 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	)
 
 	// Cache
-	if checkResponse.CachedValue != nil {
-		attributes.PutStr(otelconsts.ApertureCacheLookupStatusLabel, checkResponse.CachedValue.LookupStatus.String())
-		attributes.PutStr(otelconsts.ApertureCacheOperationStatusLabel, checkResponse.CachedValue.OperationStatus.String())
+	if checkResponse.CacheLookupResponse != nil && checkResponse.CacheLookupResponse.ResultCacheResponse != nil {
+		resultCacheResponse := checkResponse.CacheLookupResponse.ResultCacheResponse
+		attributes.PutStr(otelconsts.ApertureCacheLookupStatusLabel, resultCacheResponse.LookupStatus.String())
+		attributes.PutStr(otelconsts.ApertureCacheOperationStatusLabel, resultCacheResponse.OperationStatus.String())
 	}
 
 	// Note: Sorted alphabetically to help sorting attributes in rollupprocessor.key at least a bit.

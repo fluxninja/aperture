@@ -9,11 +9,11 @@ import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor, Tracer } from "@opentelemetry/sdk-trace-base";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
+import { Flow, _Flow } from "./flow.js";
 import { CheckRequest } from "./gen/aperture/flowcontrol/check/v1/CheckRequest.js";
 import { CheckResponse__Output } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { LIBRARY_NAME, LIBRARY_VERSION } from "./consts.js";
-import { Flow } from "./flow.js";
 import { fcs } from "./utils.js";
 
 /**
@@ -37,9 +37,13 @@ export interface FlowParams {
    */
   tryConnect?: boolean;
   /**
-   * The cache key for the flow.
+   * Key to the result cache entry which needs to be fetched at flow start.
    */
-  cacheKey?: string;
+  resultCacheKey?: string;
+  /**
+   * Keys to state cache entries that need to be fetched at flow start.
+   */
+  stateCacheKeys?: string[];
 }
 
 /**
@@ -155,7 +159,7 @@ export class ApertureClient {
    *  cacheKey: "cache",
    *});
    */
-  async StartFlow(controlPoint: string, params: FlowParams): Promise<Flow> {
+  async startFlow(controlPoint: string, params: FlowParams): Promise<Flow> {
     return new Promise<Flow>((resolve) => {
       if (params.rampMode === undefined) {
         params.rampMode = false;
@@ -165,14 +169,15 @@ export class ApertureClient {
 
       const resolveFlow = (response: any, err: any) => {
         resolve(
-          new Flow(
+          new _Flow(
             this.fcsClient,
             params.grpcCallOptions ?? {},
             controlPoint,
             span,
             startDate,
             params.rampMode,
-            params.cacheKey,
+            params.resultCacheKey,
+            params.stateCacheKeys,
             response,
             err,
           ),
@@ -195,7 +200,10 @@ export class ApertureClient {
           controlPoint: controlPoint,
           labels: mergedLabels,
           rampMode: params.rampMode,
-          cacheKey: params.cacheKey,
+          cacheLookupRequest: {
+            resultCacheKey: params.resultCacheKey,
+            stateCacheKeys: params.stateCacheKeys,
+          },
         };
 
         const cb: grpc.requestCallback<CheckResponse__Output> = (
@@ -220,7 +228,7 @@ export class ApertureClient {
   /**
    * Shuts down the ApertureClient.
    */
-  Shutdown() {
+  shutdown() {
     this.fcsClient.getChannel().close();
     this.exporter.shutdown();
     this.tracerProvider.shutdown();
@@ -231,7 +239,7 @@ export class ApertureClient {
    * Gets the current state of the gRPC channel.
    * @returns The connectivity state of the channel.
    */
-  GetState() {
+  getState() {
     return this.fcsClient.getChannel().getConnectivityState(true);
   }
 

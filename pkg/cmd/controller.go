@@ -10,10 +10,12 @@ import (
 	autoscalecontrolpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
 	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
-	"github.com/fluxninja/aperture/v2/pkg/agent-functions/agents"
+	"github.com/fluxninja/aperture/v2/pkg/cmd/agents"
+	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/consts"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
@@ -26,6 +28,7 @@ type Handler struct {
 	agents        agents.Agents
 	policyService *controlplane.PolicyService
 	statusService *apertureStatus.StatusService
+	etcdTransport *transport.EtcdTransportServer
 }
 
 // NewHandler creates a new Handler.
@@ -33,11 +36,13 @@ func NewHandler(
 	agents agents.Agents,
 	policyService *controlplane.PolicyService,
 	statusService *apertureStatus.StatusService,
+	etcdTransport *transport.EtcdTransportServer,
 ) *Handler {
 	return &Handler{
 		agents:        agents,
 		policyService: policyService,
 		statusService: statusService,
+		etcdTransport: etcdTransport,
 	}
 }
 
@@ -408,4 +413,64 @@ func (h *Handler) GetPolicy(ctx context.Context, req *policylangv1.GetPolicyRequ
 // GetStatus returns status of jobs in the system.
 func (h *Handler) GetStatus(ctx context.Context, req *statusv1.GroupStatusRequest) (*statusv1.GroupStatus, error) {
 	return h.statusService.GetGroupStatus(ctx, req)
+}
+
+// CacheLookup lookups specified cache entries.
+func (h *Handler) CacheLookup(ctx context.Context, req *cmdv1.GlobalCacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, error) {
+	// find agent with given agent group
+	agent, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := transport.SendRequest[flowcontrolv1.CacheLookupResponse](ctx, h.etcdTransport, agent, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// CacheUpsert inserts or deletes specified cache entries.
+func (h *Handler) CacheUpsert(ctx context.Context, req *cmdv1.GlobalCacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
+	// find agent with given agent group
+	agents, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := transport.SendRequest[flowcontrolv1.CacheUpsertResponse](ctx, h.etcdTransport, agents, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// CacheDelete deletes specified cache entries.
+func (h *Handler) CacheDelete(ctx context.Context, req *cmdv1.GlobalCacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
+	// find agent with given agent group
+	agents, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := transport.SendRequest[flowcontrolv1.CacheDeleteResponse](ctx, h.etcdTransport, agents, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (h *Handler) getOneAgentForGroup(ctx context.Context, agentGroup string) (string, error) {
+	// find agent with given agent group
+	agents, err := h.agents.GetAgentsForGroup(ctx, agentGroup)
+	if err != nil {
+		return "", err
+	}
+
+	// send request to only first agent
+	if len(agents) == 0 {
+		return "", status.Error(codes.FailedPrecondition, "no agent with such agent group")
+	}
+
+	return agents[0], nil
 }
