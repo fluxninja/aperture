@@ -5,6 +5,7 @@ package aperture.cmd.v1;
 
 import "aperture/autoscale/kubernetes/controlpoints/v1/controlpoints.proto";
 import "aperture/discovery/entities/v1/entities.proto";
+import "aperture/flowcontrol/check/v1/check.proto";
 import "aperture/flowcontrol/controlpoints/v1/controlpoints.proto";
 import "aperture/flowcontrol/preview/v1/preview.proto";
 import "aperture/policy/language/v1/policy.proto";
@@ -34,6 +35,11 @@ service Controller {
   rpc DeletePolicy(aperture.policy.language.v1.DeletePolicyRequest) returns (google.protobuf.Empty);
   rpc GetDecisions(aperture.policy.language.v1.GetDecisionsRequest) returns (aperture.policy.language.v1.GetDecisionsResponse);
   rpc GetStatus(aperture.status.v1.GroupStatusRequest) returns (aperture.status.v1.GroupStatus);
+
+  // caching
+  rpc CacheLookup(GlobalCacheLookupRequest) returns (aperture.flowcontrol.check.v1.CacheLookupResponse);
+  rpc CacheUpsert(GlobalCacheUpsertRequest) returns (aperture.flowcontrol.check.v1.CacheUpsertResponse);
+  rpc CacheDelete(GlobalCacheDeleteRequest) returns (aperture.flowcontrol.check.v1.CacheDeleteResponse);
 }
 
 message ListServicesRequest {}
@@ -145,4 +151,19 @@ message PreviewFlowLabelsControllerResponse {
 
 message PreviewHTTPRequestsControllerResponse {
   aperture.flowcontrol.preview.v1.PreviewHTTPRequestsResponse response = 1;
+}
+
+message GlobalCacheLookupRequest {
+  aperture.flowcontrol.check.v1.CacheLookupRequest request = 1;
+  string agent_group = 2;
+}
+
+message GlobalCacheUpsertRequest {
+  aperture.flowcontrol.check.v1.CacheUpsertRequest request = 1;
+  string agent_group = 2;
+}
+
+message GlobalCacheDeleteRequest {
+  aperture.flowcontrol.check.v1.CacheDeleteRequest request = 1;
+  string agent_group = 2;
 }

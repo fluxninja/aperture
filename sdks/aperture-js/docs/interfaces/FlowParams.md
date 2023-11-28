@@ -8,21 +8,14 @@ Represents the parameters for a flow.
 
 ### Properties
 
-- [cacheKey](FlowParams.md#cachekey)
 - [grpcCallOptions](FlowParams.md#grpccalloptions)
 - [labels](FlowParams.md#labels)
 - [rampMode](FlowParams.md#rampmode)
+- [resultCacheKey](FlowParams.md#resultcachekey)
+- [stateCacheKeys](FlowParams.md#statecachekeys)
 - [tryConnect](FlowParams.md#tryconnect)
 
 ## Properties
-
-### cacheKey
-
-• `Optional` **cacheKey**: `string`
-
-The cache key for the flow.
-
-___
 
 ### grpcCallOptions
 
@@ -45,6 +38,22 @@ ___
 • `Optional` **rampMode**: `boolean`
 
 Specifies whether the flow should use ramp mode.
+
+___
+
+### resultCacheKey
+
+• `Optional` **resultCacheKey**: `string`
+
+Key to the result cache entry which needs to be fetched at flow start.
+
+___
+
+### stateCacheKeys
+
+• `Optional` **stateCacheKeys**: `string`[]
+
+Keys to state cache entries that need to be fetched at flow start.
 
 ___
 

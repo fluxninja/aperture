@@ -8,6 +8,7 @@ import (
 
 	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
 	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 )
@@ -28,6 +29,10 @@ type IntrospectionClient interface {
 	ListDiscoveryEntity(ctx context.Context, in *cmdv1.ListDiscoveryEntityRequest, opts ...grpc.CallOption) (*cmdv1.ListDiscoveryEntityAgentResponse, error)
 	PreviewFlowLabels(ctx context.Context, in *cmdv1.PreviewFlowLabelsRequest, opts ...grpc.CallOption) (*cmdv1.PreviewFlowLabelsControllerResponse, error)
 	PreviewHTTPRequests(ctx context.Context, in *cmdv1.PreviewHTTPRequestsRequest, opts ...grpc.CallOption) (*cmdv1.PreviewHTTPRequestsControllerResponse, error)
+	// Caching
+	CacheLookup(ctx context.Context, in *cmdv1.GlobalCacheLookupRequest, opts ...grpc.CallOption) (*flowcontrolv1.CacheLookupResponse, error)
+	CacheUpsert(ctx context.Context, in *cmdv1.GlobalCacheUpsertRequest, opts ...grpc.CallOption) (*flowcontrolv1.CacheUpsertResponse, error)
+	CacheDelete(ctx context.Context, in *cmdv1.GlobalCacheDeleteRequest, opts ...grpc.CallOption) (*flowcontrolv1.CacheDeleteResponse, error)
 }
 
 // PolicyClient is a subset of cmdv1.ControllerClient that covers APIs related to policies.

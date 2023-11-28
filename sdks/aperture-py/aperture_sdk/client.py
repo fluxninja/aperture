@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Type, TypeVar
 
 import grpc
-from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import CheckRequest
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
+    CacheLookupRequest,
+    CheckRequest,
+)
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
 )
@@ -50,7 +53,8 @@ class FlowParams:
     explicit_labels: Optional[Labels] = None
     check_timeout: datetime.timedelta = default_rpc_timeout
     ramp_mode: bool = False
-    cache_key: Optional[str] = None
+    result_cache_key: Optional[str] = None
+    state_cache_keys: Optional[typing.List[str]] = None
 
 
 class ApertureClient:
@@ -142,7 +146,9 @@ class ApertureClient:
             control_point=control_point,
             labels=labels,
             ramp_mode=params.ramp_mode,
-            cache_key=params.cache_key,
+            cache_lookup_request=CacheLookupRequest(
+                result_cache_key=params.result_cache_key,
+            ),
         )
         span_attributes: otel_types.Attributes = {
             flow_start_timestamp_label: time.monotonic_ns(),
@@ -169,7 +175,7 @@ class ApertureClient:
             span=span,
             check_response=response,
             ramp_mode=params.ramp_mode,
-            cache_key=params.cache_key,
+            cache_key=params.result_cache_key,
         )
 
     def decorate(

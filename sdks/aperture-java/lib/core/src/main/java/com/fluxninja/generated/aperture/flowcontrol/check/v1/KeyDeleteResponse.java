@@ -4,20 +4,19 @@
 package com.fluxninja.generated.aperture.flowcontrol.check.v1;
 
 /**
- * Protobuf type {@code aperture.flowcontrol.check.v1.CachedValue}
+ * Protobuf type {@code aperture.flowcontrol.check.v1.KeyDeleteResponse}
  */
-public final class CachedValue extends
+public final class KeyDeleteResponse extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.CachedValue)
-    CachedValueOrBuilder {
+    // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.KeyDeleteResponse)
+    KeyDeleteResponseOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use CachedValue.newBuilder() to construct.
-  private CachedValue(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use KeyDeleteResponse.newBuilder() to construct.
+  private KeyDeleteResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private CachedValue() {
-    value_ = com.google.protobuf.ByteString.EMPTY;
-    lookupStatus_ = 0;
+  private KeyDeleteResponse() {
+    key_ = "";
     operationStatus_ = 0;
     error_ = "";
   }
@@ -26,62 +25,72 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings({"unused"})
   protected java.lang.Object newInstance(
       UnusedPrivateParameter unused) {
-    return new CachedValue();
+    return new KeyDeleteResponse();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor;
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_KeyDeleteResponse_descriptor;
   }
 
   @java.lang.Override
   protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CachedValue_fieldAccessorTable
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_KeyDeleteResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder.class);
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.Builder.class);
   }
 
-  public static final int VALUE_FIELD_NUMBER = 1;
-  private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+  public static final int KEY_FIELD_NUMBER = 1;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object key_ = "";
   /**
-   * <code>bytes value = 1 [json_name = "value"];</code>
-   * @return The value.
+   * <code>string key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString getValue() {
-    return value_;
+  public java.lang.String getKey() {
+    java.lang.Object ref = key_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      key_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string key = 1 [json_name = "key"];</code>
+   * @return The bytes for key.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getKeyBytes() {
+    java.lang.Object ref = key_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      key_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
   }
 
-  public static final int LOOKUP_STATUS_FIELD_NUMBER = 2;
-  private int lookupStatus_ = 0;
-  /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-   * @return The enum numeric value on the wire for lookupStatus.
-   */
-  @java.lang.Override public int getLookupStatusValue() {
-    return lookupStatus_;
-  }
-  /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-   * @return The lookupStatus.
-   */
-  @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus getLookupStatus() {
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.forNumber(lookupStatus_);
-    return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.UNRECOGNIZED : result;
-  }
-
-  public static final int OPERATION_STATUS_FIELD_NUMBER = 3;
+  public static final int OPERATION_STATUS_FIELD_NUMBER = 2;
   private int operationStatus_ = 0;
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
    * @return The enum numeric value on the wire for operationStatus.
    */
   @java.lang.Override public int getOperationStatusValue() {
     return operationStatus_;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
    * @return The operationStatus.
    */
   @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
@@ -89,11 +98,11 @@ private static final long serialVersionUID = 0L;
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
   }
 
-  public static final int ERROR_FIELD_NUMBER = 4;
+  public static final int ERROR_FIELD_NUMBER = 3;
   @SuppressWarnings("serial")
   private volatile java.lang.Object error_ = "";
   /**
-   * <code>string error = 4 [json_name = "error"];</code>
+   * <code>string error = 3 [json_name = "error"];</code>
    * @return The error.
    */
   @java.lang.Override
@@ -110,7 +119,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string error = 4 [json_name = "error"];</code>
+   * <code>string error = 3 [json_name = "error"];</code>
    * @return The bytes for error.
    */
   @java.lang.Override
@@ -142,17 +151,14 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!value_.isEmpty()) {
-      output.writeBytes(1, value_);
-    }
-    if (lookupStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.HIT.getNumber()) {
-      output.writeEnum(2, lookupStatus_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(key_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, key_);
     }
     if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
-      output.writeEnum(3, operationStatus_);
+      output.writeEnum(2, operationStatus_);
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, error_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, error_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -163,20 +169,15 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!value_.isEmpty()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBytesSize(1, value_);
-    }
-    if (lookupStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.HIT.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, lookupStatus_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(key_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, key_);
     }
     if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(3, operationStatus_);
+        .computeEnumSize(2, operationStatus_);
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, error_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, error_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -188,14 +189,13 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue)) {
+    if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse)) {
       return super.equals(obj);
     }
-    com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue) obj;
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse) obj;
 
-    if (!getValue()
-        .equals(other.getValue())) return false;
-    if (lookupStatus_ != other.lookupStatus_) return false;
+    if (!getKey()
+        .equals(other.getKey())) return false;
     if (operationStatus_ != other.operationStatus_) return false;
     if (!getError()
         .equals(other.getError())) return false;
@@ -210,10 +210,8 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + VALUE_FIELD_NUMBER;
-    hash = (53 * hash) + getValue().hashCode();
-    hash = (37 * hash) + LOOKUP_STATUS_FIELD_NUMBER;
-    hash = (53 * hash) + lookupStatus_;
+    hash = (37 * hash) + KEY_FIELD_NUMBER;
+    hash = (53 * hash) + getKey().hashCode();
     hash = (37 * hash) + OPERATION_STATUS_FIELD_NUMBER;
     hash = (53 * hash) + operationStatus_;
     hash = (37 * hash) + ERROR_FIELD_NUMBER;
@@ -223,44 +221,44 @@ private static final long serialVersionUID = 0L;
     return hash;
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(byte[] data)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -268,26 +266,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseDelimitedFrom(java.io.InputStream input)
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseDelimitedFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue parseFrom(
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -300,7 +298,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue prototype) {
+  public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @java.lang.Override
@@ -316,26 +314,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code aperture.flowcontrol.check.v1.CachedValue}
+   * Protobuf type {@code aperture.flowcontrol.check.v1.KeyDeleteResponse}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.CachedValue)
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder {
+      // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.KeyDeleteResponse)
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponseOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_KeyDeleteResponse_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CachedValue_fieldAccessorTable
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_KeyDeleteResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.Builder.class);
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.Builder.class);
     }
 
-    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.newBuilder()
+    // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.newBuilder()
     private Builder() {
 
     }
@@ -349,8 +347,7 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      value_ = com.google.protobuf.ByteString.EMPTY;
-      lookupStatus_ = 0;
+      key_ = "";
       operationStatus_ = 0;
       error_ = "";
       return this;
@@ -359,17 +356,17 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CachedValue_descriptor;
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_KeyDeleteResponse_descriptor;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getDefaultInstanceForType() {
-      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getDefaultInstanceForType() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.getDefaultInstance();
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue build() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue result = buildPartial();
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse build() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -377,25 +374,22 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue buildPartial() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue(this);
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse buildPartial() {
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue result) {
+    private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.value_ = value_;
+        result.key_ = key_;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.lookupStatus_ = lookupStatus_;
-      }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
         result.operationStatus_ = operationStatus_;
       }
-      if (((from_bitField0_ & 0x00000008) != 0)) {
+      if (((from_bitField0_ & 0x00000004) != 0)) {
         result.error_ = error_;
       }
     }
@@ -434,28 +428,27 @@ private static final long serialVersionUID = 0L;
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue) {
-        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue)other);
+      if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse) {
+        return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue other) {
-      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue.getDefaultInstance()) return this;
-      if (other.getValue() != com.google.protobuf.ByteString.EMPTY) {
-        setValue(other.getValue());
-      }
-      if (other.lookupStatus_ != 0) {
-        setLookupStatusValue(other.getLookupStatusValue());
+    public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse other) {
+      if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.getDefaultInstance()) return this;
+      if (!other.getKey().isEmpty()) {
+        key_ = other.key_;
+        bitField0_ |= 0x00000001;
+        onChanged();
       }
       if (other.operationStatus_ != 0) {
         setOperationStatusValue(other.getOperationStatusValue());
       }
       if (!other.getError().isEmpty()) {
         error_ = other.error_;
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -485,25 +478,20 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              value_ = input.readBytes();
+              key_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000001;
               break;
             } // case 10
             case 16: {
-              lookupStatus_ = input.readEnum();
+              operationStatus_ = input.readEnum();
               bitField0_ |= 0x00000002;
               break;
             } // case 16
-            case 24: {
-              operationStatus_ = input.readEnum();
+            case 26: {
+              error_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000004;
               break;
-            } // case 24
-            case 34: {
-              error_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000008;
-              break;
-            } // case 34
+            } // case 26
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -521,112 +509,99 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+    private java.lang.Object key_ = "";
     /**
-     * <code>bytes value = 1 [json_name = "value"];</code>
-     * @return The value.
+     * <code>string key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    @java.lang.Override
-    public com.google.protobuf.ByteString getValue() {
-      return value_;
+    public java.lang.String getKey() {
+      java.lang.Object ref = key_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        key_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
     }
     /**
-     * <code>bytes value = 1 [json_name = "value"];</code>
-     * @param value The value to set.
+     * <code>string key = 1 [json_name = "key"];</code>
+     * @return The bytes for key.
+     */
+    public com.google.protobuf.ByteString
+        getKeyBytes() {
+      java.lang.Object ref = key_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        key_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string key = 1 [json_name = "key"];</code>
+     * @param value The key to set.
      * @return This builder for chaining.
      */
-    public Builder setValue(com.google.protobuf.ByteString value) {
+    public Builder setKey(
+        java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      value_ = value;
+      key_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>bytes value = 1 [json_name = "value"];</code>
+     * <code>string key = 1 [json_name = "key"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearValue() {
+    public Builder clearKey() {
+      key_ = getDefaultInstance().getKey();
       bitField0_ = (bitField0_ & ~0x00000001);
-      value_ = getDefaultInstance().getValue();
-      onChanged();
-      return this;
-    }
-
-    private int lookupStatus_ = 0;
-    /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-     * @return The enum numeric value on the wire for lookupStatus.
-     */
-    @java.lang.Override public int getLookupStatusValue() {
-      return lookupStatus_;
-    }
-    /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-     * @param value The enum numeric value on the wire for lookupStatus to set.
-     * @return This builder for chaining.
-     */
-    public Builder setLookupStatusValue(int value) {
-      lookupStatus_ = value;
-      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-     * @return The lookupStatus.
-     */
-    @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus getLookupStatus() {
-      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus result = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.forNumber(lookupStatus_);
-      return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus.UNRECOGNIZED : result;
-    }
-    /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-     * @param value The lookupStatus to set.
+     * <code>string key = 1 [json_name = "key"];</code>
+     * @param value The bytes for key to set.
      * @return This builder for chaining.
      */
-    public Builder setLookupStatus(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
-      bitField0_ |= 0x00000002;
-      lookupStatus_ = value.getNumber();
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearLookupStatus() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      lookupStatus_ = 0;
+    public Builder setKeyBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      key_ = value;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
 
     private int operationStatus_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
      * @return The enum numeric value on the wire for operationStatus.
      */
     @java.lang.Override public int getOperationStatusValue() {
       return operationStatus_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
      * @param value The enum numeric value on the wire for operationStatus to set.
      * @return This builder for chaining.
      */
     public Builder setOperationStatusValue(int value) {
       operationStatus_ = value;
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
      * @return The operationStatus.
      */
     @java.lang.Override
@@ -635,7 +610,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
      * @param value The operationStatus to set.
      * @return This builder for chaining.
      */
@@ -643,17 +618,17 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000002;
       operationStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
      * @return This builder for chaining.
      */
     public Builder clearOperationStatus() {
-      bitField0_ = (bitField0_ & ~0x00000004);
+      bitField0_ = (bitField0_ & ~0x00000002);
       operationStatus_ = 0;
       onChanged();
       return this;
@@ -661,7 +636,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object error_ = "";
     /**
-     * <code>string error = 4 [json_name = "error"];</code>
+     * <code>string error = 3 [json_name = "error"];</code>
      * @return The error.
      */
     public java.lang.String getError() {
@@ -677,7 +652,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string error = 4 [json_name = "error"];</code>
+     * <code>string error = 3 [json_name = "error"];</code>
      * @return The bytes for error.
      */
     public com.google.protobuf.ByteString
@@ -694,7 +669,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string error = 4 [json_name = "error"];</code>
+     * <code>string error = 3 [json_name = "error"];</code>
      * @param value The error to set.
      * @return This builder for chaining.
      */
@@ -702,22 +677,22 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       error_ = value;
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>string error = 4 [json_name = "error"];</code>
+     * <code>string error = 3 [json_name = "error"];</code>
      * @return This builder for chaining.
      */
     public Builder clearError() {
       error_ = getDefaultInstance().getError();
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
       onChanged();
       return this;
     }
     /**
-     * <code>string error = 4 [json_name = "error"];</code>
+     * <code>string error = 3 [json_name = "error"];</code>
      * @param value The bytes for error to set.
      * @return This builder for chaining.
      */
@@ -726,7 +701,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       error_ = value;
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
@@ -743,23 +718,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.CachedValue)
+    // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.KeyDeleteResponse)
   }
 
-  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.CachedValue)
-  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.KeyDeleteResponse)
+  private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue();
+    DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse();
   }
 
-  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getDefaultInstance() {
+  public static com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<CachedValue>
-      PARSER = new com.google.protobuf.AbstractParser<CachedValue>() {
+  private static final com.google.protobuf.Parser<KeyDeleteResponse>
+      PARSER = new com.google.protobuf.AbstractParser<KeyDeleteResponse>() {
     @java.lang.Override
-    public CachedValue parsePartialFrom(
+    public KeyDeleteResponse parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -778,17 +753,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<CachedValue> parser() {
+  public static com.google.protobuf.Parser<KeyDeleteResponse> parser() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.google.protobuf.Parser<CachedValue> getParserForType() {
+  public com.google.protobuf.Parser<KeyDeleteResponse> getParserForType() {
     return PARSER;
   }
 
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getDefaultInstanceForType() {
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

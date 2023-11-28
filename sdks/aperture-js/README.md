@@ -29,118 +29,18 @@ details.
 
 ### Enumerations
 
+- [FlowStatus](docs/enums/FlowStatus.md)
 - [LookupStatus](docs/enums/LookupStatus.md)
-- [OperationStatus](docs/enums/OperationStatus.md)
 
 ### Classes
 
 - [ApertureClient](docs/classes/ApertureClient.md)
-- [CachedValueResponse](docs/classes/CachedValueResponse.md)
-- [DeleteCachedValueResponse](docs/classes/DeleteCachedValueResponse.md)
-- [Flow](docs/classes/Flow.md)
-- [SetCachedValueResponse](docs/classes/SetCachedValueResponse.md)
 
 ### Interfaces
 
+- [CacheEntry](docs/interfaces/CacheEntry.md)
+- [Flow](docs/interfaces/Flow.md)
 - [FlowParams](docs/interfaces/FlowParams.md)
-
-### Type Aliases
-
-- [FlowStatus](README.md#flowstatus)
-
-### Variables
-
-- [FlowStatusEnum](README.md#flowstatusenum)
-
-### Functions
-
-- [ConvertCacheError](README.md#convertcacheerror)
-- [ConvertCacheLookupStatus](README.md#convertcachelookupstatus)
-- [ConvertCacheOperationStatus](README.md#convertcacheoperationstatus)
-
-## Type Aliases
-
-### FlowStatus
-
-Ƭ **FlowStatus**: typeof [`FlowStatusEnum`](README.md#flowstatusenum)[keyof
-typeof [`FlowStatusEnum`](README.md#flowstatusenum)]
-
-Represents the status of a flow.
-
-## Variables
-
-### FlowStatusEnum
-
-• `Const` **FlowStatusEnum**: `Object`
-
-Enum representing the status of a flow.
-
-#### Type declaration
-
-| Name    | Type      |
-| :------ | :-------- |
-| `Error` | `"Error"` |
-| `OK`    | `"OK"`    |
-
-## Functions
-
-### ConvertCacheError
-
-▸ **ConvertCacheError**(`error`): `Error` \| `null`
-
-Converts a cache error string into an Error object.
-
-#### Parameters
-
-| Name    | Type                    | Description             |
-| :------ | :---------------------- | :---------------------- |
-| `error` | `undefined` \| `string` | The cache error string. |
-
-#### Returns
-
-`Error` \| `null`
-
-The Error object representing the cache error, or null if the error string is
-empty.
-
----
-
-### ConvertCacheLookupStatus
-
-▸ **ConvertCacheLookupStatus**(`status`):
-[`LookupStatus`](docs/enums/LookupStatus.md)
-
-Converts the cache lookup status to a lookup status.
-
-#### Parameters
-
-| Name     | Type                                         | Description                         |
-| :------- | :------------------------------------------- | :---------------------------------- |
-| `status` | `undefined` \| `null` \| `CacheLookupStatus` | The cache lookup status to convert. |
-
-#### Returns
-
-[`LookupStatus`](docs/enums/LookupStatus.md)
-
-The converted lookup status.
-
----
-
-### ConvertCacheOperationStatus
-
-▸ **ConvertCacheOperationStatus**(`status`):
-[`OperationStatus`](docs/enums/OperationStatus.md)
-
-Converts a cache operation status to an operation status.
-
-#### Parameters
-
-| Name     | Type                                  | Description                            |
-| :------- | :------------------------------------ | :------------------------------------- |
-| `status` | `undefined` \| `CacheOperationStatus` | The cache operation status to convert. |
-
-#### Returns
-
-[`OperationStatus`](docs/enums/OperationStatus.md)
-
-The converted operation status.
+- [KeyDeleteResponse](docs/interfaces/KeyDeleteResponse.md)
+- [KeyLookupResponse](docs/interfaces/KeyLookupResponse.md)
+- [KeyUpsertResponse](docs/interfaces/KeyUpsertResponse.md)

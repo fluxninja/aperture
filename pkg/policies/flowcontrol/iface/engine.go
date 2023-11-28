@@ -12,11 +12,11 @@ import (
 
 // RequestContext provides the request parameters for the Check method.
 type RequestContext struct {
-	FlowLabels   labels.Labels
-	ControlPoint string
-	CacheKey     string
-	Services     []string
-	RampMode     bool
+	FlowLabels         labels.Labels
+	ControlPoint       string
+	CacheLookupRequest *flowcontrolv1.CacheLookupRequest
+	Services           []string
+	RampMode           bool
 }
 
 // Engine is an interface for registering fluxmeters and schedulers.

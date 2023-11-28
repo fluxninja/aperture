@@ -60,22 +60,17 @@ java.lang.String defaultValue);
   boolean getRampMode();
 
   /**
-   * <pre>
-   * Cache item to fetch.
-   * </pre>
-   *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The cacheKey.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   * @return Whether the cacheLookupRequest field is set.
    */
-  java.lang.String getCacheKey();
+  boolean hasCacheLookupRequest();
   /**
-   * <pre>
-   * Cache item to fetch.
-   * </pre>
-   *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The bytes for cacheKey.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   * @return The cacheLookupRequest.
    */
-  com.google.protobuf.ByteString
-      getCacheKeyBytes();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest getCacheLookupRequest();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder getCacheLookupRequestOrBuilder();
 }

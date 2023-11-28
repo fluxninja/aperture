@@ -14,16 +14,21 @@ export interface ProtoGrpcType {
         v1: {
           CacheDeleteRequest: MessageTypeDefinition
           CacheDeleteResponse: MessageTypeDefinition
+          CacheEntry: MessageTypeDefinition
+          CacheLookupRequest: MessageTypeDefinition
+          CacheLookupResponse: MessageTypeDefinition
           CacheLookupStatus: EnumTypeDefinition
           CacheOperationStatus: EnumTypeDefinition
           CacheUpsertRequest: MessageTypeDefinition
           CacheUpsertResponse: MessageTypeDefinition
-          CachedValue: MessageTypeDefinition
           CheckRequest: MessageTypeDefinition
           CheckResponse: MessageTypeDefinition
           ClassifierInfo: MessageTypeDefinition
           FlowControlService: SubtypeConstructor<typeof grpc.Client, _aperture_flowcontrol_check_v1_FlowControlServiceClient> & { service: _aperture_flowcontrol_check_v1_FlowControlServiceDefinition }
           FluxMeterInfo: MessageTypeDefinition
+          KeyDeleteResponse: MessageTypeDefinition
+          KeyLookupResponse: MessageTypeDefinition
+          KeyUpsertResponse: MessageTypeDefinition
           LimiterDecision: MessageTypeDefinition
           StatusCode: EnumTypeDefinition
         }

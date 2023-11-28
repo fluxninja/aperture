@@ -2,15 +2,27 @@ package iface
 
 import (
 	"context"
-	"time"
+
+	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+)
+
+// CacheType is the type of cache.
+type CacheType int
+
+//go:generate enumer -type=CacheType -transform=lower -output=cache-type-string.go
+const (
+	// Result is the type of cache for saving results.
+	Result CacheType = iota
+	// CacheTypeState is the type of cache for saving state.
+	State
 )
 
 // Cache is an interface for the cache.
 type Cache interface {
-	// Get returns the value for the given key.
-	Get(ctx context.Context, controlPoint, key string) ([]byte, error)
-	// Upsert inserts or updates the value for the given key.
-	Upsert(ctx context.Context, controlPoint, key string, value []byte, ttl time.Duration) error
-	// Delete deletes the value for the given key.
-	Delete(ctx context.Context, controlPoint, key string) error
+	// Lookup looks up specified keys in cache. It takes flowcontrolv1.LookupRequest and returns flowcontrolv1.LookupResponse.
+	Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse
+	// Upsert inserts or updates specified cache entries. It takes flowcontrolv1.UpsertRequest and returns flowcontrolv1.UpsertResponse.
+	Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse
+	// Delete deletes specified keys from cache. It takes flowcontrolv1.DeleteRequest and returns flowcontrolv1.DeleteResponse.
+	Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) *flowcontrolv1.CacheDeleteResponse
 }
