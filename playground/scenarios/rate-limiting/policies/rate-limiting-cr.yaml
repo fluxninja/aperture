@@ -41,7 +41,7 @@ spec:
             signal_name: ACCEPT_PERCENTAGE_ALERT
     - alerter:
         in_ports:
-          alert:
+          signal:
             signal_name: ACCEPT_PERCENTAGE_ALERT
         parameters:
           alert_name: More than 90% of requests are being rate limited
