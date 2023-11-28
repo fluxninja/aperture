@@ -172,6 +172,8 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	// Could be nil during unit tests
 	if e.cache != nil {
 		// Lookup cache
+		// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
+		requestContext.CacheLookupRequest.ControlPoint = controlPoint
 		response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
 		resultCacheResponse := response.CacheLookupResponse.ResultCacheResponse
 

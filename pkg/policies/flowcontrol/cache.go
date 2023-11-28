@@ -10,7 +10,6 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"go.uber.org/fx"
@@ -148,12 +147,9 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 				return
 			}
 			lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
-			log.Info().Err(err).Msg("error")
 			if err.Error() == ErrCacheKeyNotFound.Error() {
-				log.Info().Msg("key not found")
 				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
 			} else {
-				log.Info().Msg("some other error")
 				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
 				lookupResponse.Error = err.Error()
 			}
