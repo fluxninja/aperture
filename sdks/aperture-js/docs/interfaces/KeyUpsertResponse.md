@@ -2,7 +2,7 @@
 
 # Interface: KeyUpsertResponse
 
-Represents the response of updating or inserting a cache key.
+Represents the response of a cache key update operation.
 
 ## Table of contents
 

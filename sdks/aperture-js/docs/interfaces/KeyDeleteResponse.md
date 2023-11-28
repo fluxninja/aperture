@@ -2,7 +2,7 @@
 
 # Interface: KeyDeleteResponse
 
-Represents the response of deleting a cache key.
+Represents the response of a cache key delete operation.
 
 ## Table of contents
 

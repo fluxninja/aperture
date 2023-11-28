@@ -40,7 +40,7 @@ export interface CacheEntry {
 }
 
 /**
- * Represents the response of updating or inserting a cache key.
+ * Represents the response of a cache key update operation.
  */
 export interface KeyUpsertResponse {
   /**
@@ -51,7 +51,7 @@ export interface KeyUpsertResponse {
 }
 
 /**
- * Represents the response of deleting a cache key.
+ * Represents the response of a cache key delete operation.
  */
 export interface KeyDeleteResponse {
   /**
