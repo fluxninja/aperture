@@ -74,7 +74,7 @@ func ParseRateLimiter(
 
 	labelKey := rateLimiter.Parameters.GetLimitByLabelKey()
 	if labelKey == "" {
-		// Deprecated: Remove in v2.25.0
+		// Deprecated: Remove in v3.0.0
 		labelKey = rateLimiter.Parameters.GetLabelKey()
 	}
 

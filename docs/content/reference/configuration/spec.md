@@ -7613,7 +7613,7 @@ Rate limiting is done independently for each value of the
 a separate limit, assuming you have a _user_ flow label set up, set
 `label_key: "user"`. If no label key is specified, then all requests matching
 the selectors will be rate limited based on the global bucket. Deprecated:
-v2.25.0. Use _limit_by_label_key_ instead.
+v3.0.0. Use _limit_by_label_key_ instead.
 
 </dd>
 <dt>lazy_sync</dt>
