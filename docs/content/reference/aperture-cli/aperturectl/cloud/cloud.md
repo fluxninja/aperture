@@ -32,5 +32,7 @@ Use this command to talk to the Cloud Controller.
 - [aperturectl cloud discovery](/reference/aperture-cli/aperturectl/cloud/discovery/discovery.md) - Discovery integrations
 - [aperturectl cloud dynamic-config](/reference/aperture-cli/aperturectl/cloud/dynamic-config/dynamic-config.md) - DynamicConfig of Aperture Policy related commands for the Cloud Controller
 - [aperturectl cloud flow-control](/reference/aperture-cli/aperturectl/cloud/flow-control/flow-control.md) - Flow Control integrations
+- [aperturectl cloud global-cache](/reference/aperture-cli/aperturectl/cloud/global-cache/global-cache.md) - Global Cache related commands
 - [aperturectl cloud policy](/reference/aperture-cli/aperturectl/cloud/policy/policy.md) - Aperture Policy related commands for the Cloud Controller
+- [aperturectl cloud result-cache](/reference/aperture-cli/aperturectl/cloud/result-cache/result-cache.md) - Result Cache related commands
 - [aperturectl cloud status](/reference/aperture-cli/aperturectl/cloud/status/status.md) - Get Jobs status
