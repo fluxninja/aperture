@@ -8,25 +8,51 @@ public interface CacheUpsertResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-   * @return The enum numeric value on the wire for operationStatus.
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   * @return Whether the resultCacheResponse field is set.
    */
-  int getOperationStatusValue();
+  boolean hasResultCacheResponse();
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
-   * @return The operationStatus.
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   * @return The resultCacheResponse.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getResultCacheResponse();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.KeyUpsertResponse result_cache_response = 1 [json_name = "resultCacheResponse"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponseOrBuilder getResultCacheResponseOrBuilder();
 
   /**
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The error.
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
-  java.lang.String getError();
+  int getGlobalCacheResponsesCount();
   /**
-   * <code>string error = 2 [json_name = "error"];</code>
-   * @return The bytes for error.
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
-  com.google.protobuf.ByteString
-      getErrorBytes();
+  boolean containsGlobalCacheResponses(
+      java.lang.String key);
+  /**
+   * Use {@link #getGlobalCacheResponsesMap()} instead.
+   */
+  @java.lang.Deprecated
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+  getGlobalCacheResponses();
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
+   */
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse>
+  getGlobalCacheResponsesMap();
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
+   */
+  /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getGlobalCacheResponsesOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse defaultValue);
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyUpsertResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyUpsertResponse getGlobalCacheResponsesOrThrow(
+      java.lang.String key);
 }

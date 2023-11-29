@@ -1,11 +1,11 @@
-import express from "express";
 import {
   ApertureClient,
   Flow,
-  FlowStatusEnum,
+  FlowStatus,
   LookupStatus,
 } from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
+import express from "express";
 
 // Create aperture client
 export const apertureClient = new ApertureClient({
@@ -29,47 +29,46 @@ apertureRoute.get("/", async (_: express.Request, res: express.Response) => {
   let flow: Flow | undefined = undefined;
 
   try {
-    flow = await apertureClient.StartFlow("awesomeFeature", {
+    flow = await apertureClient.startFlow("awesomeFeature", {
       labels: labels,
       grpcCallOptions: {
         deadline: Date.now() + 30000,
       },
       rampMode: false,
-      cacheKey: "cache",
+      resultCacheKey: "cache",
     });
 
     const endTimestamp = Date.now();
     console.log(`Flow took ${endTimestamp - startTimestamp}ms`);
 
-    if (flow.ShouldRun()) {
+    if (flow.shouldRun()) {
       await sleep(200);
 
-      if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
-        console.log("Cache hit:", flow.CachedValue().GetValue()?.toString());
+      if (flow.resultCache().getLookupStatus() === LookupStatus.Hit) {
+        console.log("Cache hit:", flow.resultCache().getValue()?.toString());
       } else {
-        console.log(
-          "Cache miss:",
-          flow.CachedValue().GetOperationStatus(),
-          flow.CachedValue().GetError()?.message,
-        );
+        console.log("Cache miss:", flow.resultCache().getError()?.message);
         const resString = "awesomeString";
 
         // create a new buffer
         const buffer = Buffer.from(resString);
 
         // set cache value
-        const setResult = await flow.SetCachedValue(buffer, {
-          seconds: 30,
-          nanos: 0,
+        const setResult = await flow.setResultCache({
+          value: buffer,
+          ttl: {
+            seconds: 30,
+            nanos: 0,
+          },
         });
-        if (setResult?.error) {
-          console.log(`Error setting cache value: ${setResult.error}`);
+        if (setResult.getError()) {
+          console.log(`Error setting cache value: ${setResult.getError()}`);
         }
       }
 
       res.sendStatus(202);
     } else {
-      flow.SetStatus(FlowStatusEnum.Error);
+      flow.setStatus(FlowStatus.Error);
       res.sendStatus(403);
     }
   } catch (e) {
@@ -77,7 +76,7 @@ apertureRoute.get("/", async (_: express.Request, res: express.Response) => {
     res.status(500).send(`Error occurred: ${e}`);
   } finally {
     if (flow) {
-      flow.End();
+      flow.end();
     }
   }
 });

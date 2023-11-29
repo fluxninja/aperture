@@ -5,12 +5,14 @@ import time
 from contextlib import AbstractContextManager
 from typing import Optional, TypeVar
 
+import grpc
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
-    ERROR,
     MISS,
+    CacheDeleteRequest,
     CacheDeleteResponse,
-    CacheUpsertResponse,
+    CacheEntry,
+    CacheUpsertRequest,
 )
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
@@ -22,6 +24,7 @@ from aperture_sdk.const import (
     flow_status_label,
 )
 from google.protobuf import json_format
+from google.protobuf.duration_pb2 import Duration
 from opentelemetry import trace
 
 
@@ -48,6 +51,7 @@ class Flow(AbstractContextManager):
         check_response: Optional[check_pb2.CheckResponse],
         ramp_mode: bool,
         cache_key: Optional[str],
+        error: Optional[Exception],
     ):
         self._fcs_stub = fcs_stub
         self._control_point = control_point
@@ -57,6 +61,7 @@ class Flow(AbstractContextManager):
         self._status_code = FlowStatus.OK
         self._ended = False
         self._ramp_mode = ramp_mode
+        self._error = error
         self.logger = logging.getLogger("aperture-py-sdk-flow")
 
     def should_run(self) -> bool:
@@ -106,56 +111,159 @@ class Flow(AbstractContextManager):
         )
         self._span.end()
 
-    def set_cached_value(self, value: str, ttl: datetime.timedelta):
+    def error(self) -> Optional[Exception]:
+        return self._error
+
+    def set_result_cache(
+        self, value: str, ttl: datetime.timedelta, **grpc_opts
+    ) -> KeyUpsertResponse:
         if not self._cache_key:
-            raise ValueError("No cache key")
+            return KeyUpsertResponse(ValueError("No cache key"))
 
-        cache_upsert_request = {
-            "controlPoint": self._control_point,
-            "key": self._cache_key,
-            "value": value,
-            "ttl": ttl,
-        }
-
-        res: CacheUpsertResponse = self._fcs_stub.CacheUpsert(cache_upsert_request)
-
-        return SetCachedValueResponse(
-            convert_cache_operation_status(res.operation_status),
-            convert_cache_error(res.error),
+        cache_upsert_request = CacheUpsertRequest(
+            control_point=self._control_point,
+            result_cache_entry=CacheEntry(
+                key=self._cache_key,
+                value=bytes(value, "utf-8"),
+                ttl=Duration().FromTimedelta(ttl),
+            ),
         )
 
-    async def delete_cached_value(self):
-        if not self._cache_key:
-            raise ValueError("No cache key")
+        try:
+            res = self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
+            return KeyUpsertResponse(e)
 
-        cache_delete_request = {
-            "controlPoint": self._control_point,
-            "key": self._cache_key,
-        }
+        if res.result_cache_response is None:
+            return KeyUpsertResponse(ValueError("No cache upsert response"))
 
-        res: CacheDeleteResponse = self._fcs_stub.CacheDelete(cache_delete_request)
-
-        return DeleteCachedValueResponse(
-            convert_cache_operation_status(res.operation_status),
-            convert_cache_error(res.error),
+        return KeyUpsertResponse(
+            convert_cache_error(res.result_cache_response.error),
         )
 
-    def cached_value(self):
-        if not self.check_response:
-            return GetCachedValueResponse(
-                None, MISS, ERROR, ValueError("check response in nil")
+    def delete_result_cache(self, **grpc_opts) -> KeyDeleteResponse:
+        if not self._cache_key:
+            return KeyDeleteResponse(ValueError("No cache key"))
+
+        cache_delete_request = CacheDeleteRequest(
+            control_point=self._control_point,
+            result_cache_key=self._cache_key,
+        )
+
+        try:
+            res: CacheDeleteResponse = self._fcs_stub.CacheDelete(
+                cache_delete_request, **grpc_opts
             )
-        cached_value = self._check_response.cached_value
-        if not cached_value:
-            return GetCachedValueResponse(
-                None, MISS, ERROR, ValueError("cached value in nil")
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
+            return KeyDeleteResponse(e)
+
+        if res.result_cache_response is None:
+            return KeyDeleteResponse(ValueError("No cache delete response"))
+
+        return KeyDeleteResponse(
+            convert_cache_error(res.result_cache_response.error),
+        )
+
+    def result_cache(self) -> KeyLookupResponse:
+        if self._error is not None:
+            return KeyLookupResponse(None, MISS, self._error)
+        if (
+            not self.check_response
+            or not self.check_response.cache_lookup_response
+            or not self.check_response.cache_lookup_response.result_cache_response
+        ):
+            return KeyLookupResponse(None, MISS, ValueError("No cache lookup response"))
+
+        lookup_response = (
+            self.check_response.cache_lookup_response.result_cache_response
+        )
+        return KeyLookupResponse(
+            lookup_response.value,
+            convert_cache_lookup_status(lookup_response.lookup_status),
+            convert_cache_error(lookup_response.error),
+        )
+
+    def set_global_cache(
+        self, key: str, value: str, ttl: datetime.timedelta, **grpc_opts
+    ) -> KeyUpsertResponse:
+        cache_upsert_request = CacheUpsertRequest(
+            global_cache_entries={
+                key: CacheEntry(
+                    value=bytes(value, "utf-8"),
+                    ttl=Duration().FromTimedelta(ttl),
+                ),
+            },
+        )
+
+        try:
+            res = self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
+            return KeyUpsertResponse(e)
+
+        responses = res.global_cache_responses
+        if responses is None:
+            return KeyUpsertResponse(ValueError("No cache upsert response"))
+        if key not in responses:
+            return KeyUpsertResponse(
+                ValueError("Key missing from global cache response")
             )
 
-        return GetCachedValueResponse(
-            cached_value.value,
-            convert_cache_lookup_status(cached_value.lookup_status),
-            convert_cache_operation_status(cached_value.operation_status),
-            None,
+        return KeyUpsertResponse(
+            convert_cache_error(responses[key].error),
+        )
+
+    def delete_global_cache(self, key: str, **grpc_opts) -> KeyDeleteResponse:
+        cache_delete_request = CacheDeleteRequest(
+            global_cache_keys=[key],
+        )
+
+        try:
+            res: CacheDeleteResponse = self._fcs_stub.CacheDelete(
+                cache_delete_request, **grpc_opts
+            )
+        except grpc.RpcError as e:
+            self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
+            return KeyDeleteResponse(e)
+
+        delete_responses = res.global_cache_responses
+
+        if delete_responses is None:
+            return KeyDeleteResponse(ValueError("No cache delete response"))
+        if key not in delete_responses:
+            return KeyDeleteResponse(
+                ValueError("Key missing from global cache response")
+            )
+
+        return KeyDeleteResponse(
+            convert_cache_error(delete_responses[key].error),
+        )
+
+    def global_cache(self, key: str) -> KeyLookupResponse:
+        if self._error is not None:
+            return KeyLookupResponse(None, MISS, self._error)
+        if (
+            not self.check_response
+            or not self.check_response.cache_lookup_response
+            or not self.check_response.cache_lookup_response.global_cache_responses
+        ):
+            return KeyLookupResponse(
+                None, MISS, ValueError("No global cache lookup response")
+            )
+
+        lookup_response_map = (
+            self.check_response.cache_lookup_response.global_cache_responses
+        )
+        if key not in lookup_response_map:
+            return KeyLookupResponse(None, MISS, ValueError("Unknown global cache key"))
+
+        lookup_response = lookup_response_map[key]
+        return KeyLookupResponse(
+            lookup_response.value,
+            convert_cache_lookup_status(lookup_response.lookup_status),
+            convert_cache_error(lookup_response.error),
         )
 
     def __enter__(self: TFlow) -> TFlow:

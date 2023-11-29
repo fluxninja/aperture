@@ -21,7 +21,6 @@ private static final long serialVersionUID = 0L;
   }
   private CheckRequest() {
     controlPoint_ = "";
-    cacheKey_ = "";
   }
 
   @java.lang.Override
@@ -56,6 +55,7 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.Builder.class);
   }
 
+  private int bitField0_;
   public static final int CONTROL_POINT_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile java.lang.Object controlPoint_ = "";
@@ -185,51 +185,30 @@ java.lang.String defaultValue) {
     return rampMode_;
   }
 
-  public static final int CACHE_KEY_FIELD_NUMBER = 4;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object cacheKey_ = "";
+  public static final int CACHE_LOOKUP_REQUEST_FIELD_NUMBER = 4;
+  private com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest cacheLookupRequest_;
   /**
-   * <pre>
-   * Cache item to fetch.
-   * </pre>
-   *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The cacheKey.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   * @return Whether the cacheLookupRequest field is set.
    */
   @java.lang.Override
-  public java.lang.String getCacheKey() {
-    java.lang.Object ref = cacheKey_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      cacheKey_ = s;
-      return s;
-    }
+  public boolean hasCacheLookupRequest() {
+    return ((bitField0_ & 0x00000001) != 0);
   }
   /**
-   * <pre>
-   * Cache item to fetch.
-   * </pre>
-   *
-   * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-   * @return The bytes for cacheKey.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   * @return The cacheLookupRequest.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getCacheKeyBytes() {
-    java.lang.Object ref = cacheKey_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      cacheKey_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest getCacheLookupRequest() {
+    return cacheLookupRequest_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance() : cacheLookupRequest_;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder getCacheLookupRequestOrBuilder() {
+    return cacheLookupRequest_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance() : cacheLookupRequest_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -258,8 +237,8 @@ java.lang.String defaultValue) {
     if (rampMode_ != false) {
       output.writeBool(3, rampMode_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(cacheKey_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, cacheKey_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      output.writeMessage(4, getCacheLookupRequest());
     }
     getUnknownFields().writeTo(output);
   }
@@ -287,8 +266,9 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(3, rampMode_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(cacheKey_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, cacheKey_);
+    if (((bitField0_ & 0x00000001) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, getCacheLookupRequest());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -311,8 +291,11 @@ java.lang.String defaultValue) {
         other.internalGetLabels())) return false;
     if (getRampMode()
         != other.getRampMode()) return false;
-    if (!getCacheKey()
-        .equals(other.getCacheKey())) return false;
+    if (hasCacheLookupRequest() != other.hasCacheLookupRequest()) return false;
+    if (hasCacheLookupRequest()) {
+      if (!getCacheLookupRequest()
+          .equals(other.getCacheLookupRequest())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -333,8 +316,10 @@ java.lang.String defaultValue) {
     hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getRampMode());
-    hash = (37 * hash) + CACHE_KEY_FIELD_NUMBER;
-    hash = (53 * hash) + getCacheKey().hashCode();
+    if (hasCacheLookupRequest()) {
+      hash = (37 * hash) + CACHE_LOOKUP_REQUEST_FIELD_NUMBER;
+      hash = (53 * hash) + getCacheLookupRequest().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -480,13 +465,19 @@ java.lang.String defaultValue) {
 
     // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest.newBuilder()
     private Builder() {
-
+      maybeForceBuilderInitialization();
     }
 
     private Builder(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       super(parent);
-
+      maybeForceBuilderInitialization();
+    }
+    private void maybeForceBuilderInitialization() {
+      if (com.google.protobuf.GeneratedMessageV3
+              .alwaysUseFieldBuilders) {
+        getCacheLookupRequestFieldBuilder();
+      }
     }
     @java.lang.Override
     public Builder clear() {
@@ -495,7 +486,11 @@ java.lang.String defaultValue) {
       controlPoint_ = "";
       internalGetMutableLabels().clear();
       rampMode_ = false;
-      cacheKey_ = "";
+      cacheLookupRequest_ = null;
+      if (cacheLookupRequestBuilder_ != null) {
+        cacheLookupRequestBuilder_.dispose();
+        cacheLookupRequestBuilder_ = null;
+      }
       return this;
     }
 
@@ -539,9 +534,14 @@ java.lang.String defaultValue) {
       if (((from_bitField0_ & 0x00000004) != 0)) {
         result.rampMode_ = rampMode_;
       }
+      int to_bitField0_ = 0;
       if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.cacheKey_ = cacheKey_;
+        result.cacheLookupRequest_ = cacheLookupRequestBuilder_ == null
+            ? cacheLookupRequest_
+            : cacheLookupRequestBuilder_.build();
+        to_bitField0_ |= 0x00000001;
       }
+      result.bitField0_ |= to_bitField0_;
     }
 
     @java.lang.Override
@@ -599,10 +599,8 @@ java.lang.String defaultValue) {
       if (other.getRampMode() != false) {
         setRampMode(other.getRampMode());
       }
-      if (!other.getCacheKey().isEmpty()) {
-        cacheKey_ = other.cacheKey_;
-        bitField0_ |= 0x00000008;
-        onChanged();
+      if (other.hasCacheLookupRequest()) {
+        mergeCacheLookupRequest(other.getCacheLookupRequest());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -650,7 +648,9 @@ java.lang.String defaultValue) {
               break;
             } // case 24
             case 34: {
-              cacheKey_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getCacheLookupRequestFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000008;
               break;
             } // case 34
@@ -902,96 +902,125 @@ java.lang.String defaultValue) {
       return this;
     }
 
-    private java.lang.Object cacheKey_ = "";
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest cacheLookupRequest_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder> cacheLookupRequestBuilder_;
     /**
-     * <pre>
-     * Cache item to fetch.
-     * </pre>
-     *
-     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-     * @return The cacheKey.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     * @return Whether the cacheLookupRequest field is set.
      */
-    public java.lang.String getCacheKey() {
-      java.lang.Object ref = cacheKey_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        cacheKey_ = s;
-        return s;
+    public boolean hasCacheLookupRequest() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     * @return The cacheLookupRequest.
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest getCacheLookupRequest() {
+      if (cacheLookupRequestBuilder_ == null) {
+        return cacheLookupRequest_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance() : cacheLookupRequest_;
       } else {
-        return (java.lang.String) ref;
+        return cacheLookupRequestBuilder_.getMessage();
       }
     }
     /**
-     * <pre>
-     * Cache item to fetch.
-     * </pre>
-     *
-     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-     * @return The bytes for cacheKey.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
      */
-    public com.google.protobuf.ByteString
-        getCacheKeyBytes() {
-      java.lang.Object ref = cacheKey_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        cacheKey_ = b;
-        return b;
+    public Builder setCacheLookupRequest(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest value) {
+      if (cacheLookupRequestBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        cacheLookupRequest_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        cacheLookupRequestBuilder_.setMessage(value);
       }
-    }
-    /**
-     * <pre>
-     * Cache item to fetch.
-     * </pre>
-     *
-     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-     * @param value The cacheKey to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCacheKey(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      cacheKey_ = value;
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <pre>
-     * Cache item to fetch.
-     * </pre>
-     *
-     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-     * @return This builder for chaining.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
      */
-    public Builder clearCacheKey() {
-      cacheKey_ = getDefaultInstance().getCacheKey();
+    public Builder setCacheLookupRequest(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.Builder builderForValue) {
+      if (cacheLookupRequestBuilder_ == null) {
+        cacheLookupRequest_ = builderForValue.build();
+      } else {
+        cacheLookupRequestBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     */
+    public Builder mergeCacheLookupRequest(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest value) {
+      if (cacheLookupRequestBuilder_ == null) {
+        if (((bitField0_ & 0x00000008) != 0) &&
+          cacheLookupRequest_ != null &&
+          cacheLookupRequest_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance()) {
+          getCacheLookupRequestBuilder().mergeFrom(value);
+        } else {
+          cacheLookupRequest_ = value;
+        }
+      } else {
+        cacheLookupRequestBuilder_.mergeFrom(value);
+      }
+      if (cacheLookupRequest_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     */
+    public Builder clearCacheLookupRequest() {
       bitField0_ = (bitField0_ & ~0x00000008);
+      cacheLookupRequest_ = null;
+      if (cacheLookupRequestBuilder_ != null) {
+        cacheLookupRequestBuilder_.dispose();
+        cacheLookupRequestBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <pre>
-     * Cache item to fetch.
-     * </pre>
-     *
-     * <code>string cache_key = 4 [json_name = "cacheKey"];</code>
-     * @param value The bytes for cacheKey to set.
-     * @return This builder for chaining.
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
      */
-    public Builder setCacheKeyBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      cacheKey_ = value;
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.Builder getCacheLookupRequestBuilder() {
       bitField0_ |= 0x00000008;
       onChanged();
-      return this;
+      return getCacheLookupRequestFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder getCacheLookupRequestOrBuilder() {
+      if (cacheLookupRequestBuilder_ != null) {
+        return cacheLookupRequestBuilder_.getMessageOrBuilder();
+      } else {
+        return cacheLookupRequest_ == null ?
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance() : cacheLookupRequest_;
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.CacheLookupRequest cache_lookup_request = 4 [json_name = "cacheLookupRequest"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder> 
+        getCacheLookupRequestFieldBuilder() {
+      if (cacheLookupRequestBuilder_ == null) {
+        cacheLookupRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequestOrBuilder>(
+                getCacheLookupRequest(),
+                getParentForChildren(),
+                isClean());
+        cacheLookupRequest_ = null;
+      }
+      return cacheLookupRequestBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Type, TypeVar
 
 import grpc
-from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import CheckRequest
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
+    CacheLookupRequest,
+    CheckRequest,
+)
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
 )
@@ -50,7 +53,8 @@ class FlowParams:
     explicit_labels: Optional[Labels] = None
     check_timeout: datetime.timedelta = default_rpc_timeout
     ramp_mode: bool = False
-    cache_key: Optional[str] = None
+    result_cache_key: Optional[str] = None
+    global_cache_keys: Optional[typing.List[str]] = None
 
 
 class ApertureClient:
@@ -142,7 +146,9 @@ class ApertureClient:
             control_point=control_point,
             labels=labels,
             ramp_mode=params.ramp_mode,
-            cache_key=params.cache_key,
+            cache_lookup_request=CacheLookupRequest(
+                result_cache_key=params.result_cache_key,
+            ),
         )
         span_attributes: otel_types.Attributes = {
             flow_start_timestamp_label: time.monotonic_ns(),
@@ -151,6 +157,7 @@ class ApertureClient:
 
         span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
         stub = FlowControlServiceStub(self.grpc_channel)
+        error: Optional[Exception] = None
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
             timeout = typing.cast(int, params.check_timeout.total_seconds())
@@ -162,6 +169,7 @@ class ApertureClient:
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
+            error = e
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
         return Flow(
             fcs_stub=stub,
@@ -169,7 +177,8 @@ class ApertureClient:
             span=span,
             check_response=response,
             ramp_mode=params.ramp_mode,
-            cache_key=params.cache_key,
+            cache_key=params.result_cache_key,
+            error=error,
         )
 
     def decorate(
@@ -187,7 +196,6 @@ class ApertureClient:
                     else:
                         if on_reject:
                             return on_reject()
-                        raise RejectedFlowException("Flow was rejected")
 
             return wrapper
 
@@ -195,11 +203,3 @@ class ApertureClient:
 
     def close(self):
         self.otlp_exporter.shutdown()
-
-
-class ApertureException(Exception):
-    pass
-
-
-class RejectedFlowException(ApertureException):
-    pass

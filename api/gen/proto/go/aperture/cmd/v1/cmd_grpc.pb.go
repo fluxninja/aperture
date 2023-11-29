@@ -10,6 +10,7 @@ package cmdv1
 
 import (
 	context "context"
+	v12 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
 	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
 	v11 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
 	grpc "google.golang.org/grpc"
@@ -41,6 +42,9 @@ const (
 	Controller_DeletePolicy_FullMethodName               = "/aperture.cmd.v1.Controller/DeletePolicy"
 	Controller_GetDecisions_FullMethodName               = "/aperture.cmd.v1.Controller/GetDecisions"
 	Controller_GetStatus_FullMethodName                  = "/aperture.cmd.v1.Controller/GetStatus"
+	Controller_CacheLookup_FullMethodName                = "/aperture.cmd.v1.Controller/CacheLookup"
+	Controller_CacheUpsert_FullMethodName                = "/aperture.cmd.v1.Controller/CacheUpsert"
+	Controller_CacheDelete_FullMethodName                = "/aperture.cmd.v1.Controller/CacheDelete"
 )
 
 // ControllerClient is the client API for Controller service.
@@ -65,6 +69,10 @@ type ControllerClient interface {
 	DeletePolicy(ctx context.Context, in *v1.DeletePolicyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetDecisions(ctx context.Context, in *v1.GetDecisionsRequest, opts ...grpc.CallOption) (*v1.GetDecisionsResponse, error)
 	GetStatus(ctx context.Context, in *v11.GroupStatusRequest, opts ...grpc.CallOption) (*v11.GroupStatus, error)
+	// caching
+	CacheLookup(ctx context.Context, in *GlobalCacheLookupRequest, opts ...grpc.CallOption) (*v12.CacheLookupResponse, error)
+	CacheUpsert(ctx context.Context, in *GlobalCacheUpsertRequest, opts ...grpc.CallOption) (*v12.CacheUpsertResponse, error)
+	CacheDelete(ctx context.Context, in *GlobalCacheDeleteRequest, opts ...grpc.CallOption) (*v12.CacheDeleteResponse, error)
 }
 
 type controllerClient struct {
@@ -228,6 +236,33 @@ func (c *controllerClient) GetStatus(ctx context.Context, in *v11.GroupStatusReq
 	return out, nil
 }
 
+func (c *controllerClient) CacheLookup(ctx context.Context, in *GlobalCacheLookupRequest, opts ...grpc.CallOption) (*v12.CacheLookupResponse, error) {
+	out := new(v12.CacheLookupResponse)
+	err := c.cc.Invoke(ctx, Controller_CacheLookup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) CacheUpsert(ctx context.Context, in *GlobalCacheUpsertRequest, opts ...grpc.CallOption) (*v12.CacheUpsertResponse, error) {
+	out := new(v12.CacheUpsertResponse)
+	err := c.cc.Invoke(ctx, Controller_CacheUpsert_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *controllerClient) CacheDelete(ctx context.Context, in *GlobalCacheDeleteRequest, opts ...grpc.CallOption) (*v12.CacheDeleteResponse, error) {
+	out := new(v12.CacheDeleteResponse)
+	err := c.cc.Invoke(ctx, Controller_CacheDelete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ControllerServer is the server API for Controller service.
 // All implementations should embed UnimplementedControllerServer
 // for forward compatibility
@@ -250,6 +285,10 @@ type ControllerServer interface {
 	DeletePolicy(context.Context, *v1.DeletePolicyRequest) (*emptypb.Empty, error)
 	GetDecisions(context.Context, *v1.GetDecisionsRequest) (*v1.GetDecisionsResponse, error)
 	GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error)
+	// caching
+	CacheLookup(context.Context, *GlobalCacheLookupRequest) (*v12.CacheLookupResponse, error)
+	CacheUpsert(context.Context, *GlobalCacheUpsertRequest) (*v12.CacheUpsertResponse, error)
+	CacheDelete(context.Context, *GlobalCacheDeleteRequest) (*v12.CacheDeleteResponse, error)
 }
 
 // UnimplementedControllerServer should be embedded to have forward compatible implementations.
@@ -306,6 +345,15 @@ func (UnimplementedControllerServer) GetDecisions(context.Context, *v1.GetDecisi
 }
 func (UnimplementedControllerServer) GetStatus(context.Context, *v11.GroupStatusRequest) (*v11.GroupStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
+}
+func (UnimplementedControllerServer) CacheLookup(context.Context, *GlobalCacheLookupRequest) (*v12.CacheLookupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheLookup not implemented")
+}
+func (UnimplementedControllerServer) CacheUpsert(context.Context, *GlobalCacheUpsertRequest) (*v12.CacheUpsertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheUpsert not implemented")
+}
+func (UnimplementedControllerServer) CacheDelete(context.Context, *GlobalCacheDeleteRequest) (*v12.CacheDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheDelete not implemented")
 }
 
 // UnsafeControllerServer may be embedded to opt out of forward compatibility for this service.
@@ -625,6 +673,60 @@ func _Controller_GetStatus_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Controller_CacheLookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GlobalCacheLookupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).CacheLookup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_CacheLookup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).CacheLookup(ctx, req.(*GlobalCacheLookupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_CacheUpsert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GlobalCacheUpsertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).CacheUpsert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_CacheUpsert_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).CacheUpsert(ctx, req.(*GlobalCacheUpsertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Controller_CacheDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GlobalCacheDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).CacheDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Controller_CacheDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).CacheDelete(ctx, req.(*GlobalCacheDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Controller_ServiceDesc is the grpc.ServiceDesc for Controller service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -699,6 +801,18 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetStatus",
 			Handler:    _Controller_GetStatus_Handler,
+		},
+		{
+			MethodName: "CacheLookup",
+			Handler:    _Controller_CacheLookup_Handler,
+		},
+		{
+			MethodName: "CacheUpsert",
+			Handler:    _Controller_CacheUpsert_Handler,
+		},
+		{
+			MethodName: "CacheDelete",
+			Handler:    _Controller_CacheDelete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

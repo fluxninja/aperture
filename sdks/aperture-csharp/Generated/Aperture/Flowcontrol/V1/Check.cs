@@ -27,155 +27,203 @@ namespace Aperture.Flowcontrol.Check.V1 {
             "CilhcGVydHVyZS9mbG93Y29udHJvbC9jaGVjay92MS9jaGVjay5wcm90bxId",
             "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEaHmdvb2dsZS9wcm90b2J1",
             "Zi9kdXJhdGlvbi5wcm90bxofZ29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5w",
-            "cm90byL5AQoMQ2hlY2tSZXF1ZXN0EiMKDWNvbnRyb2xfcG9pbnQYASABKAlS",
+            "cm90byLBAgoMQ2hlY2tSZXF1ZXN0EiMKDWNvbnRyb2xfcG9pbnQYASABKAlS",
             "DGNvbnRyb2xQb2ludBJPCgZsYWJlbHMYAiADKAsyNy5hcGVydHVyZS5mbG93",
             "Y29udHJvbC5jaGVjay52MS5DaGVja1JlcXVlc3QuTGFiZWxzRW50cnlSBmxh",
-            "YmVscxIbCglyYW1wX21vZGUYAyABKAhSCHJhbXBNb2RlEhsKCWNhY2hlX2tl",
-            "eRgEIAEoCVIIY2FjaGVLZXkaOQoLTGFiZWxzRW50cnkSEAoDa2V5GAEgASgJ",
-            "UgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ASLMCgoNQ2hlY2tSZXNw",
-            "b25zZRIwCgVzdGFydBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3Rh",
-            "bXBSBXN0YXJ0EiwKA2VuZBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1l",
-            "c3RhbXBSA2VuZBIaCghzZXJ2aWNlcxgEIAMoCVIIc2VydmljZXMSIwoNY29u",
-            "dHJvbF9wb2ludBgFIAEoCVIMY29udHJvbFBvaW50EiYKD2Zsb3dfbGFiZWxf",
-            "a2V5cxgGIAMoCVINZmxvd0xhYmVsS2V5cxJ5ChV0ZWxlbWV0cnlfZmxvd19s",
-            "YWJlbHMYByADKAsyRS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5D",
-            "aGVja1Jlc3BvbnNlLlRlbGVtZXRyeUZsb3dMYWJlbHNFbnRyeVITdGVsZW1l",
-            "dHJ5Rmxvd0xhYmVscxJeCg1kZWNpc2lvbl90eXBlGAggASgOMjkuYXBlcnR1",
-            "cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2hlY2tSZXNwb25zZS5EZWNpc2lv",
-            "blR5cGVSDGRlY2lzaW9uVHlwZRJeCg1yZWplY3RfcmVhc29uGAkgASgOMjku",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2hlY2tSZXNwb25zZS5S",
-            "ZWplY3RSZWFzb25SDHJlamVjdFJlYXNvbhJYChBjbGFzc2lmaWVyX2luZm9z",
-            "GAogAygLMi0uYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2xhc3Np",
-            "ZmllckluZm9SD2NsYXNzaWZpZXJJbmZvcxJWChBmbHV4X21ldGVyX2luZm9z",
-            "GAsgAygLMiwuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuRmx1eE1l",
-            "dGVySW5mb1IOZmx1eE1ldGVySW5mb3MSWwoRbGltaXRlcl9kZWNpc2lvbnMY",
-            "DCADKAsyLi5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVy",
-            "RGVjaXNpb25SEGxpbWl0ZXJEZWNpc2lvbnMSNgoJd2FpdF90aW1lGA0gASgL",
-            "MhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUgh3YWl0VGltZRJoChtkZW5p",
-            "ZWRfcmVzcG9uc2Vfc3RhdHVzX2NvZGUYDiABKA4yKS5hcGVydHVyZS5mbG93",
-            "Y29udHJvbC5jaGVjay52MS5TdGF0dXNDb2RlUhhkZW5pZWRSZXNwb25zZVN0",
-            "YXR1c0NvZGUSTQoMY2FjaGVkX3ZhbHVlGA8gASgLMiouYXBlcnR1cmUuZmxv",
-            "d2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVkVmFsdWVSC2NhY2hlZFZhbHVlGkYK",
-            "GFRlbGVtZXRyeUZsb3dMYWJlbHNFbnRyeRIQCgNrZXkYASABKAlSA2tleRIU",
-            "CgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgBIqYBCgxSZWplY3RSZWFzb24SFgoS",
-            "UkVKRUNUX1JFQVNPTl9OT05FEAASHgoaUkVKRUNUX1JFQVNPTl9SQVRFX0xJ",
-            "TUlURUQQARIbChdSRUpFQ1RfUkVBU09OX05PX1RPS0VOUxACEh0KGVJFSkVD",
-            "VF9SRUFTT05fTk9UX1NBTVBMRUQQAxIiCh5SRUpFQ1RfUkVBU09OX05PX01B",
-            "VENISU5HX1JBTVAQBCJGCgxEZWNpc2lvblR5cGUSGgoWREVDSVNJT05fVFlQ",
-            "RV9BQ0NFUFRFRBAAEhoKFkRFQ0lTSU9OX1RZUEVfUkVKRUNURUQQASLwAQoL",
-            "Q2FjaGVkVmFsdWUSFAoFdmFsdWUYASABKAxSBXZhbHVlElUKDWxvb2t1cF9z",
-            "dGF0dXMYAiABKA4yMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5D",
-            "YWNoZUxvb2t1cFN0YXR1c1IMbG9va3VwU3RhdHVzEl4KEG9wZXJhdGlvbl9z",
-            "dGF0dXMYAyABKA4yMy5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5D",
-            "YWNoZU9wZXJhdGlvblN0YXR1c1IPb3BlcmF0aW9uU3RhdHVzEhQKBWVycm9y",
-            "GAQgASgJUgVlcnJvciKOAQoSQ2FjaGVVcHNlcnRSZXF1ZXN0EiMKDWNvbnRy",
-            "b2xfcG9pbnQYASABKAlSDGNvbnRyb2xQb2ludBIQCgNrZXkYAiABKAlSA2tl",
-            "eRIUCgV2YWx1ZRgDIAEoDFIFdmFsdWUSKwoDdHRsGAQgASgLMhkuZ29vZ2xl",
-            "LnByb3RvYnVmLkR1cmF0aW9uUgN0dGwiiwEKE0NhY2hlVXBzZXJ0UmVzcG9u",
-            "c2USXgoQb3BlcmF0aW9uX3N0YXR1cxgBIAEoDjIzLmFwZXJ0dXJlLmZsb3dj",
-            "b250cm9sLmNoZWNrLnYxLkNhY2hlT3BlcmF0aW9uU3RhdHVzUg9vcGVyYXRp",
-            "b25TdGF0dXMSFAoFZXJyb3IYAiABKAlSBWVycm9yIksKEkNhY2hlRGVsZXRl",
-            "UmVxdWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJUgxjb250cm9sUG9pbnQS",
-            "EAoDa2V5GAIgASgJUgNrZXkiiwEKE0NhY2hlRGVsZXRlUmVzcG9uc2USXgoQ",
-            "b3BlcmF0aW9uX3N0YXR1cxgBIAEoDjIzLmFwZXJ0dXJlLmZsb3djb250cm9s",
-            "LmNoZWNrLnYxLkNhY2hlT3BlcmF0aW9uU3RhdHVzUg9vcGVyYXRpb25TdGF0",
-            "dXMSFAoFZXJyb3IYAiABKAlSBWVycm9yIu0CCg5DbGFzc2lmaWVySW5mbxIf",
-            "Cgtwb2xpY3lfbmFtZRgBIAEoCVIKcG9saWN5TmFtZRIfCgtwb2xpY3lfaGFz",
-            "aBgCIAEoCVIKcG9saWN5SGFzaBIpChBjbGFzc2lmaWVyX2luZGV4GAMgASgD",
-            "Ug9jbGFzc2lmaWVySW5kZXgSSQoFZXJyb3IYBSABKA4yMy5hcGVydHVyZS5m",
-            "bG93Y29udHJvbC5jaGVjay52MS5DbGFzc2lmaWVySW5mby5FcnJvclIFZXJy",
-            "b3IiogEKBUVycm9yEg4KCkVSUk9SX05PTkUQABIVChFFUlJPUl9FVkFMX0ZB",
-            "SUxFRBABEhkKFUVSUk9SX0VNUFRZX1JFU1VMVFNFVBACEh0KGUVSUk9SX0FN",
-            "QklHVU9VU19SRVNVTFRTRVQQAxIaChZFUlJPUl9NVUxUSV9FWFBSRVNTSU9O",
-            "EAQSHAoYRVJST1JfRVhQUkVTU0lPTl9OT1RfTUFQEAUipgwKD0xpbWl0ZXJE",
-            "ZWNpc2lvbhIfCgtwb2xpY3lfbmFtZRgBIAEoCVIKcG9saWN5TmFtZRIfCgtw",
-            "b2xpY3lfaGFzaBgCIAEoCVIKcG9saWN5SGFzaBIhCgxjb21wb25lbnRfaWQY",
-            "AyABKAlSC2NvbXBvbmVudElkEhgKB2Ryb3BwZWQYBCABKAhSB2Ryb3BwZWQS",
-            "VAoGcmVhc29uGAUgASgOMjwuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2su",
-            "djEuTGltaXRlckRlY2lzaW9uLkxpbWl0ZXJSZWFzb25SBnJlYXNvbhJoChtk",
-            "ZW5pZWRfcmVzcG9uc2Vfc3RhdHVzX2NvZGUYCiABKA4yKS5hcGVydHVyZS5m",
-            "bG93Y29udHJvbC5jaGVjay52MS5TdGF0dXNDb2RlUhhkZW5pZWRSZXNwb25z",
-            "ZVN0YXR1c0NvZGUSNgoJd2FpdF90aW1lGAsgASgLMhkuZ29vZ2xlLnByb3Rv",
-            "YnVmLkR1cmF0aW9uUgh3YWl0VGltZRJsChFyYXRlX2xpbWl0ZXJfaW5mbxgU",
-            "IAEoCzI+LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0ZXJE",
-            "ZWNpc2lvbi5SYXRlTGltaXRlckluZm9IAFIPcmF0ZUxpbWl0ZXJJbmZvEm4K",
-            "E2xvYWRfc2NoZWR1bGVyX2luZm8YFSABKAsyPC5hcGVydHVyZS5mbG93Y29u",
-            "dHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uU2NoZWR1bGVySW5mb0gA",
-            "UhFsb2FkU2NoZWR1bGVySW5mbxJfCgxzYW1wbGVyX2luZm8YFiABKAsyOi5h",
-            "cGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24u",
-            "U2FtcGxlckluZm9IAFILc2FtcGxlckluZm8SdQoUcXVvdGFfc2NoZWR1bGVy",
-            "X2luZm8YFyABKAsyQS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5M",
-            "aW1pdGVyRGVjaXNpb24uUXVvdGFTY2hlZHVsZXJJbmZvSABSEnF1b3RhU2No",
-            "ZWR1bGVySW5mbxpgCgpUb2tlbnNJbmZvEhwKCXJlbWFpbmluZxgBIAEoAVIJ",
-            "cmVtYWluaW5nEhgKB2N1cnJlbnQYAiABKAFSB2N1cnJlbnQSGgoIY29uc3Vt",
-            "ZWQYAyABKAFSCGNvbnN1bWVkGoMBCg9SYXRlTGltaXRlckluZm8SFAoFbGFi",
-            "ZWwYASABKAlSBWxhYmVsEloKC3Rva2Vuc19pbmZvGAIgASgLMjkuYXBlcnR1",
-            "cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuTGltaXRlckRlY2lzaW9uLlRva2Vu",
-            "c0luZm9SCnRva2Vuc0luZm8argEKDVNjaGVkdWxlckluZm8SJQoOd29ya2xv",
-            "YWRfaW5kZXgYASABKAlSDXdvcmtsb2FkSW5kZXgSWgoLdG9rZW5zX2luZm8Y",
-            "AiABKAsyOS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVy",
-            "RGVjaXNpb24uVG9rZW5zSW5mb1IKdG9rZW5zSW5mbxIaCghwcmlvcml0eRgD",
-            "IAEoAVIIcHJpb3JpdHkaIwoLU2FtcGxlckluZm8SFAoFbGFiZWwYASABKAlS",
-            "BWxhYmVsGskBChJRdW90YVNjaGVkdWxlckluZm8SFAoFbGFiZWwYASABKAlS",
-            "BWxhYmVsEiUKDndvcmtsb2FkX2luZGV4GAIgASgJUg13b3JrbG9hZEluZGV4",
-            "EloKC3Rva2Vuc19pbmZvGAMgASgLMjkuYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
-            "Y2hlY2sudjEuTGltaXRlckRlY2lzaW9uLlRva2Vuc0luZm9SCnRva2Vuc0lu",
-            "Zm8SGgoIcHJpb3JpdHkYBCABKAFSCHByaW9yaXR5IlEKDUxpbWl0ZXJSZWFz",
-            "b24SHgoaTElNSVRFUl9SRUFTT05fVU5TUEVDSUZJRUQQABIgChxMSU1JVEVS",
-            "X1JFQVNPTl9LRVlfTk9UX0ZPVU5EEAFCCQoHZGV0YWlscyI3Cg1GbHV4TWV0",
-            "ZXJJbmZvEiYKD2ZsdXhfbWV0ZXJfbmFtZRgBIAEoCVINZmx1eE1ldGVyTmFt",
-            "ZSomChFDYWNoZUxvb2t1cFN0YXR1cxIHCgNISVQQABIICgRNSVNTEAEqLgoU",
-            "Q2FjaGVPcGVyYXRpb25TdGF0dXMSCwoHU1VDQ0VTUxAAEgkKBUVSUk9SEAEq",
-            "tQkKClN0YXR1c0NvZGUSCQoFRW1wdHkQABIMCghDb250aW51ZRBkEgcKAk9L",
-            "EMgBEgwKB0NyZWF0ZWQQyQESDQoIQWNjZXB0ZWQQygESIAobTm9uQXV0aG9y",
-            "aXRhdGl2ZUluZm9ybWF0aW9uEMsBEg4KCU5vQ29udGVudBDMARIRCgxSZXNl",
-            "dENvbnRlbnQQzQESEwoOUGFydGlhbENvbnRlbnQQzgESEAoLTXVsdGlTdGF0",
-            "dXMQzwESFAoPQWxyZWFkeVJlcG9ydGVkENABEgsKBklNVXNlZBDiARIUCg9N",
-            "dWx0aXBsZUNob2ljZXMQrAISFQoQTW92ZWRQZXJtYW5lbnRseRCtAhIKCgVG",
-            "b3VuZBCuAhINCghTZWVPdGhlchCvAhIQCgtOb3RNb2RpZmllZBCwAhINCghV",
-            "c2VQcm94eRCxAhIWChFUZW1wb3JhcnlSZWRpcmVjdBCzAhIWChFQZXJtYW5l",
-            "bnRSZWRpcmVjdBC0AhIPCgpCYWRSZXF1ZXN0EJADEhEKDFVuYXV0aG9yaXpl",
-            "ZBCRAxIUCg9QYXltZW50UmVxdWlyZWQQkgMSDgoJRm9yYmlkZGVuEJMDEg0K",
-            "CE5vdEZvdW5kEJQDEhUKEE1ldGhvZE5vdEFsbG93ZWQQlQMSEgoNTm90QWNj",
-            "ZXB0YWJsZRCWAxIgChtQcm94eUF1dGhlbnRpY2F0aW9uUmVxdWlyZWQQlwMS",
-            "EwoOUmVxdWVzdFRpbWVvdXQQmAMSDQoIQ29uZmxpY3QQmQMSCQoER29uZRCa",
-            "AxITCg5MZW5ndGhSZXF1aXJlZBCbAxIXChJQcmVjb25kaXRpb25GYWlsZWQQ",
-            "nAMSFAoPUGF5bG9hZFRvb0xhcmdlEJ0DEg8KClVSSVRvb0xvbmcQngMSGQoU",
-            "VW5zdXBwb3J0ZWRNZWRpYVR5cGUQnwMSGAoTUmFuZ2VOb3RTYXRpc2ZpYWJs",
-            "ZRCgAxIWChFFeHBlY3RhdGlvbkZhaWxlZBChAxIXChJNaXNkaXJlY3RlZFJl",
-            "cXVlc3QQpQMSGAoTVW5wcm9jZXNzYWJsZUVudGl0eRCmAxILCgZMb2NrZWQQ",
-            "pwMSFQoQRmFpbGVkRGVwZW5kZW5jeRCoAxIUCg9VcGdyYWRlUmVxdWlyZWQQ",
-            "qgMSGQoUUHJlY29uZGl0aW9uUmVxdWlyZWQQrAMSFAoPVG9vTWFueVJlcXVl",
-            "c3RzEK0DEiAKG1JlcXVlc3RIZWFkZXJGaWVsZHNUb29MYXJnZRCvAxIYChNJ",
-            "bnRlcm5hbFNlcnZlckVycm9yEPQDEhMKDk5vdEltcGxlbWVudGVkEPUDEg8K",
-            "CkJhZEdhdGV3YXkQ9gMSFwoSU2VydmljZVVuYXZhaWxhYmxlEPcDEhMKDkdh",
-            "dGV3YXlUaW1lb3V0EPgDEhwKF0hUVFBWZXJzaW9uTm90U3VwcG9ydGVkEPkD",
-            "EhoKFVZhcmlhbnRBbHNvTmVnb3RpYXRlcxD6AxIYChNJbnN1ZmZpY2llbnRT",
-            "dG9yYWdlEPsDEhEKDExvb3BEZXRlY3RlZBD8AxIQCgtOb3RFeHRlbmRlZBD+",
-            "AxIiCh1OZXR3b3JrQXV0aGVudGljYXRpb25SZXF1aXJlZBD/AzLqAgoSRmxv",
-            "d0NvbnRyb2xTZXJ2aWNlEmQKBUNoZWNrEisuYXBlcnR1cmUuZmxvd2NvbnRy",
-            "b2wuY2hlY2sudjEuQ2hlY2tSZXF1ZXN0GiwuYXBlcnR1cmUuZmxvd2NvbnRy",
-            "b2wuY2hlY2sudjEuQ2hlY2tSZXNwb25zZSIAEnYKC0NhY2hlVXBzZXJ0EjEu",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVVcHNlcnRSZXF1",
-            "ZXN0GjIuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVVcHNl",
-            "cnRSZXNwb25zZSIAEnYKC0NhY2hlRGVsZXRlEjEuYXBlcnR1cmUuZmxvd2Nv",
-            "bnRyb2wuY2hlY2sudjEuQ2FjaGVEZWxldGVSZXF1ZXN0GjIuYXBlcnR1cmUu",
-            "Zmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVEZWxldGVSZXNwb25zZSIAQsYB",
-            "CiFjb20uYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjFCCkNoZWNrUHJv",
-            "dG9QAaICA0FGQ6oCHUFwZXJ0dXJlLkZsb3djb250cm9sLkNoZWNrLlYxygId",
-            "QXBlcnR1cmVcRmxvd2NvbnRyb2xcQ2hlY2tcVjHiAilBcGVydHVyZVxGbG93",
-            "Y29udHJvbFxDaGVja1xWMVxHUEJNZXRhZGF0YeoCIEFwZXJ0dXJlOjpGbG93",
-            "Y29udHJvbDo6Q2hlY2s6OlYxYgZwcm90bzM="));
+            "YmVscxIbCglyYW1wX21vZGUYAyABKAhSCHJhbXBNb2RlEmMKFGNhY2hlX2xv",
+            "b2t1cF9yZXF1ZXN0GAQgASgLMjEuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hl",
+            "Y2sudjEuQ2FjaGVMb29rdXBSZXF1ZXN0UhJjYWNoZUxvb2t1cFJlcXVlc3Qa",
+            "OQoLTGFiZWxzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiAB",
+            "KAlSBXZhbHVlOgI4ASLlCgoNQ2hlY2tSZXNwb25zZRIwCgVzdGFydBgBIAEo",
+            "CzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBXN0YXJ0EiwKA2VuZBgC",
+            "IAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSA2VuZBIaCghzZXJ2",
+            "aWNlcxgEIAMoCVIIc2VydmljZXMSIwoNY29udHJvbF9wb2ludBgFIAEoCVIM",
+            "Y29udHJvbFBvaW50EiYKD2Zsb3dfbGFiZWxfa2V5cxgGIAMoCVINZmxvd0xh",
+            "YmVsS2V5cxJ5ChV0ZWxlbWV0cnlfZmxvd19sYWJlbHMYByADKAsyRS5hcGVy",
+            "dHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5DaGVja1Jlc3BvbnNlLlRlbGVt",
+            "ZXRyeUZsb3dMYWJlbHNFbnRyeVITdGVsZW1ldHJ5Rmxvd0xhYmVscxJeCg1k",
+            "ZWNpc2lvbl90eXBlGAggASgOMjkuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hl",
+            "Y2sudjEuQ2hlY2tSZXNwb25zZS5EZWNpc2lvblR5cGVSDGRlY2lzaW9uVHlw",
+            "ZRJeCg1yZWplY3RfcmVhc29uGAkgASgOMjkuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2hlY2tSZXNwb25zZS5SZWplY3RSZWFzb25SDHJlamVj",
+            "dFJlYXNvbhJYChBjbGFzc2lmaWVyX2luZm9zGAogAygLMi0uYXBlcnR1cmUu",
+            "Zmxvd2NvbnRyb2wuY2hlY2sudjEuQ2xhc3NpZmllckluZm9SD2NsYXNzaWZp",
+            "ZXJJbmZvcxJWChBmbHV4X21ldGVyX2luZm9zGAsgAygLMiwuYXBlcnR1cmUu",
+            "Zmxvd2NvbnRyb2wuY2hlY2sudjEuRmx1eE1ldGVySW5mb1IOZmx1eE1ldGVy",
+            "SW5mb3MSWwoRbGltaXRlcl9kZWNpc2lvbnMYDCADKAsyLi5hcGVydHVyZS5m",
+            "bG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb25SEGxpbWl0ZXJE",
+            "ZWNpc2lvbnMSNgoJd2FpdF90aW1lGA0gASgLMhkuZ29vZ2xlLnByb3RvYnVm",
+            "LkR1cmF0aW9uUgh3YWl0VGltZRJoChtkZW5pZWRfcmVzcG9uc2Vfc3RhdHVz",
+            "X2NvZGUYDiABKA4yKS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5T",
+            "dGF0dXNDb2RlUhhkZW5pZWRSZXNwb25zZVN0YXR1c0NvZGUSZgoVY2FjaGVf",
+            "bG9va3VwX3Jlc3BvbnNlGA8gASgLMjIuYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
+            "Y2hlY2sudjEuQ2FjaGVMb29rdXBSZXNwb25zZVITY2FjaGVMb29rdXBSZXNw",
+            "b25zZRpGChhUZWxlbWV0cnlGbG93TGFiZWxzRW50cnkSEAoDa2V5GAEgASgJ",
+            "UgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ASKmAQoMUmVqZWN0UmVh",
+            "c29uEhYKElJFSkVDVF9SRUFTT05fTk9ORRAAEh4KGlJFSkVDVF9SRUFTT05f",
+            "UkFURV9MSU1JVEVEEAESGwoXUkVKRUNUX1JFQVNPTl9OT19UT0tFTlMQAhId",
+            "ChlSRUpFQ1RfUkVBU09OX05PVF9TQU1QTEVEEAMSIgoeUkVKRUNUX1JFQVNP",
+            "Tl9OT19NQVRDSElOR19SQU1QEAQiRgoMRGVjaXNpb25UeXBlEhoKFkRFQ0lT",
+            "SU9OX1RZUEVfQUNDRVBURUQQABIaChZERUNJU0lPTl9UWVBFX1JFSkVDVEVE",
+            "EAEi9gEKEUtleUxvb2t1cFJlc3BvbnNlEhQKBXZhbHVlGAEgASgMUgV2YWx1",
+            "ZRJVCg1sb29rdXBfc3RhdHVzGAIgASgOMjAuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVMb29rdXBTdGF0dXNSDGxvb2t1cFN0YXR1cxJe",
+            "ChBvcGVyYXRpb25fc3RhdHVzGAMgASgOMjMuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVPcGVyYXRpb25TdGF0dXNSD29wZXJhdGlvblN0",
+            "YXR1cxIUCgVlcnJvchgEIAEoCVIFZXJyb3IigQMKEkNhY2hlVXBzZXJ0UmVx",
+            "dWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJUgxjb250cm9sUG9pbnQSVwoS",
+            "cmVzdWx0X2NhY2hlX2VudHJ5GAIgASgLMikuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVFbnRyeVIQcmVzdWx0Q2FjaGVFbnRyeRJ7ChRn",
+            "bG9iYWxfY2FjaGVfZW50cmllcxgDIAMoCzJJLmFwZXJ0dXJlLmZsb3djb250",
+            "cm9sLmNoZWNrLnYxLkNhY2hlVXBzZXJ0UmVxdWVzdC5HbG9iYWxDYWNoZUVu",
+            "dHJpZXNFbnRyeVISZ2xvYmFsQ2FjaGVFbnRyaWVzGnAKF0dsb2JhbENhY2hl",
+            "RW50cmllc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5Ej8KBXZhbHVlGAIgASgL",
+            "MikuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVFbnRyeVIF",
+            "dmFsdWU6AjgBImEKCkNhY2hlRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoF",
+            "dmFsdWUYAiABKAxSBXZhbHVlEisKA3R0bBgDIAEoCzIZLmdvb2dsZS5wcm90",
+            "b2J1Zi5EdXJhdGlvblIDdHRsIvsCChNDYWNoZVVwc2VydFJlc3BvbnNlEmQK",
+            "FXJlc3VsdF9jYWNoZV9yZXNwb25zZRgBIAEoCzIwLmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLktleVVwc2VydFJlc3BvbnNlUhNyZXN1bHRDYWNo",
+            "ZVJlc3BvbnNlEoIBChZnbG9iYWxfY2FjaGVfcmVzcG9uc2VzGAIgAygLMkwu",
+            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVVcHNlcnRSZXNw",
+            "b25zZS5HbG9iYWxDYWNoZVJlc3BvbnNlc0VudHJ5UhRnbG9iYWxDYWNoZVJl",
+            "c3BvbnNlcxp5ChlHbG9iYWxDYWNoZVJlc3BvbnNlc0VudHJ5EhAKA2tleRgB",
+            "IAEoCVIDa2V5EkYKBXZhbHVlGAIgASgLMjAuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuS2V5VXBzZXJ0UmVzcG9uc2VSBXZhbHVlOgI4ASKJAQoR",
+            "S2V5VXBzZXJ0UmVzcG9uc2USXgoQb3BlcmF0aW9uX3N0YXR1cxgBIAEoDjIz",
+            "LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkNhY2hlT3BlcmF0aW9u",
+            "U3RhdHVzUg9vcGVyYXRpb25TdGF0dXMSFAoFZXJyb3IYAiABKAlSBWVycm9y",
+            "Io8BChJDYWNoZURlbGV0ZVJlcXVlc3QSIwoNY29udHJvbF9wb2ludBgBIAEo",
+            "CVIMY29udHJvbFBvaW50EigKEHJlc3VsdF9jYWNoZV9rZXkYAiABKAlSDnJl",
+            "c3VsdENhY2hlS2V5EioKEWdsb2JhbF9jYWNoZV9rZXlzGAMgAygJUg9nbG9i",
+            "YWxDYWNoZUtleXMi+wIKE0NhY2hlRGVsZXRlUmVzcG9uc2USZAoVcmVzdWx0",
+            "X2NhY2hlX3Jlc3BvbnNlGAEgASgLMjAuYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
+            "Y2hlY2sudjEuS2V5RGVsZXRlUmVzcG9uc2VSE3Jlc3VsdENhY2hlUmVzcG9u",
+            "c2USggEKFmdsb2JhbF9jYWNoZV9yZXNwb25zZXMYAiADKAsyTC5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZURlbGV0ZVJlc3BvbnNlLkds",
+            "b2JhbENhY2hlUmVzcG9uc2VzRW50cnlSFGdsb2JhbENhY2hlUmVzcG9uc2Vz",
+            "GnkKGUdsb2JhbENhY2hlUmVzcG9uc2VzRW50cnkSEAoDa2V5GAEgASgJUgNr",
+            "ZXkSRgoFdmFsdWUYAiABKAsyMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVj",
+            "ay52MS5LZXlEZWxldGVSZXNwb25zZVIFdmFsdWU6AjgBIokBChFLZXlEZWxl",
+            "dGVSZXNwb25zZRJeChBvcGVyYXRpb25fc3RhdHVzGAEgASgOMjMuYXBlcnR1",
+            "cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVPcGVyYXRpb25TdGF0dXNS",
+            "D29wZXJhdGlvblN0YXR1cxIUCgVlcnJvchgCIAEoCVIFZXJyb3IijwEKEkNh",
+            "Y2hlTG9va3VwUmVxdWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJUgxjb250",
+            "cm9sUG9pbnQSKAoQcmVzdWx0X2NhY2hlX2tleRgCIAEoCVIOcmVzdWx0Q2Fj",
+            "aGVLZXkSKgoRZ2xvYmFsX2NhY2hlX2tleXMYAyADKAlSD2dsb2JhbENhY2hl",
+            "S2V5cyL7AgoTQ2FjaGVMb29rdXBSZXNwb25zZRJkChVyZXN1bHRfY2FjaGVf",
+            "cmVzcG9uc2UYASABKAsyMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
+            "MS5LZXlMb29rdXBSZXNwb25zZVITcmVzdWx0Q2FjaGVSZXNwb25zZRKCAQoW",
+            "Z2xvYmFsX2NhY2hlX3Jlc3BvbnNlcxgCIAMoCzJMLmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLkNhY2hlTG9va3VwUmVzcG9uc2UuR2xvYmFsQ2Fj",
+            "aGVSZXNwb25zZXNFbnRyeVIUZ2xvYmFsQ2FjaGVSZXNwb25zZXMaeQoZR2xv",
+            "YmFsQ2FjaGVSZXNwb25zZXNFbnRyeRIQCgNrZXkYASABKAlSA2tleRJGCgV2",
+            "YWx1ZRgCIAEoCzIwLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLktl",
+            "eUxvb2t1cFJlc3BvbnNlUgV2YWx1ZToCOAEi7QIKDkNsYXNzaWZpZXJJbmZv",
+            "Eh8KC3BvbGljeV9uYW1lGAEgASgJUgpwb2xpY3lOYW1lEh8KC3BvbGljeV9o",
+            "YXNoGAIgASgJUgpwb2xpY3lIYXNoEikKEGNsYXNzaWZpZXJfaW5kZXgYAyAB",
+            "KANSD2NsYXNzaWZpZXJJbmRleBJJCgVlcnJvchgFIAEoDjIzLmFwZXJ0dXJl",
+            "LmZsb3djb250cm9sLmNoZWNrLnYxLkNsYXNzaWZpZXJJbmZvLkVycm9yUgVl",
+            "cnJvciKiAQoFRXJyb3ISDgoKRVJST1JfTk9ORRAAEhUKEUVSUk9SX0VWQUxf",
+            "RkFJTEVEEAESGQoVRVJST1JfRU1QVFlfUkVTVUxUU0VUEAISHQoZRVJST1Jf",
+            "QU1CSUdVT1VTX1JFU1VMVFNFVBADEhoKFkVSUk9SX01VTFRJX0VYUFJFU1NJ",
+            "T04QBBIcChhFUlJPUl9FWFBSRVNTSU9OX05PVF9NQVAQBSKmDAoPTGltaXRl",
+            "ckRlY2lzaW9uEh8KC3BvbGljeV9uYW1lGAEgASgJUgpwb2xpY3lOYW1lEh8K",
+            "C3BvbGljeV9oYXNoGAIgASgJUgpwb2xpY3lIYXNoEiEKDGNvbXBvbmVudF9p",
+            "ZBgDIAEoCVILY29tcG9uZW50SWQSGAoHZHJvcHBlZBgEIAEoCFIHZHJvcHBl",
+            "ZBJUCgZyZWFzb24YBSABKA4yPC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVj",
+            "ay52MS5MaW1pdGVyRGVjaXNpb24uTGltaXRlclJlYXNvblIGcmVhc29uEmgK",
+            "G2RlbmllZF9yZXNwb25zZV9zdGF0dXNfY29kZRgKIAEoDjIpLmFwZXJ0dXJl",
+            "LmZsb3djb250cm9sLmNoZWNrLnYxLlN0YXR1c0NvZGVSGGRlbmllZFJlc3Bv",
+            "bnNlU3RhdHVzQ29kZRI2Cgl3YWl0X3RpbWUYCyABKAsyGS5nb29nbGUucHJv",
+            "dG9idWYuRHVyYXRpb25SCHdhaXRUaW1lEmwKEXJhdGVfbGltaXRlcl9pbmZv",
+            "GBQgASgLMj4uYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuTGltaXRl",
+            "ckRlY2lzaW9uLlJhdGVMaW1pdGVySW5mb0gAUg9yYXRlTGltaXRlckluZm8S",
+            "bgoTbG9hZF9zY2hlZHVsZXJfaW5mbxgVIAEoCzI8LmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLkxpbWl0ZXJEZWNpc2lvbi5TY2hlZHVsZXJJbmZv",
+            "SABSEWxvYWRTY2hlZHVsZXJJbmZvEl8KDHNhbXBsZXJfaW5mbxgWIAEoCzI6",
+            "LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0ZXJEZWNpc2lv",
+            "bi5TYW1wbGVySW5mb0gAUgtzYW1wbGVySW5mbxJ1ChRxdW90YV9zY2hlZHVs",
+            "ZXJfaW5mbxgXIAEoCzJBLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYx",
+            "LkxpbWl0ZXJEZWNpc2lvbi5RdW90YVNjaGVkdWxlckluZm9IAFIScXVvdGFT",
+            "Y2hlZHVsZXJJbmZvGmAKClRva2Vuc0luZm8SHAoJcmVtYWluaW5nGAEgASgB",
+            "UglyZW1haW5pbmcSGAoHY3VycmVudBgCIAEoAVIHY3VycmVudBIaCghjb25z",
+            "dW1lZBgDIAEoAVIIY29uc3VtZWQagwEKD1JhdGVMaW1pdGVySW5mbxIUCgVs",
+            "YWJlbBgBIAEoCVIFbGFiZWwSWgoLdG9rZW5zX2luZm8YAiABKAsyOS5hcGVy",
+            "dHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uVG9r",
+            "ZW5zSW5mb1IKdG9rZW5zSW5mbxquAQoNU2NoZWR1bGVySW5mbxIlCg53b3Jr",
+            "bG9hZF9pbmRleBgBIAEoCVINd29ya2xvYWRJbmRleBJaCgt0b2tlbnNfaW5m",
+            "bxgCIAEoCzI5LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0",
+            "ZXJEZWNpc2lvbi5Ub2tlbnNJbmZvUgp0b2tlbnNJbmZvEhoKCHByaW9yaXR5",
+            "GAMgASgBUghwcmlvcml0eRojCgtTYW1wbGVySW5mbxIUCgVsYWJlbBgBIAEo",
+            "CVIFbGFiZWwayQEKElF1b3RhU2NoZWR1bGVySW5mbxIUCgVsYWJlbBgBIAEo",
+            "CVIFbGFiZWwSJQoOd29ya2xvYWRfaW5kZXgYAiABKAlSDXdvcmtsb2FkSW5k",
+            "ZXgSWgoLdG9rZW5zX2luZm8YAyABKAsyOS5hcGVydHVyZS5mbG93Y29udHJv",
+            "bC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uVG9rZW5zSW5mb1IKdG9rZW5z",
+            "SW5mbxIaCghwcmlvcml0eRgEIAEoAVIIcHJpb3JpdHkiUQoNTGltaXRlclJl",
+            "YXNvbhIeChpMSU1JVEVSX1JFQVNPTl9VTlNQRUNJRklFRBAAEiAKHExJTUlU",
+            "RVJfUkVBU09OX0tFWV9OT1RfRk9VTkQQAUIJCgdkZXRhaWxzIjcKDUZsdXhN",
+            "ZXRlckluZm8SJgoPZmx1eF9tZXRlcl9uYW1lGAEgASgJUg1mbHV4TWV0ZXJO",
+            "YW1lKiYKEUNhY2hlTG9va3VwU3RhdHVzEgcKA0hJVBAAEggKBE1JU1MQASou",
+            "ChRDYWNoZU9wZXJhdGlvblN0YXR1cxILCgdTVUNDRVNTEAASCQoFRVJST1IQ",
+            "ASq1CQoKU3RhdHVzQ29kZRIJCgVFbXB0eRAAEgwKCENvbnRpbnVlEGQSBwoC",
+            "T0sQyAESDAoHQ3JlYXRlZBDJARINCghBY2NlcHRlZBDKARIgChtOb25BdXRo",
+            "b3JpdGF0aXZlSW5mb3JtYXRpb24QywESDgoJTm9Db250ZW50EMwBEhEKDFJl",
+            "c2V0Q29udGVudBDNARITCg5QYXJ0aWFsQ29udGVudBDOARIQCgtNdWx0aVN0",
+            "YXR1cxDPARIUCg9BbHJlYWR5UmVwb3J0ZWQQ0AESCwoGSU1Vc2VkEOIBEhQK",
+            "D011bHRpcGxlQ2hvaWNlcxCsAhIVChBNb3ZlZFBlcm1hbmVudGx5EK0CEgoK",
+            "BUZvdW5kEK4CEg0KCFNlZU90aGVyEK8CEhAKC05vdE1vZGlmaWVkELACEg0K",
+            "CFVzZVByb3h5ELECEhYKEVRlbXBvcmFyeVJlZGlyZWN0ELMCEhYKEVBlcm1h",
+            "bmVudFJlZGlyZWN0ELQCEg8KCkJhZFJlcXVlc3QQkAMSEQoMVW5hdXRob3Jp",
+            "emVkEJEDEhQKD1BheW1lbnRSZXF1aXJlZBCSAxIOCglGb3JiaWRkZW4QkwMS",
+            "DQoITm90Rm91bmQQlAMSFQoQTWV0aG9kTm90QWxsb3dlZBCVAxISCg1Ob3RB",
+            "Y2NlcHRhYmxlEJYDEiAKG1Byb3h5QXV0aGVudGljYXRpb25SZXF1aXJlZBCX",
+            "AxITCg5SZXF1ZXN0VGltZW91dBCYAxINCghDb25mbGljdBCZAxIJCgRHb25l",
+            "EJoDEhMKDkxlbmd0aFJlcXVpcmVkEJsDEhcKElByZWNvbmRpdGlvbkZhaWxl",
+            "ZBCcAxIUCg9QYXlsb2FkVG9vTGFyZ2UQnQMSDwoKVVJJVG9vTG9uZxCeAxIZ",
+            "ChRVbnN1cHBvcnRlZE1lZGlhVHlwZRCfAxIYChNSYW5nZU5vdFNhdGlzZmlh",
+            "YmxlEKADEhYKEUV4cGVjdGF0aW9uRmFpbGVkEKEDEhcKEk1pc2RpcmVjdGVk",
+            "UmVxdWVzdBClAxIYChNVbnByb2Nlc3NhYmxlRW50aXR5EKYDEgsKBkxvY2tl",
+            "ZBCnAxIVChBGYWlsZWREZXBlbmRlbmN5EKgDEhQKD1VwZ3JhZGVSZXF1aXJl",
+            "ZBCqAxIZChRQcmVjb25kaXRpb25SZXF1aXJlZBCsAxIUCg9Ub29NYW55UmVx",
+            "dWVzdHMQrQMSIAobUmVxdWVzdEhlYWRlckZpZWxkc1Rvb0xhcmdlEK8DEhgK",
+            "E0ludGVybmFsU2VydmVyRXJyb3IQ9AMSEwoOTm90SW1wbGVtZW50ZWQQ9QMS",
+            "DwoKQmFkR2F0ZXdheRD2AxIXChJTZXJ2aWNlVW5hdmFpbGFibGUQ9wMSEwoO",
+            "R2F0ZXdheVRpbWVvdXQQ+AMSHAoXSFRUUFZlcnNpb25Ob3RTdXBwb3J0ZWQQ",
+            "+QMSGgoVVmFyaWFudEFsc29OZWdvdGlhdGVzEPoDEhgKE0luc3VmZmljaWVu",
+            "dFN0b3JhZ2UQ+wMSEQoMTG9vcERldGVjdGVkEPwDEhAKC05vdEV4dGVuZGVk",
+            "EP4DEiIKHU5ldHdvcmtBdXRoZW50aWNhdGlvblJlcXVpcmVkEP8DMuIDChJG",
+            "bG93Q29udHJvbFNlcnZpY2USZAoFQ2hlY2sSKy5hcGVydHVyZS5mbG93Y29u",
+            "dHJvbC5jaGVjay52MS5DaGVja1JlcXVlc3QaLC5hcGVydHVyZS5mbG93Y29u",
+            "dHJvbC5jaGVjay52MS5DaGVja1Jlc3BvbnNlIgASdgoLQ2FjaGVMb29rdXAS",
+            "MS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZUxvb2t1cFJl",
+            "cXVlc3QaMi5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZUxv",
+            "b2t1cFJlc3BvbnNlIgASdgoLQ2FjaGVVcHNlcnQSMS5hcGVydHVyZS5mbG93",
+            "Y29udHJvbC5jaGVjay52MS5DYWNoZVVwc2VydFJlcXVlc3QaMi5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZVVwc2VydFJlc3BvbnNlIgAS",
+            "dgoLQ2FjaGVEZWxldGUSMS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
+            "MS5DYWNoZURlbGV0ZVJlcXVlc3QaMi5hcGVydHVyZS5mbG93Y29udHJvbC5j",
+            "aGVjay52MS5DYWNoZURlbGV0ZVJlc3BvbnNlIgBCxgEKIWNvbS5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MUIKQ2hlY2tQcm90b1ABogIDQUZDqgId",
+            "QXBlcnR1cmUuRmxvd2NvbnRyb2wuQ2hlY2suVjHKAh1BcGVydHVyZVxGbG93",
+            "Y29udHJvbFxDaGVja1xWMeICKUFwZXJ0dXJlXEZsb3djb250cm9sXENoZWNr",
+            "XFYxXEdQQk1ldGFkYXRh6gIgQXBlcnR1cmU6OkZsb3djb250cm9sOjpDaGVj",
+            "azo6VjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.DurationReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus), typeof(global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus), typeof(global::Aperture.Flowcontrol.Check.V1.StatusCode), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckRequest), global::Aperture.Flowcontrol.Check.V1.CheckRequest.Parser, new[]{ "ControlPoint", "Labels", "RampMode", "CacheKey" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse), global::Aperture.Flowcontrol.Check.V1.CheckResponse.Parser, new[]{ "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", "DeniedResponseStatusCode", "CachedValue" }, null, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.RejectReason), typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.DecisionType) }, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CachedValue), global::Aperture.Flowcontrol.Check.V1.CachedValue.Parser, new[]{ "Value", "LookupStatus", "OperationStatus", "Error" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest), global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest.Parser, new[]{ "ControlPoint", "Key", "Value", "Ttl" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse), global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest), global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest.Parser, new[]{ "ControlPoint", "Key" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse), global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckRequest), global::Aperture.Flowcontrol.Check.V1.CheckRequest.Parser, new[]{ "ControlPoint", "Labels", "RampMode", "CacheLookupRequest" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse), global::Aperture.Flowcontrol.Check.V1.CheckResponse.Parser, new[]{ "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", "DeniedResponseStatusCode", "CacheLookupResponse" }, null, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.RejectReason), typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.DecisionType) }, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse), global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse.Parser, new[]{ "Value", "LookupStatus", "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest), global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest.Parser, new[]{ "ControlPoint", "ResultCacheEntry", "GlobalCacheEntries" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheEntry), global::Aperture.Flowcontrol.Check.V1.CacheEntry.Parser, new[]{ "Key", "Value", "Ttl" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse), global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse), global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest), global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "GlobalCacheKeys" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse), global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse), global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest), global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "GlobalCacheKeys" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse), global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.ClassifierInfo), global::Aperture.Flowcontrol.Check.V1.ClassifierInfo.Parser, new[]{ "PolicyName", "PolicyHash", "ClassifierIndex", "Error" }, null, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.ClassifierInfo.Types.Error) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Parser, new[]{ "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "DeniedResponseStatusCode", "WaitTime", "RateLimiterInfo", "LoadSchedulerInfo", "SamplerInfo", "QuotaSchedulerInfo" }, new[]{ "Details" }, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.LimiterReason) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.TokensInfo), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.TokensInfo.Parser, new[]{ "Remaining", "Current", "Consumed" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.RateLimiterInfo), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.RateLimiterInfo.Parser, new[]{ "Label", "TokensInfo" }, null, null, null, null),
@@ -309,7 +357,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       controlPoint_ = other.controlPoint_;
       labels_ = other.labels_.Clone();
       rampMode_ = other.rampMode_;
-      cacheKey_ = other.cacheKey_;
+      cacheLookupRequest_ = other.cacheLookupRequest_ != null ? other.cacheLookupRequest_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -354,18 +402,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "cache_key" field.</summary>
-    public const int CacheKeyFieldNumber = 4;
-    private string cacheKey_ = "";
-    /// <summary>
-    /// Cache item to fetch.
-    /// </summary>
+    /// <summary>Field number for the "cache_lookup_request" field.</summary>
+    public const int CacheLookupRequestFieldNumber = 4;
+    private global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest cacheLookupRequest_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string CacheKey {
-      get { return cacheKey_; }
+    public global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest CacheLookupRequest {
+      get { return cacheLookupRequest_; }
       set {
-        cacheKey_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        cacheLookupRequest_ = value;
       }
     }
 
@@ -387,7 +432,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ControlPoint != other.ControlPoint) return false;
       if (!Labels.Equals(other.Labels)) return false;
       if (RampMode != other.RampMode) return false;
-      if (CacheKey != other.CacheKey) return false;
+      if (!object.Equals(CacheLookupRequest, other.CacheLookupRequest)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -398,7 +443,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
       hash ^= Labels.GetHashCode();
       if (RampMode != false) hash ^= RampMode.GetHashCode();
-      if (CacheKey.Length != 0) hash ^= CacheKey.GetHashCode();
+      if (cacheLookupRequest_ != null) hash ^= CacheLookupRequest.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -426,9 +471,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(24);
         output.WriteBool(RampMode);
       }
-      if (CacheKey.Length != 0) {
+      if (cacheLookupRequest_ != null) {
         output.WriteRawTag(34);
-        output.WriteString(CacheKey);
+        output.WriteMessage(CacheLookupRequest);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -449,9 +494,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(24);
         output.WriteBool(RampMode);
       }
-      if (CacheKey.Length != 0) {
+      if (cacheLookupRequest_ != null) {
         output.WriteRawTag(34);
-        output.WriteString(CacheKey);
+        output.WriteMessage(CacheLookupRequest);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -470,8 +515,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (RampMode != false) {
         size += 1 + 1;
       }
-      if (CacheKey.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(CacheKey);
+      if (cacheLookupRequest_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CacheLookupRequest);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -492,8 +537,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (other.RampMode != false) {
         RampMode = other.RampMode;
       }
-      if (other.CacheKey.Length != 0) {
-        CacheKey = other.CacheKey;
+      if (other.cacheLookupRequest_ != null) {
+        if (cacheLookupRequest_ == null) {
+          CacheLookupRequest = new global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest();
+        }
+        CacheLookupRequest.MergeFrom(other.CacheLookupRequest);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -523,7 +571,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 34: {
-            CacheKey = input.ReadString();
+            if (cacheLookupRequest_ == null) {
+              CacheLookupRequest = new global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest();
+            }
+            input.ReadMessage(CacheLookupRequest);
             break;
           }
         }
@@ -554,7 +605,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 34: {
-            CacheKey = input.ReadString();
+            if (cacheLookupRequest_ == null) {
+              CacheLookupRequest = new global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest();
+            }
+            input.ReadMessage(CacheLookupRequest);
             break;
           }
         }
@@ -614,7 +668,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       limiterDecisions_ = other.limiterDecisions_.Clone();
       waitTime_ = other.waitTime_ != null ? other.waitTime_.Clone() : null;
       deniedResponseStatusCode_ = other.deniedResponseStatusCode_;
-      cachedValue_ = other.cachedValue_ != null ? other.cachedValue_.Clone() : null;
+      cacheLookupResponse_ = other.cacheLookupResponse_ != null ? other.cacheLookupResponse_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -815,18 +869,18 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "cached_value" field.</summary>
-    public const int CachedValueFieldNumber = 15;
-    private global::Aperture.Flowcontrol.Check.V1.CachedValue cachedValue_;
+    /// <summary>Field number for the "cache_lookup_response" field.</summary>
+    public const int CacheLookupResponseFieldNumber = 15;
+    private global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse cacheLookupResponse_;
     /// <summary>
-    /// Matching cached value.
+    /// CacheLookupResponse contains the result of the cache lookup.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Aperture.Flowcontrol.Check.V1.CachedValue CachedValue {
-      get { return cachedValue_; }
+    public global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse CacheLookupResponse {
+      get { return cacheLookupResponse_; }
       set {
-        cachedValue_ = value;
+        cacheLookupResponse_ = value;
       }
     }
 
@@ -858,7 +912,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if(!limiterDecisions_.Equals(other.limiterDecisions_)) return false;
       if (!object.Equals(WaitTime, other.WaitTime)) return false;
       if (DeniedResponseStatusCode != other.DeniedResponseStatusCode) return false;
-      if (!object.Equals(CachedValue, other.CachedValue)) return false;
+      if (!object.Equals(CacheLookupResponse, other.CacheLookupResponse)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -879,7 +933,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       hash ^= limiterDecisions_.GetHashCode();
       if (waitTime_ != null) hash ^= WaitTime.GetHashCode();
       if (DeniedResponseStatusCode != global::Aperture.Flowcontrol.Check.V1.StatusCode.Empty) hash ^= DeniedResponseStatusCode.GetHashCode();
-      if (cachedValue_ != null) hash ^= CachedValue.GetHashCode();
+      if (cacheLookupResponse_ != null) hash ^= CacheLookupResponse.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -932,9 +986,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(112);
         output.WriteEnum((int) DeniedResponseStatusCode);
       }
-      if (cachedValue_ != null) {
+      if (cacheLookupResponse_ != null) {
         output.WriteRawTag(122);
-        output.WriteMessage(CachedValue);
+        output.WriteMessage(CacheLookupResponse);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -980,9 +1034,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(112);
         output.WriteEnum((int) DeniedResponseStatusCode);
       }
-      if (cachedValue_ != null) {
+      if (cacheLookupResponse_ != null) {
         output.WriteRawTag(122);
-        output.WriteMessage(CachedValue);
+        output.WriteMessage(CacheLookupResponse);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1021,8 +1075,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (DeniedResponseStatusCode != global::Aperture.Flowcontrol.Check.V1.StatusCode.Empty) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) DeniedResponseStatusCode);
       }
-      if (cachedValue_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CachedValue);
+      if (cacheLookupResponse_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CacheLookupResponse);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1072,11 +1126,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (other.DeniedResponseStatusCode != global::Aperture.Flowcontrol.Check.V1.StatusCode.Empty) {
         DeniedResponseStatusCode = other.DeniedResponseStatusCode;
       }
-      if (other.cachedValue_ != null) {
-        if (cachedValue_ == null) {
-          CachedValue = new global::Aperture.Flowcontrol.Check.V1.CachedValue();
+      if (other.cacheLookupResponse_ != null) {
+        if (cacheLookupResponse_ == null) {
+          CacheLookupResponse = new global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse();
         }
-        CachedValue.MergeFrom(other.CachedValue);
+        CacheLookupResponse.MergeFrom(other.CacheLookupResponse);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1155,10 +1209,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 122: {
-            if (cachedValue_ == null) {
-              CachedValue = new global::Aperture.Flowcontrol.Check.V1.CachedValue();
+            if (cacheLookupResponse_ == null) {
+              CacheLookupResponse = new global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse();
             }
-            input.ReadMessage(CachedValue);
+            input.ReadMessage(CacheLookupResponse);
             break;
           }
         }
@@ -1238,10 +1292,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 122: {
-            if (cachedValue_ == null) {
-              CachedValue = new global::Aperture.Flowcontrol.Check.V1.CachedValue();
+            if (cacheLookupResponse_ == null) {
+              CacheLookupResponse = new global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse();
             }
-            input.ReadMessage(CachedValue);
+            input.ReadMessage(CacheLookupResponse);
             break;
           }
         }
@@ -1278,16 +1332,16 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
   }
 
-  public sealed partial class CachedValue : pb::IMessage<CachedValue>
+  public sealed partial class KeyLookupResponse : pb::IMessage<KeyLookupResponse>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<CachedValue> _parser = new pb::MessageParser<CachedValue>(() => new CachedValue());
+    private static readonly pb::MessageParser<KeyLookupResponse> _parser = new pb::MessageParser<KeyLookupResponse>(() => new KeyLookupResponse());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<CachedValue> Parser { get { return _parser; } }
+    public static pb::MessageParser<KeyLookupResponse> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1303,7 +1357,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CachedValue() {
+    public KeyLookupResponse() {
       OnConstruction();
     }
 
@@ -1311,7 +1365,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CachedValue(CachedValue other) : this() {
+    public KeyLookupResponse(KeyLookupResponse other) : this() {
       value_ = other.value_;
       lookupStatus_ = other.lookupStatus_;
       operationStatus_ = other.operationStatus_;
@@ -1321,8 +1375,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CachedValue Clone() {
-      return new CachedValue(this);
+    public KeyLookupResponse Clone() {
+      return new KeyLookupResponse(this);
     }
 
     /// <summary>Field number for the "value" field.</summary>
@@ -1376,12 +1430,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as CachedValue);
+      return Equals(other as KeyLookupResponse);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(CachedValue other) {
+    public bool Equals(KeyLookupResponse other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1493,7 +1547,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(CachedValue other) {
+    public void MergeFrom(KeyLookupResponse other) {
       if (other == null) {
         return;
       }
@@ -1613,9 +1667,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheUpsertRequest(CacheUpsertRequest other) : this() {
       controlPoint_ = other.controlPoint_;
-      key_ = other.key_;
-      value_ = other.value_;
-      ttl_ = other.ttl_ != null ? other.ttl_.Clone() : null;
+      resultCacheEntry_ = other.resultCacheEntry_ != null ? other.resultCacheEntry_.Clone() : null;
+      globalCacheEntries_ = other.globalCacheEntries_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1637,40 +1690,27 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 2;
-    private string key_ = "";
+    /// <summary>Field number for the "result_cache_entry" field.</summary>
+    public const int ResultCacheEntryFieldNumber = 2;
+    private global::Aperture.Flowcontrol.Check.V1.CacheEntry resultCacheEntry_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Key {
-      get { return key_; }
+    public global::Aperture.Flowcontrol.Check.V1.CacheEntry ResultCacheEntry {
+      get { return resultCacheEntry_; }
       set {
-        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        resultCacheEntry_ = value;
       }
     }
 
-    /// <summary>Field number for the "value" field.</summary>
-    public const int ValueFieldNumber = 3;
-    private pb::ByteString value_ = pb::ByteString.Empty;
+    /// <summary>Field number for the "global_cache_entries" field.</summary>
+    public const int GlobalCacheEntriesFieldNumber = 3;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>.Codec _map_globalCacheEntries_codec
+        = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.CacheEntry.Parser), 26);
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> globalCacheEntries_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pb::ByteString Value {
-      get { return value_; }
-      set {
-        value_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "ttl" field.</summary>
-    public const int TtlFieldNumber = 4;
-    private global::Google.Protobuf.WellKnownTypes.Duration ttl_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Google.Protobuf.WellKnownTypes.Duration Ttl {
-      get { return ttl_; }
-      set {
-        ttl_ = value;
-      }
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> GlobalCacheEntries {
+      get { return globalCacheEntries_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1689,9 +1729,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
         return true;
       }
       if (ControlPoint != other.ControlPoint) return false;
-      if (Key != other.Key) return false;
-      if (Value != other.Value) return false;
-      if (!object.Equals(Ttl, other.Ttl)) return false;
+      if (!object.Equals(ResultCacheEntry, other.ResultCacheEntry)) return false;
+      if (!GlobalCacheEntries.Equals(other.GlobalCacheEntries)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1700,9 +1739,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
-      if (Key.Length != 0) hash ^= Key.GetHashCode();
-      if (Value.Length != 0) hash ^= Value.GetHashCode();
-      if (ttl_ != null) hash ^= Ttl.GetHashCode();
+      if (resultCacheEntry_ != null) hash ^= ResultCacheEntry.GetHashCode();
+      hash ^= GlobalCacheEntries.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1725,18 +1763,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteString(ControlPoint);
       }
-      if (Key.Length != 0) {
+      if (resultCacheEntry_ != null) {
         output.WriteRawTag(18);
-        output.WriteString(Key);
+        output.WriteMessage(ResultCacheEntry);
       }
-      if (Value.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteBytes(Value);
-      }
-      if (ttl_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Ttl);
-      }
+      globalCacheEntries_.WriteTo(output, _map_globalCacheEntries_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1751,18 +1782,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteString(ControlPoint);
       }
-      if (Key.Length != 0) {
+      if (resultCacheEntry_ != null) {
         output.WriteRawTag(18);
-        output.WriteString(Key);
+        output.WriteMessage(ResultCacheEntry);
       }
-      if (Value.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteBytes(Value);
-      }
-      if (ttl_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Ttl);
-      }
+      globalCacheEntries_.WriteTo(ref output, _map_globalCacheEntries_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1776,6 +1800,271 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ControlPoint.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ControlPoint);
       }
+      if (resultCacheEntry_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheEntry);
+      }
+      size += globalCacheEntries_.CalculateSize(_map_globalCacheEntries_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CacheUpsertRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ControlPoint.Length != 0) {
+        ControlPoint = other.ControlPoint;
+      }
+      if (other.resultCacheEntry_ != null) {
+        if (resultCacheEntry_ == null) {
+          ResultCacheEntry = new global::Aperture.Flowcontrol.Check.V1.CacheEntry();
+        }
+        ResultCacheEntry.MergeFrom(other.ResultCacheEntry);
+      }
+      globalCacheEntries_.MergeFrom(other.globalCacheEntries_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            ControlPoint = input.ReadString();
+            break;
+          }
+          case 18: {
+            if (resultCacheEntry_ == null) {
+              ResultCacheEntry = new global::Aperture.Flowcontrol.Check.V1.CacheEntry();
+            }
+            input.ReadMessage(ResultCacheEntry);
+            break;
+          }
+          case 26: {
+            globalCacheEntries_.AddEntriesFrom(input, _map_globalCacheEntries_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            ControlPoint = input.ReadString();
+            break;
+          }
+          case 18: {
+            if (resultCacheEntry_ == null) {
+              ResultCacheEntry = new global::Aperture.Flowcontrol.Check.V1.CacheEntry();
+            }
+            input.ReadMessage(ResultCacheEntry);
+            break;
+          }
+          case 26: {
+            globalCacheEntries_.AddEntriesFrom(ref input, _map_globalCacheEntries_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class CacheEntry : pb::IMessage<CacheEntry>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CacheEntry> _parser = new pb::MessageParser<CacheEntry>(() => new CacheEntry());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CacheEntry> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheEntry() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheEntry(CacheEntry other) : this() {
+      key_ = other.key_;
+      value_ = other.value_;
+      ttl_ = other.ttl_ != null ? other.ttl_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheEntry Clone() {
+      return new CacheEntry(this);
+    }
+
+    /// <summary>Field number for the "key" field.</summary>
+    public const int KeyFieldNumber = 1;
+    private string key_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Key {
+      get { return key_; }
+      set {
+        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "value" field.</summary>
+    public const int ValueFieldNumber = 2;
+    private pb::ByteString value_ = pb::ByteString.Empty;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pb::ByteString Value {
+      get { return value_; }
+      set {
+        value_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "ttl" field.</summary>
+    public const int TtlFieldNumber = 3;
+    private global::Google.Protobuf.WellKnownTypes.Duration ttl_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Google.Protobuf.WellKnownTypes.Duration Ttl {
+      get { return ttl_; }
+      set {
+        ttl_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CacheEntry);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CacheEntry other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Key != other.Key) return false;
+      if (Value != other.Value) return false;
+      if (!object.Equals(Ttl, other.Ttl)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Key.Length != 0) hash ^= Key.GetHashCode();
+      if (Value.Length != 0) hash ^= Value.GetHashCode();
+      if (ttl_ != null) hash ^= Ttl.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Key.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Key);
+      }
+      if (Value.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteBytes(Value);
+      }
+      if (ttl_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Ttl);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Key.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Key);
+      }
+      if (Value.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteBytes(Value);
+      }
+      if (ttl_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Ttl);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
       if (Key.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
       }
@@ -1793,12 +2082,9 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(CacheUpsertRequest other) {
+    public void MergeFrom(CacheEntry other) {
       if (other == null) {
         return;
-      }
-      if (other.ControlPoint.Length != 0) {
-        ControlPoint = other.ControlPoint;
       }
       if (other.Key.Length != 0) {
         Key = other.Key;
@@ -1828,18 +2114,14 @@ namespace Aperture.Flowcontrol.Check.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            ControlPoint = input.ReadString();
-            break;
-          }
-          case 18: {
             Key = input.ReadString();
             break;
           }
-          case 26: {
+          case 18: {
             Value = input.ReadBytes();
             break;
           }
-          case 34: {
+          case 26: {
             if (ttl_ == null) {
               Ttl = new global::Google.Protobuf.WellKnownTypes.Duration();
             }
@@ -1862,18 +2144,14 @@ namespace Aperture.Flowcontrol.Check.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            ControlPoint = input.ReadString();
-            break;
-          }
-          case 18: {
             Key = input.ReadString();
             break;
           }
-          case 26: {
+          case 18: {
             Value = input.ReadBytes();
             break;
           }
-          case 34: {
+          case 26: {
             if (ttl_ == null) {
               Ttl = new global::Google.Protobuf.WellKnownTypes.Duration();
             }
@@ -1901,7 +2179,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1921,8 +2199,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheUpsertResponse(CacheUpsertResponse other) : this() {
-      operationStatus_ = other.operationStatus_;
-      error_ = other.error_;
+      resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1930,6 +2208,230 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheUpsertResponse Clone() {
       return new CacheUpsertResponse(this);
+    }
+
+    /// <summary>Field number for the "result_cache_response" field.</summary>
+    public const int ResultCacheResponseFieldNumber = 1;
+    private global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse resultCacheResponse_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse ResultCacheResponse {
+      get { return resultCacheResponse_; }
+      set {
+        resultCacheResponse_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>.Codec _map_globalCacheResponses_codec
+        = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse.Parser), 18);
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CacheUpsertResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CacheUpsertResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (resultCacheResponse_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
+      }
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CacheUpsertResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.resultCacheResponse_ != null) {
+        if (resultCacheResponse_ == null) {
+          ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse();
+        }
+        ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
+      }
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class KeyUpsertResponse : pb::IMessage<KeyUpsertResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<KeyUpsertResponse> _parser = new pb::MessageParser<KeyUpsertResponse>(() => new KeyUpsertResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<KeyUpsertResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyUpsertResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyUpsertResponse(KeyUpsertResponse other) : this() {
+      operationStatus_ = other.operationStatus_;
+      error_ = other.error_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyUpsertResponse Clone() {
+      return new KeyUpsertResponse(this);
     }
 
     /// <summary>Field number for the "operation_status" field.</summary>
@@ -1959,12 +2461,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as CacheUpsertResponse);
+      return Equals(other as KeyUpsertResponse);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(CacheUpsertResponse other) {
+    public bool Equals(KeyUpsertResponse other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2050,7 +2552,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(CacheUpsertResponse other) {
+    public void MergeFrom(KeyUpsertResponse other) {
       if (other == null) {
         return;
       }
@@ -2127,7 +2629,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2148,7 +2650,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheDeleteRequest(CacheDeleteRequest other) : this() {
       controlPoint_ = other.controlPoint_;
-      key_ = other.key_;
+      resultCacheKey_ = other.resultCacheKey_;
+      globalCacheKeys_ = other.globalCacheKeys_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2170,16 +2673,27 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 2;
-    private string key_ = "";
+    /// <summary>Field number for the "result_cache_key" field.</summary>
+    public const int ResultCacheKeyFieldNumber = 2;
+    private string resultCacheKey_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Key {
-      get { return key_; }
+    public string ResultCacheKey {
+      get { return resultCacheKey_; }
       set {
-        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        resultCacheKey_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
+    }
+
+    /// <summary>Field number for the "global_cache_keys" field.</summary>
+    public const int GlobalCacheKeysFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_globalCacheKeys_codec
+        = pb::FieldCodec.ForString(26);
+    private readonly pbc::RepeatedField<string> globalCacheKeys_ = new pbc::RepeatedField<string>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<string> GlobalCacheKeys {
+      get { return globalCacheKeys_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2198,7 +2712,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
         return true;
       }
       if (ControlPoint != other.ControlPoint) return false;
-      if (Key != other.Key) return false;
+      if (ResultCacheKey != other.ResultCacheKey) return false;
+      if(!globalCacheKeys_.Equals(other.globalCacheKeys_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2207,7 +2722,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
-      if (Key.Length != 0) hash ^= Key.GetHashCode();
+      if (ResultCacheKey.Length != 0) hash ^= ResultCacheKey.GetHashCode();
+      hash ^= globalCacheKeys_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2230,10 +2746,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteString(ControlPoint);
       }
-      if (Key.Length != 0) {
+      if (ResultCacheKey.Length != 0) {
         output.WriteRawTag(18);
-        output.WriteString(Key);
+        output.WriteString(ResultCacheKey);
       }
+      globalCacheKeys_.WriteTo(output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2248,10 +2765,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteString(ControlPoint);
       }
-      if (Key.Length != 0) {
+      if (ResultCacheKey.Length != 0) {
         output.WriteRawTag(18);
-        output.WriteString(Key);
+        output.WriteString(ResultCacheKey);
       }
+      globalCacheKeys_.WriteTo(ref output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2265,9 +2783,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ControlPoint.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ControlPoint);
       }
-      if (Key.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
+      if (ResultCacheKey.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ResultCacheKey);
       }
+      size += globalCacheKeys_.CalculateSize(_repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -2283,9 +2802,10 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (other.ControlPoint.Length != 0) {
         ControlPoint = other.ControlPoint;
       }
-      if (other.Key.Length != 0) {
-        Key = other.Key;
+      if (other.ResultCacheKey.Length != 0) {
+        ResultCacheKey = other.ResultCacheKey;
       }
+      globalCacheKeys_.Add(other.globalCacheKeys_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -2306,7 +2826,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            Key = input.ReadString();
+            ResultCacheKey = input.ReadString();
+            break;
+          }
+          case 26: {
+            globalCacheKeys_.AddEntriesFrom(input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -2329,7 +2853,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            Key = input.ReadString();
+            ResultCacheKey = input.ReadString();
+            break;
+          }
+          case 26: {
+            globalCacheKeys_.AddEntriesFrom(ref input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -2353,7 +2881,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2373,8 +2901,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheDeleteResponse(CacheDeleteResponse other) : this() {
-      operationStatus_ = other.operationStatus_;
-      error_ = other.error_;
+      resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2382,6 +2910,230 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheDeleteResponse Clone() {
       return new CacheDeleteResponse(this);
+    }
+
+    /// <summary>Field number for the "result_cache_response" field.</summary>
+    public const int ResultCacheResponseFieldNumber = 1;
+    private global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse resultCacheResponse_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse ResultCacheResponse {
+      get { return resultCacheResponse_; }
+      set {
+        resultCacheResponse_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>.Codec _map_globalCacheResponses_codec
+        = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse.Parser), 18);
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CacheDeleteResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CacheDeleteResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (resultCacheResponse_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
+      }
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CacheDeleteResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.resultCacheResponse_ != null) {
+        if (resultCacheResponse_ == null) {
+          ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse();
+        }
+        ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
+      }
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class KeyDeleteResponse : pb::IMessage<KeyDeleteResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<KeyDeleteResponse> _parser = new pb::MessageParser<KeyDeleteResponse>(() => new KeyDeleteResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<KeyDeleteResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[9]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyDeleteResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyDeleteResponse(KeyDeleteResponse other) : this() {
+      operationStatus_ = other.operationStatus_;
+      error_ = other.error_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public KeyDeleteResponse Clone() {
+      return new KeyDeleteResponse(this);
     }
 
     /// <summary>Field number for the "operation_status" field.</summary>
@@ -2411,12 +3163,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as CacheDeleteResponse);
+      return Equals(other as KeyDeleteResponse);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(CacheDeleteResponse other) {
+    public bool Equals(KeyDeleteResponse other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2502,7 +3254,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(CacheDeleteResponse other) {
+    public void MergeFrom(KeyDeleteResponse other) {
       if (other == null) {
         return;
       }
@@ -2565,6 +3317,488 @@ namespace Aperture.Flowcontrol.Check.V1 {
 
   }
 
+  public sealed partial class CacheLookupRequest : pb::IMessage<CacheLookupRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CacheLookupRequest> _parser = new pb::MessageParser<CacheLookupRequest>(() => new CacheLookupRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CacheLookupRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[10]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupRequest(CacheLookupRequest other) : this() {
+      controlPoint_ = other.controlPoint_;
+      resultCacheKey_ = other.resultCacheKey_;
+      globalCacheKeys_ = other.globalCacheKeys_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupRequest Clone() {
+      return new CacheLookupRequest(this);
+    }
+
+    /// <summary>Field number for the "control_point" field.</summary>
+    public const int ControlPointFieldNumber = 1;
+    private string controlPoint_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ControlPoint {
+      get { return controlPoint_; }
+      set {
+        controlPoint_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "result_cache_key" field.</summary>
+    public const int ResultCacheKeyFieldNumber = 2;
+    private string resultCacheKey_ = "";
+    /// <summary>
+    /// Key for result cache that needs to be fetched.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string ResultCacheKey {
+      get { return resultCacheKey_; }
+      set {
+        resultCacheKey_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "global_cache_keys" field.</summary>
+    public const int GlobalCacheKeysFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_globalCacheKeys_codec
+        = pb::FieldCodec.ForString(26);
+    private readonly pbc::RepeatedField<string> globalCacheKeys_ = new pbc::RepeatedField<string>();
+    /// <summary>
+    /// Keys for global cache entries that need to be fetched.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<string> GlobalCacheKeys {
+      get { return globalCacheKeys_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CacheLookupRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CacheLookupRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (ControlPoint != other.ControlPoint) return false;
+      if (ResultCacheKey != other.ResultCacheKey) return false;
+      if(!globalCacheKeys_.Equals(other.globalCacheKeys_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
+      if (ResultCacheKey.Length != 0) hash ^= ResultCacheKey.GetHashCode();
+      hash ^= globalCacheKeys_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (ControlPoint.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ControlPoint);
+      }
+      if (ResultCacheKey.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ResultCacheKey);
+      }
+      globalCacheKeys_.WriteTo(output, _repeated_globalCacheKeys_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (ControlPoint.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(ControlPoint);
+      }
+      if (ResultCacheKey.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(ResultCacheKey);
+      }
+      globalCacheKeys_.WriteTo(ref output, _repeated_globalCacheKeys_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (ControlPoint.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ControlPoint);
+      }
+      if (ResultCacheKey.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ResultCacheKey);
+      }
+      size += globalCacheKeys_.CalculateSize(_repeated_globalCacheKeys_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CacheLookupRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ControlPoint.Length != 0) {
+        ControlPoint = other.ControlPoint;
+      }
+      if (other.ResultCacheKey.Length != 0) {
+        ResultCacheKey = other.ResultCacheKey;
+      }
+      globalCacheKeys_.Add(other.globalCacheKeys_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            ControlPoint = input.ReadString();
+            break;
+          }
+          case 18: {
+            ResultCacheKey = input.ReadString();
+            break;
+          }
+          case 26: {
+            globalCacheKeys_.AddEntriesFrom(input, _repeated_globalCacheKeys_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            ControlPoint = input.ReadString();
+            break;
+          }
+          case 18: {
+            ResultCacheKey = input.ReadString();
+            break;
+          }
+          case 26: {
+            globalCacheKeys_.AddEntriesFrom(ref input, _repeated_globalCacheKeys_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class CacheLookupResponse : pb::IMessage<CacheLookupResponse>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CacheLookupResponse> _parser = new pb::MessageParser<CacheLookupResponse>(() => new CacheLookupResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CacheLookupResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[11]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupResponse(CacheLookupResponse other) : this() {
+      resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CacheLookupResponse Clone() {
+      return new CacheLookupResponse(this);
+    }
+
+    /// <summary>Field number for the "result_cache_response" field.</summary>
+    public const int ResultCacheResponseFieldNumber = 1;
+    private global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse resultCacheResponse_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse ResultCacheResponse {
+      get { return resultCacheResponse_; }
+      set {
+        resultCacheResponse_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>.Codec _map_globalCacheResponses_codec
+        = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse.Parser), 18);
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CacheLookupResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CacheLookupResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (resultCacheResponse_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(ResultCacheResponse);
+      }
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (resultCacheResponse_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
+      }
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CacheLookupResponse other) {
+      if (other == null) {
+        return;
+      }
+      if (other.resultCacheResponse_ != null) {
+        if (resultCacheResponse_ == null) {
+          ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse();
+        }
+        ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
+      }
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (resultCacheResponse_ == null) {
+              ResultCacheResponse = new global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse();
+            }
+            input.ReadMessage(ResultCacheResponse);
+            break;
+          }
+          case 18: {
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   /// <summary>
   /// ClassifierInfo describes details for each ClassifierInfo.
   /// </summary>
@@ -2582,7 +3816,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2905,7 +4139,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4854,7 +6088,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Aperture.Flowcontrol.Check.V1.CheckReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

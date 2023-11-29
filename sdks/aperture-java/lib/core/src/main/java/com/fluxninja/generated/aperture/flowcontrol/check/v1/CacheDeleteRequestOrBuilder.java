@@ -20,14 +20,39 @@ public interface CacheDeleteRequestOrBuilder extends
       getControlPointBytes();
 
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The key.
+   * <code>string result_cache_key = 2 [json_name = "resultCacheKey"];</code>
+   * @return The resultCacheKey.
    */
-  java.lang.String getKey();
+  java.lang.String getResultCacheKey();
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The bytes for key.
+   * <code>string result_cache_key = 2 [json_name = "resultCacheKey"];</code>
+   * @return The bytes for resultCacheKey.
    */
   com.google.protobuf.ByteString
-      getKeyBytes();
+      getResultCacheKeyBytes();
+
+  /**
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @return A list containing the globalCacheKeys.
+   */
+  java.util.List<java.lang.String>
+      getGlobalCacheKeysList();
+  /**
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @return The count of globalCacheKeys.
+   */
+  int getGlobalCacheKeysCount();
+  /**
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @param index The index of the element to return.
+   * @return The globalCacheKeys at the given index.
+   */
+  java.lang.String getGlobalCacheKeys(int index);
+  /**
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @param index The index of the value to return.
+   * @return The bytes of the globalCacheKeys at the given index.
+   */
+  com.google.protobuf.ByteString
+      getGlobalCacheKeysBytes(int index);
 }
