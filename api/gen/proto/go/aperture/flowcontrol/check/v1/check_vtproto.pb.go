@@ -342,29 +342,22 @@ func (m *KeyLookupResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Error)
 		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if m.OperationStatus != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x18
 	}
 	if m.LookupStatus != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.LookupStatus))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x10
 	}
 	if len(m.Value) > 0 {
 		i -= len(m.Value)
 		copy(dAtA[i:], m.Value)
 		i = encodeVarint(dAtA, i, uint64(len(m.Value)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Key) > 0 {
-		i -= len(m.Key)
-		copy(dAtA[i:], m.Key)
-		i = encodeVarint(dAtA, i, uint64(len(m.Key)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -401,9 +394,9 @@ func (m *CacheUpsertRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheEntries) > 0 {
-		for k := range m.StateCacheEntries {
-			v := m.StateCacheEntries[k]
+	if len(m.GlobalCacheEntries) > 0 {
+		for k := range m.GlobalCacheEntries {
+			v := m.GlobalCacheEntries[k]
 			baseI := i
 			size, err := v.MarshalToSizedBufferVT(dAtA[:i])
 			if err != nil {
@@ -542,9 +535,9 @@ func (m *CacheUpsertResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k := range m.StateCacheResponses {
-			v := m.StateCacheResponses[k]
+	if len(m.GlobalCacheResponses) > 0 {
+		for k := range m.GlobalCacheResponses {
+			v := m.GlobalCacheResponses[k]
 			baseI := i
 			size, err := v.MarshalToSizedBufferVT(dAtA[:i])
 			if err != nil {
@@ -612,19 +605,12 @@ func (m *KeyUpsertResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Error)
 		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if m.OperationStatus != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Key) > 0 {
-		i -= len(m.Key)
-		copy(dAtA[i:], m.Key)
-		i = encodeVarint(dAtA, i, uint64(len(m.Key)))
-		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -659,11 +645,11 @@ func (m *CacheDeleteRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheKeys) > 0 {
-		for iNdEx := len(m.StateCacheKeys) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.StateCacheKeys[iNdEx])
-			copy(dAtA[i:], m.StateCacheKeys[iNdEx])
-			i = encodeVarint(dAtA, i, uint64(len(m.StateCacheKeys[iNdEx])))
+	if len(m.GlobalCacheKeys) > 0 {
+		for iNdEx := len(m.GlobalCacheKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.GlobalCacheKeys[iNdEx])
+			copy(dAtA[i:], m.GlobalCacheKeys[iNdEx])
+			i = encodeVarint(dAtA, i, uint64(len(m.GlobalCacheKeys[iNdEx])))
 			i--
 			dAtA[i] = 0x1a
 		}
@@ -715,9 +701,9 @@ func (m *CacheDeleteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k := range m.StateCacheResponses {
-			v := m.StateCacheResponses[k]
+	if len(m.GlobalCacheResponses) > 0 {
+		for k := range m.GlobalCacheResponses {
+			v := m.GlobalCacheResponses[k]
 			baseI := i
 			size, err := v.MarshalToSizedBufferVT(dAtA[:i])
 			if err != nil {
@@ -785,19 +771,12 @@ func (m *KeyDeleteResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Error)
 		i = encodeVarint(dAtA, i, uint64(len(m.Error)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if m.OperationStatus != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.OperationStatus))
 		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Key) > 0 {
-		i -= len(m.Key)
-		copy(dAtA[i:], m.Key)
-		i = encodeVarint(dAtA, i, uint64(len(m.Key)))
-		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -832,11 +811,11 @@ func (m *CacheLookupRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheKeys) > 0 {
-		for iNdEx := len(m.StateCacheKeys) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.StateCacheKeys[iNdEx])
-			copy(dAtA[i:], m.StateCacheKeys[iNdEx])
-			i = encodeVarint(dAtA, i, uint64(len(m.StateCacheKeys[iNdEx])))
+	if len(m.GlobalCacheKeys) > 0 {
+		for iNdEx := len(m.GlobalCacheKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.GlobalCacheKeys[iNdEx])
+			copy(dAtA[i:], m.GlobalCacheKeys[iNdEx])
+			i = encodeVarint(dAtA, i, uint64(len(m.GlobalCacheKeys[iNdEx])))
 			i--
 			dAtA[i] = 0x1a
 		}
@@ -888,9 +867,9 @@ func (m *CacheLookupResponse) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k := range m.StateCacheResponses {
-			v := m.StateCacheResponses[k]
+	if len(m.GlobalCacheResponses) > 0 {
+		for k := range m.GlobalCacheResponses {
+			v := m.GlobalCacheResponses[k]
 			baseI := i
 			size, err := v.MarshalToSizedBufferVT(dAtA[:i])
 			if err != nil {
@@ -1667,10 +1646,6 @@ func (m *KeyLookupResponse) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Key)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
-	}
 	l = len(m.Value)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
@@ -1703,8 +1678,8 @@ func (m *CacheUpsertRequest) SizeVT() (n int) {
 		l = m.ResultCacheEntry.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheEntries) > 0 {
-		for k, v := range m.StateCacheEntries {
+	if len(m.GlobalCacheEntries) > 0 {
+		for k, v := range m.GlobalCacheEntries {
 			_ = k
 			_ = v
 			l = 0
@@ -1758,8 +1733,8 @@ func (m *CacheUpsertResponse) SizeVT() (n int) {
 		l = m.ResultCacheResponse.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k, v := range m.StateCacheResponses {
+	if len(m.GlobalCacheResponses) > 0 {
+		for k, v := range m.GlobalCacheResponses {
 			_ = k
 			_ = v
 			l = 0
@@ -1781,10 +1756,6 @@ func (m *KeyUpsertResponse) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Key)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
-	}
 	if m.OperationStatus != 0 {
 		n += 1 + sov(uint64(m.OperationStatus))
 	}
@@ -1810,8 +1781,8 @@ func (m *CacheDeleteRequest) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheKeys) > 0 {
-		for _, s := range m.StateCacheKeys {
+	if len(m.GlobalCacheKeys) > 0 {
+		for _, s := range m.GlobalCacheKeys {
 			l = len(s)
 			n += 1 + l + sov(uint64(l))
 		}
@@ -1830,8 +1801,8 @@ func (m *CacheDeleteResponse) SizeVT() (n int) {
 		l = m.ResultCacheResponse.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k, v := range m.StateCacheResponses {
+	if len(m.GlobalCacheResponses) > 0 {
+		for k, v := range m.GlobalCacheResponses {
 			_ = k
 			_ = v
 			l = 0
@@ -1853,10 +1824,6 @@ func (m *KeyDeleteResponse) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Key)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
-	}
 	if m.OperationStatus != 0 {
 		n += 1 + sov(uint64(m.OperationStatus))
 	}
@@ -1882,8 +1849,8 @@ func (m *CacheLookupRequest) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheKeys) > 0 {
-		for _, s := range m.StateCacheKeys {
+	if len(m.GlobalCacheKeys) > 0 {
+		for _, s := range m.GlobalCacheKeys {
 			l = len(s)
 			n += 1 + l + sov(uint64(l))
 		}
@@ -1902,8 +1869,8 @@ func (m *CacheLookupResponse) SizeVT() (n int) {
 		l = m.ResultCacheResponse.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if len(m.StateCacheResponses) > 0 {
-		for k, v := range m.StateCacheResponses {
+	if len(m.GlobalCacheResponses) > 0 {
+		for k, v := range m.GlobalCacheResponses {
 			_ = k
 			_ = v
 			l = 0
@@ -3071,38 +3038,6 @@ func (m *KeyLookupResponse) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
 			var byteLen int
@@ -3135,7 +3070,7 @@ func (m *KeyLookupResponse) UnmarshalVT(dAtA []byte) error {
 				m.Value = []byte{}
 			}
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LookupStatus", wireType)
 			}
@@ -3154,7 +3089,7 @@ func (m *KeyLookupResponse) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 4:
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
@@ -3173,7 +3108,7 @@ func (m *KeyLookupResponse) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
@@ -3326,7 +3261,7 @@ func (m *CacheUpsertRequest) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheEntries", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheEntries", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3353,8 +3288,8 @@ func (m *CacheUpsertRequest) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.StateCacheEntries == nil {
-				m.StateCacheEntries = make(map[string]*CacheEntry)
+			if m.GlobalCacheEntries == nil {
+				m.GlobalCacheEntries = make(map[string]*CacheEntry)
 			}
 			var mapkey string
 			var mapvalue *CacheEntry
@@ -3451,7 +3386,7 @@ func (m *CacheUpsertRequest) UnmarshalVT(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.StateCacheEntries[mapkey] = mapvalue
+			m.GlobalCacheEntries[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3703,7 +3638,7 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheResponses", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheResponses", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3730,8 +3665,8 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.StateCacheResponses == nil {
-				m.StateCacheResponses = make(map[string]*KeyUpsertResponse)
+			if m.GlobalCacheResponses == nil {
+				m.GlobalCacheResponses = make(map[string]*KeyUpsertResponse)
 			}
 			var mapkey string
 			var mapvalue *KeyUpsertResponse
@@ -3828,7 +3763,7 @@ func (m *CacheUpsertResponse) UnmarshalVT(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.StateCacheResponses[mapkey] = mapvalue
+			m.GlobalCacheResponses[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3882,38 +3817,6 @@ func (m *KeyUpsertResponse) UnmarshalVT(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
@@ -3932,7 +3835,7 @@ func (m *KeyUpsertResponse) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
@@ -4081,7 +3984,7 @@ func (m *CacheDeleteRequest) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheKeys", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4109,7 +4012,7 @@ func (m *CacheDeleteRequest) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.StateCacheKeys = append(m.StateCacheKeys, string(dAtA[iNdEx:postIndex]))
+			m.GlobalCacheKeys = append(m.GlobalCacheKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4200,7 +4103,7 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheResponses", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheResponses", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4227,8 +4130,8 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.StateCacheResponses == nil {
-				m.StateCacheResponses = make(map[string]*KeyDeleteResponse)
+			if m.GlobalCacheResponses == nil {
+				m.GlobalCacheResponses = make(map[string]*KeyDeleteResponse)
 			}
 			var mapkey string
 			var mapvalue *KeyDeleteResponse
@@ -4325,7 +4228,7 @@ func (m *CacheDeleteResponse) UnmarshalVT(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.StateCacheResponses[mapkey] = mapvalue
+			m.GlobalCacheResponses[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4379,38 +4282,6 @@ func (m *KeyDeleteResponse) UnmarshalVT(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OperationStatus", wireType)
 			}
@@ -4429,7 +4300,7 @@ func (m *KeyDeleteResponse) UnmarshalVT(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
 			}
@@ -4578,7 +4449,7 @@ func (m *CacheLookupRequest) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheKeys", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4606,7 +4477,7 @@ func (m *CacheLookupRequest) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.StateCacheKeys = append(m.StateCacheKeys, string(dAtA[iNdEx:postIndex]))
+			m.GlobalCacheKeys = append(m.GlobalCacheKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4697,7 +4568,7 @@ func (m *CacheLookupResponse) UnmarshalVT(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCacheResponses", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalCacheResponses", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4724,8 +4595,8 @@ func (m *CacheLookupResponse) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.StateCacheResponses == nil {
-				m.StateCacheResponses = make(map[string]*KeyLookupResponse)
+			if m.GlobalCacheResponses == nil {
+				m.GlobalCacheResponses = make(map[string]*KeyLookupResponse)
 			}
 			var mapkey string
 			var mapvalue *KeyLookupResponse
@@ -4822,7 +4693,7 @@ func (m *CacheLookupResponse) UnmarshalVT(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.StateCacheResponses[mapkey] = mapvalue
+			m.GlobalCacheResponses[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

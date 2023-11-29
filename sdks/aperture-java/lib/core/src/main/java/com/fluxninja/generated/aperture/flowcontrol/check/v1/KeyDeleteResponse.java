@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private KeyDeleteResponse() {
-    key_ = "";
     operationStatus_ = 0;
     error_ = "";
   }
@@ -41,56 +40,17 @@ private static final long serialVersionUID = 0L;
             com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.Builder.class);
   }
 
-  public static final int KEY_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object key_ = "";
-  /**
-   * <code>string key = 1 [json_name = "key"];</code>
-   * @return The key.
-   */
-  @java.lang.Override
-  public java.lang.String getKey() {
-    java.lang.Object ref = key_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      key_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string key = 1 [json_name = "key"];</code>
-   * @return The bytes for key.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getKeyBytes() {
-    java.lang.Object ref = key_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      key_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int OPERATION_STATUS_FIELD_NUMBER = 2;
+  public static final int OPERATION_STATUS_FIELD_NUMBER = 1;
   private int operationStatus_ = 0;
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
    * @return The enum numeric value on the wire for operationStatus.
    */
   @java.lang.Override public int getOperationStatusValue() {
     return operationStatus_;
   }
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
    * @return The operationStatus.
    */
   @java.lang.Override public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus() {
@@ -98,11 +58,11 @@ private static final long serialVersionUID = 0L;
     return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
   }
 
-  public static final int ERROR_FIELD_NUMBER = 3;
+  public static final int ERROR_FIELD_NUMBER = 2;
   @SuppressWarnings("serial")
   private volatile java.lang.Object error_ = "";
   /**
-   * <code>string error = 3 [json_name = "error"];</code>
+   * <code>string error = 2 [json_name = "error"];</code>
    * @return The error.
    */
   @java.lang.Override
@@ -119,7 +79,7 @@ private static final long serialVersionUID = 0L;
     }
   }
   /**
-   * <code>string error = 3 [json_name = "error"];</code>
+   * <code>string error = 2 [json_name = "error"];</code>
    * @return The bytes for error.
    */
   @java.lang.Override
@@ -151,14 +111,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(key_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, key_);
-    }
     if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
-      output.writeEnum(2, operationStatus_);
+      output.writeEnum(1, operationStatus_);
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, error_);
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, error_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -169,15 +126,12 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(key_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, key_);
-    }
     if (operationStatus_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.SUCCESS.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, operationStatus_);
+        .computeEnumSize(1, operationStatus_);
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(error_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, error_);
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, error_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -194,8 +148,6 @@ private static final long serialVersionUID = 0L;
     }
     com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse) obj;
 
-    if (!getKey()
-        .equals(other.getKey())) return false;
     if (operationStatus_ != other.operationStatus_) return false;
     if (!getError()
         .equals(other.getError())) return false;
@@ -210,8 +162,6 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + KEY_FIELD_NUMBER;
-    hash = (53 * hash) + getKey().hashCode();
     hash = (37 * hash) + OPERATION_STATUS_FIELD_NUMBER;
     hash = (53 * hash) + operationStatus_;
     hash = (37 * hash) + ERROR_FIELD_NUMBER;
@@ -347,7 +297,6 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      key_ = "";
       operationStatus_ = 0;
       error_ = "";
       return this;
@@ -384,12 +333,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.key_ = key_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
         result.operationStatus_ = operationStatus_;
       }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
+      if (((from_bitField0_ & 0x00000002) != 0)) {
         result.error_ = error_;
       }
     }
@@ -438,17 +384,12 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse other) {
       if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.getDefaultInstance()) return this;
-      if (!other.getKey().isEmpty()) {
-        key_ = other.key_;
-        bitField0_ |= 0x00000001;
-        onChanged();
-      }
       if (other.operationStatus_ != 0) {
         setOperationStatusValue(other.getOperationStatusValue());
       }
       if (!other.getError().isEmpty()) {
         error_ = other.error_;
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000002;
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -477,21 +418,16 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
-            case 10: {
-              key_ = input.readStringRequireUtf8();
+            case 8: {
+              operationStatus_ = input.readEnum();
               bitField0_ |= 0x00000001;
               break;
-            } // case 10
-            case 16: {
-              operationStatus_ = input.readEnum();
+            } // case 8
+            case 18: {
+              error_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000002;
               break;
-            } // case 16
-            case 26: {
-              error_ = input.readStringRequireUtf8();
-              bitField0_ |= 0x00000004;
-              break;
-            } // case 26
+            } // case 18
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -509,99 +445,27 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object key_ = "";
-    /**
-     * <code>string key = 1 [json_name = "key"];</code>
-     * @return The key.
-     */
-    public java.lang.String getKey() {
-      java.lang.Object ref = key_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        key_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string key = 1 [json_name = "key"];</code>
-     * @return The bytes for key.
-     */
-    public com.google.protobuf.ByteString
-        getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string key = 1 [json_name = "key"];</code>
-     * @param value The key to set.
-     * @return This builder for chaining.
-     */
-    public Builder setKey(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      key_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string key = 1 [json_name = "key"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearKey() {
-      key_ = getDefaultInstance().getKey();
-      bitField0_ = (bitField0_ & ~0x00000001);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string key = 1 [json_name = "key"];</code>
-     * @param value The bytes for key to set.
-     * @return This builder for chaining.
-     */
-    public Builder setKeyBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      key_ = value;
-      bitField0_ |= 0x00000001;
-      onChanged();
-      return this;
-    }
-
     private int operationStatus_ = 0;
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
      * @return The enum numeric value on the wire for operationStatus.
      */
     @java.lang.Override public int getOperationStatusValue() {
       return operationStatus_;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
      * @param value The enum numeric value on the wire for operationStatus to set.
      * @return This builder for chaining.
      */
     public Builder setOperationStatusValue(int value) {
       operationStatus_ = value;
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
      * @return The operationStatus.
      */
     @java.lang.Override
@@ -610,7 +474,7 @@ private static final long serialVersionUID = 0L;
       return result == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
      * @param value The operationStatus to set.
      * @return This builder for chaining.
      */
@@ -618,17 +482,17 @@ private static final long serialVersionUID = 0L;
       if (value == null) {
         throw new NullPointerException();
       }
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000001;
       operationStatus_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 2 [json_name = "operationStatus"];</code>
+     * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 1 [json_name = "operationStatus"];</code>
      * @return This builder for chaining.
      */
     public Builder clearOperationStatus() {
-      bitField0_ = (bitField0_ & ~0x00000002);
+      bitField0_ = (bitField0_ & ~0x00000001);
       operationStatus_ = 0;
       onChanged();
       return this;
@@ -636,7 +500,7 @@ private static final long serialVersionUID = 0L;
 
     private java.lang.Object error_ = "";
     /**
-     * <code>string error = 3 [json_name = "error"];</code>
+     * <code>string error = 2 [json_name = "error"];</code>
      * @return The error.
      */
     public java.lang.String getError() {
@@ -652,7 +516,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string error = 3 [json_name = "error"];</code>
+     * <code>string error = 2 [json_name = "error"];</code>
      * @return The bytes for error.
      */
     public com.google.protobuf.ByteString
@@ -669,7 +533,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>string error = 3 [json_name = "error"];</code>
+     * <code>string error = 2 [json_name = "error"];</code>
      * @param value The error to set.
      * @return This builder for chaining.
      */
@@ -677,22 +541,22 @@ private static final long serialVersionUID = 0L;
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       error_ = value;
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>string error = 3 [json_name = "error"];</code>
+     * <code>string error = 2 [json_name = "error"];</code>
      * @return This builder for chaining.
      */
     public Builder clearError() {
       error_ = getDefaultInstance().getError();
-      bitField0_ = (bitField0_ & ~0x00000004);
+      bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
       return this;
     }
     /**
-     * <code>string error = 3 [json_name = "error"];</code>
+     * <code>string error = 2 [json_name = "error"];</code>
      * @param value The bytes for error to set.
      * @return This builder for chaining.
      */
@@ -701,7 +565,7 @@ private static final long serialVersionUID = 0L;
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       error_ = value;
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }

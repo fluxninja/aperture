@@ -49,8 +49,8 @@ type FlowParams struct {
 	RampMode bool
 	// ResultCacheKey is key to the result cache entry which needs to be fetched at flow start.
 	ResultCacheKey string
-	// StateCacheKeys are keys to state cache entries that need to be fetched at flow start.
-	StateCacheKeys []string
+	// GlobalCacheKeys are keys to global cache entries that need to be fetched at flow start.
+	GlobalCacheKeys []string
 }
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -158,14 +158,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
 		CacheLookupRequest: &checkv1.CacheLookupRequest{
-			ResultCacheKey: flowParams.ResultCacheKey,
-			StateCacheKeys: flowParams.StateCacheKeys,
+			ResultCacheKey:  flowParams.ResultCacheKey,
+			GlobalCacheKeys: flowParams.GlobalCacheKeys,
 		},
 	}
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.StateCacheKeys)
+	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.GlobalCacheKeys)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),

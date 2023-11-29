@@ -519,8 +519,6 @@ func (m *KeyLookupResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Key
-
 	// no validation rules for Value
 
 	// no validation rules for LookupStatus
@@ -663,25 +661,25 @@ func (m *CacheUpsertRequest) validate(all bool) error {
 	}
 
 	{
-		sorted_keys := make([]string, len(m.GetStateCacheEntries()))
+		sorted_keys := make([]string, len(m.GetGlobalCacheEntries()))
 		i := 0
-		for key := range m.GetStateCacheEntries() {
+		for key := range m.GetGlobalCacheEntries() {
 			sorted_keys[i] = key
 			i++
 		}
 		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
 		for _, key := range sorted_keys {
-			val := m.GetStateCacheEntries()[key]
+			val := m.GetGlobalCacheEntries()[key]
 			_ = val
 
-			// no validation rules for StateCacheEntries[key]
+			// no validation rules for GlobalCacheEntries[key]
 
 			if all {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
 						errors = append(errors, CacheUpsertRequestValidationError{
-							field:  fmt.Sprintf("StateCacheEntries[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheEntries[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -689,7 +687,7 @@ func (m *CacheUpsertRequest) validate(all bool) error {
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
 						errors = append(errors, CacheUpsertRequestValidationError{
-							field:  fmt.Sprintf("StateCacheEntries[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheEntries[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -698,7 +696,7 @@ func (m *CacheUpsertRequest) validate(all bool) error {
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
 					return CacheUpsertRequestValidationError{
-						field:  fmt.Sprintf("StateCacheEntries[%v]", key),
+						field:  fmt.Sprintf("GlobalCacheEntries[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -972,25 +970,25 @@ func (m *CacheUpsertResponse) validate(all bool) error {
 	}
 
 	{
-		sorted_keys := make([]string, len(m.GetStateCacheResponses()))
+		sorted_keys := make([]string, len(m.GetGlobalCacheResponses()))
 		i := 0
-		for key := range m.GetStateCacheResponses() {
+		for key := range m.GetGlobalCacheResponses() {
 			sorted_keys[i] = key
 			i++
 		}
 		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
 		for _, key := range sorted_keys {
-			val := m.GetStateCacheResponses()[key]
+			val := m.GetGlobalCacheResponses()[key]
 			_ = val
 
-			// no validation rules for StateCacheResponses[key]
+			// no validation rules for GlobalCacheResponses[key]
 
 			if all {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
 						errors = append(errors, CacheUpsertResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -998,7 +996,7 @@ func (m *CacheUpsertResponse) validate(all bool) error {
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
 						errors = append(errors, CacheUpsertResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -1007,7 +1005,7 @@ func (m *CacheUpsertResponse) validate(all bool) error {
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
 					return CacheUpsertResponseValidationError{
-						field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+						field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -1118,8 +1116,6 @@ func (m *KeyUpsertResponse) validate(all bool) error {
 	}
 
 	var errors []error
-
-	// no validation rules for Key
 
 	// no validation rules for OperationStatus
 
@@ -1363,25 +1359,25 @@ func (m *CacheDeleteResponse) validate(all bool) error {
 	}
 
 	{
-		sorted_keys := make([]string, len(m.GetStateCacheResponses()))
+		sorted_keys := make([]string, len(m.GetGlobalCacheResponses()))
 		i := 0
-		for key := range m.GetStateCacheResponses() {
+		for key := range m.GetGlobalCacheResponses() {
 			sorted_keys[i] = key
 			i++
 		}
 		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
 		for _, key := range sorted_keys {
-			val := m.GetStateCacheResponses()[key]
+			val := m.GetGlobalCacheResponses()[key]
 			_ = val
 
-			// no validation rules for StateCacheResponses[key]
+			// no validation rules for GlobalCacheResponses[key]
 
 			if all {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
 						errors = append(errors, CacheDeleteResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -1389,7 +1385,7 @@ func (m *CacheDeleteResponse) validate(all bool) error {
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
 						errors = append(errors, CacheDeleteResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -1398,7 +1394,7 @@ func (m *CacheDeleteResponse) validate(all bool) error {
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
 					return CacheDeleteResponseValidationError{
-						field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+						field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -1509,8 +1505,6 @@ func (m *KeyDeleteResponse) validate(all bool) error {
 	}
 
 	var errors []error
-
-	// no validation rules for Key
 
 	// no validation rules for OperationStatus
 
@@ -1754,25 +1748,25 @@ func (m *CacheLookupResponse) validate(all bool) error {
 	}
 
 	{
-		sorted_keys := make([]string, len(m.GetStateCacheResponses()))
+		sorted_keys := make([]string, len(m.GetGlobalCacheResponses()))
 		i := 0
-		for key := range m.GetStateCacheResponses() {
+		for key := range m.GetGlobalCacheResponses() {
 			sorted_keys[i] = key
 			i++
 		}
 		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
 		for _, key := range sorted_keys {
-			val := m.GetStateCacheResponses()[key]
+			val := m.GetGlobalCacheResponses()[key]
 			_ = val
 
-			// no validation rules for StateCacheResponses[key]
+			// no validation rules for GlobalCacheResponses[key]
 
 			if all {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
 						errors = append(errors, CacheLookupResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -1780,7 +1774,7 @@ func (m *CacheLookupResponse) validate(all bool) error {
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
 						errors = append(errors, CacheLookupResponseValidationError{
-							field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+							field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
 						})
@@ -1789,7 +1783,7 @@ func (m *CacheLookupResponse) validate(all bool) error {
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
 					return CacheLookupResponseValidationError{
-						field:  fmt.Sprintf("StateCacheResponses[%v]", key),
+						field:  fmt.Sprintf("GlobalCacheResponses[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

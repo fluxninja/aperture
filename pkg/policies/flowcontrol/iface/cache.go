@@ -14,7 +14,7 @@ const (
 	// Result is the type of cache for saving results.
 	Result CacheType = iota
 	// CacheTypeState is the type of cache for saving state.
-	State
+	Global
 )
 
 // Cache is an interface for the cache.

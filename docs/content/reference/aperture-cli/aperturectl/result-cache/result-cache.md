@@ -14,7 +14,7 @@ Result Cache related commands
 
 ### Synopsis
 
-Use this command to interact with Aperture Result Cache.
+Use this command to interact with Aperture's Result Cache.
 
 ### Options
 

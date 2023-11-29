@@ -3,32 +3,31 @@ sidebar_label: Set
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_state-cache_set
+  - aperturectl_global-cache_set
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl state-cache set
+## aperturectl global-cache set
 
-Set a state cache entry
+Set a global cache entry
 
 ### Synopsis
 
-Set a state cache entry
+Set a global cache entry
 
 ```
-aperturectl state-cache set [flags]
+aperturectl global-cache set [flags]
 ```
 
 ### Options
 
 ```
-  -a, --agent-group string     Agent group
-  -c, --control-point string   Control point
-  -h, --help                   help for set
-  -k, --key string             Key
-  -t, --ttl int                TTL in milliseconds (default 600000)
-      --value string           Value
+  -a, --agent-group string   Agent group
+  -h, --help                 help for set
+  -k, --key string           Key
+  -t, --ttl int              TTL in milliseconds (default 600000)
+      --value string         Value
 ```
 
 ### Options inherited from parent commands
@@ -44,4 +43,4 @@ aperturectl state-cache set [flags]
 
 ### SEE ALSO
 
-- [aperturectl state-cache](/reference/aperture-cli/aperturectl/state-cache/state-cache.md) - State Cache related commands
+- [aperturectl global-cache](/reference/aperture-cli/aperturectl/global-cache/global-cache.md) - Global Cache related commands

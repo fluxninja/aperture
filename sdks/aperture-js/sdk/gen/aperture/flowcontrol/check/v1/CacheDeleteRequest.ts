@@ -4,11 +4,11 @@
 export interface CacheDeleteRequest {
   'controlPoint'?: (string);
   'resultCacheKey'?: (string);
-  'stateCacheKeys'?: (string)[];
+  'globalCacheKeys'?: (string)[];
 }
 
 export interface CacheDeleteRequest__Output {
   'controlPoint': (string);
   'resultCacheKey': (string);
-  'stateCacheKeys': (string)[];
+  'globalCacheKeys': (string)[];
 }
