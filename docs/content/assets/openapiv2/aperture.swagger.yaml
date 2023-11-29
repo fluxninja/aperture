@@ -4027,7 +4027,7 @@ definitions:
                     label set up, set `label_key: "user"`.
                     If no label key is specified, then all requests matching the
                     selectors will be rate limited based on the global bucket.
-                    Deprecated: v2.25.0. Use _limit_by_label_key_ instead.
+                    Deprecated: v3.0.0. Use _limit_by_label_key_ instead.
 
                 type: string
                 x-deprecated: true
