@@ -169,20 +169,24 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	// Could be nil during unit tests
-	if e.cache != nil {
-		// Lookup cache
-		// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
-		requestContext.CacheLookupRequest.ControlPoint = controlPoint
-		response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
-		resultCacheResponse := response.CacheLookupResponse.ResultCacheResponse
-
-		// Check if result cache is hit
-		if resultCacheResponse != nil && resultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
-			response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
-			return
-		}
+	// Check if cache is enabled (can be disabled during unit tests) and cache lookup request is present
+	if e.cache == nil || requestContext.CacheLookupRequest == nil {
+		goto RUN_SCHEDULERS
 	}
+	// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
+	requestContext.CacheLookupRequest.ControlPoint = controlPoint
+	// Lookup cache
+	response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
+	if response.CacheLookupResponse == nil || response.CacheLookupResponse.ResultCacheResponse == nil {
+		goto RUN_SCHEDULERS
+	}
+	// Check if result cache is a hit
+	if response.CacheLookupResponse.ResultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
+		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+		return
+	}
+
+RUN_SCHEDULERS:
 
 	limiterTypes = []LimiterType{
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
