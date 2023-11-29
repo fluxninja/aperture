@@ -169,24 +169,10 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	// Check if cache is enabled (can be disabled during unit tests) and cache lookup request is present
-	if e.cache == nil || requestContext.CacheLookupRequest == nil {
-		goto RUN_SCHEDULERS
-	}
-	// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
-	requestContext.CacheLookupRequest.ControlPoint = controlPoint
-	// Lookup cache
-	response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
-	if response.CacheLookupResponse == nil || response.CacheLookupResponse.ResultCacheResponse == nil {
-		goto RUN_SCHEDULERS
-	}
-	// Check if result cache is a hit
-	if response.CacheLookupResponse.ResultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
-		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+	resultCacheHit := e.cacheLookup(ctx, requestContext, controlPoint, response)
+	if resultCacheHit {
 		return
 	}
-
-RUN_SCHEDULERS:
 
 	limiterTypes = []LimiterType{
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
@@ -194,6 +180,26 @@ RUN_SCHEDULERS:
 	runLimiters(limiterTypes)
 
 	return
+}
+
+func (e *Engine) cacheLookup(ctx context.Context, requestContext iface.RequestContext, controlPoint string, response *flowcontrolv1.CheckResponse) bool {
+	// Check if cache is enabled (can be disabled during unit tests) and cache lookup request is present
+	if e.cache == nil || requestContext.CacheLookupRequest == nil {
+		return false
+	}
+	// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
+	requestContext.CacheLookupRequest.ControlPoint = controlPoint
+	// Lookup cache
+	response.CacheLookupResponse = e.cache.Lookup(ctx, requestContext.CacheLookupRequest)
+	if response.CacheLookupResponse == nil || response.CacheLookupResponse.ResultCacheResponse == nil {
+		return false
+	}
+	// Check if result cache is a hit
+	if response.CacheLookupResponse.ResultCacheResponse.LookupStatus == flowcontrolv1.CacheLookupStatus_HIT {
+		response.DecisionType = flowcontrolv1.CheckResponse_DECISION_TYPE_ACCEPTED
+		return true
+	}
+	return false
 }
 
 // Runs limiters in parallel.
