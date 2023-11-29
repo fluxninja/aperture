@@ -123,7 +123,7 @@ export class _Flow implements Flow {
         resolve(resp);
         return;
       }
-      let cacheUpsertRequest: CacheUpsertRequest = {
+      const cacheUpsertRequest: CacheUpsertRequest = {
         controlPoint: this.controlPoint,
         resultCacheEntry: {
           key: this.resultCacheKey,
@@ -168,9 +168,9 @@ export class _Flow implements Flow {
     grpcCallOptions?: grpc.CallOptions,
   ) {
     return new Promise<KeyUpsertResponse>((resolve) => {
-      let cacheUpsertRequest: CacheUpsertRequest = {
+      const cacheUpsertRequest: CacheUpsertRequest = {
         globalCacheEntries: {
-          key: {
+          [key]: {
             value: cacheEntry.value,
             ttl: cacheEntry.ttl,
           },
@@ -241,7 +241,7 @@ export class _Flow implements Flow {
    */
   async deleteGlobalCache(key: string, grpcCallOptions?: grpc.CallOptions) {
     return new Promise<KeyDeleteResponse>((resolve) => {
-      let cacheDeleteRequest: CacheDeleteRequest = {
+      const cacheDeleteRequest: CacheDeleteRequest = {
         globalCacheKeys: [key],
       };
       this.fcsClient.CacheDelete(
@@ -295,7 +295,7 @@ export class _Flow implements Flow {
    * Returns global cache lookup response that was fetched at flow start.
    * @returns The global cache lookup response.
    */
-  globalCache(key: string) {
+  globalCache(key: string): KeyLookupResponse {
     if (this._error) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
@@ -329,7 +329,7 @@ export class _Flow implements Flow {
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(lookupResp?.lookupStatus),
       convertCacheError(lookupResp?.error),
-      lookupResp?.value ?? null,
+      lookupResp?.value.byteLength ? lookupResp?.value : null,
     );
 
     return resp;
