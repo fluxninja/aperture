@@ -161,7 +161,11 @@ export class _Flow implements Flow {
    * @param cacheEntry The cache entry to set.
    * @returns A promise that resolves to the response of the key upsert operation.
    */
-  async setGlobalCache(key: string, cacheEntry: CacheEntry) {
+  async setGlobalCache(
+    key: string,
+    cacheEntry: CacheEntry,
+    grpcCallOptions: grpc.CallOptions,
+  ) {
     return new Promise<KeyUpsertResponse>((resolve) => {
       let cacheUpsertRequest: CacheUpsertRequest = {
         globalCacheEntries: {
@@ -173,7 +177,7 @@ export class _Flow implements Flow {
       };
       this.fcsClient.CacheUpsert(
         cacheUpsertRequest,
-        this.grpcCallOptions,
+        grpcCallOptions,
         (err, res) => {
           if (err) {
             const resp = new _KeyUpsertResponse(err);
