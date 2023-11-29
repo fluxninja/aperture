@@ -71,13 +71,11 @@ export class _Flow implements Flow {
 
   constructor(
     private fcsClient: FlowControlServiceClient,
-    private grpcCallOptions: grpc.CallOptions,
     private controlPoint: string,
     private _span: Span,
     private startDate: number,
     private rampMode: boolean = false,
     private resultCacheKey: string | null = null,
-    private globalCacheKeys: string[] | null = null,
     private _checkResponse: CheckResponse__Output | null = null,
     private _error: Error | null = null,
   ) {
@@ -115,7 +113,10 @@ export class _Flow implements Flow {
    * @param cacheEntry The cache entry to set.
    * @returns A promise that resolves to the response of the key upsert operation.
    */
-  async setResultCache(cacheEntry: CacheEntry) {
+  async setResultCache(
+    cacheEntry: CacheEntry,
+    grpcCallOptions?: grpc.CallOptions,
+  ) {
     return new Promise<KeyUpsertResponse>((resolve) => {
       if (!this.resultCacheKey) {
         const resp = new _KeyUpsertResponse(new Error("No cache key"));
@@ -132,7 +133,7 @@ export class _Flow implements Flow {
       };
       this.fcsClient.CacheUpsert(
         cacheUpsertRequest,
-        this.grpcCallOptions,
+        grpcCallOptions ?? {},
         (err, res) => {
           if (err) {
             const resp = new _KeyUpsertResponse(err);
@@ -161,7 +162,11 @@ export class _Flow implements Flow {
    * @param cacheEntry The cache entry to set.
    * @returns A promise that resolves to the response of the key upsert operation.
    */
-  async setGlobalCache(key: string, cacheEntry: CacheEntry) {
+  async setGlobalCache(
+    key: string,
+    cacheEntry: CacheEntry,
+    grpcCallOptions?: grpc.CallOptions,
+  ) {
     return new Promise<KeyUpsertResponse>((resolve) => {
       let cacheUpsertRequest: CacheUpsertRequest = {
         globalCacheEntries: {
@@ -173,7 +178,7 @@ export class _Flow implements Flow {
       };
       this.fcsClient.CacheUpsert(
         cacheUpsertRequest,
-        this.grpcCallOptions,
+        grpcCallOptions ?? {},
         (err, res) => {
           if (err) {
             const resp = new _KeyUpsertResponse(err);
@@ -200,7 +205,7 @@ export class _Flow implements Flow {
    * Deletes the result cache for the flow.
    * @returns A promise that resolves to the response of the key delete operation.
    */
-  async deleteResultCache() {
+  async deleteResultCache(grpcCallOptions?: grpc.CallOptions) {
     if (!this.resultCacheKey) {
       return Promise.reject(new Error("No cache key"));
     }
@@ -213,7 +218,7 @@ export class _Flow implements Flow {
       };
       this.fcsClient.CacheDelete(
         cacheDeleteRequest,
-        this.grpcCallOptions,
+        grpcCallOptions ?? {},
         (err, res) => {
           if (err) {
             const resp = new _KeyDeleteResponse(err);
@@ -234,14 +239,14 @@ export class _Flow implements Flow {
    * @param key The key of the cache entry to delete.
    * @returns A promise that resolves to the response of the key delete operation.
    */
-  async deleteGlobalCache(key: string) {
+  async deleteGlobalCache(key: string, grpcCallOptions?: grpc.CallOptions) {
     return new Promise<KeyDeleteResponse>((resolve) => {
       let cacheDeleteRequest: CacheDeleteRequest = {
         globalCacheKeys: [key],
       };
       this.fcsClient.CacheDelete(
         cacheDeleteRequest,
-        this.grpcCallOptions,
+        grpcCallOptions ?? {},
         (err, res) => {
           if (err) {
             const resp = new _KeyDeleteResponse(err);

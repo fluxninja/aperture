@@ -142,15 +142,15 @@ export class ApertureClient {
 
   /**
    * Starts a new flow with the specified control point and parameters.
-   * StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+   * startFlow() takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
    * Return value is a Flow.
-   * The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+   * The default semantics are fail-to-wire. If startFlow() fails, calling Flow.ShouldRun() on returned Flow returns as true.
    * @param controlPoint The control point for the flow.
    * @param params The parameters for the flow.
    * @returns A promise that resolves to a Flow object.
    * @example
    * ```ts
-   *apertureClient.StartFlow("awesomeFeature", {
+   *apertureClient.startFlow("awesomeFeature", {
    *  labels: labels,
    *  grpcCallOptions: {
    *    deadline: Date.now() + 30000,
@@ -171,13 +171,11 @@ export class ApertureClient {
         resolve(
           new _Flow(
             this.fcsClient,
-            params.grpcCallOptions ?? {},
             controlPoint,
             span,
             startDate,
             params.rampMode,
             params.resultCacheKey,
-            params.globalCacheKeys,
             response,
             err,
           ),
