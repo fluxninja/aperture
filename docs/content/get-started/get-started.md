@@ -158,7 +158,7 @@ aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.
 **Define a Control Point**
 
 Once the SDK is connected to Aperture Cloud, you can create a feature control
-point anywhere within your code. For instance, before executing the business
+point anywhere within your code. For example, before executing the business
 logic of a specific API, you can create a feature control point that can control
 the execution flow of the API and can reject the request based on the policy
 defined in Aperture.
