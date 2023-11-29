@@ -1,6 +1,6 @@
 ---
-title: Create Your First Policy
-sidebar_label: Create Your First Policy
+title: How to Create a Policy
+sidebar_label: Policy Creation
 description: How to generate and apply policies in Aperture Cloud
 keywords:
   - policy
