@@ -157,6 +157,7 @@ class ApertureClient:
 
         span = self.tracer.start_span("Aperture Check", attributes=span_attributes)
         stub = FlowControlServiceStub(self.grpc_channel)
+        error: Optional[Exception] = None
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
             timeout = typing.cast(int, params.check_timeout.total_seconds())
@@ -168,6 +169,7 @@ class ApertureClient:
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
+            error = e
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
         return Flow(
             fcs_stub=stub,
@@ -176,6 +178,7 @@ class ApertureClient:
             check_response=response,
             ramp_mode=params.ramp_mode,
             cache_key=params.result_cache_key,
+            error=error,
         )
 
     def decorate(
@@ -193,7 +196,6 @@ class ApertureClient:
                     else:
                         if on_reject:
                             return on_reject()
-                        raise RejectedFlowException("Flow was rejected")
 
             return wrapper
 
@@ -201,11 +203,3 @@ class ApertureClient:
 
     def close(self):
         self.otlp_exporter.shutdown()
-
-
-class ApertureException(Exception):
-    pass
-
-
-class RejectedFlowException(ApertureException):
-    pass
