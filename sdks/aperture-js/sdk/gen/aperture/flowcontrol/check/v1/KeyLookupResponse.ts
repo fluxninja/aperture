@@ -4,7 +4,6 @@ import type { CacheLookupStatus as _aperture_flowcontrol_check_v1_CacheLookupSta
 import type { CacheOperationStatus as _aperture_flowcontrol_check_v1_CacheOperationStatus, CacheOperationStatus__Output as _aperture_flowcontrol_check_v1_CacheOperationStatus__Output } from '../../../../aperture/flowcontrol/check/v1/CacheOperationStatus';
 
 export interface KeyLookupResponse {
-  'key'?: (string);
   'value'?: (Buffer | Uint8Array | string);
   'lookupStatus'?: (_aperture_flowcontrol_check_v1_CacheLookupStatus);
   'operationStatus'?: (_aperture_flowcontrol_check_v1_CacheOperationStatus);
@@ -12,7 +11,6 @@ export interface KeyLookupResponse {
 }
 
 export interface KeyLookupResponse__Output {
-  'key': (string);
   'value': (Buffer);
   'lookupStatus': (_aperture_flowcontrol_check_v1_CacheLookupStatus__Output);
   'operationStatus': (_aperture_flowcontrol_check_v1_CacheOperationStatus__Output);

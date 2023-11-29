@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -20,8 +21,8 @@ var (
 	// ErrResultCacheKeyNotSet is returned when empty result cache key is provided by the caller during start flow.
 	ErrResultCacheKeyNotSet = errors.New("result cache key not set")
 
-	// ErrKeyMissingFromStateCacheResponse is returned when the state cache response does not contain the key.
-	ErrKeyMissingFromStateCacheResponse = errors.New("key missing from state cache response")
+	// ErrKeyMissingFromGlobalCacheResponse is returned when the global cache response does not contain the key.
+	ErrKeyMissingFromGlobalCacheResponse = errors.New("key missing from global cache response")
 )
 
 // CacheEntry describes the properties of cache entry.
@@ -36,11 +37,11 @@ type Flow interface {
 	ShouldRun() bool
 	SetStatus(status FlowStatus)
 	ResultCache() KeyLookupResponse
-	SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUpsertResponse
-	DeleteResultCache(ctx context.Context) KeyDeleteResponse
-	StateCache(key string) KeyLookupResponse
-	SetStateCache(ctx context.Context, key string, cacheEntry CacheEntry) KeyUpsertResponse
-	DeleteStateCache(ctx context.Context, key string) KeyDeleteResponse
+	SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse
+	DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) KeyDeleteResponse
+	GlobalCache(key string) KeyLookupResponse
+	SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse
+	DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse
 	Error() error
 	Span() trace.Span
 	End() error
@@ -53,7 +54,7 @@ type flow struct {
 	err               error
 	checkResponse     *checkv1.CheckResponse
 	resultCacheKey    string
-	stateCacheKeys    []string
+	globalCacheKeys   []string
 	statusCode        FlowStatus
 	ended             bool
 	rampMode          bool
@@ -63,7 +64,7 @@ type flow struct {
 var _ Flow = (*flow)(nil)
 
 // newFlow creates a new flow with default field values.
-func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, stateCacheKeys []string) *flow {
+func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, globalCacheKeys []string) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
 		span:              span,
@@ -72,7 +73,7 @@ func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span
 		ended:             false,
 		rampMode:          rampMode,
 		resultCacheKey:    resultCacheKey,
-		stateCacheKeys:    stateCacheKeys,
+		globalCacheKeys:   globalCacheKeys,
 	}
 }
 
@@ -110,7 +111,7 @@ func (f *flow) ResultCache() KeyLookupResponse {
 }
 
 // SetResultCache sets the result cache entry for the flow.
-func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUpsertResponse {
+func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse {
 	if f.resultCacheKey == "" {
 		return newKeyUpsertResponse(ErrResultCacheKeyNotSet)
 	}
@@ -124,7 +125,7 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUps
 			Value: cacheEntry.value,
 			Ttl:   ttlProto,
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyUpsertResponse(err)
 	}
@@ -137,7 +138,7 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUps
 }
 
 // DeleteResultCache deletes the result cache entry for the flow.
-func (f *flow) DeleteResultCache(ctx context.Context) KeyDeleteResponse {
+func (f *flow) DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) KeyDeleteResponse {
 	if f.resultCacheKey == "" {
 		return newKeyDeleteResponse(ErrResultCacheKeyNotSet)
 	}
@@ -145,7 +146,7 @@ func (f *flow) DeleteResultCache(ctx context.Context) KeyDeleteResponse {
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
 		ControlPoint:   f.checkResponse.ControlPoint,
 		ResultCacheKey: f.resultCacheKey,
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyDeleteResponse(err)
 	}
@@ -156,66 +157,64 @@ func (f *flow) DeleteResultCache(ctx context.Context) KeyDeleteResponse {
 	return newKeyDeleteResponse(convertCacheError(cacheDeleteResponse.ResultCacheResponse.Error))
 }
 
-// StateCache returns a state cache entry for the flow.
-func (f *flow) StateCache(key string) KeyLookupResponse {
+// GlobalCache returns a global cache entry for the flow.
+func (f *flow) GlobalCache(key string) KeyLookupResponse {
 	if f.err != nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, f.err)
 	}
 	if f.checkResponse == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("check response is nil"))
 	}
-	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetStateCacheResponses() == nil {
-		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("state cache is nil"))
+	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetGlobalCacheResponses() == nil {
+		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("global cache is nil"))
 	}
-	lookupResponseMap := f.checkResponse.CacheLookupResponse.GetStateCacheResponses()
+	lookupResponseMap := f.checkResponse.CacheLookupResponse.GetGlobalCacheResponses()
 	lookupResponse, ok := lookupResponseMap[key]
 	if !ok {
-		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("unknown state cache key"))
+		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("unknown global cache key"))
 	}
 
 	return newKeyLookupResponse(lookupResponse.Value, convertCacheLookupStatus(lookupResponse.LookupStatus), convertCacheError(lookupResponse.Error))
 }
 
-// SetStateCache sets a state cache entry for the flow.
-func (f *flow) SetStateCache(ctx context.Context, key string, cacheEntry CacheEntry) KeyUpsertResponse {
+// SetGlobalCache sets a global cache entry for the flow.
+func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse {
 	ttlProto := durationpb.New(cacheEntry.ttl)
 
 	cacheUpsertResponse, err := f.flowControlClient.CacheUpsert(ctx, &checkv1.CacheUpsertRequest{
-		ControlPoint: f.checkResponse.ControlPoint,
-		StateCacheEntries: map[string]*checkv1.CacheEntry{
+		GlobalCacheEntries: map[string]*checkv1.CacheEntry{
 			key: {
 				Value: cacheEntry.value,
 				Ttl:   ttlProto,
 			},
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyUpsertResponse(err)
 	}
 
-	upsertResponse, ok := cacheUpsertResponse.StateCacheResponses[key]
+	upsertResponse, ok := cacheUpsertResponse.GlobalCacheResponses[key]
 	if !ok {
-		return newKeyUpsertResponse(ErrKeyMissingFromStateCacheResponse)
+		return newKeyUpsertResponse(ErrKeyMissingFromGlobalCacheResponse)
 	}
 
 	return newKeyUpsertResponse(convertCacheError(upsertResponse.Error))
 }
 
-// DeleteStateCache deletes a state cache entry for the flow.
-func (f *flow) DeleteStateCache(ctx context.Context, key string) KeyDeleteResponse {
+// DeleteGlobalCache deletes a global cache entry for the flow.
+func (f *flow) DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse {
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
-		ControlPoint: f.checkResponse.ControlPoint,
-		StateCacheKeys: []string{
+		GlobalCacheKeys: []string{
 			key,
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyDeleteResponse(err)
 	}
 
-	deleteResponse, ok := cacheDeleteResponse.StateCacheResponses[key]
+	deleteResponse, ok := cacheDeleteResponse.GlobalCacheResponses[key]
 	if !ok {
-		return newKeyDeleteResponse(ErrKeyMissingFromStateCacheResponse)
+		return newKeyDeleteResponse(ErrKeyMissingFromGlobalCacheResponse)
 	}
 
 	return newKeyDeleteResponse(convertCacheError(deleteResponse.Error))

@@ -54,7 +54,7 @@ class FlowParams:
     check_timeout: datetime.timedelta = default_rpc_timeout
     ramp_mode: bool = False
     result_cache_key: Optional[str] = None
-    state_cache_keys: Optional[typing.List[str]] = None
+    global_cache_keys: Optional[typing.List[str]] = None
 
 
 class ApertureClient:

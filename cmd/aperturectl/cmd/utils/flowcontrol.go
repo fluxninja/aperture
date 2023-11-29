@@ -148,14 +148,13 @@ func ParseResultCacheLookup(client IntrospectionClient, input CacheLookupInput) 
 	return nil
 }
 
-func ParseStateCacheLookup(client IntrospectionClient, input CacheLookupInput) error {
+func ParseGlobalCacheLookup(client IntrospectionClient, input CacheLookupInput) error {
 	resp, err := client.CacheLookup(
 		context.Background(),
 		&cmdv1.GlobalCacheLookupRequest{
 			AgentGroup: input.AgentGroup,
 			Request: &flowcontrolv1.CacheLookupRequest{
-				ControlPoint:   input.ControlPoint,
-				StateCacheKeys: []string{input.Key},
+				GlobalCacheKeys: []string{input.Key},
 			},
 		},
 	)
@@ -163,11 +162,11 @@ func ParseStateCacheLookup(client IntrospectionClient, input CacheLookupInput) e
 		return err
 	}
 
-	if resp.StateCacheResponses == nil || resp.StateCacheResponses[input.Key] == nil {
+	if resp.GlobalCacheResponses == nil || resp.GlobalCacheResponses[input.Key] == nil {
 		fmt.Fprintf(os.Stderr, "Could not get answer")
 		return nil
 	}
-	lookupResponse := resp.StateCacheResponses[input.Key]
+	lookupResponse := resp.GlobalCacheResponses[input.Key]
 	if lookupResponse.Error != "" {
 		fmt.Fprintf(os.Stderr, "Error: %s", lookupResponse.Error)
 		return nil
@@ -219,14 +218,13 @@ func ParseResultCacheUpsert(client IntrospectionClient, input CacheUpsertInput) 
 	return nil
 }
 
-func ParseStateCacheUpsert(client IntrospectionClient, input CacheUpsertInput) error {
+func ParseGlobalCacheUpsert(client IntrospectionClient, input CacheUpsertInput) error {
 	resp, err := client.CacheUpsert(
 		context.Background(),
 		&cmdv1.GlobalCacheUpsertRequest{
 			AgentGroup: input.AgentGroup,
 			Request: &flowcontrolv1.CacheUpsertRequest{
-				ControlPoint: input.ControlPoint,
-				StateCacheEntries: map[string]*flowcontrolv1.CacheEntry{
+				GlobalCacheEntries: map[string]*flowcontrolv1.CacheEntry{
 					input.Key: {
 						Key:   input.Key,
 						Value: []byte(input.Value),
@@ -279,14 +277,13 @@ func ParseResultCacheDelete(client IntrospectionClient, input CacheDeleteInput) 
 	return nil
 }
 
-func ParseStateCacheDelete(client IntrospectionClient, input CacheDeleteInput) error {
+func ParseGlobalCacheDelete(client IntrospectionClient, input CacheDeleteInput) error {
 	resp, err := client.CacheDelete(
 		context.Background(),
 		&cmdv1.GlobalCacheDeleteRequest{
 			AgentGroup: input.AgentGroup,
 			Request: &flowcontrolv1.CacheDeleteRequest{
-				ControlPoint:   input.ControlPoint,
-				StateCacheKeys: []string{input.Key},
+				GlobalCacheKeys: []string{input.Key},
 			},
 		},
 	)

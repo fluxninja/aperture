@@ -782,21 +782,21 @@ definitions:
         properties:
             control_point:
                 type: string
-            result_cache_key:
-                type: string
-            state_cache_keys:
+            global_cache_keys:
                 items:
                     type: string
                 type: array
+            result_cache_key:
+                type: string
         type: object
     CacheDeleteResponse:
         properties:
-            result_cache_response:
-                $ref: '#/definitions/KeyDeleteResponse'
-            state_cache_responses:
+            global_cache_responses:
                 additionalProperties:
                     $ref: '#/definitions/KeyDeleteResponse'
                 type: object
+            result_cache_response:
+                $ref: '#/definitions/KeyDeleteResponse'
         type: object
     CacheEntry:
         properties:
@@ -812,23 +812,23 @@ definitions:
         properties:
             control_point:
                 type: string
-            result_cache_key:
-                description: Key for result cache that needs to be fetched.
-                type: string
-            state_cache_keys:
-                description: Keys for state cache entries that need to be fetched.
+            global_cache_keys:
+                description: Keys for global cache entries that need to be fetched.
                 items:
                     type: string
                 type: array
+            result_cache_key:
+                description: Key for result cache that needs to be fetched.
+                type: string
         type: object
     CacheLookupResponse:
         properties:
-            result_cache_response:
-                $ref: '#/definitions/KeyLookupResponse'
-            state_cache_responses:
+            global_cache_responses:
                 additionalProperties:
                     $ref: '#/definitions/KeyLookupResponse'
                 type: object
+            result_cache_response:
+                $ref: '#/definitions/KeyLookupResponse'
         type: object
     CacheLookupStatus:
         default: HIT
@@ -846,21 +846,21 @@ definitions:
         properties:
             control_point:
                 type: string
-            result_cache_entry:
-                $ref: '#/definitions/CacheEntry'
-            state_cache_entries:
+            global_cache_entries:
                 additionalProperties:
                     $ref: '#/definitions/CacheEntry'
                 type: object
+            result_cache_entry:
+                $ref: '#/definitions/CacheEntry'
         type: object
     CacheUpsertResponse:
         properties:
-            result_cache_response:
-                $ref: '#/definitions/KeyUpsertResponse'
-            state_cache_responses:
+            global_cache_responses:
                 additionalProperties:
                     $ref: '#/definitions/KeyUpsertResponse'
                 type: object
+            result_cache_response:
+                $ref: '#/definitions/KeyUpsertResponse'
         type: object
     CheckHTTPRequest:
         properties:
@@ -2588,16 +2588,12 @@ definitions:
         properties:
             error:
                 type: string
-            key:
-                type: string
             operation_status:
                 $ref: '#/definitions/CacheOperationStatus'
         type: object
     KeyLookupResponse:
         properties:
             error:
-                type: string
-            key:
                 type: string
             lookup_status:
                 $ref: '#/definitions/CacheLookupStatus'
@@ -2610,8 +2606,6 @@ definitions:
     KeyUpsertResponse:
         properties:
             error:
-                type: string
-            key:
                 type: string
             operation_status:
                 $ref: '#/definitions/CacheOperationStatus'

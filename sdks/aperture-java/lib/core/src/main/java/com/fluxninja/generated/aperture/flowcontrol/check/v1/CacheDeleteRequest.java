@@ -18,7 +18,7 @@ private static final long serialVersionUID = 0L;
   private CacheDeleteRequest() {
     controlPoint_ = "";
     resultCacheKey_ = "";
-    stateCacheKeys_ =
+    globalCacheKeys_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
   }
 
@@ -120,41 +120,41 @@ private static final long serialVersionUID = 0L;
     }
   }
 
-  public static final int STATE_CACHE_KEYS_FIELD_NUMBER = 3;
+  public static final int GLOBAL_CACHE_KEYS_FIELD_NUMBER = 3;
   @SuppressWarnings("serial")
-  private com.google.protobuf.LazyStringArrayList stateCacheKeys_ =
+  private com.google.protobuf.LazyStringArrayList globalCacheKeys_ =
       com.google.protobuf.LazyStringArrayList.emptyList();
   /**
-   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-   * @return A list containing the stateCacheKeys.
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @return A list containing the globalCacheKeys.
    */
   public com.google.protobuf.ProtocolStringList
-      getStateCacheKeysList() {
-    return stateCacheKeys_;
+      getGlobalCacheKeysList() {
+    return globalCacheKeys_;
   }
   /**
-   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-   * @return The count of stateCacheKeys.
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+   * @return The count of globalCacheKeys.
    */
-  public int getStateCacheKeysCount() {
-    return stateCacheKeys_.size();
+  public int getGlobalCacheKeysCount() {
+    return globalCacheKeys_.size();
   }
   /**
-   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
    * @param index The index of the element to return.
-   * @return The stateCacheKeys at the given index.
+   * @return The globalCacheKeys at the given index.
    */
-  public java.lang.String getStateCacheKeys(int index) {
-    return stateCacheKeys_.get(index);
+  public java.lang.String getGlobalCacheKeys(int index) {
+    return globalCacheKeys_.get(index);
   }
   /**
-   * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+   * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
    * @param index The index of the value to return.
-   * @return The bytes of the stateCacheKeys at the given index.
+   * @return The bytes of the globalCacheKeys at the given index.
    */
   public com.google.protobuf.ByteString
-      getStateCacheKeysBytes(int index) {
-    return stateCacheKeys_.getByteString(index);
+      getGlobalCacheKeysBytes(int index) {
+    return globalCacheKeys_.getByteString(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -177,8 +177,8 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(resultCacheKey_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 2, resultCacheKey_);
     }
-    for (int i = 0; i < stateCacheKeys_.size(); i++) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, stateCacheKeys_.getRaw(i));
+    for (int i = 0; i < globalCacheKeys_.size(); i++) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, globalCacheKeys_.getRaw(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -197,11 +197,11 @@ private static final long serialVersionUID = 0L;
     }
     {
       int dataSize = 0;
-      for (int i = 0; i < stateCacheKeys_.size(); i++) {
-        dataSize += computeStringSizeNoTag(stateCacheKeys_.getRaw(i));
+      for (int i = 0; i < globalCacheKeys_.size(); i++) {
+        dataSize += computeStringSizeNoTag(globalCacheKeys_.getRaw(i));
       }
       size += dataSize;
-      size += 1 * getStateCacheKeysList().size();
+      size += 1 * getGlobalCacheKeysList().size();
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -222,8 +222,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getControlPoint())) return false;
     if (!getResultCacheKey()
         .equals(other.getResultCacheKey())) return false;
-    if (!getStateCacheKeysList()
-        .equals(other.getStateCacheKeysList())) return false;
+    if (!getGlobalCacheKeysList()
+        .equals(other.getGlobalCacheKeysList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -239,9 +239,9 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getControlPoint().hashCode();
     hash = (37 * hash) + RESULT_CACHE_KEY_FIELD_NUMBER;
     hash = (53 * hash) + getResultCacheKey().hashCode();
-    if (getStateCacheKeysCount() > 0) {
-      hash = (37 * hash) + STATE_CACHE_KEYS_FIELD_NUMBER;
-      hash = (53 * hash) + getStateCacheKeysList().hashCode();
+    if (getGlobalCacheKeysCount() > 0) {
+      hash = (37 * hash) + GLOBAL_CACHE_KEYS_FIELD_NUMBER;
+      hash = (53 * hash) + getGlobalCacheKeysList().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -376,7 +376,7 @@ private static final long serialVersionUID = 0L;
       bitField0_ = 0;
       controlPoint_ = "";
       resultCacheKey_ = "";
-      stateCacheKeys_ =
+      globalCacheKeys_ =
           com.google.protobuf.LazyStringArrayList.emptyList();
       return this;
     }
@@ -418,8 +418,8 @@ private static final long serialVersionUID = 0L;
         result.resultCacheKey_ = resultCacheKey_;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        stateCacheKeys_.makeImmutable();
-        result.stateCacheKeys_ = stateCacheKeys_;
+        globalCacheKeys_.makeImmutable();
+        result.globalCacheKeys_ = globalCacheKeys_;
       }
     }
 
@@ -477,13 +477,13 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000002;
         onChanged();
       }
-      if (!other.stateCacheKeys_.isEmpty()) {
-        if (stateCacheKeys_.isEmpty()) {
-          stateCacheKeys_ = other.stateCacheKeys_;
+      if (!other.globalCacheKeys_.isEmpty()) {
+        if (globalCacheKeys_.isEmpty()) {
+          globalCacheKeys_ = other.globalCacheKeys_;
           bitField0_ |= 0x00000004;
         } else {
-          ensureStateCacheKeysIsMutable();
-          stateCacheKeys_.addAll(other.stateCacheKeys_);
+          ensureGlobalCacheKeysIsMutable();
+          globalCacheKeys_.addAll(other.globalCacheKeys_);
         }
         onChanged();
       }
@@ -525,8 +525,8 @@ private static final long serialVersionUID = 0L;
             } // case 18
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
-              ensureStateCacheKeysIsMutable();
-              stateCacheKeys_.add(s);
+              ensureGlobalCacheKeysIsMutable();
+              globalCacheKeys_.add(s);
               break;
             } // case 26
             default: {
@@ -690,112 +690,112 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.google.protobuf.LazyStringArrayList stateCacheKeys_ =
+    private com.google.protobuf.LazyStringArrayList globalCacheKeys_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
-    private void ensureStateCacheKeysIsMutable() {
-      if (!stateCacheKeys_.isModifiable()) {
-        stateCacheKeys_ = new com.google.protobuf.LazyStringArrayList(stateCacheKeys_);
+    private void ensureGlobalCacheKeysIsMutable() {
+      if (!globalCacheKeys_.isModifiable()) {
+        globalCacheKeys_ = new com.google.protobuf.LazyStringArrayList(globalCacheKeys_);
       }
       bitField0_ |= 0x00000004;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-     * @return A list containing the stateCacheKeys.
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+     * @return A list containing the globalCacheKeys.
      */
     public com.google.protobuf.ProtocolStringList
-        getStateCacheKeysList() {
-      stateCacheKeys_.makeImmutable();
-      return stateCacheKeys_;
+        getGlobalCacheKeysList() {
+      globalCacheKeys_.makeImmutable();
+      return globalCacheKeys_;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-     * @return The count of stateCacheKeys.
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+     * @return The count of globalCacheKeys.
      */
-    public int getStateCacheKeysCount() {
-      return stateCacheKeys_.size();
+    public int getGlobalCacheKeysCount() {
+      return globalCacheKeys_.size();
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
      * @param index The index of the element to return.
-     * @return The stateCacheKeys at the given index.
+     * @return The globalCacheKeys at the given index.
      */
-    public java.lang.String getStateCacheKeys(int index) {
-      return stateCacheKeys_.get(index);
+    public java.lang.String getGlobalCacheKeys(int index) {
+      return globalCacheKeys_.get(index);
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
      * @param index The index of the value to return.
-     * @return The bytes of the stateCacheKeys at the given index.
+     * @return The bytes of the globalCacheKeys at the given index.
      */
     public com.google.protobuf.ByteString
-        getStateCacheKeysBytes(int index) {
-      return stateCacheKeys_.getByteString(index);
+        getGlobalCacheKeysBytes(int index) {
+      return globalCacheKeys_.getByteString(index);
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
      * @param index The index to set the value at.
-     * @param value The stateCacheKeys to set.
+     * @param value The globalCacheKeys to set.
      * @return This builder for chaining.
      */
-    public Builder setStateCacheKeys(
+    public Builder setGlobalCacheKeys(
         int index, java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      ensureStateCacheKeysIsMutable();
-      stateCacheKeys_.set(index, value);
+      ensureGlobalCacheKeysIsMutable();
+      globalCacheKeys_.set(index, value);
       bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-     * @param value The stateCacheKeys to add.
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+     * @param value The globalCacheKeys to add.
      * @return This builder for chaining.
      */
-    public Builder addStateCacheKeys(
+    public Builder addGlobalCacheKeys(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      ensureStateCacheKeysIsMutable();
-      stateCacheKeys_.add(value);
+      ensureGlobalCacheKeysIsMutable();
+      globalCacheKeys_.add(value);
       bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-     * @param values The stateCacheKeys to add.
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+     * @param values The globalCacheKeys to add.
      * @return This builder for chaining.
      */
-    public Builder addAllStateCacheKeys(
+    public Builder addAllGlobalCacheKeys(
         java.lang.Iterable<java.lang.String> values) {
-      ensureStateCacheKeysIsMutable();
+      ensureGlobalCacheKeysIsMutable();
       com.google.protobuf.AbstractMessageLite.Builder.addAll(
-          values, stateCacheKeys_);
+          values, globalCacheKeys_);
       bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearStateCacheKeys() {
-      stateCacheKeys_ =
+    public Builder clearGlobalCacheKeys() {
+      globalCacheKeys_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
       bitField0_ = (bitField0_ & ~0x00000004);;
       onChanged();
       return this;
     }
     /**
-     * <code>repeated string state_cache_keys = 3 [json_name = "stateCacheKeys"];</code>
-     * @param value The bytes of the stateCacheKeys to add.
+     * <code>repeated string global_cache_keys = 3 [json_name = "globalCacheKeys"];</code>
+     * @param value The bytes of the globalCacheKeys to add.
      * @return This builder for chaining.
      */
-    public Builder addStateCacheKeysBytes(
+    public Builder addGlobalCacheKeysBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      ensureStateCacheKeysIsMutable();
-      stateCacheKeys_.add(value);
+      ensureGlobalCacheKeysIsMutable();
+      globalCacheKeys_.add(value);
       bitField0_ |= 0x00000004;
       onChanged();
       return this;

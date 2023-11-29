@@ -3,30 +3,29 @@ sidebar_label: Get
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_state-cache_get
+  - aperturectl_global-cache_get
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl state-cache get
+## aperturectl global-cache get
 
-Get a state cache entry
+Get a global cache entry
 
 ### Synopsis
 
-Get a state cache entry
+Get a global cache entry
 
 ```
-aperturectl state-cache get [flags]
+aperturectl global-cache get [flags]
 ```
 
 ### Options
 
 ```
-  -a, --agent-group string     Agent group
-  -c, --control-point string   Control point
-  -h, --help                   help for get
-  -k, --key string             Key
+  -a, --agent-group string   Agent group
+  -h, --help                 help for get
+  -k, --key string           Key
 ```
 
 ### Options inherited from parent commands
@@ -42,4 +41,4 @@ aperturectl state-cache get [flags]
 
 ### SEE ALSO
 
-- [aperturectl state-cache](/reference/aperture-cli/aperturectl/state-cache/state-cache.md) - State Cache related commands
+- [aperturectl global-cache](/reference/aperture-cli/aperturectl/global-cache/global-cache.md) - Global Cache related commands

@@ -36,7 +36,7 @@ private static final long serialVersionUID = 0L;
       int number) {
     switch (number) {
       case 2:
-        return internalGetStateCacheResponses();
+        return internalGetGlobalCacheResponses();
       default:
         throw new RuntimeException(
             "Invalid map field number: " + number);
@@ -77,13 +77,13 @@ private static final long serialVersionUID = 0L;
     return resultCacheResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse.getDefaultInstance() : resultCacheResponse_;
   }
 
-  public static final int STATE_CACHE_RESPONSES_FIELD_NUMBER = 2;
-  private static final class StateCacheResponsesDefaultEntryHolder {
+  public static final int GLOBAL_CACHE_RESPONSES_FIELD_NUMBER = 2;
+  private static final class GlobalCacheResponsesDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
         java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>newDefaultInstance(
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_StateCacheResponsesEntry_descriptor, 
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheDeleteResponse_GlobalCacheResponsesEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.MESSAGE,
@@ -91,65 +91,65 @@ private static final long serialVersionUID = 0L;
   }
   @SuppressWarnings("serial")
   private com.google.protobuf.MapField<
-      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> stateCacheResponses_;
+      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> globalCacheResponses_;
   private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-  internalGetStateCacheResponses() {
-    if (stateCacheResponses_ == null) {
+  internalGetGlobalCacheResponses() {
+    if (globalCacheResponses_ == null) {
       return com.google.protobuf.MapField.emptyMapField(
-          StateCacheResponsesDefaultEntryHolder.defaultEntry);
+          GlobalCacheResponsesDefaultEntryHolder.defaultEntry);
     }
-    return stateCacheResponses_;
+    return globalCacheResponses_;
   }
-  public int getStateCacheResponsesCount() {
-    return internalGetStateCacheResponses().getMap().size();
+  public int getGlobalCacheResponsesCount() {
+    return internalGetGlobalCacheResponses().getMap().size();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
   @java.lang.Override
-  public boolean containsStateCacheResponses(
+  public boolean containsGlobalCacheResponses(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
-    return internalGetStateCacheResponses().getMap().containsKey(key);
+    return internalGetGlobalCacheResponses().getMap().containsKey(key);
   }
   /**
-   * Use {@link #getStateCacheResponsesMap()} instead.
+   * Use {@link #getGlobalCacheResponsesMap()} instead.
    */
   @java.lang.Override
   @java.lang.Deprecated
-  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getStateCacheResponses() {
-    return getStateCacheResponsesMap();
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getGlobalCacheResponses() {
+    return getGlobalCacheResponsesMap();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
   @java.lang.Override
-  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getStateCacheResponsesMap() {
-    return internalGetStateCacheResponses().getMap();
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getGlobalCacheResponsesMap() {
+    return internalGetGlobalCacheResponses().getMap();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
   @java.lang.Override
   public /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getStateCacheResponsesOrDefault(
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getGlobalCacheResponsesOrDefault(
       java.lang.String key,
       /* nullable */
 com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultValue) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> map =
-        internalGetStateCacheResponses().getMap();
+        internalGetGlobalCacheResponses().getMap();
     return map.containsKey(key) ? map.get(key) : defaultValue;
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getStateCacheResponsesOrThrow(
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getGlobalCacheResponsesOrThrow(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> map =
-        internalGetStateCacheResponses().getMap();
+        internalGetGlobalCacheResponses().getMap();
     if (!map.containsKey(key)) {
       throw new java.lang.IllegalArgumentException();
     }
@@ -176,8 +176,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
     com.google.protobuf.GeneratedMessageV3
       .serializeStringMapTo(
         output,
-        internalGetStateCacheResponses(),
-        StateCacheResponsesDefaultEntryHolder.defaultEntry,
+        internalGetGlobalCacheResponses(),
+        GlobalCacheResponsesDefaultEntryHolder.defaultEntry,
         2);
     getUnknownFields().writeTo(output);
   }
@@ -193,14 +193,14 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
         .computeMessageSize(1, getResultCacheResponse());
     }
     for (java.util.Map.Entry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> entry
-         : internalGetStateCacheResponses().getMap().entrySet()) {
+         : internalGetGlobalCacheResponses().getMap().entrySet()) {
       com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-      stateCacheResponses__ = StateCacheResponsesDefaultEntryHolder.defaultEntry.newBuilderForType()
+      globalCacheResponses__ = GlobalCacheResponsesDefaultEntryHolder.defaultEntry.newBuilderForType()
           .setKey(entry.getKey())
           .setValue(entry.getValue())
           .build();
       size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, stateCacheResponses__);
+          .computeMessageSize(2, globalCacheResponses__);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -222,8 +222,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
       if (!getResultCacheResponse()
           .equals(other.getResultCacheResponse())) return false;
     }
-    if (!internalGetStateCacheResponses().equals(
-        other.internalGetStateCacheResponses())) return false;
+    if (!internalGetGlobalCacheResponses().equals(
+        other.internalGetGlobalCacheResponses())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -239,9 +239,9 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
       hash = (37 * hash) + RESULT_CACHE_RESPONSE_FIELD_NUMBER;
       hash = (53 * hash) + getResultCacheResponse().hashCode();
     }
-    if (!internalGetStateCacheResponses().getMap().isEmpty()) {
-      hash = (37 * hash) + STATE_CACHE_RESPONSES_FIELD_NUMBER;
-      hash = (53 * hash) + internalGetStateCacheResponses().hashCode();
+    if (!internalGetGlobalCacheResponses().getMap().isEmpty()) {
+      hash = (37 * hash) + GLOBAL_CACHE_RESPONSES_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetGlobalCacheResponses().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -357,7 +357,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
         int number) {
       switch (number) {
         case 2:
-          return internalGetStateCacheResponses();
+          return internalGetGlobalCacheResponses();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -368,7 +368,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
         int number) {
       switch (number) {
         case 2:
-          return internalGetMutableStateCacheResponses();
+          return internalGetMutableGlobalCacheResponses();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -407,7 +407,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
         resultCacheResponseBuilder_.dispose();
         resultCacheResponseBuilder_ = null;
       }
-      internalGetMutableStateCacheResponses().clear();
+      internalGetMutableGlobalCacheResponses().clear();
       return this;
     }
 
@@ -449,8 +449,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.stateCacheResponses_ = internalGetStateCacheResponses();
-        result.stateCacheResponses_.makeImmutable();
+        result.globalCacheResponses_ = internalGetGlobalCacheResponses();
+        result.globalCacheResponses_.makeImmutable();
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -502,8 +502,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
       if (other.hasResultCacheResponse()) {
         mergeResultCacheResponse(other.getResultCacheResponse());
       }
-      internalGetMutableStateCacheResponses().mergeFrom(
-          other.internalGetStateCacheResponses());
+      internalGetMutableGlobalCacheResponses().mergeFrom(
+          other.internalGetGlobalCacheResponses());
       bitField0_ |= 0x00000002;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -540,10 +540,10 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
             } // case 10
             case 18: {
               com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-              stateCacheResponses__ = input.readMessage(
-                  StateCacheResponsesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              internalGetMutableStateCacheResponses().getMutableMap().put(
-                  stateCacheResponses__.getKey(), stateCacheResponses__.getValue());
+              globalCacheResponses__ = input.readMessage(
+                  GlobalCacheResponsesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableGlobalCacheResponses().getMutableMap().put(
+                  globalCacheResponses__.getKey(), globalCacheResponses__.getValue());
               bitField0_ |= 0x00000002;
               break;
             } // case 18
@@ -686,96 +686,96 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
     }
 
     private com.google.protobuf.MapField<
-        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> stateCacheResponses_;
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> globalCacheResponses_;
     private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-        internalGetStateCacheResponses() {
-      if (stateCacheResponses_ == null) {
+        internalGetGlobalCacheResponses() {
+      if (globalCacheResponses_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
-            StateCacheResponsesDefaultEntryHolder.defaultEntry);
+            GlobalCacheResponsesDefaultEntryHolder.defaultEntry);
       }
-      return stateCacheResponses_;
+      return globalCacheResponses_;
     }
     private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-        internalGetMutableStateCacheResponses() {
-      if (stateCacheResponses_ == null) {
-        stateCacheResponses_ = com.google.protobuf.MapField.newMapField(
-            StateCacheResponsesDefaultEntryHolder.defaultEntry);
+        internalGetMutableGlobalCacheResponses() {
+      if (globalCacheResponses_ == null) {
+        globalCacheResponses_ = com.google.protobuf.MapField.newMapField(
+            GlobalCacheResponsesDefaultEntryHolder.defaultEntry);
       }
-      if (!stateCacheResponses_.isMutable()) {
-        stateCacheResponses_ = stateCacheResponses_.copy();
+      if (!globalCacheResponses_.isMutable()) {
+        globalCacheResponses_ = globalCacheResponses_.copy();
       }
       bitField0_ |= 0x00000002;
       onChanged();
-      return stateCacheResponses_;
+      return globalCacheResponses_;
     }
-    public int getStateCacheResponsesCount() {
-      return internalGetStateCacheResponses().getMap().size();
+    public int getGlobalCacheResponsesCount() {
+      return internalGetGlobalCacheResponses().getMap().size();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
     @java.lang.Override
-    public boolean containsStateCacheResponses(
+    public boolean containsGlobalCacheResponses(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
-      return internalGetStateCacheResponses().getMap().containsKey(key);
+      return internalGetGlobalCacheResponses().getMap().containsKey(key);
     }
     /**
-     * Use {@link #getStateCacheResponsesMap()} instead.
+     * Use {@link #getGlobalCacheResponsesMap()} instead.
      */
     @java.lang.Override
     @java.lang.Deprecated
-    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getStateCacheResponses() {
-      return getStateCacheResponsesMap();
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getGlobalCacheResponses() {
+      return getGlobalCacheResponsesMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
     @java.lang.Override
-    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getStateCacheResponsesMap() {
-      return internalGetStateCacheResponses().getMap();
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> getGlobalCacheResponsesMap() {
+      return internalGetGlobalCacheResponses().getMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
     @java.lang.Override
     public /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getStateCacheResponsesOrDefault(
+com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getGlobalCacheResponsesOrDefault(
         java.lang.String key,
         /* nullable */
 com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultValue) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> map =
-          internalGetStateCacheResponses().getMap();
+          internalGetGlobalCacheResponses().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getStateCacheResponsesOrThrow(
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse getGlobalCacheResponsesOrThrow(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> map =
-          internalGetStateCacheResponses().getMap();
+          internalGetGlobalCacheResponses().getMap();
       if (!map.containsKey(key)) {
         throw new java.lang.IllegalArgumentException();
       }
       return map.get(key);
     }
-    public Builder clearStateCacheResponses() {
+    public Builder clearGlobalCacheResponses() {
       bitField0_ = (bitField0_ & ~0x00000002);
-      internalGetMutableStateCacheResponses().getMutableMap()
+      internalGetMutableGlobalCacheResponses().getMutableMap()
           .clear();
       return this;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
-    public Builder removeStateCacheResponses(
+    public Builder removeGlobalCacheResponses(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
-      internalGetMutableStateCacheResponses().getMutableMap()
+      internalGetMutableGlobalCacheResponses().getMutableMap()
           .remove(key);
       return this;
     }
@@ -784,29 +784,29 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse defaultV
      */
     @java.lang.Deprecated
     public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse>
-        getMutableStateCacheResponses() {
+        getMutableGlobalCacheResponses() {
       bitField0_ |= 0x00000002;
-      return internalGetMutableStateCacheResponses().getMutableMap();
+      return internalGetMutableGlobalCacheResponses().getMutableMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
-    public Builder putStateCacheResponses(
+    public Builder putGlobalCacheResponses(
         java.lang.String key,
         com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse value) {
       if (key == null) { throw new NullPointerException("map key"); }
       if (value == null) { throw new NullPointerException("map value"); }
-      internalGetMutableStateCacheResponses().getMutableMap()
+      internalGetMutableGlobalCacheResponses().getMutableMap()
           .put(key, value);
       bitField0_ |= 0x00000002;
       return this;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; state_cache_responses = 2 [json_name = "stateCacheResponses"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.KeyDeleteResponse&gt; global_cache_responses = 2 [json_name = "globalCacheResponses"];</code>
      */
-    public Builder putAllStateCacheResponses(
+    public Builder putAllGlobalCacheResponses(
         java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyDeleteResponse> values) {
-      internalGetMutableStateCacheResponses().getMutableMap()
+      internalGetMutableGlobalCacheResponses().getMutableMap()
           .putAll(values);
       bitField0_ |= 0x00000002;
       return this;

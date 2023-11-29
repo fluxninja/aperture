@@ -37,7 +37,7 @@ private static final long serialVersionUID = 0L;
       int number) {
     switch (number) {
       case 3:
-        return internalGetStateCacheEntries();
+        return internalGetGlobalCacheEntries();
       default:
         throw new RuntimeException(
             "Invalid map field number: " + number);
@@ -117,13 +117,13 @@ private static final long serialVersionUID = 0L;
     return resultCacheEntry_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry.getDefaultInstance() : resultCacheEntry_;
   }
 
-  public static final int STATE_CACHE_ENTRIES_FIELD_NUMBER = 3;
-  private static final class StateCacheEntriesDefaultEntryHolder {
+  public static final int GLOBAL_CACHE_ENTRIES_FIELD_NUMBER = 3;
+  private static final class GlobalCacheEntriesDefaultEntryHolder {
     static final com.google.protobuf.MapEntry<
         java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> defaultEntry =
             com.google.protobuf.MapEntry
             .<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>newDefaultInstance(
-                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_StateCacheEntriesEntry_descriptor, 
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_CacheUpsertRequest_GlobalCacheEntriesEntry_descriptor, 
                 com.google.protobuf.WireFormat.FieldType.STRING,
                 "",
                 com.google.protobuf.WireFormat.FieldType.MESSAGE,
@@ -131,65 +131,65 @@ private static final long serialVersionUID = 0L;
   }
   @SuppressWarnings("serial")
   private com.google.protobuf.MapField<
-      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> stateCacheEntries_;
+      java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> globalCacheEntries_;
   private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-  internalGetStateCacheEntries() {
-    if (stateCacheEntries_ == null) {
+  internalGetGlobalCacheEntries() {
+    if (globalCacheEntries_ == null) {
       return com.google.protobuf.MapField.emptyMapField(
-          StateCacheEntriesDefaultEntryHolder.defaultEntry);
+          GlobalCacheEntriesDefaultEntryHolder.defaultEntry);
     }
-    return stateCacheEntries_;
+    return globalCacheEntries_;
   }
-  public int getStateCacheEntriesCount() {
-    return internalGetStateCacheEntries().getMap().size();
+  public int getGlobalCacheEntriesCount() {
+    return internalGetGlobalCacheEntries().getMap().size();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   @java.lang.Override
-  public boolean containsStateCacheEntries(
+  public boolean containsGlobalCacheEntries(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
-    return internalGetStateCacheEntries().getMap().containsKey(key);
+    return internalGetGlobalCacheEntries().getMap().containsKey(key);
   }
   /**
-   * Use {@link #getStateCacheEntriesMap()} instead.
+   * Use {@link #getGlobalCacheEntriesMap()} instead.
    */
   @java.lang.Override
   @java.lang.Deprecated
-  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getStateCacheEntries() {
-    return getStateCacheEntriesMap();
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getGlobalCacheEntries() {
+    return getGlobalCacheEntriesMap();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   @java.lang.Override
-  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getStateCacheEntriesMap() {
-    return internalGetStateCacheEntries().getMap();
+  public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getGlobalCacheEntriesMap() {
+    return internalGetGlobalCacheEntries().getMap();
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   @java.lang.Override
   public /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrDefault(
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrDefault(
       java.lang.String key,
       /* nullable */
 com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> map =
-        internalGetStateCacheEntries().getMap();
+        internalGetGlobalCacheEntries().getMap();
     return map.containsKey(key) ? map.get(key) : defaultValue;
   }
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   @java.lang.Override
-  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrThrow(
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrThrow(
       java.lang.String key) {
     if (key == null) { throw new NullPointerException("map key"); }
     java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> map =
-        internalGetStateCacheEntries().getMap();
+        internalGetGlobalCacheEntries().getMap();
     if (!map.containsKey(key)) {
       throw new java.lang.IllegalArgumentException();
     }
@@ -219,8 +219,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
     com.google.protobuf.GeneratedMessageV3
       .serializeStringMapTo(
         output,
-        internalGetStateCacheEntries(),
-        StateCacheEntriesDefaultEntryHolder.defaultEntry,
+        internalGetGlobalCacheEntries(),
+        GlobalCacheEntriesDefaultEntryHolder.defaultEntry,
         3);
     getUnknownFields().writeTo(output);
   }
@@ -239,14 +239,14 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
         .computeMessageSize(2, getResultCacheEntry());
     }
     for (java.util.Map.Entry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> entry
-         : internalGetStateCacheEntries().getMap().entrySet()) {
+         : internalGetGlobalCacheEntries().getMap().entrySet()) {
       com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-      stateCacheEntries__ = StateCacheEntriesDefaultEntryHolder.defaultEntry.newBuilderForType()
+      globalCacheEntries__ = GlobalCacheEntriesDefaultEntryHolder.defaultEntry.newBuilderForType()
           .setKey(entry.getKey())
           .setValue(entry.getValue())
           .build();
       size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, stateCacheEntries__);
+          .computeMessageSize(3, globalCacheEntries__);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -270,8 +270,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
       if (!getResultCacheEntry()
           .equals(other.getResultCacheEntry())) return false;
     }
-    if (!internalGetStateCacheEntries().equals(
-        other.internalGetStateCacheEntries())) return false;
+    if (!internalGetGlobalCacheEntries().equals(
+        other.internalGetGlobalCacheEntries())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -289,9 +289,9 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
       hash = (37 * hash) + RESULT_CACHE_ENTRY_FIELD_NUMBER;
       hash = (53 * hash) + getResultCacheEntry().hashCode();
     }
-    if (!internalGetStateCacheEntries().getMap().isEmpty()) {
-      hash = (37 * hash) + STATE_CACHE_ENTRIES_FIELD_NUMBER;
-      hash = (53 * hash) + internalGetStateCacheEntries().hashCode();
+    if (!internalGetGlobalCacheEntries().getMap().isEmpty()) {
+      hash = (37 * hash) + GLOBAL_CACHE_ENTRIES_FIELD_NUMBER;
+      hash = (53 * hash) + internalGetGlobalCacheEntries().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -407,7 +407,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
         int number) {
       switch (number) {
         case 3:
-          return internalGetStateCacheEntries();
+          return internalGetGlobalCacheEntries();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -418,7 +418,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
         int number) {
       switch (number) {
         case 3:
-          return internalGetMutableStateCacheEntries();
+          return internalGetMutableGlobalCacheEntries();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -458,7 +458,7 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
         resultCacheEntryBuilder_.dispose();
         resultCacheEntryBuilder_ = null;
       }
-      internalGetMutableStateCacheEntries().clear();
+      internalGetMutableGlobalCacheEntries().clear();
       return this;
     }
 
@@ -503,8 +503,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.stateCacheEntries_ = internalGetStateCacheEntries();
-        result.stateCacheEntries_.makeImmutable();
+        result.globalCacheEntries_ = internalGetGlobalCacheEntries();
+        result.globalCacheEntries_.makeImmutable();
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -561,8 +561,8 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
       if (other.hasResultCacheEntry()) {
         mergeResultCacheEntry(other.getResultCacheEntry());
       }
-      internalGetMutableStateCacheEntries().mergeFrom(
-          other.internalGetStateCacheEntries());
+      internalGetMutableGlobalCacheEntries().mergeFrom(
+          other.internalGetGlobalCacheEntries());
       bitField0_ |= 0x00000004;
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -604,10 +604,10 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
             } // case 18
             case 26: {
               com.google.protobuf.MapEntry<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-              stateCacheEntries__ = input.readMessage(
-                  StateCacheEntriesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              internalGetMutableStateCacheEntries().getMutableMap().put(
-                  stateCacheEntries__.getKey(), stateCacheEntries__.getValue());
+              globalCacheEntries__ = input.readMessage(
+                  GlobalCacheEntriesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              internalGetMutableGlobalCacheEntries().getMutableMap().put(
+                  globalCacheEntries__.getKey(), globalCacheEntries__.getValue());
               bitField0_ |= 0x00000004;
               break;
             } // case 26
@@ -822,96 +822,96 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
     }
 
     private com.google.protobuf.MapField<
-        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> stateCacheEntries_;
+        java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> globalCacheEntries_;
     private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-        internalGetStateCacheEntries() {
-      if (stateCacheEntries_ == null) {
+        internalGetGlobalCacheEntries() {
+      if (globalCacheEntries_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
-            StateCacheEntriesDefaultEntryHolder.defaultEntry);
+            GlobalCacheEntriesDefaultEntryHolder.defaultEntry);
       }
-      return stateCacheEntries_;
+      return globalCacheEntries_;
     }
     private com.google.protobuf.MapField<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-        internalGetMutableStateCacheEntries() {
-      if (stateCacheEntries_ == null) {
-        stateCacheEntries_ = com.google.protobuf.MapField.newMapField(
-            StateCacheEntriesDefaultEntryHolder.defaultEntry);
+        internalGetMutableGlobalCacheEntries() {
+      if (globalCacheEntries_ == null) {
+        globalCacheEntries_ = com.google.protobuf.MapField.newMapField(
+            GlobalCacheEntriesDefaultEntryHolder.defaultEntry);
       }
-      if (!stateCacheEntries_.isMutable()) {
-        stateCacheEntries_ = stateCacheEntries_.copy();
+      if (!globalCacheEntries_.isMutable()) {
+        globalCacheEntries_ = globalCacheEntries_.copy();
       }
       bitField0_ |= 0x00000004;
       onChanged();
-      return stateCacheEntries_;
+      return globalCacheEntries_;
     }
-    public int getStateCacheEntriesCount() {
-      return internalGetStateCacheEntries().getMap().size();
+    public int getGlobalCacheEntriesCount() {
+      return internalGetGlobalCacheEntries().getMap().size();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
     @java.lang.Override
-    public boolean containsStateCacheEntries(
+    public boolean containsGlobalCacheEntries(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
-      return internalGetStateCacheEntries().getMap().containsKey(key);
+      return internalGetGlobalCacheEntries().getMap().containsKey(key);
     }
     /**
-     * Use {@link #getStateCacheEntriesMap()} instead.
+     * Use {@link #getGlobalCacheEntriesMap()} instead.
      */
     @java.lang.Override
     @java.lang.Deprecated
-    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getStateCacheEntries() {
-      return getStateCacheEntriesMap();
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getGlobalCacheEntries() {
+      return getGlobalCacheEntriesMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
     @java.lang.Override
-    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getStateCacheEntriesMap() {
-      return internalGetStateCacheEntries().getMap();
+    public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> getGlobalCacheEntriesMap() {
+      return internalGetGlobalCacheEntries().getMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
     @java.lang.Override
     public /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrDefault(
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrDefault(
         java.lang.String key,
         /* nullable */
 com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> map =
-          internalGetStateCacheEntries().getMap();
+          internalGetGlobalCacheEntries().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
     @java.lang.Override
-    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrThrow(
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrThrow(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
       java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> map =
-          internalGetStateCacheEntries().getMap();
+          internalGetGlobalCacheEntries().getMap();
       if (!map.containsKey(key)) {
         throw new java.lang.IllegalArgumentException();
       }
       return map.get(key);
     }
-    public Builder clearStateCacheEntries() {
+    public Builder clearGlobalCacheEntries() {
       bitField0_ = (bitField0_ & ~0x00000004);
-      internalGetMutableStateCacheEntries().getMutableMap()
+      internalGetMutableGlobalCacheEntries().getMutableMap()
           .clear();
       return this;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
-    public Builder removeStateCacheEntries(
+    public Builder removeGlobalCacheEntries(
         java.lang.String key) {
       if (key == null) { throw new NullPointerException("map key"); }
-      internalGetMutableStateCacheEntries().getMutableMap()
+      internalGetMutableGlobalCacheEntries().getMutableMap()
           .remove(key);
       return this;
     }
@@ -920,29 +920,29 @@ com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue) {
      */
     @java.lang.Deprecated
     public java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-        getMutableStateCacheEntries() {
+        getMutableGlobalCacheEntries() {
       bitField0_ |= 0x00000004;
-      return internalGetMutableStateCacheEntries().getMutableMap();
+      return internalGetMutableGlobalCacheEntries().getMutableMap();
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
-    public Builder putStateCacheEntries(
+    public Builder putGlobalCacheEntries(
         java.lang.String key,
         com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry value) {
       if (key == null) { throw new NullPointerException("map key"); }
       if (value == null) { throw new NullPointerException("map value"); }
-      internalGetMutableStateCacheEntries().getMutableMap()
+      internalGetMutableGlobalCacheEntries().getMutableMap()
           .put(key, value);
       bitField0_ |= 0x00000004;
       return this;
     }
     /**
-     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+     * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
      */
-    public Builder putAllStateCacheEntries(
+    public Builder putAllGlobalCacheEntries(
         java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry> values) {
-      internalGetMutableStateCacheEntries().getMutableMap()
+      internalGetMutableGlobalCacheEntries().getMutableMap()
           .putAll(values);
       bitField0_ |= 0x00000004;
       return this;

@@ -72,11 +72,10 @@ message CheckResponse {
 }
 
 message KeyLookupResponse {
-  string key = 1;
-  bytes value = 2;
-  CacheLookupStatus lookup_status = 3;
-  CacheOperationStatus operation_status = 4;
-  string error = 5;
+  bytes value = 1;
+  CacheLookupStatus lookup_status = 2;
+  CacheOperationStatus operation_status = 3;
+  string error = 4;
 }
 
 enum CacheLookupStatus {
@@ -92,7 +91,7 @@ enum CacheOperationStatus {
 message CacheUpsertRequest {
   string control_point = 1;
   CacheEntry result_cache_entry = 2;
-  map<string, CacheEntry> state_cache_entries = 3;
+  map<string, CacheEntry> global_cache_entries = 3;
 }
 
 message CacheEntry {
@@ -103,43 +102,41 @@ message CacheEntry {
 
 message CacheUpsertResponse {
   KeyUpsertResponse result_cache_response = 1;
-  map<string, KeyUpsertResponse> state_cache_responses = 2;
+  map<string, KeyUpsertResponse> global_cache_responses = 2;
 }
 
 message KeyUpsertResponse {
-  string key = 1;
-  CacheOperationStatus operation_status = 2;
-  string error = 3;
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
 }
 
 message CacheDeleteRequest {
   string control_point = 1;
   string result_cache_key = 2;
-  repeated string state_cache_keys = 3;
+  repeated string global_cache_keys = 3;
 }
 
 message CacheDeleteResponse {
   KeyDeleteResponse result_cache_response = 1;
-  map<string, KeyDeleteResponse> state_cache_responses = 2;
+  map<string, KeyDeleteResponse> global_cache_responses = 2;
 }
 
 message KeyDeleteResponse {
-  string key = 1;
-  CacheOperationStatus operation_status = 2;
-  string error = 3;
+  CacheOperationStatus operation_status = 1;
+  string error = 2;
 }
 
 message CacheLookupRequest {
   string control_point = 1;
   // Key for result cache that needs to be fetched.
   string result_cache_key = 2;
-  // Keys for state cache entries that need to be fetched.
-  repeated string state_cache_keys = 3;
+  // Keys for global cache entries that need to be fetched.
+  repeated string global_cache_keys = 3;
 }
 
 message CacheLookupResponse {
   KeyLookupResponse result_cache_response = 1;
-  map<string, KeyLookupResponse> state_cache_responses = 2;
+  map<string, KeyLookupResponse> global_cache_responses = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

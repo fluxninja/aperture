@@ -65,165 +65,165 @@ namespace Aperture.Flowcontrol.Check.V1 {
             "ChlSRUpFQ1RfUkVBU09OX05PVF9TQU1QTEVEEAMSIgoeUkVKRUNUX1JFQVNP",
             "Tl9OT19NQVRDSElOR19SQU1QEAQiRgoMRGVjaXNpb25UeXBlEhoKFkRFQ0lT",
             "SU9OX1RZUEVfQUNDRVBURUQQABIaChZERUNJU0lPTl9UWVBFX1JFSkVDVEVE",
-            "EAEiiAIKEUtleUxvb2t1cFJlc3BvbnNlEhAKA2tleRgBIAEoCVIDa2V5EhQK",
-            "BXZhbHVlGAIgASgMUgV2YWx1ZRJVCg1sb29rdXBfc3RhdHVzGAMgASgOMjAu",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVMb29rdXBTdGF0",
-            "dXNSDGxvb2t1cFN0YXR1cxJeChBvcGVyYXRpb25fc3RhdHVzGAQgASgOMjMu",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVPcGVyYXRpb25T",
-            "dGF0dXNSD29wZXJhdGlvblN0YXR1cxIUCgVlcnJvchgFIAEoCVIFZXJyb3Ii",
-            "/QIKEkNhY2hlVXBzZXJ0UmVxdWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJ",
-            "Ugxjb250cm9sUG9pbnQSVwoScmVzdWx0X2NhY2hlX2VudHJ5GAIgASgLMiku",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVFbnRyeVIQcmVz",
-            "dWx0Q2FjaGVFbnRyeRJ4ChNzdGF0ZV9jYWNoZV9lbnRyaWVzGAMgAygLMkgu",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVVcHNlcnRSZXF1",
-            "ZXN0LlN0YXRlQ2FjaGVFbnRyaWVzRW50cnlSEXN0YXRlQ2FjaGVFbnRyaWVz",
-            "Gm8KFlN0YXRlQ2FjaGVFbnRyaWVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkS",
-            "PwoFdmFsdWUYAiABKAsyKS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
-            "MS5DYWNoZUVudHJ5UgV2YWx1ZToCOAEiYQoKQ2FjaGVFbnRyeRIQCgNrZXkY",
-            "ASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoDFIFdmFsdWUSKwoDdHRsGAMgASgL",
-            "MhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUgN0dGwi9gIKE0NhY2hlVXBz",
-            "ZXJ0UmVzcG9uc2USZAoVcmVzdWx0X2NhY2hlX3Jlc3BvbnNlGAEgASgLMjAu",
-            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuS2V5VXBzZXJ0UmVzcG9u",
-            "c2VSE3Jlc3VsdENhY2hlUmVzcG9uc2USfwoVc3RhdGVfY2FjaGVfcmVzcG9u",
-            "c2VzGAIgAygLMksuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2Fj",
-            "aGVVcHNlcnRSZXNwb25zZS5TdGF0ZUNhY2hlUmVzcG9uc2VzRW50cnlSE3N0",
-            "YXRlQ2FjaGVSZXNwb25zZXMaeAoYU3RhdGVDYWNoZVJlc3BvbnNlc0VudHJ5",
-            "EhAKA2tleRgBIAEoCVIDa2V5EkYKBXZhbHVlGAIgASgLMjAuYXBlcnR1cmUu",
-            "Zmxvd2NvbnRyb2wuY2hlY2sudjEuS2V5VXBzZXJ0UmVzcG9uc2VSBXZhbHVl",
-            "OgI4ASKbAQoRS2V5VXBzZXJ0UmVzcG9uc2USEAoDa2V5GAEgASgJUgNrZXkS",
-            "XgoQb3BlcmF0aW9uX3N0YXR1cxgCIAEoDjIzLmFwZXJ0dXJlLmZsb3djb250",
-            "cm9sLmNoZWNrLnYxLkNhY2hlT3BlcmF0aW9uU3RhdHVzUg9vcGVyYXRpb25T",
-            "dGF0dXMSFAoFZXJyb3IYAyABKAlSBWVycm9yIo0BChJDYWNoZURlbGV0ZVJl",
-            "cXVlc3QSIwoNY29udHJvbF9wb2ludBgBIAEoCVIMY29udHJvbFBvaW50EigK",
-            "EHJlc3VsdF9jYWNoZV9rZXkYAiABKAlSDnJlc3VsdENhY2hlS2V5EigKEHN0",
-            "YXRlX2NhY2hlX2tleXMYAyADKAlSDnN0YXRlQ2FjaGVLZXlzIvYCChNDYWNo",
-            "ZURlbGV0ZVJlc3BvbnNlEmQKFXJlc3VsdF9jYWNoZV9yZXNwb25zZRgBIAEo",
-            "CzIwLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLktleURlbGV0ZVJl",
-            "c3BvbnNlUhNyZXN1bHRDYWNoZVJlc3BvbnNlEn8KFXN0YXRlX2NhY2hlX3Jl",
-            "c3BvbnNlcxgCIAMoCzJLLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYx",
-            "LkNhY2hlRGVsZXRlUmVzcG9uc2UuU3RhdGVDYWNoZVJlc3BvbnNlc0VudHJ5",
-            "UhNzdGF0ZUNhY2hlUmVzcG9uc2VzGngKGFN0YXRlQ2FjaGVSZXNwb25zZXNF",
-            "bnRyeRIQCgNrZXkYASABKAlSA2tleRJGCgV2YWx1ZRgCIAEoCzIwLmFwZXJ0",
-            "dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLktleURlbGV0ZVJlc3BvbnNlUgV2",
-            "YWx1ZToCOAEimwEKEUtleURlbGV0ZVJlc3BvbnNlEhAKA2tleRgBIAEoCVID",
-            "a2V5El4KEG9wZXJhdGlvbl9zdGF0dXMYAiABKA4yMy5hcGVydHVyZS5mbG93",
-            "Y29udHJvbC5jaGVjay52MS5DYWNoZU9wZXJhdGlvblN0YXR1c1IPb3BlcmF0",
-            "aW9uU3RhdHVzEhQKBWVycm9yGAMgASgJUgVlcnJvciKNAQoSQ2FjaGVMb29r",
-            "dXBSZXF1ZXN0EiMKDWNvbnRyb2xfcG9pbnQYASABKAlSDGNvbnRyb2xQb2lu",
-            "dBIoChByZXN1bHRfY2FjaGVfa2V5GAIgASgJUg5yZXN1bHRDYWNoZUtleRIo",
-            "ChBzdGF0ZV9jYWNoZV9rZXlzGAMgAygJUg5zdGF0ZUNhY2hlS2V5cyL2AgoT",
-            "Q2FjaGVMb29rdXBSZXNwb25zZRJkChVyZXN1bHRfY2FjaGVfcmVzcG9uc2UY",
-            "ASABKAsyMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5LZXlMb29r",
-            "dXBSZXNwb25zZVITcmVzdWx0Q2FjaGVSZXNwb25zZRJ/ChVzdGF0ZV9jYWNo",
-            "ZV9yZXNwb25zZXMYAiADKAsySy5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVj",
-            "ay52MS5DYWNoZUxvb2t1cFJlc3BvbnNlLlN0YXRlQ2FjaGVSZXNwb25zZXNF",
-            "bnRyeVITc3RhdGVDYWNoZVJlc3BvbnNlcxp4ChhTdGF0ZUNhY2hlUmVzcG9u",
-            "c2VzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSRgoFdmFsdWUYAiABKAsyMC5h",
-            "cGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5LZXlMb29rdXBSZXNwb25z",
-            "ZVIFdmFsdWU6AjgBIu0CCg5DbGFzc2lmaWVySW5mbxIfCgtwb2xpY3lfbmFt",
-            "ZRgBIAEoCVIKcG9saWN5TmFtZRIfCgtwb2xpY3lfaGFzaBgCIAEoCVIKcG9s",
-            "aWN5SGFzaBIpChBjbGFzc2lmaWVyX2luZGV4GAMgASgDUg9jbGFzc2lmaWVy",
-            "SW5kZXgSSQoFZXJyb3IYBSABKA4yMy5hcGVydHVyZS5mbG93Y29udHJvbC5j",
-            "aGVjay52MS5DbGFzc2lmaWVySW5mby5FcnJvclIFZXJyb3IiogEKBUVycm9y",
-            "Eg4KCkVSUk9SX05PTkUQABIVChFFUlJPUl9FVkFMX0ZBSUxFRBABEhkKFUVS",
-            "Uk9SX0VNUFRZX1JFU1VMVFNFVBACEh0KGUVSUk9SX0FNQklHVU9VU19SRVNV",
-            "TFRTRVQQAxIaChZFUlJPUl9NVUxUSV9FWFBSRVNTSU9OEAQSHAoYRVJST1Jf",
-            "RVhQUkVTU0lPTl9OT1RfTUFQEAUipgwKD0xpbWl0ZXJEZWNpc2lvbhIfCgtw",
-            "b2xpY3lfbmFtZRgBIAEoCVIKcG9saWN5TmFtZRIfCgtwb2xpY3lfaGFzaBgC",
-            "IAEoCVIKcG9saWN5SGFzaBIhCgxjb21wb25lbnRfaWQYAyABKAlSC2NvbXBv",
-            "bmVudElkEhgKB2Ryb3BwZWQYBCABKAhSB2Ryb3BwZWQSVAoGcmVhc29uGAUg",
-            "ASgOMjwuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuTGltaXRlckRl",
-            "Y2lzaW9uLkxpbWl0ZXJSZWFzb25SBnJlYXNvbhJoChtkZW5pZWRfcmVzcG9u",
-            "c2Vfc3RhdHVzX2NvZGUYCiABKA4yKS5hcGVydHVyZS5mbG93Y29udHJvbC5j",
-            "aGVjay52MS5TdGF0dXNDb2RlUhhkZW5pZWRSZXNwb25zZVN0YXR1c0NvZGUS",
-            "NgoJd2FpdF90aW1lGAsgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9u",
-            "Ugh3YWl0VGltZRJsChFyYXRlX2xpbWl0ZXJfaW5mbxgUIAEoCzI+LmFwZXJ0",
-            "dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0ZXJEZWNpc2lvbi5SYXRl",
-            "TGltaXRlckluZm9IAFIPcmF0ZUxpbWl0ZXJJbmZvEm4KE2xvYWRfc2NoZWR1",
-            "bGVyX2luZm8YFSABKAsyPC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
-            "MS5MaW1pdGVyRGVjaXNpb24uU2NoZWR1bGVySW5mb0gAUhFsb2FkU2NoZWR1",
-            "bGVySW5mbxJfCgxzYW1wbGVyX2luZm8YFiABKAsyOi5hcGVydHVyZS5mbG93",
-            "Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uU2FtcGxlckluZm9I",
-            "AFILc2FtcGxlckluZm8SdQoUcXVvdGFfc2NoZWR1bGVyX2luZm8YFyABKAsy",
-            "QS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNp",
-            "b24uUXVvdGFTY2hlZHVsZXJJbmZvSABSEnF1b3RhU2NoZWR1bGVySW5mbxpg",
-            "CgpUb2tlbnNJbmZvEhwKCXJlbWFpbmluZxgBIAEoAVIJcmVtYWluaW5nEhgK",
-            "B2N1cnJlbnQYAiABKAFSB2N1cnJlbnQSGgoIY29uc3VtZWQYAyABKAFSCGNv",
-            "bnN1bWVkGoMBCg9SYXRlTGltaXRlckluZm8SFAoFbGFiZWwYASABKAlSBWxh",
-            "YmVsEloKC3Rva2Vuc19pbmZvGAIgASgLMjkuYXBlcnR1cmUuZmxvd2NvbnRy",
-            "b2wuY2hlY2sudjEuTGltaXRlckRlY2lzaW9uLlRva2Vuc0luZm9SCnRva2Vu",
-            "c0luZm8argEKDVNjaGVkdWxlckluZm8SJQoOd29ya2xvYWRfaW5kZXgYASAB",
-            "KAlSDXdvcmtsb2FkSW5kZXgSWgoLdG9rZW5zX2luZm8YAiABKAsyOS5hcGVy",
+            "EAEi9gEKEUtleUxvb2t1cFJlc3BvbnNlEhQKBXZhbHVlGAEgASgMUgV2YWx1",
+            "ZRJVCg1sb29rdXBfc3RhdHVzGAIgASgOMjAuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVMb29rdXBTdGF0dXNSDGxvb2t1cFN0YXR1cxJe",
+            "ChBvcGVyYXRpb25fc3RhdHVzGAMgASgOMjMuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVPcGVyYXRpb25TdGF0dXNSD29wZXJhdGlvblN0",
+            "YXR1cxIUCgVlcnJvchgEIAEoCVIFZXJyb3IigQMKEkNhY2hlVXBzZXJ0UmVx",
+            "dWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJUgxjb250cm9sUG9pbnQSVwoS",
+            "cmVzdWx0X2NhY2hlX2VudHJ5GAIgASgLMikuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuQ2FjaGVFbnRyeVIQcmVzdWx0Q2FjaGVFbnRyeRJ7ChRn",
+            "bG9iYWxfY2FjaGVfZW50cmllcxgDIAMoCzJJLmFwZXJ0dXJlLmZsb3djb250",
+            "cm9sLmNoZWNrLnYxLkNhY2hlVXBzZXJ0UmVxdWVzdC5HbG9iYWxDYWNoZUVu",
+            "dHJpZXNFbnRyeVISZ2xvYmFsQ2FjaGVFbnRyaWVzGnAKF0dsb2JhbENhY2hl",
+            "RW50cmllc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5Ej8KBXZhbHVlGAIgASgL",
+            "MikuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVFbnRyeVIF",
+            "dmFsdWU6AjgBImEKCkNhY2hlRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoF",
+            "dmFsdWUYAiABKAxSBXZhbHVlEisKA3R0bBgDIAEoCzIZLmdvb2dsZS5wcm90",
+            "b2J1Zi5EdXJhdGlvblIDdHRsIvsCChNDYWNoZVVwc2VydFJlc3BvbnNlEmQK",
+            "FXJlc3VsdF9jYWNoZV9yZXNwb25zZRgBIAEoCzIwLmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLktleVVwc2VydFJlc3BvbnNlUhNyZXN1bHRDYWNo",
+            "ZVJlc3BvbnNlEoIBChZnbG9iYWxfY2FjaGVfcmVzcG9uc2VzGAIgAygLMkwu",
+            "YXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVVcHNlcnRSZXNw",
+            "b25zZS5HbG9iYWxDYWNoZVJlc3BvbnNlc0VudHJ5UhRnbG9iYWxDYWNoZVJl",
+            "c3BvbnNlcxp5ChlHbG9iYWxDYWNoZVJlc3BvbnNlc0VudHJ5EhAKA2tleRgB",
+            "IAEoCVIDa2V5EkYKBXZhbHVlGAIgASgLMjAuYXBlcnR1cmUuZmxvd2NvbnRy",
+            "b2wuY2hlY2sudjEuS2V5VXBzZXJ0UmVzcG9uc2VSBXZhbHVlOgI4ASKJAQoR",
+            "S2V5VXBzZXJ0UmVzcG9uc2USXgoQb3BlcmF0aW9uX3N0YXR1cxgBIAEoDjIz",
+            "LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkNhY2hlT3BlcmF0aW9u",
+            "U3RhdHVzUg9vcGVyYXRpb25TdGF0dXMSFAoFZXJyb3IYAiABKAlSBWVycm9y",
+            "Io8BChJDYWNoZURlbGV0ZVJlcXVlc3QSIwoNY29udHJvbF9wb2ludBgBIAEo",
+            "CVIMY29udHJvbFBvaW50EigKEHJlc3VsdF9jYWNoZV9rZXkYAiABKAlSDnJl",
+            "c3VsdENhY2hlS2V5EioKEWdsb2JhbF9jYWNoZV9rZXlzGAMgAygJUg9nbG9i",
+            "YWxDYWNoZUtleXMi+wIKE0NhY2hlRGVsZXRlUmVzcG9uc2USZAoVcmVzdWx0",
+            "X2NhY2hlX3Jlc3BvbnNlGAEgASgLMjAuYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
+            "Y2hlY2sudjEuS2V5RGVsZXRlUmVzcG9uc2VSE3Jlc3VsdENhY2hlUmVzcG9u",
+            "c2USggEKFmdsb2JhbF9jYWNoZV9yZXNwb25zZXMYAiADKAsyTC5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZURlbGV0ZVJlc3BvbnNlLkds",
+            "b2JhbENhY2hlUmVzcG9uc2VzRW50cnlSFGdsb2JhbENhY2hlUmVzcG9uc2Vz",
+            "GnkKGUdsb2JhbENhY2hlUmVzcG9uc2VzRW50cnkSEAoDa2V5GAEgASgJUgNr",
+            "ZXkSRgoFdmFsdWUYAiABKAsyMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVj",
+            "ay52MS5LZXlEZWxldGVSZXNwb25zZVIFdmFsdWU6AjgBIokBChFLZXlEZWxl",
+            "dGVSZXNwb25zZRJeChBvcGVyYXRpb25fc3RhdHVzGAEgASgOMjMuYXBlcnR1",
+            "cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVPcGVyYXRpb25TdGF0dXNS",
+            "D29wZXJhdGlvblN0YXR1cxIUCgVlcnJvchgCIAEoCVIFZXJyb3IijwEKEkNh",
+            "Y2hlTG9va3VwUmVxdWVzdBIjCg1jb250cm9sX3BvaW50GAEgASgJUgxjb250",
+            "cm9sUG9pbnQSKAoQcmVzdWx0X2NhY2hlX2tleRgCIAEoCVIOcmVzdWx0Q2Fj",
+            "aGVLZXkSKgoRZ2xvYmFsX2NhY2hlX2tleXMYAyADKAlSD2dsb2JhbENhY2hl",
+            "S2V5cyL7AgoTQ2FjaGVMb29rdXBSZXNwb25zZRJkChVyZXN1bHRfY2FjaGVf",
+            "cmVzcG9uc2UYASABKAsyMC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
+            "MS5LZXlMb29rdXBSZXNwb25zZVITcmVzdWx0Q2FjaGVSZXNwb25zZRKCAQoW",
+            "Z2xvYmFsX2NhY2hlX3Jlc3BvbnNlcxgCIAMoCzJMLmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLkNhY2hlTG9va3VwUmVzcG9uc2UuR2xvYmFsQ2Fj",
+            "aGVSZXNwb25zZXNFbnRyeVIUZ2xvYmFsQ2FjaGVSZXNwb25zZXMaeQoZR2xv",
+            "YmFsQ2FjaGVSZXNwb25zZXNFbnRyeRIQCgNrZXkYASABKAlSA2tleRJGCgV2",
+            "YWx1ZRgCIAEoCzIwLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLktl",
+            "eUxvb2t1cFJlc3BvbnNlUgV2YWx1ZToCOAEi7QIKDkNsYXNzaWZpZXJJbmZv",
+            "Eh8KC3BvbGljeV9uYW1lGAEgASgJUgpwb2xpY3lOYW1lEh8KC3BvbGljeV9o",
+            "YXNoGAIgASgJUgpwb2xpY3lIYXNoEikKEGNsYXNzaWZpZXJfaW5kZXgYAyAB",
+            "KANSD2NsYXNzaWZpZXJJbmRleBJJCgVlcnJvchgFIAEoDjIzLmFwZXJ0dXJl",
+            "LmZsb3djb250cm9sLmNoZWNrLnYxLkNsYXNzaWZpZXJJbmZvLkVycm9yUgVl",
+            "cnJvciKiAQoFRXJyb3ISDgoKRVJST1JfTk9ORRAAEhUKEUVSUk9SX0VWQUxf",
+            "RkFJTEVEEAESGQoVRVJST1JfRU1QVFlfUkVTVUxUU0VUEAISHQoZRVJST1Jf",
+            "QU1CSUdVT1VTX1JFU1VMVFNFVBADEhoKFkVSUk9SX01VTFRJX0VYUFJFU1NJ",
+            "T04QBBIcChhFUlJPUl9FWFBSRVNTSU9OX05PVF9NQVAQBSKmDAoPTGltaXRl",
+            "ckRlY2lzaW9uEh8KC3BvbGljeV9uYW1lGAEgASgJUgpwb2xpY3lOYW1lEh8K",
+            "C3BvbGljeV9oYXNoGAIgASgJUgpwb2xpY3lIYXNoEiEKDGNvbXBvbmVudF9p",
+            "ZBgDIAEoCVILY29tcG9uZW50SWQSGAoHZHJvcHBlZBgEIAEoCFIHZHJvcHBl",
+            "ZBJUCgZyZWFzb24YBSABKA4yPC5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVj",
+            "ay52MS5MaW1pdGVyRGVjaXNpb24uTGltaXRlclJlYXNvblIGcmVhc29uEmgK",
+            "G2RlbmllZF9yZXNwb25zZV9zdGF0dXNfY29kZRgKIAEoDjIpLmFwZXJ0dXJl",
+            "LmZsb3djb250cm9sLmNoZWNrLnYxLlN0YXR1c0NvZGVSGGRlbmllZFJlc3Bv",
+            "bnNlU3RhdHVzQ29kZRI2Cgl3YWl0X3RpbWUYCyABKAsyGS5nb29nbGUucHJv",
+            "dG9idWYuRHVyYXRpb25SCHdhaXRUaW1lEmwKEXJhdGVfbGltaXRlcl9pbmZv",
+            "GBQgASgLMj4uYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuTGltaXRl",
+            "ckRlY2lzaW9uLlJhdGVMaW1pdGVySW5mb0gAUg9yYXRlTGltaXRlckluZm8S",
+            "bgoTbG9hZF9zY2hlZHVsZXJfaW5mbxgVIAEoCzI8LmFwZXJ0dXJlLmZsb3dj",
+            "b250cm9sLmNoZWNrLnYxLkxpbWl0ZXJEZWNpc2lvbi5TY2hlZHVsZXJJbmZv",
+            "SABSEWxvYWRTY2hlZHVsZXJJbmZvEl8KDHNhbXBsZXJfaW5mbxgWIAEoCzI6",
+            "LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0ZXJEZWNpc2lv",
+            "bi5TYW1wbGVySW5mb0gAUgtzYW1wbGVySW5mbxJ1ChRxdW90YV9zY2hlZHVs",
+            "ZXJfaW5mbxgXIAEoCzJBLmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYx",
+            "LkxpbWl0ZXJEZWNpc2lvbi5RdW90YVNjaGVkdWxlckluZm9IAFIScXVvdGFT",
+            "Y2hlZHVsZXJJbmZvGmAKClRva2Vuc0luZm8SHAoJcmVtYWluaW5nGAEgASgB",
+            "UglyZW1haW5pbmcSGAoHY3VycmVudBgCIAEoAVIHY3VycmVudBIaCghjb25z",
+            "dW1lZBgDIAEoAVIIY29uc3VtZWQagwEKD1JhdGVMaW1pdGVySW5mbxIUCgVs",
+            "YWJlbBgBIAEoCVIFbGFiZWwSWgoLdG9rZW5zX2luZm8YAiABKAsyOS5hcGVy",
             "dHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uVG9r",
-            "ZW5zSW5mb1IKdG9rZW5zSW5mbxIaCghwcmlvcml0eRgDIAEoAVIIcHJpb3Jp",
-            "dHkaIwoLU2FtcGxlckluZm8SFAoFbGFiZWwYASABKAlSBWxhYmVsGskBChJR",
-            "dW90YVNjaGVkdWxlckluZm8SFAoFbGFiZWwYASABKAlSBWxhYmVsEiUKDndv",
-            "cmtsb2FkX2luZGV4GAIgASgJUg13b3JrbG9hZEluZGV4EloKC3Rva2Vuc19p",
-            "bmZvGAMgASgLMjkuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuTGlt",
-            "aXRlckRlY2lzaW9uLlRva2Vuc0luZm9SCnRva2Vuc0luZm8SGgoIcHJpb3Jp",
-            "dHkYBCABKAFSCHByaW9yaXR5IlEKDUxpbWl0ZXJSZWFzb24SHgoaTElNSVRF",
-            "Ul9SRUFTT05fVU5TUEVDSUZJRUQQABIgChxMSU1JVEVSX1JFQVNPTl9LRVlf",
-            "Tk9UX0ZPVU5EEAFCCQoHZGV0YWlscyI3Cg1GbHV4TWV0ZXJJbmZvEiYKD2Zs",
-            "dXhfbWV0ZXJfbmFtZRgBIAEoCVINZmx1eE1ldGVyTmFtZSomChFDYWNoZUxv",
-            "b2t1cFN0YXR1cxIHCgNISVQQABIICgRNSVNTEAEqLgoUQ2FjaGVPcGVyYXRp",
-            "b25TdGF0dXMSCwoHU1VDQ0VTUxAAEgkKBUVSUk9SEAEqtQkKClN0YXR1c0Nv",
-            "ZGUSCQoFRW1wdHkQABIMCghDb250aW51ZRBkEgcKAk9LEMgBEgwKB0NyZWF0",
-            "ZWQQyQESDQoIQWNjZXB0ZWQQygESIAobTm9uQXV0aG9yaXRhdGl2ZUluZm9y",
-            "bWF0aW9uEMsBEg4KCU5vQ29udGVudBDMARIRCgxSZXNldENvbnRlbnQQzQES",
-            "EwoOUGFydGlhbENvbnRlbnQQzgESEAoLTXVsdGlTdGF0dXMQzwESFAoPQWxy",
-            "ZWFkeVJlcG9ydGVkENABEgsKBklNVXNlZBDiARIUCg9NdWx0aXBsZUNob2lj",
-            "ZXMQrAISFQoQTW92ZWRQZXJtYW5lbnRseRCtAhIKCgVGb3VuZBCuAhINCghT",
-            "ZWVPdGhlchCvAhIQCgtOb3RNb2RpZmllZBCwAhINCghVc2VQcm94eRCxAhIW",
-            "ChFUZW1wb3JhcnlSZWRpcmVjdBCzAhIWChFQZXJtYW5lbnRSZWRpcmVjdBC0",
-            "AhIPCgpCYWRSZXF1ZXN0EJADEhEKDFVuYXV0aG9yaXplZBCRAxIUCg9QYXlt",
-            "ZW50UmVxdWlyZWQQkgMSDgoJRm9yYmlkZGVuEJMDEg0KCE5vdEZvdW5kEJQD",
-            "EhUKEE1ldGhvZE5vdEFsbG93ZWQQlQMSEgoNTm90QWNjZXB0YWJsZRCWAxIg",
-            "ChtQcm94eUF1dGhlbnRpY2F0aW9uUmVxdWlyZWQQlwMSEwoOUmVxdWVzdFRp",
-            "bWVvdXQQmAMSDQoIQ29uZmxpY3QQmQMSCQoER29uZRCaAxITCg5MZW5ndGhS",
-            "ZXF1aXJlZBCbAxIXChJQcmVjb25kaXRpb25GYWlsZWQQnAMSFAoPUGF5bG9h",
-            "ZFRvb0xhcmdlEJ0DEg8KClVSSVRvb0xvbmcQngMSGQoUVW5zdXBwb3J0ZWRN",
-            "ZWRpYVR5cGUQnwMSGAoTUmFuZ2VOb3RTYXRpc2ZpYWJsZRCgAxIWChFFeHBl",
-            "Y3RhdGlvbkZhaWxlZBChAxIXChJNaXNkaXJlY3RlZFJlcXVlc3QQpQMSGAoT",
-            "VW5wcm9jZXNzYWJsZUVudGl0eRCmAxILCgZMb2NrZWQQpwMSFQoQRmFpbGVk",
-            "RGVwZW5kZW5jeRCoAxIUCg9VcGdyYWRlUmVxdWlyZWQQqgMSGQoUUHJlY29u",
-            "ZGl0aW9uUmVxdWlyZWQQrAMSFAoPVG9vTWFueVJlcXVlc3RzEK0DEiAKG1Jl",
-            "cXVlc3RIZWFkZXJGaWVsZHNUb29MYXJnZRCvAxIYChNJbnRlcm5hbFNlcnZl",
-            "ckVycm9yEPQDEhMKDk5vdEltcGxlbWVudGVkEPUDEg8KCkJhZEdhdGV3YXkQ",
-            "9gMSFwoSU2VydmljZVVuYXZhaWxhYmxlEPcDEhMKDkdhdGV3YXlUaW1lb3V0",
-            "EPgDEhwKF0hUVFBWZXJzaW9uTm90U3VwcG9ydGVkEPkDEhoKFVZhcmlhbnRB",
-            "bHNvTmVnb3RpYXRlcxD6AxIYChNJbnN1ZmZpY2llbnRTdG9yYWdlEPsDEhEK",
-            "DExvb3BEZXRlY3RlZBD8AxIQCgtOb3RFeHRlbmRlZBD+AxIiCh1OZXR3b3Jr",
-            "QXV0aGVudGljYXRpb25SZXF1aXJlZBD/AzLiAwoSRmxvd0NvbnRyb2xTZXJ2",
-            "aWNlEmQKBUNoZWNrEisuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEu",
-            "Q2hlY2tSZXF1ZXN0GiwuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEu",
-            "Q2hlY2tSZXNwb25zZSIAEnYKC0NhY2hlTG9va3VwEjEuYXBlcnR1cmUuZmxv",
-            "d2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVMb29rdXBSZXF1ZXN0GjIuYXBlcnR1",
-            "cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVMb29rdXBSZXNwb25zZSIA",
-            "EnYKC0NhY2hlVXBzZXJ0EjEuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2su",
-            "djEuQ2FjaGVVcHNlcnRSZXF1ZXN0GjIuYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
-            "Y2hlY2sudjEuQ2FjaGVVcHNlcnRSZXNwb25zZSIAEnYKC0NhY2hlRGVsZXRl",
-            "EjEuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVEZWxldGVS",
-            "ZXF1ZXN0GjIuYXBlcnR1cmUuZmxvd2NvbnRyb2wuY2hlY2sudjEuQ2FjaGVE",
-            "ZWxldGVSZXNwb25zZSIAQsYBCiFjb20uYXBlcnR1cmUuZmxvd2NvbnRyb2wu",
-            "Y2hlY2sudjFCCkNoZWNrUHJvdG9QAaICA0FGQ6oCHUFwZXJ0dXJlLkZsb3dj",
-            "b250cm9sLkNoZWNrLlYxygIdQXBlcnR1cmVcRmxvd2NvbnRyb2xcQ2hlY2tc",
-            "VjHiAilBcGVydHVyZVxGbG93Y29udHJvbFxDaGVja1xWMVxHUEJNZXRhZGF0",
-            "YeoCIEFwZXJ0dXJlOjpGbG93Y29udHJvbDo6Q2hlY2s6OlYxYgZwcm90bzM="));
+            "ZW5zSW5mb1IKdG9rZW5zSW5mbxquAQoNU2NoZWR1bGVySW5mbxIlCg53b3Jr",
+            "bG9hZF9pbmRleBgBIAEoCVINd29ya2xvYWRJbmRleBJaCgt0b2tlbnNfaW5m",
+            "bxgCIAEoCzI5LmFwZXJ0dXJlLmZsb3djb250cm9sLmNoZWNrLnYxLkxpbWl0",
+            "ZXJEZWNpc2lvbi5Ub2tlbnNJbmZvUgp0b2tlbnNJbmZvEhoKCHByaW9yaXR5",
+            "GAMgASgBUghwcmlvcml0eRojCgtTYW1wbGVySW5mbxIUCgVsYWJlbBgBIAEo",
+            "CVIFbGFiZWwayQEKElF1b3RhU2NoZWR1bGVySW5mbxIUCgVsYWJlbBgBIAEo",
+            "CVIFbGFiZWwSJQoOd29ya2xvYWRfaW5kZXgYAiABKAlSDXdvcmtsb2FkSW5k",
+            "ZXgSWgoLdG9rZW5zX2luZm8YAyABKAsyOS5hcGVydHVyZS5mbG93Y29udHJv",
+            "bC5jaGVjay52MS5MaW1pdGVyRGVjaXNpb24uVG9rZW5zSW5mb1IKdG9rZW5z",
+            "SW5mbxIaCghwcmlvcml0eRgEIAEoAVIIcHJpb3JpdHkiUQoNTGltaXRlclJl",
+            "YXNvbhIeChpMSU1JVEVSX1JFQVNPTl9VTlNQRUNJRklFRBAAEiAKHExJTUlU",
+            "RVJfUkVBU09OX0tFWV9OT1RfRk9VTkQQAUIJCgdkZXRhaWxzIjcKDUZsdXhN",
+            "ZXRlckluZm8SJgoPZmx1eF9tZXRlcl9uYW1lGAEgASgJUg1mbHV4TWV0ZXJO",
+            "YW1lKiYKEUNhY2hlTG9va3VwU3RhdHVzEgcKA0hJVBAAEggKBE1JU1MQASou",
+            "ChRDYWNoZU9wZXJhdGlvblN0YXR1cxILCgdTVUNDRVNTEAASCQoFRVJST1IQ",
+            "ASq1CQoKU3RhdHVzQ29kZRIJCgVFbXB0eRAAEgwKCENvbnRpbnVlEGQSBwoC",
+            "T0sQyAESDAoHQ3JlYXRlZBDJARINCghBY2NlcHRlZBDKARIgChtOb25BdXRo",
+            "b3JpdGF0aXZlSW5mb3JtYXRpb24QywESDgoJTm9Db250ZW50EMwBEhEKDFJl",
+            "c2V0Q29udGVudBDNARITCg5QYXJ0aWFsQ29udGVudBDOARIQCgtNdWx0aVN0",
+            "YXR1cxDPARIUCg9BbHJlYWR5UmVwb3J0ZWQQ0AESCwoGSU1Vc2VkEOIBEhQK",
+            "D011bHRpcGxlQ2hvaWNlcxCsAhIVChBNb3ZlZFBlcm1hbmVudGx5EK0CEgoK",
+            "BUZvdW5kEK4CEg0KCFNlZU90aGVyEK8CEhAKC05vdE1vZGlmaWVkELACEg0K",
+            "CFVzZVByb3h5ELECEhYKEVRlbXBvcmFyeVJlZGlyZWN0ELMCEhYKEVBlcm1h",
+            "bmVudFJlZGlyZWN0ELQCEg8KCkJhZFJlcXVlc3QQkAMSEQoMVW5hdXRob3Jp",
+            "emVkEJEDEhQKD1BheW1lbnRSZXF1aXJlZBCSAxIOCglGb3JiaWRkZW4QkwMS",
+            "DQoITm90Rm91bmQQlAMSFQoQTWV0aG9kTm90QWxsb3dlZBCVAxISCg1Ob3RB",
+            "Y2NlcHRhYmxlEJYDEiAKG1Byb3h5QXV0aGVudGljYXRpb25SZXF1aXJlZBCX",
+            "AxITCg5SZXF1ZXN0VGltZW91dBCYAxINCghDb25mbGljdBCZAxIJCgRHb25l",
+            "EJoDEhMKDkxlbmd0aFJlcXVpcmVkEJsDEhcKElByZWNvbmRpdGlvbkZhaWxl",
+            "ZBCcAxIUCg9QYXlsb2FkVG9vTGFyZ2UQnQMSDwoKVVJJVG9vTG9uZxCeAxIZ",
+            "ChRVbnN1cHBvcnRlZE1lZGlhVHlwZRCfAxIYChNSYW5nZU5vdFNhdGlzZmlh",
+            "YmxlEKADEhYKEUV4cGVjdGF0aW9uRmFpbGVkEKEDEhcKEk1pc2RpcmVjdGVk",
+            "UmVxdWVzdBClAxIYChNVbnByb2Nlc3NhYmxlRW50aXR5EKYDEgsKBkxvY2tl",
+            "ZBCnAxIVChBGYWlsZWREZXBlbmRlbmN5EKgDEhQKD1VwZ3JhZGVSZXF1aXJl",
+            "ZBCqAxIZChRQcmVjb25kaXRpb25SZXF1aXJlZBCsAxIUCg9Ub29NYW55UmVx",
+            "dWVzdHMQrQMSIAobUmVxdWVzdEhlYWRlckZpZWxkc1Rvb0xhcmdlEK8DEhgK",
+            "E0ludGVybmFsU2VydmVyRXJyb3IQ9AMSEwoOTm90SW1wbGVtZW50ZWQQ9QMS",
+            "DwoKQmFkR2F0ZXdheRD2AxIXChJTZXJ2aWNlVW5hdmFpbGFibGUQ9wMSEwoO",
+            "R2F0ZXdheVRpbWVvdXQQ+AMSHAoXSFRUUFZlcnNpb25Ob3RTdXBwb3J0ZWQQ",
+            "+QMSGgoVVmFyaWFudEFsc29OZWdvdGlhdGVzEPoDEhgKE0luc3VmZmljaWVu",
+            "dFN0b3JhZ2UQ+wMSEQoMTG9vcERldGVjdGVkEPwDEhAKC05vdEV4dGVuZGVk",
+            "EP4DEiIKHU5ldHdvcmtBdXRoZW50aWNhdGlvblJlcXVpcmVkEP8DMuIDChJG",
+            "bG93Q29udHJvbFNlcnZpY2USZAoFQ2hlY2sSKy5hcGVydHVyZS5mbG93Y29u",
+            "dHJvbC5jaGVjay52MS5DaGVja1JlcXVlc3QaLC5hcGVydHVyZS5mbG93Y29u",
+            "dHJvbC5jaGVjay52MS5DaGVja1Jlc3BvbnNlIgASdgoLQ2FjaGVMb29rdXAS",
+            "MS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZUxvb2t1cFJl",
+            "cXVlc3QaMi5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZUxv",
+            "b2t1cFJlc3BvbnNlIgASdgoLQ2FjaGVVcHNlcnQSMS5hcGVydHVyZS5mbG93",
+            "Y29udHJvbC5jaGVjay52MS5DYWNoZVVwc2VydFJlcXVlc3QaMi5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MS5DYWNoZVVwc2VydFJlc3BvbnNlIgAS",
+            "dgoLQ2FjaGVEZWxldGUSMS5hcGVydHVyZS5mbG93Y29udHJvbC5jaGVjay52",
+            "MS5DYWNoZURlbGV0ZVJlcXVlc3QaMi5hcGVydHVyZS5mbG93Y29udHJvbC5j",
+            "aGVjay52MS5DYWNoZURlbGV0ZVJlc3BvbnNlIgBCxgEKIWNvbS5hcGVydHVy",
+            "ZS5mbG93Y29udHJvbC5jaGVjay52MUIKQ2hlY2tQcm90b1ABogIDQUZDqgId",
+            "QXBlcnR1cmUuRmxvd2NvbnRyb2wuQ2hlY2suVjHKAh1BcGVydHVyZVxGbG93",
+            "Y29udHJvbFxDaGVja1xWMeICKUFwZXJ0dXJlXEZsb3djb250cm9sXENoZWNr",
+            "XFYxXEdQQk1ldGFkYXRh6gIgQXBlcnR1cmU6OkZsb3djb250cm9sOjpDaGVj",
+            "azo6VjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.DurationReflection.Descriptor, global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus), typeof(global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus), typeof(global::Aperture.Flowcontrol.Check.V1.StatusCode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckRequest), global::Aperture.Flowcontrol.Check.V1.CheckRequest.Parser, new[]{ "ControlPoint", "Labels", "RampMode", "CacheLookupRequest" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse), global::Aperture.Flowcontrol.Check.V1.CheckResponse.Parser, new[]{ "Start", "End", "Services", "ControlPoint", "FlowLabelKeys", "TelemetryFlowLabels", "DecisionType", "RejectReason", "ClassifierInfos", "FluxMeterInfos", "LimiterDecisions", "WaitTime", "DeniedResponseStatusCode", "CacheLookupResponse" }, null, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.RejectReason), typeof(global::Aperture.Flowcontrol.Check.V1.CheckResponse.Types.DecisionType) }, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse), global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse.Parser, new[]{ "Key", "Value", "LookupStatus", "OperationStatus", "Error" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest), global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest.Parser, new[]{ "ControlPoint", "ResultCacheEntry", "StateCacheEntries" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse), global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse.Parser, new[]{ "Value", "LookupStatus", "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest), global::Aperture.Flowcontrol.Check.V1.CacheUpsertRequest.Parser, new[]{ "ControlPoint", "ResultCacheEntry", "GlobalCacheEntries" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheEntry), global::Aperture.Flowcontrol.Check.V1.CacheEntry.Parser, new[]{ "Key", "Value", "Ttl" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse), global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse.Parser, new[]{ "ResultCacheResponse", "StateCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse), global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse.Parser, new[]{ "Key", "OperationStatus", "Error" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest), global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "StateCacheKeys" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse), global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse.Parser, new[]{ "ResultCacheResponse", "StateCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse), global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse.Parser, new[]{ "Key", "OperationStatus", "Error" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest), global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "StateCacheKeys" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse), global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse.Parser, new[]{ "ResultCacheResponse", "StateCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse), global::Aperture.Flowcontrol.Check.V1.CacheUpsertResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse), global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest), global::Aperture.Flowcontrol.Check.V1.CacheDeleteRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "GlobalCacheKeys" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse), global::Aperture.Flowcontrol.Check.V1.CacheDeleteResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse), global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse.Parser, new[]{ "OperationStatus", "Error" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest), global::Aperture.Flowcontrol.Check.V1.CacheLookupRequest.Parser, new[]{ "ControlPoint", "ResultCacheKey", "GlobalCacheKeys" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse), global::Aperture.Flowcontrol.Check.V1.CacheLookupResponse.Parser, new[]{ "ResultCacheResponse", "GlobalCacheResponses" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.ClassifierInfo), global::Aperture.Flowcontrol.Check.V1.ClassifierInfo.Parser, new[]{ "PolicyName", "PolicyHash", "ClassifierIndex", "Error" }, null, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.ClassifierInfo.Types.Error) }, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Parser, new[]{ "PolicyName", "PolicyHash", "ComponentId", "Dropped", "Reason", "DeniedResponseStatusCode", "WaitTime", "RateLimiterInfo", "LoadSchedulerInfo", "SamplerInfo", "QuotaSchedulerInfo" }, new[]{ "Details" }, new[]{ typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.LimiterReason) }, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.TokensInfo), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.TokensInfo.Parser, new[]{ "Remaining", "Current", "Consumed" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.RateLimiterInfo), global::Aperture.Flowcontrol.Check.V1.LimiterDecision.Types.RateLimiterInfo.Parser, new[]{ "Label", "TokensInfo" }, null, null, null, null),
@@ -1366,7 +1366,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public KeyLookupResponse(KeyLookupResponse other) : this() {
-      key_ = other.key_;
       value_ = other.value_;
       lookupStatus_ = other.lookupStatus_;
       operationStatus_ = other.operationStatus_;
@@ -1380,20 +1379,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
       return new KeyLookupResponse(this);
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 1;
-    private string key_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Key {
-      get { return key_; }
-      set {
-        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "value" field.</summary>
-    public const int ValueFieldNumber = 2;
+    public const int ValueFieldNumber = 1;
     private pb::ByteString value_ = pb::ByteString.Empty;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1405,7 +1392,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     }
 
     /// <summary>Field number for the "lookup_status" field.</summary>
-    public const int LookupStatusFieldNumber = 3;
+    public const int LookupStatusFieldNumber = 2;
     private global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus lookupStatus_ = global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus.Hit;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1417,7 +1404,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     }
 
     /// <summary>Field number for the "operation_status" field.</summary>
-    public const int OperationStatusFieldNumber = 4;
+    public const int OperationStatusFieldNumber = 3;
     private global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus operationStatus_ = global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1429,7 +1416,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     }
 
     /// <summary>Field number for the "error" field.</summary>
-    public const int ErrorFieldNumber = 5;
+    public const int ErrorFieldNumber = 4;
     private string error_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1455,7 +1442,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Key != other.Key) return false;
       if (Value != other.Value) return false;
       if (LookupStatus != other.LookupStatus) return false;
       if (OperationStatus != other.OperationStatus) return false;
@@ -1467,7 +1453,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Key.Length != 0) hash ^= Key.GetHashCode();
       if (Value.Length != 0) hash ^= Value.GetHashCode();
       if (LookupStatus != global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus.Hit) hash ^= LookupStatus.GetHashCode();
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) hash ^= OperationStatus.GetHashCode();
@@ -1490,24 +1475,20 @@ namespace Aperture.Flowcontrol.Check.V1 {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (Value.Length != 0) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(10);
         output.WriteBytes(Value);
       }
       if (LookupStatus != global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus.Hit) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(16);
         output.WriteEnum((int) LookupStatus);
       }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(42);
+        output.WriteRawTag(34);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -1520,24 +1501,20 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (Value.Length != 0) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(10);
         output.WriteBytes(Value);
       }
       if (LookupStatus != global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus.Hit) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(16);
         output.WriteEnum((int) LookupStatus);
       }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(42);
+        output.WriteRawTag(34);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -1550,9 +1527,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Key.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
-      }
       if (Value.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeBytesSize(Value);
       }
@@ -1576,9 +1550,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public void MergeFrom(KeyLookupResponse other) {
       if (other == null) {
         return;
-      }
-      if (other.Key.Length != 0) {
-        Key = other.Key;
       }
       if (other.Value.Length != 0) {
         Value = other.Value;
@@ -1608,22 +1579,18 @@ namespace Aperture.Flowcontrol.Check.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 18: {
             Value = input.ReadBytes();
             break;
           }
-          case 24: {
+          case 16: {
             LookupStatus = (global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus) input.ReadEnum();
             break;
           }
-          case 32: {
+          case 24: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 42: {
+          case 34: {
             Error = input.ReadString();
             break;
           }
@@ -1643,22 +1610,18 @@ namespace Aperture.Flowcontrol.Check.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 18: {
             Value = input.ReadBytes();
             break;
           }
-          case 24: {
+          case 16: {
             LookupStatus = (global::Aperture.Flowcontrol.Check.V1.CacheLookupStatus) input.ReadEnum();
             break;
           }
-          case 32: {
+          case 24: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 42: {
+          case 34: {
             Error = input.ReadString();
             break;
           }
@@ -1705,7 +1668,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public CacheUpsertRequest(CacheUpsertRequest other) : this() {
       controlPoint_ = other.controlPoint_;
       resultCacheEntry_ = other.resultCacheEntry_ != null ? other.resultCacheEntry_.Clone() : null;
-      stateCacheEntries_ = other.stateCacheEntries_.Clone();
+      globalCacheEntries_ = other.globalCacheEntries_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1739,15 +1702,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_entries" field.</summary>
-    public const int StateCacheEntriesFieldNumber = 3;
-    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>.Codec _map_stateCacheEntries_codec
+    /// <summary>Field number for the "global_cache_entries" field.</summary>
+    public const int GlobalCacheEntriesFieldNumber = 3;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>.Codec _map_globalCacheEntries_codec
         = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.CacheEntry.Parser), 26);
-    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> stateCacheEntries_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>();
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> globalCacheEntries_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> StateCacheEntries {
-      get { return stateCacheEntries_; }
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.CacheEntry> GlobalCacheEntries {
+      get { return globalCacheEntries_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1767,7 +1730,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
       if (ControlPoint != other.ControlPoint) return false;
       if (!object.Equals(ResultCacheEntry, other.ResultCacheEntry)) return false;
-      if (!StateCacheEntries.Equals(other.StateCacheEntries)) return false;
+      if (!GlobalCacheEntries.Equals(other.GlobalCacheEntries)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1777,7 +1740,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       int hash = 1;
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
       if (resultCacheEntry_ != null) hash ^= ResultCacheEntry.GetHashCode();
-      hash ^= StateCacheEntries.GetHashCode();
+      hash ^= GlobalCacheEntries.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1804,7 +1767,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteMessage(ResultCacheEntry);
       }
-      stateCacheEntries_.WriteTo(output, _map_stateCacheEntries_codec);
+      globalCacheEntries_.WriteTo(output, _map_globalCacheEntries_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1823,7 +1786,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteMessage(ResultCacheEntry);
       }
-      stateCacheEntries_.WriteTo(ref output, _map_stateCacheEntries_codec);
+      globalCacheEntries_.WriteTo(ref output, _map_globalCacheEntries_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1840,7 +1803,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (resultCacheEntry_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheEntry);
       }
-      size += stateCacheEntries_.CalculateSize(_map_stateCacheEntries_codec);
+      size += globalCacheEntries_.CalculateSize(_map_globalCacheEntries_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1862,7 +1825,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         }
         ResultCacheEntry.MergeFrom(other.ResultCacheEntry);
       }
-      stateCacheEntries_.MergeFrom(other.stateCacheEntries_);
+      globalCacheEntries_.MergeFrom(other.globalCacheEntries_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1890,7 +1853,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheEntries_.AddEntriesFrom(input, _map_stateCacheEntries_codec);
+            globalCacheEntries_.AddEntriesFrom(input, _map_globalCacheEntries_codec);
             break;
           }
         }
@@ -1920,7 +1883,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheEntries_.AddEntriesFrom(ref input, _map_stateCacheEntries_codec);
+            globalCacheEntries_.AddEntriesFrom(ref input, _map_globalCacheEntries_codec);
             break;
           }
         }
@@ -2237,7 +2200,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheUpsertResponse(CacheUpsertResponse other) : this() {
       resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
-      stateCacheResponses_ = other.stateCacheResponses_.Clone();
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2259,15 +2222,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_responses" field.</summary>
-    public const int StateCacheResponsesFieldNumber = 2;
-    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>.Codec _map_stateCacheResponses_codec
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>.Codec _map_globalCacheResponses_codec
         = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse.Parser), 18);
-    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> stateCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>();
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> StateCacheResponses {
-      get { return stateCacheResponses_; }
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyUpsertResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2286,7 +2249,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         return true;
       }
       if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
-      if (!StateCacheResponses.Equals(other.StateCacheResponses)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2295,7 +2258,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
-      hash ^= StateCacheResponses.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2318,7 +2281,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2333,7 +2296,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(ref output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2347,7 +2310,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (resultCacheResponse_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
       }
-      size += stateCacheResponses_.CalculateSize(_map_stateCacheResponses_codec);
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -2366,7 +2329,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         }
         ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
       }
-      stateCacheResponses_.MergeFrom(other.stateCacheResponses_);
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -2390,7 +2353,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
             break;
           }
         }
@@ -2416,7 +2379,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(ref input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
             break;
           }
         }
@@ -2460,7 +2423,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public KeyUpsertResponse(KeyUpsertResponse other) : this() {
-      key_ = other.key_;
       operationStatus_ = other.operationStatus_;
       error_ = other.error_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -2472,20 +2434,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
       return new KeyUpsertResponse(this);
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 1;
-    private string key_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Key {
-      get { return key_; }
-      set {
-        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "operation_status" field.</summary>
-    public const int OperationStatusFieldNumber = 2;
+    public const int OperationStatusFieldNumber = 1;
     private global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus operationStatus_ = global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2497,7 +2447,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     }
 
     /// <summary>Field number for the "error" field.</summary>
-    public const int ErrorFieldNumber = 3;
+    public const int ErrorFieldNumber = 2;
     private string error_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2523,7 +2473,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Key != other.Key) return false;
       if (OperationStatus != other.OperationStatus) return false;
       if (Error != other.Error) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -2533,7 +2482,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Key.Length != 0) hash ^= Key.GetHashCode();
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) hash ^= OperationStatus.GetHashCode();
       if (Error.Length != 0) hash ^= Error.GetHashCode();
       if (_unknownFields != null) {
@@ -2554,16 +2502,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(8);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(18);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -2576,16 +2520,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(8);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(18);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -2598,9 +2538,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Key.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) OperationStatus);
       }
@@ -2618,9 +2555,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public void MergeFrom(KeyUpsertResponse other) {
       if (other == null) {
         return;
-      }
-      if (other.Key.Length != 0) {
-        Key = other.Key;
       }
       if (other.OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
         OperationStatus = other.OperationStatus;
@@ -2643,15 +2577,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 16: {
+          case 8: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 26: {
+          case 18: {
             Error = input.ReadString();
             break;
           }
@@ -2670,15 +2600,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 16: {
+          case 8: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 26: {
+          case 18: {
             Error = input.ReadString();
             break;
           }
@@ -2725,7 +2651,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public CacheDeleteRequest(CacheDeleteRequest other) : this() {
       controlPoint_ = other.controlPoint_;
       resultCacheKey_ = other.resultCacheKey_;
-      stateCacheKeys_ = other.stateCacheKeys_.Clone();
+      globalCacheKeys_ = other.globalCacheKeys_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2759,15 +2685,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_keys" field.</summary>
-    public const int StateCacheKeysFieldNumber = 3;
-    private static readonly pb::FieldCodec<string> _repeated_stateCacheKeys_codec
+    /// <summary>Field number for the "global_cache_keys" field.</summary>
+    public const int GlobalCacheKeysFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_globalCacheKeys_codec
         = pb::FieldCodec.ForString(26);
-    private readonly pbc::RepeatedField<string> stateCacheKeys_ = new pbc::RepeatedField<string>();
+    private readonly pbc::RepeatedField<string> globalCacheKeys_ = new pbc::RepeatedField<string>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<string> StateCacheKeys {
-      get { return stateCacheKeys_; }
+    public pbc::RepeatedField<string> GlobalCacheKeys {
+      get { return globalCacheKeys_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2787,7 +2713,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
       if (ControlPoint != other.ControlPoint) return false;
       if (ResultCacheKey != other.ResultCacheKey) return false;
-      if(!stateCacheKeys_.Equals(other.stateCacheKeys_)) return false;
+      if(!globalCacheKeys_.Equals(other.globalCacheKeys_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2797,7 +2723,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       int hash = 1;
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
       if (ResultCacheKey.Length != 0) hash ^= ResultCacheKey.GetHashCode();
-      hash ^= stateCacheKeys_.GetHashCode();
+      hash ^= globalCacheKeys_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2824,7 +2750,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteString(ResultCacheKey);
       }
-      stateCacheKeys_.WriteTo(output, _repeated_stateCacheKeys_codec);
+      globalCacheKeys_.WriteTo(output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2843,7 +2769,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteString(ResultCacheKey);
       }
-      stateCacheKeys_.WriteTo(ref output, _repeated_stateCacheKeys_codec);
+      globalCacheKeys_.WriteTo(ref output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2860,7 +2786,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ResultCacheKey.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ResultCacheKey);
       }
-      size += stateCacheKeys_.CalculateSize(_repeated_stateCacheKeys_codec);
+      size += globalCacheKeys_.CalculateSize(_repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -2879,7 +2805,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (other.ResultCacheKey.Length != 0) {
         ResultCacheKey = other.ResultCacheKey;
       }
-      stateCacheKeys_.Add(other.stateCacheKeys_);
+      globalCacheKeys_.Add(other.globalCacheKeys_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -2904,7 +2830,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheKeys_.AddEntriesFrom(input, _repeated_stateCacheKeys_codec);
+            globalCacheKeys_.AddEntriesFrom(input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -2931,7 +2857,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheKeys_.AddEntriesFrom(ref input, _repeated_stateCacheKeys_codec);
+            globalCacheKeys_.AddEntriesFrom(ref input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -2976,7 +2902,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheDeleteResponse(CacheDeleteResponse other) : this() {
       resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
-      stateCacheResponses_ = other.stateCacheResponses_.Clone();
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2998,15 +2924,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_responses" field.</summary>
-    public const int StateCacheResponsesFieldNumber = 2;
-    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>.Codec _map_stateCacheResponses_codec
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>.Codec _map_globalCacheResponses_codec
         = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse.Parser), 18);
-    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> stateCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>();
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> StateCacheResponses {
-      get { return stateCacheResponses_; }
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyDeleteResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3025,7 +2951,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         return true;
       }
       if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
-      if (!StateCacheResponses.Equals(other.StateCacheResponses)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3034,7 +2960,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
-      hash ^= StateCacheResponses.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3057,7 +2983,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3072,7 +2998,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(ref output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3086,7 +3012,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (resultCacheResponse_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
       }
-      size += stateCacheResponses_.CalculateSize(_map_stateCacheResponses_codec);
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -3105,7 +3031,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         }
         ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
       }
-      stateCacheResponses_.MergeFrom(other.stateCacheResponses_);
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3129,7 +3055,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
             break;
           }
         }
@@ -3155,7 +3081,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(ref input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
             break;
           }
         }
@@ -3199,7 +3125,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public KeyDeleteResponse(KeyDeleteResponse other) : this() {
-      key_ = other.key_;
       operationStatus_ = other.operationStatus_;
       error_ = other.error_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -3211,20 +3136,8 @@ namespace Aperture.Flowcontrol.Check.V1 {
       return new KeyDeleteResponse(this);
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 1;
-    private string key_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Key {
-      get { return key_; }
-      set {
-        key_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "operation_status" field.</summary>
-    public const int OperationStatusFieldNumber = 2;
+    public const int OperationStatusFieldNumber = 1;
     private global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus operationStatus_ = global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3236,7 +3149,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     }
 
     /// <summary>Field number for the "error" field.</summary>
-    public const int ErrorFieldNumber = 3;
+    public const int ErrorFieldNumber = 2;
     private string error_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -3262,7 +3175,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Key != other.Key) return false;
       if (OperationStatus != other.OperationStatus) return false;
       if (Error != other.Error) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -3272,7 +3184,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Key.Length != 0) hash ^= Key.GetHashCode();
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) hash ^= OperationStatus.GetHashCode();
       if (Error.Length != 0) hash ^= Error.GetHashCode();
       if (_unknownFields != null) {
@@ -3293,16 +3204,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(8);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(18);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -3315,16 +3222,12 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Key.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(8);
         output.WriteEnum((int) OperationStatus);
       }
       if (Error.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(18);
         output.WriteString(Error);
       }
       if (_unknownFields != null) {
@@ -3337,9 +3240,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Key.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Key);
-      }
       if (OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) OperationStatus);
       }
@@ -3357,9 +3257,6 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public void MergeFrom(KeyDeleteResponse other) {
       if (other == null) {
         return;
-      }
-      if (other.Key.Length != 0) {
-        Key = other.Key;
       }
       if (other.OperationStatus != global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus.Success) {
         OperationStatus = other.OperationStatus;
@@ -3382,15 +3279,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 16: {
+          case 8: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 26: {
+          case 18: {
             Error = input.ReadString();
             break;
           }
@@ -3409,15 +3302,11 @@ namespace Aperture.Flowcontrol.Check.V1 {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 10: {
-            Key = input.ReadString();
-            break;
-          }
-          case 16: {
+          case 8: {
             OperationStatus = (global::Aperture.Flowcontrol.Check.V1.CacheOperationStatus) input.ReadEnum();
             break;
           }
-          case 26: {
+          case 18: {
             Error = input.ReadString();
             break;
           }
@@ -3464,7 +3353,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public CacheLookupRequest(CacheLookupRequest other) : this() {
       controlPoint_ = other.controlPoint_;
       resultCacheKey_ = other.resultCacheKey_;
-      stateCacheKeys_ = other.stateCacheKeys_.Clone();
+      globalCacheKeys_ = other.globalCacheKeys_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3501,18 +3390,18 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_keys" field.</summary>
-    public const int StateCacheKeysFieldNumber = 3;
-    private static readonly pb::FieldCodec<string> _repeated_stateCacheKeys_codec
+    /// <summary>Field number for the "global_cache_keys" field.</summary>
+    public const int GlobalCacheKeysFieldNumber = 3;
+    private static readonly pb::FieldCodec<string> _repeated_globalCacheKeys_codec
         = pb::FieldCodec.ForString(26);
-    private readonly pbc::RepeatedField<string> stateCacheKeys_ = new pbc::RepeatedField<string>();
+    private readonly pbc::RepeatedField<string> globalCacheKeys_ = new pbc::RepeatedField<string>();
     /// <summary>
-    /// Keys for state cache entries that need to be fetched.
+    /// Keys for global cache entries that need to be fetched.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<string> StateCacheKeys {
-      get { return stateCacheKeys_; }
+    public pbc::RepeatedField<string> GlobalCacheKeys {
+      get { return globalCacheKeys_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3532,7 +3421,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
       if (ControlPoint != other.ControlPoint) return false;
       if (ResultCacheKey != other.ResultCacheKey) return false;
-      if(!stateCacheKeys_.Equals(other.stateCacheKeys_)) return false;
+      if(!globalCacheKeys_.Equals(other.globalCacheKeys_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3542,7 +3431,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       int hash = 1;
       if (ControlPoint.Length != 0) hash ^= ControlPoint.GetHashCode();
       if (ResultCacheKey.Length != 0) hash ^= ResultCacheKey.GetHashCode();
-      hash ^= stateCacheKeys_.GetHashCode();
+      hash ^= globalCacheKeys_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3569,7 +3458,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteString(ResultCacheKey);
       }
-      stateCacheKeys_.WriteTo(output, _repeated_stateCacheKeys_codec);
+      globalCacheKeys_.WriteTo(output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3588,7 +3477,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(18);
         output.WriteString(ResultCacheKey);
       }
-      stateCacheKeys_.WriteTo(ref output, _repeated_stateCacheKeys_codec);
+      globalCacheKeys_.WriteTo(ref output, _repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3605,7 +3494,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (ResultCacheKey.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(ResultCacheKey);
       }
-      size += stateCacheKeys_.CalculateSize(_repeated_stateCacheKeys_codec);
+      size += globalCacheKeys_.CalculateSize(_repeated_globalCacheKeys_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -3624,7 +3513,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (other.ResultCacheKey.Length != 0) {
         ResultCacheKey = other.ResultCacheKey;
       }
-      stateCacheKeys_.Add(other.stateCacheKeys_);
+      globalCacheKeys_.Add(other.globalCacheKeys_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3649,7 +3538,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheKeys_.AddEntriesFrom(input, _repeated_stateCacheKeys_codec);
+            globalCacheKeys_.AddEntriesFrom(input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -3676,7 +3565,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 26: {
-            stateCacheKeys_.AddEntriesFrom(ref input, _repeated_stateCacheKeys_codec);
+            globalCacheKeys_.AddEntriesFrom(ref input, _repeated_globalCacheKeys_codec);
             break;
           }
         }
@@ -3721,7 +3610,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CacheLookupResponse(CacheLookupResponse other) : this() {
       resultCacheResponse_ = other.resultCacheResponse_ != null ? other.resultCacheResponse_.Clone() : null;
-      stateCacheResponses_ = other.stateCacheResponses_.Clone();
+      globalCacheResponses_ = other.globalCacheResponses_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3743,15 +3632,15 @@ namespace Aperture.Flowcontrol.Check.V1 {
       }
     }
 
-    /// <summary>Field number for the "state_cache_responses" field.</summary>
-    public const int StateCacheResponsesFieldNumber = 2;
-    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>.Codec _map_stateCacheResponses_codec
+    /// <summary>Field number for the "global_cache_responses" field.</summary>
+    public const int GlobalCacheResponsesFieldNumber = 2;
+    private static readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>.Codec _map_globalCacheResponses_codec
         = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse.Parser), 18);
-    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> stateCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>();
+    private readonly pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> globalCacheResponses_ = new pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> StateCacheResponses {
-      get { return stateCacheResponses_; }
+    public pbc::MapField<string, global::Aperture.Flowcontrol.Check.V1.KeyLookupResponse> GlobalCacheResponses {
+      get { return globalCacheResponses_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3770,7 +3659,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         return true;
       }
       if (!object.Equals(ResultCacheResponse, other.ResultCacheResponse)) return false;
-      if (!StateCacheResponses.Equals(other.StateCacheResponses)) return false;
+      if (!GlobalCacheResponses.Equals(other.GlobalCacheResponses)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3779,7 +3668,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (resultCacheResponse_ != null) hash ^= ResultCacheResponse.GetHashCode();
-      hash ^= StateCacheResponses.GetHashCode();
+      hash ^= GlobalCacheResponses.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3802,7 +3691,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3817,7 +3706,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         output.WriteRawTag(10);
         output.WriteMessage(ResultCacheResponse);
       }
-      stateCacheResponses_.WriteTo(ref output, _map_stateCacheResponses_codec);
+      globalCacheResponses_.WriteTo(ref output, _map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3831,7 +3720,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
       if (resultCacheResponse_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(ResultCacheResponse);
       }
-      size += stateCacheResponses_.CalculateSize(_map_stateCacheResponses_codec);
+      size += globalCacheResponses_.CalculateSize(_map_globalCacheResponses_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -3850,7 +3739,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
         }
         ResultCacheResponse.MergeFrom(other.ResultCacheResponse);
       }
-      stateCacheResponses_.MergeFrom(other.stateCacheResponses_);
+      globalCacheResponses_.MergeFrom(other.globalCacheResponses_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3874,7 +3763,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(input, _map_globalCacheResponses_codec);
             break;
           }
         }
@@ -3900,7 +3789,7 @@ namespace Aperture.Flowcontrol.Check.V1 {
             break;
           }
           case 18: {
-            stateCacheResponses_.AddEntriesFrom(ref input, _map_stateCacheResponses_codec);
+            globalCacheResponses_.AddEntriesFrom(ref input, _map_globalCacheResponses_codec);
             break;
           }
         }

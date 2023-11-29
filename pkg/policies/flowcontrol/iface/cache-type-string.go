@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _CacheTypeName = "resultstate"
+const _CacheTypeName = "resultglobal"
 
-var _CacheTypeIndex = [...]uint8{0, 6, 11}
+var _CacheTypeIndex = [...]uint8{0, 6, 12}
 
-const _CacheTypeLowerName = "resultstate"
+const _CacheTypeLowerName = "resultglobal"
 
 func (i CacheType) String() string {
 	if i < 0 || i >= CacheType(len(_CacheTypeIndex)-1) {
@@ -25,21 +25,21 @@ func (i CacheType) String() string {
 func _CacheTypeNoOp() {
 	var x [1]struct{}
 	_ = x[Result-(0)]
-	_ = x[State-(1)]
+	_ = x[Global-(1)]
 }
 
-var _CacheTypeValues = []CacheType{Result, State}
+var _CacheTypeValues = []CacheType{Result, Global}
 
 var _CacheTypeNameToValueMap = map[string]CacheType{
 	_CacheTypeName[0:6]:       Result,
 	_CacheTypeLowerName[0:6]:  Result,
-	_CacheTypeName[6:11]:      State,
-	_CacheTypeLowerName[6:11]: State,
+	_CacheTypeName[6:12]:      Global,
+	_CacheTypeLowerName[6:12]: Global,
 }
 
 var _CacheTypeNames = []string{
 	_CacheTypeName[0:6],
-	_CacheTypeName[6:11],
+	_CacheTypeName[6:12],
 }
 
 // CacheTypeString retrieves an enum value from the enum constants string name.

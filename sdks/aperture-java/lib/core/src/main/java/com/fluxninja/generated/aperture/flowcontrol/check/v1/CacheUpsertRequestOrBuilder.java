@@ -35,36 +35,36 @@ public interface CacheUpsertRequestOrBuilder extends
   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntryOrBuilder getResultCacheEntryOrBuilder();
 
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
-  int getStateCacheEntriesCount();
+  int getGlobalCacheEntriesCount();
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
-  boolean containsStateCacheEntries(
+  boolean containsGlobalCacheEntries(
       java.lang.String key);
   /**
-   * Use {@link #getStateCacheEntriesMap()} instead.
+   * Use {@link #getGlobalCacheEntriesMap()} instead.
    */
   @java.lang.Deprecated
   java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-  getStateCacheEntries();
+  getGlobalCacheEntries();
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
-  getStateCacheEntriesMap();
+  getGlobalCacheEntriesMap();
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
   /* nullable */
-com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrDefault(
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrDefault(
       java.lang.String key,
       /* nullable */
 com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue);
   /**
-   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; global_cache_entries = 3 [json_name = "globalCacheEntries"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrThrow(
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getGlobalCacheEntriesOrThrow(
       java.lang.String key);
 }

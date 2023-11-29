@@ -433,12 +433,12 @@ func (h *Handler) CacheLookup(ctx context.Context, req *cmdv1.GlobalCacheLookupR
 // CacheUpsert inserts or deletes specified cache entries.
 func (h *Handler) CacheUpsert(ctx context.Context, req *cmdv1.GlobalCacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
 	// find agent with given agent group
-	agents, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
+	agent, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := transport.SendRequest[flowcontrolv1.CacheUpsertResponse](ctx, h.etcdTransport, agents, req)
+	resp, err := transport.SendRequest[flowcontrolv1.CacheUpsertResponse](ctx, h.etcdTransport, agent, req)
 	if err != nil {
 		return nil, err
 	}
@@ -448,12 +448,12 @@ func (h *Handler) CacheUpsert(ctx context.Context, req *cmdv1.GlobalCacheUpsertR
 // CacheDelete deletes specified cache entries.
 func (h *Handler) CacheDelete(ctx context.Context, req *cmdv1.GlobalCacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
 	// find agent with given agent group
-	agents, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
+	agent, err := h.getOneAgentForGroup(ctx, req.AgentGroup)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := transport.SendRequest[flowcontrolv1.CacheDeleteResponse](ctx, h.etcdTransport, agents, req)
+	resp, err := transport.SendRequest[flowcontrolv1.CacheDeleteResponse](ctx, h.etcdTransport, agent, req)
 	if err != nil {
 		return nil, err
 	}

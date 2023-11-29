@@ -15,10 +15,10 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/dynamicconfig"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/flowcontrol"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/globalcache"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/installation"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/resultcache"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/statecache"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/config"
@@ -50,7 +50,7 @@ func init() {
 	RootCmd.AddCommand(policy.PolicyCmd)
 	RootCmd.AddCommand(dashboardCmd)
 	RootCmd.AddCommand(resultcache.CacheCmd)
-	RootCmd.AddCommand(statecache.CacheCmd)
+	RootCmd.AddCommand(globalcache.CacheCmd)
 
 	RootCmd.InitDefaultCompletionCmd()
 	RootCmd.SilenceUsage = true

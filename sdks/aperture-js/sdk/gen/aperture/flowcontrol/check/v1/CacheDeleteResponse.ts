@@ -4,10 +4,10 @@ import type { KeyDeleteResponse as _aperture_flowcontrol_check_v1_KeyDeleteRespo
 
 export interface CacheDeleteResponse {
   'resultCacheResponse'?: (_aperture_flowcontrol_check_v1_KeyDeleteResponse | null);
-  'stateCacheResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyDeleteResponse});
+  'globalCacheResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyDeleteResponse});
 }
 
 export interface CacheDeleteResponse__Output {
   'resultCacheResponse': (_aperture_flowcontrol_check_v1_KeyDeleteResponse__Output | null);
-  'stateCacheResponses': ({[key: string]: _aperture_flowcontrol_check_v1_KeyDeleteResponse__Output});
+  'globalCacheResponses': ({[key: string]: _aperture_flowcontrol_check_v1_KeyDeleteResponse__Output});
 }

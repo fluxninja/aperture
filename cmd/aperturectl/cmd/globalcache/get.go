@@ -1,4 +1,4 @@
-package statecache
+package globalcache
 
 import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
@@ -6,20 +6,14 @@ import (
 )
 
 var (
-	agentGroup   string
-	controlPoint string
-	key          string
+	agentGroup string
+	key        string
 )
 
 func init() {
 	GetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
-	GetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
 	GetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
 	err := GetCommand.MarkFlagRequired("agent-group")
-	if err != nil {
-		panic(err)
-	}
-	err = GetCommand.MarkFlagRequired("control-point")
 	if err != nil {
 		panic(err)
 	}
@@ -31,8 +25,8 @@ func init() {
 
 var GetCommand = &cobra.Command{
 	Use:   "get",
-	Short: "Get a state cache entry",
-	Long:  `Get a state cache entry`,
+	Short: "Get a global cache entry",
+	Long:  `Get a global cache entry`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {
@@ -40,11 +34,10 @@ var GetCommand = &cobra.Command{
 		}
 
 		input := utils.CacheLookupInput{
-			AgentGroup:   agentGroup,
-			ControlPoint: controlPoint,
-			Key:          key,
+			AgentGroup: agentGroup,
+			Key:        key,
 		}
 
-		return utils.ParseStateCacheLookup(client, input)
+		return utils.ParseGlobalCacheLookup(client, input)
 	},
 }

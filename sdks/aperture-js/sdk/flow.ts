@@ -38,15 +38,25 @@ export interface Flow {
   checkResponse(): CheckResponse__Output | null;
   shouldRun(): boolean;
   setStatus(status: FlowStatus): void;
-  setResultCache(cacheEntry: CacheEntry): Promise<KeyUpsertResponse>;
-  setStateCache(
+  // grpc options is optional argument
+  setResultCache(
+    cacheEntry: CacheEntry,
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyUpsertResponse>;
+  setGlobalCache(
     key: string,
     cacheEntry: CacheEntry,
+    grpcOptions?: grpc.CallOptions,
   ): Promise<KeyUpsertResponse>;
-  deleteResultCache(): Promise<KeyDeleteResponse | undefined>;
-  deleteStateCache(key: string): Promise<KeyDeleteResponse>;
+  deleteResultCache(
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyDeleteResponse | undefined>;
+  deleteGlobalCache(
+    key: string,
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyDeleteResponse>;
   resultCache(): KeyLookupResponse;
-  stateCache(key: string): KeyLookupResponse;
+  globalCache(key: string): KeyLookupResponse;
   error(): Error | null;
   span(): Span;
   end(): void;
@@ -67,7 +77,7 @@ export class _Flow implements Flow {
     private startDate: number,
     private rampMode: boolean = false,
     private resultCacheKey: string | null = null,
-    private stateCacheKeys: string[] | null = null,
+    private globalCacheKeys: string[] | null = null,
     private _checkResponse: CheckResponse__Output | null = null,
     private _error: Error | null = null,
   ) {
@@ -146,16 +156,15 @@ export class _Flow implements Flow {
   }
 
   /**
-   * Sets a state cache entry for the flow.
+   * Sets a global cache entry for the flow.
    * @param key The key of the cache entry to set.
    * @param cacheEntry The cache entry to set.
    * @returns A promise that resolves to the response of the key upsert operation.
    */
-  async setStateCache(key: string, cacheEntry: CacheEntry) {
+  async setGlobalCache(key: string, cacheEntry: CacheEntry) {
     return new Promise<KeyUpsertResponse>((resolve) => {
       let cacheUpsertRequest: CacheUpsertRequest = {
-        controlPoint: this.controlPoint,
-        stateCacheEntries: {
+        globalCacheEntries: {
           key: {
             value: cacheEntry.value,
             ttl: cacheEntry.ttl,
@@ -179,7 +188,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyUpsertResponse(
-            convertCacheError(res.stateCacheResponses[key]?.error),
+            convertCacheError(res.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -221,15 +230,14 @@ export class _Flow implements Flow {
   }
 
   /**
-   * Deletes a state cache entry for the flow.
+   * Deletes a global cache entry for the flow.
    * @param key The key of the cache entry to delete.
    * @returns A promise that resolves to the response of the key delete operation.
    */
-  async deleteStateCache(key: string) {
+  async deleteGlobalCache(key: string) {
     return new Promise<KeyDeleteResponse>((resolve) => {
       let cacheDeleteRequest: CacheDeleteRequest = {
-        controlPoint: this.controlPoint,
-        stateCacheKeys: [key],
+        globalCacheKeys: [key],
       };
       this.fcsClient.CacheDelete(
         cacheDeleteRequest,
@@ -241,7 +249,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyDeleteResponse(
-            convertCacheError(res?.stateCacheResponses[key]?.error),
+            convertCacheError(res?.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -279,40 +287,40 @@ export class _Flow implements Flow {
   }
 
   /**
-   * Returns state cache lookup response that was fetched at flow start.
-   * @returns The state cache lookup response.
+   * Returns global cache lookup response that was fetched at flow start.
+   * @returns The global cache lookup response.
    */
-  stateCache(key: string) {
+  globalCache(key: string) {
     if (this._error) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
       return resp;
     }
-    if (!this._checkResponse?.cacheLookupResponse?.stateCacheResponses) {
+    if (!this._checkResponse?.cacheLookupResponse?.globalCacheResponses) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
-        new Error("No state cache response found"),
+        new Error("No global cache response found"),
         null,
       );
       return resp;
     }
-    // if key is not found in state cache dict, return miss
+    // if key is not found in global cache dict, return miss
     if (
-      !this._checkResponse?.cacheLookupResponse?.stateCacheResponses?.hasOwnProperty(
+      !this._checkResponse?.cacheLookupResponse?.globalCacheResponses?.hasOwnProperty(
         key,
       )
     ) {
       const resp = new _KeyLookupResponse(
         LookupStatus.Miss,
-        new Error("Unknown state cache key"),
+        new Error("Unknown global cache key"),
         null,
       );
       return resp;
     }
 
     const lookupResp =
-      this._checkResponse?.cacheLookupResponse?.stateCacheResponses?.[key];
+      this._checkResponse?.cacheLookupResponse?.globalCacheResponses?.[key];
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(lookupResp?.lookupStatus),
       convertCacheError(lookupResp?.error),

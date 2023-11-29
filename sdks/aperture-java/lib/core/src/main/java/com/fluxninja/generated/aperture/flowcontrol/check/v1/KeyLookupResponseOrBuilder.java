@@ -8,52 +8,40 @@ public interface KeyLookupResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string key = 1 [json_name = "key"];</code>
-   * @return The key.
-   */
-  java.lang.String getKey();
-  /**
-   * <code>string key = 1 [json_name = "key"];</code>
-   * @return The bytes for key.
-   */
-  com.google.protobuf.ByteString
-      getKeyBytes();
-
-  /**
-   * <code>bytes value = 2 [json_name = "value"];</code>
+   * <code>bytes value = 1 [json_name = "value"];</code>
    * @return The value.
    */
   com.google.protobuf.ByteString getValue();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 3 [json_name = "lookupStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
    * @return The enum numeric value on the wire for lookupStatus.
    */
   int getLookupStatusValue();
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 3 [json_name = "lookupStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupStatus lookup_status = 2 [json_name = "lookupStatus"];</code>
    * @return The lookupStatus.
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupStatus getLookupStatus();
 
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 4 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
    * @return The enum numeric value on the wire for operationStatus.
    */
   int getOperationStatusValue();
   /**
-   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 4 [json_name = "operationStatus"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheOperationStatus operation_status = 3 [json_name = "operationStatus"];</code>
    * @return The operationStatus.
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheOperationStatus getOperationStatus();
 
   /**
-   * <code>string error = 5 [json_name = "error"];</code>
+   * <code>string error = 4 [json_name = "error"];</code>
    * @return The error.
    */
   java.lang.String getError();
   /**
-   * <code>string error = 5 [json_name = "error"];</code>
+   * <code>string error = 4 [json_name = "error"];</code>
    * @return The bytes for error.
    */
   com.google.protobuf.ByteString
