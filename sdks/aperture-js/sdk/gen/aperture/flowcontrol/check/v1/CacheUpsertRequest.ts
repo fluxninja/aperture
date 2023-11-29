@@ -5,11 +5,11 @@ import type { CacheEntry as _aperture_flowcontrol_check_v1_CacheEntry, CacheEntr
 export interface CacheUpsertRequest {
   'controlPoint'?: (string);
   'resultCacheEntry'?: (_aperture_flowcontrol_check_v1_CacheEntry | null);
-  'stateCacheEntries'?: ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry});
+  'globalCacheEntries'?: ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry});
 }
 
 export interface CacheUpsertRequest__Output {
   'controlPoint': (string);
   'resultCacheEntry': (_aperture_flowcontrol_check_v1_CacheEntry__Output | null);
-  'stateCacheEntries': ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry__Output});
+  'globalCacheEntries': ({[key: string]: _aperture_flowcontrol_check_v1_CacheEntry__Output});
 }

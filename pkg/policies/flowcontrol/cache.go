@@ -59,10 +59,10 @@ func (c *Cache) get(ctx context.Context, controlPoint string, cacheType iface.Ca
 	if key == "" {
 		return nil, ErrCacheKeyEmpty
 	}
-	if controlPoint == "" {
-		return nil, ErrCacheControlPointEmpty
+	cacheKey, err := formatCacheKey(controlPoint, cacheType, key)
+	if err != nil {
+		return nil, err
 	}
-	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	getResponse, err := c.dmapCache.Get(ctx, cacheKey)
 	if err != nil {
 		return nil, err
@@ -85,10 +85,10 @@ func (c *Cache) upsert(ctx context.Context, controlPoint string, cacheType iface
 	if key == "" {
 		return ErrCacheKeyEmpty
 	}
-	if controlPoint == "" {
-		return ErrCacheControlPointEmpty
+	cacheKey, err := formatCacheKey(controlPoint, cacheType, key)
+	if err != nil {
+		return err
 	}
-	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	return c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
 }
 
@@ -101,10 +101,10 @@ func (c *Cache) delete(ctx context.Context, controlPoint string, cacheType iface
 	if key == "" {
 		return ErrCacheKeyEmpty
 	}
-	if controlPoint == "" {
-		return ErrCacheControlPointEmpty
+	cacheKey, err := formatCacheKey(controlPoint, cacheType, key)
+	if err != nil {
+		return err
 	}
-	cacheKey := formatCacheKey(controlPoint, cacheType, key)
 	_, err = c.dmapCache.Delete(ctx, cacheKey)
 	return err
 }
@@ -120,7 +120,7 @@ func (c *Cache) ready() error {
 // Lookup looks up the cache for the given CacheLookupRequest.
 func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
 	response := &flowcontrolv1.CacheLookupResponse{
-		StateCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
+		GlobalCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
 	}
 	if request == nil {
 		return response
@@ -158,24 +158,20 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 	var lookups []*Lookup
 	// define a lookup struct to hold the cache key and the cached value
 	if request.ResultCacheKey != "" {
-		response.ResultCacheResponse = &flowcontrolv1.KeyLookupResponse{
-			Key: request.ResultCacheKey,
-		}
+		response.ResultCacheResponse = &flowcontrolv1.KeyLookupResponse{}
 		lookups = append(lookups, &Lookup{
 			key:            request.ResultCacheKey,
 			lookupResponse: response.ResultCacheResponse,
 			cacheType:      iface.Result,
 		})
 	}
-	for _, stateCacheKey := range request.StateCacheKeys {
-		lookupResponse := &flowcontrolv1.KeyLookupResponse{
-			Key: stateCacheKey,
-		}
-		response.StateCacheResponses[stateCacheKey] = lookupResponse
+	for _, globalCacheKey := range request.GlobalCacheKeys {
+		lookupResponse := &flowcontrolv1.KeyLookupResponse{}
+		response.GlobalCacheResponses[globalCacheKey] = lookupResponse
 		lookups = append(lookups, &Lookup{
-			key:            stateCacheKey,
+			key:            globalCacheKey,
 			lookupResponse: lookupResponse,
-			cacheType:      iface.State,
+			cacheType:      iface.Global,
 		})
 	}
 
@@ -194,7 +190,7 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 // Upsert upserts the cache for the given CacheUpsertRequest.
 func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse {
 	response := &flowcontrolv1.CacheUpsertResponse{
-		StateCacheResponses: make(map[string]*flowcontrolv1.KeyUpsertResponse),
+		GlobalCacheResponses: make(map[string]*flowcontrolv1.KeyUpsertResponse),
 	}
 	if req == nil {
 		return response
@@ -244,18 +240,18 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 	}
 
 	// iterate over the state cache entries map
-	for key, stateCacheEntry := range req.StateCacheEntries {
+	for key, globalCacheEntry := range req.GlobalCacheEntries {
 		if key == "" {
 			continue
 		}
 		wg.Add(1)
 		upsertResponse := &flowcontrolv1.KeyUpsertResponse{}
-		response.StateCacheResponses[key] = upsertResponse
+		response.GlobalCacheResponses[key] = upsertResponse
 		// set the state cache entry key
 		upsertRequests = append(upsertRequests, &UpsertRequest{
 			key:            key,
-			cacheType:      iface.State,
-			entry:          stateCacheEntry,
+			cacheType:      iface.Global,
+			entry:          globalCacheEntry,
 			upsertResponse: upsertResponse,
 		})
 	}
@@ -275,7 +271,7 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 // Delete deletes the cache for the given CacheDeleteRequest.
 func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) *flowcontrolv1.CacheDeleteResponse {
 	response := &flowcontrolv1.CacheDeleteResponse{
-		StateCacheResponses: make(map[string]*flowcontrolv1.KeyDeleteResponse),
+		GlobalCacheResponses: make(map[string]*flowcontrolv1.KeyDeleteResponse),
 	}
 
 	if req == nil {
@@ -317,16 +313,16 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 		})
 	}
 
-	for _, stateCacheKey := range req.StateCacheKeys {
-		if stateCacheKey == "" {
+	for _, globalCacheKey := range req.GlobalCacheKeys {
+		if globalCacheKey == "" {
 			continue
 		}
 		wg.Add(1)
 		deleteResponse := &flowcontrolv1.KeyDeleteResponse{}
-		response.StateCacheResponses[stateCacheKey] = deleteResponse
+		response.GlobalCacheResponses[globalCacheKey] = deleteResponse
 		deleteRequests = append(deleteRequests, &DeleteRequest{
-			cacheType:      iface.State,
-			key:            stateCacheKey,
+			cacheType:      iface.Global,
+			key:            globalCacheKey,
 			deleteResponse: deleteResponse,
 		})
 	}
@@ -344,6 +340,13 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 }
 
 // formatCacheKey returns the cache key for the given control point and key.
-func formatCacheKey(controlPoint string, cacheType iface.CacheType, key string) string {
-	return "@controlpoint:" + controlPoint + "/type:" + cacheType.String() + "/key:" + key
+func formatCacheKey(controlPoint string, cacheType iface.CacheType, key string) (string, error) {
+	if cacheType == iface.Result {
+		if controlPoint == "" {
+			return "", ErrCacheControlPointEmpty
+		}
+		return "@controlpoint:" + controlPoint + "/type:bytes" + "/key:" + key, nil
+	} else {
+		return "@global" + "/type:bytes" + "/key:" + key, nil
+	}
 }

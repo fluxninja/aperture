@@ -41,9 +41,9 @@ export interface FlowParams {
    */
   resultCacheKey?: string;
   /**
-   * Keys to state cache entries that need to be fetched at flow start.
+   * Keys to global cache entries that need to be fetched at flow start.
    */
-  stateCacheKeys?: string[];
+  globalCacheKeys?: string[];
 }
 
 /**
@@ -177,7 +177,7 @@ export class ApertureClient {
             startDate,
             params.rampMode,
             params.resultCacheKey,
-            params.stateCacheKeys,
+            params.globalCacheKeys,
             response,
             err,
           ),
@@ -202,7 +202,7 @@ export class ApertureClient {
           rampMode: params.rampMode,
           cacheLookupRequest: {
             resultCacheKey: params.resultCacheKey,
-            stateCacheKeys: params.stateCacheKeys,
+            globalCacheKeys: params.globalCacheKeys,
           },
         };
 

@@ -4,11 +4,11 @@
 export interface CacheLookupRequest {
   'controlPoint'?: (string);
   'resultCacheKey'?: (string);
-  'stateCacheKeys'?: (string)[];
+  'globalCacheKeys'?: (string)[];
 }
 
 export interface CacheLookupRequest__Output {
   'controlPoint': (string);
   'resultCacheKey': (string);
-  'stateCacheKeys': (string)[];
+  'globalCacheKeys': (string)[];
 }

@@ -20,7 +20,7 @@ func init() {
 var CacheCmd = &cobra.Command{
 	Use:               "result-cache",
 	Short:             "Result Cache related commands",
-	Long:              `Use this command to interact with Aperture Result Cache.`,
+	Long:              `Use this command to interact with Aperture's Result Cache.`,
 	SilenceErrors:     true,
 	PersistentPreRunE: controller.PreRunE,
 	PersistentPostRun: controller.PostRun,

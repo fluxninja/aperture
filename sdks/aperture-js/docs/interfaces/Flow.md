@@ -7,17 +7,17 @@
 ### Methods
 
 - [checkResponse](Flow.md#checkresponse)
+- [deleteGlobalCache](Flow.md#deleteglobalcache)
 - [deleteResultCache](Flow.md#deleteresultcache)
-- [deleteStateCache](Flow.md#deletestatecache)
 - [end](Flow.md#end)
 - [error](Flow.md#error)
+- [globalCache](Flow.md#globalcache)
 - [resultCache](Flow.md#resultcache)
+- [setGlobalCache](Flow.md#setglobalcache)
 - [setResultCache](Flow.md#setresultcache)
-- [setStateCache](Flow.md#setstatecache)
 - [setStatus](Flow.md#setstatus)
 - [shouldRun](Flow.md#shouldrun)
 - [span](Flow.md#span)
-- [stateCache](Flow.md#statecache)
 
 ## Methods
 
@@ -31,19 +31,9 @@
 
 ___
 
-### deleteResultCache
+### deleteGlobalCache
 
-▸ **deleteResultCache**(): `Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
-
-#### Returns
-
-`Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
-
-___
-
-### deleteStateCache
-
-▸ **deleteStateCache**(`key`): `Promise`\<[`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+▸ **deleteGlobalCache**(`key`): `Promise`\<[`KeyDeleteResponse`](KeyDeleteResponse.md)\>
 
 #### Parameters
 
@@ -54,6 +44,16 @@ ___
 #### Returns
 
 `Promise`\<[`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+
+___
+
+### deleteResultCache
+
+▸ **deleteResultCache**(): `Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+
+#### Returns
+
+`Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
 
 ___
 
@@ -77,6 +77,22 @@ ___
 
 ___
 
+### globalCache
+
+▸ **globalCache**(`key`): [`KeyLookupResponse`](KeyLookupResponse.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `key` | `string` |
+
+#### Returns
+
+[`KeyLookupResponse`](KeyLookupResponse.md)
+
+___
+
 ### resultCache
 
 ▸ **resultCache**(): [`KeyLookupResponse`](KeyLookupResponse.md)
@@ -84,6 +100,23 @@ ___
 #### Returns
 
 [`KeyLookupResponse`](KeyLookupResponse.md)
+
+___
+
+### setGlobalCache
+
+▸ **setGlobalCache**(`key`, `cacheEntry`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `key` | `string` |
+| `cacheEntry` | [`CacheEntry`](CacheEntry.md) |
+
+#### Returns
+
+`Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
 
 ___
 
@@ -95,23 +128,6 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `cacheEntry` | [`CacheEntry`](CacheEntry.md) |
-
-#### Returns
-
-`Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
-
-___
-
-### setStateCache
-
-▸ **setStateCache**(`key`, `cacheEntry`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `key` | `string` |
 | `cacheEntry` | [`CacheEntry`](CacheEntry.md) |
 
 #### Returns
@@ -153,19 +169,3 @@ ___
 #### Returns
 
 `Span`
-
-___
-
-### stateCache
-
-▸ **stateCache**(`key`): [`KeyLookupResponse`](KeyLookupResponse.md)
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `key` | `string` |
-
-#### Returns
-
-[`KeyLookupResponse`](KeyLookupResponse.md)

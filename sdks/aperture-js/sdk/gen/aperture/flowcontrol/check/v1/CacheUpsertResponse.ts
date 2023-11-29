@@ -4,10 +4,10 @@ import type { KeyUpsertResponse as _aperture_flowcontrol_check_v1_KeyUpsertRespo
 
 export interface CacheUpsertResponse {
   'resultCacheResponse'?: (_aperture_flowcontrol_check_v1_KeyUpsertResponse | null);
-  'stateCacheResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyUpsertResponse});
+  'globalCacheResponses'?: ({[key: string]: _aperture_flowcontrol_check_v1_KeyUpsertResponse});
 }
 
 export interface CacheUpsertResponse__Output {
   'resultCacheResponse': (_aperture_flowcontrol_check_v1_KeyUpsertResponse__Output | null);
-  'stateCacheResponses': ({[key: string]: _aperture_flowcontrol_check_v1_KeyUpsertResponse__Output});
+  'globalCacheResponses': ({[key: string]: _aperture_flowcontrol_check_v1_KeyUpsertResponse__Output});
 }
