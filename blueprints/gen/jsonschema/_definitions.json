@@ -3111,7 +3111,7 @@
           "x-go-tag-validate": "required"
         },
         "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.\nDeprecated: v2.25.0. Use _limit_by_label_key_ instead.\n\n",
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.\nDeprecated: v3.0.0. Use _limit_by_label_key_ instead.\n\n",
           "type": "string",
           "x-deprecated": true,
           "x-go-tag-validate": "deprecated"
