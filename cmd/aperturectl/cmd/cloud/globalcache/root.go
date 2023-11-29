@@ -1,4 +1,4 @@
-package statecache
+package globalcache
 
 import (
 	"github.com/spf13/cobra"
@@ -18,9 +18,9 @@ func init() {
 
 // CacheCmd is the command to observe Flow Control control points.
 var CacheCmd = &cobra.Command{
-	Use:               "state-cache",
-	Short:             "State Cache related commands",
-	Long:              `Use this command to interact with Aperture State Cache.`,
+	Use:               "global-cache",
+	Short:             "Global Cache related commands",
+	Long:              `Use this command to interact with Aperture's Global Cache.`,
 	SilenceErrors:     true,
 	PersistentPreRunE: controller.PreRunE,
 	PersistentPostRun: controller.PostRun,

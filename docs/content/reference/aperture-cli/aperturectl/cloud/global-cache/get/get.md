@@ -1,34 +1,31 @@
 ---
-sidebar_label: Set
+sidebar_label: Get
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_state-cache_set
+  - aperturectl_cloud_global-cache_get
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud state-cache set
+## aperturectl cloud global-cache get
 
-Set a state cache entry
+Get a global cache entry
 
 ### Synopsis
 
-Set a state cache entry
+Get a global cache entry
 
 ```
-aperturectl cloud state-cache set [flags]
+aperturectl cloud global-cache get [flags]
 ```
 
 ### Options
 
 ```
-  -a, --agent-group string     Agent group
-  -c, --control-point string   Control point
-  -h, --help                   help for set
-  -k, --key string             Key
-  -t, --ttl int                TTL in milliseconds (default 600000)
-      --value string           Value
+  -a, --agent-group string   Agent group
+  -h, --help                 help for get
+  -k, --key string           Key
 ```
 
 ### Options inherited from parent commands
@@ -44,4 +41,4 @@ aperturectl cloud state-cache set [flags]
 
 ### SEE ALSO
 
-- [aperturectl cloud state-cache](/reference/aperture-cli/aperturectl/cloud/state-cache/state-cache.md) - State Cache related commands
+- [aperturectl cloud global-cache](/reference/aperture-cli/aperturectl/cloud/global-cache/global-cache.md) - Global Cache related commands

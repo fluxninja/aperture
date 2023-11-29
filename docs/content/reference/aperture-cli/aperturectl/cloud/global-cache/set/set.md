@@ -1,32 +1,33 @@
 ---
-sidebar_label: Delete
+sidebar_label: Set
 hide_title: true
 keywords:
   - aperturectl
-  - aperturectl_cloud_state-cache_delete
+  - aperturectl_cloud_global-cache_set
 ---
 
 <!-- markdownlint-disable -->
 
-## aperturectl cloud state-cache delete
+## aperturectl cloud global-cache set
 
-Delete a state cache entry
+Set a global cache entry
 
 ### Synopsis
 
-Delete a state cache entry
+Set a global cache entry
 
 ```
-aperturectl cloud state-cache delete [flags]
+aperturectl cloud global-cache set [flags]
 ```
 
 ### Options
 
 ```
-  -a, --agent-group string     Agent group
-  -c, --control-point string   Control point
-  -h, --help                   help for delete
-  -k, --key string             Key
+  -a, --agent-group string   Agent group
+  -h, --help                 help for set
+  -k, --key string           Key
+  -t, --ttl int              TTL in milliseconds (default 600000)
+      --value string         Value
 ```
 
 ### Options inherited from parent commands
@@ -42,4 +43,4 @@ aperturectl cloud state-cache delete [flags]
 
 ### SEE ALSO
 
-- [aperturectl cloud state-cache](/reference/aperture-cli/aperturectl/cloud/state-cache/state-cache.md) - State Cache related commands
+- [aperturectl cloud global-cache](/reference/aperture-cli/aperturectl/cloud/global-cache/global-cache.md) - Global Cache related commands

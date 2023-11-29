@@ -9,9 +9,9 @@ import (
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/discovery"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/dynamicconfig"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/flowcontrol"
+	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/globalcache"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/policy"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/resultcache"
-	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/statecache"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/status"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/cloud/utils"
 )
@@ -32,7 +32,7 @@ func init() {
 	CloudCmd.AddCommand(blueprints.BlueprintsCmd)
 	CloudCmd.AddCommand(policy.PolicyCmd)
 	CloudCmd.AddCommand(resultcache.CacheCmd)
-	CloudCmd.AddCommand(statecache.CacheCmd)
+	CloudCmd.AddCommand(globalcache.CacheCmd)
 }
 
 // CloudCmd is the command to apply a policy to the Cloud Controller.

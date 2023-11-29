@@ -1,4 +1,4 @@
-package statecache
+package globalcache
 
 import (
 	"time"
@@ -14,15 +14,10 @@ var (
 
 func init() {
 	SetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
-	SetCommand.Flags().StringVarP(&controlPoint, "control-point", "c", "", "Control point")
 	SetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
 	SetCommand.Flags().StringVarP(&value, "value", "", "", "Value")
 	SetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600000, "TTL in milliseconds")
 	err := SetCommand.MarkFlagRequired("agent-group")
-	if err != nil {
-		panic(err)
-	}
-	err = SetCommand.MarkFlagRequired("control-point")
 	if err != nil {
 		panic(err)
 	}
@@ -38,8 +33,8 @@ func init() {
 
 var SetCommand = &cobra.Command{
 	Use:   "set",
-	Short: "Set a state cache entry",
-	Long:  `Set a state cache entry`,
+	Short: "Set a global cache entry",
+	Long:  `Set a global cache entry`,
 	RunE: func(_ *cobra.Command, _ []string) error {
 		client, err := controller.IntrospectionClient()
 		if err != nil {
@@ -47,13 +42,12 @@ var SetCommand = &cobra.Command{
 		}
 
 		input := utils.CacheUpsertInput{
-			AgentGroup:   agentGroup,
-			ControlPoint: controlPoint,
-			Key:          key,
-			Value:        value,
-			TTL:          time.Duration(ttl) * time.Millisecond,
+			AgentGroup: agentGroup,
+			Key:        key,
+			Value:      value,
+			TTL:        time.Duration(ttl) * time.Millisecond,
 		}
 
-		return utils.ParseStateCacheUpsert(client, input)
+		return utils.ParseGlobalCacheUpsert(client, input)
 	},
 }
