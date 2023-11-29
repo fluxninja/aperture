@@ -455,7 +455,7 @@ certain fields:
   the pod might fail to start.
 
 Additionally, the `agent-group` field can be configured using the annotation
-like:
+such as:
 
 `sidecar.fluxninja.com/agent-group=group1`
 
@@ -504,7 +504,7 @@ following these steps:
       </Tabs>
 
 3. If you have installed the chart in some other namespace than the `default`,
-   execute the following commands:
+   run the following commands:
 
    <Tabs groupId="setup" queryString>
    <TabItem value="Helm" label="Helm">

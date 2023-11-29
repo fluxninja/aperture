@@ -6,9 +6,6 @@ import (
 	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
 )
 
-// ErrCacheKeyNotSet is returned when empty cache key is provided by the caller.
-var ErrCacheKeyNotSet = errors.New("cache key not set")
-
 // LookupStatus is the status of a cache lookup, either HIT or MISS.
 type LookupStatus string
 
@@ -41,18 +38,6 @@ func convertCacheLookupStatus(status checkv1.CacheLookupStatus) LookupStatus {
 	}
 }
 
-// convertCacheOperationStatus converts CacheOperationStatus to OperationStatus.
-func convertCacheOperationStatus(status checkv1.CacheOperationStatus) OperationStatus {
-	switch status {
-	case checkv1.CacheOperationStatus_SUCCESS:
-		return OperationStatusSuccess
-	case checkv1.CacheOperationStatus_ERROR:
-		return OperationStatusError
-	default:
-		return OperationStatusError
-	}
-}
-
 // convertCacheError converts a string error message to Go's error type.
 // Returns nil if the input string is empty.
 func convertCacheError(errorMessage string) error {
@@ -62,102 +47,96 @@ func convertCacheError(errorMessage string) error {
 	return errors.New(errorMessage)
 }
 
-// GetCachedValueResponse is the interface to read the response from a get cached value operation.
-type GetCachedValueResponse interface {
-	GetValue() []byte
-	GetLookupStatus() LookupStatus
-	GetOperationStatus() OperationStatus
-	GetError() error
+// KeyLookupResponse is the interface to read the response from a get cached value operation.
+type KeyLookupResponse interface {
+	Value() []byte
+	LookupStatus() LookupStatus
+	Error() error
 }
 
-// SetCachedValueResponse is the interface to read the response from a set cached value operation.
-type SetCachedValueResponse interface {
-	GetError() error
-	GetOperationStatus() OperationStatus
+// KeyUpsertResponse is the interface to read the response from a set cached value operation.
+type KeyUpsertResponse interface {
+	Error() error
 }
 
-// DeleteCachedValueResponse is the interface to read the response from a delete cached value operation.
-type DeleteCachedValueResponse interface {
-	GetError() error
-	GetOperationStatus() OperationStatus
+// KeyDeleteResponse is the interface to read the response from a delete cached value operation.
+type KeyDeleteResponse interface {
+	Error() error
 }
 
-type getCachedValueResponse struct {
-	value           []byte
+type keyLookupResponse struct {
+	error           error
 	lookupStatus    LookupStatus
 	operationStatus OperationStatus
-	error           error
+	value           []byte
 }
 
-type setCachedValueResponse struct {
-	error           error
-	operationStatus OperationStatus
-}
-
-type deleteCachedValueResponse struct {
+type keyUpsertResponse struct {
 	error           error
 	operationStatus OperationStatus
 }
 
-// GetValue returns the cached value.
-func (g *getCachedValueResponse) GetValue() []byte {
+type keyDeleteResponse struct {
+	error           error
+	operationStatus OperationStatus
+}
+
+// Value returns the cached value.
+func (g *keyLookupResponse) Value() []byte {
 	return g.value
 }
 
-// GetLookupStatus returns the lookup status.
-func (g *getCachedValueResponse) GetLookupStatus() LookupStatus {
+// LookupStatus returns the lookup status.
+func (g *keyLookupResponse) LookupStatus() LookupStatus {
 	return g.lookupStatus
 }
 
-// GetOperationStatus returns the operation status.
-func (g *getCachedValueResponse) GetOperationStatus() OperationStatus {
+// OperationStatus returns the operation status.
+func (g *keyLookupResponse) OperationStatus() OperationStatus {
 	return g.operationStatus
 }
 
-// GetError returns the error.
-func (g *getCachedValueResponse) GetError() error {
+// Error returns the error.
+func (g *keyLookupResponse) Error() error {
 	return g.error
 }
 
-// GetError returns the error.
-func (s *setCachedValueResponse) GetError() error {
+// Error returns the error.
+func (s *keyUpsertResponse) Error() error {
 	return s.error
 }
 
-// GetOperationStatus returns the operation status.
-func (s *setCachedValueResponse) GetOperationStatus() OperationStatus {
+// OperationStatus returns the operation status.
+func (s *keyUpsertResponse) OperationStatus() OperationStatus {
 	return s.operationStatus
 }
 
-// GetError returns the error.
-func (d *deleteCachedValueResponse) GetError() error {
+// Error returns the error.
+func (d *keyDeleteResponse) Error() error {
 	return d.error
 }
 
-// GetOperationStatus returns the operation status.
-func (d *deleteCachedValueResponse) GetOperationStatus() OperationStatus {
+// OperationStatus returns the operation status.
+func (d *keyDeleteResponse) OperationStatus() OperationStatus {
 	return d.operationStatus
 }
 
-func newGetCachedValueResponse(value []byte, lookupStatus LookupStatus, operationStatus OperationStatus, err error) GetCachedValueResponse {
-	return &getCachedValueResponse{
-		value:           value,
-		lookupStatus:    lookupStatus,
-		operationStatus: operationStatus,
-		error:           err,
+func newKeyLookupResponse(value []byte, lookupStatus LookupStatus, err error) KeyLookupResponse {
+	return &keyLookupResponse{
+		value:        value,
+		lookupStatus: lookupStatus,
+		error:        err,
 	}
 }
 
-func newSetCachedValueResponse(operationStatus OperationStatus, err error) SetCachedValueResponse {
-	return &setCachedValueResponse{
-		error:           err,
-		operationStatus: operationStatus,
+func newKeyUpsertResponse(err error) KeyUpsertResponse {
+	return &keyUpsertResponse{
+		error: err,
 	}
 }
 
-func newDeleteCachedValueResponse(operationStatus OperationStatus, err error) DeleteCachedValueResponse {
-	return &deleteCachedValueResponse{
-		error:           err,
-		operationStatus: operationStatus,
+func newKeyDeleteResponse(err error) KeyDeleteResponse {
+	return &keyDeleteResponse{
+		error: err,
 	}
 }

@@ -20,35 +20,51 @@ public interface CacheUpsertRequestOrBuilder extends
       getControlPointBytes();
 
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The key.
+   * <code>.aperture.flowcontrol.check.v1.CacheEntry result_cache_entry = 2 [json_name = "resultCacheEntry"];</code>
+   * @return Whether the resultCacheEntry field is set.
    */
-  java.lang.String getKey();
+  boolean hasResultCacheEntry();
   /**
-   * <code>string key = 2 [json_name = "key"];</code>
-   * @return The bytes for key.
+   * <code>.aperture.flowcontrol.check.v1.CacheEntry result_cache_entry = 2 [json_name = "resultCacheEntry"];</code>
+   * @return The resultCacheEntry.
    */
-  com.google.protobuf.ByteString
-      getKeyBytes();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getResultCacheEntry();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.CacheEntry result_cache_entry = 2 [json_name = "resultCacheEntry"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntryOrBuilder getResultCacheEntryOrBuilder();
 
   /**
-   * <code>bytes value = 3 [json_name = "value"];</code>
-   * @return The value.
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
    */
-  com.google.protobuf.ByteString getValue();
-
+  int getStateCacheEntriesCount();
   /**
-   * <code>.google.protobuf.Duration ttl = 4 [json_name = "ttl"];</code>
-   * @return Whether the ttl field is set.
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
    */
-  boolean hasTtl();
+  boolean containsStateCacheEntries(
+      java.lang.String key);
   /**
-   * <code>.google.protobuf.Duration ttl = 4 [json_name = "ttl"];</code>
-   * @return The ttl.
+   * Use {@link #getStateCacheEntriesMap()} instead.
    */
-  com.google.protobuf.Duration getTtl();
+  @java.lang.Deprecated
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
+  getStateCacheEntries();
   /**
-   * <code>.google.protobuf.Duration ttl = 4 [json_name = "ttl"];</code>
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
    */
-  com.google.protobuf.DurationOrBuilder getTtlOrBuilder();
+  java.util.Map<java.lang.String, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry>
+  getStateCacheEntriesMap();
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   */
+  /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrDefault(
+      java.lang.String key,
+      /* nullable */
+com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry defaultValue);
+  /**
+   * <code>map&lt;string, .aperture.flowcontrol.check.v1.CacheEntry&gt; state_cache_entries = 3 [json_name = "stateCacheEntries"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheEntry getStateCacheEntriesOrThrow(
+      java.lang.String key);
 }

@@ -21,11 +21,13 @@ var Module = fx.Options(
 	fx.Provide(
 		NewFlowControlControlPointsHandler,
 		ProvidePreviewHandler,
+		NewCacheHandler,
 	),
 	fx.Invoke(
 		RegisterEtcdTransport,
 		RegisterControlPointsHandler,
 		RegisterPreviewHandler,
+		RegisterCacheHandlers,
 	),
 )
 

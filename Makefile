@@ -58,7 +58,7 @@ go-generate-swagger:
 	@echo Generating swagger specs from go code
 	@./scripts/go_generate_swagger.sh
 
-generate-docs: generate-helm-readme generate-doc-assets generate-aperturectl-docs generate-otel-docs
+generate-docs: generate-helm-readme generate-doc-assets generate-aperturectl-docs generate-otel-docs generate-code-snippets
 	@echo Generating docs
 
 generate-config-markdown: go-generate-swagger generate-api
@@ -82,6 +82,10 @@ generate-doc-assets: generate-blueprints
 
 generate-aperturectl-docs:
 	@cd ./docs && $(MAKE) generate-aperturectl-docs
+
+generate-code-snippets:
+	@echo Generating code snippets
+	cd ./docs && $(MAKE) generate-code-snippets
 
 generate-otel-docs:
 	@cd ./docs && $(MAKE) generate-otel-docs

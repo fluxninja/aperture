@@ -50,7 +50,7 @@ multiplier applied to the recent rate of requests.
 :::note
 
 Aperture facilitates the observation of health signals from various services.
-For instance, adaptive service protection can also be implemented based on the
+For example, adaptive service protection can also be implemented based on the
 health observation of an upstream service in relation to a downstream service.
 
 :::

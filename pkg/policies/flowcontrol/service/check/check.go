@@ -73,11 +73,11 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 	resp := h.CheckRequest(
 		ctx,
 		iface.RequestContext{
-			FlowLabels:   labels.PlainMap(req.Labels),
-			ControlPoint: req.ControlPoint,
-			Services:     services,
-			RampMode:     req.RampMode,
-			CacheKey:     req.CacheKey,
+			FlowLabels:         labels.PlainMap(req.Labels),
+			ControlPoint:       req.ControlPoint,
+			Services:           services,
+			RampMode:           req.RampMode,
+			CacheLookupRequest: req.CacheLookupRequest,
 		},
 	)
 	end := time.Now()
@@ -92,41 +92,23 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 // CacheUpsert is the CacheUpsert method of Flow Control service updates the cache with the given key and value.
 func (h *Handler) CacheUpsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) (*flowcontrolv1.CacheUpsertResponse, error) {
 	if h.cache == nil {
-		return &flowcontrolv1.CacheUpsertResponse{
-			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
-			Error:           "cache is not enabled",
-		}, nil
+		return nil, nil
 	}
-	err := h.cache.Upsert(ctx, req.ControlPoint, req.Key, req.Value, req.Ttl.AsDuration())
-	if err != nil {
-		return &flowcontrolv1.CacheUpsertResponse{
-			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
-			Error:           err.Error(),
-		}, nil
-	}
-
-	return &flowcontrolv1.CacheUpsertResponse{
-		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
-	}, nil
+	return h.cache.Upsert(ctx, req), nil
 }
 
 // CacheDelete is the CacheDelete method of Flow Control service deletes the cache entry with the given key.
 func (h *Handler) CacheDelete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) (*flowcontrolv1.CacheDeleteResponse, error) {
 	if h.cache == nil {
-		return &flowcontrolv1.CacheDeleteResponse{
-			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
-			Error:           "cache is not enabled",
-		}, nil
+		return nil, nil
 	}
-	err := h.cache.Delete(ctx, req.ControlPoint, req.Key)
-	if err != nil {
-		return &flowcontrolv1.CacheDeleteResponse{
-			OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
-			Error:           err.Error(),
-		}, nil
-	}
+	return h.cache.Delete(ctx, req), nil
+}
 
-	return &flowcontrolv1.CacheDeleteResponse{
-		OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
-	}, nil
+// CacheLookup is the CacheLookup method of Flow Control service which takes a CacheLookupRequest and returns a CacheLookupResponse.
+func (h *Handler) CacheLookup(ctx context.Context, req *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, error) {
+	if h.cache == nil {
+		return nil, nil
+	}
+	return h.cache.Lookup(ctx, req), nil
 }

@@ -98,8 +98,8 @@ code.
 
 :::note
 
-The control point definition does not care about which particular entity (like a
-pod) is handling a particular flow. A single control point covers _all_ the
+The control point definition does not care about which particular entity (such
+as a pod) is handling a particular flow. A single control point covers _all_ the
 entities belonging to the same service.
 
 :::

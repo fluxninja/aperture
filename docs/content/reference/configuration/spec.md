@@ -4799,7 +4799,7 @@ Label key that the selector applies to.
 
 <!-- vale off -->
 
-(string, one of: `In | NotIn | Exists | DoesNotExists`)
+(string, one of: `In | NotIn | Exists | DoesNotExist`, **required**)
 
 <!-- vale on -->
 

@@ -174,8 +174,8 @@ func deploymentMutate(dep *appsv1.Deployment, spec appsv1.DeploymentSpec) contro
 	return func() error {
 		dep.Spec.Selector = spec.Selector
 		dep.Spec.Strategy = spec.Strategy
-		dep.Spec.Template.Annotations = spec.Template.Annotations
-		dep.Spec.Template.Labels = spec.Template.Labels
+		dep.Spec.Template.Annotations = controllers.SyncMaps(spec.Template.Annotations, dep.Spec.Template.Annotations)
+		dep.Spec.Template.Labels = controllers.SyncMaps(spec.Template.Labels, dep.Spec.Template.Labels)
 		dep.Spec.Template.Spec.ServiceAccountName = spec.Template.Spec.ServiceAccountName
 		dep.Spec.Template.Spec.HostAliases = spec.Template.Spec.HostAliases
 		dep.Spec.Template.Spec.ImagePullSecrets = spec.Template.Spec.ImagePullSecrets

@@ -55,9 +55,9 @@ protocol.
 
 ### Token Bucket Algorithm {#token-bucket-algorithm}
 
-This algorithm allows users to execute a substantial number of requests in
-bursts, and then continue at a steady rate. Here are the key points to
-understand about the token bucket algorithm:
+This algorithm allows users to run a substantial number of requests in bursts,
+and then continue at a steady rate. Here are the key points to understand about
+the token bucket algorithm:
 
 - Each user (or any flow label) has access to a bucket, which can hold, say, 60
   "tokens".

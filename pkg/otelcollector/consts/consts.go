@@ -87,6 +87,10 @@ const (
 	ApertureFlowStatusOK = "OK"
 	// ApertureFlowStatusError const for error status.
 	ApertureFlowStatusError = "Error"
+	// ApertureCacheLookupStatusLabel describes status of the cache lookup.
+	ApertureCacheLookupStatusLabel = "aperture.cache_lookup_status"
+	// ApertureCacheOperationStatusLabel describes status of the cache operation.
+	ApertureCacheOperationStatusLabel = "aperture.cache_operation_status"
 
 	/* HTTP Specific labels. */
 

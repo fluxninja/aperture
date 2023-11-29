@@ -440,28 +440,28 @@ java.lang.String defaultValue);
 
   /**
    * <pre>
-   * Matching cached value.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
-   * @return Whether the cachedValue field is set.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
+   * @return Whether the cacheLookupResponse field is set.
    */
-  boolean hasCachedValue();
+  boolean hasCacheLookupResponse();
   /**
    * <pre>
-   * Matching cached value.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
-   * @return The cachedValue.
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
+   * @return The cacheLookupResponse.
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValue getCachedValue();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse getCacheLookupResponse();
   /**
    * <pre>
-   * Matching cached value.
+   * CacheLookupResponse contains the result of the cache lookup.
    * </pre>
    *
-   * <code>.aperture.flowcontrol.check.v1.CachedValue cached_value = 15 [json_name = "cachedValue"];</code>
+   * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
    */
-  com.fluxninja.generated.aperture.flowcontrol.check.v1.CachedValueOrBuilder getCachedValueOrBuilder();
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponseOrBuilder getCacheLookupResponseOrBuilder();
 }

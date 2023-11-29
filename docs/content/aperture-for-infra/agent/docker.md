@@ -50,8 +50,7 @@ Below are the instructions to install the Aperture Agent on Docker.
    **`Aperture`** tab in the sidebar menu and then select **`API Keys`** in the
    top bar. From there, you can either copy the existing key or create a new one
    by clicking on **`Create API Key`**. For detailed instructions on locating
-   API Keys, please refer to the [API Keys](/reference/cloud-ui/api-keys.md)
-   section.
+   API Keys, refer to the [API Keys](/reference/cloud-ui/api-keys.md) section.
 
    :::note
 

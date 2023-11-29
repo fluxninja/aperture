@@ -9,6 +9,7 @@ import "google/protobuf/timestamp.proto";
 service FlowControlService {
   // Check wraps the given arbitrary resource and matches the given labels against Flow Control Limiters to makes a decision whether to allow/deny.
   rpc Check(CheckRequest) returns (CheckResponse) {}
+  rpc CacheLookup(CacheLookupRequest) returns (CacheLookupResponse) {}
   rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
   rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
 }
@@ -18,8 +19,7 @@ message CheckRequest {
   string control_point = 1;
   map<string, string> labels = 2;
   bool ramp_mode = 3;
-  // Cache item to fetch.
-  string cache_key = 4;
+  CacheLookupRequest cache_lookup_request = 4;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -67,8 +67,16 @@ message CheckResponse {
   // http_status contains the http status code to be returned to the client, if
   // decision_type is REJECTED. Optional.
   StatusCode denied_response_status_code = 14;
-  // Matching cached value.
-  CachedValue cached_value = 15;
+  // CacheLookupResponse contains the result of the cache lookup.
+  CacheLookupResponse cache_lookup_response = 15;
+}
+
+message KeyLookupResponse {
+  string key = 1;
+  bytes value = 2;
+  CacheLookupStatus lookup_status = 3;
+  CacheOperationStatus operation_status = 4;
+  string error = 5;
 }
 
 enum CacheLookupStatus {
@@ -81,33 +89,57 @@ enum CacheOperationStatus {
   ERROR = 1;
 }
 
-message CachedValue {
-  bytes value = 1;
-  CacheLookupStatus lookup_status = 2;
-  CacheOperationStatus operation_status = 3;
-  string error = 4;
-}
-
 message CacheUpsertRequest {
   string control_point = 1;
-  string key = 2;
-  bytes value = 3;
-  google.protobuf.Duration ttl = 4;
+  CacheEntry result_cache_entry = 2;
+  map<string, CacheEntry> state_cache_entries = 3;
+}
+
+message CacheEntry {
+  string key = 1;
+  bytes value = 2;
+  google.protobuf.Duration ttl = 3;
 }
 
 message CacheUpsertResponse {
-  CacheOperationStatus operation_status = 1;
-  string error = 2;
+  KeyUpsertResponse result_cache_response = 1;
+  map<string, KeyUpsertResponse> state_cache_responses = 2;
+}
+
+message KeyUpsertResponse {
+  string key = 1;
+  CacheOperationStatus operation_status = 2;
+  string error = 3;
 }
 
 message CacheDeleteRequest {
   string control_point = 1;
-  string key = 2;
+  string result_cache_key = 2;
+  repeated string state_cache_keys = 3;
 }
 
 message CacheDeleteResponse {
-  CacheOperationStatus operation_status = 1;
-  string error = 2;
+  KeyDeleteResponse result_cache_response = 1;
+  map<string, KeyDeleteResponse> state_cache_responses = 2;
+}
+
+message KeyDeleteResponse {
+  string key = 1;
+  CacheOperationStatus operation_status = 2;
+  string error = 3;
+}
+
+message CacheLookupRequest {
+  string control_point = 1;
+  // Key for result cache that needs to be fetched.
+  string result_cache_key = 2;
+  // Keys for state cache entries that need to be fetched.
+  repeated string state_cache_keys = 3;
+}
+
+message CacheLookupResponse {
+  KeyLookupResponse result_cache_response = 1;
+  map<string, KeyLookupResponse> state_cache_responses = 2;
 }
 
 // ClassifierInfo describes details for each ClassifierInfo.

@@ -3,10 +3,12 @@
 
 export interface CacheDeleteRequest {
   'controlPoint'?: (string);
-  'key'?: (string);
+  'resultCacheKey'?: (string);
+  'stateCacheKeys'?: (string)[];
 }
 
 export interface CacheDeleteRequest__Output {
   'controlPoint': (string);
-  'key': (string);
+  'resultCacheKey': (string);
+  'stateCacheKeys': (string)[];
 }

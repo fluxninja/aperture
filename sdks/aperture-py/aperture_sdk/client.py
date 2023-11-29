@@ -3,10 +3,14 @@ import functools
 import logging
 import time
 import typing
+from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Type, TypeVar
 
 import grpc
-from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import CheckRequest
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
+    CacheLookupRequest,
+    CheckRequest,
+)
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
 )
@@ -42,6 +46,15 @@ class ApertureCloudAuthMetadataPlugin(grpc.AuthMetadataPlugin):
         self, context: AuthMetadataContext, callback: AuthMetadataPluginCallback
     ) -> None:
         callback((("x-api-key", self.api_key),), None)
+
+
+@dataclass
+class FlowParams:
+    explicit_labels: Optional[Labels] = None
+    check_timeout: datetime.timedelta = default_rpc_timeout
+    ramp_mode: bool = False
+    result_cache_key: Optional[str] = None
+    state_cache_keys: Optional[typing.List[str]] = None
 
 
 class ApertureClient:
@@ -123,16 +136,19 @@ class ApertureClient:
     def start_flow(
         self,
         control_point: str,
-        explicit_labels: Optional[Labels] = None,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
-        ramp_mode: bool = False,
+        params: FlowParams,
     ) -> Flow:
         labels: Labels = {}
         labels.update({key: str(value) for key, value in baggage.get_all().items()})
         # Explicit labels override baggage
-        labels.update(explicit_labels or {})
+        labels.update(params.explicit_labels or {})
         request = CheckRequest(
-            control_point=control_point, labels=labels, ramp_mode=ramp_mode
+            control_point=control_point,
+            labels=labels,
+            ramp_mode=params.ramp_mode,
+            cache_lookup_request=CacheLookupRequest(
+                result_cache_key=params.result_cache_key,
+            ),
         )
         span_attributes: otel_types.Attributes = {
             flow_start_timestamp_label: time.monotonic_ns(),
@@ -143,7 +159,7 @@ class ApertureClient:
         stub = FlowControlServiceStub(self.grpc_channel)
         try:
             # stub.Check is typed to accept an int, but it actually accepts a float
-            timeout = typing.cast(int, check_timeout.total_seconds())
+            timeout = typing.cast(int, params.check_timeout.total_seconds())
             response = (
                 stub.Check(request)
                 if timeout == 0
@@ -153,22 +169,25 @@ class ApertureClient:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
-        return Flow(span=span, check_response=response)
+        return Flow(
+            fcs_stub=stub,
+            control_point=control_point,
+            span=span,
+            check_response=response,
+            ramp_mode=params.ramp_mode,
+            cache_key=params.result_cache_key,
+        )
 
     def decorate(
         self,
         control_point: str,
-        explicit_labels: Optional[Dict[str, str]] = None,
+        params: FlowParams = FlowParams(),
         on_reject: Optional[Callable] = None,
-        check_timeout: datetime.timedelta = default_rpc_timeout,
-        ramp_mode: bool = False,
     ) -> Callable[[TWrappedFunction], TWrappedFunction]:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                with self.start_flow(
-                    control_point, explicit_labels, check_timeout, ramp_mode
-                ) as flow:
+                with self.start_flow(control_point, params) as flow:
                     if flow.should_run():
                         return await run_fn(fn, *args, **kwargs)
                     else:

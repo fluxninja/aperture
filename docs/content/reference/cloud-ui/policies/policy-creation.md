@@ -25,16 +25,16 @@ Let's see how to create a policy in Aperture Cloud.
 Before beginning, ensure you've [signed up][] and created an organization and
 project
 
-1. To create & deploy a policy, head over to the policies dashboard. click on
-   **Create Policy** button. ![Policies Dashboard](./assets/2-create-policy.png)
+1. To create & deploy a policy, head over to the policies dashboard. Click on
+   **Create Policy** button. ![Policies Dashboard](./assets/1-create-policy.png)
 2. Now, you will be directed to use case selection page. Select the use case for
    which you want to create a Policy.
 
-   ![Use Case Selection](./assets/3-use-case-selection.png)
+   ![Use Case Selection](./assets/2-use-case-select.png)
 
 3. After choosing the use case, select the Blueprint to customize.
 
-   ![Blueprint Selection](./assets/4-choose-blueprint.png)
+   ![Blueprint Selection](./assets/3-choose-blueprint.png)
 
 4. It will open the Blueprint in the Policy Builder, allowing you to customize
    it according to your requirements. This editor offers syntax highlighting,
@@ -42,19 +42,19 @@ project
    syntax error in the policy, the editor will highlight the line and provide
    you with an error message, as shown in the example below.
 
-   ![Policy Builder](./assets/5-customize-blueprint.png)
+   ![Policy Builder](./assets/4-customize-blueprint.png)
 
 5. Once you have completed the customization, the next step will provide you
    with the draft policy and an overview of the policy before the final
    submission.
 
-   ![Deploy Policy](./assets/7-review-the-draft.png)
+   ![Deploy Policy](./assets/5-review-policy.png)
 
 6. After submitting, it will redirect to the policies dashboard, where you can
    see the policy status. It will take some time to deploy the policy. Once the
    policy is deployed, you can see the status as **Applied**.
 
-   ![Policy Status](./assets/8-policy-applied.png)
+   ![Policy Status](./assets/6-policy-applied.png)
 
 7. Now, you can see the policy in the policy dashboard. You can also edit,
    delete, and view the policy from here.

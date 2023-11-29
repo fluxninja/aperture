@@ -49,6 +49,37 @@ public final class FlowControlServiceGrpc {
     return getCheckMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest,
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> getCacheLookupMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "CacheLookup",
+      requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.class,
+      responseType = com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest,
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> getCacheLookupMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> getCacheLookupMethod;
+    if ((getCacheLookupMethod = FlowControlServiceGrpc.getCacheLookupMethod) == null) {
+      synchronized (FlowControlServiceGrpc.class) {
+        if ((getCacheLookupMethod = FlowControlServiceGrpc.getCacheLookupMethod) == null) {
+          FlowControlServiceGrpc.getCacheLookupMethod = getCacheLookupMethod =
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CacheLookup"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("CacheLookup"))
+              .build();
+        }
+      }
+    }
+    return getCacheLookupMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest,
       com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> getCacheUpsertMethod;
 
@@ -174,6 +205,13 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
+    default void cacheLookup(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheLookupMethod(), responseObserver);
+    }
+
+    /**
+     */
     default void cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request,
         io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheUpsertMethod(), responseObserver);
@@ -233,6 +271,14 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
+    public void cacheLookup(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getCacheLookupMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void cacheUpsert(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request,
         io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
@@ -275,6 +321,13 @@ public final class FlowControlServiceGrpc {
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse check(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCheckMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse cacheLookup(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getCacheLookupMethod(), getCallOptions(), request);
     }
 
     /**
@@ -324,6 +377,14 @@ public final class FlowControlServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse> cacheLookup(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getCacheLookupMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertResponse> cacheUpsert(
         com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
@@ -340,8 +401,9 @@ public final class FlowControlServiceGrpc {
   }
 
   private static final int METHODID_CHECK = 0;
-  private static final int METHODID_CACHE_UPSERT = 1;
-  private static final int METHODID_CACHE_DELETE = 2;
+  private static final int METHODID_CACHE_LOOKUP = 1;
+  private static final int METHODID_CACHE_UPSERT = 2;
+  private static final int METHODID_CACHE_DELETE = 3;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -363,6 +425,10 @@ public final class FlowControlServiceGrpc {
         case METHODID_CHECK:
           serviceImpl.check((com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest) request,
               (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>) responseObserver);
+          break;
+        case METHODID_CACHE_LOOKUP:
+          serviceImpl.cacheLookup((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest) request,
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse>) responseObserver);
           break;
         case METHODID_CACHE_UPSERT:
           serviceImpl.cacheUpsert((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheUpsertRequest) request,
@@ -397,6 +463,13 @@ public final class FlowControlServiceGrpc {
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest,
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse>(
                 service, METHODID_CHECK)))
+        .addMethod(
+          getCacheLookupMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest,
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse>(
+                service, METHODID_CACHE_LOOKUP)))
         .addMethod(
           getCacheUpsertMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -460,6 +533,7 @@ public final class FlowControlServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new FlowControlServiceFileDescriptorSupplier())
               .addMethod(getCheckMethod())
+              .addMethod(getCacheLookupMethod())
               .addMethod(getCacheUpsertMethod())
               .addMethod(getCacheDeleteMethod())
               .build();

@@ -40,6 +40,8 @@ var (
 		otelconsts.ResponseReceivedLabel,
 		otelconsts.ApertureSourceServiceLabel,
 		otelconsts.ApertureDestinationServiceLabel,
+		otelconsts.ApertureCacheLookupStatusLabel,
+		otelconsts.ApertureCacheOperationStatusLabel,
 	}
 
 	_includeAttributesHTTP = []string{
