@@ -38,13 +38,23 @@ export interface Flow {
   checkResponse(): CheckResponse__Output | null;
   shouldRun(): boolean;
   setStatus(status: FlowStatus): void;
-  setResultCache(cacheEntry: CacheEntry): Promise<KeyUpsertResponse>;
+  // grpc options is optional argument
+  setResultCache(
+    cacheEntry: CacheEntry,
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyUpsertResponse>;
   setGlobalCache(
     key: string,
     cacheEntry: CacheEntry,
+    grpcOptions?: grpc.CallOptions,
   ): Promise<KeyUpsertResponse>;
-  deleteResultCache(): Promise<KeyDeleteResponse | undefined>;
-  deleteGlobalCache(key: string): Promise<KeyDeleteResponse>;
+  deleteResultCache(
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyDeleteResponse | undefined>;
+  deleteGlobalCache(
+    key: string,
+    grpcOptions?: grpc.CallOptions,
+  ): Promise<KeyDeleteResponse>;
   resultCache(): KeyLookupResponse;
   globalCache(key: string): KeyLookupResponse;
   error(): Error | null;

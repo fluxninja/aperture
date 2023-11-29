@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -36,11 +37,11 @@ type Flow interface {
 	ShouldRun() bool
 	SetStatus(status FlowStatus)
 	ResultCache() KeyLookupResponse
-	SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUpsertResponse
-	DeleteResultCache(ctx context.Context) KeyDeleteResponse
+	SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse
+	DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) KeyDeleteResponse
 	GlobalCache(key string) KeyLookupResponse
-	SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry) KeyUpsertResponse
-	DeleteGlobalCache(ctx context.Context, key string) KeyDeleteResponse
+	SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse
+	DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse
 	Error() error
 	Span() trace.Span
 	End() error
@@ -110,7 +111,7 @@ func (f *flow) ResultCache() KeyLookupResponse {
 }
 
 // SetResultCache sets the result cache entry for the flow.
-func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUpsertResponse {
+func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse {
 	if f.resultCacheKey == "" {
 		return newKeyUpsertResponse(ErrResultCacheKeyNotSet)
 	}
@@ -124,7 +125,7 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUps
 			Value: cacheEntry.value,
 			Ttl:   ttlProto,
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyUpsertResponse(err)
 	}
@@ -137,7 +138,7 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry) KeyUps
 }
 
 // DeleteResultCache deletes the result cache entry for the flow.
-func (f *flow) DeleteResultCache(ctx context.Context) KeyDeleteResponse {
+func (f *flow) DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) KeyDeleteResponse {
 	if f.resultCacheKey == "" {
 		return newKeyDeleteResponse(ErrResultCacheKeyNotSet)
 	}
@@ -145,7 +146,7 @@ func (f *flow) DeleteResultCache(ctx context.Context) KeyDeleteResponse {
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
 		ControlPoint:   f.checkResponse.ControlPoint,
 		ResultCacheKey: f.resultCacheKey,
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyDeleteResponse(err)
 	}
@@ -177,7 +178,7 @@ func (f *flow) GlobalCache(key string) KeyLookupResponse {
 }
 
 // SetGlobalCache sets a global cache entry for the flow.
-func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry) KeyUpsertResponse {
+func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse {
 	ttlProto := durationpb.New(cacheEntry.ttl)
 
 	cacheUpsertResponse, err := f.flowControlClient.CacheUpsert(ctx, &checkv1.CacheUpsertRequest{
@@ -187,7 +188,7 @@ func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheE
 				Ttl:   ttlProto,
 			},
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyUpsertResponse(err)
 	}
@@ -201,12 +202,12 @@ func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheE
 }
 
 // DeleteGlobalCache deletes a global cache entry for the flow.
-func (f *flow) DeleteGlobalCache(ctx context.Context, key string) KeyDeleteResponse {
+func (f *flow) DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse {
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
 		GlobalCacheKeys: []string{
 			key,
 		},
-	})
+	}, opts...)
 	if err != nil {
 		return newKeyDeleteResponse(err)
 	}

@@ -33,13 +33,14 @@ ___
 
 ### deleteGlobalCache
 
-▸ **deleteGlobalCache**(`key`): `Promise`\<[`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+▸ **deleteGlobalCache**(`key`, `grpcOptions?`): `Promise`\<[`KeyDeleteResponse`](KeyDeleteResponse.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `key` | `string` |
+| `grpcOptions?` | `CallOptions` |
 
 #### Returns
 
@@ -49,7 +50,13 @@ ___
 
 ### deleteResultCache
 
-▸ **deleteResultCache**(): `Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+▸ **deleteResultCache**(`grpcOptions?`): `Promise`\<`undefined` \| [`KeyDeleteResponse`](KeyDeleteResponse.md)\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `grpcOptions?` | `CallOptions` |
 
 #### Returns
 
@@ -105,7 +112,7 @@ ___
 
 ### setGlobalCache
 
-▸ **setGlobalCache**(`key`, `cacheEntry`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
+▸ **setGlobalCache**(`key`, `cacheEntry`, `grpcOptions?`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
 
 #### Parameters
 
@@ -113,6 +120,7 @@ ___
 | :------ | :------ |
 | `key` | `string` |
 | `cacheEntry` | [`CacheEntry`](CacheEntry.md) |
+| `grpcOptions?` | `CallOptions` |
 
 #### Returns
 
@@ -122,13 +130,14 @@ ___
 
 ### setResultCache
 
-▸ **setResultCache**(`cacheEntry`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
+▸ **setResultCache**(`cacheEntry`, `grpcOptions?`): `Promise`\<[`KeyUpsertResponse`](KeyUpsertResponse.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `cacheEntry` | [`CacheEntry`](CacheEntry.md) |
+| `grpcOptions?` | `CallOptions` |
 
 #### Returns
 
