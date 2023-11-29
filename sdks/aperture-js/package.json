@@ -1,6 +1,6 @@
 {
   "name": "@fluxninja/aperture-js",
-  "version": "2.3.5",
+  "version": "2.4.4",
   "description": "Flow control SDK that interfaces with FluxNinja Aperture Agents",
   "main": "./lib/index.js",
   "scripts": {
