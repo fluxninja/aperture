@@ -22,6 +22,8 @@ const (
 	FluxMeterMetricName = "flux_meter"
 	// InvalidSignalReadingsTotalMetricName - counts invalid signal readings.
 	InvalidSignalReadingsTotalMetricName = "invalid_signal_readings_total"
+	// InfiniteSignalReadingsTotalMetricName - counts infinite signal readings.
+	InfiniteSignalReadingsTotalMetricName = "infinite_signal_readings_total"
 	// InvalidFluxMeterTotalMetricName - counts invalid flux meters.
 	InvalidFluxMeterTotalMetricName = "invalid_flux_meter_total"
 	// RateLimiterCounterTotalMetricName - name of the counter describing times rate limiter was triggered.

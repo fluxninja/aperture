@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,8 +29,9 @@ func CircuitModule() fx.Option {
 
 // CircuitMetrics holds prometheus metrics related circuit.
 type CircuitMetrics struct {
-	SignalSummaryVec           *prometheus.SummaryVec
-	InvalidSignalReadingsTotal *prometheus.CounterVec
+	SignalSummaryVec            *prometheus.SummaryVec
+	InvalidSignalReadingsTotal  *prometheus.CounterVec
+	InfiniteSignalReadingsTotal *prometheus.CounterVec
 }
 
 var circuitMetrics = newCircuitMetrics()
@@ -64,6 +66,13 @@ func newCircuitMetrics() *CircuitMetrics {
 			},
 			circuitMetricsLabels,
 		),
+		InfiniteSignalReadingsTotal: prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: metrics.InfiniteSignalReadingsTotalMetricName,
+				Help: "The number of infinite readings from a signal",
+			},
+			circuitMetricsLabels,
+		),
 	}
 	return &circuitMetrics
 }
@@ -76,6 +85,7 @@ func setupCircuitMetrics(prometheusRegistry *prometheus.Registry, lifecycle fx.L
 	circuitMetrics := []metric{
 		{circuitMetrics.SignalSummaryVec, metrics.SignalReadingMetricName},
 		{circuitMetrics.InvalidSignalReadingsTotal, metrics.InvalidSignalReadingsTotalMetricName},
+		{circuitMetrics.InfiniteSignalReadingsTotal, metrics.InfiniteSignalReadingsTotalMetricName},
 	}
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -107,6 +117,8 @@ type Circuit struct {
 	iface.Policy
 	// Status registry to track signal values
 	statusRegistry status.Registry
+	// Current tick info
+	tickInfo TickInfo
 	// Looped signals persistence across ticks
 	loopedSignals signalToReading
 	// Background scheduler
@@ -117,8 +129,6 @@ type Circuit struct {
 	tickEndCallbacks []TickEndCallback
 	// Tick start callbacks
 	tickStartCallbacks []TickStartCallback
-	// Current tick info
-	tickInfo TickInfo
 	// Execution lock is taken when circuit needs to execute
 	executionLock sync.Mutex
 }
@@ -246,19 +256,28 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 			signalInfo.SignalReading = append(signalInfo.SignalReading, signalReadingProto)
 
 			if reading.Valid() {
-				signalSummaryMetric, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
-				if err != nil {
-					logger.Error().Err(err).Msg("Failed to get signal metric")
-					panic(err)
+				if math.IsInf(reading.Value(), 0) {
+					infReadings, err := circuitMetrics.InfiniteSignalReadingsTotal.GetMetricWith(circuitMetricsLabels)
+					if err != nil {
+						logger.Error().Err(err).Msg("Failed to get InfiniteSignalReadingsTotal metric")
+						panic(err)
+					}
+					infReadings.Inc()
+				} else {
+					signalSummary, err := circuitMetrics.SignalSummaryVec.GetMetricWith(circuitMetricsLabels)
+					if err != nil {
+						logger.Error().Err(err).Msg("Failed to get signal metric")
+						panic(err)
+					}
+					signalSummary.Observe(reading.Value())
 				}
-				signalSummaryMetric.Observe(reading.Value())
 			} else {
-				pcMetric, err := circuitMetrics.InvalidSignalReadingsTotal.GetMetricWith(circuitMetricsLabels)
+				invReadings, err := circuitMetrics.InvalidSignalReadingsTotal.GetMetricWith(circuitMetricsLabels)
 				if err != nil {
 					logger.Error().Err(err).Msg("Failed to get InvalidSignalReadingsTotal metric")
 					panic(err)
 				}
-				pcMetric.Inc()
+				invReadings.Inc()
 			}
 
 		}
