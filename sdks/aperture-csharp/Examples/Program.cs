@@ -43,6 +43,32 @@ using (var listener = new HttpListener())
         {
             var labels = new Dictionary<string, string>();
             labels.Add("user", "kenobi");
+            var rampMode = false;
+            var flowTimeout = TimeSpan.FromSeconds(5);
+            var pms = new FeatureFlowParams(
+                "featureName",
+                labels,
+                rampMode,
+               flowTimeout);
+            var flow = sdk.StartFlow(pms);
+            if (flow.ShouldRun())
+            {
+                Thread.Sleep(2000);
+                // do actual work
+            }
+            else
+            {
+                // handle flow rejection by Aperture Agent
+                flow.SetStatus(FlowStatus.Error);
+            }
+
+            flow.End();
+        }
+        else if (request.Url.AbsolutePath == "/super2")
+        {
+            // START: handleRequest
+            var labels = new Dictionary<string, string>();
+            labels.Add("key", "value");
             var pms = new FeatureFlowParams(
                 featureName,
                 labels,
@@ -56,32 +82,6 @@ using (var listener = new HttpListener())
             }
             else
             {
-                SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
-            }
-
-            flow.End();
-        }
-        else if (request.Url.AbsolutePath == "/super2")
-        {
-            // START: handleRequest
-            var labels = new Dictionary<string, string>();
-            labels.Add("key", "value");
-            var ramMode = false
-            var flowTimeout = TimeSpan.FromSeconds(5);
-            var params = new FeatureFlowParams(
-                "feature-name",
-                labels,
-                ramMode,
-                flowTimeout);
-            var flow = sdk.StartFlow(params);
-            if (flow.ShouldRun())
-            {
-                Thread.Sleep(2000);
-                SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);
-            }
-            else
-            {
-                flow.SetStatus(FlowStatus.Error);
                 SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
             }
 

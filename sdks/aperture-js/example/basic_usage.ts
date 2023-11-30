@@ -66,8 +66,8 @@ async function handleRequest(req: Request, res: Response) {
 
 // START: handleRequestRateLimit
 
-async function handleRequestRateLimit(req, res) {
-  const flow = await apertureClient.StartFlow("awesomeFeature", {
+async function handleRequestRateLimit(req: Request, res: Response) {
+  const flow = await apertureClient.startFlow("awesomeFeature", {
     labels: {
       user_id: "some_user_id",
     },
