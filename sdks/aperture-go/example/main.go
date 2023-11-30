@@ -65,6 +65,7 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 func main() {
 	ctx := context.Background()
 
+	apertureAgentAddr := getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress)
 	apertureAgentInsecure := getEnvOrDefault("APERTURE_AGENT_INSECURE", "false")
 	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
 	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
@@ -72,13 +73,10 @@ func main() {
 
 	// START: clientConstructor
 
-	agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-	apiKey := "API_KEY"
-
 	opts := aperture.Options{
-		Address:     agentAddress,
+		Address:     apertureAgentAddr,
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
-		APIKey:      apiKey,
+		APIKey:      getEnvOrDefault("APERTURE_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.
