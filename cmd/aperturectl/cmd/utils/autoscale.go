@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"golang.org/x/exp/slices"
@@ -22,17 +23,17 @@ func ParseAutoScaleControlPoints(client IntrospectionClient) error {
 		fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
 	}
 
-	slices.SortFunc(resp.GlobalAutoScaleControlPoints, func(a, b *cmdv1.GlobalAutoScaleControlPoint) bool {
+	slices.SortFunc(resp.GlobalAutoScaleControlPoints, func(a, b *cmdv1.GlobalAutoScaleControlPoint) int {
 		if a.AgentGroup != b.AgentGroup {
-			return a.AgentGroup < b.AgentGroup
+			return strings.Compare(a.AgentGroup, b.AgentGroup)
 		}
 		if a.AutoScaleControlPoint.Name != b.AutoScaleControlPoint.Name {
-			return a.AutoScaleControlPoint.Name < b.AutoScaleControlPoint.Name
+			return strings.Compare(a.AutoScaleControlPoint.Name, b.AutoScaleControlPoint.Name)
 		}
 		if a.AutoScaleControlPoint.Namespace != b.AutoScaleControlPoint.Namespace {
-			return a.AutoScaleControlPoint.Namespace < b.AutoScaleControlPoint.Namespace
+			return strings.Compare(a.AutoScaleControlPoint.Namespace, b.AutoScaleControlPoint.Namespace)
 		}
-		return a.AutoScaleControlPoint.Kind < b.AutoScaleControlPoint.Kind
+		return strings.Compare(a.AutoScaleControlPoint.Kind, b.AutoScaleControlPoint.Kind)
 	})
 
 	tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)
