@@ -118,12 +118,14 @@ class Flow(AbstractContextManager):
         if not self._cache_key:
             return KeyUpsertResponse(ValueError("No cache key"))
 
+        ttl_duration = Duration()
+        ttl_duration.FromTimedelta(ttl)
         cache_upsert_request = CacheUpsertRequest(
             control_point=self._control_point,
             result_cache_entry=CacheEntry(
                 key=self._cache_key,
                 value=bytes(value, "utf-8"),
-                ttl=Duration().FromTimedelta(ttl),
+                ttl=ttl_duration,
             ),
         )
 
@@ -187,11 +189,13 @@ class Flow(AbstractContextManager):
     def set_global_cache(
         self, key: str, value: str, ttl: datetime.timedelta, **grpc_opts
     ) -> KeyUpsertResponse:
+        ttl_duration = Duration()
+        ttl_duration.FromTimedelta(ttl)
         cache_upsert_request = CacheUpsertRequest(
             global_cache_entries={
                 key: CacheEntry(
                     value=bytes(value, "utf-8"),
-                    ttl=Duration().FromTimedelta(ttl),
+                    ttl=ttl_duration,
                 ),
             },
         )
