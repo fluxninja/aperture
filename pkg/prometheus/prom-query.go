@@ -64,10 +64,6 @@ func (pq *promQuery) execute(jobCtxt context.Context) (proto.Message, error) {
 			return innerErr
 		}
 
-		log.Info().Str("query", query).Msg("Executing promQL query")
-		// sleep for 100 seconds
-		time.Sleep(100 * time.Second)
-
 		result, warnings, err = pq.promAPI.Query(ctx, query, pq.endTimestamp)
 		// if jobCtxt is closed, return PermanentError
 		if jobCtxt.Err() != nil {
