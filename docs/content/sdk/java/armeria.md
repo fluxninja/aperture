@@ -11,6 +11,10 @@ keywords:
   - armeria
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 ### Aperture Java Instrumentation Agent
 
 All requests handled by an Armeria application can have Aperture SDK calls
@@ -30,35 +34,18 @@ section.
 contains Armeria decorators that automatically set traffic control points for
 decorated services:
 
-```java
-    public static HttpService createHelloHTTPService() {
-        return new AbstractHttpService() {
-            @Override
-            protected HttpResponse doGet(ServiceRequestContext ctx, HttpRequest req) {
-                return HttpResponse.of("Hello, world!");
-            }
-        };
-    }
+<CodeSnippet
+lang="java"
+snippetName="ArmeriaCreateHTTPService"/>
 
-    ApertureHTTPService decoratedService = createHelloHTTPService()
-        .decorate(ApertureHTTPService.newDecorator(apertureSDK, controlPointName));
-    serverBuilder.service("/somePath", decoratedService);
-```
+<CodeSnippet lang="java" snippetName="ArmeriadecorateService"/>
 
 You can instruct the decorator to exclude specific paths from being monitored by
 the Aperture SDK. For example, you might want to exclude endpoints used for
 health checks. To achieve this, you can add the path(s) you want to ignore to
 the `ignoredPaths` field of the SDK, as shown in the following code:
 
-```java
-ApertureSDK sdk = ApertureSDK.builder()
-        .setAddress("ORGANIZATION.app.fluxninja.com:443")
-        .setAPIKey("API_KEY")
-        ...
-        .addIgnoredPaths("/healthz,/metrics")
-        ...
-        .build()
-```
+<CodeSnippet lang="java" snippetName="ArmeriaCreateApertureSDK"/>
 
 The paths should be specified as a comma-separated list. Note that the paths you
 specify must match exactly. However, you can change this behavior to treat the

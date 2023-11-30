@@ -1,6 +1,11 @@
 package com.fluxninja.example;
 
+// START: NettyImports
+
 import com.fluxninja.aperture.netty.ApertureServerHandler;
+
+// END: NettyImports
+
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -10,7 +15,10 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import java.io.IOException;
 import java.time.Duration;
 
+// START: NettyServerInitializer
 public class ServerInitializer extends ChannelInitializer<Channel> {
+
+// END: NettyServerInitializer
 
     ApertureSDK sdk;
     String agentAddress;
@@ -38,19 +46,24 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         this.rootCertFile = rootCertFile;
     }
 
+    // START: NettyInitChannel
     @Override
     protected void initChannel(Channel ch) {
+
+        // START: NettyCreateSDK
         try {
             sdk =
                     ApertureSDK.builder()
                             .setAddress(this.agentAddress)
                             .setAPIKey(this.agentAPIKey)
-                            .useInsecureGrpc(insecureGrpc)
+                            .useInsecureGrpc(insecureGrpc) // Optional: Defaults to true
                             .setRootCertificateFile(rootCertFile)
+                            .addIgnoredPaths("/health,/connected")
                             .build();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+        // END: NettyCreateSDK
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
@@ -61,4 +74,5 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }
+    // END: NettyInitChannel
 }
