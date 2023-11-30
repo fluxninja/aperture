@@ -6,8 +6,9 @@ from datetime import timedelta
 from typing import Optional
 
 import grpc
-from aperture_sdk import ApertureClient, FlowParams, FlowStatus
 from aperture_sdk.cache import LookupStatus
+from aperture_sdk.client import ApertureClient, FlowParams
+from aperture_sdk.flow import FlowStatus
 from quart import Quart
 
 default_agent_address = "localhost:8089"

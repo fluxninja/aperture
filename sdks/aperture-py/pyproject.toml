@@ -7,6 +7,7 @@ readme = "README.md"
 packages = [{ include = "aperture_sdk" }]
 
 [tool.pydoctor]
+docformat="google"
 project-name="aperture-py"
 project-version="2.23.0"
 project-url="https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
