@@ -130,8 +130,8 @@ async def super3_handler():
             # Do Actual Work
             # After completing the work, you can return store the response in cache and return it, for example:
             result_string = "foo"
-            # save to result cache for 5 seconds
-            flow.set_result_cache(result_string, timedelta(seconds=5))
+            # save to result cache for 10 seconds
+            flow.set_result_cache(result_string, timedelta(seconds=10))
         else:
             result_string = flow.result_cache().get_value()
             logging.info("Result Cache Hit: {}".format(result_string))
@@ -141,8 +141,9 @@ async def super3_handler():
             logging.info(
                 "Cache Miss, setting global cache for key: '{}'".format("cache-key")
             )
-            # save to global cache for key for 5 seconds
-            flow.set_global_cache("cache-key", "awesome-value", timedelta(seconds=5))
+            # save to global cache for key for 10 seconds
+            flow.set_global_cache("cache-key", "awesome-value", timedelta(seconds=10))
+            cache_value = "awesome-value"
         else:
             logging.info("Cache Hit")
             # get value from global cache for 'cache-key'
