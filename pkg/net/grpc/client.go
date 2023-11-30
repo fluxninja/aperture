@@ -89,11 +89,11 @@ func (c ClientConstructor) provideClientConnectionBuilder(unmarshaller config.Un
 
 	dialOptions = append(dialOptions, grpc.WithChainUnaryInterceptor(
 		grpc_prometheus.UnaryClientInterceptor,
-		otelgrpc.UnaryClientInterceptor(),
+		otelgrpc.UnaryClientInterceptor(), //nolint:staticcheck // SA1019
 	))
 	dialOptions = append(dialOptions, grpc.WithChainStreamInterceptor(
 		grpc_prometheus.StreamClientInterceptor,
-		otelgrpc.StreamClientInterceptor(),
+		otelgrpc.StreamClientInterceptor(), //nolint:staticcheck // SA1019
 	))
 	dialOptions = append(dialOptions, grpc.WithConnectParams(grpc.ConnectParams{
 		Backoff: backoff.Config{
