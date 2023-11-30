@@ -13,10 +13,11 @@ Controller.
 
 <!-- vale off -->
 
-| Name                   | Type    | Labels                                                                | Unit            | Description                      |
-| ---------------------- | ------- | --------------------------------------------------------------------- | --------------- | -------------------------------- |
-| signal_reading         | Summary | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | various         | The reading from a signal        |
-| invalid_signal_reading | Counter | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | count (no unit) | Count of invalid signal readings |
+| Name                    | Type    | Labels                                                                | Unit            | Description                       |
+| ----------------------- | ------- | --------------------------------------------------------------------- | --------------- | --------------------------------- |
+| signal_reading          | Summary | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | various         | The reading from a signal         |
+| invalid_signal_reading  | Counter | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | count (no unit) | Count of invalid signal readings  |
+| infinite_signal_reading | Counter | instance, job, process_uuid, signal_name, policy_name, sub_circuit_id | count (no unit) | Count of infinite signal readings |
 
 <!-- vale on -->
 
