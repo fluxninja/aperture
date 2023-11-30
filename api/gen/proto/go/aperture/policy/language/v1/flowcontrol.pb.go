@@ -2323,7 +2323,7 @@ type RateLimiter_Parameters struct {
 	// label set up, set `label_key: "user"`.
 	// If no label key is specified, then all requests matching the
 	// selectors will be rate limited based on the global bucket.
-	// Deprecated: v2.25.0. Use _limit_by_label_key_ instead.
+	// Deprecated: v3.0.0. Use _limit_by_label_key_ instead.
 	LabelKey string `protobuf:"bytes,1,opt,name=label_key,json=labelKey,proto3" json:"label_key,omitempty" validate:"deprecated"` // @gotags: validate:"deprecated"
 	// Specifies which label the rate limiter should be keyed by.
 	//

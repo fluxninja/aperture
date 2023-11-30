@@ -11,7 +11,7 @@ export const PROTO_PATH = path.resolve(
 // The name of the library.
 export const LIBRARY_NAME = "@fluxninja/aperture-js";
 // The version of the library.
-export const LIBRARY_VERSION = "2.3.5";
+export const LIBRARY_VERSION = "2.4.4";
 // Label to hold source of flow.
 export const SOURCE_LABEL = "aperture.source";
 // Label to hold status of the flow.
