@@ -92,9 +92,9 @@ ___
 ▸ **startFlow**(`controlPoint`, `params`): `Promise`\<[`Flow`](../interfaces/Flow.md)\>
 
 Starts a new flow with the specified control point and parameters.
-StartFlow takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
+startFlow() takes a control point and labels that get passed to Aperture Agent via flowcontrolv1.Check call.
 Return value is a Flow.
-The default semantics are fail-to-wire. If StartFlow fails, calling Flow.ShouldRun() on returned Flow returns as true.
+The default semantics are fail-to-wire. If startFlow() fails, calling Flow.ShouldRun() on returned Flow returns as true.
 
 #### Parameters
 
@@ -112,7 +112,7 @@ A promise that resolves to a Flow object.
 **`Example`**
 
 ```ts
-apertureClient.StartFlow("awesomeFeature", {
+apertureClient.startFlow("awesomeFeature", {
  labels: labels,
  grpcCallOptions: {
    deadline: Date.now() + 30000,
