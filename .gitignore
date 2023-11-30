@@ -240,3 +240,6 @@ playground/tilt_local.json
 # Ignore everything in .vscode except for .vscode/ltex.hiddenFalsePositives.en-US.txt
 .vscode/*
 !.vscode/ltex.hiddenFalsePositives.en-US.txt
+
+# Python byte-compiled
+__pycache__/
