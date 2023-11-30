@@ -1,5 +1,4 @@
 import datetime
-import enum
 import logging
 import time
 from contextlib import AbstractContextManager
@@ -8,7 +7,6 @@ from typing import Optional, TypeVar
 import grpc
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
-    MISS,
     CacheDeleteRequest,
     CacheDeleteResponse,
     CacheEntry,
@@ -120,12 +118,14 @@ class Flow(AbstractContextManager):
         if not self._cache_key:
             return KeyUpsertResponse(ValueError("No cache key"))
 
+        ttl_duration = Duration()
+        ttl_duration.FromTimedelta(ttl)
         cache_upsert_request = CacheUpsertRequest(
             control_point=self._control_point,
             result_cache_entry=CacheEntry(
                 key=self._cache_key,
                 value=bytes(value, "utf-8"),
-                ttl=Duration().FromTimedelta(ttl),
+                ttl=ttl_duration,
             ),
         )
 
@@ -168,14 +168,15 @@ class Flow(AbstractContextManager):
 
     def result_cache(self) -> KeyLookupResponse:
         if self._error is not None:
-            return KeyLookupResponse(None, MISS, self._error)
+            return KeyLookupResponse(None, LookupStatus.MISS, self._error)
         if (
             not self.check_response
             or not self.check_response.cache_lookup_response
             or not self.check_response.cache_lookup_response.result_cache_response
         ):
-            return KeyLookupResponse(None, MISS, ValueError("No cache lookup response"))
-
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("No cache lookup response")
+            )
         lookup_response = (
             self.check_response.cache_lookup_response.result_cache_response
         )
@@ -188,11 +189,13 @@ class Flow(AbstractContextManager):
     def set_global_cache(
         self, key: str, value: str, ttl: datetime.timedelta, **grpc_opts
     ) -> KeyUpsertResponse:
+        ttl_duration = Duration()
+        ttl_duration.FromTimedelta(ttl)
         cache_upsert_request = CacheUpsertRequest(
             global_cache_entries={
                 key: CacheEntry(
                     value=bytes(value, "utf-8"),
-                    ttl=Duration().FromTimedelta(ttl),
+                    ttl=ttl_duration,
                 ),
             },
         )
@@ -243,21 +246,23 @@ class Flow(AbstractContextManager):
 
     def global_cache(self, key: str) -> KeyLookupResponse:
         if self._error is not None:
-            return KeyLookupResponse(None, MISS, self._error)
+            return KeyLookupResponse(None, LookupStatus.MISS, self._error)
         if (
             not self.check_response
             or not self.check_response.cache_lookup_response
             or not self.check_response.cache_lookup_response.global_cache_responses
         ):
             return KeyLookupResponse(
-                None, MISS, ValueError("No global cache lookup response")
+                None, LookupStatus.MISS, ValueError("No global cache lookup response")
             )
 
         lookup_response_map = (
             self.check_response.cache_lookup_response.global_cache_responses
         )
         if key not in lookup_response_map:
-            return KeyLookupResponse(None, MISS, ValueError("Unknown global cache key"))
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("Unknown global cache key")
+            )
 
         lookup_response = lookup_response_map[key]
         return KeyLookupResponse(
