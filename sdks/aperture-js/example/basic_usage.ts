@@ -9,7 +9,7 @@ export const apertureClient = new ApertureClient({
 });
 // END: clientConstructor
 
-// START: handleRequest
+// START: handleRequestWithCache
 import { FlowStatus, LookupStatus } from "@fluxninja/aperture-js";
 import { Request, Response } from "express";
 
@@ -62,4 +62,31 @@ async function handleRequest(req: Request, res: Response) {
 
   flow.end();
 }
-// END: handleRequest
+// END: handleRequestWithCache
+
+// START: handleRequestRateLimit
+
+async function handleRequestRateLimit(req, res) {
+  const flow = await apertureClient.StartFlow("awesomeFeature", {
+    labels: {
+      user_id: "some_user_id",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 300, // ms
+    },
+  });
+
+  if (flow.ShouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+  } else {
+    console.log("Request rate-limited. Try again later.");
+    // Handle flow rejection
+    flow.SetStatus(FlowStatus.Error);
+  }
+
+  if (flow) {
+    flow.End();
+  }
+}
+// END: handleRequestRateLimit

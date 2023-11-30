@@ -12,6 +12,10 @@ keywords:
   - manual
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 <a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go/v2`}>Aperture Go
 SDK</a> can be used to manually set feature control points within a Go service.
 
@@ -29,42 +33,13 @@ section.
 go get github.com/fluxninja/aperture-go/v2
 ```
 
-```go
-// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcOptions() []grpc.DialOption {
-  var grpcDialOptions []grpc.DialOption
-  grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
-    Backoff:           backoff.DefaultConfig,
-    MinConnectTimeout: time.Second * 10,
-  }))
-  grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
-  certPool, err := x509.SystemCertPool()
-  if err != nil {
-    return nil
-  }
-  grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
-  return grpcDialOptions
-}
-```
+<CodeSnippet lang="go" snippetName="grpcOptions" />
 
-```go
-  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-  apiKey := "API_KEY"
-
-  opts := aperture.Options{
-      Address:     agentAddress,
-      APIKey: apiKey,
-      DialOptions: grpcOptions(),
-  }
-
-  // initialize Aperture Client with the provided options.
-  apertureClient, err := aperture.NewClient(ctx, opts)
-  if err != nil {
-      log.Fatalf("failed to create client: %v", err)
-  }
-```
+<CodeSnippet lang="go" snippetName="clientConstructor" />
 
 The created instance can then be used to start a flow:
+
+<!-- TODO: Convert into Generated Code Snippet -->
 
 ```go
   // business logic produces labels

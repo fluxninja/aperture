@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
 
-const CodeSnippet = ({ lang, snippetName }) => {
+const CodeSnippet = ({ lang, snippetName, highlightLanguage = "" }) => {
   const [code, setCode] = useState("");
   useEffect(() => {
     const fetchSnippet = async () => {
@@ -16,7 +16,13 @@ const CodeSnippet = ({ lang, snippetName }) => {
     fetchSnippet();
   }, [lang, snippetName]);
 
-  return <CodeBlock language={lang}>{code}</CodeBlock>;
-};
+  if (highlightLanguage){
+    return <CodeBlock language={highlightLanguage}>{code}</CodeBlock>;
+  }
+  else {
+    return <CodeBlock language={lang}>{code}</CodeBlock>;
+
+  }
+  };
 
 export default CodeSnippet;

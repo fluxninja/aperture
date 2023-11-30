@@ -13,6 +13,10 @@ keywords:
   - manual
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 [Aperture C# SDK](https://www.nuget.org/packages/ApertureSDK/) can be used to
 manually set feature control points within a .NET service.
 
@@ -36,32 +40,7 @@ var sdk = ApertureSdk
 
 The created instance can then be used to start a flow:
 
-```cpp
-// do some business logic to collect labels
-
-var labels = new Dictionary<string, string>();
-labels.Add("key", "value");
-var rampMode = false;
-var flowTimeout = TimeSpan.FromSeconds(5);
-
-var params = new FeatureFlowParams(
-    "feature-name",
-    labels,
-    rampMode,
-    flowTimeout);
-
-var flow = sdk.StartFlow(params);
-if (flow.ShouldRun())
-{
-      // Do actual work
-}
-else
-{
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(FlowStatus.Error);
-}
-flow.End();
-```
+<CodeSnippet lang="cs" snippetName="handleRequest" highlightLanguage="cpp"/>
 
 For more context on using the Aperture C# SDK to set feature control points,
 refer to the [example app][example] available in the repository.

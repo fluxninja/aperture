@@ -39,7 +39,7 @@ func main() {
 		}
 
 		switch filepath.Ext(path) {
-		case ".py", ".ts", ".java", ".go":
+		case ".py", ".ts", ".java", ".go", ".cs":
 			fileSnippets, err := processFile(path)
 			if err != nil {
 				return err

@@ -61,6 +61,33 @@ using (var listener = new HttpListener())
 
             flow.End();
         }
+        else if (request.Url.AbsolutePath == "/super2")
+        {
+            // START: handleRequest
+            var labels = new Dictionary<string, string>();
+            labels.Add("key", "value");
+            var ramMode = false
+            var flowTimeout = TimeSpan.FromSeconds(5);
+            var params = new FeatureFlowParams(
+                "feature-name",
+                labels,
+                ramMode,
+                flowTimeout);
+            var flow = sdk.StartFlow(params);
+            if (flow.ShouldRun())
+            {
+                Thread.Sleep(2000);
+                SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);
+            }
+            else
+            {
+                flow.SetStatus(FlowStatus.Error);
+                SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
+            }
+
+            flow.End();
+            // END: handleRequest
+        }
         else if (request.Url.AbsolutePath == "/notsuper")
         {
             SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);
