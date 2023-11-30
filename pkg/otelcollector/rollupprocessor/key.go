@@ -2,6 +2,7 @@ package rollupprocessor
 
 import (
 	"math"
+	"strings"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"golang.org/x/exp/slices"
@@ -99,6 +100,6 @@ func sortedByKeys(m pcommon.Map) []kv {
 		kvs = append(kvs, kv{k, v})
 		return true
 	})
-	slices.SortFunc(kvs, func(left, right kv) bool { return left.key < right.key })
+	slices.SortFunc(kvs, func(left, right kv) int { return strings.Compare(left.key, right.key) })
 	return kvs
 }

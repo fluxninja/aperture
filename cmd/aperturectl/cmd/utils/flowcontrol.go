@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -30,14 +31,14 @@ func ParseControlPoints(client IntrospectionClient) error {
 		fmt.Fprintf(os.Stderr, "Could not get answer from %d agents", resp.ErrorsCount)
 	}
 
-	slices.SortFunc(resp.GlobalFlowControlPoints, func(a, b *cmdv1.GlobalFlowControlPoint) bool {
+	slices.SortFunc(resp.GlobalFlowControlPoints, func(a, b *cmdv1.GlobalFlowControlPoint) int {
 		if a.AgentGroup != b.AgentGroup {
-			return a.AgentGroup < b.AgentGroup
+			return strings.Compare(a.AgentGroup, b.AgentGroup)
 		}
 		if a.FlowControlPoint.Service != b.FlowControlPoint.Service {
-			return a.FlowControlPoint.Service < b.FlowControlPoint.Service
+			return strings.Compare(a.FlowControlPoint.Service, b.FlowControlPoint.Service)
 		}
-		return a.FlowControlPoint.ControlPoint < b.FlowControlPoint.ControlPoint
+		return strings.Compare(a.FlowControlPoint.ControlPoint, b.FlowControlPoint.ControlPoint)
 	})
 
 	tabwriter := tabwriter.NewWriter(os.Stdout, 5, 0, 3, ' ', 0)

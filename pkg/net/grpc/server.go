@@ -139,7 +139,7 @@ func (constructor ServerConstructor) provideServer(
 
 	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
 		grpcServerMetrics.UnaryServerInterceptor(),
-		otelgrpc.UnaryServerInterceptor(),
+		otelgrpc.UnaryServerInterceptor(), //nolint:staticcheck // SA1019
 		validatorUnaryInterceptor(),
 	}
 	unaryServerInterceptors = append(unaryServerInterceptors, constructor.UnaryServerInterceptors...)
@@ -148,7 +148,7 @@ func (constructor ServerConstructor) provideServer(
 
 	streamServerInterceptors := []grpc.StreamServerInterceptor{
 		grpcServerMetrics.StreamServerInterceptor(),
-		otelgrpc.StreamServerInterceptor(),
+		otelgrpc.StreamServerInterceptor(), //nolint:staticcheck // SA1019
 	}
 	streamServerInterceptors = append(streamServerInterceptors, constructor.StreamServerInterceptors...)
 	streamServerInterceptors = append(streamServerInterceptors, additionalStreamInterceptors...)

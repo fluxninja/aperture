@@ -81,7 +81,7 @@ func setup(in ConstructorIn) error {
 			otelService, err = otelcol.NewCollector(
 				otelcol.CollectorSettings{
 					BuildInfo:               component.NewDefaultBuildInfo(),
-					Factories:               in.Factories,
+					Factories:               func() (otelcol.Factories, error) { return in.Factories, nil },
 					ConfigProvider:          configProvider,
 					DisableGracefulShutdown: true,
 					LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
