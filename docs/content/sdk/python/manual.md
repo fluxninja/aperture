@@ -25,66 +25,74 @@ detailed instructions on locating API Keys, please refer to the
 
 :::
 
-```python
-  from aperture_sdk import ApertureClient
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
 
-  aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
+<Tabs>
+<TabItem value="Python">
+```
+
+<CodeSnippet
+lang="py"
+snippetName="clientConstructor"
+/>
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 The created instance can then be used to start a flow:
 
-```python
-    # business logic produces labels
-    labels = {
-        "key": "value",
-    }
+```mdx-code-block
+<Tabs>
+<TabItem value="Python">
+```
 
-    # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
-    # It returns a Flow or raises an error if any.
-    flow = aperture_client.start_flow(
-      control_point="AwesomeFeature",
-      explicit_labels=labels,
-      check_timeout=timedelta(seconds=200),
-    )
+<CodeSnippet
+lang="py"
+snippetName="manualFlow"
+/>
 
-    # Check if flow check was successful.
-    if not flow.success:
-        logger.info("Flow check failed - will fail-open")
-
-    # See whether flow was accepted by Aperture Agent.
-    if flow.should_run():
-        # do actual work
-    else:
-        # handle flow rejection by Aperture Agent
-        flow.set_status(FlowStatus.Error)
-    flow.end()
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 You can also use the flow as a context manager:
 
-```python
-  with aperture_client.start_flow(
-    control_point="AwesomeFeature",
-    explicit_labels=labels,
-    check_timeout=timedelta(seconds=200),
-  ) as flow:
-    if flow.should_run():
-      # do actual work
-      # if you do not call flow.end() explicitly, it will be called automatically
-      # when the context manager exits - with the status of the flow
-      # depending on whether an error was raised or not
-      pass
+```mdx-code-block
+<Tabs>
+<TabItem value="Python">
+```
+
+<CodeSnippet
+lang="py"
+snippetName="contextManagerFlow"
+/>
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 Additionally, you can decorate any function with aperture client. This will skip
 running the function if the flow is rejected by Aperture Agent. This might be
 helpful to handle specific routes in your service.
 
-```python
-  @app.get("/awesome-feature")
-  @aperture_client.decorate("AwesomeFeature", check_timeout=timedelta(seconds=200), on_reject=lambda: ("Flow was rejected", 503))
-  async def get_awesome_feature_handler():
-    return "Flow was accepted", 202
+```mdx-code-block
+<Tabs>
+<TabItem value="Python">
+```
+
+<CodeSnippet
+lang="py"
+snippetName="apertureDecorator"
+/>
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 For more context on using the Aperture Python SDK to set feature control points,

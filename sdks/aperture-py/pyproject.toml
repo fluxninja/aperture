@@ -6,6 +6,13 @@ authors = ["FluxNinja <support@fluxninja.com>"]
 readme = "README.md"
 packages = [{ include = "aperture_sdk" }]
 
+[tool.pydoctor]
+project-name="aperture-py"
+project-version="2.23.0"
+project-url="https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
+add-package = ["aperture_sdk"]
+html-output="docs"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 grpcio = "^1.59.2"
@@ -13,6 +20,8 @@ opentelemetry-api = "^1.20.0"
 opentelemetry-sdk = "^1.20.0"
 opentelemetry-exporter-otlp = "^1.20.0"
 protobuf = "^4.24.4"
+pydoctor = "^23.9.1"
+
 
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.59.2"
