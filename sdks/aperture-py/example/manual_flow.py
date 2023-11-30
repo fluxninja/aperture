@@ -7,6 +7,7 @@ from typing import Optional
 
 import grpc
 from aperture_sdk import ApertureClient, FlowParams, FlowStatus
+from aperture_sdk.cache import LookupStatus
 from quart import Quart
 
 default_agent_address = "localhost:8089"
@@ -22,6 +23,11 @@ aperture_client = ApertureClient.new_client(
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("aperture-manual-flow-example")
+
+
+@app.get("/")
+async def index():
+    return "Welcome to Aperture!, try /super, /super2 and /super3 "
 
 
 @app.get("/super")
@@ -84,6 +90,77 @@ async def super2_handler():
             # depending on whether an error was raised or not
             pass
     # END: contextManagerFlow
+
+
+@app.get("/super3")
+async def super3_handler():
+    # Flow Control + Caching
+    # START: cacheFlow
+    # business logic produces labels
+    labels = {
+        "key": "some-value",
+    }
+    flow_params = FlowParams(
+        check_timeout=timedelta(seconds=200),
+        explicit_labels=labels,
+        global_cache_keys=["cache-key"],
+        result_cache_key="result-key",
+    )
+    # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
+    # It returns a Flow or raises an error if any.
+    flow = aperture_client.start_flow(
+        control_point="super3",
+        params=flow_params,
+    )
+    result_string = None
+    cache_value = None
+
+    # Check if flow check was successful.
+    if not flow.success:
+        logger.info("Flow check failed - will fail-open")
+
+    # See whether flow was accepted by Aperture Agent.
+    if flow.should_run():
+        logging.info("Flow accepted")
+
+        # 1. Check if the response is cached in Aperture from a previous request
+
+        if flow.result_cache().get_lookup_status() == LookupStatus.MISS:
+            logging.info("Result Cache Miss, setting result cache")
+            # Do Actual Work
+            # After completing the work, you can return store the response in cache and return it, for example:
+            result_string = "foo"
+            # save to result cache for 5 seconds
+            flow.set_result_cache(result_string, timedelta(seconds=5))
+        else:
+            result_string = flow.result_cache().get_value()
+            logging.info("Result Cache Hit: {}".format(result_string))
+
+        # 2. Check if the cache for a 'cache-key' is present
+        if flow.global_cache("cache-key").get_lookup_status() == LookupStatus.MISS:
+            logging.info(
+                "Cache Miss, setting global cache for key: '{}'".format("cache-key")
+            )
+            # save to global cache for key for 5 seconds
+            flow.set_global_cache("cache-key", "awesome-value", timedelta(seconds=5))
+        else:
+            logging.info("Cache Hit")
+            # get value from global cache for 'cache-key'
+            logging.info(
+                "Cache Value: {}".format(flow.global_cache("cache-key").get_value())
+            )
+            cache_value = flow.global_cache("cache-key").get_value()
+    else:
+        # handle flow rejection by Aperture Agent
+        flow.set_status(FlowStatus.Error)
+
+    if flow:
+        flow.end()
+    # END: cacheFlow
+
+    response_string = f"Result Cache Value: {result_string}, Global Cache key: cache-key Value: {cache_value}"
+
+    return response_string, 200
 
 
 @app.get("/connected")
