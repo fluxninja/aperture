@@ -148,6 +148,7 @@ class ApertureClient:
             ramp_mode=params.ramp_mode,
             cache_lookup_request=CacheLookupRequest(
                 result_cache_key=params.result_cache_key,
+                global_cache_keys=params.global_cache_keys,
             ),
         )
         span_attributes: otel_types.Attributes = {

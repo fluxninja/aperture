@@ -23,7 +23,7 @@ def convert_cache_error(error_message):
 
 # KeyLookupResponse is the interface that represents a cache value lookup.
 class KeyLookupResponse:
-    def __init__(self, value, lookup_status, error):
+    def __init__(self, value, lookup_status: LookupStatus, error):
         self.value = value
         self.lookup_status = lookup_status
         self.error = error
@@ -31,7 +31,7 @@ class KeyLookupResponse:
     def get_value(self):
         return self.value
 
-    def get_lookup_status(self):
+    def get_lookup_status(self) -> LookupStatus:
         return self.lookup_status
 
     def get_error(self):

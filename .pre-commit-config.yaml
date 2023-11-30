@@ -24,9 +24,9 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|\.github/.*|sdks/aperture-js/sdk/gen/.*
+        exclude: ^(manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|\.github/.*|sdks/aperture-js/sdk/gen/.*|sdks/aperture-py/docs/.*
       - id: end-of-file-fixer
-        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*|\.github/.*|sdks/aperture-js/sdk/gen/.*
+        exclude: ^(docs/|manifests/charts/.*/README*)|\.*svg$|\.*dot|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*$|blueprints/gen/jsonschema/.*|\.github/.*|sdks/aperture-js/sdk/gen/.*|sdks/aperture-py/docs/.*
       - id: check-yaml
         exclude: ^(manifests/charts/.*/(templates|files)/.*|playground/tanka/charts/.*|playground/scenarios/.*/charts/.*|\.github/.*)
         args:
@@ -93,7 +93,7 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@2.8.8
-        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen|sdks/aperture-js/docs/.*)
+        exclude: ^(docs/content/reference/.*|docs/content/reference/aperture-cli/aperturectl/.*|manifests/charts/.*/README*|.github|sdks/aperture-js/sdk/gen|sdks/aperture-js/docs/.*|sdks/aperture-py/docs/.*)
         types_or:
           [
             sh,
@@ -249,7 +249,7 @@ repos:
         args:
           - "-L inport,atleast,iteraction"
           - "--ignore-words=./.github/styles/Vocab/FluxNinja/accept.txt"
-        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|sdks/aperture-js/docs/.*|sdks/aperture-js/README.md|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json|sdks/aperture-js/example/package-lock.json)$
+        exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|sdks/aperture-js/docs/.*|sdks/aperture-js/README.md|sdks/aperture-py/docs/.*|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json|sdks/aperture-js/example/package-lock.json)$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.7.1
     hooks:
