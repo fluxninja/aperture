@@ -28,7 +28,7 @@ type Handler struct {
 	agents        agents.Agents
 	policyService *controlplane.PolicyService
 	statusService *apertureStatus.StatusService
-	etcdTransport *transport.EtcdTransportServer
+	etcdTransport *transport.EtcdTransportClient
 }
 
 // NewHandler creates a new Handler.
@@ -36,7 +36,7 @@ func NewHandler(
 	agents agents.Agents,
 	policyService *controlplane.PolicyService,
 	statusService *apertureStatus.StatusService,
-	etcdTransport *transport.EtcdTransportServer,
+	etcdTransport *transport.EtcdTransportClient,
 ) *Handler {
 	return &Handler{
 		agents:        agents,

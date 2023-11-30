@@ -69,7 +69,7 @@ func (h *PreviewHandler) PreviewHTTPRequests(
 }
 
 // RegisterPreviewHandler registers PreviewHandler in handler registry.
-func RegisterPreviewHandler(handler *PreviewHandler, t *transport.EtcdTransportClient) error {
+func RegisterPreviewHandler(handler *PreviewHandler, t *transport.EtcdTransportServer) error {
 	// Note: Registering also when handler is disabled, so that we can send
 	// more specific error code than Unimplemented.
 	if err := transport.RegisterFunction(t, handler.PreviewFlowLabels); err != nil {

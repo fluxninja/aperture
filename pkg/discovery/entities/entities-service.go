@@ -25,7 +25,7 @@ type RegisterEntitiesServiceIn struct {
 	fx.In
 	Server              *grpc.Server `name:"default"`
 	Cache               *Entities
-	EtcdTransportClient *transport.EtcdTransportClient
+	EtcdTransportClient *transport.EtcdTransportServer
 }
 
 // RegisterEntitiesService registers a service for entity cache.
