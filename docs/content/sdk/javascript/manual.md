@@ -12,6 +12,10 @@ keywords:
   - manual
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 [Aperture JavaScript SDK](https://www.npmjs.com/package/@fluxninja/aperture-js)
 can be used to manually set feature control points within a JavaScript service.
 
@@ -25,40 +29,14 @@ section.
 
 :::
 
-```javascript
-import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
-
-export const apertureClient = new ApertureClient({
-  address: "ORGANIZATION.app.fluxninja.com:443",
-  agentAPIKey: "API_KEY",
-});
-```
+<CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 The created instance can then be used to start a flow:
 
-```javascript
-async function handleRequest(req, res) {
-  const flow = await apertureClient.StartFlow("feature-name", {
-    labels: {
-      label_key: "some_user_id",
-    },
-    grpcCallOptions: {
-      deadline: Date.now() + 300, // ms
-    },
-  });
-
-  if (flow.ShouldRun()) {
-    // Do Actual Work
-  } else {
-    // Handle flow rejection
-    flow.SetStatus(FlowStatusEnum.Error);
-  }
-
-  if (flow) {
-    flow.End();
-  }
-}
-```
+<CodeSnippet
+    lang="ts"
+    snippetName="handleRequestRateLimit"
+ />
 
 For more context on using the Aperture JavaScript SDK to set feature control
 points, refer to the [example app][example] available in the repository.
