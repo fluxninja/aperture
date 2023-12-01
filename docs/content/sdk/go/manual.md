@@ -83,5 +83,7 @@ useful for endpoints like `/healthz`:
   mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", labels,  []regexp.Regexp{regexp.MustCompile("/health.*")}, false, 200 * time.Millisecond).Handle)
 ```
 
+<!-- TODO: Fix Link -->
+
 [example]: https://github.com/fluxninja/aperture-go/tree/main/example
 [api-keys]: /reference/cloud-ui/api-keys.md
