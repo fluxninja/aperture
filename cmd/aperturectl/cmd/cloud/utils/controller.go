@@ -19,8 +19,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	cloudv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cloud/v1"
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	cloudv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cloud/v1"
+	cmdv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cmd/v1"
 	"github.com/fluxninja/aperture/v2/cmd/aperturectl/cmd/utils"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )

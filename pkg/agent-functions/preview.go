@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
-	previewv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	cmdv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cmd/v1"
+	previewv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/preview/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview"
@@ -69,7 +69,7 @@ func (h *PreviewHandler) PreviewHTTPRequests(
 }
 
 // RegisterPreviewHandler registers PreviewHandler in handler registry.
-func RegisterPreviewHandler(handler *PreviewHandler, t *transport.EtcdTransportClient) error {
+func RegisterPreviewHandler(handler *PreviewHandler, t *transport.EtcdTransportServer) error {
 	// Note: Registering also when handler is disabled, so that we can send
 	// more specific error code than Unimplemented.
 	if err := transport.RegisterFunction(t, handler.PreviewFlowLabels); err != nil {

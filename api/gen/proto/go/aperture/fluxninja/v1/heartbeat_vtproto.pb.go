@@ -6,12 +6,12 @@ package fluxninjav1
 
 import (
 	fmt "fmt"
-	v15 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	v14 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/info/v1"
-	v11 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/peers/v1"
-	v13 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
-	v12 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	v15 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	v14 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	v1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/info/v1"
+	v11 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/peers/v1"
+	v13 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/sync/v1"
+	v12 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	io "io"
 	bits "math/bits"

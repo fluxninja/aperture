@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/peer"
 
-	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/discovery/entities/v1"
 	discoveryentities "github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	servicegetter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service-getter"
 )

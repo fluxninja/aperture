@@ -10,9 +10,9 @@ package cmdv1
 
 import (
 	context "context"
-	v12 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
-	v11 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	v12 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
+	v1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
+	v11 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

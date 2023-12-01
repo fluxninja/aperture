@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
-	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
+	cmdv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cmd/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/discovery/entities/v1"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 )
 
@@ -25,7 +25,7 @@ type RegisterEntitiesServiceIn struct {
 	fx.In
 	Server              *grpc.Server `name:"default"`
 	Cache               *Entities
-	EtcdTransportClient *transport.EtcdTransportClient
+	EtcdTransportServer *transport.EtcdTransportServer
 }
 
 // RegisterEntitiesService registers a service for entity cache.
@@ -34,11 +34,11 @@ func RegisterEntitiesService(in RegisterEntitiesServiceIn) error {
 		entityCache: in.Cache,
 	}
 	entitiesv1.RegisterEntitiesServiceServer(in.Server, svc)
-	err := transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntities)
+	err := transport.RegisterFunction(in.EtcdTransportServer, svc.ListDiscoveryEntities)
 	if err != nil {
 		return err
 	}
-	err = transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntity)
+	err = transport.RegisterFunction(in.EtcdTransportServer, svc.ListDiscoveryEntity)
 	if err != nil {
 		return err
 	}

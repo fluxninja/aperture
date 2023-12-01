@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	monitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
-	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	monitoringv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/monitoring/v1"
+	statusv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 )
 
 // NewStatus creates a new instance of Status to be pushed into status registry. Use this function for creating status instead of by hand.

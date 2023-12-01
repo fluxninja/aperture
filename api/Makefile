@@ -26,11 +26,6 @@ buf-generate:
 
 	@#generate sdk flowcontrol stubs and copy them over
 
-	@#golang
-	@rm -rf ../sdks/aperture-go/gen/proto/flowcontrol/*
-	@cp -R gen/proto/go/aperture/flowcontrol/check ../sdks/aperture-go/gen/proto/flowcontrol/
-	@cp -R gen/proto/go/aperture/flowcontrol/checkhttp ../sdks/aperture-go/gen/proto/flowcontrol/
-
 	@#csharp
 	@rm -rf ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
 	@cp -R gen/proto/csharp/Aperture/Flowcontrol/Check ../sdks/aperture-csharp/Generated/Aperture/Flowcontrol/
@@ -85,26 +80,6 @@ buf-generate:
 		$$FIND "$$python_gen" -type d -exec touch "{}/__init__.py" \;; \
 	}
 	@rm -rf gen/proto/python
-
-	@#generate api docs
-	@rm -rfd $(DOCS_OPENAPI)
-	@mv gen/openapiv2 $(DOCS_OPENAPI)
-	@{ \
-		set -e; \
-		go run enrich-api-swagger.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
-		go run $(DOCS_ROOT)/tools/swagger/process-go-tags.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
-		for process in aperture-agent aperture-controller; do \
-			yq eval "del(.paths | .[] | select(.*.tags | contains([\"$$process\"]) | not))" $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --output=$(DOCS_OPENAPI)/$$process.swagger.json; \
-			go run $(DOCS_ROOT)/tools/jsonnet/json2yaml.go $(DOCS_OPENAPI)/$$process.swagger.json $(DOCS_OPENAPI)/$$process.swagger.yaml; \
-			rm $(DOCS_OPENAPI)/$$process.swagger.json; \
-		done; \
-	}
-	@git add $(DOCS_OPENAPI)
-	@git add ./gen/*
 
 generate: buf-update buf-generate
 
