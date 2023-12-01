@@ -46,6 +46,8 @@ type Flow interface {
 	Span() trace.Span
 	End() error
 	CheckResponse() *checkv1.CheckResponse
+	RetryAfter() time.Duration
+	HTTPResponseCode() checkv1.StatusCode
 }
 
 type flow struct {
@@ -86,6 +88,19 @@ func (f *flow) ShouldRun() bool {
 // CheckResponse returns the response from the server.
 func (f *flow) CheckResponse() *checkv1.CheckResponse {
 	return f.checkResponse
+}
+
+// RetryAfter returns the retry-after duration.
+func (f *flow) RetryAfter() time.Duration {
+	if f.checkResponse == nil {
+		return 0
+	}
+	return f.checkResponse.WaitTime.AsDuration()
+}
+
+// HTTPResponseCode returns the HTTP response code.
+func (f *flow) HTTPResponseCode() checkv1.StatusCode {
+	return f.checkResponse.DeniedResponseStatusCode
 }
 
 // SetStatus sets the status code of a flow.

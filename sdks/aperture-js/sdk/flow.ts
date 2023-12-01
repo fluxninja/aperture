@@ -23,7 +23,8 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
+import { StatusCode, StatusCode__Output } from "./gen/aperture/flowcontrol/check/v1/StatusCode";
+import type { Duration__Output, Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
 /**
@@ -60,6 +61,8 @@ export interface Flow {
   error(): Error | null;
   span(): Span;
   end(): void;
+  httpResponseCode(): StatusCode__Output
+  retryAfter(): Duration__Output
 }
 
 /**
@@ -83,6 +86,7 @@ export class _Flow implements Flow {
     _span.setAttribute(FLOW_START_TIMESTAMP_LABEL, this.startDate);
     _span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
   }
+
 
   /**
    * Determines whether the flow should run based on the check response and ramp mode.
@@ -349,6 +353,22 @@ export class _Flow implements Flow {
    */
   checkResponse() {
     return this._checkResponse;
+  }
+
+  /**
+   * Gets the retry-after duration of the flow.
+   * @returns The retry-after duration.
+   */
+  retryAfter() {
+    return this._checkResponse?.waitTime ?? {seconds: "0", nanos: 0};
+  }
+
+  /**
+   * Gets the status for the flow.
+   * @returns The response code.
+   */
+  httpResponseCode() {
+    return this._checkResponse?.deniedResponseStatusCode ?? StatusCode.Empty;
   }
 
   /**
