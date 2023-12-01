@@ -5,195 +5,184 @@ import (
 	"errors"
 	"fmt"
 	"path"
-	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/fx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/anypb"
 
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 )
+
+const (
+	leaseDuration       = 30
+	serverWatchDuration = 60
+)
+
+// ExactMessage is like proto.Message, but known to point to T.
+type ExactMessage[T any] interface {
+	proto.Message
+	*T
+}
 
 // TransportClientModule is the client fx provider for etcd transport.
 var TransportClientModule = fx.Options(
 	fx.Provide(NewEtcdTransportClient),
 )
 
-// EtcdTransportClient is the client side for the etcd transport.
-type EtcdTransportClient struct {
-	ctx        context.Context
-	cancel     context.CancelFunc
-	etcdClient *etcdclient.Client
-	Registry   *HandlerRegistry
-	waitGroup  panichandler.WaitGroup
+// Result is a result from one agent.
+type Result[Resp any] struct {
+	Client  string
+	Success Resp
+	Err     error
 }
 
-// NewEtcdTransportClient creates and returns a new etcd transport client module.
+// EtcdTransportClient is the client side of the etcd transport.
+type EtcdTransportClient struct {
+	etcdClient *etcdclient.Client
+}
+
+// Request is the raw request on the etcd transport.
+type Request struct {
+	ID     string
+	Client string
+	Data   []byte
+}
+
+// Response is the raw response on the etcd transport.
+type Response struct {
+	ID     string
+	Client string
+	Data   []byte
+	Error  error
+}
+
+// NewEtcdTransportClient creates a new client on the etcd transport.
 func NewEtcdTransportClient(client *etcdclient.Client) (*EtcdTransportClient, error) {
 	if client == nil {
 		return nil, errors.New("provided etcd client is nil")
 	}
-	c := &EtcdTransportClient{
+	return &EtcdTransportClient{
 		etcdClient: client,
-		Registry:   NewHandlerRegistry(),
-	}
-	c.ctx, c.cancel = context.WithCancel(context.Background())
-	return c, nil
+	}, nil
 }
 
-// HandlerRegistry allow registering handlers and can start a dispatcher.
-//
-// This is intended to be used at at fx provide/invoke stage.
-type HandlerRegistry struct {
-	handlers map[protoreflect.FullName]untypedHandler
-}
+// SendRequests allows consumers of the etcd transport to send requests to agents.
+func SendRequests[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportClient, agents []string, msg proto.Message) ([]Result[*RespValue], error) {
+	respCh := make(chan *Response, len(agents))
 
-type untypedHandler func(context.Context, *anypb.Any) (proto.Message, error)
-
-// NewHandlerRegistry creates a new HandlerRegistry.
-func NewHandlerRegistry() *HandlerRegistry {
-	return &HandlerRegistry{
-		handlers: map[protoreflect.FullName]untypedHandler{},
-	}
-}
-
-// RegisterWatcher allows to register a client on the etcd transport.
-func RegisterWatcher(lc fx.Lifecycle, t *EtcdTransportClient, agentName string) {
-	lc.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
-			t.waitGroup.Go(func() {
-				for {
-					err := t.RegisterWatcher(agentName)
-					if t.ctx.Err() != nil {
-						log.Info().Err(t.ctx.Err()).Msg("Context canceled, stopping etcd watcher")
-						return
-					}
-					log.Error().Err(err).Msg("etcd watch channel was canceled. Re-starting watcher")
-				}
-			})
-			return nil
-		},
-		OnStop: func(_ context.Context) error {
-			t.Stop()
-			return nil
-		},
-	})
-}
-
-// RegisterWatcher register an agent on the etcd transport client.
-func (c *EtcdTransportClient) RegisterWatcher(agentName string) error {
-	path := path.Join(RPCBasePath, RPCRequestPath, agentName)
-	watchCh, err := c.etcdClient.Watch(c.ctx, path, clientv3.WithPrefix())
-	if err != nil {
-		log.Error().Err(err).Msg("failed to watch etcd path")
-		return err
-	}
-	for watchResp := range watchCh {
-		if watchResp.Err() != nil {
-			log.Error().Err(watchResp.Err()).Msg("failed to watch etcd path")
-			return watchResp.Err()
-		}
-
-		for _, event := range watchResp.Events {
-			if event.Type == clientv3.EventTypePut {
-				id, _ := strings.CutPrefix(string(event.Kv.Key), path)
-				request := Request{
-					ID:     id,
-					Data:   event.Kv.Value,
+	for _, agent := range agents {
+		go func(agentName string) {
+			resp, err := t.SendRequest(ctx, agentName, msg)
+			if err != nil {
+				log.Error().Err(err).Msg("failed to send request to agent")
+				respCh <- &Response{
 					Client: agentName,
+					Error:  err,
 				}
-				go c.handleRequest(c.ctx, request)
+			} else {
+				respCh <- resp
 			}
+		}(agent)
+	}
+
+	resps := make([]Result[*RespValue], 0, len(agents))
+	for i := 0; i < len(agents); i++ {
+		resp := <-respCh
+		if resp.Error != nil {
+			resps = append(resps, Result[*RespValue]{
+				Err: resp.Error,
+			})
+			continue
 		}
-	}
-	return nil
-}
-
-// Stop stops the etcd transport client.
-func (c *EtcdTransportClient) Stop() {
-	c.cancel()
-	c.waitGroup.Wait()
-}
-
-func (c *EtcdTransportClient) handleRequest(ctx context.Context, req Request) {
-	var msg anypb.Any
-	err := proto.Unmarshal(req.Data, &msg)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to unmarshal response data")
-		return
-	}
-	result, err := c.callHandler(ctx, &msg)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to handle request")
-		return
-	}
-	response := Response{
-		Client: req.Client,
-		Data:   result,
-		ID:     req.ID,
-	}
-	c.respond(ctx, response)
-}
-
-func (c *EtcdTransportClient) callHandler(ctx context.Context, req *anypb.Any) ([]byte, error) {
-	handler, exists := c.Registry.handlers[req.MessageName()]
-	if !exists {
-		return nil, status.Error(
-			codes.Unavailable,
-			fmt.Sprintf("no handler for type %s", req.MessageName()),
-		)
-	}
-
-	resp, err := handler(ctx, req)
-	if err != nil {
-		return nil, fmt.Errorf("error calling handler for request: %w", err)
-	}
-
-	serializedResp, err := proto.Marshal(resp)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return serializedResp, nil
-}
-
-func (c *EtcdTransportClient) respond(ctx context.Context, resp Response) {
-	path := path.Join(RPCBasePath, RPCResponsePath, resp.Client, resp.ID)
-
-	c.etcdClient.PutWithExpiry(path, string(resp.Data), 30)
-}
-
-// RegisterFunction register a function as a handler in the registry
-// Only one function for a given Req type can be registered.
-func RegisterFunction[Req, Resp proto.Message](
-	t *EtcdTransportClient,
-	handler func(context.Context, Req) (Resp, error),
-) error {
-	if handler == nil {
-		return errors.New("handler cannot be nil")
-	}
-
-	var req Req // used only to pull out the message name from descriptor
-	name := req.ProtoReflect().Descriptor().FullName()
-	if _, exists := t.Registry.handlers[name]; exists {
-		log.Error().Err(fmt.Errorf("handler for %s already registered", name))
-		return fmt.Errorf("handler for %s already registered", name)
-	}
-
-	t.Registry.handlers[name] = func(ctx context.Context, anyreq *anypb.Any) (proto.Message, error) {
-		var nilReq Req
-		req := nilReq.ProtoReflect().New().Interface().(Req)
-		if err := anyreq.UnmarshalTo(req); err != nil {
+		var result RespValue
+		if err := proto.Unmarshal(resp.Data, Resp(&result)); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
-		return handler(ctx, req)
+		resps = append(resps, Result[*RespValue]{
+			Client:  resp.Client,
+			Success: &result,
+		})
 	}
 
-	return nil
+	return resps, nil
+}
+
+// SendRequest allows consumers of the etcd transport to send single request to agents.
+func SendRequest[RespValue any, Resp ExactMessage[RespValue]](ctx context.Context, t *EtcdTransportClient, agentName string, msg proto.Message) (*RespValue, error) {
+	resp, err := t.SendRequest(ctx, agentName, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	var result RespValue
+	if err := proto.Unmarshal(resp.Data, Resp(&result)); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// SendRequest sends a request to etcd, supposed to be consumed by an agent.
+func (t *EtcdTransportClient) SendRequest(ctx context.Context, agentName string, msg proto.Message) (*Response, error) {
+	anyreq, err := anypb.New(msg)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	rawReq, err := proto.Marshal(anyreq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request %v: %w", msg, err)
+	}
+
+	req := Request{
+		ID:     uuid.NewString(),
+		Client: agentName,
+		Data:   rawReq,
+	}
+
+	path := path.Join(RPCBasePath, RPCRequestPath, req.Client, req.ID)
+
+	t.etcdClient.PutWithExpiry(path, string(rawReq), leaseDuration)
+
+	return t.waitForResponse(ctx, req)
+}
+
+func (t *EtcdTransportClient) waitForResponse(ctx context.Context, req Request) (*Response, error) {
+	watchCtx, cancel := context.WithTimeout(ctx, serverWatchDuration*time.Second)
+	defer cancel()
+
+	responsePath := path.Join(RPCBasePath, RPCResponsePath, req.Client, req.ID)
+
+	watchCh, err := t.etcdClient.Watch(watchCtx, responsePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to watch etcd path: %w", err)
+	}
+	for {
+		select {
+		case watchResp, ok := <-watchCh:
+			if !ok {
+				return nil, fmt.Errorf("watch channel closed")
+			}
+			if watchResp.Err() != nil {
+				return nil, fmt.Errorf("failed to watch etcd path: %w", watchResp.Err())
+			}
+
+			for _, event := range watchResp.Events {
+				if event.Type == clientv3.EventTypePut {
+					return &Response{
+						Client: req.Client,
+						Data:   event.Kv.Value,
+					}, nil
+				}
+			}
+		case <-watchCtx.Done():
+			return nil, fmt.Errorf("context deadline exceeded")
+		}
+	}
 }

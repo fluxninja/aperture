@@ -54,7 +54,7 @@ func (h *CacheHandler) CacheDelete(ctx context.Context, req *cmdv1.GlobalCacheDe
 }
 
 // RegisterCacheHandlers registers cache handler functions in handler registry.
-func RegisterCacheHandlers(handler *CacheHandler, t *transport.EtcdTransportClient) error {
+func RegisterCacheHandlers(handler *CacheHandler, t *transport.EtcdTransportServer) error {
 	err := transport.RegisterFunction(t, handler.CacheUpsert)
 	if err != nil {
 		return err

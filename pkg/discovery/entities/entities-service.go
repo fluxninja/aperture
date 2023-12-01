@@ -25,7 +25,7 @@ type RegisterEntitiesServiceIn struct {
 	fx.In
 	Server              *grpc.Server `name:"default"`
 	Cache               *Entities
-	EtcdTransportClient *transport.EtcdTransportClient
+	EtcdTransportServer *transport.EtcdTransportServer
 }
 
 // RegisterEntitiesService registers a service for entity cache.
@@ -34,11 +34,11 @@ func RegisterEntitiesService(in RegisterEntitiesServiceIn) error {
 		entityCache: in.Cache,
 	}
 	entitiesv1.RegisterEntitiesServiceServer(in.Server, svc)
-	err := transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntities)
+	err := transport.RegisterFunction(in.EtcdTransportServer, svc.ListDiscoveryEntities)
 	if err != nil {
 		return err
 	}
-	err = transport.RegisterFunction(in.EtcdTransportClient, svc.ListDiscoveryEntity)
+	err = transport.RegisterFunction(in.EtcdTransportServer, svc.ListDiscoveryEntity)
 	if err != nil {
 		return err
 	}

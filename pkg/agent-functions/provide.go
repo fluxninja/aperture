@@ -37,11 +37,11 @@ type RegisterClientIn struct {
 	Lc                  fx.Lifecycle
 	Unmarshaller        config.Unmarshaller
 	ConnBuilder         grpcclient.ClientConnectionBuilder `name:"agent-functions"`
-	EtcdTransportClient *transport.EtcdTransportClient
+	EtcdTransportServer *transport.EtcdTransportServer
 	EtcdClient          *etcdclient.Client
 }
 
 // RegisterEtcdTransport registers a server on the etcd transport.
 func RegisterEtcdTransport(in RegisterClientIn) {
-	transport.RegisterWatcher(in.Lc, in.EtcdTransportClient, info.Hostname)
+	transport.RegisterWatcher(in.Lc, in.EtcdTransportServer, info.Hostname)
 }

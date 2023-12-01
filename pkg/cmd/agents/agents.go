@@ -25,12 +25,12 @@ var Module = fx.Provide(NewAgents)
 //
 // Agents wraps functions registered in agentfunctions, types should match.
 type Agents struct {
-	etcdTransport *transport.EtcdTransportServer
+	etcdTransport *transport.EtcdTransportClient
 	etcdClient    *etcdclient.Client
 }
 
 // NewAgents wraps Clients with Agent-specific function wrappers.
-func NewAgents(transport *transport.EtcdTransportServer, client *etcdclient.Client) Agents {
+func NewAgents(transport *transport.EtcdTransportClient, client *etcdclient.Client) Agents {
 	return Agents{
 		etcdTransport: transport,
 		etcdClient:    client,

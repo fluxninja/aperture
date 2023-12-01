@@ -54,7 +54,7 @@ func main() {
 		autoscale.Module(),
 		agent.ModuleForAgentOTel(),
 		discovery.Module(),
-		transport.TransportClientModule,
+		transport.TransportServerModule,
 		agentfunctions.Module,
 		secretmanager.Module(),
 		Module(),

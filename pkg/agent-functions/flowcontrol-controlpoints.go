@@ -43,6 +43,6 @@ func (h *FlowControlControlPointsHandler) ListFlowControlPoints(
 }
 
 // RegisterControlPointsHandler registers ControlPointsHandler in handler registry.
-func RegisterControlPointsHandler(handler FlowControlControlPointsHandler, t *transport.EtcdTransportClient) error {
+func RegisterControlPointsHandler(handler FlowControlControlPointsHandler, t *transport.EtcdTransportServer) error {
 	return transport.RegisterFunction(t, handler.ListFlowControlPoints)
 }
