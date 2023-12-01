@@ -127,17 +127,26 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// START: manualFlowNoCaching
 
+	// START: defineLabels
+
 	// business logic produces labels
 	labels := map[string]string{
 		"key": "value",
 	}
+	// END: defineLabels
+
+	// START: defineFlowParams
 	flowParams := aperture.FlowParams{
 		Labels:   labels,
 		RampMode: false,
 	}
+	// END: defineFlowParams
 
+	// START: startFlow
 	flow := a.apertureClient.StartFlow(r.Context(), "featureName", flowParams)
 	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
+
+	// END: startFlow
 
 	// See whether flow was accepted by Aperture Agent.
 	if flow.ShouldRun() {
