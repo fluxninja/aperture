@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Update API Version in Go SDK
           environment:
-            COMMIT_SHA: ${CIRCLE_SHA1}
+            COMMIT_SHA: << pipeline.git.revision >>
             GIT_SSH_COMMAND: "ssh -i ~/.ssh/id_rsa_9df3c9c9e7109b88da0f786f7bc00e72"
           command: .circleci/scripts/update_api_go_sdk.sh
 
