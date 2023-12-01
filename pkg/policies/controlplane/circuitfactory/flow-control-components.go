@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/fx"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"

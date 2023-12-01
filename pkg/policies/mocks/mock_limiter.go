@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	checkv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
+	languagev1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	labels "github.com/fluxninja/aperture/v2/pkg/labels"
 	iface "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	gomock "github.com/golang/mock/gomock"

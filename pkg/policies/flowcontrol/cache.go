@@ -8,7 +8,7 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
-	flowcontrolv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
+	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"

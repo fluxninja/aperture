@@ -6,11 +6,11 @@ package cmdv1
 
 import (
 	fmt "fmt"
-	v11 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	v12 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
-	v14 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1"
-	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
-	v13 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/preview/v1"
+	v11 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	v12 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/discovery/entities/v1"
+	v14 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
+	v1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	v13 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/preview/v1"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	io "io"
 	bits "math/bits"

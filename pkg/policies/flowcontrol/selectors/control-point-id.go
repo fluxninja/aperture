@@ -1,8 +1,8 @@
 package selectors
 
 import (
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
-	flowcontrolpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
+	cmdv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cmd/v1"
+	flowcontrolpointsv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/controlpoints/v1"
 )
 
 // ControlPointID is the struct that represents a ControlPoint.

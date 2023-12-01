@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/v2
 
-go 1.21
+go 1.21.4
 
 require (
 	cloud.google.com/go/secretmanager v1.11.4
@@ -18,6 +18,7 @@ require (
 	github.com/elastic/gosigar v0.14.2
 	github.com/emicklei/dot v1.6.0
 	github.com/envoyproxy/go-control-plane v0.11.1
+	github.com/fluxninja/aperture/api/v2 v2.0.0
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.24.1
@@ -193,8 +194,7 @@ require (
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e
 	golang.org/x/net v0.19.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20231106174013-bbf56f31fb17
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231127180814-3a041ad873d4
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/fsnotify.v1 v1.4.7
@@ -485,7 +485,8 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	gonum.org/v1/gonum v0.14.0 // indirect
-	google.golang.org/genproto v0.0.0-20231106174013-bbf56f31fb17 // indirect
+	google.golang.org/genproto v0.0.0-20231120223509-83a465c0220f // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20231127180814-3a041ad873d4 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gotest.tools/v3 v3.4.0 // indirect
@@ -527,7 +528,7 @@ require (
 	github.com/docker/docker v24.0.7+incompatible
 	github.com/docker/go-connections v0.4.1-0.20210727194412-58542c764a11
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/envoyproxy/protoc-gen-validate v1.0.2
+	github.com/envoyproxy/protoc-gen-validate v1.0.2 // indirect
 	github.com/facebookgo/symwalk v0.0.0-20150726040526-42004b9f3222
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -655,6 +656,7 @@ require (
 
 replace (
 	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.12
+	github.com/fluxninja/aperture/api/v2 => ./api
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter => github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter => github.com/fluxninja/opentelemetry-collector-contrib/exporter/kafkaexporter v0.90.0-fn.patch.1

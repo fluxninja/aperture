@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/dot"
-	policymonitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
+	policymonitoringv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/monitoring/v1"
 )
 
 // MermaidGraph returns Components and Links as a mermaid graph.

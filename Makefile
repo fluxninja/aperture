@@ -5,9 +5,33 @@ SHELL := /bin/bash
 # use GOMAXPROCS from environment if set, otherwise default to 8
 export GOMAXPROCS ?= 8
 
+GIT_ROOT := $(shell git rev-parse --show-toplevel)
+DOCS_OPENAPI := $(GIT_ROOT)/docs/content/assets/openapiv2
+DOCS_ROOT := $(GIT_ROOT)/docs
+
 generate-api:
 	@echo Generating API
 	@cd api && $(MAKE) generate
+
+	@#generate api docs
+	@rm -rfd $(DOCS_OPENAPI)
+	@mv $(GIT_ROOT)/api/gen/openapiv2 $(DOCS_OPENAPI)
+	@{ \
+		set -e; \
+		go run $(GIT_ROOT)/api/enrich-api-swagger.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
+		go run $(DOCS_ROOT)/tools/swagger/process-go-tags.go $(DOCS_OPENAPI)/aperture.swagger.yaml; \
+		for process in aperture-agent aperture-controller; do \
+			yq eval "del(.paths | .[] | select(.*.tags | contains([\"$$process\"]) | not))" $(DOCS_OPENAPI)/aperture.swagger.yaml > $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i "del(.tags)" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i ".host = \"$$process\"" $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			yq eval -i '.schemes = ["https"]' $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			swagger flatten --with-flatten=remove-unused $(DOCS_OPENAPI)/$$process.swagger.yaml --output=$(DOCS_OPENAPI)/$$process.swagger.json; \
+			go run $(DOCS_ROOT)/tools/jsonnet/json2yaml.go $(DOCS_OPENAPI)/$$process.swagger.json $(DOCS_OPENAPI)/$$process.swagger.yaml; \
+			rm $(DOCS_OPENAPI)/$$process.swagger.json; \
+		done; \
+	}
+	@git add $(DOCS_OPENAPI)
+	@git add $(GIT_ROOT)/api/gen/*
 
 go-generate:
 	@echo Generating go code

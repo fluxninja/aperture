@@ -1,6 +1,6 @@
 package iface
 
-import policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+import policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 
 // PreviewID is the ID of a preview.
 type PreviewID struct {

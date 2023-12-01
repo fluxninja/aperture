@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
