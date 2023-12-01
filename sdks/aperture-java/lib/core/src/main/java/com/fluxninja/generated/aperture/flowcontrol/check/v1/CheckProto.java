@@ -357,7 +357,7 @@ public final class CheckProto {
       "e.flowcontrol.check.v1.CacheDeleteRespon" +
       "se\"\000B\263\002\n5com.fluxninja.generated.apertur" +
       "e.flowcontrol.check.v1B\nCheckProtoP\001ZWgi" +
-      "thub.com/fluxninja/aperture/v2/api/gen/p" +
+      "thub.com/fluxninja/aperture/api/v2/gen/p" +
       "roto/go/aperture/flowcontrol/check/v1;ch" +
       "eckv1\242\002\003AFC\252\002\035Aperture.Flowcontrol.Check" +
       ".V1\312\002\035Aperture\\Flowcontrol\\Check\\V1\342\002)Ap" +

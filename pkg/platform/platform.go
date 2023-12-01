@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	infov1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/info/v1"
+	infov1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/info/v1"
 	alertmanager "github.com/fluxninja/aperture/v2/pkg/alert-manager"
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	"github.com/fluxninja/aperture/v2/pkg/config"

@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 	"go.uber.org/fx"
 
-	heartbeatv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/fluxninja/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/fluxninja/v1"
 	"github.com/fluxninja/aperture/v2/extensions/fluxninja/extconfig"
 	"github.com/fluxninja/aperture/v2/extensions/fluxninja/heartbeats"
 	"github.com/fluxninja/aperture/v2/extensions/fluxninja/otel"

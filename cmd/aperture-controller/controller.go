@@ -43,7 +43,7 @@ func main() {
 		controlplane.Module(),
 		webhooks.Module(),
 		policyvalidator.Module(),
-		transport.TransportServerModule,
+		transport.TransportClientModule,
 		cmd.Module,
 		Module(),
 		agents.Module,

@@ -123,8 +123,8 @@ public final class CheckhttpProto {
       "ure-agent\202\323\344\223\002\036\"\031/v1/flowcontrol/checkht" +
       "tp:\001*B\323\002\n9com.fluxninja.generated.apertu" +
       "re.flowcontrol.checkhttp.v1B\016CheckhttpPr" +
-      "otoP\001Z_github.com/fluxninja/aperture/v2/" +
-      "api/gen/proto/go/aperture/flowcontrol/ch" +
+      "otoP\001Z_github.com/fluxninja/aperture/api" +
+      "/v2/gen/proto/go/aperture/flowcontrol/ch" +
       "eckhttp/v1;checkhttpv1\242\002\003AFC\252\002!Aperture." +
       "Flowcontrol.Checkhttp.V1\312\002!Aperture\\Flow" +
       "control\\Checkhttp\\V1\342\002-Aperture\\Flowcont" +

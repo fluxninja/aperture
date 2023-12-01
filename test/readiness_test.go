@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 )
 
 var _ = Describe("Readiness", func() {

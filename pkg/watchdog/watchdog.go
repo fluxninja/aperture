@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	watchdogv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/watchdog/v1"
+	watchdogv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/watchdog/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
