@@ -39,49 +39,29 @@ go get github.com/fluxninja/aperture-go/v2
 
 The created instance can then be used to start a flow:
 
-<!-- TODO: Convert into Generated Code Snippet -->
-
-```go
-  // business logic produces labels
-  labels := map[string]string{
-      "key": "value",
-  }
-
-  rampMode := false
-
-  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
-  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
-
-  // See whether flow was accepted by Aperture Agent.
-  if flow.ShouldRun() {
-      // do actual work
-  } else {
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(aperture.Error)
-  }
-  _ = flow.End()
-```
+<CodeSnippet
+    lang="go"
+    snippetName="manualFlowNoCaching"
+ />
 
 For more context on using Aperture Go SDK to set feature control points, refer
 to the [example app][example] available in the repository.
 
 ## HTTP Middleware
 
-You can also automatically set middleware for your HTTP server using the SDK. To
-do so, after creating an instance of ApertureClient, use the middleware on your
-router:
+You can also configure middleware for your HTTP server using the SDK. To do
+this, after creating an instance of ApertureClient, apply the middleware to your
+router as demonstrated in the example below.
 
-```go
-  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", labels, nil, false, 200 * time.Millisecond).Handle)
-```
+For added convenience, you can specify a list of regular expression patterns.
+The middleware will only be applied to request paths that match these patterns.
+This feature is particularly beneficial for endpoints such as `/health`,
+`/connected` which may not require Aperture intervention.
 
-For simplicity, you can also pass a list of regexp patterns to match against the
-request path, for which the middleware will pass through. This is especially
-useful for endpoints like `/healthz`:
-
-```go
-  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", labels,  []regexp.Regexp{regexp.MustCompile("/health.*")}, false, 200 * time.Millisecond).Handle)
-```
+<CodeSnippet
+    lang="go"
+    snippetName="middleware"
+ />
 
 <!-- TODO: Fix Link -->
 

@@ -36,7 +36,6 @@ type app struct {
 	apertureClient aperture.Client
 }
 
-// START: grpcOptions
 // grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
 func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 	var grpcDialOptions []grpc.DialOption
@@ -61,8 +60,6 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 	return grpcDialOptions
 }
 
-// END: grpcOptions
-
 func main() {
 	ctx := context.Background()
 
@@ -71,8 +68,6 @@ func main() {
 	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
 	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
 	apertureAgentSkipVerifyBool, _ := strconv.ParseBool(apertureAgentSkipVerify)
-
-	// START: clientConstructor
 
 	opts := aperture.Options{
 		Address:     apertureAgentAddr,
@@ -85,8 +80,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
-
-	// END: clientConstructor
 
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.

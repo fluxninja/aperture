@@ -71,7 +71,7 @@ using (var listener = new HttpListener())
             var rampMode = false;
             var flowTimeout = TimeSpan.FromSeconds(5);
             var pms = new FeatureFlowParams(
-                "feature-name",
+                "featureName",
                 labels,
                 rampMode,
                 flowTimeout);

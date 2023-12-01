@@ -184,27 +184,10 @@ Each of these keys is associated with a TTL, a cache expiration time.
 <TabItem value="Go">
 ```
 
-```go
-  // business logic produces labels
-  labels := map[string]string{
-      "key": "value",
-  }
-
-  rampMode := false
-
-  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
-  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
-
-  // See whether flow was accepted by Aperture Agent.
-  if flow.ShouldRun() {
-      // do actual work
-  } else {
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(aperture.Error)
-  }
-  _ = flow.End()
-
-```
+<CodeSnippet
+    lang="go"
+    snippetName="manualFlowNoCaching"
+ />
 
 ```mdx-code-block
 </TabItem>

@@ -24,8 +24,7 @@ import (
 )
 
 const (
-	defaultAgentAddress = "localhost:8089"
-	defaultAppPort      = "8080"
+	defaultAppPort = "8080"
 )
 
 // app struct contains the server and the Aperture client.
@@ -64,7 +63,6 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 func main() {
 	ctx := context.Background()
 
-	apertureAgentAddr := getEnvOrDefault("APERTURE_AGENT_ADDRESS", defaultAgentAddress)
 	apertureAgentInsecure := getEnvOrDefault("APERTURE_AGENT_INSECURE", "false")
 	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
 	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
@@ -73,7 +71,7 @@ func main() {
 	// START: clientConstructor
 
 	opts := aperture.Options{
-		Address:     apertureAgentAddr,
+		Address:     "ORGANIZATION.app.fluxninja.com:443",
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
 		APIKey:      getEnvOrDefault("APERTURE_API_KEY", ""),
 	}
@@ -127,6 +125,8 @@ func main() {
 // SuperHandler handles HTTP requests on /super endpoint.
 func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
+	// START: manualFlowNoCaching
+
 	// business logic produces labels
 	labels := map[string]string{
 		"key": "value",
@@ -141,19 +141,26 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// See whether flow was accepted by Aperture Agent.
 	if flow.ShouldRun() {
+
 		// do actual work
+
 		log.Println("Flow Accepted Processing work")
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("Super!"))
-		// Simulate work being done
-		time.Sleep(2 * time.Second)
+
 	} else {
-		log.Println("Flow Rejected")
+
 		// handle flow rejection by Aperture Agent
+		log.Println("Flow Rejected")
 		flow.SetStatus(aperture.Error)
 		w.WriteHeader(http.StatusForbidden)
 	}
-	_ = flow.End()
+
+	if err := flow.End(); err != nil {
+		log.Printf("failed to end flow: %v", err)
+	}
+
+	// END: manualFlowNoCaching
 }
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.
