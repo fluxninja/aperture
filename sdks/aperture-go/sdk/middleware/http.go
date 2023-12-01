@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 	"github.com/fluxninja/aperture-go/v2/sdk/utils"
+	checkhttpv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 )
 
 // HTTPMiddleware is the interface for the HTTP middleware.

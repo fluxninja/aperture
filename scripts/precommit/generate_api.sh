@@ -3,6 +3,6 @@ set -euo pipefail
 
 gitroot="$(git rev-parse --show-toplevel)"
 
-pushd "$gitroot"/api >/dev/null
-make buf-generate
+pushd "$gitroot" >/dev/null
+make generate-api
 popd >/dev/null
