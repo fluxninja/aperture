@@ -1,11 +1,6 @@
 package com.fluxninja.example;
 
-// START: NettyImports
-
 import com.fluxninja.aperture.netty.ApertureServerHandler;
-
-// END: NettyImports
-
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -15,10 +10,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import java.io.IOException;
 import java.time.Duration;
 
-// START: NettyServerInitializer
 public class ServerInitializer extends ChannelInitializer<Channel> {
-
-// END: NettyServerInitializer
 
     ApertureSDK sdk;
     String agentAddress;
@@ -47,6 +39,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     }
 
     // START: NettyInitChannel
+
     @Override
     protected void initChannel(Channel ch) {
 

@@ -34,9 +34,15 @@ section.
 contains a Handler that automatically creates traffic flows for requests in a
 given pipeline:
 
-<CodeSnippet lang="java" snippetName="NettyImports"/>
+```java
+import com.fluxninja.aperture.netty.ApertureServerHandler;
+```
 
-<CodeSnippet lang="java" snippetName="NettyServerInitializer"/>
+```java
+public class ServerInitializer extends ChannelInitializer<Channel>{
+  ...
+  }
+```
 
 <CodeSnippet lang="java" snippetName="NettyInitChannel"/>
 
