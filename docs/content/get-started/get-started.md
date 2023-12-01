@@ -164,7 +164,7 @@ internal services and use it for subsequent requests. There are two types of
 cache key that can be passed to Aperture:
 
 - `result_cache_key` - This key is useful to store the response of the request
-  in Aperture. For example, result of a heavy tasks like database query, a
+  in Aperture. For example, the result of a heavy tasks like database query, a
   third-party API call which later can be used for subsequent requests if
   requested within the TTL. This removes the need to perform the same task
   again.

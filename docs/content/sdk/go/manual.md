@@ -65,7 +65,7 @@ points.
 
 ### Define Labels
 
-You can define labels for your control points. These labels can be produce by
+You can define labels for your control points. These labels can be produced by
 business logic or can be static. For example, you define a label `user_id` which
 is the user ID of the user making the request. You can also define a static
 label `version` which is the version of your service. Depending on your use
@@ -78,9 +78,9 @@ case, you can define any number of labels.
 
 #### Passing Labels using `FlowParams`
 
-Defined can be passed to the `FlowParams` struct. This struct is used to pass
-parameters to the `Flow` method. Additionally this struct also define caching
-behavior for the control point.
+Defined labels can be passed to the `FlowParams` struct. This struct is used to
+pass parameters to the `Flow` method. Additionally, this struct also define
+caching behavior for the control point.
 
 <CodeSnippet
     lang="go"
