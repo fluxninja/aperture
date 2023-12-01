@@ -138,12 +138,12 @@ public class App {
         // business logic produces labels
         labels.put("key", "value");
 
-        Boolean ramMode = false;
+        Boolean rampMode = false;
 
         FeatureFlowParameters params =
                 FeatureFlowParameters.newBuilder("featureName")
                         .setExplicitLabels(labels)
-                        .setRampMode(ramMode)
+                        .setRampMode(rampMode)
                         .setFlowTimeout(Duration.ofMillis(1000))
                         .build();
         // StartFlow performs a flowcontrolv1.Check call to Aperture. It returns a Flow.
