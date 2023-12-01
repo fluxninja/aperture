@@ -85,6 +85,7 @@ jobs:
   update-api-go-sdk:
     executor: go-cimg-executor
     steps:
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "9d:f3:c9:c9:e7:10:9b:88:da:0f:78:6f:7b:c0:0e:72" # fluxninja/aperture R/w
@@ -1143,7 +1144,10 @@ workflows:
   version: 2
 
   update-api-go-sdk:
-    when: << pipeline.parameters.updated-aperture-api >>
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-api >>
     jobs:
       - update-api-go-sdk:
           name: Update API in aperture-go SDK
