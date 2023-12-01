@@ -157,20 +157,19 @@ Agents.
 
 The code snippet below shows how to wrap your
 [Control Point](/concepts/control-point.md) within the `start_flow` call while
-also passing [labels](/concepts/flow-label.md) and cache keys to Aperture
-Agents.
+passing [labels](/concepts/flow-label.md) and cache keys to Aperture Agents.
 
 Caching mechanism allows you to store the response of a request in the Aperture
-Agent. This feature is useful when you want to cache the some value or response
-from external or internal services and use it for subsequent requests. There are
-two types cache key that can be passed to Aperture Agents:
+Agent. This feature is useful when you want to cache the response from external
+or internal services and use it for subsequent requests. There are two types of
+cache key that can be passed to Aperture Agents:
 
 - `result_cache_key` - This key is useful to store the response of the request
   in Aperture Agent. For example, result of a heavy tasks like database query, a
-  third party API call which later can be used for subsequent requests, if
+  third-party API call which later can be used for subsequent requests if
   requested within the TTL. This removes the need to perform the same task
   again.
-- `global_cache_keys` - Using these keys, a global cache value can be setup,
+- `global_cache_keys` - Using these keys, a global cache value can be set up,
   which can be accessed throughput anywhere in the application.
 
 Each of these keys is associated with a TTL, a cache expiration time.
