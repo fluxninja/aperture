@@ -16,6 +16,10 @@ description:
   guide covers best practices and provides examples for implementation.
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 [Aperture Java SDK core library][SDK-Library] can be used to manually set
 feature control points within a Java service.
 
@@ -31,43 +35,14 @@ section.
 
 ```java
     String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
-    String agentAPIKey = "API_KEY";
-
-    ApertureSDK apertureSDK;
-
-    apertureSDK = ApertureSDK.builder()
-            .setAddress(agentAddress)
-            .setAPIKey(agentAPIKey)
-            .setFlowTimeout(Duration.ofMillis(1000))
-            .build();
+    String apiKey = "API_KEY";
 ```
+
+<CodeSnippet lang="java" snippetName="StandaloneExampleSDKInit" />
 
 The created instance can then be used to start a flow:
 
-```java
-
-    Map<String, String> labels = new HashMap<>();
-
-    // business logic produces labels
-    labels.put("key", "value");
-
-    Boolean rampMode = false;
-
-    FeatureFlowParameters params = FeatureFlowParameters.newBuilder("featureName")
-        .setExplicitLabels(labels)
-        .setRampMode(rampMode)
-        .setFlowTimeout(Duration.ofMillis(1000))
-        .build();
-
-    Flow flow = apertureSDK.startFlow(params);
-    if (flow.shouldRun()) {
-        // do actual work
-    } else {
-        // handle flow rejection by Aperture Agent
-        flow.setStatus(FlowStatus.Error);
-    }
-    flow.end();
-```
+<CodeSnippet lang="java" snippetName="StandaloneExampleFlow" />
 
 For more context on using Aperture Java SDK to set feature control points, refer
 to the [example app][example] available in the repository.
