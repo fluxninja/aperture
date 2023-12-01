@@ -121,3 +121,4 @@ onboarding
 Duolingo
 [Ww]avepool
 APIKey
+[Aa]uthz
