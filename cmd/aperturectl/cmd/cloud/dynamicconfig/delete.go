@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	languagev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	languagev1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 )
 
 // DelCmd is a command to delete a policy's dynamic config.

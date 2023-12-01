@@ -15,7 +15,7 @@ import (
 
 	mm "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
 
-	policylangv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 )
 
 // UniqueAgentGroups returns the unique agent groups of selectors.

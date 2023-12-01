@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	statusv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/status/v1"
+	statusv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/status/v1"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 

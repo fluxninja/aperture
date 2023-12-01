@@ -1,8 +1,8 @@
 package heartbeats
 
 import (
-	entitiesv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/discovery/entities/v1"
-	heartbeatv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/fluxninja/v1"
+	entitiesv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/discovery/entities/v1"
+	heartbeatv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/fluxninja/v1"
 	"github.com/fluxninja/aperture/v2/pkg/discovery/entities"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )

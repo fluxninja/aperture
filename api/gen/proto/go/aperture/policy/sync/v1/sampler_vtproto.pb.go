@@ -7,7 +7,7 @@ package syncv1
 import (
 	binary "encoding/binary"
 	fmt "fmt"
-	v1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/language/v1"
+	v1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	io "io"
 	math "math"

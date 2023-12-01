@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"k8s.io/client-go/rest"
 
-	policysyncv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/sync/v1"
+	policysyncv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/sync/v1"
 	agentconfig "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"

@@ -4,7 +4,7 @@ managed:
   java_package_prefix:
     default: com.fluxninja.generated
   go_package_prefix:
-    default: github.com/fluxninja/aperture/v2/api/gen/proto/go
+    default: github.com/fluxninja/aperture/api/v2/gen/proto/go
     except:
       - buf.build/googleapis/googleapis
       - buf.build/grpc-ecosystem/grpc-gateway
@@ -35,13 +35,13 @@ plugins:
       # Note: Pooling is enabled only for top-level messages, or messages which
       # get automatically used in unmarshalling. The rest of messages don't use
       # the pool.
-      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.CheckResponse
+      - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1.CheckResponse
       # Doesn't compile, hit some bug in vtproto.
-      # - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision
-      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision_SchedulerInfo
-      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest
-      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest_HttpRequest
-      - pool=github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/flowcontrol/checkhttp/v1.SocketAddress
+      # - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision
+      - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1.LimiterDecision_SchedulerInfo
+      - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest
+      - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/checkhttp/v1.CheckHTTPRequest_HttpRequest
+      - pool=github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/checkhttp/v1.SocketAddress
   - plugin: buf.build/grpc/go
     out: gen/proto/go
     opt:

@@ -3,7 +3,7 @@ package aperture
 import (
 	"errors"
 
-	checkv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/check/v1"
+	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 // LookupStatus is the status of a cache lookup, either HIT or MISS.

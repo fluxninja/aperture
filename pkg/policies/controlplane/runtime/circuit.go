@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
-	policymonitoringv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/policy/monitoring/v1"
+	policymonitoringv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/monitoring/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"

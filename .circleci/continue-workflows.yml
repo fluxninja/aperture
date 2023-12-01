@@ -26,6 +26,9 @@ executors:
       - image: cimg/base:2022.12-18.04
 
 parameters:
+  updated-aperture-api:
+    type: boolean
+    default: false
   updated-aperture:
     type: boolean
     default: false
@@ -79,6 +82,20 @@ parameters:
     default: false
 
 jobs:
+  update-api-go-sdk:
+    executor: go-cimg-executor
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "9d:f3:c9:c9:e7:10:9b:88:da:0f:78:6f:7b:c0:0e:72" # fluxninja/aperture R/w
+      - run:
+          name: Update API Version in Go SDK
+          environment:
+            COMMIT_SHA: ${CIRCLE_SHA1}
+            GIT_SSH_COMMAND: "ssh -i ~/.ssh/id_rsa_9df3c9c9e7109b88da0f786f7bc00e72"
+          command: .circleci/scripts/update_api_go_sdk.sh
+
   build-push-add-tag:
     parameters:
       attach-workspace:
@@ -1125,6 +1142,15 @@ jobs:
 
 workflows:
   version: 2
+
+  update-api-go-sdk:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - << pipeline.parameters.updated-aperture-api >>
+    jobs:
+      - update-api-go-sdk:
+          name: Update API in aperture-go SDK
 
   upload-policy-to-latest:
     when:

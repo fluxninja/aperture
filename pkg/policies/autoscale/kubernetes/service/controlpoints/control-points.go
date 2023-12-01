@@ -5,8 +5,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	controlpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
-	cmdv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/cmd/v1"
+	controlpointsv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	cmdv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/cmd/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/discovery"
