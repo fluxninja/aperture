@@ -79,7 +79,7 @@ case, you can define any number of labels.
 #### Passing Labels using `FlowParams`
 
 Labels can be passed to the `FlowParams` struct. This struct is used to pass
-parameters to the `Flow` method. Additionally, this struct also define caching
+parameters to the `Flow` method. Additionally, this struct also defines caching
 behavior for the control point.
 
 <CodeSnippet
