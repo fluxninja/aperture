@@ -4,7 +4,7 @@ FROM golang:1.21.4 AS builder
 WORKDIR /src
 COPY --link . .
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "aperture-go-example" "./example"
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "aperture-go-example" "./examples/middleware"
 
 # Final image
 FROM debian:bullseye-slim

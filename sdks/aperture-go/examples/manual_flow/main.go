@@ -21,7 +21,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
-	"github.com/fluxninja/aperture-go/v2/sdk/middleware"
 )
 
 const (
@@ -102,16 +101,6 @@ func main() {
 	superRouter := mux.PathPrefix("/super").Subrouter()
 	superRouter.HandleFunc("", a.SuperHandler)
 
-	middlewareParams := aperture.MiddlewareParams{
-		Timeout: 2000 * time.Millisecond,
-	}
-
-	m, err := middleware.NewHTTPMiddleware(apertureClient, "awesomeFeature", middlewareParams)
-	if err != nil {
-		log.Fatalf("failed to create HTTP middleware: %v", err)
-	}
-	superRouter.Use(m.Handle)
-
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
 
@@ -137,9 +126,34 @@ func main() {
 
 // SuperHandler handles HTTP requests on /super endpoint.
 func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusAccepted)
-	// Simulate work being done
-	time.Sleep(2 * time.Second)
+
+	// business logic produces labels
+	labels := map[string]string{
+		"key": "value",
+	}
+	flowParams := aperture.FlowParams{
+		Labels:   labels,
+		RampMode: false,
+	}
+
+	flow := a.apertureClient.StartFlow(r.Context(), "featureName", flowParams)
+	// StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
+
+	// See whether flow was accepted by Aperture Agent.
+	if flow.ShouldRun() {
+		// do actual work
+		log.Println("Flow Accepted Processing work")
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("Super!"))
+		// Simulate work being done
+		time.Sleep(2 * time.Second)
+	} else {
+		log.Println("Flow Rejected")
+		// handle flow rejection by Aperture Agent
+		flow.SetStatus(aperture.Error)
+		w.WriteHeader(http.StatusForbidden)
+	}
+	_ = flow.End()
 }
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.
