@@ -17,9 +17,9 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
-	checkhttpv1 "github.com/fluxninja/aperture-go/v2/gen/proto/flowcontrol/checkhttp/v1"
 	aperture "github.com/fluxninja/aperture-go/v2/sdk"
 	"github.com/fluxninja/aperture-go/v2/sdk/utils"
+	checkhttpv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/checkhttp/v1"
 )
 
 // socketAddressFromNetAddr takes a net.Addr and returns a flowcontrolhttp.SocketAddress.
