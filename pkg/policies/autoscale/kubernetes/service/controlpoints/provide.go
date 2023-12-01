@@ -4,7 +4,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
-	controlpointsv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
+	controlpointsv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/autoscale/kubernetes/controlpoints/v1"
 	"github.com/fluxninja/aperture/v2/pkg/net/grpcgateway"
 )
 

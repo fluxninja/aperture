@@ -10,7 +10,7 @@ import (
 	"github.com/buraksezer/olric/config"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	tokenbucketv1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/tokenbucket/v1"
+	tokenbucketv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/tokenbucket/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"

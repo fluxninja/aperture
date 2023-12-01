@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
-	distcachev1 "github.com/fluxninja/aperture/v2/api/gen/proto/go/aperture/distcache/v1"
+	distcachev1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/distcache/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	dcconfig "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/info"
