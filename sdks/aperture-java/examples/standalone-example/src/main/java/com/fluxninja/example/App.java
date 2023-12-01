@@ -56,6 +56,8 @@ public class App {
 
         final ManagedChannel channel = ManagedChannelBuilder.forTarget(agentAddress).build();
 
+        // START: StandaloneExampleSDKInit
+
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
@@ -70,6 +72,8 @@ public class App {
             return;
         }
 
+        // END: StandaloneExampleSDKInit
+
         String featureName = System.getenv("APERTURE_FEATURE_NAME");
         if (featureName == null) {
             featureName = DEFAULT_FEATURE_NAME;
@@ -82,6 +86,7 @@ public class App {
         }
         Spark.port(Integer.parseInt(appPort));
         Spark.get("/super", app::handleSuperAPI);
+        Spark.get("/super2", app::handleSuper2API);
         Spark.get("/connected", app::handleConnectedAPI);
         Spark.get("/health", app::handleHealthAPI);
     }
@@ -121,6 +126,50 @@ public class App {
         } finally {
             flow.end();
         }
+        return "";
+    }
+
+    private String handleSuper2API(spark.Request req, spark.Response res) {
+
+        // START: StandaloneExampleFlow
+
+        Map<String, String> labels = new HashMap<>();
+
+        // business logic produces labels
+        labels.put("key", "value");
+
+        Boolean rampMode = false;
+
+        FeatureFlowParameters params =
+                FeatureFlowParameters.newBuilder("featureName")
+                        .setExplicitLabels(labels)
+                        .setRampMode(rampMode)
+                        .setFlowTimeout(Duration.ofMillis(1000))
+                        .build();
+        // StartFlow performs a flowcontrolv1.Check call to Aperture. It returns a Flow.
+        Flow flow = this.apertureSDK.startFlow(params);
+
+        // See whether flow was accepted by Aperture.
+        try {
+            if (flow.shouldRun()) {
+                // do actual work
+                res.status(202);
+            } else {
+                // handle flow rejection by Aperture
+                res.status(flow.getRejectionHttpStatusCode());
+            }
+        } catch (Exception e) {
+            // Flow Status captures whether the feature captured by the Flow was
+            // successful or resulted in an error. When not explicitly set,
+            // the default value is FlowStatus.OK .
+            flow.setStatus(FlowStatus.Error);
+            logger.error("Error in flow execution", e);
+        } finally {
+            flow.end();
+        }
+
+        // END: StandaloneExampleFlow
+
         return "";
     }
 

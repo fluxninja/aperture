@@ -38,19 +38,25 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         this.rootCertFile = rootCertFile;
     }
 
+    // START: NettyInitChannel
+
     @Override
     protected void initChannel(Channel ch) {
+
+        // START: NettyCreateSDK
         try {
             sdk =
                     ApertureSDK.builder()
                             .setAddress(this.agentAddress)
                             .setAPIKey(this.agentAPIKey)
-                            .useInsecureGrpc(insecureGrpc)
+                            .useInsecureGrpc(insecureGrpc) // Optional: Defaults to true
                             .setRootCertificateFile(rootCertFile)
+                            .addIgnoredPaths("/health,/connected")
                             .build();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+        // END: NettyCreateSDK
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
@@ -61,4 +67,5 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }
+    // END: NettyInitChannel
 }

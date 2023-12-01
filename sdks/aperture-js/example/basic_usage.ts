@@ -9,7 +9,7 @@ export const apertureClient = new ApertureClient({
 });
 // END: clientConstructor
 
-// START: handleRequest
+// START: handleRequestWithCache
 import { FlowStatus, LookupStatus } from "@fluxninja/aperture-js";
 import { Request, Response } from "express";
 
@@ -31,7 +31,7 @@ async function handleRequest(req: Request, res: Response) {
       res.send({ message: flow.resultCache().getValue()?.toString() });
     } else {
       // Do Actual Work
-      // After completing the work, you can return store the response in cache and return it, for example:
+      // After completing the work, you can store the response in the cache and return it, for example
       const resString = "foo";
 
       // create a new buffer
@@ -62,4 +62,31 @@ async function handleRequest(req: Request, res: Response) {
 
   flow.end();
 }
-// END: handleRequest
+// END: handleRequestWithCache
+
+// START: handleRequestRateLimit
+
+async function handleRequestRateLimit(req: Request, res: Response) {
+  const flow = await apertureClient.startFlow("awesomeFeature", {
+    labels: {
+      user_id: "some_user_id",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 300, // ms
+    },
+  });
+
+  if (flow.shouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+  } else {
+    console.log("Request rate-limited. Try again later.");
+    // Handle flow rejection
+    flow.setStatus(FlowStatus.Error);
+  }
+
+  if (flow) {
+    flow.end();
+  }
+}
+// END: handleRequestRateLimit

@@ -22,6 +22,8 @@ public class ArmeriaServer {
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
 
+    // START: ArmeriaCreateHTTPService
+
     public static HttpService createHelloHTTPService() {
         return new AbstractHttpService() {
             @Override
@@ -30,6 +32,7 @@ public class ArmeriaServer {
             }
         };
     }
+    // END: ArmeriaCreateHTTPService
 
     public static HttpService createHealthService() {
         return new AbstractHttpService() {
@@ -71,25 +74,30 @@ public class ArmeriaServer {
 
         String rootCertFile = getEnv("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);
 
+        // START: ArmeriaCreateApertureSDK
         ApertureSDK apertureSDK;
         try {
             apertureSDK =
                     ApertureSDK.builder()
                             .setAddress(agentHost)
                             .setAPIKey(apiKey)
-                            .useInsecureGrpc(insecureGrpc)
+                            .addIgnoredPaths("/health,/connected")
+                            .useInsecureGrpc(insecureGrpc) // Optional: Defaults to true
                             .setRootCertificateFile(rootCertFile)
                             .build();
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
+        // END: ArmeriaCreateApertureSDK
+
         ServerBuilder serverBuilder = Server.builder();
         serverBuilder.http(Integer.parseInt(appPort));
         serverBuilder.service("/notsuper", createHelloHTTPService());
         serverBuilder.service("/health", createHealthService());
         serverBuilder.service("/connected", createConnectedHTTPService());
 
+        // START: ArmeriadecorateService
         ApertureHTTPService decoratedService =
                 createHelloHTTPService()
                         .decorate(
@@ -99,6 +107,7 @@ public class ArmeriaServer {
                                         rampMode,
                                         Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
+        // END: ArmeriadecorateService
 
         Server server = serverBuilder.build();
         CompletableFuture<Void> future = server.start();

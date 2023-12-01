@@ -6,13 +6,14 @@ from datetime import timedelta
 from typing import Optional
 
 import grpc
-from aperture_sdk.client import ApertureClient, FlowParams
 from quart import Quart
 
 default_agent_address = "localhost:8089"
 app = Quart(__name__)
 
 # START: clientConstructor
+from aperture_sdk.client import ApertureClient, FlowParams
+
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
 api_key = os.getenv("APERTURE_API_KEY", "")
 insecure = os.getenv("APERTURE_AGENT_INSECURE", "true").lower() == "true"

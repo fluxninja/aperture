@@ -61,6 +61,37 @@ using (var listener = new HttpListener())
 
             flow.End();
         }
+        else if (request.Url.AbsolutePath == "/super2")
+        {
+            // START: handleRequest
+            // do some business logic to collect labels
+            var labels = new Dictionary<string, string>();
+            labels.Add("key", "value");
+
+            var rampMode = false;
+            var flowTimeout = TimeSpan.FromSeconds(5);
+            var pms = new FeatureFlowParams(
+                "featureName",
+                labels,
+                rampMode,
+                flowTimeout);
+            var flow = sdk.StartFlow(pms);
+            if (flow.ShouldRun())
+            {
+                // do actual work
+                Thread.Sleep(2000);
+                SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);
+            }
+            else
+            {
+                // handle flow rejection by Aperture Agent
+                flow.SetStatus(FlowStatus.Error);
+                SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
+            }
+
+            flow.End();
+            // END: handleRequest
+        }
         else if (request.Url.AbsolutePath == "/notsuper")
         {
             SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);

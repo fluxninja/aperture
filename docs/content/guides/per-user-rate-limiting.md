@@ -13,6 +13,8 @@ import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from "@theme/TabItem";
 import {BashTab, TabContent} from './blueprintsComponents.js';
+import CodeSnippet from '../codeSnippet.js'
+
 ```
 
 ## Overview
@@ -63,14 +65,7 @@ The first step to use Aperture SDK is to import and set up Aperture Client:
 <TabItem value="Typescript">
 ```
 
-```typescript
-import { ApertureClient, Flow, FlowStatusEnum } from "@fluxninja/aperture-js";
-
-apertureClient = new ApertureClient({
-  address: "ORGANIZATION.app.fluxninja.com:443",
-  apiKey: "API_KEY",
-});
-```
+<CodeSnippet lang="py" snippetName="clientConstructor" />
 
 ```mdx-code-block
   </TabItem>
@@ -89,31 +84,7 @@ specified cache entry within Aperture.
 <TabItem value="TypeScript">
 ```
 
-```javascript
-async function handleRequest(req, res) {
-  const flow = await apertureClient.StartFlow("awesomeFeature", {
-    labels: {
-      user_id: "some_user_id",
-    },
-    grpcCallOptions: {
-      deadline: Date.now() + 300, // ms
-    },
-  });
-
-  if (flow.ShouldRun()) {
-    // Add business logic to process incoming request
-    console.log("Request accepted. Processing...");
-  } else {
-    console.log("Request rate-limited. Try again later.");
-    // Handle flow rejection
-    flow.SetStatus(FlowStatusEnum.Error);
-  }
-
-  if (flow) {
-    flow.End();
-  }
-}
-```
+<CodeSnippet lang="ts" snippetName="handleRequestRateLimit" />
 
 ```mdx-code-block
   </TabItem>

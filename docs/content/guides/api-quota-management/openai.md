@@ -14,6 +14,8 @@ import Tabs from '@theme/Tabs';
 import TabItem from "@theme/TabItem";
 import {BashTab, TabContent} from '../blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
+import CodeSnippet from '../../codeSnippet.js'
+
 ```
 
 ## Understanding OpenAI rate limits
@@ -96,14 +98,7 @@ labels.
 
 Import and setup Aperture Client:
 
-```typescript
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-
-apertureClient = new ApertureClient({
-  address: "localhost:8080",
-  channelCredentials: grpc.credentials.createSsl(),
-});
-```
+<CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
 

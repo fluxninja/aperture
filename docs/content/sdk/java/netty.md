@@ -11,6 +11,10 @@ keywords:
   - netty
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 ### Aperture Java Instrumentation Agent
 
 All Netty pipelines can have an Aperture Handler automatically added into them
@@ -32,44 +36,22 @@ given pipeline:
 
 ```java
 import com.fluxninja.aperture.netty.ApertureServerHandler;
-
-...
-
-public class ServerInitializer extends ChannelInitializer<Channel> {
-
-    ...
-
-    @Override
-    protected void initChannel(Channel ch) {
-        String controlPointName = "someFeature";
-
-        sdk = ApertureSDK.builder().setAddress(this.agentAddress).setAgentAPIKey(this.agentAPIKey).build();
-
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new HttpServerCodec());
-        pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        // ApertureServerHandler must be added before the response-generating HelloWorldHandler,
-        //    but after the codec handler.
-        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName));
-        pipeline.addLast(new HelloWorldHandler());
-    }
-}
 ```
+
+```java
+public class ServerInitializer extends ChannelInitializer<Channel>{
+  ...
+  }
+```
+
+<CodeSnippet lang="java" snippetName="NettyInitChannel"/>
 
 You can instruct the handler to exclude specific paths from being monitored by
 the Aperture SDK. For example, you might want to exclude endpoints used for
 health checks. To achieve this, you can add the path(s) you want to ignore to
 the `ignoredPaths` field of the SDK, as shown in the following code:
 
-```java
-ApertureSDK sdk = ApertureSDK.builder()
-        .setAddress("ORGANIZATION.app.fluxninja.com:443")
-        .setAgentAPIKey(agentAPIKey)
-        ...
-        .addIgnoredPaths("/healthz,/metrics")
-        ...
-        .build()
-```
+<CodeSnippet lang="java" snippetName="NettyCreateSDK"/>
 
 The paths should be specified as a comma-separated list. Note that the paths you
 specify must match exactly. However, you can change this behavior to treat the

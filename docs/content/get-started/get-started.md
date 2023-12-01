@@ -12,6 +12,8 @@ hide_table_of_contents: true
 import { Cards } from '@site/src/components/Cards';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import CodeSnippet from '../codeSnippet.js'
+
 ```
 
 Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
@@ -61,20 +63,20 @@ npm install @fluxninja/aperture-js
 
 ```mdx-code-block
 </TabItem>
-<TabItem value="Go">
-```
-
-```bash
-go get github.com/fluxninja/aperture-go/v2
-```
-
-```mdx-code-block
-</TabItem>
 <TabItem value="Python">
 ```
 
 ```bash
 pip install aperture-py
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
+```
+
+```bash
+go get github.com/fluxninja/aperture-go/v2
 ```
 
 ```mdx-code-block
@@ -90,65 +92,23 @@ organization's address and API Key.
 <TabItem value="TypeScript">
 ```
 
-```typescript
-import { ApertureClient, FlowStatusEnum } from "@fluxninja/aperture-js";
-
-// Create aperture client
-export const apertureClient = new ApertureClient({
-  address: "ORGANIZATION.app.fluxninja.com:443",
-  agentAPIKey: "API_KEY",
-});
-```
-
-```mdx-code-block
-</TabItem>
-<TabItem value="Go">
-```
-
-```go
-// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcOptions() []grpc.DialOption {
-  var grpcDialOptions []grpc.DialOption
-  grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
-    Backoff:           backoff.DefaultConfig,
-    MinConnectTimeout: time.Second * 10,
-  }))
-  grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
-  certPool, err := x509.SystemCertPool()
-  if err != nil {
-    return nil
-  }
-  grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
-  return grpcDialOptions
-}
-
-// Create aperture client
-agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-apiKey := "API_KEY"
-
-opts := aperture.Options{
-    Address:     agentAddress,
-    APIKey: apiKey,
-    DialOptions: grpcOptions(),
-}
-
-// initialize Aperture Client with the provided options.
-apertureClient, err := aperture.NewClient(ctx, opts)
-if err != nil {
-    log.Fatalf("failed to create client: %v", err)
-}
-```
+<CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 ```mdx-code-block
 </TabItem>
 <TabItem value="Python">
 ```
 
-```python
-from aperture_sdk import ApertureClient
+<CodeSnippet lang="py" snippetName="clientConstructor" />
 
-aperture_client = ApertureClient.new_client(address="ORGANIZATION.app.fluxninja.com:443", api_key="API_KEY")
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
 ```
+
+<CodeSnippet lang="go" snippetName="grpcOptions" />
+
+<CodeSnippet lang="go" snippetName="clientConstructor" />
 
 ```mdx-code-block
 </TabItem>
@@ -170,61 +130,13 @@ Let's create a feature control point in the following code snippet.
 <TabItem value="TypeScript">
 ```
 
-```typescript
-async function handleRequest(req, res) {
-  const flow = await apertureClient.StartFlow("archimedes-service", {
-    labels: {
-      api_key: "some_api_key",
-    },
-    grpcCallOptions: {
-      deadline: Date.now() + 300, // ms
-    },
-    rampMode: false,
-    cacheKey: "cache",
-  });
-
-  if (flow.ShouldRun()) {
-    // Check if the response is cached in Aperture from a previous request
-    if (flow.CachedValue().GetLookupStatus() === LookupStatus.Hit) {
-      res.send({ message: flow.CachedValue().GetValue()?.toString() });
-    } else {
-      // Do Actual Work
-      // After completing the work, you can return store the response in cache and return it, for example:
-      const resString = "foo";
-
-      // create a new buffer
-      const buffer = Buffer.from(resString);
-
-      // set cache value
-      const setResult = await flow.SetCachedValue(buffer, {
-        seconds: 30,
-        nanos: 0,
-      });
-      if (setResult?.error) {
-        console.log(`Error setting cache value: ${setResult.error}`);
-      }
-
-      res.send({ message: resString });
-    }
-  } else {
-    // Handle flow rejection
-    flow.SetStatus(FlowStatusEnum.Error);
-  }
-
-  if (flow) {
-    flow.End();
-  }
-}
-```
-
 The code snippet below shows how to wrap your
 [Control Point](/concepts/control-point.md) within the `StartFlow` call while
 also passing [labels](/concepts/flow-label.md) and `cacheKey` to Aperture
 Agents.
 
 - The function `Flow.ShouldRun()` checks if the flow allows the request.
-- The `Flow.End()` function is responsible for sending telemetry, and updating
-  the specified cache entry within Aperture.
+- The `Flow.End()` function is responsible for sending telemetry.
 - The `flow.CachedValue().GetLookupStatus()` function returns the status of the
   cache lookup. The status can be `Hit` or `Miss`.
 - If the status is `Hit`, the `flow.CachedValue().GetValue()` function returns
@@ -232,64 +144,49 @@ Agents.
 - The `flow.SetCachedValue()` function is responsible for setting the response
   in Aperture cache with the specified TTL (time to live).
 
-```mdx-code-block
-</TabItem>
-<TabItem value="Go">
-```
-
-```go
-  // business logic produces labels
-  labels := map[string]string{
-      "key": "value",
-  }
-
-  rampMode := false
-
-  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
-  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
-
-  // See whether flow was accepted by Aperture Agent.
-  if flow.ShouldRun() {
-      // do actual work
-  } else {
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(aperture.Error)
-  }
-  _ = flow.End()
-
-```
+<CodeSnippet
+    lang="ts"
+    snippetName="handleRequestWithCache"
+ />
 
 ```mdx-code-block
 </TabItem>
 <TabItem value="Python">
 ```
 
-```python
-  # business logic produces labels
-  labels = {
-      "key": "value",
-  }
+The code snippet below shows how to wrap your
+[Control Point](/concepts/control-point.md) within the `start_flow` call while
+passing [labels](/concepts/flow-label.md) and cache keys to Aperture.
 
-  # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
-  # It returns a Flow or raises an error if any.
-  flow = aperture_client.start_flow(
-    control_point="AwesomeFeature",
-    explicit_labels=labels,
-    check_timeout=timedelta(seconds=200),
-  )
+Caching mechanism allows you to store the response of a request in the Aperture.
+This feature is useful when you want to cache the response from external or
+internal services and use it for subsequent requests. There are two types of
+cache key that can be passed to Aperture:
 
-  # Check if flow check was successful.
-  if not flow.success:
-      logger.info("Flow check failed - will fail-open")
+- `result_cache_key` - This key is useful to store the response of the request
+  in Aperture. For example, the result of a heavy tasks like database query, a
+  third-party API call which later can be used for subsequent requests if
+  requested within the TTL. This removes the need to perform the same task
+  again.
+- `global_cache_keys` - Using these keys, a global cache value can be set up,
+  which can be accessed throughput anywhere in the application.
 
-  # See whether flow was accepted by Aperture Agent.
-  if flow.should_run():
-      # do actual work
-  else:
-      # handle flow rejection by Aperture Agent
-      flow.set_status(FlowStatus.Error)
-  flow.end()
+Each of these keys is associated with a TTL, a cache expiration time.
+
+<CodeSnippet
+    lang="py"
+    snippetName="cacheFlow"
+ />
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Go">
 ```
+
+<CodeSnippet
+    lang="go"
+    snippetName="manualFlowNoCaching"
+ />
 
 ```mdx-code-block
 </TabItem>

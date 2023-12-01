@@ -12,10 +12,31 @@ keywords:
   - manual
 ---
 
+```mdx-code-block
+import CodeSnippet from '../../codeSnippet.js'
+```
+
 <a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go/v2`}>Aperture Go
 SDK</a> can be used to manually set feature control points within a Go service.
 
-To do so, first create an instance of ApertureClient:
+To do so, first install the SDK:
+
+## Install SDK
+
+```bash
+go get github.com/fluxninja/aperture-go/v2
+```
+
+Now, create an instance of ApertureClient.
+
+## Create ApertureClient Instance
+
+To create an instance of ApertureClient, you need to provide the address of your
+Aperture Cloud instance and an API key.
+
+Address of your Aperture Cloud is made of Organization ID. For example, if your
+organization ID is `ORGANIZATION` and available at port `443` then the address
+is `ORGANIZATION.app.fluxninja.com:443`.
 
 :::info API Key
 
@@ -25,88 +46,88 @@ section.
 
 :::
 
-```bash
-go get github.com/fluxninja/aperture-go/v2
-```
+### Configuring gRPC Client Options
 
-```go
-// grpcOptions creates a new gRPC client that will be passed in order to initialize the Aperture client.
-func grpcOptions() []grpc.DialOption {
-  var grpcDialOptions []grpc.DialOption
-  grpcDialOptions = append(grpcDialOptions, grpc.WithConnectParams(grpc.ConnectParams{
-    Backoff:           backoff.DefaultConfig,
-    MinConnectTimeout: time.Second * 10,
-  }))
-  grpcDialOptions = append(grpcDialOptions, grpc.WithUserAgent("aperture-go"))
-  certPool, err := x509.SystemCertPool()
-  if err != nil {
-    return nil
-  }
-  grpcDialOptions = append(grpcDialOptions, grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
-  return grpcDialOptions
-}
-```
+Aperture Go SDK uses gRPC to communicate with Aperture Cloud. You can configure
+gRPC client options by passing a list of gRPC client options to the
+ApertureClient constructor.
 
-```go
-  agentAddress := "ORGANIZATION.app.fluxninja.com:443"
-  apiKey := "API_KEY"
+<CodeSnippet lang="go" snippetName="grpcOptions" />
 
-  opts := aperture.Options{
-      Address:     agentAddress,
-      APIKey: apiKey,
-      DialOptions: grpcOptions(),
-  }
+### Defining Aperture Options and Creating ApertureClient
 
-  // initialize Aperture Client with the provided options.
-  apertureClient, err := aperture.NewClient(ctx, opts)
-  if err != nil {
-      log.Fatalf("failed to create client: %v", err)
-  }
-```
+<CodeSnippet lang="go" snippetName="clientConstructor" />
 
-The created instance can then be used to start a flow:
+## Define Control Points
 
-```go
-  // business logic produces labels
-  labels := map[string]string{
-      "key": "value",
-  }
+Once you have created an instance of ApertureClient, you can define control
+points.
 
-  rampMode := false
+### Define Labels
 
-  // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a Flow object.
-  flow := apertureClient.StartFlow(ctx, "featureName", labels, rampMode, 200 * time.Millisecond)
+You can define labels for your control points. These labels can be produced by
+business logic or can be static. For example, you define a label `user_id` which
+is the user ID of the user making the request. You can also define a static
+label `version` which is the version of your service. Depending on your use
+case, you can define any number of labels.
 
-  // See whether flow was accepted by Aperture Agent.
-  if flow.ShouldRun() {
-      // do actual work
-  } else {
-      // handle flow rejection by Aperture Agent
-      flow.SetStatus(aperture.Error)
-  }
-  _ = flow.End()
-```
+<CodeSnippet
+    lang="go"
+    snippetName="defineLabels"
+ />
 
-For more context on using Aperture Go SDK to set feature control points, refer
-to the [example app][example] available in the repository.
+#### Passing Labels using `FlowParams`
+
+Labels can be passed to the `FlowParams` struct. This struct is used to pass
+parameters to the `Flow` method. Additionally, this struct also defines caching
+behavior for the control point.
+
+<CodeSnippet
+    lang="go"
+    snippetName="defineFlowParams"
+ />
+
+### Create Control Point
+
+Once you have defined labels, you can start a flow. To start a flow, you need to
+provide the control point of the flow and the `FlowParams` struct.
+
+<CodeSnippet
+    lang="go"
+    snippetName="startFlow"
+ />
+
+<details><summary>Control Point Code</summary>
+<p>
+
+<CodeSnippet
+    lang="go"
+    snippetName="manualFlowNoCaching"
+ />
+
+</p>
+</details>
+
+To view the working example for more context, refer to the [example
+app][example] available in the repository.
 
 ## HTTP Middleware
 
-You can also automatically set middleware for your HTTP server using the SDK. To
-do so, after creating an instance of ApertureClient, use the middleware on your
-router:
+You can also configure middleware for your HTTP server using the SDK. To do
+this, after creating an instance of ApertureClient, apply the middleware to your
+router as demonstrated in the example below.
 
-```go
-  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", labels, nil, false, 200 * time.Millisecond).Handle)
-```
+For added convenience, you can specify a list of regular expression patterns.
+The middleware will only be applied to request paths that match these patterns.
+This feature is particularly beneficial for endpoints such as `/health`,
+`/connected` which may not require Aperture intervention.
 
-For simplicity, you can also pass a list of regexp patterns to match against the
-request path, for which the middleware will pass through. This is especially
-useful for endpoints like `/healthz`:
+<CodeSnippet
+    lang="go"
+    snippetName="middleware"
+ />
 
-```go
-  mux.Use(aperturemiddlewares.NewHTTPMiddleware(apertureClient, "awesomeFeature", labels,  []regexp.Regexp{regexp.MustCompile("/health.*")}, false, 200 * time.Millisecond).Handle)
-```
+<!-- TODO: Fix Link -->
 
 [example]: https://github.com/fluxninja/aperture-go/tree/main/example
 [api-keys]: /reference/cloud-ui/api-keys.md
