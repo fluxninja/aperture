@@ -170,6 +170,10 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 
 	resultCacheHit, globalWg := e.cacheLookup(ctx, requestContext, controlPoint, response)
+	if globalWg != nil {
+		// Wait for result cache lookup to finish before returning
+		defer globalWg.Wait()
+	}
 	if resultCacheHit {
 		return
 	}
@@ -178,9 +182,6 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
 	}
 	runLimiters(limiterTypes)
-	if globalWg != nil {
-		globalWg.Wait()
-	}
 
 	return
 }
@@ -198,6 +199,7 @@ func (e *Engine) cacheLookup(ctx context.Context, requestContext iface.RequestCo
 	response.CacheLookupResponse = lookupResponse
 	// wait for result cache lookup to finish
 	wgResult.Wait()
+
 	if lookupResponse == nil || lookupResponse.ResultCacheResponse == nil {
 		return false, wgGlobal
 	}
