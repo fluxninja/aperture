@@ -119,25 +119,33 @@ func (c *Cache) ready() error {
 
 // Lookup looks up the cache for the given CacheLookupRequest.
 func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
+	response, wgResult, wgGlobal := c.LookupWait(ctx, request)
+	wgResult.Wait()
+	wgGlobal.Wait()
+	return response
+}
+
+// LookupWait looks up the cache for the given CacheLookupRequest. It does not wait for the response.
+func (c *Cache) LookupWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, *sync.WaitGroup, *sync.WaitGroup) {
+	// define wait groups
+	var wgResult, wgGlobal sync.WaitGroup
 	response := &flowcontrolv1.CacheLookupResponse{
 		GlobalCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
 	}
 	if request == nil {
-		return response
+		return response, &wgResult, &wgGlobal
 	}
 
 	type Lookup struct {
 		lookupResponse *flowcontrolv1.KeyLookupResponse
 		key            string
 		cacheType      iface.CacheType
+		wg             *sync.WaitGroup
 	}
-
-	// define a wait group to wait for all the lookups to complete
-	var wg sync.WaitGroup
 
 	execLookup := func(lookup *Lookup) func() {
 		return func() {
-			defer wg.Done()
+			defer lookup.wg.Done()
 			lookupResponse := lookup.lookupResponse
 			cachedBytes, err := c.get(ctx, request.ControlPoint, lookup.cacheType, lookup.key)
 			if err == nil {
@@ -163,6 +171,7 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 			key:            request.ResultCacheKey,
 			lookupResponse: response.ResultCacheResponse,
 			cacheType:      iface.Result,
+			wg:             &wgResult,
 		})
 	}
 	for _, globalCacheKey := range request.GlobalCacheKeys {
@@ -172,19 +181,19 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 			key:            globalCacheKey,
 			lookupResponse: lookupResponse,
 			cacheType:      iface.Global,
+			wg:             &wgGlobal,
 		})
 	}
 
 	for i, lookup := range lookups {
-		wg.Add(1)
+		lookup.wg.Add(1)
 		if i == len(lookups)-1 {
 			execLookup(lookup)()
 			continue
 		}
 		panichandler.Go(execLookup(lookup))
 	}
-	wg.Wait()
-	return response
+	return response, &wgResult, &wgGlobal
 }
 
 // Upsert upserts the cache for the given CacheUpsertRequest.

@@ -2,6 +2,7 @@ package iface
 
 import (
 	"context"
+	"sync"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
@@ -21,6 +22,8 @@ const (
 type Cache interface {
 	// Lookup looks up specified keys in cache. It takes flowcontrolv1.LookupRequest and returns flowcontrolv1.LookupResponse.
 	Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse
+	// LookupWait starts lookup for specified keys in cache. It does not wait for response. It takes flowcontrolv1.LookupRequest and returns flowcontrolv1.LookupResponse and result and global wait groups.
+	LookupWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, *sync.WaitGroup, *sync.WaitGroup)
 	// Upsert inserts or updates specified cache entries. It takes flowcontrolv1.UpsertRequest and returns flowcontrolv1.UpsertResponse.
 	Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse
 	// Delete deletes specified keys from cache. It takes flowcontrolv1.DeleteRequest and returns flowcontrolv1.DeleteResponse.
