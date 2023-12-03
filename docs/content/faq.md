@@ -21,9 +21,9 @@ keywords:
 ### Does Aperture add latency on requests? {#request-overhead}
 
 While Aperture does add some latency, it is a minimal one. The latency of
-requests to Aperture Cloud is in the order 5-10ms within the same region as your
-app. If you are hosting Aperture Agents yourself, the latency is in the order of
-1-2ms.
+requests to Aperture Cloud is in the order of 10 to 20 ms within the same region
+as your application. If you are hosting Aperture Agents yourself, the latency is
+in the order of 1-2ms.
 
 ### Does Aperture reject requests immediately? {#reject-immediately}
 
