@@ -191,5 +191,5 @@ func setupOutputDir(outputDir string) (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(absOutputDir, "dashboards"), nil
+	return absOutputDir, nil
 }
