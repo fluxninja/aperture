@@ -102,60 +102,51 @@ Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
 
 ```typescript
 const PRIORITIES: Record<string, number> = {
-    paid_user: 10000,
-    trial_user: 1000,
-    free_user: 100,
-}
+  paid_user: 10000,
+  trial_user: 1000,
+  free_user: 100,
+};
 
-let flow: Flow | undefined = undefined
+let flow: Flow | undefined = undefined;
 
 if (this.apertureClient) {
-    // Alternatively, simply use JSON.stringify() to get charCount
-    const charCount =
-        this.systemMessage.length +
-        message.length +
-        String("system" + "user").length
-    const labels: Record<string, string> = {
-        api_key: CryptoES.SHA256(api.apiKey).toString(),
-        estimated_tokens: (
-            Math.ceil(charCount / 4) + responseTokens
-        ).toString(),
-        model_variant: modelVariant,
-        priority: String(
-            PRIORITIES[userType],
-        ),
-    }
+  const charCount = JSON.stringify(createCompletionParams).length;
+  const labels: Record<string, string> = {
+    api_key: CryptoES.SHA256(api.apiKey).toString(),
+    estimated_tokens: (
+      Math.ceil(charCount / 4) + Number(createCompletionParams.max_tokens)
+    ).toString(),
+    model_variant: baseModel,
+    product_tier: this.settings.product_tier,
+    product_reason: this.settings.product_reason,
+    priority: String(PRIORITIES[this.settings.product_reason] + priorityBump),
+    prompt_type: promptType,
+  };
 
-    flow = await this.apertureClient.StartFlow("openai", {
-        labels: labels,
-        grpcCallOptions: {
-            deadline: Date.now() + 1200000,
-        },
-    })
+  flow = await this.apertureClient.startFlow("openai", {
+    labels: labels,
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000,
+    },
+  });
 }
 
-// As we use Aperture as a queue, send the message regardless of whether it was accepted or rejected
+// Regardless of whether the flow is rejected, send the message
 try {
-    const { data: chatCompletion, response: raw } = await api.chat.completions
-        .create({
-            model: modelVariant,
-            temperature: temperature,
-            top_p: topP,
-            max_tokens: responseTokens,
-            messages: messages,
-        })
-        .withResponse()
-        .catch(err => {
-            logger.error(`openai chat error: ${JSON.stringify(err)}`)
-            throw err
-        })
-    )
-    return chatCompletion.choices[0]?.message?.content ?? ""
+  const { data: chatCompletion, response: raw } = await api.chat.completions
+    .create(createCompletionParams)
+    .withResponse()
+    .catch((err) => {
+      this.#logger.error(`openai chat error: ${JSON.stringify(err)}`);
+      throw err;
+    });
+
+  return chatCompletion;
 } catch (e) {
-    flow?.SetStatus(FlowStatusEnum.Error)
-    throw e // throw the error to be caught by the chat function
+  flow?.setStatus(FlowStatus.Error);
+  throw e; // throw the error to be caught by the chat function
 } finally {
-    flow?.End()
+  flow?.end();
 }
 ```
 
@@ -320,9 +311,13 @@ policy:
     selectors:
       - control_point: openai
         agent_group: default
-        label_matcher:
+      - label_matcher:
           match_labels:
             model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
 ```
 
 ```mdx-code-block
@@ -365,9 +360,13 @@ policy:
     selectors:
       - control_point: openai
         agent_group: default
-        label_matcher:
+      - label_matcher:
           match_labels:
             model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
 ```
 
 ```mdx-code-block
