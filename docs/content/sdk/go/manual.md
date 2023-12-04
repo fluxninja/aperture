@@ -129,5 +129,5 @@ This feature is particularly beneficial for endpoints such as `/health`,
 
 <!-- TODO: Fix Link -->
 
-[example]: https://github.com/fluxninja/aperture-go/tree/main/example
+[example]: https://github.com/fluxninja/aperture-go/tree/main/examples
 [api-keys]: /reference/cloud-ui/api-keys.md
