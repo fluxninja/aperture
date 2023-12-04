@@ -75,7 +75,7 @@ func (s *selector) ControlPointID() ControlPointID {
 //
 // LabelMatcher can be nil or a validated LabelMatcher.
 func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
-	backCompatConv(lm)
+	backCompatConvLabelMatcher(lm)
 
 	var reqExprs []mm.Expr
 
@@ -177,8 +177,8 @@ func valuesRegex(values []string) string {
 	return "^(" + strings.Join(escaped, "|") + ")$"
 }
 
-// backCompatConv converts old label matcher to new one.
-func backCompatConv(lm *policylangv1.LabelMatcher) {
+// backCompatConvLabelMatcher converts old label matcher to new one.
+func backCompatConvLabelMatcher(lm *policylangv1.LabelMatcher) {
 	if lm.GetMatchExpressions() != nil && lm.GetMatchList() == nil {
 		lm.MatchList = lm.MatchExpressions
 	}

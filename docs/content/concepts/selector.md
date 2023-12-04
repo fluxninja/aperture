@@ -40,19 +40,19 @@ service: checkout.myns.svc.cluster.local # Service
 control_point: ingress # Control Point
 agent_group: default # Agent Group
 label_matcher: # Label Matcher
-match_labels:
-  user_tier: premium
-  http.method: GET
-match_list:
-  - key: query
-    operator: In
-    values:
-      - insert
-      - delete
-expression: # Using Label Matcher with expression
-  label_matches:
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  match_labels:
+    user_tier: premium
+    http.method: GET
+  match_list:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+  expression: # Using Label Matcher with expression
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
 
 ## Control Point {#control-point}
@@ -68,8 +68,17 @@ The label matcher is used to narrow down the selected flows using conditions
 defined on [Labels][label]. It allows for precise filtering of flows based on
 specific criteria.
 
-There are two ways to define a label matcher. If both match criteria are defined
-simultaneously, then both must match for a flow to be selected.
+There are multiple ways to define a label matcher. If multiple match criteria
+are defined simultaneously, then they all must match for a flow to be selected.
+
+- **Match Labels**: It is the simplest way to match a label. It matches the
+  label value exactly.
+
+  ```yaml
+  label_matcher:
+    match_labels:
+      http.method: GET
+  ```
 
 - **Match List**: It allows for more complex matching conditions using operators
   such as `In`, `NotIn`, `Exists`, and `DoesNotExists`.
