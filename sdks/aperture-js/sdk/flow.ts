@@ -23,7 +23,6 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { StatusCode } from "./gen/aperture/flowcontrol/check/v1/StatusCode.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
@@ -61,7 +60,7 @@ export interface Flow {
   error(): Error | null;
   span(): Span;
   end(): void;
-  httpResponseCode(): Number
+  httpResponseCode(): Number | undefined;
   retryAfter(): {seconds: string | undefined, nanos: number | undefined}
 }
 
@@ -360,21 +359,24 @@ export class _Flow implements Flow {
    * @returns The retry-after duration.
    */
   retryAfter() {
-    if (this._checkResponse?.waitTime)
-      return {seconds: "0", nanos: 0};
-    return {seconds: this._checkResponse?.waitTime?.seconds, nanos: this._checkResponse?.waitTime?.nanos }
+    if (this._checkResponse) {
+      return {seconds: this._checkResponse?.waitTime?.seconds.toString(), nanos: this._checkResponse?.waitTime?.nanos };
+    }
+    return {seconds: undefined, nanos: undefined};
   }
 
   /**
    * Gets the status for the flow.
-   * @returns The response code.
+   * @returns The http response code.
    */
   httpResponseCode() {
-    if (this._checkResponse)
+    if (this._checkResponse) {
+      let statusCode = this._checkResponse?.deniedResponseStatusCode;
+      if (statusCode == 0)
+        return 200;
       return Number(this._checkResponse?.deniedResponseStatusCode);
-    if (this._checkResponse == StatusCode.Empty)
-      return 200;
-    return 0
+    }
+    return 0;
   }
 
   /**
