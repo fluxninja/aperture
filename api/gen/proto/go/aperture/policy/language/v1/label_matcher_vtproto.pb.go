@@ -47,6 +47,18 @@ func (m *LabelMatcher) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.MatchList) > 0 {
+		for iNdEx := len(m.MatchList) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.MatchList[iNdEx].MarshalToSizedBufferVT(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
 	if m.Expression != nil {
 		size, err := m.Expression.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
@@ -91,7 +103,7 @@ func (m *LabelMatcher) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *K8SLabelMatcherRequirement) MarshalVT() (dAtA []byte, err error) {
+func (m *MatchRequirement) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -104,12 +116,12 @@ func (m *K8SLabelMatcherRequirement) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *K8SLabelMatcherRequirement) MarshalToVT(dAtA []byte) (int, error) {
+func (m *MatchRequirement) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *K8SLabelMatcherRequirement) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *MatchRequirement) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -147,7 +159,7 @@ func (m *K8SLabelMatcherRequirement) MarshalToSizedBufferVT(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *MatchExpression_List) MarshalVT() (dAtA []byte, err error) {
+func (m *Expression_List) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -160,12 +172,12 @@ func (m *MatchExpression_List) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MatchExpression_List) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_List) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_List) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_List) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -192,7 +204,7 @@ func (m *MatchExpression_List) MarshalToSizedBufferVT(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MatchExpression) MarshalVT() (dAtA []byte, err error) {
+func (m *Expression) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -205,12 +217,12 @@ func (m *MatchExpression) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MatchExpression) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -234,12 +246,12 @@ func (m *MatchExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MatchExpression_Not) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_Not) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_Not) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_Not) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.Not != nil {
 		size, err := m.Not.MarshalToSizedBufferVT(dAtA[:i])
@@ -253,12 +265,12 @@ func (m *MatchExpression_Not) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MatchExpression_All) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_All) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_All) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_All) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.All != nil {
 		size, err := m.All.MarshalToSizedBufferVT(dAtA[:i])
@@ -272,12 +284,12 @@ func (m *MatchExpression_All) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MatchExpression_Any) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_Any) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_Any) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_Any) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.Any != nil {
 		size, err := m.Any.MarshalToSizedBufferVT(dAtA[:i])
@@ -291,12 +303,12 @@ func (m *MatchExpression_Any) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MatchExpression_LabelExists) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelExists) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_LabelExists) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelExists) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i -= len(m.LabelExists)
 	copy(dAtA[i:], m.LabelExists)
@@ -305,12 +317,12 @@ func (m *MatchExpression_LabelExists) MarshalToSizedBufferVT(dAtA []byte) (int, 
 	dAtA[i] = 0x22
 	return len(dAtA) - i, nil
 }
-func (m *MatchExpression_LabelEquals) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelEquals) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_LabelEquals) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelEquals) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.LabelEquals != nil {
 		size, err := m.LabelEquals.MarshalToSizedBufferVT(dAtA[:i])
@@ -324,12 +336,12 @@ func (m *MatchExpression_LabelEquals) MarshalToSizedBufferVT(dAtA []byte) (int, 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *MatchExpression_LabelMatches) MarshalToVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelMatches) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchExpression_LabelMatches) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *Expression_LabelMatches) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.LabelMatches != nil {
 		size, err := m.LabelMatches.MarshalToSizedBufferVT(dAtA[:i])
@@ -343,7 +355,7 @@ func (m *MatchExpression_LabelMatches) MarshalToSizedBufferVT(dAtA []byte) (int,
 	}
 	return len(dAtA) - i, nil
 }
-func (m *EqualsMatchExpression) MarshalVT() (dAtA []byte, err error) {
+func (m *EqualsExpression) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -356,12 +368,12 @@ func (m *EqualsMatchExpression) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *EqualsMatchExpression) MarshalToVT(dAtA []byte) (int, error) {
+func (m *EqualsExpression) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *EqualsMatchExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *EqualsExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -390,7 +402,7 @@ func (m *EqualsMatchExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *MatchesMatchExpression) MarshalVT() (dAtA []byte, err error) {
+func (m *MatchesExpression) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -403,12 +415,12 @@ func (m *MatchesMatchExpression) MarshalVT() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MatchesMatchExpression) MarshalToVT(dAtA []byte) (int, error) {
+func (m *MatchesExpression) MarshalToVT(dAtA []byte) (int, error) {
 	size := m.SizeVT()
 	return m.MarshalToSizedBufferVT(dAtA[:size])
 }
 
-func (m *MatchesMatchExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+func (m *MatchesExpression) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -461,11 +473,17 @@ func (m *LabelMatcher) SizeVT() (n int) {
 		l = m.Expression.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
+	if len(m.MatchList) > 0 {
+		for _, e := range m.MatchList {
+			l = e.SizeVT()
+			n += 1 + l + sov(uint64(l))
+		}
+	}
 	n += len(m.unknownFields)
 	return n
 }
 
-func (m *K8SLabelMatcherRequirement) SizeVT() (n int) {
+func (m *MatchRequirement) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -489,7 +507,7 @@ func (m *K8SLabelMatcherRequirement) SizeVT() (n int) {
 	return n
 }
 
-func (m *MatchExpression_List) SizeVT() (n int) {
+func (m *Expression_List) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -505,7 +523,7 @@ func (m *MatchExpression_List) SizeVT() (n int) {
 	return n
 }
 
-func (m *MatchExpression) SizeVT() (n int) {
+func (m *Expression) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -518,7 +536,7 @@ func (m *MatchExpression) SizeVT() (n int) {
 	return n
 }
 
-func (m *MatchExpression_Not) SizeVT() (n int) {
+func (m *Expression_Not) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -530,7 +548,7 @@ func (m *MatchExpression_Not) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *MatchExpression_All) SizeVT() (n int) {
+func (m *Expression_All) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -542,7 +560,7 @@ func (m *MatchExpression_All) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *MatchExpression_Any) SizeVT() (n int) {
+func (m *Expression_Any) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -554,7 +572,7 @@ func (m *MatchExpression_Any) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *MatchExpression_LabelExists) SizeVT() (n int) {
+func (m *Expression_LabelExists) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -564,7 +582,7 @@ func (m *MatchExpression_LabelExists) SizeVT() (n int) {
 	n += 1 + l + sov(uint64(l))
 	return n
 }
-func (m *MatchExpression_LabelEquals) SizeVT() (n int) {
+func (m *Expression_LabelEquals) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -576,7 +594,7 @@ func (m *MatchExpression_LabelEquals) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *MatchExpression_LabelMatches) SizeVT() (n int) {
+func (m *Expression_LabelMatches) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -588,7 +606,7 @@ func (m *MatchExpression_LabelMatches) SizeVT() (n int) {
 	}
 	return n
 }
-func (m *EqualsMatchExpression) SizeVT() (n int) {
+func (m *EqualsExpression) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -606,7 +624,7 @@ func (m *EqualsMatchExpression) SizeVT() (n int) {
 	return n
 }
 
-func (m *MatchesMatchExpression) SizeVT() (n int) {
+func (m *MatchesExpression) SizeVT() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -809,7 +827,7 @@ func (m *LabelMatcher) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MatchExpressions = append(m.MatchExpressions, &K8SLabelMatcherRequirement{})
+			m.MatchExpressions = append(m.MatchExpressions, &MatchRequirement{})
 			if err := m.MatchExpressions[len(m.MatchExpressions)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -844,9 +862,43 @@ func (m *LabelMatcher) UnmarshalVT(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Expression == nil {
-				m.Expression = &MatchExpression{}
+				m.Expression = &Expression{}
 			}
 			if err := m.Expression.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MatchList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MatchList = append(m.MatchList, &MatchRequirement{})
+			if err := m.MatchList[len(m.MatchList)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -872,7 +924,7 @@ func (m *LabelMatcher) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *K8SLabelMatcherRequirement) UnmarshalVT(dAtA []byte) error {
+func (m *MatchRequirement) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -895,10 +947,10 @@ func (m *K8SLabelMatcherRequirement) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: K8SLabelMatcherRequirement: wiretype end group for non-group")
+			return fmt.Errorf("proto: MatchRequirement: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: K8SLabelMatcherRequirement: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MatchRequirement: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1019,7 +1071,7 @@ func (m *K8SLabelMatcherRequirement) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MatchExpression_List) UnmarshalVT(dAtA []byte) error {
+func (m *Expression_List) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1042,10 +1094,10 @@ func (m *MatchExpression_List) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MatchExpression_List: wiretype end group for non-group")
+			return fmt.Errorf("proto: Expression_List: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MatchExpression_List: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Expression_List: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1077,7 +1129,7 @@ func (m *MatchExpression_List) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Of = append(m.Of, &MatchExpression{})
+			m.Of = append(m.Of, &Expression{})
 			if err := m.Of[len(m.Of)-1].UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1104,7 +1156,7 @@ func (m *MatchExpression_List) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
+func (m *Expression) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1127,10 +1179,10 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MatchExpression: wiretype end group for non-group")
+			return fmt.Errorf("proto: Expression: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MatchExpression: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Expression: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1162,16 +1214,16 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Variant.(*MatchExpression_Not); ok {
+			if oneof, ok := m.Variant.(*Expression_Not); ok {
 				if err := oneof.Not.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &MatchExpression{}
+				v := &Expression{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Variant = &MatchExpression_Not{Not: v}
+				m.Variant = &Expression_Not{Not: v}
 			}
 			iNdEx = postIndex
 		case 2:
@@ -1203,16 +1255,16 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Variant.(*MatchExpression_All); ok {
+			if oneof, ok := m.Variant.(*Expression_All); ok {
 				if err := oneof.All.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &MatchExpression_List{}
+				v := &Expression_List{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Variant = &MatchExpression_All{All: v}
+				m.Variant = &Expression_All{All: v}
 			}
 			iNdEx = postIndex
 		case 3:
@@ -1244,16 +1296,16 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Variant.(*MatchExpression_Any); ok {
+			if oneof, ok := m.Variant.(*Expression_Any); ok {
 				if err := oneof.Any.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &MatchExpression_List{}
+				v := &Expression_List{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Variant = &MatchExpression_Any{Any: v}
+				m.Variant = &Expression_Any{Any: v}
 			}
 			iNdEx = postIndex
 		case 4:
@@ -1286,7 +1338,7 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Variant = &MatchExpression_LabelExists{LabelExists: string(dAtA[iNdEx:postIndex])}
+			m.Variant = &Expression_LabelExists{LabelExists: string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1317,16 +1369,16 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Variant.(*MatchExpression_LabelEquals); ok {
+			if oneof, ok := m.Variant.(*Expression_LabelEquals); ok {
 				if err := oneof.LabelEquals.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &EqualsMatchExpression{}
+				v := &EqualsExpression{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Variant = &MatchExpression_LabelEquals{LabelEquals: v}
+				m.Variant = &Expression_LabelEquals{LabelEquals: v}
 			}
 			iNdEx = postIndex
 		case 6:
@@ -1358,16 +1410,16 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if oneof, ok := m.Variant.(*MatchExpression_LabelMatches); ok {
+			if oneof, ok := m.Variant.(*Expression_LabelMatches); ok {
 				if err := oneof.LabelMatches.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
 			} else {
-				v := &MatchesMatchExpression{}
+				v := &MatchesExpression{}
 				if err := v.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 					return err
 				}
-				m.Variant = &MatchExpression_LabelMatches{LabelMatches: v}
+				m.Variant = &Expression_LabelMatches{LabelMatches: v}
 			}
 			iNdEx = postIndex
 		default:
@@ -1392,7 +1444,7 @@ func (m *MatchExpression) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *EqualsMatchExpression) UnmarshalVT(dAtA []byte) error {
+func (m *EqualsExpression) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1415,10 +1467,10 @@ func (m *EqualsMatchExpression) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: EqualsMatchExpression: wiretype end group for non-group")
+			return fmt.Errorf("proto: EqualsExpression: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EqualsMatchExpression: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: EqualsExpression: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1507,7 +1559,7 @@ func (m *EqualsMatchExpression) UnmarshalVT(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MatchesMatchExpression) UnmarshalVT(dAtA []byte) error {
+func (m *MatchesExpression) UnmarshalVT(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1530,10 +1582,10 @@ func (m *MatchesMatchExpression) UnmarshalVT(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MatchesMatchExpression: wiretype end group for non-group")
+			return fmt.Errorf("proto: MatchesExpression: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MatchesMatchExpression: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MatchesExpression: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

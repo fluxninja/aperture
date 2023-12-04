@@ -122,6 +122,40 @@ func (m *LabelMatcher) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetMatchList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LabelMatcherValidationError{
+						field:  fmt.Sprintf("MatchList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LabelMatcherValidationError{
+						field:  fmt.Sprintf("MatchList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LabelMatcherValidationError{
+					field:  fmt.Sprintf("MatchList[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return LabelMatcherMultiError(errors)
 	}
@@ -199,22 +233,22 @@ var _ interface {
 	ErrorName() string
 } = LabelMatcherValidationError{}
 
-// Validate checks the field values on K8SLabelMatcherRequirement with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *K8SLabelMatcherRequirement) Validate() error {
+// Validate checks the field values on MatchRequirement with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MatchRequirement) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on K8SLabelMatcherRequirement with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on MatchRequirement with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// K8SLabelMatcherRequirementMultiError, or nil if none found.
-func (m *K8SLabelMatcherRequirement) ValidateAll() error {
+// MatchRequirementMultiError, or nil if none found.
+func (m *MatchRequirement) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *K8SLabelMatcherRequirement) validate(all bool) error {
+func (m *MatchRequirement) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -226,19 +260,19 @@ func (m *K8SLabelMatcherRequirement) validate(all bool) error {
 	// no validation rules for Operator
 
 	if len(errors) > 0 {
-		return K8SLabelMatcherRequirementMultiError(errors)
+		return MatchRequirementMultiError(errors)
 	}
 
 	return nil
 }
 
-// K8SLabelMatcherRequirementMultiError is an error wrapping multiple
-// validation errors returned by K8SLabelMatcherRequirement.ValidateAll() if
-// the designated constraints aren't met.
-type K8SLabelMatcherRequirementMultiError []error
+// MatchRequirementMultiError is an error wrapping multiple validation errors
+// returned by MatchRequirement.ValidateAll() if the designated constraints
+// aren't met.
+type MatchRequirementMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m K8SLabelMatcherRequirementMultiError) Error() string {
+func (m MatchRequirementMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -247,11 +281,11 @@ func (m K8SLabelMatcherRequirementMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m K8SLabelMatcherRequirementMultiError) AllErrors() []error { return m }
+func (m MatchRequirementMultiError) AllErrors() []error { return m }
 
-// K8SLabelMatcherRequirementValidationError is the validation error returned
-// by K8SLabelMatcherRequirement.Validate if the designated constraints aren't met.
-type K8SLabelMatcherRequirementValidationError struct {
+// MatchRequirementValidationError is the validation error returned by
+// MatchRequirement.Validate if the designated constraints aren't met.
+type MatchRequirementValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -259,24 +293,22 @@ type K8SLabelMatcherRequirementValidationError struct {
 }
 
 // Field function returns field value.
-func (e K8SLabelMatcherRequirementValidationError) Field() string { return e.field }
+func (e MatchRequirementValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e K8SLabelMatcherRequirementValidationError) Reason() string { return e.reason }
+func (e MatchRequirementValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e K8SLabelMatcherRequirementValidationError) Cause() error { return e.cause }
+func (e MatchRequirementValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e K8SLabelMatcherRequirementValidationError) Key() bool { return e.key }
+func (e MatchRequirementValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e K8SLabelMatcherRequirementValidationError) ErrorName() string {
-	return "K8SLabelMatcherRequirementValidationError"
-}
+func (e MatchRequirementValidationError) ErrorName() string { return "MatchRequirementValidationError" }
 
 // Error satisfies the builtin error interface
-func (e K8SLabelMatcherRequirementValidationError) Error() string {
+func (e MatchRequirementValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -288,14 +320,14 @@ func (e K8SLabelMatcherRequirementValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sK8SLabelMatcherRequirement.%s: %s%s",
+		"invalid %sMatchRequirement.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = K8SLabelMatcherRequirementValidationError{}
+var _ error = MatchRequirementValidationError{}
 
 var _ interface {
 	Field() string
@@ -303,24 +335,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = K8SLabelMatcherRequirementValidationError{}
+} = MatchRequirementValidationError{}
 
-// Validate checks the field values on MatchExpression with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *MatchExpression) Validate() error {
+// Validate checks the field values on Expression with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Expression) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on MatchExpression with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// MatchExpressionMultiError, or nil if none found.
-func (m *MatchExpression) ValidateAll() error {
+// ValidateAll checks the field values on Expression with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ExpressionMultiError, or
+// nil if none found.
+func (m *Expression) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *MatchExpression) validate(all bool) error {
+func (m *Expression) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -328,9 +360,9 @@ func (m *MatchExpression) validate(all bool) error {
 	var errors []error
 
 	switch v := m.Variant.(type) {
-	case *MatchExpression_Not:
+	case *Expression_Not:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -344,7 +376,7 @@ func (m *MatchExpression) validate(all bool) error {
 			switch v := interface{}(m.GetNot()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "Not",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -352,7 +384,7 @@ func (m *MatchExpression) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "Not",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -361,7 +393,7 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(m.GetNot()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpressionValidationError{
+				return ExpressionValidationError{
 					field:  "Not",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -369,9 +401,9 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		}
 
-	case *MatchExpression_All:
+	case *Expression_All:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -385,7 +417,7 @@ func (m *MatchExpression) validate(all bool) error {
 			switch v := interface{}(m.GetAll()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "All",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -393,7 +425,7 @@ func (m *MatchExpression) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "All",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -402,7 +434,7 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(m.GetAll()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpressionValidationError{
+				return ExpressionValidationError{
 					field:  "All",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -410,9 +442,9 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		}
 
-	case *MatchExpression_Any:
+	case *Expression_Any:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -426,7 +458,7 @@ func (m *MatchExpression) validate(all bool) error {
 			switch v := interface{}(m.GetAny()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "Any",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -434,7 +466,7 @@ func (m *MatchExpression) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "Any",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -443,7 +475,7 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(m.GetAny()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpressionValidationError{
+				return ExpressionValidationError{
 					field:  "Any",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -451,9 +483,9 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		}
 
-	case *MatchExpression_LabelExists:
+	case *Expression_LabelExists:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -463,9 +495,9 @@ func (m *MatchExpression) validate(all bool) error {
 			errors = append(errors, err)
 		}
 		// no validation rules for LabelExists
-	case *MatchExpression_LabelEquals:
+	case *Expression_LabelEquals:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -479,7 +511,7 @@ func (m *MatchExpression) validate(all bool) error {
 			switch v := interface{}(m.GetLabelEquals()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "LabelEquals",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -487,7 +519,7 @@ func (m *MatchExpression) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "LabelEquals",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -496,7 +528,7 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(m.GetLabelEquals()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpressionValidationError{
+				return ExpressionValidationError{
 					field:  "LabelEquals",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -504,9 +536,9 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		}
 
-	case *MatchExpression_LabelMatches:
+	case *Expression_LabelMatches:
 		if v == nil {
-			err := MatchExpressionValidationError{
+			err := ExpressionValidationError{
 				field:  "Variant",
 				reason: "oneof value cannot be a typed-nil",
 			}
@@ -520,7 +552,7 @@ func (m *MatchExpression) validate(all bool) error {
 			switch v := interface{}(m.GetLabelMatches()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "LabelMatches",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -528,7 +560,7 @@ func (m *MatchExpression) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpressionValidationError{
+					errors = append(errors, ExpressionValidationError{
 						field:  "LabelMatches",
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -537,7 +569,7 @@ func (m *MatchExpression) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(m.GetLabelMatches()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpressionValidationError{
+				return ExpressionValidationError{
 					field:  "LabelMatches",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -550,19 +582,18 @@ func (m *MatchExpression) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return MatchExpressionMultiError(errors)
+		return ExpressionMultiError(errors)
 	}
 
 	return nil
 }
 
-// MatchExpressionMultiError is an error wrapping multiple validation errors
-// returned by MatchExpression.ValidateAll() if the designated constraints
-// aren't met.
-type MatchExpressionMultiError []error
+// ExpressionMultiError is an error wrapping multiple validation errors
+// returned by Expression.ValidateAll() if the designated constraints aren't met.
+type ExpressionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m MatchExpressionMultiError) Error() string {
+func (m ExpressionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -571,11 +602,11 @@ func (m MatchExpressionMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m MatchExpressionMultiError) AllErrors() []error { return m }
+func (m ExpressionMultiError) AllErrors() []error { return m }
 
-// MatchExpressionValidationError is the validation error returned by
-// MatchExpression.Validate if the designated constraints aren't met.
-type MatchExpressionValidationError struct {
+// ExpressionValidationError is the validation error returned by
+// Expression.Validate if the designated constraints aren't met.
+type ExpressionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -583,22 +614,22 @@ type MatchExpressionValidationError struct {
 }
 
 // Field function returns field value.
-func (e MatchExpressionValidationError) Field() string { return e.field }
+func (e ExpressionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MatchExpressionValidationError) Reason() string { return e.reason }
+func (e ExpressionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MatchExpressionValidationError) Cause() error { return e.cause }
+func (e ExpressionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MatchExpressionValidationError) Key() bool { return e.key }
+func (e ExpressionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MatchExpressionValidationError) ErrorName() string { return "MatchExpressionValidationError" }
+func (e ExpressionValidationError) ErrorName() string { return "ExpressionValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MatchExpressionValidationError) Error() string {
+func (e ExpressionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -610,14 +641,14 @@ func (e MatchExpressionValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMatchExpression.%s: %s%s",
+		"invalid %sExpression.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MatchExpressionValidationError{}
+var _ error = ExpressionValidationError{}
 
 var _ interface {
 	Field() string
@@ -625,24 +656,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MatchExpressionValidationError{}
+} = ExpressionValidationError{}
 
-// Validate checks the field values on EqualsMatchExpression with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *EqualsMatchExpression) Validate() error {
+// Validate checks the field values on EqualsExpression with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *EqualsExpression) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on EqualsMatchExpression with the rules
+// ValidateAll checks the field values on EqualsExpression with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// EqualsMatchExpressionMultiError, or nil if none found.
-func (m *EqualsMatchExpression) ValidateAll() error {
+// EqualsExpressionMultiError, or nil if none found.
+func (m *EqualsExpression) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *EqualsMatchExpression) validate(all bool) error {
+func (m *EqualsExpression) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -654,19 +685,19 @@ func (m *EqualsMatchExpression) validate(all bool) error {
 	// no validation rules for Value
 
 	if len(errors) > 0 {
-		return EqualsMatchExpressionMultiError(errors)
+		return EqualsExpressionMultiError(errors)
 	}
 
 	return nil
 }
 
-// EqualsMatchExpressionMultiError is an error wrapping multiple validation
-// errors returned by EqualsMatchExpression.ValidateAll() if the designated
-// constraints aren't met.
-type EqualsMatchExpressionMultiError []error
+// EqualsExpressionMultiError is an error wrapping multiple validation errors
+// returned by EqualsExpression.ValidateAll() if the designated constraints
+// aren't met.
+type EqualsExpressionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m EqualsMatchExpressionMultiError) Error() string {
+func (m EqualsExpressionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -675,11 +706,11 @@ func (m EqualsMatchExpressionMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m EqualsMatchExpressionMultiError) AllErrors() []error { return m }
+func (m EqualsExpressionMultiError) AllErrors() []error { return m }
 
-// EqualsMatchExpressionValidationError is the validation error returned by
-// EqualsMatchExpression.Validate if the designated constraints aren't met.
-type EqualsMatchExpressionValidationError struct {
+// EqualsExpressionValidationError is the validation error returned by
+// EqualsExpression.Validate if the designated constraints aren't met.
+type EqualsExpressionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -687,24 +718,22 @@ type EqualsMatchExpressionValidationError struct {
 }
 
 // Field function returns field value.
-func (e EqualsMatchExpressionValidationError) Field() string { return e.field }
+func (e EqualsExpressionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e EqualsMatchExpressionValidationError) Reason() string { return e.reason }
+func (e EqualsExpressionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e EqualsMatchExpressionValidationError) Cause() error { return e.cause }
+func (e EqualsExpressionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e EqualsMatchExpressionValidationError) Key() bool { return e.key }
+func (e EqualsExpressionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e EqualsMatchExpressionValidationError) ErrorName() string {
-	return "EqualsMatchExpressionValidationError"
-}
+func (e EqualsExpressionValidationError) ErrorName() string { return "EqualsExpressionValidationError" }
 
 // Error satisfies the builtin error interface
-func (e EqualsMatchExpressionValidationError) Error() string {
+func (e EqualsExpressionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -716,14 +745,14 @@ func (e EqualsMatchExpressionValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEqualsMatchExpression.%s: %s%s",
+		"invalid %sEqualsExpression.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = EqualsMatchExpressionValidationError{}
+var _ error = EqualsExpressionValidationError{}
 
 var _ interface {
 	Field() string
@@ -731,24 +760,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = EqualsMatchExpressionValidationError{}
+} = EqualsExpressionValidationError{}
 
-// Validate checks the field values on MatchesMatchExpression with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *MatchesMatchExpression) Validate() error {
+// Validate checks the field values on MatchesExpression with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *MatchesExpression) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on MatchesMatchExpression with the rules
+// ValidateAll checks the field values on MatchesExpression with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// MatchesMatchExpressionMultiError, or nil if none found.
-func (m *MatchesMatchExpression) ValidateAll() error {
+// MatchesExpressionMultiError, or nil if none found.
+func (m *MatchesExpression) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *MatchesMatchExpression) validate(all bool) error {
+func (m *MatchesExpression) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -760,19 +789,19 @@ func (m *MatchesMatchExpression) validate(all bool) error {
 	// no validation rules for Regex
 
 	if len(errors) > 0 {
-		return MatchesMatchExpressionMultiError(errors)
+		return MatchesExpressionMultiError(errors)
 	}
 
 	return nil
 }
 
-// MatchesMatchExpressionMultiError is an error wrapping multiple validation
-// errors returned by MatchesMatchExpression.ValidateAll() if the designated
-// constraints aren't met.
-type MatchesMatchExpressionMultiError []error
+// MatchesExpressionMultiError is an error wrapping multiple validation errors
+// returned by MatchesExpression.ValidateAll() if the designated constraints
+// aren't met.
+type MatchesExpressionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m MatchesMatchExpressionMultiError) Error() string {
+func (m MatchesExpressionMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -781,11 +810,11 @@ func (m MatchesMatchExpressionMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m MatchesMatchExpressionMultiError) AllErrors() []error { return m }
+func (m MatchesExpressionMultiError) AllErrors() []error { return m }
 
-// MatchesMatchExpressionValidationError is the validation error returned by
-// MatchesMatchExpression.Validate if the designated constraints aren't met.
-type MatchesMatchExpressionValidationError struct {
+// MatchesExpressionValidationError is the validation error returned by
+// MatchesExpression.Validate if the designated constraints aren't met.
+type MatchesExpressionValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -793,24 +822,24 @@ type MatchesMatchExpressionValidationError struct {
 }
 
 // Field function returns field value.
-func (e MatchesMatchExpressionValidationError) Field() string { return e.field }
+func (e MatchesExpressionValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MatchesMatchExpressionValidationError) Reason() string { return e.reason }
+func (e MatchesExpressionValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MatchesMatchExpressionValidationError) Cause() error { return e.cause }
+func (e MatchesExpressionValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MatchesMatchExpressionValidationError) Key() bool { return e.key }
+func (e MatchesExpressionValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MatchesMatchExpressionValidationError) ErrorName() string {
-	return "MatchesMatchExpressionValidationError"
+func (e MatchesExpressionValidationError) ErrorName() string {
+	return "MatchesExpressionValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e MatchesMatchExpressionValidationError) Error() string {
+func (e MatchesExpressionValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -822,14 +851,14 @@ func (e MatchesMatchExpressionValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMatchesMatchExpression.%s: %s%s",
+		"invalid %sMatchesExpression.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MatchesMatchExpressionValidationError{}
+var _ error = MatchesExpressionValidationError{}
 
 var _ interface {
 	Field() string
@@ -837,24 +866,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MatchesMatchExpressionValidationError{}
+} = MatchesExpressionValidationError{}
 
-// Validate checks the field values on MatchExpression_List with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *MatchExpression_List) Validate() error {
+// Validate checks the field values on Expression_List with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *Expression_List) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on MatchExpression_List with the rules
+// ValidateAll checks the field values on Expression_List with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// MatchExpression_ListMultiError, or nil if none found.
-func (m *MatchExpression_List) ValidateAll() error {
+// Expression_ListMultiError, or nil if none found.
+func (m *Expression_List) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *MatchExpression_List) validate(all bool) error {
+func (m *Expression_List) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -868,7 +897,7 @@ func (m *MatchExpression_List) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, MatchExpression_ListValidationError{
+					errors = append(errors, Expression_ListValidationError{
 						field:  fmt.Sprintf("Of[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -876,7 +905,7 @@ func (m *MatchExpression_List) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, MatchExpression_ListValidationError{
+					errors = append(errors, Expression_ListValidationError{
 						field:  fmt.Sprintf("Of[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -885,7 +914,7 @@ func (m *MatchExpression_List) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return MatchExpression_ListValidationError{
+				return Expression_ListValidationError{
 					field:  fmt.Sprintf("Of[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -896,19 +925,19 @@ func (m *MatchExpression_List) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return MatchExpression_ListMultiError(errors)
+		return Expression_ListMultiError(errors)
 	}
 
 	return nil
 }
 
-// MatchExpression_ListMultiError is an error wrapping multiple validation
-// errors returned by MatchExpression_List.ValidateAll() if the designated
-// constraints aren't met.
-type MatchExpression_ListMultiError []error
+// Expression_ListMultiError is an error wrapping multiple validation errors
+// returned by Expression_List.ValidateAll() if the designated constraints
+// aren't met.
+type Expression_ListMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m MatchExpression_ListMultiError) Error() string {
+func (m Expression_ListMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -917,11 +946,11 @@ func (m MatchExpression_ListMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m MatchExpression_ListMultiError) AllErrors() []error { return m }
+func (m Expression_ListMultiError) AllErrors() []error { return m }
 
-// MatchExpression_ListValidationError is the validation error returned by
-// MatchExpression_List.Validate if the designated constraints aren't met.
-type MatchExpression_ListValidationError struct {
+// Expression_ListValidationError is the validation error returned by
+// Expression_List.Validate if the designated constraints aren't met.
+type Expression_ListValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -929,24 +958,22 @@ type MatchExpression_ListValidationError struct {
 }
 
 // Field function returns field value.
-func (e MatchExpression_ListValidationError) Field() string { return e.field }
+func (e Expression_ListValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MatchExpression_ListValidationError) Reason() string { return e.reason }
+func (e Expression_ListValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MatchExpression_ListValidationError) Cause() error { return e.cause }
+func (e Expression_ListValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MatchExpression_ListValidationError) Key() bool { return e.key }
+func (e Expression_ListValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MatchExpression_ListValidationError) ErrorName() string {
-	return "MatchExpression_ListValidationError"
-}
+func (e Expression_ListValidationError) ErrorName() string { return "Expression_ListValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MatchExpression_ListValidationError) Error() string {
+func (e Expression_ListValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -958,14 +985,14 @@ func (e MatchExpression_ListValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMatchExpression_List.%s: %s%s",
+		"invalid %sExpression_List.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MatchExpression_ListValidationError{}
+var _ error = Expression_ListValidationError{}
 
 var _ interface {
 	Field() string
@@ -973,4 +1000,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MatchExpression_ListValidationError{}
+} = Expression_ListValidationError{}

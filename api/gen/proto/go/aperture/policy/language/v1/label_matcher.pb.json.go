@@ -24,7 +24,7 @@ func (msg *LabelMatcher) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *K8SLabelMatcherRequirement) MarshalJSON() ([]byte, error) {
+func (msg *MatchRequirement) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -33,14 +33,14 @@ func (msg *K8SLabelMatcherRequirement) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *K8SLabelMatcherRequirement) UnmarshalJSON(b []byte) error {
+func (msg *MatchRequirement) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *MatchExpression) MarshalJSON() ([]byte, error) {
+func (msg *Expression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -49,14 +49,14 @@ func (msg *MatchExpression) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *MatchExpression) UnmarshalJSON(b []byte) error {
+func (msg *Expression) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *MatchExpression_List) MarshalJSON() ([]byte, error) {
+func (msg *Expression_List) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -65,14 +65,14 @@ func (msg *MatchExpression_List) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *MatchExpression_List) UnmarshalJSON(b []byte) error {
+func (msg *Expression_List) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *EqualsMatchExpression) MarshalJSON() ([]byte, error) {
+func (msg *EqualsExpression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -81,14 +81,14 @@ func (msg *EqualsMatchExpression) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *EqualsMatchExpression) UnmarshalJSON(b []byte) error {
+func (msg *EqualsExpression) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: true,
 	}.Unmarshal(b, msg)
 }
 
 // MarshalJSON implements json.Marshaler
-func (msg *MatchesMatchExpression) MarshalJSON() ([]byte, error) {
+func (msg *MatchesExpression) MarshalJSON() ([]byte, error) {
 	return protojson.MarshalOptions{
 		UseEnumNumbers:  false,
 		EmitUnpopulated: true,
@@ -97,7 +97,7 @@ func (msg *MatchesMatchExpression) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (msg *MatchesMatchExpression) UnmarshalJSON(b []byte) error {
+func (msg *MatchesExpression) UnmarshalJSON(b []byte) error {
 	return protojson.UnmarshalOptions{
 		DiscardUnknown: true,
 	}.Unmarshal(b, msg)

@@ -43,7 +43,7 @@ label_matcher: # Label Matcher
 match_labels:
   user_tier: premium
   http.method: GET
-match_expressions:
+match_list:
   - key: query
     operator: In
     values:
@@ -68,24 +68,15 @@ The label matcher is used to narrow down the selected flows using conditions
 defined on [Labels][label]. It allows for precise filtering of flows based on
 specific criteria.
 
-There are multiple ways to define a label matcher. If multiple match criteria
-are defined simultaneously, then they all must match for a flow to be selected.
+There are two ways to define a label matcher. If both match criteria are defined
+simultaneously, then both must match for a flow to be selected.
 
-- **Exact Match**: It is the simplest way to match a label. It matches the label
-  value exactly.
-
-  ```yaml
-  label_matcher:
-    match_labels:
-      http.method: GET
-  ```
-
-- **Matching Expressions**: It allows for more complex matching conditions using
-  operators such as `In`, `NotIn`, `Exists`, and `DoesNotExists`.
+- **Match List**: It allows for more complex matching conditions using operators
+  such as `In`, `NotIn`, `Exists`, and `DoesNotExists`.
 
   ```yaml
   label_matcher:
-    match_expressions:
+    match_list:
       - key: http.method
         operator: In
         values:
@@ -93,8 +84,8 @@ are defined simultaneously, then they all must match for a flow to be selected.
           - POST
   ```
 
-- **Arbitrary Expression**: This allows for defining complex matching
-  conditions, including regular expression matching.
+- **Expression**: This allows for defining complex matching conditions,
+  including regular expression matching.
 
   ```yaml
   label_matcher:
@@ -272,17 +263,17 @@ latency calculations. If included in an actuation component like _Load
 Scheduler_, they might cause these requests to be rejected under load, leading
 to unnecessary pod restarts.
 
-To prevent these issues, traffic to these endpoints can be filtered out by
-matching expressions. In the example below, flows with `http.target` starting
-with `/health`, `/live`, or `/ready`, and User Agent starting with
-`kube-probe/1.23` are filtered out.
+To prevent these issues, traffic to these endpoints can be filtered out using a
+label matcher. In the example below, flows with `http.target` starting with
+`/health`, `/live`, or `/ready`, and User Agent starting with `kube-probe/1.23`
+are filtered out.
 
 ```yaml
 service: checkout.myns.svc.cluster.local
 agent_group: default
 control_point: ingress
 label_matcher:
-  match_expressions:
+  match_list:
     - key: http.target
       operator: NotIn
       values:
