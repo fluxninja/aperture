@@ -11,6 +11,7 @@ from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
     CacheDeleteResponse,
     CacheEntry,
     CacheUpsertRequest,
+    StatusCode,
 )
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
     FlowControlServiceStub,
@@ -66,6 +67,20 @@ class Flow(AbstractContextManager):
         return self.decision == FlowDecision.Accepted or (
             (not self._ramp_mode) and self.decision == FlowDecision.Unreachable
         )
+
+    def http_response_code(self) -> Optional[int]:
+        if self.check_response is None:
+            return 0
+        if self.check_response.denied_response_status_code is StatusCode.Empty:
+            return 200
+        return int(self._check_response.denied_response_status_code)
+
+    def retry_after(self) -> Optional[datetime.timedelta]:
+        if self.check_response is None:
+            return None
+        if self.check_response.wait_time is None:
+            return None
+        return datetime.timedelta(seconds=self.check_response.wait_time.seconds)
 
     @property
     def decision(self) -> FlowDecision:

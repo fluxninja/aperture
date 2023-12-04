@@ -5,13 +5,12 @@ import (
 	"errors"
 	"time"
 
+	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
-
-	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 var (
@@ -46,6 +45,8 @@ type Flow interface {
 	Span() trace.Span
 	End() error
 	CheckResponse() *checkv1.CheckResponse
+	RetryAfter() time.Duration
+	HTTPResponseCode() int
 }
 
 type flow struct {
@@ -86,6 +87,23 @@ func (f *flow) ShouldRun() bool {
 // CheckResponse returns the response from the server.
 func (f *flow) CheckResponse() *checkv1.CheckResponse {
 	return f.checkResponse
+}
+
+// RetryAfter returns the retry-after duration.
+func (f *flow) RetryAfter() time.Duration {
+	if f.checkResponse == nil {
+		return 0
+	}
+	return f.checkResponse.WaitTime.AsDuration()
+}
+
+// HTTPResponseCode returns the HTTP response code.
+func (f *flow) HTTPResponseCode() int {
+	// Mapping empty status code to 200 to a success
+	if f.checkResponse.DeniedResponseStatusCode == checkv1.StatusCode_Empty {
+		return 200
+	}
+	return int(f.checkResponse.DeniedResponseStatusCode)
 }
 
 // SetStatus sets the status code of a flow.
