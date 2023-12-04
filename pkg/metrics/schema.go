@@ -47,6 +47,10 @@ const (
 	DistCacheGetHitsMetricName = "distcache_get_hits"
 	// DistCacheEvictedTotalMetricName - metric for number of entries removed from cache to free memory for new entries.
 	DistCacheEvictedTotalMetricName = "distcache_evicted_total"
+	// DistCachePartitionsCountMetricsName - metric for the current number of non-empty partitions owned by given node.
+	DistCachePartitionsCountMetricsName = "distcache_partitions_count"
+	// DistCacheBackupPartitionsCountMetricsName - metric for the current number of non-empty backups owned by given node.
+	DistCacheBackupPartitionsCountMetricsName = "distcache_backup_partitions_count"
 
 	// Workload metrics.
 

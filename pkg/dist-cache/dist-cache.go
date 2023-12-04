@@ -8,6 +8,7 @@ import (
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
+	olricstats "github.com/buraksezer/olric/stats"
 	"github.com/clarketm/json"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -127,6 +128,20 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 	} else {
 		evictedTotalGauge.Set(float64(stats.DMaps.EvictedTotal))
 	}
+
+	partitionsCountGauge, err := dc.metrics.PartitionsCount.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract partitions count gauge metric from olric instance: %v", err)
+	} else {
+		partitionsCountGauge.Set(float64(countNotEmptyPartitions(stats.Partitions)))
+	}
+
+	backupPartitionsCountGauge, err := dc.metrics.BackupPartitionsCount.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract backup partitions count gauge metric from olric instance: %v", err)
+	} else {
+		backupPartitionsCountGauge.Set(float64(countNotEmptyPartitions(stats.Backups)))
+	}
 	return nil, nil
 }
 
@@ -163,4 +178,14 @@ func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.
 	}
 
 	return structpbStats, nil
+}
+
+func countNotEmptyPartitions(partitions map[olricstats.PartitionID]olricstats.Partition) int {
+	result := 0
+	for _, partition := range partitions {
+		if partition.Length > 0 {
+			result += 1
+		}
+	}
+	return result
 }
