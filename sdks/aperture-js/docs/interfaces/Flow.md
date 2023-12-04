@@ -104,11 +104,11 @@ ___
 
 ### httpResponseCode
 
-▸ **httpResponseCode**(): `Number`
+▸ **httpResponseCode**(): `undefined` \| `Number`
 
 #### Returns
 
-`Number`
+`undefined` \| `Number`
 
 ___
 
