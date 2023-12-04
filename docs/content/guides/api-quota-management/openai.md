@@ -57,16 +57,14 @@ consisting of two main components:
   scheduler that prioritizes the requests based on multiple factors such as the
   number of tokens, priority levels and workload labels.
 
-## Pre-Requisites
-
-Before you begin with this guide, verify the prerequisites are fulfilled.
-
-- Aperture is installed and running. If not, follow the
-  [get started guide](/get-started/get-started.md).
-- `aperturectl` is installed and configured. If not, head over to
-  [Set up CLI (aperturectl) guide](../../reference/aperture-cli/aperture-cli.md).
-
 ## Configuration
+
+:::note Pre-Requisites
+
+Refer to the [get started guide](/get-started/get-started.md) to pick the
+appropriate method of integration with Aperture.
+
+:::
 
 Before creating a policy, a control point needs to be defined. Control Point
 specifies where the policy should apply the decisions. There are multiple ways
@@ -192,15 +190,44 @@ Aperture, we also attach the following labels to each request:
 
 ### Policies
 
-To generate a policy using quota scheduler blueprint, `values` files should be
-generated first, specific to the policy. The values file can be generated using
-the following command:
+You can generate a policy using quota scheduler blueprint, either via Aperture
+Cloud UI, or `aperturectl` cli.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml</CodeBlock>
+<Tabs>
+<TabItem value="Aperture Cloud UI">
 ```
 
-The values file needs to be adjusted to match the application requirements -
+Follow these steps to create a policy using the quota scheduler blueprint in
+Aperture Cloud UI:
+
+- Navigate to the `Policies` tab in the sidebar menu within your organization.
+- Click `Create Policy` in the top right corner.
+- Select the `Request Prioritization` tab and click on the dropdown menu.
+- Choose `Quota Based`; the corresponding screen will then appear.
+
+![Quota based blueprint](./assets/openai/quota-scheduler-blueprint.png)
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="aperturectl (Aperture Cloud)">
+```
+
+If you haven't installed `aperturectl` yet, begin by following the
+[Set up CLI (aperturectl) guide](/reference/aperture-cli/aperture-cli.md). Once
+`aperturectl` is installed, generate the `values` file necessary for creating
+the quota scheduling policy using the command below:
+
+<CodeBlock language="bash"> aperturectl blueprints values
+--name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml </CodeBlock>
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+Following are the fields that need to be adjusted to match the application
+requirements -
 
 - `policy_name`: Name of the policy — This value should be unique and required.
 - `bucket_capacity`: This value defines burst capacity. For example, in the case
@@ -212,9 +239,9 @@ The values file needs to be adjusted to match the application requirements -
 - `rate_limiter`:
   - `interval`: Interval at which the rate limiter will be filled. When to reset
     the bucket.
-  - `label_key`: Label key to match the request against. This label key in this
-    case is the OpenAI API key (`api_key`) which helps determine the quota for
-    the request.
+  - `limit_by_label_key`: Label key to match the request against. This label key
+    in this case is the OpenAI API key (`api_key`) which helps determine the
+    quota for the request.
 
 The scheduler helps prioritize the requests based on the labels and priority
 defined. In this case, we are using the `priority` label, which is being passed
@@ -283,7 +310,7 @@ policy:
     # Required: True
     rate_limiter:
       interval: 60s
-      label_key: api_key
+      limit_by_label_key: api_key
     scheduler:
       priority_label_key: priority
       tokens_label_key: estimated_tokens
@@ -329,7 +356,7 @@ policy:
     # Required: True
     rate_limiter:
       interval: 60s
-      label_key: api_key
+      limit_by_label_key: api_key
     scheduler:
       priority_label_key: priority
     # Flow selectors to match requests against
@@ -355,8 +382,21 @@ policy:
 
 ```mdx-code-block
 <Tabs>
-  <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
-    <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (Aperture Cloud)" />
+  <TabItem value="Aperture Cloud UI">
+```
+
+After entering all required values, click `Continue` followed by `Apply Policy`
+in the bottom right corner.
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="aperturectl (Aperture Cloud)">
+```
+
+<CodeBlock language="bash"> aperturectl cloud blueprints apply
+--values-file=gpt-4-tpm.yaml </CodeBlock>
+
+```mdx-code-block
   </TabItem>
 </Tabs>
 ```
