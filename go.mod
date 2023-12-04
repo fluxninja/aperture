@@ -18,7 +18,7 @@ require (
 	github.com/elastic/gosigar v0.14.2
 	github.com/emicklei/dot v1.6.0
 	github.com/envoyproxy/go-control-plane v0.11.1
-	github.com/fluxninja/aperture/api/v2 v2.0.0
+	github.com/fluxninja/aperture/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/fluxninja/datasketches-go v0.0.0-20220916235224-7501a2d28551
 	github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814
 	github.com/getsentry/sentry-go v0.24.1
