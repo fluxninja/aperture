@@ -23,7 +23,7 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { StatusCode, StatusCode__Output } from "./gen/aperture/flowcontrol/check/v1/StatusCode";
+import { StatusCode, StatusCode__Output } from "./gen/aperture/flowcontrol/check/v1/StatusCode.js";
 import type { Duration__Output, Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 

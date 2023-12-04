@@ -12,7 +12,9 @@
 - [end](Flow.md#end)
 - [error](Flow.md#error)
 - [globalCache](Flow.md#globalcache)
+- [httpResponseCode](Flow.md#httpresponsecode)
 - [resultCache](Flow.md#resultcache)
+- [retryAfter](Flow.md#retryafter)
 - [setGlobalCache](Flow.md#setglobalcache)
 - [setResultCache](Flow.md#setresultcache)
 - [setStatus](Flow.md#setstatus)
@@ -100,6 +102,16 @@ ___
 
 ___
 
+### httpResponseCode
+
+▸ **httpResponseCode**(): `StatusCode__Output`
+
+#### Returns
+
+`StatusCode__Output`
+
+___
+
 ### resultCache
 
 ▸ **resultCache**(): [`KeyLookupResponse`](KeyLookupResponse.md)
@@ -107,6 +119,16 @@ ___
 #### Returns
 
 [`KeyLookupResponse`](KeyLookupResponse.md)
+
+___
+
+### retryAfter
+
+▸ **retryAfter**(): `Duration__Output`
+
+#### Returns
+
+`Duration__Output`
 
 ___
 
