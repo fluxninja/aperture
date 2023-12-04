@@ -42,7 +42,7 @@ jobs:
           echo "COMBINE_BRANCH_NAME=${{ github.event.inputs.combineBranchName || env.DEFAULT_COMBINE_BRANCH_NAME }}" >> $GITHUB_ENV
           echo "IGNORE_LABEL=${{ github.event.inputs.ignoreLabel || env.DEFAULT_IGNORE_LABEL }}" >> $GITHUB_ENV
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         id: fetch-branch-names
         name: Fetch branch names
         with:
