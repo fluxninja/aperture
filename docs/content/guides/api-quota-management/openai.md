@@ -182,7 +182,7 @@ Aperture, we also attach the following labels to each request:
 ### Policies
 
 You can generate a policy using quota scheduler blueprint, either via Aperture
-Cloud UI, or `aperturectl` cli.
+Cloud UI, or `aperturectl` command line interface.
 
 ```mdx-code-block
 <Tabs>
