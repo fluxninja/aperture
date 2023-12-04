@@ -104,11 +104,11 @@ ___
 
 ### httpResponseCode
 
-▸ **httpResponseCode**(): `StatusCode__Output`
+▸ **httpResponseCode**(): `Number`
 
 #### Returns
 
-`StatusCode__Output`
+`Number`
 
 ___
 
@@ -124,11 +124,16 @@ ___
 
 ### retryAfter
 
-▸ **retryAfter**(): `Duration__Output`
+▸ **retryAfter**(): `Object`
 
 #### Returns
 
-`Duration__Output`
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `nanos` | `undefined` \| `number` |
+| `seconds` | `undefined` \| `string` |
 
 ___
 
