@@ -7,23 +7,18 @@ from typing import Optional, TypeVar
 import grpc
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
-    CacheDeleteRequest,
-    CacheDeleteResponse,
-    CacheEntry,
-    CacheUpsertRequest,
-)
-from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
-    FlowControlServiceStub,
-)
+    CacheDeleteRequest, CacheDeleteResponse, CacheEntry, CacheUpsertRequest)
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import \
+    FlowControlServiceStub
+from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import \
+    StatusCode
 from aperture_sdk.cache import *
-from aperture_sdk.const import (
-    check_response_label,
-    flow_end_timestamp_label,
-    flow_status_label,
-)
+from aperture_sdk.const import (check_response_label, flow_end_timestamp_label,
+                                flow_status_label)
 from google.protobuf import json_format
 from google.protobuf.duration_pb2 import Duration
 from opentelemetry import trace
+from datetime import timedelta
 
 
 class FlowDecision(enum.Enum):
@@ -66,6 +61,21 @@ class Flow(AbstractContextManager):
         return self.decision == FlowDecision.Accepted or (
             (not self._ramp_mode) and self.decision == FlowDecision.Unreachable
         )
+    
+    def http_response_code(self) -> Optional[int]:        
+        if self.check_response is None:
+            print("check_response is None")
+            return 0
+        if self.check_response.denied_response_status_code is StatusCode.Empty:
+            return 200
+        return int(self._check_response.denied_response_status_code)
+    
+    def retry_after(self) -> Optional[datetime.timedelta]:
+        if self.check_response is None:
+            return None
+        if self.check_response.wait_time is None:
+            return None
+        return datetime.timedelta(seconds=self.check_response.wait_time.seconds)
 
     @property
     def decision(self) -> FlowDecision:

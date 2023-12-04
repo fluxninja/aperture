@@ -23,8 +23,8 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { StatusCode, StatusCode__Output } from "./gen/aperture/flowcontrol/check/v1/StatusCode.js";
-import type { Duration__Output, Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
+import { StatusCode } from "./gen/aperture/flowcontrol/check/v1/StatusCode.js";
+import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
 /**
@@ -61,8 +61,8 @@ export interface Flow {
   error(): Error | null;
   span(): Span;
   end(): void;
-  httpResponseCode(): StatusCode__Output
-  retryAfter(): Duration__Output
+  httpResponseCode(): Number
+  retryAfter(): {seconds: string | undefined, nanos: number | undefined}
 }
 
 /**
@@ -360,7 +360,9 @@ export class _Flow implements Flow {
    * @returns The retry-after duration.
    */
   retryAfter() {
-    return this._checkResponse?.waitTime ?? {seconds: "0", nanos: 0};
+    if (this._checkResponse?.waitTime)
+      return {seconds: "0", nanos: 0};
+    return {seconds: this._checkResponse?.waitTime?.seconds, nanos: this._checkResponse?.waitTime?.nanos }
   }
 
   /**
@@ -368,7 +370,11 @@ export class _Flow implements Flow {
    * @returns The response code.
    */
   httpResponseCode() {
-    return this._checkResponse?.deniedResponseStatusCode ?? StatusCode.Empty;
+    if (this._checkResponse)
+      return Number(this._checkResponse?.deniedResponseStatusCode);
+    if (this._checkResponse == StatusCode.Empty)
+      return 200;
+    return 0
   }
 
   /**
