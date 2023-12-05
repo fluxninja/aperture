@@ -27,7 +27,7 @@ aperturectl cloud result-cache set [flags]
   -c, --control-point string   Control point
   -h, --help                   help for set
   -k, --key string             Key
-  -t, --ttl int                TTL in milliseconds (default 600000)
+  -t, --ttl int                TTL in seconds (default 600)
       --value string           Value
 ```
 
