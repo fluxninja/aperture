@@ -219,7 +219,7 @@ type CommonSpec struct {
 	//+kubebuilder:validation:Optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 
-	// Seconds Redmine pod needs to terminate gracefully
+	// Seconds pod needs to terminate gracefully
 	//+kubebuilder:validation:Optional
 	TerminationGracePeriodSeconds int64 `json:"terminationGracePeriodSeconds" validate:"gte=0"`
 
