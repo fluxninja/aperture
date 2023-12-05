@@ -99,6 +99,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 	oc.BindAddr = bindAddr
 	oc.BindPort = bindPort
+	oc.EnableClusterEventsChannel = true
 
 	memberlistBindAddr, p, err := net.SplitHostPort(defaultConfig.MemberlistBindAddr)
 	if err != nil {
