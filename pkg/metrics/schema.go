@@ -51,6 +51,10 @@ const (
 	DistCachePartitionsCountMetricsName = "distcache_partitions_count"
 	// DistCacheBackupPartitionsCountMetricsName - metric for the current number of non-empty backups owned by given node.
 	DistCacheBackupPartitionsCountMetricsName = "distcache_backup_partitions_count"
+	// DistCacheFragmentMigrationEventsTotalMetricsName - metric for cumulative number of fragment migration (outgoing) events.
+	DistCacheFragmentMigrationEventsTotalMetricsName = "distcache_fragment_migration_events_total"
+	// DistCacheFragmentReceivedEventsTotalMetricsName - metric for cumulative number of fragment received (incoming) events.
+	DistCacheFragmentReceivedEventsTotalMetricsName = "distcache_fragment_received_events_total"
 
 	// Workload metrics.
 

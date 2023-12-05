@@ -9,14 +9,16 @@ import (
 
 // DistCacheMetrics holds metrics from DistCache, Olric, DMap statistics.
 type DistCacheMetrics struct {
-	EntriesTotal          *prometheus.GaugeVec
-	DeleteHits            *prometheus.GaugeVec
-	DeleteMisses          *prometheus.GaugeVec
-	GetMisses             *prometheus.GaugeVec
-	GetHits               *prometheus.GaugeVec
-	EvictedTotal          *prometheus.GaugeVec
-	PartitionsCount       *prometheus.GaugeVec
-	BackupPartitionsCount *prometheus.GaugeVec
+	EntriesTotal                 *prometheus.GaugeVec
+	DeleteHits                   *prometheus.GaugeVec
+	DeleteMisses                 *prometheus.GaugeVec
+	GetMisses                    *prometheus.GaugeVec
+	GetHits                      *prometheus.GaugeVec
+	EvictedTotal                 *prometheus.GaugeVec
+	PartitionsCount              *prometheus.GaugeVec
+	BackupPartitionsCount        *prometheus.GaugeVec
+	FragmentMigrationEventsTotal *prometheus.CounterVec
+	FragmentReceivedEventsTotal  *prometheus.CounterVec
 }
 
 func newDistCacheMetrics() *DistCacheMetrics {
@@ -54,6 +56,14 @@ func newDistCacheMetrics() *DistCacheMetrics {
 			Name: metrics.DistCacheBackupPartitionsCountMetricsName,
 			Help: "Current number of non-empty backup partitions owned by given node.",
 		}, distCacheMetricsLabels),
+		FragmentMigrationEventsTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: metrics.DistCacheFragmentMigrationEventsTotalMetricsName,
+			Help: "Cumulative number of fragment migration (outgoing) events.",
+		}, distCacheMetricsLabels),
+		FragmentReceivedEventsTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: metrics.DistCacheFragmentReceivedEventsTotalMetricsName,
+			Help: "Cumulative number of fragment received (incoming) events.",
+		}, distCacheMetricsLabels),
 	}
 }
 
@@ -67,6 +77,8 @@ func (dm *DistCacheMetrics) allMetrics() []prometheus.Collector {
 		dm.EvictedTotal,
 		dm.PartitionsCount,
 		dm.BackupPartitionsCount,
+		dm.FragmentMigrationEventsTotal,
+		dm.FragmentReceivedEventsTotal,
 	}
 }
 

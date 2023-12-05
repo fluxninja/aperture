@@ -147,6 +147,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
 
+	eventListenerCtx, eventListenerCancel := context.WithCancel(context.Background())
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -180,9 +181,16 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				log.Error().Err(err).Msg("Failed to register distcache scrape metrics job with jobGroup")
 				return err
 			}
+
+			err = dc.startReportingMetricsFromEvents(eventListenerCtx)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to start reporting metrics from events")
+				return err
+			}
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			eventListenerCancel()
 			err := in.LivenessMultiJob.DeregisterJob(distCacheMetricsJobName)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to deregister distcache scrape metrics job with jobGroup")
