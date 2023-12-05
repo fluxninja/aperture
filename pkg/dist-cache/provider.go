@@ -147,6 +147,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
 
+	// Context used by goroutine listening for Olric events. Should be canceled in fx.Stop.
 	eventListenerCtx, eventListenerCancel := context.WithCancel(context.Background())
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
@@ -190,6 +191,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			log.Info().Msg("Canceling events listener context")
 			eventListenerCancel()
 			err := in.LivenessMultiJob.DeregisterJob(distCacheMetricsJobName)
 			if err != nil {

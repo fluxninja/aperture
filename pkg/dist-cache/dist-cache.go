@@ -156,7 +156,7 @@ func (dc *DistCache) getMetricsLabels() (prometheus.Labels, bool) {
 	metricLabels := make(prometheus.Labels)
 	metricLabels[metrics.DistCacheMemberIDLabel] = dc.memberID
 	metricLabels[metrics.DistCacheMemberNameLabel] = dc.memberName
-	return metricLabels, dc.memberID == "" || dc.memberName == ""
+	return metricLabels, dc.memberID != "" && dc.memberName != ""
 }
 
 // GetStats returns stats of the current Olric member.
