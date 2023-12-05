@@ -4,8 +4,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/envoyproxy/protoc-gen-validate v1.0.2 h1:QkIBuU5k+x7/QXPvPPnWXWlCdaBFApVqftFV6k087DA=
 github.com/envoyproxy/protoc-gen-validate v1.0.2/go.mod h1:GpiZQP3dDbg4JouG/NNS7QWXpgx6x8QiMKdmN72jogE=
-github.com/fluxninja/aperture/api/v2 v2.0.0-20231201111841-6378d157d6a4 h1:ZDs8GWXyNnhQDYPoM/rGOCVfGlpo9CrPtqlXw2nR7F4=
-github.com/fluxninja/aperture/api/v2 v2.0.0-20231201111841-6378d157d6a4/go.mod h1:iR1VNxcDDnMZIV5ELQpu/XLZqYwJgIQsn+YUdX/y8Uc=
+github.com/fluxninja/aperture/api/v2 v2.0.0-20231204041156-66df25998d98 h1:q3rCTKQkT+XTn60VcdyBmkiKk6VEgNU6mjN4E5Dvky4=
+github.com/fluxninja/aperture/api/v2 v2.0.0-20231204041156-66df25998d98/go.mod h1:iR1VNxcDDnMZIV5ELQpu/XLZqYwJgIQsn+YUdX/y8Uc=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.3.0 h1:2y3SDp0ZXuc6/cjLSZ+Q3ir+QB9T/iG5yYRXqsagWSY=
 github.com/go-logr/logr v1.3.0/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=

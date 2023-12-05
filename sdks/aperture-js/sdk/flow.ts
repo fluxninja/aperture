@@ -60,6 +60,8 @@ export interface Flow {
   error(): Error | null;
   span(): Span;
   end(): void;
+  httpResponseCode(): Number | undefined;
+  retryAfter(): {seconds: string | undefined, nanos: number | undefined}
 }
 
 /**
@@ -83,6 +85,7 @@ export class _Flow implements Flow {
     _span.setAttribute(FLOW_START_TIMESTAMP_LABEL, this.startDate);
     _span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
   }
+
 
   /**
    * Determines whether the flow should run based on the check response and ramp mode.
@@ -349,6 +352,31 @@ export class _Flow implements Flow {
    */
   checkResponse() {
     return this._checkResponse;
+  }
+
+  /**
+   * Gets the retry-after duration of the flow.
+   * @returns The retry-after duration.
+   */
+  retryAfter() {
+    if (this._checkResponse) {
+      return {seconds: this._checkResponse?.waitTime?.seconds.toString(), nanos: this._checkResponse?.waitTime?.nanos };
+    }
+    return {seconds: undefined, nanos: undefined};
+  }
+
+  /**
+   * Gets the status for the flow.
+   * @returns The http response code.
+   */
+  httpResponseCode() {
+    if (this._checkResponse) {
+      let statusCode = this._checkResponse?.deniedResponseStatusCode;
+      if (statusCode == 0)
+        return 200;
+      return Number(this._checkResponse?.deniedResponseStatusCode);
+    }
+    return 0;
   }
 
   /**

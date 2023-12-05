@@ -103,7 +103,7 @@ aperturectl blueprints generate --values-file=rate-limiting.yaml --apply`,
 				return err
 			}
 
-			err = policy.ApplyCmd.PersistentPreRunE(cmd, args)
+			err = policy.PolicyCmd.PersistentPreRunE(cmd, args)
 			if err != nil {
 				return err
 			}

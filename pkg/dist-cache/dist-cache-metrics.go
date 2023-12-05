@@ -9,12 +9,14 @@ import (
 
 // DistCacheMetrics holds metrics from DistCache, Olric, DMap statistics.
 type DistCacheMetrics struct {
-	EntriesTotal *prometheus.GaugeVec
-	DeleteHits   *prometheus.GaugeVec
-	DeleteMisses *prometheus.GaugeVec
-	GetMisses    *prometheus.GaugeVec
-	GetHits      *prometheus.GaugeVec
-	EvictedTotal *prometheus.GaugeVec
+	EntriesTotal          *prometheus.GaugeVec
+	DeleteHits            *prometheus.GaugeVec
+	DeleteMisses          *prometheus.GaugeVec
+	GetMisses             *prometheus.GaugeVec
+	GetHits               *prometheus.GaugeVec
+	EvictedTotal          *prometheus.GaugeVec
+	PartitionsCount       *prometheus.GaugeVec
+	BackupPartitionsCount *prometheus.GaugeVec
 }
 
 func newDistCacheMetrics() *DistCacheMetrics {
@@ -44,6 +46,14 @@ func newDistCacheMetrics() *DistCacheMetrics {
 			Name: metrics.DistCacheEvictedTotalMetricName,
 			Help: "Total number of entries removed from cache to free memory for new entries in the DMap.",
 		}, distCacheMetricsLabels),
+		PartitionsCount: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: metrics.DistCachePartitionsCountMetricsName,
+			Help: "Current number of non-empty partitions owned by given node.",
+		}, distCacheMetricsLabels),
+		BackupPartitionsCount: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: metrics.DistCacheBackupPartitionsCountMetricsName,
+			Help: "Current number of non-empty backup partitions owned by given node.",
+		}, distCacheMetricsLabels),
 	}
 }
 
@@ -55,6 +65,8 @@ func (dm *DistCacheMetrics) allMetrics() []prometheus.Collector {
 		dm.GetMisses,
 		dm.GetHits,
 		dm.EvictedTotal,
+		dm.PartitionsCount,
+		dm.BackupPartitionsCount,
 	}
 }
 

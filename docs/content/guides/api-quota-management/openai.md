@@ -57,16 +57,14 @@ consisting of two main components:
   scheduler that prioritizes the requests based on multiple factors such as the
   number of tokens, priority levels and workload labels.
 
-## Pre-Requisites
-
-Before you begin with this guide, verify the prerequisites are fulfilled.
-
-- Aperture is installed and running. If not, follow the
-  [get started guide](/get-started/get-started.md).
-- `aperturectl` is installed and configured. If not, head over to
-  [Set up CLI (aperturectl) guide](../../reference/aperture-cli/aperture-cli.md).
-
 ## Configuration
+
+:::note Pre-Requisites
+
+Refer to the [get started guide](/get-started/get-started.md) to pick the
+appropriate method of integration with Aperture.
+
+:::
 
 Before creating a policy, a control point needs to be defined. Control Point
 specifies where the policy should apply the decisions. There are multiple ways
@@ -104,60 +102,51 @@ Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
 
 ```typescript
 const PRIORITIES: Record<string, number> = {
-    paid_user: 10000,
-    trial_user: 1000,
-    free_user: 100,
-}
+  paid_user: 10000,
+  trial_user: 1000,
+  free_user: 100,
+};
 
-let flow: Flow | undefined = undefined
+let flow: Flow | undefined = undefined;
 
 if (this.apertureClient) {
-    // Alternatively, simply use JSON.stringify() to get charCount
-    const charCount =
-        this.systemMessage.length +
-        message.length +
-        String("system" + "user").length
-    const labels: Record<string, string> = {
-        api_key: CryptoES.SHA256(api.apiKey).toString(),
-        estimated_tokens: (
-            Math.ceil(charCount / 4) + responseTokens
-        ).toString(),
-        model_variant: modelVariant,
-        priority: String(
-            PRIORITIES[userType],
-        ),
-    }
+  const charCount = JSON.stringify(createCompletionParams).length;
+  const labels: Record<string, string> = {
+    api_key: CryptoES.SHA256(api.apiKey).toString(),
+    estimated_tokens: (
+      Math.ceil(charCount / 4) + Number(createCompletionParams.max_tokens)
+    ).toString(),
+    model_variant: baseModel,
+    product_tier: this.settings.product_tier,
+    product_reason: this.settings.product_reason,
+    priority: String(PRIORITIES[this.settings.product_reason] + priorityBump),
+    prompt_type: promptType,
+  };
 
-    flow = await this.apertureClient.StartFlow("openai", {
-        labels: labels,
-        grpcCallOptions: {
-            deadline: Date.now() + 1200000,
-        },
-    })
+  flow = await this.apertureClient.startFlow("openai", {
+    labels: labels,
+    grpcCallOptions: {
+      deadline: Date.now() + 1200000,
+    },
+  });
 }
 
-// As we use Aperture as a queue, send the message regardless of whether it was accepted or rejected
+// Regardless of whether the flow is rejected, send the message
 try {
-    const { data: chatCompletion, response: raw } = await api.chat.completions
-        .create({
-            model: modelVariant,
-            temperature: temperature,
-            top_p: topP,
-            max_tokens: responseTokens,
-            messages: messages,
-        })
-        .withResponse()
-        .catch(err => {
-            logger.error(`openai chat error: ${JSON.stringify(err)}`)
-            throw err
-        })
-    )
-    return chatCompletion.choices[0]?.message?.content ?? ""
+  const { data: chatCompletion, response: raw } = await api.chat.completions
+    .create(createCompletionParams)
+    .withResponse()
+    .catch((err) => {
+      this.#logger.error(`openai chat error: ${JSON.stringify(err)}`);
+      throw err;
+    });
+
+  return chatCompletion;
 } catch (e) {
-    flow?.SetStatus(FlowStatusEnum.Error)
-    throw e // throw the error to be caught by the chat function
+  flow?.setStatus(FlowStatus.Error);
+  throw e; // throw the error to be caught by the chat function
 } finally {
-    flow?.End()
+  flow?.end();
 }
 ```
 
@@ -192,15 +181,44 @@ Aperture, we also attach the following labels to each request:
 
 ### Policies
 
-To generate a policy using quota scheduler blueprint, `values` files should be
-generated first, specific to the policy. The values file can be generated using
-the following command:
+You can generate a policy using quota scheduler blueprint, either via Aperture
+Cloud UI, or `aperturectl` command line interface.
 
 ```mdx-code-block
-<CodeBlock language="bash">aperturectl blueprints values --name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml</CodeBlock>
+<Tabs>
+<TabItem value="Aperture Cloud UI">
 ```
 
-The values file needs to be adjusted to match the application requirements -
+Follow these steps to create a policy using the quota scheduler blueprint in
+Aperture Cloud UI:
+
+- Navigate to the `Policies` tab in the sidebar menu within your organization.
+- Click `Create Policy` in the top right corner.
+- Select the `Request Prioritization` tab and click on the dropdown menu.
+- Choose `Quota Based`; the corresponding screen will then appear.
+
+![Quota based blueprint](./assets/openai/quota-scheduler-blueprint.png)
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="aperturectl (Aperture Cloud)">
+```
+
+If you haven't installed `aperturectl` yet, begin by following the
+[Set up CLI (aperturectl) guide](/reference/aperture-cli/aperture-cli.md). Once
+`aperturectl` is installed, generate the `values` file necessary for creating
+the quota scheduling policy using the command below:
+
+<CodeBlock language="bash"> aperturectl blueprints values
+--name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml </CodeBlock>
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+Following are the fields that need to be adjusted to match the application
+requirements -
 
 - `policy_name`: Name of the policy — This value should be unique and required.
 - `bucket_capacity`: This value defines burst capacity. For example, in the case
@@ -212,9 +230,9 @@ The values file needs to be adjusted to match the application requirements -
 - `rate_limiter`:
   - `interval`: Interval at which the rate limiter will be filled. When to reset
     the bucket.
-  - `label_key`: Label key to match the request against. This label key in this
-    case is the OpenAI API key (`api_key`) which helps determine the quota for
-    the request.
+  - `limit_by_label_key`: Label key to match the request against. This label key
+    in this case is the OpenAI API key (`api_key`) which helps determine the
+    quota for the request.
 
 The scheduler helps prioritize the requests based on the labels and priority
 defined. In this case, we are using the `priority` label, which is being passed
@@ -283,7 +301,7 @@ policy:
     # Required: True
     rate_limiter:
       interval: 60s
-      label_key: api_key
+      limit_by_label_key: api_key
     scheduler:
       priority_label_key: priority
       tokens_label_key: estimated_tokens
@@ -293,9 +311,13 @@ policy:
     selectors:
       - control_point: openai
         agent_group: default
-        label_matcher:
+      - label_matcher:
           match_labels:
             model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
 ```
 
 ```mdx-code-block
@@ -329,7 +351,7 @@ policy:
     # Required: True
     rate_limiter:
       interval: 60s
-      label_key: api_key
+      limit_by_label_key: api_key
     scheduler:
       priority_label_key: priority
     # Flow selectors to match requests against
@@ -338,9 +360,13 @@ policy:
     selectors:
       - control_point: openai
         agent_group: default
-        label_matcher:
+      - label_matcher:
           match_labels:
             model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
 ```
 
 ```mdx-code-block
@@ -355,8 +381,21 @@ policy:
 
 ```mdx-code-block
 <Tabs>
-  <TabItem value="aperturectl (Aperture Cloud)" label="aperturectl (Aperture Cloud)">
-    <TabContent valuesFile="gpt-4-tpm" tabValue="aperturectl (Aperture Cloud)" />
+  <TabItem value="Aperture Cloud UI">
+```
+
+After entering all required values, click `Continue` followed by `Apply Policy`
+in the bottom right corner.
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="aperturectl (Aperture Cloud)">
+```
+
+<CodeBlock language="bash"> aperturectl cloud blueprints apply
+--values-file=gpt-4-tpm.yaml </CodeBlock>
+
+```mdx-code-block
   </TabItem>
 </Tabs>
 ```
