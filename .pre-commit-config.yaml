@@ -183,6 +183,13 @@ repos:
         files: "^sdks/aperture-js/sdk/.*|^sdks/aperture-js/proto/.*"
         pass_filenames: false
         description: "Generate aperturejs docs"
+      - id: generate-aperturepy-docs
+        name: "Generate aperture-py docs"
+        entry: "./scripts/precommit/generate_aperturepy_docs.sh"
+        language: script
+        files: "^sdks/aperture-py/.*"
+        pass_filenames: false
+        description: "Generate aperture-py docs"
       - id: generate-blueprints
         name: "Generate Blueprints"
         entry: "./scripts/precommit/generate_blueprints.sh"
