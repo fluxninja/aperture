@@ -44,7 +44,7 @@ sum(increase(flux_meter_sum))/sum(increase(flux_meter_count))
 :::info
 
 See reference for the
-[`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
+[`AIMDLoadScheduler`](/reference/configuration/spec.md#a-i-m-d-load-scheduler)
 component that is used within this blueprint.
 
 :::

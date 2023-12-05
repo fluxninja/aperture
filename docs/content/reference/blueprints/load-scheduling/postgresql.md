@@ -32,7 +32,7 @@ overloaded. The following PromQL query (with appropriate filters) is used as
 :::info
 
 See reference for the
-[`AdaptiveLoadScheduler`](/reference/configuration/spec.md#adaptive-load-scheduler)
+[`AIADLoadScheduler`](/reference/configuration/spec.md#a-i-a-d-load-scheduler)
 component that is used within this blueprint.
 
 :::
