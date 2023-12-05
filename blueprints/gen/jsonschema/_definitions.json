@@ -243,7 +243,7 @@
       "additionalProperties": false
     },
     "AdaptiveLoadScheduler": {
-      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.",
+      "description": "The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.\nDeprecated: v3.0.0. Use `AIMDLoadScheduler` instead.",
       "properties": {
         "dry_run": {
           "description": "Decides whether to run the load scheduler in dry-run mode. In dry run mode the scheduler acts as pass through to all flow and does not queue flows.\nIt is useful for observing the behavior of load scheduler without disrupting any real traffic.",
@@ -1367,7 +1367,7 @@
       "properties": {
         "adaptive_load_scheduler": {
           "$ref": "#/definitions/AdaptiveLoadScheduler",
-          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.\nDeprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.\n\n",
+          "description": "_Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.\nDeprecated: v3.0.0. Use `AIMDLoadScheduler` instead.\n\n",
           "x-deprecated": true,
           "x-go-tag-validate": "deprecated"
         },
@@ -1997,7 +1997,7 @@
           "description": "An arbitrary expression to be evaluated on the labels."
         },
         "match_expressions": {
-          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\n<!-- vale off -->\nDeprecated: v2.27.0. Use _match_list_ instead.\n<!-- vale on -->\n\n",
+          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\nDeprecated: v2.27.0. Use `match_list` instead.\n\n",
           "items": {
             "$ref": "#/definitions/MatchRequirement",
             "type": "object"
@@ -3120,7 +3120,7 @@
           "x-go-tag-validate": "required"
         },
         "label_key": {
-          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.\nDeprecated: v3.0.0. Use _limit_by_label_key_ instead.\n\n",
+          "description": "Specifies which label the rate limiter should be keyed by.\n\nRate limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each user a separate limit, assuming you\nhave a _user_ flow\nlabel set up, set `label_key: \"user\"`.\nIf no label key is specified, then all requests matching the\nselectors will be rate limited based on the global bucket.\nDeprecated: v3.0.0. Use `limit_by_label_key` instead.\n\n",
           "type": "string",
           "x-deprecated": true,
           "x-go-tag-validate": "deprecated"

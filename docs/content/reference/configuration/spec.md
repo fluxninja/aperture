@@ -590,8 +590,8 @@ state.
 <!-- vale on -->
 
 The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the
-deviation of the input signal from the setpoint. Deprecated: v3.0.0. Use _AIMD
-Load Scheduler_ instead.
+deviation of the input signal from the setpoint. Deprecated: v3.0.0. Use
+`AIMDLoadScheduler` instead.
 
 <dl>
 <dt>dry_run</dt>
@@ -3409,7 +3409,7 @@ to features within a service.
 
 _Adaptive Load Scheduler_ component does additive increase of load multiplier
 during non-overload state. During overload, the load multiplier is throttled
-based on the provided strategy. Deprecated: v3.0.0. Use _AIMD Load Scheduler_
+based on the provided strategy. Deprecated: v3.0.0. Use `AIMDLoadScheduler`
 instead.
 
 </dd>
@@ -5010,13 +5010,8 @@ An arbitrary expression to be evaluated on the labels.
 
 List of Kubernetes-style label matcher requirements.
 
-Note: The requirements are combined using the logical AND operator.
-
-<!-- vale off -->
-
-Deprecated: v2.27.0. Use _match_list_ instead.
-
-<!-- vale on -->
+Note: The requirements are combined using the logical AND operator. Deprecated:
+v2.27.0. Use `match_list` instead.
 
 </dd>
 <dt>match_labels</dt>
@@ -7634,7 +7629,7 @@ Rate limiting is done independently for each value of the
 a separate limit, assuming you have a _user_ flow label set up, set
 `label_key: "user"`. If no label key is specified, then all requests matching
 the selectors will be rate limited based on the global bucket. Deprecated:
-v3.0.0. Use _limit_by_label_key_ instead.
+v3.0.0. Use `limit_by_label_key` instead.
 
 </dd>
 <dt>lazy_sync</dt>

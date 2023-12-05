@@ -269,7 +269,7 @@ definitions:
     AdaptiveLoadScheduler:
         description: |-
             The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
-            Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+            Deprecated: v3.0.0. Use `AIMDLoadScheduler` instead.
         properties:
             dry_run:
                 description: |-
@@ -1430,7 +1430,7 @@ definitions:
                 $ref: '#/definitions/AdaptiveLoadScheduler'
                 description: |+
                     _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
-                    Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+                    Deprecated: v3.0.0. Use `AIMDLoadScheduler` instead.
 
                 x-deprecated: true
                 x-go-tag-validate: deprecated
@@ -2134,9 +2134,7 @@ definitions:
                     List of Kubernetes-style label matcher requirements.
 
                     Note: The requirements are combined using the logical AND operator.
-                    <!-- vale off -->
-                    Deprecated: v2.27.0. Use _match_list_ instead.
-                    <!-- vale on -->
+                    Deprecated: v2.27.0. Use `match_list` instead.
 
                 items:
                     $ref: '#/definitions/MatchRequirement'
@@ -3209,7 +3207,7 @@ definitions:
                     label set up, set `label_key: "user"`.
                     If no label key is specified, then all requests matching the
                     selectors will be rate limited based on the global bucket.
-                    Deprecated: v3.0.0. Use _limit_by_label_key_ instead.
+                    Deprecated: v3.0.0. Use `limit_by_label_key` instead.
 
                 type: string
                 x-deprecated: true

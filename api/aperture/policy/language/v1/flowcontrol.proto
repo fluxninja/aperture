@@ -33,7 +33,7 @@ message FlowControl {
     LoadScheduler load_scheduler = 7;
 
     // _Adaptive Load Scheduler_ component does additive increase of load multiplier during non-overload state. During overload, the load multiplier is throttled based on the provided strategy.
-    // Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+    // Deprecated: v3.0.0. Use `AIMDLoadScheduler` instead.
     AdaptiveLoadScheduler adaptive_load_scheduler = 8; // @gotags: validate:"deprecated"
 
     // Sampler is a component that regulates the flow of requests to the service by allowing only the specified percentage of requests or sticky sessions.
@@ -104,7 +104,7 @@ message RateLimiter {
     // label set up, set `label_key: "user"`.
     // If no label key is specified, then all requests matching the
     // selectors will be rate limited based on the global bucket.
-    // Deprecated: v3.0.0. Use _limit_by_label_key_ instead.
+    // Deprecated: v3.0.0. Use `limit_by_label_key` instead.
     string label_key = 1; // @gotags: validate:"deprecated"
 
     // Specifies which label the rate limiter should be keyed by.
@@ -574,7 +574,7 @@ message AIADLoadScheduler {
 }
 
 // The _Adaptive Load Scheduler_ adjusts the accepted token rate based on the deviation of the input signal from the setpoint.
-// Deprecated: v3.0.0. Use _AIMD Load Scheduler_ instead.
+// Deprecated: v3.0.0. Use `AIMDLoadScheduler` instead.
 message AdaptiveLoadScheduler {
   // Parameters for the _Adaptive Load Scheduler_ component.
   message Parameters {
