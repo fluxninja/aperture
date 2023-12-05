@@ -40,12 +40,13 @@ type LabelMatcher struct {
 	// A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
 	//
 	// Note: The requirements are combined using the logical AND operator.
-	// Deprecated: v2.27.0
 	MatchLabels map[string]string `protobuf:"bytes,1,rep,name=match_labels,json=matchLabels,proto3" json:"match_labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// List of Kubernetes-style label matcher requirements.
 	//
 	// Note: The requirements are combined using the logical AND operator.
+	// <!-- vale off -->
 	// Deprecated: v2.27.0. Use _match_list_ instead.
+	// <!-- vale on -->
 	MatchExpressions []*MatchRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// An arbitrary expression to be evaluated on the labels.
 	Expression *Expression `protobuf:"bytes,3,opt,name=expression,proto3" json:"expression,omitempty"`

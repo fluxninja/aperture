@@ -5010,8 +5010,13 @@ An arbitrary expression to be evaluated on the labels.
 
 List of Kubernetes-style label matcher requirements.
 
-Note: The requirements are combined using the logical AND operator. Deprecated:
-v2.27.0. Use _match_list_ instead.
+Note: The requirements are combined using the logical AND operator.
+
+<!-- vale off -->
+
+Deprecated: v2.27.0. Use _match_list_ instead.
+
+<!-- vale on -->
 
 </dd>
 <dt>match_labels</dt>
@@ -5027,8 +5032,7 @@ A map of {key,value} pairs representing labels to be matched. A single
 {key,value} in the `match_labels` requires that the label `key` is present and
 equal to `value`.
 
-Note: The requirements are combined using the logical AND operator. Deprecated:
-v2.27.0
+Note: The requirements are combined using the logical AND operator.
 
 </dd>
 <dt>match_list</dt>

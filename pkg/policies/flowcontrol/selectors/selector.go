@@ -151,8 +151,8 @@ func MMExprFromProto(expr *policylangv1.Expression) (mm.Expr, error) {
 	case *policylangv1.Expression_LabelMatches:
 		return mm.LabelMatchesRegex(e.LabelMatches.Label, e.LabelMatches.Regex)
 	default:
-		log.Error().Msg("unknown/unset expression variant")
-		return nil, nil
+		err := fmt.Errorf("unknown/unset expression variant")
+		return nil, err
 	}
 }
 

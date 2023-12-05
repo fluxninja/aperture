@@ -18,13 +18,14 @@ message LabelMatcher {
   // A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
   //
   // Note: The requirements are combined using the logical AND operator.
-  // Deprecated: v2.27.0
   map<string, string> match_labels = 1;
 
   // List of Kubernetes-style label matcher requirements.
   //
   // Note: The requirements are combined using the logical AND operator.
+  // <!-- vale off -->
   // Deprecated: v2.27.0. Use _match_list_ instead.
+  // <!-- vale on -->
   repeated MatchRequirement match_expressions = 2; // @gotags: validate:"dive"
 
   // An arbitrary expression to be evaluated on the labels.

@@ -268,14 +268,13 @@ Liveness and health probes are essential for checking the health of the
 application, and metrics endpoints are necessary for monitoring its performance.
 However, these endpoints do not usually represent the intended workload in an
 Aperture policy. If included in a _Flux Meter_, they can reduce the accuracy of
-latency calculations. If included in an actuation component like _Load
-Scheduler_, they might cause these requests to be rejected under load, leading
-to unnecessary pod restarts.
+latency calculations. If included in a _Rate Limiter_ or _Quota Scheduler_, they
+can cause these endpoints to be rate limited or throttled unnecessarily.
 
 To prevent these issues, traffic to these endpoints can be filtered out using a
-label matcher. In the example below, flows with `http.target` starting with
-`/health`, `/live`, or `/ready`, and User Agent starting with `kube-probe/1.23`
-are filtered out.
+label matcher. In the example below, flows with `http.target` either `/health`,
+`/live` or `/ready` are filtered out. Also, flows with User Agent equal to
+`kube-probe/1.23` are filtered out.
 
 ```yaml
 service: checkout.myns.svc.cluster.local
