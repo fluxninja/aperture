@@ -16,7 +16,7 @@ func init() {
 	SetCommand.Flags().StringVarP(&agentGroup, "agent-group", "a", "", "Agent group")
 	SetCommand.Flags().StringVarP(&key, "key", "k", "", "Key")
 	SetCommand.Flags().StringVarP(&value, "value", "", "", "Value")
-	SetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600000, "TTL in milliseconds")
+	SetCommand.Flags().Int64VarP(&ttl, "ttl", "t", 600, "TTL in seconds")
 	err := SetCommand.MarkFlagRequired("agent-group")
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ var SetCommand = &cobra.Command{
 			AgentGroup: agentGroup,
 			Key:        key,
 			Value:      value,
-			TTL:        time.Duration(ttl) * time.Millisecond,
+			TTL:        time.Duration(ttl) * time.Second,
 		}
 
 		return utils.ParseGlobalCacheUpsert(client, input)
