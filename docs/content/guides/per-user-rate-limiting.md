@@ -65,7 +65,7 @@ The first step to use Aperture SDK is to import and set up Aperture Client:
 <TabItem value="Typescript">
 ```
 
-<CodeSnippet lang="py" snippetName="clientConstructor" />
+<CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 ```mdx-code-block
   </TabItem>

@@ -74,6 +74,9 @@ To sign-up to Aperture Cloud, [click here][sign-up].
   Aperture aligns resource distribution with business value and urgency of
   requests. Workload prioritization applies to API Quota Management and Adaptive
   Queuing use cases.
+- 💾 [**Caching**]: Boost application performance and reduce costs by caching
+  costly operations, preventing duplicate requests to pay-per-use services, and
+  easing the load on constrained services.
 
 ## ✨ Get started {#get-started}
 
