@@ -195,9 +195,44 @@ Aperture Cloud UI:
 - Navigate to the `Policies` tab in the sidebar menu within your organization.
 - Click `Create Policy` in the top right corner.
 - Select the `Request Prioritization` tab and click on the dropdown menu.
-- Choose `Quota Based`; the corresponding screen will then appear.
+- Choose `Quota Based`, once there, fill in the form to create your quota
+  scheduling policy.
 
-![Quota based blueprint](./assets/openai/quota-scheduler-blueprint.png)
+Following are the fields that need to be adjusted to match the application
+requirements -
+
+- `Policy name`: Name of the policy — This value should be unique and required.
+- `Bucket Capacity`: This value defines burst capacity. For example, in the case
+  of `gpt-4` tokens per minute policy, the bucket will have a capacity of
+  `40000 tokens`.
+- `Fill amount`: After the tokens are consumed, the bucket will be filled with
+  this amount. For example, in the case of `gpt-4` tokens per minute policy, the
+  bucket will fill at `40000 tokens per minute`.
+- `Interval`: Interval at which the rate limiter will be filled. When to reset
+  the bucket.
+- `Limit by label key`: Label key to match the request against. This label key
+  in this case is the OpenAI API key (`api_key`) which helps determine the quota
+  for the request.
+- `Priority label key`: Priority label key to match the request against. In this
+  case, it is `priority`.
+- `Tokens label key`: In the case of tokens per minute policy, each request has
+  a `estimated_tokens` label value, which can be used to prioritize the request
+  based on the number of tokens. In this case, it is `estimated_tokens`.
+  - `Workloads`:
+    - `name`: To match the label value against the name of workloads. In this
+      case, it is `paid_user`, `trial_user`, `free_user`.
+    - `Label matcher`:
+      - `match_labels`: Labels to match the request against. In this case, it is
+        `product_reason`.
+
+Selector parameters allow filtering of the requests to ensure where the policy
+will act on.
+
+- `Selectors`:
+  - `Control Point`: Control point name to match the request against. In this
+    case, it will be `openai`.
+  - `Label matcher`:
+    - `match_labels`: Labels to match the request against. It is optional.
 
 ```mdx-code-block
   </TabItem>
@@ -211,11 +246,6 @@ the quota scheduling policy using the command below:
 
 <CodeBlock language="bash"> aperturectl blueprints values
 --name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml </CodeBlock>
-
-```mdx-code-block
-  </TabItem>
-</Tabs>
-```
 
 Following are the fields that need to be adjusted to match the application
 requirements -
@@ -258,34 +288,127 @@ will act on.
 - `selectors`:
   - `control_point`: Control point name to match the request against. In this
     case, it will be `openai`.
-  - `agent_group`: Agent group name to match the request against. It is
-    optional.
   - `label_matcher`:
     - `match_labels`: Labels to match the request against. It is optional.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 Below are examples of values file adjusted to match the SDK code snippet &
 control point labels.
 
-### Client-side quota management policies for gpt-4
+<details>
+<summary>Client-side quota management policies for gpt-4</summary>
+<p>
 
 ```mdx-code-block
 <Tabs>
 <TabItem value="Tokens Per Minute (gpt-4)">
 ```
 
-![Tokens Per Minute](./assets/openai/gpt-4-tpm.png)
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
+# Generated values file for quota-scheduling/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
+
+blueprint: quota-scheduling/base
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: gpt-4-tpm
+  quota_scheduler:
+    # Bucket capacity.
+    # Type: float64
+    # Required: True
+    bucket_capacity: 40000
+    # Fill amount.
+    # Type: float64
+    # Required: True
+    fill_amount: 40000
+    # Rate Limiter Parameters
+    # Type: aperture.spec.v1.RateLimiterParameters
+    # Required: True
+    rate_limiter:
+      interval: 60s
+      limit_by_label_key: api_key
+    scheduler:
+      priority_label_key: priority
+      tokens_label_key: estimated_tokens
+    # Flow selectors to match requests against
+    # Type: []aperture.spec.v1.Selector
+    # Required: True
+    selectors:
+      - control_point: openai
+        agent_group: default
+      - label_matcher:
+          match_labels:
+            model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
+```
 
 ```mdx-code-block
 </TabItem>
 <TabItem value="Requests Per Minute (gpt-4)">
 ```
 
-![Request Per Minute](./assets/openai/gpt-4-rpm.png)
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
+# Generated values file for quota-scheduling/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
+
+blueprint: quota-scheduling/base
+policy:
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: gpt-4-rpm
+  quota_scheduler:
+    # Bucket capacity.
+    # Type: float64
+    # Required: True
+    bucket_capacity: 200
+    # Fill amount.
+    # Type: float64
+    # Required: True
+    fill_amount: 200
+    # Rate Limiter Parameters.
+    # Type: aperture.spec.v1.RateLimiterParameters
+    # Required: True
+    rate_limiter:
+      interval: 60s
+      limit_by_label_key: api_key
+    scheduler:
+      priority_label_key: priority
+    # Flow selectors to match requests against
+    # Type: []aperture.spec.v1.Selector
+    # Required: True
+    selectors:
+      - control_point: openai
+        agent_group: default
+      - label_matcher:
+          match_labels:
+            model_variant: gpt-4
+      - label_matcher:
+          match_labels:
+            product_reason: paid_user
+            prompt_type: chat
+```
 
 ```mdx-code-block
 </TabItem>
 </Tabs>
 ```
+
+</p>
+</details>
 
 #### Apply Policy
 
