@@ -1,7 +1,9 @@
 package com.fluxninja.aperture.sdk;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FeatureFlowParameters {
@@ -9,6 +11,9 @@ public class FeatureFlowParameters {
     private Map<String, String> explicitLabels;
     private Boolean rampMode;
     private Duration flowTimeout;
+    private String resultCacheKey;
+
+    private List<String> globalCacheKeys;
 
     public static Builder newBuilder(String controlPoint) {
         return new Builder(controlPoint);
@@ -34,6 +39,14 @@ public class FeatureFlowParameters {
         return flowTimeout;
     }
 
+    public String getResultCacheKey() {
+        return resultCacheKey;
+    }
+
+    public List<String> getGlobalCacheKeys() {
+        return globalCacheKeys;
+    }
+
     public static class Builder {
         private final FeatureFlowParameters params;
 
@@ -44,6 +57,8 @@ public class FeatureFlowParameters {
             params.explicitLabels = new HashMap<>();
             params.rampMode = false;
             params.flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
+            params.resultCacheKey = "";
+            params.globalCacheKeys = Collections.emptyList();
         }
 
         /**
@@ -77,6 +92,39 @@ public class FeatureFlowParameters {
          */
         public Builder setFlowTimeout(Duration flowTimeout) {
             params.flowTimeout = flowTimeout;
+            return this;
+        }
+
+        /**
+         * Set the result cache key for result cache request
+         *
+         * @param resultCacheKey The result cache key
+         * @return This builder for method chaining
+         */
+        public Builder setResultCacheKey(String resultCacheKey) {
+            params.resultCacheKey = resultCacheKey;
+            return this;
+        }
+
+        /**
+         * Add global cache keys for global cache request
+         *
+         * @param globalCacheKeys The global cache keys to add
+         * @return This builder for method chaining
+         */
+        public Builder addGlobalCacheKeys(List<String> globalCacheKeys) {
+            params.globalCacheKeys.addAll(globalCacheKeys);
+            return this;
+        }
+
+        /**
+         * Add a global cache key for global cache request
+         *
+         * @param globalCacheKey The global cache key to add
+         * @return This builder for method chaining
+         */
+        public Builder addGlobalCacheKey(String globalCacheKey) {
+            params.globalCacheKeys.add(globalCacheKey);
             return this;
         }
 
