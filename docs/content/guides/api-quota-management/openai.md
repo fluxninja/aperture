@@ -220,7 +220,7 @@ requirements -
 
 - `Priority label key`: This field specifies the label that is used to determine
   the priority. It is set to `priority` in the policy and SDK code example.
-- `Tokens label key`: This field specifiies the label that is used to determine
+- `Tokens label key`: This field specifies the label that is used to determine
   tokens. It is set to `estimated_tokens` in the policy and SDK code example.
 - `Workload label key`: This field specifies the label that is used to determine
   the workload. It is set to `product_reason` in the policy and SDK code
