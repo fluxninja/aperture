@@ -261,9 +261,9 @@ requirements -
 - `rate_limiter`:
   - `interval`: It specifies the time frequency at which `fill_amount` is
     applied.
-  - `limit_by_label_key`: Label key to match the request against. This label key
-    in this case is the OpenAI API key (`api_key`) which helps determine the
-    quota for the request.
+  - `limit_by_label_key`: This field specifies the label that is used to
+    determine the unique token bucket. It is set to `api_key` meaning that a
+    tocken bucket would get initiated for each OpenAI key.
 
 The scheduler helps prioritize the requests based on the labels and priority
 defined. In this case, we are using the `priority` label, which is being passed
