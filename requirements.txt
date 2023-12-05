@@ -9,3 +9,4 @@ openapi2jsonschema==0.9.1
 ordered-set==4.1.0
 python-slugify==8.0.1
 text-unidecode==1.3
+pydoctor==23.9.1
