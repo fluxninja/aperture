@@ -215,7 +215,7 @@ requirements -
   bucket will fill at `40000 tokens per minute`.
 - `Interval`: It specifies the time duration in which `fill_amount` is applied.
 - `Limit by label key`: This field specifies the label that is used to determine
-  the unique token bucket. It is set to `api_key` meaning that a tocken bucket
+  the unique token bucket. It is set to `api_key` meaning that a token bucket
   would get initiated for each OpenAI key.
 
 - `Priority label key`: This field specifies the label that is used to determine
@@ -263,7 +263,7 @@ requirements -
     applied.
   - `limit_by_label_key`: This field specifies the label that is used to
     determine the unique token bucket. It is set to `api_key` meaning that a
-    tocken bucket would get initiated for each OpenAI key.
+    token bucket would get initiated for each OpenAI key.
 
 The scheduler helps prioritize the requests based on the labels and priority
 defined. In this case, we are using the `priority` label, which is being passed
