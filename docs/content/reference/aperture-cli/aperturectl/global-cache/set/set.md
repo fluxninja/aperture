@@ -26,7 +26,7 @@ aperturectl global-cache set [flags]
   -a, --agent-group string   Agent group
   -h, --help                 help for set
   -k, --key string           Key
-  -t, --ttl int              TTL in milliseconds (default 600000)
+  -t, --ttl int              TTL in seconds (default 600)
       --value string         Value
 ```
 

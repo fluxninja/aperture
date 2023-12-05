@@ -6759,7 +6759,7 @@ spec:
                   type: object
                 type: array
               terminationGracePeriodSeconds:
-                description: Seconds Redmine pod needs to terminate gracefully
+                description: Seconds pod needs to terminate gracefully
                 format: int64
                 type: integer
               tolerations:

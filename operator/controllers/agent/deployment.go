@@ -187,6 +187,9 @@ func deploymentMutate(dep *appsv1.Deployment, spec appsv1.DeploymentSpec) contro
 		dep.Spec.Template.Spec.InitContainers = spec.Template.Spec.InitContainers
 		dep.Spec.Template.Spec.Containers = spec.Template.Spec.Containers
 		dep.Spec.Template.Spec.Volumes = spec.Template.Spec.Volumes
+		if dep.Spec.Template.Spec.TerminationGracePeriodSeconds != nil && spec.Template.Spec.TerminationGracePeriodSeconds != nil {
+			*dep.Spec.Template.Spec.TerminationGracePeriodSeconds = *spec.Template.Spec.TerminationGracePeriodSeconds
+		}
 		return nil
 	}
 }
