@@ -13,6 +13,7 @@ project-version="2.23.0"
 project-url="https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
 add-package = ["aperture_sdk"]
 html-output="docs"
+sidebar-expand-depth = 2
 
 [tool.poetry.dependencies]
 python = "^3.8"

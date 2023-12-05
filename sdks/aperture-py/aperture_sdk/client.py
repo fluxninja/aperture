@@ -1,3 +1,5 @@
+"""ApertureClient for starting Flows."""
+
 import datetime
 import functools
 import logging
@@ -58,6 +60,9 @@ class FlowParams:
 
 
 class ApertureClient:
+    """
+    ApertureClient can be used to start Flows.
+    """
     def __init__(
         self,
         channel: grpc.Channel,
