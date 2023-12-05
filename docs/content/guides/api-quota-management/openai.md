@@ -266,116 +266,26 @@ will act on.
 Below are examples of values file adjusted to match the SDK code snippet &
 control point labels.
 
-<details>
-<summary>Client-side quota management policies for gpt-4</summary>
-<p>
+### Client-side quota management policies for gpt-4
 
 ```mdx-code-block
 <Tabs>
 <TabItem value="Tokens Per Minute (gpt-4)">
 ```
 
-```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-tpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 40000
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 40000
-    # Rate Limiter Parameters
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-      tokens_label_key: estimated_tokens
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-        agent_group: default
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
-```
+![Tokens Per Minute](./assets/openai/gpt-4-tpm.png)
 
 ```mdx-code-block
 </TabItem>
 <TabItem value="Requests Per Minute (gpt-4)">
 ```
 
-```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-rpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 200
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 200
-    # Rate Limiter Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-        agent_group: default
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
-```
+![Request Per Minute](./assets/openai/gpt-4-rpm.png)
 
 ```mdx-code-block
 </TabItem>
 </Tabs>
 ```
-
-</p>
-</details>
 
 #### Apply Policy
 
