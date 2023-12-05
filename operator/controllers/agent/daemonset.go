@@ -180,6 +180,9 @@ func daemonsetMutate(dms *appsv1.DaemonSet, spec appsv1.DaemonSetSpec) controlle
 		dms.Spec.Template.Spec.InitContainers = spec.Template.Spec.InitContainers
 		dms.Spec.Template.Spec.Containers = spec.Template.Spec.Containers
 		dms.Spec.Template.Spec.Volumes = spec.Template.Spec.Volumes
+		if dms.Spec.Template.Spec.TerminationGracePeriodSeconds != nil && spec.Template.Spec.TerminationGracePeriodSeconds != nil {
+			*dms.Spec.Template.Spec.TerminationGracePeriodSeconds = *spec.Template.Spec.TerminationGracePeriodSeconds
+		}
 		return nil
 	}
 }
