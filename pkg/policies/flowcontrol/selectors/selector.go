@@ -75,13 +75,15 @@ func (s *selector) ControlPointID() ControlPointID {
 //
 // LabelMatcher can be nil or a validated LabelMatcher.
 func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
+	backCompatConvLabelMatcher(lm)
+
 	var reqExprs []mm.Expr
 
 	for k, v := range lm.GetMatchLabels() {
 		reqExprs = append(reqExprs, mm.LabelEquals(k, v))
 	}
 
-	for _, req := range lm.GetMatchExpressions() {
+	for _, req := range lm.GetMatchList() {
 		switch metav1.LabelSelectorOperator(req.Operator) {
 		case metav1.LabelSelectorOpIn:
 			matchExpr, err := mm.LabelMatchesRegex(req.Key, valuesRegex(req.Values))
@@ -122,39 +124,39 @@ func MMExprFromLabelMatcher(lm *policylangv1.LabelMatcher) (mm.Expr, error) {
 // MMExprFromProto converts proto definition of expression into multimatcher Expression
 //
 // The expr is assumed to be validated and nonnil.
-func MMExprFromProto(expr *policylangv1.MatchExpression) (mm.Expr, error) {
+func MMExprFromProto(expr *policylangv1.Expression) (mm.Expr, error) {
 	switch e := expr.Variant.(type) {
-	case *policylangv1.MatchExpression_Not:
+	case *policylangv1.Expression_Not:
 		expr, err := MMExprFromProto(e.Not)
 		if err != nil {
 			return nil, err
 		}
 		return mm.Not(expr), nil
-	case *policylangv1.MatchExpression_All:
+	case *policylangv1.Expression_All:
 		exprs, err := mmExprsFromProtoList(e.All)
 		if err != nil {
 			return nil, err
 		}
 		return mm.All(exprs), nil
-	case *policylangv1.MatchExpression_Any:
+	case *policylangv1.Expression_Any:
 		exprs, err := mmExprsFromProtoList(e.Any)
 		if err != nil {
 			return nil, err
 		}
 		return mm.Any(exprs), nil
-	case *policylangv1.MatchExpression_LabelExists:
+	case *policylangv1.Expression_LabelExists:
 		return mm.LabelExists(e.LabelExists), nil
-	case *policylangv1.MatchExpression_LabelEquals:
+	case *policylangv1.Expression_LabelEquals:
 		return mm.LabelEquals(e.LabelEquals.Label, e.LabelEquals.Value), nil
-	case *policylangv1.MatchExpression_LabelMatches:
+	case *policylangv1.Expression_LabelMatches:
 		return mm.LabelMatchesRegex(e.LabelMatches.Label, e.LabelMatches.Regex)
 	default:
-		log.Error().Msg("unknown/unset expression variant")
-		return nil, nil
+		err := fmt.Errorf("unknown/unset expression variant")
+		return nil, err
 	}
 }
 
-func mmExprsFromProtoList(list *policylangv1.MatchExpression_List) ([]mm.Expr, error) {
+func mmExprsFromProtoList(list *policylangv1.Expression_List) ([]mm.Expr, error) {
 	exprs := make([]mm.Expr, 0, len(list.Of))
 	for _, protoExpr := range list.Of {
 		expr, err := MMExprFromProto(protoExpr)
@@ -173,4 +175,11 @@ func valuesRegex(values []string) string {
 		escaped = append(escaped, regexp.QuoteMeta(v))
 	}
 	return "^(" + strings.Join(escaped, "|") + ")$"
+}
+
+// backCompatConvLabelMatcher converts old label matcher to new one.
+func backCompatConvLabelMatcher(lm *policylangv1.LabelMatcher) {
+	if lm.GetMatchExpressions() != nil && lm.GetMatchList() == nil {
+		lm.MatchList = lm.MatchExpressions
+	}
 }

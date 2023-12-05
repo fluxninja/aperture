@@ -175,7 +175,7 @@ definitions:
             - ip_address
             - uid
         type: object
-    EqualsMatchExpression:
+    EqualsExpression:
         description: Label selector expression of the equal form `label == value`.
         properties:
             label:
@@ -189,6 +189,50 @@ definitions:
                 type: string
         required:
             - label
+        type: object
+    Expression:
+        description: |-
+            Expression has multiple variants, exactly one should be set.
+
+            Example:
+            ```yaml
+            all:
+              of:
+                - label_exists: foo
+                - label_equals:
+                    label: app
+                    value: frobnicator
+            ```
+        properties:
+            all:
+                $ref: '#/definitions/ExpressionList'
+                description: The expression is true when all sub expressions are true.
+            any:
+                $ref: '#/definitions/ExpressionList'
+                description: The expression is true when any sub expression is true.
+            label_equals:
+                $ref: '#/definitions/EqualsExpression'
+                description: The expression is true when label value equals given value.
+            label_exists:
+                description: The expression is true when label with given name exists.
+                type: string
+            label_matches:
+                $ref: '#/definitions/MatchesExpression'
+                description: The expression is true when label matches given regular expression.
+            not:
+                $ref: '#/definitions/Expression'
+                description: The expression negates the result of sub expression.
+        type: object
+    ExpressionList:
+        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
+        properties:
+            of:
+                description: List of sub expressions of the match expression.
+                items:
+                    $ref: '#/definitions/Expression'
+                    type: object
+                type: array
+        title: List of MatchExpressions that is used for all or any matching
         type: object
     FlowControlPoint:
         properties:
@@ -228,8 +272,62 @@ definitions:
             uuid:
                 type: string
         type: object
-    K8sLabelMatcherRequirement:
-        description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
+    LabelMatcher:
+        description: |-
+            It provides three ways to define requirements:
+            - match labels
+            - match expressions
+            - arbitrary expression
+
+            If multiple requirements are set, they're all combined using the logical AND operator.
+            An empty label matcher always matches.
+        properties:
+            expression:
+                $ref: '#/definitions/Expression'
+                description: An arbitrary expression to be evaluated on the labels.
+            match_expressions:
+                description: |+
+                    List of Kubernetes-style label matcher requirements.
+
+                    Note: The requirements are combined using the logical AND operator.
+                    <!-- vale off -->
+                    Deprecated: v2.27.0. Use _match_list_ instead.
+                    <!-- vale on -->
+
+                items:
+                    $ref: '#/definitions/MatchRequirement'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
+            match_labels:
+                additionalProperties:
+                    type: string
+                description: |-
+                    A map of {key,value} pairs representing labels to be matched.
+                    A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
+
+                    Note: The requirements are combined using the logical AND operator.
+                type: object
+            match_list:
+                description: |+
+                    List of label matching requirements.
+
+                    Note: The requirements are combined using the logical AND operator.
+
+                items:
+                    $ref: '#/definitions/MatchRequirement'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
+        title: |-
+            Allows to define rules whether a map of
+            [labels](/concepts/flow-label.md)
+            should be considered a match or not
+        type: object
+    MatchRequirement:
+        description: |-
+            MatchRequirement. A requirement that the specified label should satisfy on a flow.
+            The match requirement consists of the label key, its values and an operator that relates the key and values.
         properties:
             key:
                 description: |+
@@ -262,89 +360,7 @@ definitions:
             - key
             - operator
         type: object
-    LabelMatcher:
-        description: |-
-            It provides three ways to define requirements:
-            - match labels
-            - match expressions
-            - arbitrary expression
-
-            If multiple requirements are set, they're all combined using the logical AND operator.
-            An empty label matcher always matches.
-        properties:
-            expression:
-                $ref: '#/definitions/MatchExpression'
-                description: An arbitrary expression to be evaluated on the labels.
-            match_expressions:
-                description: |+
-                    List of Kubernetes-style label matcher requirements.
-
-                    Note: The requirements are combined using the logical AND operator.
-
-                items:
-                    $ref: '#/definitions/K8sLabelMatcherRequirement'
-                    type: object
-                type: array
-                x-go-tag-validate: dive
-            match_labels:
-                additionalProperties:
-                    type: string
-                description: |-
-                    A map of {key,value} pairs representing labels to be matched.
-                    A single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.
-
-                    Note: The requirements are combined using the logical AND operator.
-                type: object
-        title: |-
-            Allows to define rules whether a map of
-            [labels](/concepts/flow-label.md)
-            should be considered a match or not
-        type: object
-    MatchExpression:
-        description: |-
-            MatchExpression has multiple variants, exactly one should be set.
-
-            Example:
-            ```yaml
-            all:
-              of:
-                - label_exists: foo
-                - label_equals:
-                    label: app
-                    value: frobnicator
-            ```
-        properties:
-            all:
-                $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when all sub expressions are true.
-            any:
-                $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when any sub expression is true.
-            label_equals:
-                $ref: '#/definitions/EqualsMatchExpression'
-                description: The expression is true when label value equals given value.
-            label_exists:
-                description: The expression is true when label with given name exists.
-                type: string
-            label_matches:
-                $ref: '#/definitions/MatchesMatchExpression'
-                description: The expression is true when label matches given regular expression.
-            not:
-                $ref: '#/definitions/MatchExpression'
-                description: The expression negates the result of sub expression.
-        type: object
-    MatchExpressionList:
-        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
-        properties:
-            of:
-                description: List of sub expressions of the match expression.
-                items:
-                    $ref: '#/definitions/MatchExpression'
-                    type: object
-                type: array
-        title: List of MatchExpressions that is used for all or any matching
-        type: object
-    MatchesMatchExpression:
+    MatchesExpression:
         description: Label selector expression of the form `label matches regex`.
         properties:
             label:

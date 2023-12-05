@@ -2913,7 +2913,7 @@ a value of "10s" would signify a duration of 10 seconds.
 
 <!-- vale off -->
 
-### EqualsMatchExpression {#equals-match-expression}
+### EqualsExpression {#equals-expression}
 
 <!-- vale on -->
 
@@ -2942,6 +2942,129 @@ Name of the label to equal match the value.
 <!-- vale on -->
 
 Exact value that the label should be equal to.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### Expression {#expression}
+
+<!-- vale on -->
+
+Expression has multiple variants, exactly one should be set.
+
+Example:
+
+```yaml
+all:
+  of:
+    - label_exists: foo
+    - label_equals:
+        label: app
+        value: frobnicator
+```
+
+<dl>
+<dt>all</dt>
+<dd>
+
+<!-- vale off -->
+
+([ExpressionList](#expression-list))
+
+<!-- vale on -->
+
+The expression is true when all sub expressions are true.
+
+</dd>
+<dt>any</dt>
+<dd>
+
+<!-- vale off -->
+
+([ExpressionList](#expression-list))
+
+<!-- vale on -->
+
+The expression is true when any sub expression is true.
+
+</dd>
+<dt>label_equals</dt>
+<dd>
+
+<!-- vale off -->
+
+([EqualsExpression](#equals-expression))
+
+<!-- vale on -->
+
+The expression is true when label value equals given value.
+
+</dd>
+<dt>label_exists</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+The expression is true when label with given name exists.
+
+</dd>
+<dt>label_matches</dt>
+<dd>
+
+<!-- vale off -->
+
+([MatchesExpression](#matches-expression))
+
+<!-- vale on -->
+
+The expression is true when label matches given regular expression.
+
+</dd>
+<dt>not</dt>
+<dd>
+
+<!-- vale off -->
+
+([Expression](#expression))
+
+<!-- vale on -->
+
+The expression negates the result of sub expression.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ExpressionList {#expression-list}
+
+<!-- vale on -->
+
+List of MatchExpressions that is used for all or any matching
+
+for example, `{any: {of: [expr1, expr2]}}`.
+
+<dl>
+<dt>of</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Expression](#expression))
+
+<!-- vale on -->
+
+List of sub expressions of the match expression.
 
 </dd>
 </dl>
@@ -4774,59 +4897,6 @@ to a string.
 
 <!-- vale off -->
 
-### K8sLabelMatcherRequirement {#k8s-label-matcher-requirement}
-
-<!-- vale on -->
-
-Label selector requirement which is a selector that contains values, a key, and
-an operator that relates the key and values.
-
-<dl>
-<dt>key</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, **required**)
-
-<!-- vale on -->
-
-Label key that the selector applies to.
-
-</dd>
-<dt>operator</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, one of: `In | NotIn | Exists | DoesNotExist`, **required**)
-
-<!-- vale on -->
-
-Logical operator which represents a key's relationship to a set of values. Valid
-operators are In, NotIn, Exists and DoesNotExist.
-
-</dd>
-<dt>values</dt>
-<dd>
-
-<!-- vale off -->
-
-([]string)
-
-<!-- vale on -->
-
-An array of string values that relates to the key by an operator. If the
-operator is In or NotIn, the values array must be non-empty. If the operator is
-Exists or DoesNotExist, the values array must be empty.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
 ### KubernetesObjectSelector {#kubernetes-object-selector}
 
 <!-- vale on -->
@@ -4922,7 +4992,7 @@ operator. An empty label matcher always matches.
 
 <!-- vale off -->
 
-([MatchExpression](#match-expression))
+([Expression](#expression))
 
 <!-- vale on -->
 
@@ -4934,13 +5004,19 @@ An arbitrary expression to be evaluated on the labels.
 
 <!-- vale off -->
 
-([[]K8sLabelMatcherRequirement](#k8s-label-matcher-requirement))
+([[]MatchRequirement](#match-requirement))
 
 <!-- vale on -->
 
 List of Kubernetes-style label matcher requirements.
 
 Note: The requirements are combined using the logical AND operator.
+
+<!-- vale off -->
+
+Deprecated: v2.27.0. Use _match_list_ instead.
+
+<!-- vale on -->
 
 </dd>
 <dt>match_labels</dt>
@@ -4955,6 +5031,20 @@ Note: The requirements are combined using the logical AND operator.
 A map of {key,value} pairs representing labels to be matched. A single
 {key,value} in the `match_labels` requires that the label `key` is present and
 equal to `value`.
+
+Note: The requirements are combined using the logical AND operator.
+
+</dd>
+<dt>match_list</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]MatchRequirement](#match-requirement))
+
+<!-- vale on -->
+
+List of label matching requirements.
 
 Note: The requirements are combined using the logical AND operator.
 
@@ -5435,94 +5525,52 @@ in the flow labels.
 
 <!-- vale off -->
 
-### MatchExpression {#match-expression}
+### MatchRequirement {#match-requirement}
 
 <!-- vale on -->
 
-MatchExpression has multiple variants, exactly one should be set.
-
-Example:
-
-```yaml
-all:
-  of:
-    - label_exists: foo
-    - label_equals:
-        label: app
-        value: frobnicator
-```
+MatchRequirement. A requirement that the specified label should satisfy on a
+flow. The match requirement consists of the label key, its values and an
+operator that relates the key and values.
 
 <dl>
-<dt>all</dt>
+<dt>key</dt>
 <dd>
 
 <!-- vale off -->
 
-([MatchExpressionList](#match-expression-list))
+(string, **required**)
 
 <!-- vale on -->
 
-The expression is true when all sub expressions are true.
+Label key that the selector applies to.
 
 </dd>
-<dt>any</dt>
+<dt>operator</dt>
 <dd>
 
 <!-- vale off -->
 
-([MatchExpressionList](#match-expression-list))
+(string, one of: `In | NotIn | Exists | DoesNotExist`, **required**)
 
 <!-- vale on -->
 
-The expression is true when any sub expression is true.
+Logical operator which represents a key's relationship to a set of values. Valid
+operators are In, NotIn, Exists and DoesNotExist.
 
 </dd>
-<dt>label_equals</dt>
+<dt>values</dt>
 <dd>
 
 <!-- vale off -->
 
-([EqualsMatchExpression](#equals-match-expression))
+([]string)
 
 <!-- vale on -->
 
-The expression is true when label value equals given value.
-
-</dd>
-<dt>label_exists</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-The expression is true when label with given name exists.
-
-</dd>
-<dt>label_matches</dt>
-<dd>
-
-<!-- vale off -->
-
-([MatchesMatchExpression](#matches-match-expression))
-
-<!-- vale on -->
-
-The expression is true when label matches given regular expression.
-
-</dd>
-<dt>not</dt>
-<dd>
-
-<!-- vale off -->
-
-([MatchExpression](#match-expression))
-
-<!-- vale on -->
-
-The expression negates the result of sub expression.
+An array of string values that relates to the key by an operator. If the
+operator is In or NotIn, the values array must be non-empty. If the operator is
+Exists or DoesNotExist, the values array must be empty.
 
 </dd>
 </dl>
@@ -5531,34 +5579,7 @@ The expression negates the result of sub expression.
 
 <!-- vale off -->
 
-### MatchExpressionList {#match-expression-list}
-
-<!-- vale on -->
-
-List of MatchExpressions that is used for all or any matching
-
-for example, `{any: {of: [expr1, expr2]}}`.
-
-<dl>
-<dt>of</dt>
-<dd>
-
-<!-- vale off -->
-
-([[]MatchExpression](#match-expression))
-
-<!-- vale on -->
-
-List of sub expressions of the match expression.
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### MatchesMatchExpression {#matches-match-expression}
+### MatchesExpression {#matches-expression}
 
 <!-- vale on -->
 

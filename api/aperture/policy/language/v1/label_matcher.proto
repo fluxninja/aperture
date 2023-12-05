@@ -23,14 +23,23 @@ message LabelMatcher {
   // List of Kubernetes-style label matcher requirements.
   //
   // Note: The requirements are combined using the logical AND operator.
-  repeated K8sLabelMatcherRequirement match_expressions = 2; // @gotags: validate:"dive"
+  // <!-- vale off -->
+  // Deprecated: v2.27.0. Use _match_list_ instead.
+  // <!-- vale on -->
+  repeated MatchRequirement match_expressions = 2; // @gotags: validate:"dive"
 
   // An arbitrary expression to be evaluated on the labels.
-  MatchExpression expression = 3;
+  Expression expression = 3;
+
+  // List of label matching requirements.
+  //
+  // Note: The requirements are combined using the logical AND operator.
+  repeated MatchRequirement match_list = 4; // @gotags: validate:"dive"
 }
 
-// Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
-message K8sLabelMatcherRequirement {
+// MatchRequirement. A requirement that the specified label should satisfy on a flow.
+// The match requirement consists of the label key, its values and an operator that relates the key and values.
+message MatchRequirement {
   // Label key that the selector applies to.
   string key = 1; // @gotags: validate:"required"
 
@@ -44,7 +53,7 @@ message K8sLabelMatcherRequirement {
   repeated string values = 3;
 }
 
-// MatchExpression has multiple variants, exactly one should be set.
+// Expression has multiple variants, exactly one should be set.
 //
 // Example:
 // ```yaml
@@ -55,19 +64,19 @@ message K8sLabelMatcherRequirement {
 //         label: app
 //         value: frobnicator
 // ```
-message MatchExpression {
+message Expression {
   // List of MatchExpressions that is used for all or any matching
   //
   // for example, `{any: {of: [expr1, expr2]}}`.
   message List {
     // List of sub expressions of the match expression.
-    repeated MatchExpression of = 1;
+    repeated Expression of = 1;
   }
 
   // @gotags: validate:"required"
   oneof variant {
     // The expression negates the result of sub expression.
-    MatchExpression not = 1;
+    Expression not = 1;
 
     // The expression is true when all sub expressions are true.
     List all = 2;
@@ -79,15 +88,15 @@ message MatchExpression {
     string label_exists = 4;
 
     // The expression is true when label value equals given value.
-    EqualsMatchExpression label_equals = 5;
+    EqualsExpression label_equals = 5;
 
     // The expression is true when label matches given regular expression.
-    MatchesMatchExpression label_matches = 6;
+    MatchesExpression label_matches = 6;
   }
 }
 
 // Label selector expression of the equal form `label == value`.
-message EqualsMatchExpression {
+message EqualsExpression {
   // Name of the label to equal match the value.
   string label = 1; // @gotags: validate:"required"
 
@@ -96,7 +105,7 @@ message EqualsMatchExpression {
 }
 
 // Label selector expression of the form `label matches regex`.
-message MatchesMatchExpression {
+message MatchesExpression {
   // Name of the label to match the regular expression.
   string label = 1; // @gotags: validate:"required"
 

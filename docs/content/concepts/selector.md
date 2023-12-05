@@ -40,19 +40,19 @@ service: checkout.myns.svc.cluster.local # Service
 control_point: ingress # Control Point
 agent_group: default # Agent Group
 label_matcher: # Label Matcher
-match_labels:
-  user_tier: premium
-  http.method: GET
-match_expressions:
-  - key: query
-    operator: In
-    values:
-      - insert
-      - delete
-expression: # Using Label Matcher with expression
-  label_matches:
-    - label: user_agent
-      regex: ^(?!.*Chrome).*Safari
+  match_labels:
+    user_tier: premium
+    http.method: GET
+  match_list:
+    - key: query
+      operator: In
+      values:
+        - insert
+        - delete
+  expression: # Using Label Matcher with expression
+    label_matches:
+      - label: user_agent
+        regex: ^(?!.*Chrome).*Safari
 ```
 
 ## Control Point {#control-point}
@@ -71,8 +71,8 @@ specific criteria.
 There are multiple ways to define a label matcher. If multiple match criteria
 are defined simultaneously, then they all must match for a flow to be selected.
 
-- **Exact Match**: It is the simplest way to match a label. It matches the label
-  value exactly.
+- **Match Labels**: It is the simplest way to match a label. It matches the
+  label value exactly.
 
   ```yaml
   label_matcher:
@@ -80,12 +80,12 @@ are defined simultaneously, then they all must match for a flow to be selected.
       http.method: GET
   ```
 
-- **Matching Expressions**: It allows for more complex matching conditions using
-  operators such as `In`, `NotIn`, `Exists`, and `DoesNotExists`.
+- **Match List**: It allows for more complex matching conditions using operators
+  such as `In`, `NotIn`, `Exists`, and `DoesNotExists`.
 
   ```yaml
   label_matcher:
-    match_expressions:
+    match_list:
       - key: http.method
         operator: In
         values:
@@ -93,8 +93,8 @@ are defined simultaneously, then they all must match for a flow to be selected.
           - POST
   ```
 
-- **Arbitrary Expression**: This allows for defining complex matching
-  conditions, including regular expression matching.
+- **Expression**: This allows for defining complex matching conditions,
+  including regular expression matching.
 
   ```yaml
   label_matcher:
@@ -268,13 +268,12 @@ Liveness and health probes are essential for checking the health of the
 application, and metrics endpoints are necessary for monitoring its performance.
 However, these endpoints do not usually represent the intended workload in an
 Aperture policy. If included in a _Flux Meter_, they can reduce the accuracy of
-latency calculations. If included in an actuation component like _Load
-Scheduler_, they might cause these requests to be rejected under load, leading
-to unnecessary pod restarts.
+latency calculations. If included in a _Rate Limiter_ or _Quota Scheduler_, they
+can cause these endpoints to be rate limited or throttled unnecessarily.
 
-To prevent these issues, traffic to these endpoints can be filtered out by
-matching expressions. In the example below, flows with `http.target` starting
-with `/health`, `/live`, or `/ready`, and User Agent starting with
+To prevent these issues, traffic to these endpoints can be filtered out using a
+label matcher. In the example below, flows with `http.target` either `/health`,
+`/live` or `/ready` are filtered out. Also, flows with User Agent equal to
 `kube-probe/1.23` are filtered out.
 
 ```yaml
@@ -282,7 +281,7 @@ service: checkout.myns.svc.cluster.local
 agent_group: default
 control_point: ingress
 label_matcher:
-  match_expressions:
+  match_list:
     - key: http.target
       operator: NotIn
       values:

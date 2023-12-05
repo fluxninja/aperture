@@ -1253,7 +1253,7 @@ definitions:
             - ema_window
             - warmup_window
         type: object
-    EqualsMatchExpression:
+    EqualsExpression:
         description: Label selector expression of the equal form `label == value`.
         properties:
             label:
@@ -1267,6 +1267,50 @@ definitions:
                 type: string
         required:
             - label
+        type: object
+    Expression:
+        description: |-
+            Expression has multiple variants, exactly one should be set.
+
+            Example:
+            ```yaml
+            all:
+              of:
+                - label_exists: foo
+                - label_equals:
+                    label: app
+                    value: frobnicator
+            ```
+        properties:
+            all:
+                $ref: '#/definitions/ExpressionList'
+                description: The expression is true when all sub expressions are true.
+            any:
+                $ref: '#/definitions/ExpressionList'
+                description: The expression is true when any sub expression is true.
+            label_equals:
+                $ref: '#/definitions/EqualsExpression'
+                description: The expression is true when label value equals given value.
+            label_exists:
+                description: The expression is true when label with given name exists.
+                type: string
+            label_matches:
+                $ref: '#/definitions/MatchesExpression'
+                description: The expression is true when label matches given regular expression.
+            not:
+                $ref: '#/definitions/Expression'
+                description: The expression negates the result of sub expression.
+        type: object
+    ExpressionList:
+        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
+        properties:
+            of:
+                description: List of sub expressions of the match expression.
+                items:
+                    $ref: '#/definitions/Expression'
+                    type: object
+                type: array
+        title: List of MatchExpressions that is used for all or any matching
         type: object
     Extractor:
         description: There are multiple variants of extractor, specify exactly one.
@@ -2031,40 +2075,6 @@ definitions:
             - from
         title: Parse the attribute as JWT and read the payload
         type: object
-    K8sLabelMatcherRequirement:
-        description: Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.
-        properties:
-            key:
-                description: |+
-                    Label key that the selector applies to.
-
-                type: string
-                x-go-tag-validate: required
-            operator:
-                description: |+
-                    Logical operator which represents a key's relationship to a set of values.
-                    Valid operators are In, NotIn, Exists and DoesNotExist.
-
-                enum:
-                    - In
-                    - NotIn
-                    - Exists
-                    - DoesNotExist
-                type: string
-                x-go-tag-validate: required,oneof=In NotIn Exists DoesNotExist
-                x-oneof: In | NotIn | Exists | DoesNotExist
-            values:
-                description: |-
-                    An array of string values that relates to the key by an operator.
-                    If the operator is In or NotIn, the values array must be non-empty.
-                    If the operator is Exists or DoesNotExist, the values array must be empty.
-                items:
-                    type: string
-                type: array
-        required:
-            - key
-            - operator
-        type: object
     KubernetesObjectSelector:
         description: |-
             Describes which pods a control or observability
@@ -2117,16 +2127,19 @@ definitions:
             An empty label matcher always matches.
         properties:
             expression:
-                $ref: '#/definitions/MatchExpression'
+                $ref: '#/definitions/Expression'
                 description: An arbitrary expression to be evaluated on the labels.
             match_expressions:
                 description: |+
                     List of Kubernetes-style label matcher requirements.
 
                     Note: The requirements are combined using the logical AND operator.
+                    <!-- vale off -->
+                    Deprecated: v2.27.0. Use _match_list_ instead.
+                    <!-- vale on -->
 
                 items:
-                    $ref: '#/definitions/K8sLabelMatcherRequirement'
+                    $ref: '#/definitions/MatchRequirement'
                     type: object
                 type: array
                 x-go-tag-validate: dive
@@ -2139,6 +2152,17 @@ definitions:
 
                     Note: The requirements are combined using the logical AND operator.
                 type: object
+            match_list:
+                description: |+
+                    List of label matching requirements.
+
+                    Note: The requirements are combined using the logical AND operator.
+
+                items:
+                    $ref: '#/definitions/MatchRequirement'
+                    type: object
+                type: array
+                x-go-tag-validate: dive
         title: |-
             Allows to define rules whether a map of
             [labels](/concepts/flow-label.md)
@@ -2341,51 +2365,43 @@ definitions:
             - selectors
         title: Parameters for _Load Scheduler_ component
         type: object
-    MatchExpression:
+    MatchRequirement:
         description: |-
-            MatchExpression has multiple variants, exactly one should be set.
+            MatchRequirement. A requirement that the specified label should satisfy on a flow.
+            The match requirement consists of the label key, its values and an operator that relates the key and values.
+        properties:
+            key:
+                description: |+
+                    Label key that the selector applies to.
 
-            Example:
-            ```yaml
-            all:
-              of:
-                - label_exists: foo
-                - label_equals:
-                    label: app
-                    value: frobnicator
-            ```
-        properties:
-            all:
-                $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when all sub expressions are true.
-            any:
-                $ref: '#/definitions/MatchExpressionList'
-                description: The expression is true when any sub expression is true.
-            label_equals:
-                $ref: '#/definitions/EqualsMatchExpression'
-                description: The expression is true when label value equals given value.
-            label_exists:
-                description: The expression is true when label with given name exists.
                 type: string
-            label_matches:
-                $ref: '#/definitions/MatchesMatchExpression'
-                description: The expression is true when label matches given regular expression.
-            not:
-                $ref: '#/definitions/MatchExpression'
-                description: The expression negates the result of sub expression.
-        type: object
-    MatchExpressionList:
-        description: 'for example, `{any: {of: [expr1, expr2]}}`.'
-        properties:
-            of:
-                description: List of sub expressions of the match expression.
+                x-go-tag-validate: required
+            operator:
+                description: |+
+                    Logical operator which represents a key's relationship to a set of values.
+                    Valid operators are In, NotIn, Exists and DoesNotExist.
+
+                enum:
+                    - In
+                    - NotIn
+                    - Exists
+                    - DoesNotExist
+                type: string
+                x-go-tag-validate: required,oneof=In NotIn Exists DoesNotExist
+                x-oneof: In | NotIn | Exists | DoesNotExist
+            values:
+                description: |-
+                    An array of string values that relates to the key by an operator.
+                    If the operator is In or NotIn, the values array must be non-empty.
+                    If the operator is Exists or DoesNotExist, the values array must be empty.
                 items:
-                    $ref: '#/definitions/MatchExpression'
-                    type: object
+                    type: string
                 type: array
-        title: List of MatchExpressions that is used for all or any matching
+        required:
+            - key
+            - operator
         type: object
-    MatchesMatchExpression:
+    MatchesExpression:
         description: Label selector expression of the form `label matches regex`.
         properties:
             label:

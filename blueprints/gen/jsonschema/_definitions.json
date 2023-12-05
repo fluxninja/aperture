@@ -1170,7 +1170,7 @@
       "type": "object",
       "additionalProperties": false
     },
-    "EqualsMatchExpression": {
+    "EqualsExpression": {
       "description": "Label selector expression of the equal form `label == value`.",
       "properties": {
         "label": {
@@ -1184,6 +1184,53 @@
         }
       },
       "required": ["label"],
+      "type": "object",
+      "additionalProperties": false
+    },
+    "Expression": {
+      "description": "Expression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals:\n        label: app\n        value: frobnicator\n```",
+      "properties": {
+        "all": {
+          "$ref": "#/definitions/ExpressionList",
+          "description": "The expression is true when all sub expressions are true."
+        },
+        "any": {
+          "$ref": "#/definitions/ExpressionList",
+          "description": "The expression is true when any sub expression is true."
+        },
+        "label_equals": {
+          "$ref": "#/definitions/EqualsExpression",
+          "description": "The expression is true when label value equals given value."
+        },
+        "label_exists": {
+          "description": "The expression is true when label with given name exists.",
+          "type": "string"
+        },
+        "label_matches": {
+          "$ref": "#/definitions/MatchesExpression",
+          "description": "The expression is true when label matches given regular expression."
+        },
+        "not": {
+          "$ref": "#/definitions/Expression",
+          "description": "The expression negates the result of sub expression."
+        }
+      },
+      "type": "object",
+      "additionalProperties": false
+    },
+    "ExpressionList": {
+      "description": "for example, `{any: {of: [expr1, expr2]}}`.",
+      "properties": {
+        "of": {
+          "description": "List of sub expressions of the match expression.",
+          "items": {
+            "$ref": "#/definitions/Expression",
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "title": "List of MatchExpressions that is used for all or any matching",
       "type": "object",
       "additionalProperties": false
     },
@@ -1908,33 +1955,6 @@
       "type": "object",
       "additionalProperties": false
     },
-    "K8sLabelMatcherRequirement": {
-      "description": "Label selector requirement which is a selector that contains values, a key, and an operator that relates the key and values.",
-      "properties": {
-        "key": {
-          "description": "Label key that the selector applies to.\n\n",
-          "type": "string",
-          "x-go-tag-validate": "required"
-        },
-        "operator": {
-          "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
-          "enum": ["In", "NotIn", "Exists", "DoesNotExist"],
-          "type": "string",
-          "x-go-tag-validate": "required,oneof=In NotIn Exists DoesNotExist",
-          "x-oneof": "In | NotIn | Exists | DoesNotExist"
-        },
-        "values": {
-          "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "required": ["key", "operator"],
-      "type": "object",
-      "additionalProperties": false
-    },
     "KubernetesObjectSelector": {
       "description": "Describes which pods a control or observability\ncomponent should apply to.",
       "properties": {
@@ -1973,13 +1993,13 @@
       "description": "It provides three ways to define requirements:\n- match labels\n- match expressions\n- arbitrary expression\n\nIf multiple requirements are set, they're all combined using the logical AND operator.\nAn empty label matcher always matches.",
       "properties": {
         "expression": {
-          "$ref": "#/definitions/MatchExpression",
+          "$ref": "#/definitions/Expression",
           "description": "An arbitrary expression to be evaluated on the labels."
         },
         "match_expressions": {
-          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\n\n",
+          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\n<!-- vale off -->\nDeprecated: v2.27.0. Use _match_list_ instead.\n<!-- vale on -->\n\n",
           "items": {
-            "$ref": "#/definitions/K8sLabelMatcherRequirement",
+            "$ref": "#/definitions/MatchRequirement",
             "type": "object"
           },
           "type": "array",
@@ -1991,6 +2011,15 @@
           },
           "description": "A map of {key,value} pairs representing labels to be matched.\nA single {key,value} in the `match_labels` requires that the label `key` is present and equal to `value`.\n\nNote: The requirements are combined using the logical AND operator.",
           "type": "object"
+        },
+        "match_list": {
+          "description": "List of label matching requirements.\n\nNote: The requirements are combined using the logical AND operator.\n\n",
+          "items": {
+            "$ref": "#/definitions/MatchRequirement",
+            "type": "object"
+          },
+          "type": "array",
+          "x-go-tag-validate": "dive"
         }
       },
       "title": "Allows to define rules whether a map of\n[labels](/concepts/flow-label.md)\nshould be considered a match or not",
@@ -2190,54 +2219,34 @@
       "type": "object",
       "additionalProperties": false
     },
-    "MatchExpression": {
-      "description": "MatchExpression has multiple variants, exactly one should be set.\n\nExample:\n```yaml\nall:\n  of:\n    - label_exists: foo\n    - label_equals:\n        label: app\n        value: frobnicator\n```",
+    "MatchRequirement": {
+      "description": "MatchRequirement. A requirement that the specified label should satisfy on a flow.\nThe match requirement consists of the label key, its values and an operator that relates the key and values.",
       "properties": {
-        "all": {
-          "$ref": "#/definitions/MatchExpressionList",
-          "description": "The expression is true when all sub expressions are true."
+        "key": {
+          "description": "Label key that the selector applies to.\n\n",
+          "type": "string",
+          "x-go-tag-validate": "required"
         },
-        "any": {
-          "$ref": "#/definitions/MatchExpressionList",
-          "description": "The expression is true when any sub expression is true."
+        "operator": {
+          "description": "Logical operator which represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.\n\n",
+          "enum": ["In", "NotIn", "Exists", "DoesNotExist"],
+          "type": "string",
+          "x-go-tag-validate": "required,oneof=In NotIn Exists DoesNotExist",
+          "x-oneof": "In | NotIn | Exists | DoesNotExist"
         },
-        "label_equals": {
-          "$ref": "#/definitions/EqualsMatchExpression",
-          "description": "The expression is true when label value equals given value."
-        },
-        "label_exists": {
-          "description": "The expression is true when label with given name exists.",
-          "type": "string"
-        },
-        "label_matches": {
-          "$ref": "#/definitions/MatchesMatchExpression",
-          "description": "The expression is true when label matches given regular expression."
-        },
-        "not": {
-          "$ref": "#/definitions/MatchExpression",
-          "description": "The expression negates the result of sub expression."
-        }
-      },
-      "type": "object",
-      "additionalProperties": false
-    },
-    "MatchExpressionList": {
-      "description": "for example, `{any: {of: [expr1, expr2]}}`.",
-      "properties": {
-        "of": {
-          "description": "List of sub expressions of the match expression.",
+        "values": {
+          "description": "An array of string values that relates to the key by an operator.\nIf the operator is In or NotIn, the values array must be non-empty.\nIf the operator is Exists or DoesNotExist, the values array must be empty.",
           "items": {
-            "$ref": "#/definitions/MatchExpression",
-            "type": "object"
+            "type": "string"
           },
           "type": "array"
         }
       },
-      "title": "List of MatchExpressions that is used for all or any matching",
+      "required": ["key", "operator"],
       "type": "object",
       "additionalProperties": false
     },
-    "MatchesMatchExpression": {
+    "MatchesExpression": {
       "description": "Label selector expression of the form `label matches regex`.",
       "properties": {
         "label": {
