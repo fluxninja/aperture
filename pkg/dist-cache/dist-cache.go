@@ -2,12 +2,14 @@ package distcache
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
+	"github.com/buraksezer/olric/events"
 	olricstats "github.com/buraksezer/olric/stats"
 	"github.com/clarketm/json"
 	"github.com/prometheus/client_golang/prometheus"
@@ -31,6 +33,10 @@ type DistCache struct {
 	metrics           *DistCacheMetrics
 	shutDowner        fx.Shutdowner
 	statsFailureCount uint8
+
+	// These are periodically update by the scapeMetrics function.
+	memberID   string
+	memberName string
 }
 
 // NewDistCache creates a new instance of DistCache.
@@ -81,11 +87,10 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 
 	dc.statsFailureCount = 0
 
-	memberID := stats.Member.ID
-	memberName := stats.Member.Name
-	metricLabels := make(prometheus.Labels)
-	metricLabels[metrics.DistCacheMemberIDLabel] = strconv.FormatUint(memberID, 10)
-	metricLabels[metrics.DistCacheMemberNameLabel] = memberName
+	dc.memberID = strconv.FormatUint(stats.Member.ID, 10)
+	dc.memberName = stats.Member.Name
+	// We don't care about the second argument as we just set all needed values above.
+	metricLabels, _ := dc.getMetricsLabels()
 
 	entriesTotalGauge, err := dc.metrics.EntriesTotal.GetMetricWith(metricLabels)
 	if err != nil {
@@ -145,6 +150,15 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 	return nil, nil
 }
 
+// getMetricsLabels returns metric labels based on dc.memberID and dc.memberName.
+// If any of those is empty, function will return false as second argument.
+func (dc *DistCache) getMetricsLabels() (prometheus.Labels, bool) {
+	metricLabels := make(prometheus.Labels)
+	metricLabels[metrics.DistCacheMemberIDLabel] = dc.memberID
+	metricLabels[metrics.DistCacheMemberNameLabel] = dc.memberName
+	return metricLabels, dc.memberID != "" && dc.memberName != ""
+}
+
 // GetStats returns stats of the current Olric member.
 func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.Struct, error) {
 	// create a new context with a timeout to avoid hanging
@@ -180,6 +194,55 @@ func (dc *DistCache) GetStats(ctx context.Context, _ *emptypb.Empty) (*structpb.
 	return structpbStats, nil
 }
 
+func (dc *DistCache) startReportingMetricsFromEvents(ctx context.Context) error {
+	ps, err := dc.client.NewPubSub()
+	if err != nil {
+		return fmt.Errorf("failed creating pub sub client: %w", err)
+	}
+	rps := ps.Subscribe(ctx, events.ClusterEventsChannel)
+	msgCh := rps.Channel()
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case message, ok := <-msgCh:
+				if !ok {
+					log.Warn().Msg("Events channel closed")
+					return
+				}
+				event, err := olricEventFromPayload(message.Payload)
+				if err != nil {
+					log.Debug().Err(err).Msg("Failed getting olric event from payload")
+					continue
+				}
+				metricLabels, ready := dc.getMetricsLabels()
+				if !ready {
+					log.Warn().Msg("Member ID or Member Name not yet set. Skipping event")
+					continue
+				}
+				switch event.Kind {
+				case events.KindFragmentMigrationEvent:
+					fragmentMigrationEventsCounter, err := dc.metrics.FragmentMigrationEventsTotal.GetMetricWith(metricLabels)
+					if err != nil {
+						log.Debug().Msgf("Could not extract fragment migrate counter metric from olric instance: %v", err)
+						continue
+					}
+					fragmentMigrationEventsCounter.Inc()
+				case events.KindFragmentReceivedEvent:
+					fragmentReceivedEventsCounter, err := dc.metrics.FragmentReceivedEventsTotal.GetMetricWith(metricLabels)
+					if err != nil {
+						log.Debug().Msgf("Could not extract fragment received counter metric from olric instance: %v", err)
+						continue
+					}
+					fragmentReceivedEventsCounter.Inc()
+				}
+			}
+		}
+	}()
+	return nil
+}
+
 func countNotEmptyPartitions(partitions map[olricstats.PartitionID]olricstats.Partition) int {
 	result := 0
 	for _, partition := range partitions {
@@ -188,4 +251,17 @@ func countNotEmptyPartitions(partitions map[olricstats.PartitionID]olricstats.Pa
 		}
 	}
 	return result
+}
+
+type olricEvent struct {
+	Kind string `json:"Kind"`
+}
+
+func olricEventFromPayload(payload string) (*olricEvent, error) {
+	var event olricEvent
+	err := json.Unmarshal([]byte(payload), &event)
+	if err != nil {
+		return nil, fmt.Errorf("failed unmarhalling event from payload: %w", err)
+	}
+	return &event, nil
 }
