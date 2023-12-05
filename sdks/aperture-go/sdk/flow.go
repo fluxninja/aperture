@@ -22,12 +22,15 @@ var (
 
 	// ErrKeyMissingFromGlobalCacheResponse is returned when the global cache response does not contain the key.
 	ErrKeyMissingFromGlobalCacheResponse = errors.New("key missing from global cache response")
+
+	// ErrAgentDisconnected is returned when entry is being inserted into cache, but agent connection is not established
+	ErrAgentDisconnected = errors.New("aperture agent connection not established")
 )
 
 // CacheEntry describes the properties of cache entry.
 type CacheEntry struct {
-	value []byte
-	ttl   time.Duration
+	Value []byte
+	TTL   time.Duration
 }
 
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
@@ -134,13 +137,17 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts .
 		return newKeyUpsertResponse(ErrResultCacheKeyNotSet)
 	}
 
-	ttlProto := durationpb.New(cacheEntry.ttl)
+	if f.checkResponse == nil {
+		return newKeyUpsertResponse(ErrAgentDisconnected)
+	}
+
+	ttlProto := durationpb.New(cacheEntry.TTL)
 
 	cacheUpsertResponse, err := f.flowControlClient.CacheUpsert(ctx, &checkv1.CacheUpsertRequest{
 		ControlPoint: f.checkResponse.ControlPoint,
 		ResultCacheEntry: &checkv1.CacheEntry{
 			Key:   f.resultCacheKey,
-			Value: cacheEntry.value,
+			Value: cacheEntry.Value,
 			Ttl:   ttlProto,
 		},
 	}, opts...)
@@ -159,6 +166,10 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts .
 func (f *flow) DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) KeyDeleteResponse {
 	if f.resultCacheKey == "" {
 		return newKeyDeleteResponse(ErrResultCacheKeyNotSet)
+	}
+
+	if f.checkResponse == nil {
+		return newKeyDeleteResponse(ErrAgentDisconnected)
 	}
 
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
@@ -197,12 +208,12 @@ func (f *flow) GlobalCache(key string) KeyLookupResponse {
 
 // SetGlobalCache sets a global cache entry for the flow.
 func (f *flow) SetGlobalCache(ctx context.Context, key string, cacheEntry CacheEntry, opts ...grpc.CallOption) KeyUpsertResponse {
-	ttlProto := durationpb.New(cacheEntry.ttl)
+	ttlProto := durationpb.New(cacheEntry.TTL)
 
 	cacheUpsertResponse, err := f.flowControlClient.CacheUpsert(ctx, &checkv1.CacheUpsertRequest{
 		GlobalCacheEntries: map[string]*checkv1.CacheEntry{
 			key: {
-				Value: cacheEntry.value,
+				Value: cacheEntry.Value,
 				Ttl:   ttlProto,
 			},
 		},
