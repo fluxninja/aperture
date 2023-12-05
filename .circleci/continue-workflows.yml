@@ -1,11 +1,9 @@
 version: 2.1
 
 orbs:
-  docker: circleci/docker@2.1.1
-  gcp-gcr: circleci/gcp-gcr@0.15.1
-  slack: circleci/slack@4.4.4
-  rust: circleci/rust@1.5.0
-  codecov: codecov/codecov@3.2.2
+  docker: circleci/docker@2.4.0
+  gcp-gcr: circleci/gcp-gcr@0.15.3
+  codecov: codecov/codecov@3.3.0
 
 executors:
   base-cimg-executor:
@@ -82,7 +80,7 @@ parameters:
     default: false
 
 jobs:
-  update-api-go-sdk:
+  update-api-go-sdk-job:
     executor: go-cimg-executor
     steps:
       - checkout
@@ -100,13 +98,11 @@ jobs:
     parameters:
       attach-workspace:
         type: boolean
-        description:
-          Boolean for whether or not to attach to an existing workspace
+        description: Boolean for whether or not to attach to an existing workspace
         default: false
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to .
+        description: Path to the directory containing your build context, defaults to .
         default: .
       dockerfile:
         type: string
@@ -139,8 +135,7 @@ jobs:
         description: A name for the image pushed to GCR
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to .
+        description: Path to the directory containing your Dockerfile, defaults to .
         default: .
       remote-docker-version:
         type: string
@@ -318,7 +313,7 @@ jobs:
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
           when: always
 
-  pre-commit:
+  pre-commit-job:
     executor: python-cimg-executor
     resource_class: xlarge
     environment:
@@ -441,8 +436,7 @@ jobs:
           when: on_success
       - save_cache:
           name: Save pre-commit cache
-          key:
-            aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
+          key: aperture-v1-pc-cache-{{ checksum "/tmp/pre-commit-cache-key.txt" }}
           paths:
             - ../.cache/pre-commit
             - ../.cache/pre-commit-zipapp
@@ -452,8 +446,7 @@ jobs:
       - asdf_save_cache:
           cache_name: pre-commit
       - run:
-          name:
-            Show diff and assert pre-commit didn't create any non-ignored files
+          name: Show diff and assert pre-commit didn't create any non-ignored files
           command: |
             git status
             git add .
@@ -467,13 +460,11 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -686,8 +677,7 @@ jobs:
     parameters:
       docker-context:
         type: string
-        description:
-          Path to the directory containing your build context, defaults to "".
+        description: Path to the directory containing your build context, defaults to "".
         default: .
       dockerfile:
         type: string
@@ -698,8 +688,7 @@ jobs:
         description: Name for Docker image
       path:
         type: string
-        description:
-          Path to the directory containing your Dockerfile, defaults to "".
+        description: Path to the directory containing your Dockerfile, defaults to "".
         default: .
       tag:
         type: string
@@ -780,7 +769,7 @@ jobs:
                   )
                   fn release publish-sdk "${args[@]}"
 
-  publish-aperture-docs:
+  publish-aperture-docs-job:
     executor: python-cimg-executor
     resource_class: xlarge
     parameters:
@@ -946,8 +935,7 @@ jobs:
       job-root:
         type: string
         default: "/home/circleci"
-        description:
-          The root folder of the job where all repositories will be cloned to
+        description: The root folder of the job where all repositories will be cloned to
       manifests-repo:
         type: string
         default: git@github.com:fluxninja/argo-manifests.git
@@ -962,13 +950,11 @@ jobs:
       component:
         type: string
         default: ""
-        description:
-          Application component to update image and deployment code for
+        description: Application component to update image and deployment code for
       update:
         type: string
         default: everything
-        description:
-          Whether to update 'images', 'deployment-code' or 'everything'
+        description: Whether to update 'images', 'deployment-code' or 'everything'
     executor: python-cimg-executor
     steps:
       - add_ssh_keys:
@@ -995,8 +981,7 @@ jobs:
     parameters:
       workspace-name:
         type: string
-        description:
-          the name of the workspace to which built packages should be added
+        description: the name of the workspace to which built packages should be added
         default: packages
       goarch:
         type: string
@@ -1106,7 +1091,7 @@ jobs:
       - asdf_save_cache:
           cache_name: aperture-{{ .Environment.COMPONENT }}-packages
 
-  upload-policy-to-latest:
+  upload-policy-to-latest-job:
     parameters:
       policy-name:
         type: string
@@ -1116,8 +1101,7 @@ jobs:
         description: Name of the playground scenario to apply
       controller-endpoint:
         type: string
-        description:
-          The endpoint of the controller to which the policy should be applied
+        description: The endpoint of the controller to which the policy should be applied
     executor: go-cimg-executor
     steps:
       - checkout
@@ -1141,15 +1125,13 @@ jobs:
           when: on_success
 
 workflows:
-  version: 2
-
   update-api-go-sdk:
     when:
       and:
         - equal: [main, << pipeline.git.branch >>]
         - << pipeline.parameters.updated-aperture-api >>
     jobs:
-      - update-api-go-sdk:
+      - update-api-go-sdk-job:
           name: Update API in aperture-go SDK
 
   upload-policy-to-latest:
@@ -1158,7 +1140,7 @@ workflows:
         - equal: [main, << pipeline.git.branch >>]
         - << pipeline.parameters.updated-playground-policies >>
     jobs:
-      - upload-policy-to-latest:
+      - upload-policy-to-latest-job:
           name: upload-policy-to-latest
           policy-name: service1-demo-app
           scenario-name: service-protection-rl-escalation
@@ -1448,7 +1430,7 @@ workflows:
 
   pre-commit:
     jobs:
-      - pre-commit
+      - pre-commit-job
 
   java-demo-app:
     when: << pipeline.parameters.updated-java-demo-app >>
@@ -1480,7 +1462,7 @@ workflows:
         - equal: [main, << pipeline.git.branch >>]
         - << pipeline.parameters.updated-aperture-docs >>
     jobs:
-      - publish-aperture-docs
+      - publish-aperture-docs-job
 
   build-aperture-docs:
     when:
@@ -1489,7 +1471,7 @@ workflows:
             equal: [main, << pipeline.git.branch >>]
         - << pipeline.parameters.updated-aperture-docs >>
     jobs:
-      - publish-aperture-docs:
+      - publish-aperture-docs-job:
           name: build-aperture-docs
           task-name: Build aperture documentation and verify changes
           dry-run: true
@@ -1544,8 +1526,7 @@ workflows:
           <<: *push_deployment_code_job
           name: preview-deployment-changes
           dry-run: true
-          task-name:
-            "Preview changes between aperture.git and deployment repository"
+          task-name: "Preview changes between aperture.git and deployment repository"
 
 commands:
   asdf_install:
@@ -1597,8 +1578,7 @@ commands:
     steps:
       - save_cache:
           name: Save ASDF cache
-          key:
-            aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
+          key: aperture-asdf-cache-v12-{{ checksum "~/month" }}-<<
             parameters.cache_name >>-{{ checksum ".tool-versions" }}-{{ checksum
             "tools/go/go.mod" }}
           paths:
@@ -1686,8 +1666,7 @@ commands:
         type: string
       git-branch:
         type: string
-        description:
-          Use the name of the current branch been used for Image build
+        description: Use the name of the current branch been used for Image build
         default: ${CIRCLE_BRANCH}
       git-commit-hash:
         type: string
