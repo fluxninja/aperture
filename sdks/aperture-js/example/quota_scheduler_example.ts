@@ -30,7 +30,7 @@ const userTiers = {
     "free": 0,
 };
 
-const intervalTime = 1000; // Interval time in milliseconds
+const intervalTime = 1000;
 
 async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: string) {
     const flow = await apertureClient.startFlow("my-feature", {
