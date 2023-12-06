@@ -14,12 +14,14 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@fluxninja/aperture-js": "^2.3.3",
+    "@fluxninja/aperture-js": "^2.4.4",
     "express": "^4.18.2",
-    "http-terminator": "^3.2.0"
+    "http-terminator": "^3.2.0",
+    "inquirer": "^9.2.12"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
+    "@types/inquirer": "^9.0.7",
     "typescript": "^5.2.2"
   }
 }
