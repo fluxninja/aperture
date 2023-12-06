@@ -393,7 +393,11 @@ func (rl *rateLimiter) TakeIfAvailable(
 		return label, true, 0, 0, 0
 	}
 
-	labelKey := rl.lbProto.Parameters.GetLabelKey()
+	labelKey := rl.lbProto.Parameters.GetLimitByLabelKey()
+	if labelKey == "" {
+		// Deprecated: Remove in v3.0.0
+		labelKey = rl.lbProto.Parameters.GetLabelKey()
+	}
 	if labelKey == "" {
 		label = "default"
 	} else {
