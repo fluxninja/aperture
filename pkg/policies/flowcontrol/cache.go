@@ -70,6 +70,7 @@ func NewCache(dc *distcache.DistCache, lc fx.Lifecycle, pr *prometheus.Registry)
 			for _, m := range []prometheus.Collector{
 				cacheLookupHitsTotal,
 				cacheLookupMissesTotal,
+				cacheOperationResultsTotal,
 			} {
 				err := pr.Register(m)
 				if err != nil {
