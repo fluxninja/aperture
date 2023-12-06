@@ -48,7 +48,7 @@ func NewCache(dc *distcache.DistCache, lc fx.Lifecycle, pr *prometheus.Registry)
 		metrics.ControlPointLabel,
 	}
 	cacheLookupHitsTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: metrics.CacheLookupMissesTotalMetricName,
+		Name: metrics.CacheLookupHitsTotalMetricName,
 		Help: "Cumulative number of cache lookup hits.",
 	}, labels)
 	cacheLookupMissesTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
