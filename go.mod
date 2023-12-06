@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/v2
 
-go 1.21.4
+go 1.21
 
 require (
 	cloud.google.com/go/secretmanager v1.11.4

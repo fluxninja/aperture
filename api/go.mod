@@ -1,6 +1,6 @@
 module github.com/fluxninja/aperture/api/v2
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
