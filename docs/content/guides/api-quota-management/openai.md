@@ -101,6 +101,10 @@ Import and setup Aperture Client:
 Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
 
 ```typescript
+
+```
+
+```typescript
 const PRIORITIES: Record<string, number> = {
   paid_user: 10000,
   trial_user: 1000,
@@ -121,6 +125,7 @@ if (this.apertureClient) {
     product_reason: this.settings.product_reason,
     priority: String(PRIORITIES[this.settings.product_reason] + priorityBump),
     prompt_type: promptType,
+    workload_name: this.settings.product_reason,
   };
 
   flow = await this.apertureClient.startFlow("openai", {
@@ -195,9 +200,40 @@ Aperture Cloud UI:
 - Navigate to the `Policies` tab in the sidebar menu within your organization.
 - Click `Create Policy` in the top right corner.
 - Select the `Request Prioritization` tab and click on the dropdown menu.
-- Choose `Quota Based`; the corresponding screen will then appear.
+- Choose `Quota Based`, once there, complete the form to create your quota
+  scheduling policy.
 
-![Quota based blueprint](./assets/openai/quota-scheduler-blueprint.png)
+Following are the fields that need to be adjusted to match the application
+requirements -
+
+- `Policy name`: Name of the policy — This value should be unique and required.
+- `Bucket Capacity`: This value defines burst capacity. For example, in the case
+  of `gpt-4` tokens per minute policy, the bucket will have a capacity of
+  `40000 tokens`.
+- `Fill amount`: After the tokens are consumed, the bucket will be filled with
+  this amount. For example, in the case of `gpt-4` tokens per minute policy, the
+  bucket will fill at `40000 tokens per minute`.
+- `Interval`: It specifies the time duration in which `fill_amount` is applied.
+- `Limit by label key`: This field specifies the label that is used to determine
+  the unique token bucket. It is set to `api_key` meaning that a token bucket
+  would get initiated for each OpenAI key.
+
+- `Priority label key`: This field specifies the label that is used to determine
+  the priority. It is set to `priority` in the policy and SDK code example.
+- `Tokens label key`: This field specifies the label that is used to determine
+  tokens. It is set to `estimated_tokens` in the policy and SDK code example.
+- `Workload label key`: This field specifies the label that is used to determine
+  the workload. It is set to `product_reason` in the policy and SDK code
+  example.
+
+Selector parameters allow filtering of the requests to ensure where the policy
+will act on.
+
+- `Selectors`:
+  - `Control Point`: Control point name to match the request against. In this
+    case, it will be `openai`.
+  - `Label matcher`:
+    - `match_labels`: Labels to match the request against. It is optional.
 
 ```mdx-code-block
   </TabItem>
@@ -212,11 +248,6 @@ the quota scheduling policy using the command below:
 <CodeBlock language="bash"> aperturectl blueprints values
 --name=quota-scheduling/base --output-file=gpt-4-tpm-values.yaml </CodeBlock>
 
-```mdx-code-block
-  </TabItem>
-</Tabs>
-```
-
 Following are the fields that need to be adjusted to match the application
 requirements -
 
@@ -228,29 +259,25 @@ requirements -
   this amount. For example, in the case of `gpt-4` tokens per minute policy, the
   bucket will fill at `40000 tokens per minute`.
 - `rate_limiter`:
-  - `interval`: Interval at which the rate limiter will be filled. When to reset
-    the bucket.
-  - `limit_by_label_key`: Label key to match the request against. This label key
-    in this case is the OpenAI API key (`api_key`) which helps determine the
-    quota for the request.
+  - `interval`: It specifies the time frequency at which `fill_amount` is
+    applied.
+  - `limit_by_label_key`: This field specifies the label that is used to
+    determine the unique token bucket. It is set to `api_key` meaning that a
+    token bucket would get initiated for each OpenAI key.
 
 The scheduler helps prioritize the requests based on the labels and priority
 defined. In this case, we are using the `priority` label, which is being passed
 by Aperture SDK in code, containing the priority of the request.
 
 - `scheduler`:
-  - `priority_label_key`: Priority label key to match the request against. In
-    this case, it is `priority`.
-  - `tokens_label_key`: In the case of tokens per minute policy, each request
-    has a `estimated_tokens` label value, which can be used to prioritize the
-    request based on the number of tokens. In this case, it is
-    `estimated_tokens`.
-  - `workloads`:
-    - `name`: To match the label value against the name of workloads. In this
-      case, it is `paid_user`, `trial_user`, `free_user`.
-    - `label_matcher`:
-      - `match_labels`: Labels to match the request against. In this case, it is
-        `product_reason`.
+  - `priority_label_key`: This field specifies the label that is used to
+    determine the priority. It is set to `priority` in the policy and SDK code
+    example.
+  - `tokens_label_key`: This field specifies the label that is used to determine
+    tokens. It is set to `estimated_tokens` in the policy and SDK code example.
+  - `workload_label_key`: This field specifies the label that is used to
+    determine the workload. It is set to `product_reason` in the policy and SDK
+    code example.
 
 Selector parameters allow filtering of the requests to ensure where the policy
 will act on.
@@ -258,10 +285,13 @@ will act on.
 - `selectors`:
   - `control_point`: Control point name to match the request against. In this
     case, it will be `openai`.
-  - `agent_group`: Agent group name to match the request against. It is
-    optional.
   - `label_matcher`:
     - `match_labels`: Labels to match the request against. It is optional.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 Below are examples of values file adjusted to match the SDK code snippet &
 control point labels.
@@ -310,7 +340,6 @@ policy:
     # Required: True
     selectors:
       - control_point: openai
-        agent_group: default
       - label_matcher:
           match_labels:
             model_variant: gpt-4
@@ -359,7 +388,6 @@ policy:
     # Required: True
     selectors:
       - control_point: openai
-        agent_group: default
       - label_matcher:
           match_labels:
             model_variant: gpt-4
