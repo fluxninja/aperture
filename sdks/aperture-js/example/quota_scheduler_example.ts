@@ -32,11 +32,11 @@ const userTiers = {
 
 const intervalTime = 1000; // Interval time in milliseconds
 
-async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: number) {
+async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: string) {
     const flow = await apertureClient.startFlow("my-feature", {
         labels: {
             user_id: "some_user_id",
-            priority: priority, // Priority is sent as an integer
+            priority: priority,
             workload: `${tier} user`,
         },
         grpcCallOptions: {
@@ -51,7 +51,7 @@ async function sendRequestForTier(apertureClient: ApertureClient, tier: string, 
 function scheduleRequests(apertureClient: ApertureClient) {
     Object.entries(userTiers).forEach(([tier, priority]) => {
         setInterval(() => {
-            sendRequestForTier(apertureClient, tier, priority);
+            sendRequestForTier(apertureClient, tier, priority.toString());
         }, intervalTime);
     });
 }
