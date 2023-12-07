@@ -60,6 +60,8 @@ components for that stage.
   feature rollouts.
 - [**Rate-Limiters**](./rate-limiter.md) proactively guard against abuse by
   regulating excessive requests in accordance with per-label limits.
+- **Caches** reduce the cost of operations and alleviate the load on constrained
+  services by preventing duplicate requests to pay-per-use services.
 - [**Schedulers**](./scheduler/scheduler.md) offer on-demand queuing based on a
   token bucket algorithm, and prioritize requests using weighted fair queuing.
   Multiple matching schedulers can evaluate concurrently, with each having the
