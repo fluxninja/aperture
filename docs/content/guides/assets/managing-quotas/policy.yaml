@@ -1,0 +1,51 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: quota-scheduling-test
+spec:
+  circuit:
+    components:
+    - flow_control:
+        quota_scheduler:
+          in_ports:
+            bucket_capacity:
+              constant_signal:
+                value: 30
+            fill_amount:
+              constant_signal:
+                value: 15
+          out_ports:
+            accept_percentage:
+              signal_name: ACCEPT_PERCENTAGE
+          rate_limiter:
+            interval: 60s
+            limit_by_label_key: user_id
+          scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
+          selectors:
+          - control_point: my-feature
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: ACCEPT_PERCENTAGE
+          rhs:
+            constant_signal:
+              value: 90
+        operator: gte
+        out_ports:
+          output:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+    - alerter:
+        in_ports:
+          signal:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+        parameters:
+          alert_name: More than 90% of requests are being rate limited
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []

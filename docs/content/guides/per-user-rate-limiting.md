@@ -58,8 +58,8 @@ tokens specified by the bucket capacity.
 
 :::note Pre-Requisites
 
-Before exploring the rate limiting capabilities of Aperture, make sure that you
-have signed up [Aperture Cloud](https://app.fluxninja.com/sign-up) and set up an
+Before exploring Aperture's rate limiting capabilities, make sure that you have
+signed up to [Aperture Cloud](https://app.fluxninja.com/sign-up) and set up an
 organization. For more information on how to sign up, follow our
 [step-by-step guide](/reference/cloud-ui/sign-up.md).
 

@@ -1,5 +1,6 @@
 ---
 title: Managing OpenAI API Rate Limits
+sidebar_position: 4
 keywords:
   - policies
   - quota
@@ -8,13 +9,13 @@ keywords:
 ---
 
 ```mdx-code-block
-import {apertureVersion} from '../../apertureVersion.js';
+import {apertureVersion} from '../apertureVersion.js';
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from "@theme/TabItem";
-import {BashTab, TabContent} from '../blueprintsComponents.js';
+import {BashTab, TabContent} from './blueprintsComponents.js';
 import Zoom from 'react-medium-image-zoom';
-import CodeSnippet from '../../codeSnippet.js'
+import CodeSnippet from '../codeSnippet.js'
 
 ```
 
