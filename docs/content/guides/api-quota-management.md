@@ -64,8 +64,8 @@ to the rate limit.
 :::note Pre-Requisites
 
 Before exploring Aperture's quota scheduling capabilities, make sure that you
-have signed up [Aperture Cloud](https://app.fluxninja.com/sign-up) and set up an
-organization. For more information on how to sign up, follow our
+have signed up to [Aperture Cloud](https://app.fluxninja.com/sign-up) and set up
+an organization. For more information on how to sign up, follow our
 [step-by-step guide](/reference/cloud-ui/sign-up.md).
 
 :::
@@ -153,7 +153,7 @@ these specific values:
 2. `Fill amount`: Configures the number of tokens added to the bucket within the
    selected interval. Set `Fill amount` to `15`.
 3. `Bucket Capacity`: Defines the maximum capacity of the bucket in the rate
-   limiter. UnCheck the option `same value for bucket capacity option` to set
+   limiter. Clear the option `same value for bucket capacity option` to set
    value as `30`.
 4. `Interval`: Specifies the time amount of time `Fill amount` will take to
    refill tokens in the bucket. Set `Interval` to `1 minute`.
