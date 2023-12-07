@@ -4,9 +4,15 @@ import static com.fluxninja.aperture.sdk.Constants.CHECK_RESPONSE_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.FLOW_STATUS_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.FLOW_STOP_TIMESTAMP_LABEL;
 
-import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
+import com.fluxninja.aperture.sdk.cache.KeyDeleteResponse;
+import com.fluxninja.aperture.sdk.cache.KeyLookupResponse;
+import com.fluxninja.aperture.sdk.cache.KeyUpsertResponse;
+import com.fluxninja.aperture.sdk.cache.LookupStatus;
+import com.fluxninja.generated.aperture.flowcontrol.check.v1.*;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
+import java.time.Duration;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +24,31 @@ public final class Flow {
     private boolean ended;
     private boolean rampMode;
     private FlowStatus flowStatus;
+    private FlowControlServiceGrpc.FlowControlServiceBlockingStub flowControlClient;
+    private String cacheKey;
+    private String controlPoint;
+    private Exception error;
 
     private static final Logger logger = LoggerFactory.getLogger(Flow.class);
 
-    Flow(CheckResponse checkResponse, Span span, boolean ended, boolean rampMode) {
+    Flow(
+            CheckResponse checkResponse,
+            Span span,
+            boolean ended,
+            boolean rampMode,
+            FlowControlServiceGrpc.FlowControlServiceBlockingStub fcs,
+            String resultCacheKey,
+            String controlPoint,
+            Exception error) {
         this.checkResponse = checkResponse;
         this.span = span;
         this.ended = ended;
         this.rampMode = rampMode;
         this.flowStatus = FlowStatus.OK;
+        this.flowControlClient = fcs;
+        this.cacheKey = resultCacheKey;
+        this.controlPoint = controlPoint;
+        this.error = error;
     }
 
     /**
@@ -114,6 +136,225 @@ public final class Flow {
             logger.warn("Trying to change status of an already ended flow");
         }
         this.flowStatus = status;
+    }
+
+    /**
+     * Set the result cache entry for the flow.
+     *
+     * @param value entry value
+     * @param ttl time-to-live of the entry
+     * @return upsert grpc response
+     */
+    public KeyUpsertResponse setResultCache(byte[] value, Duration ttl) {
+        if (this.cacheKey == null) {
+            return new KeyUpsertResponse(new IllegalArgumentException("Cache key not set"));
+        }
+        com.google.protobuf.Duration ttl_duration =
+                com.google.protobuf.Duration.newBuilder().setSeconds(ttl.getSeconds()).build();
+        CacheEntry entry =
+                CacheEntry.newBuilder()
+                        .setTtl(ttl_duration)
+                        .setValue(ByteString.copyFrom(value))
+                        .setKey(this.cacheKey)
+                        .build();
+        CacheUpsertRequest cacheUpsertRequest =
+                CacheUpsertRequest.newBuilder()
+                        .setControlPoint(this.controlPoint)
+                        .setResultCacheEntry(entry)
+                        .build();
+
+        CacheUpsertResponse res;
+        try {
+            res = this.flowControlClient.cacheUpsert(cacheUpsertRequest);
+        } catch (Exception e) {
+            logger.debug("Aperture gRPC call failed", e);
+            return new KeyUpsertResponse(e);
+        }
+
+        if (!res.hasResultCacheResponse()) {
+            return new KeyUpsertResponse(new IllegalArgumentException("No cache upsert response"));
+        }
+
+        return new KeyUpsertResponse(
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        res.getResultCacheResponse().getError()));
+    }
+
+    /**
+     * Delete the result cache entry for the flow.
+     *
+     * @return delete grpc response
+     */
+    public KeyDeleteResponse deleteResultCache() {
+        if (this.cacheKey == null) {
+            return new KeyDeleteResponse(new IllegalArgumentException("Cache key not set"));
+        }
+
+        CacheDeleteRequest cacheDeleteRequest =
+                CacheDeleteRequest.newBuilder()
+                        .setControlPoint(this.controlPoint)
+                        .setResultCacheKey(this.cacheKey)
+                        .build();
+        CacheDeleteResponse res;
+        try {
+            res = this.flowControlClient.cacheDelete(cacheDeleteRequest);
+        } catch (Exception e) {
+            logger.debug("Aperture gRPC call failed", e);
+            return new KeyDeleteResponse(e);
+        }
+
+        if (!res.hasResultCacheResponse()) {
+            return new KeyDeleteResponse(new IllegalArgumentException("No cache upsert response"));
+        }
+
+        return new KeyDeleteResponse(
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        res.getResultCacheResponse().getError()));
+    }
+
+    /**
+     * Retrieve the result cache entry for the flow.
+     *
+     * @return cache entry for the flow
+     */
+    public KeyLookupResponse resultCache() {
+        if (this.error != null) {
+            return new KeyLookupResponse(null, LookupStatus.MISS, this.error);
+        }
+
+        if (this.checkResponse == null
+                || !this.checkResponse.hasCacheLookupResponse()
+                || !this.checkResponse.getCacheLookupResponse().hasResultCacheResponse()) {
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
+        }
+
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse lookupResponse =
+                this.checkResponse.getCacheLookupResponse().getResultCacheResponse();
+
+        return new KeyLookupResponse(
+                lookupResponse.getValue(),
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheLookupStatus(
+                        lookupResponse.getLookupStatus()),
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        lookupResponse.getError()));
+    }
+
+    /**
+     * Set the global cache entry for the given key.
+     *
+     * @param key entry key
+     * @param value entry value
+     * @param ttl time-to-live of the entry
+     * @return upsert grpc response
+     */
+    public KeyUpsertResponse setGlobalCache(String key, byte[] value, Duration ttl) {
+        com.google.protobuf.Duration ttl_duration =
+                com.google.protobuf.Duration.newBuilder().setSeconds(ttl.getSeconds()).build();
+        CacheEntry entry =
+                CacheEntry.newBuilder()
+                        .setTtl(ttl_duration)
+                        .setValue(ByteString.copyFrom(value))
+                        .build();
+        CacheUpsertRequest cacheUpsertRequest =
+                CacheUpsertRequest.newBuilder().putGlobalCacheEntries(key, entry).build();
+
+        CacheUpsertResponse res;
+        try {
+            res = this.flowControlClient.cacheUpsert(cacheUpsertRequest);
+        } catch (Exception e) {
+            logger.debug("Aperture gRPC call failed", e);
+            return new KeyUpsertResponse(e);
+        }
+
+        if (res.getGlobalCacheResponsesCount() == 0) {
+            return new KeyUpsertResponse(new IllegalArgumentException("No cache upsert responses"));
+        }
+
+        if (!res.containsGlobalCacheResponses(key)) {
+            return new KeyUpsertResponse(
+                    new IllegalArgumentException("Key missing from global cache response"));
+        }
+
+        return new KeyUpsertResponse(
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        res.getGlobalCacheResponsesOrThrow(key).getError()));
+    }
+
+    /**
+     * Delete the global cache entry for the given key.
+     *
+     * @param key entry key
+     * @return delete grpc response
+     */
+    public KeyDeleteResponse deleteGlobalCache(String key) {
+        CacheDeleteRequest cacheDeleteRequest =
+                CacheDeleteRequest.newBuilder().addGlobalCacheKeys(key).build();
+        CacheDeleteResponse res;
+        try {
+            res = this.flowControlClient.cacheDelete(cacheDeleteRequest);
+        } catch (Exception e) {
+            logger.debug("Aperture gRPC call failed", e);
+            return new KeyDeleteResponse(e);
+        }
+
+        if (res.getGlobalCacheResponsesCount() == 0) {
+            return new KeyDeleteResponse(new IllegalArgumentException("No cache upsert response"));
+        }
+
+        if (!res.containsGlobalCacheResponses(key)) {
+            return new KeyDeleteResponse(
+                    new IllegalArgumentException("Key missing from global cache response"));
+        }
+
+        return new KeyDeleteResponse(
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        res.getGlobalCacheResponsesOrThrow(key).getError()));
+    }
+
+    /**
+     * Retrieve the global cache entry for the given key.
+     *
+     * @param key entry key
+     * @return cache entry for the flow
+     */
+    public KeyLookupResponse globalCache(String key) {
+        if (this.error != null) {
+            return new KeyLookupResponse(null, LookupStatus.MISS, this.error);
+        }
+
+        if (this.checkResponse == null
+                || !this.checkResponse.hasCacheLookupResponse()
+                || this.checkResponse.getCacheLookupResponse().getGlobalCacheResponsesCount()
+                        == 0) {
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
+        }
+
+        if (!this.checkResponse.getCacheLookupResponse().containsGlobalCacheResponses(key)) {
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("Key missing from global cache response"));
+        }
+
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse lookupResponse =
+                this.checkResponse.getCacheLookupResponse().getGlobalCacheResponsesOrThrow(key);
+
+        return new KeyLookupResponse(
+                lookupResponse.getValue(),
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheLookupStatus(
+                        lookupResponse.getLookupStatus()),
+                com.fluxninja.aperture.sdk.cache.Utils.convertCacheError(
+                        lookupResponse.getError()));
+    }
+
+    public Exception getError() {
+        return this.error;
     }
 
     /**
