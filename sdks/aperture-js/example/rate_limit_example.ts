@@ -25,6 +25,7 @@ async function initializeApertureClient() {
 
 async function handleRequestRateLimit(apertureClient: ApertureClient) {
     while (true) {
+        // START: RLStartFlow
         const flow = await apertureClient.startFlow("my-feature", {
             labels: {
                 user_id: "some_user_id",
@@ -33,9 +34,11 @@ async function handleRequestRateLimit(apertureClient: ApertureClient) {
                 deadline: Date.now() + 300, // ms
             },
         });
+        // END: RLStartFlow
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
+        // START: RLFlowShouldRun
         if (flow.shouldRun()) {
             console.log("Request accepted. Processing...");
         } else {
@@ -43,6 +46,7 @@ async function handleRequestRateLimit(apertureClient: ApertureClient) {
         }
 
         flow.end();
+        // END: RLFlowShouldRun
     }
 }
 

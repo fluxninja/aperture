@@ -27,7 +27,7 @@ const userTiers = {
     "platinum": 8,
     "gold": 4,
     "silver": 2,
-    "free": 0,
+    "free": 1,
 };
 
 const intervalTime = 1000;
