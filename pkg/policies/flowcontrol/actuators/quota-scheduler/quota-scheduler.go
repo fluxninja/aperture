@@ -345,7 +345,11 @@ func (qs *quotaScheduler) GetSelectors() []*policylangv1.Selector {
 }
 
 func (qs *quotaScheduler) getLabelKey(labels labels.Labels) (string, bool) {
-	labelKey := qs.proto.RateLimiter.GetLabelKey()
+	labelKey := qs.proto.RateLimiter.GetLimitByLabelKey()
+	if labelKey == "" {
+		// Deprecated: Remove in v3.0.0
+		labelKey = qs.proto.RateLimiter.GetLabelKey()
+	}
 	var label string
 	if labelKey == "" {
 		label = "default"

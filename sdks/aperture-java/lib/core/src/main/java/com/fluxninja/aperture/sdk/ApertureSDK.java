@@ -4,6 +4,7 @@ import static com.fluxninja.aperture.sdk.Constants.FLOW_START_TIMESTAMP_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.SOURCE_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.WORKLOAD_START_TIMESTAMP_LABEL;
 
+import com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckRequest;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowControlServiceGrpc;
@@ -85,7 +86,15 @@ public final class ApertureSDK {
             } catch (java.io.UnsupportedEncodingException e) {
                 // This should never happen, as `StandardCharsets.UTF_8.name()` is a valid
                 // encoding
-                throw new RuntimeException(e);
+                return new Flow(
+                        null,
+                        null,
+                        false,
+                        parameters.getRampMode(),
+                        this.flowControlClient,
+                        parameters.getResultCacheKey(),
+                        parameters.getControlPoint(),
+                        e);
             }
             labels.put(entry.getKey(), value);
         }
@@ -99,6 +108,11 @@ public final class ApertureSDK {
                         .setControlPoint(parameters.getControlPoint())
                         .putAllLabels(labels)
                         .setRampMode(parameters.getRampMode())
+                        .setCacheLookupRequest(
+                                CacheLookupRequest.newBuilder()
+                                        .addAllGlobalCacheKeys(parameters.getGlobalCacheKeys())
+                                        .setResultCacheKey(parameters.getResultCacheKey())
+                                        .build())
                         .build();
 
         Span span =
@@ -121,10 +135,27 @@ public final class ApertureSDK {
             }
         } catch (StatusRuntimeException e) {
             // deadline exceeded or couldn't reach agent - request should not be blocked
+            return new Flow(
+                    res,
+                    span,
+                    false,
+                    parameters.getRampMode(),
+                    this.flowControlClient,
+                    parameters.getResultCacheKey(),
+                    parameters.getControlPoint(),
+                    e);
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new Flow(res, span, false, parameters.getRampMode());
+        return new Flow(
+                res,
+                span,
+                false,
+                parameters.getRampMode(),
+                this.flowControlClient,
+                parameters.getResultCacheKey(),
+                parameters.getControlPoint(),
+                null);
     }
 
     /**

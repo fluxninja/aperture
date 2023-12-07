@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: static-rate-limiting
+  name: rate-limit-test
 spec:
   circuit:
     components:
@@ -12,19 +12,19 @@ spec:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 40
+                value: 10
             fill_amount:
               constant_signal:
-                value: 2
+                value: 10
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
           parameters:
-            interval: 1s
+            interval: 30s
             limit_by_label_key: user_id
           request_parameters: {}
           selectors:
-          - control_point: awesomeFeature
+          - control_point: my-feature
     - decider:
         in_ports:
           lhs:

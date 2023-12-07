@@ -51,6 +51,19 @@ const (
 	DistCachePartitionsCountMetricsName = "distcache_partitions_count"
 	// DistCacheBackupPartitionsCountMetricsName - metric for the current number of non-empty backups owned by given node.
 	DistCacheBackupPartitionsCountMetricsName = "distcache_backup_partitions_count"
+	// DistCacheFragmentMigrationEventsTotalMetricsName - metric for cumulative number of fragment migration (outgoing) events.
+	DistCacheFragmentMigrationEventsTotalMetricsName = "distcache_fragment_migration_events_total"
+	// DistCacheFragmentReceivedEventsTotalMetricsName - metric for cumulative number of fragment received (incoming) events.
+	DistCacheFragmentReceivedEventsTotalMetricsName = "distcache_fragment_received_events_total"
+
+	// Cache metrics.
+
+	// CacheLookupHitsTotalMetricName - metric for cumulative number of cache lookup hits.
+	CacheLookupHitsTotalMetricName = "aperture_cache_lookup_hits_total"
+	// CacheLookupMissesTotalMetricName - metric for cumulative number of cache lookup misses.
+	CacheLookupMissesTotalMetricName = "aperture_cache_lookup_misses_total"
+	// CacheOperationResultsTotalMetricName - metric for cumulative number of cache operation results.
+	CacheOperationResultsTotalMetricName = "aperture_cache_operation_results_total"
 
 	// Workload metrics.
 
@@ -172,6 +185,26 @@ const (
 	FlowControlCheckRejectReasonLabel = "reject_reason"
 	// AgentGroupLabel - label for agent group.
 	AgentGroupLabel = "agent_group"
+	// CacheTypeLabel - label for cache type.
+	CacheTypeLabel = "type"
+	// CacheTypeGlobal - cache type global.
+	CacheTypeGlobal = "global"
+	// CacheTypeResult - cache type result.
+	CacheTypeResult = "result"
+	// CacheOperationTypeLabel - label for type of cache operation.
+	CacheOperationTypeLabel = "operation_type"
+	// CacheOperationTypeLookup - cache lookup operation.
+	CacheOperationTypeLookup = "lookup"
+	// CacheOperationTypeDelete - cache delete operation.
+	CacheOperationTypeDelete = "delete"
+	// CacheOperationStatusLabel - label for cacho operation status.
+	CacheOperationStatusLabel = "status"
+	// CacheOperationStatusSuccess - cache operation success.
+	CacheOperationStatusSuccess = "success"
+	// CacheOperationStatusError - cache operation error.
+	CacheOperationStatusError = "error"
+	// ControlPointLabel - label for control point.
+	ControlPointLabel = "control_point"
 
 	// DEFAULTS.
 

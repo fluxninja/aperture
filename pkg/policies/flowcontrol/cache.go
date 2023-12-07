@@ -3,6 +3,7 @@ package flowcontrol
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -10,8 +11,11 @@ import (
 	olricconfig "github.com/buraksezer/olric/config"
 	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
 )
 
@@ -28,17 +32,53 @@ var (
 
 // Cache for saving responses at flow end.
 type Cache struct {
-	dmapCache olric.DMap
+	dmapCache                  olric.DMap
+	cacheLookupHitsTotal       *prometheus.CounterVec
+	cacheMissesTotal           *prometheus.CounterVec
+	cacheOperationResultsTotal *prometheus.CounterVec
 }
 
 // Cache implements iface.Cache.
 var _ iface.Cache = (*Cache)(nil)
 
 // NewCache creates a new cache.
-func NewCache(dc *distcache.DistCache, lc fx.Lifecycle) (iface.Cache, error) {
-	cache := &Cache{}
+func NewCache(dc *distcache.DistCache, lc fx.Lifecycle, pr *prometheus.Registry) (iface.Cache, error) {
+	labels := []string{
+		metrics.CacheTypeLabel,
+		metrics.ControlPointLabel,
+	}
+	cacheLookupHitsTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.CacheLookupHitsTotalMetricName,
+		Help: "Cumulative number of cache lookup hits.",
+	}, labels)
+	cacheLookupMissesTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.CacheLookupMissesTotalMetricName,
+		Help: "Cumulative number of cache lookup misses.",
+	}, labels)
+	labels = append(labels, []string{metrics.CacheOperationTypeLabel, metrics.CacheOperationStatusLabel}...)
+	cacheOperationResultsTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.CacheOperationResultsTotalMetricName,
+		Help: "Cumulative number of operation statuses.",
+	}, labels)
+	cache := &Cache{
+		cacheLookupHitsTotal:       cacheLookupHitsTotal,
+		cacheMissesTotal:           cacheLookupMissesTotal,
+		cacheOperationResultsTotal: cacheOperationResultsTotal,
+	}
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
+			for _, m := range []prometheus.Collector{
+				cacheLookupHitsTotal,
+				cacheLookupMissesTotal,
+				cacheOperationResultsTotal,
+			} {
+				err := pr.Register(m)
+				if err != nil {
+					if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+						return fmt.Errorf("unable to register cache metrics: %v", err)
+					}
+				}
+			}
 			dmapCache, err := dc.NewDMap("control_point_cache", olricconfig.DMap{})
 			if err != nil {
 				return err
@@ -122,6 +162,7 @@ func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRe
 	response, wgResult, wgGlobal := c.LookupWait(ctx, request)
 	wgResult.Wait()
 	wgGlobal.Wait()
+	c.reportLookupMetrics(request, response)
 	return response
 }
 
@@ -345,7 +386,105 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 	}
 	wg.Wait()
 
+	c.reportDeleteMetrics(req, response)
 	return response
+}
+
+func (c *Cache) reportLookupMetrics(
+	request *flowcontrolv1.CacheLookupRequest,
+	response *flowcontrolv1.CacheLookupResponse,
+) {
+	if response.ResultCacheResponse != nil {
+		c.reportLookupMetricsForResponse(
+			metrics.CacheTypeResult,
+			request.ControlPoint,
+			response.ResultCacheResponse,
+		)
+		c.reportOperationMetricsForResponse(
+			metrics.CacheOperationTypeLookup,
+			metrics.CacheTypeResult,
+			request.ControlPoint,
+			response.ResultCacheResponse.OperationStatus,
+		)
+	}
+	for _, resp := range response.GlobalCacheResponses {
+		c.reportLookupMetricsForResponse(
+			metrics.CacheTypeGlobal,
+			request.ControlPoint,
+			resp,
+		)
+		c.reportOperationMetricsForResponse(
+			metrics.CacheOperationTypeLookup,
+			metrics.CacheTypeGlobal,
+			request.ControlPoint,
+			resp.OperationStatus,
+		)
+	}
+}
+
+func (c *Cache) reportDeleteMetrics(
+	request *flowcontrolv1.CacheDeleteRequest,
+	response *flowcontrolv1.CacheDeleteResponse,
+) {
+	if response.ResultCacheResponse != nil {
+		c.reportOperationMetricsForResponse(
+			metrics.CacheOperationTypeDelete,
+			metrics.CacheTypeResult,
+			request.ControlPoint,
+			response.ResultCacheResponse.OperationStatus,
+		)
+	}
+	for _, resp := range response.GlobalCacheResponses {
+		c.reportOperationMetricsForResponse(
+			metrics.CacheOperationTypeDelete,
+			metrics.CacheTypeGlobal,
+			request.ControlPoint,
+			resp.OperationStatus,
+		)
+	}
+}
+
+func (c *Cache) reportLookupMetricsForResponse(cacheType, controlPoint string, response *flowcontrolv1.KeyLookupResponse) {
+	labels := prometheus.Labels(map[string]string{
+		metrics.CacheTypeLabel:    cacheType,
+		metrics.ControlPointLabel: controlPoint,
+	})
+	switch response.LookupStatus {
+	case flowcontrolv1.CacheLookupStatus_HIT:
+		hitCounter, err := c.cacheLookupHitsTotal.GetMetricWith(labels)
+		if err != nil {
+			log.Debug().Msgf("Could not extract cache hit count counter metric: %v", err)
+			return
+		}
+		hitCounter.Inc()
+	case flowcontrolv1.CacheLookupStatus_MISS:
+		missCounter, err := c.cacheMissesTotal.GetMetricWith(labels)
+		if err != nil {
+			log.Debug().Msgf("Could not extract cache miss count counter metric: %v", err)
+			return
+		}
+		missCounter.Inc()
+	}
+}
+
+func (c *Cache) reportOperationMetricsForResponse(operationType, cacheType, controlPoint string, operationStatus flowcontrolv1.CacheOperationStatus) {
+	labels := prometheus.Labels(map[string]string{
+		metrics.CacheTypeLabel:          cacheType,
+		metrics.ControlPointLabel:       controlPoint,
+		metrics.CacheOperationTypeLabel: operationType,
+	})
+	switch operationStatus {
+	case flowcontrolv1.CacheOperationStatus_SUCCESS:
+		labels[metrics.CacheOperationStatusLabel] = metrics.CacheOperationStatusSuccess
+	case flowcontrolv1.CacheOperationStatus_ERROR:
+		labels[metrics.CacheOperationStatusLabel] = metrics.CacheOperationStatusError
+	}
+	statusCounter, err := c.cacheOperationResultsTotal.GetMetricWith(labels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract cache operation status metric: %v", err)
+		return
+	}
+	statusCounter.Inc()
 }
 
 // formatCacheKey returns the cache key for the given control point and key.

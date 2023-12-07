@@ -99,6 +99,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	}
 	oc.BindAddr = bindAddr
 	oc.BindPort = bindPort
+	oc.EnableClusterEventsChannel = true
 
 	memberlistBindAddr, p, err := net.SplitHostPort(defaultConfig.MemberlistBindAddr)
 	if err != nil {
@@ -147,6 +148,8 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 
 	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
 
+	// Context used by goroutine listening for Olric events. Should be canceled in fx.Stop.
+	eventListenerCtx, eventListenerCancel := context.WithCancel(context.Background())
 	job := jobs.NewBasicJob(distCacheMetricsJobName, dc.scrapeMetrics)
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -180,9 +183,17 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 				log.Error().Err(err).Msg("Failed to register distcache scrape metrics job with jobGroup")
 				return err
 			}
+
+			err = dc.startReportingMetricsFromEvents(eventListenerCtx)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to start reporting metrics from events")
+				return err
+			}
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			log.Info().Msg("Canceling events listener context")
+			eventListenerCancel()
 			err := in.LivenessMultiJob.DeregisterJob(distCacheMetricsJobName)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to deregister distcache scrape metrics job with jobGroup")
