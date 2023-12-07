@@ -23,16 +23,19 @@ async function initializeApertureClient() {
     return apertureClient;
 }
 
+// START: Priority
 const userTiers = {
     "platinum": 8,
     "gold": 4,
     "silver": 2,
     "free": 1,
 };
+// END: Priority
 
 const intervalTime = 1000;
 
 async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: string) {
+    // START: QSStartFlow
     const flow = await apertureClient.startFlow("my-feature", {
         labels: {
             user_id: "some_user_id",
@@ -46,6 +49,7 @@ async function sendRequestForTier(apertureClient: ApertureClient, tier: string, 
 
     console.log(`Request sent for ${tier} tier with priority ${priority}.`);
     flow.end();
+    // END: QSStartFlow
 }
 
 function scheduleRequests(apertureClient: ApertureClient) {

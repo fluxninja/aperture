@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../../../blueprints/quota-scheduling/base/gen/definitions.json
+blueprint: quota-scheduling/base
+uri: ../../../../../blueprints
+policy:
+
+  policy_name: "quota-scheduling-test"
+  quota_scheduler:
+    bucket_capacity: 30
+    fill_amount: 15
+    rate_limiter:
+      interval: 60s
+      limit_by_label_key: "user_id"
+    scheduler:
+      priority_label_key: priority
+      workload_label_key: workload
+    selectors:
+      - control_point: my-feature

@@ -1,0 +1,21 @@
+flowchart LR
+classDef Orange fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Green fill:#56AE89,stroke:#000000,stroke-width:2px;
+classDef Red fill:#F13C15,stroke:#000000,stroke-width:1px;
+classDef Pink fill:#ffb6c1,stroke:#000000,stroke-width:1px;
+
+TB[\Token Bucket/]
+class TB Orange
+
+Scheduler
+class Scheduler Orange
+
+SDK
+class SDK Green
+
+subgraph Aperture_Cloud ["Aperture Cloud"]
+    Scheduler -- "Counting" --> TB
+end
+class Aperture_Cloud Green
+
+SDK -- "Schedule Request" --> Scheduler

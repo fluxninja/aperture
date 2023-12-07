@@ -1,12 +1,12 @@
-flowchart LR
+flowchart RL
 classDef TokenBucket fill:#F8773D,stroke:#000000,stroke-width:2px;
 classDef Service fill:#56AE89,stroke:#000000,stroke-width:2px;
 
-subgraph Cloud
+subgraph Aperture_Cloud ["Aperture Cloud"]
 TB[\Token Bucket/]
 class TB TokenBucket
 end
-class Cloud Service
+class Aperture_Cloud Service
 
 TB <-- "counting tokens" --> SDK
 
