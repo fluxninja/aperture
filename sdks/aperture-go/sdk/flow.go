@@ -22,9 +22,6 @@ var (
 
 	// ErrKeyMissingFromGlobalCacheResponse is returned when the global cache response does not contain the key.
 	ErrKeyMissingFromGlobalCacheResponse = errors.New("key missing from global cache response")
-
-	// ErrAgentDisconnected is returned when entry is being inserted into cache, but agent connection is not established
-	ErrAgentDisconnected = errors.New("aperture agent connection not established")
 )
 
 // CacheEntry describes the properties of cache entry.
@@ -138,7 +135,7 @@ func (f *flow) SetResultCache(ctx context.Context, cacheEntry CacheEntry, opts .
 	}
 
 	if f.checkResponse == nil {
-		return newKeyUpsertResponse(ErrAgentDisconnected)
+		return newKeyDeleteResponse(f.err)
 	}
 
 	ttlProto := durationpb.New(cacheEntry.TTL)
@@ -169,7 +166,7 @@ func (f *flow) DeleteResultCache(ctx context.Context, opts ...grpc.CallOption) K
 	}
 
 	if f.checkResponse == nil {
-		return newKeyDeleteResponse(ErrAgentDisconnected)
+		return newKeyDeleteResponse(f.err)
 	}
 
 	cacheDeleteResponse, err := f.flowControlClient.CacheDelete(ctx, &checkv1.CacheDeleteRequest{
