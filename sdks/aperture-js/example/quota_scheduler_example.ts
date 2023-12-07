@@ -34,12 +34,12 @@ const userTiers = {
 
 const intervalTime = 1000;
 
-async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: string) {
+async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: number) {
     // START: QSStartFlow
     const flow = await apertureClient.startFlow("my-feature", {
         labels: {
             user_id: "some_user_id",
-            priority: priority,
+            priority: priority.toString(),
             workload: `${tier} user`,
         },
         grpcCallOptions: {
@@ -55,7 +55,7 @@ async function sendRequestForTier(apertureClient: ApertureClient, tier: string, 
 function scheduleRequests(apertureClient: ApertureClient) {
     Object.entries(userTiers).forEach(([tier, priority]) => {
         setInterval(() => {
-            sendRequestForTier(apertureClient, tier, priority.toString());
+            sendRequestForTier(apertureClient, tier, priority);
         }, intervalTime);
     });
 }
