@@ -7555,16 +7555,6 @@ The percentage of flows being accepted by the _Rate Limiter_.
 <!-- vale on -->
 
 <dl>
-<dt>adaptive_load_scheduler</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadScheduler](#adaptive-load-scheduler))
-
-<!-- vale on -->
-
-</dd>
 <dt>continuous_fill</dt>
 <dd>
 

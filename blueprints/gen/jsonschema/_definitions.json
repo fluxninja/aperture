@@ -3099,9 +3099,6 @@
     },
     "RateLimiterParameters": {
       "properties": {
-        "adaptive_load_scheduler": {
-          "$ref": "#/definitions/AdaptiveLoadScheduler"
-        },
         "continuous_fill": {
           "default": true,
           "description": "Continuous fill determines whether the token bucket should be filled\ncontinuously or only on discrete intervals.\n\n",

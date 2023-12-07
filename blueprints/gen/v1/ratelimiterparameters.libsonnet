@@ -1,12 +1,6 @@
 {
   new():: {
   },
-  withAdaptiveLoadScheduler(adaptive_load_scheduler):: {
-    adaptive_load_scheduler: adaptive_load_scheduler,
-  },
-  withAdaptiveLoadSchedulerMixin(adaptive_load_scheduler):: {
-    adaptive_load_scheduler+: adaptive_load_scheduler,
-  },
   withContinuousFill(continuous_fill):: {
     continuous_fill: continuous_fill,
   },

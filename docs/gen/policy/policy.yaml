@@ -3164,8 +3164,6 @@ definitions:
         type: object
     RateLimiterParameters:
         properties:
-            adaptive_load_scheduler:
-                $ref: '#/definitions/AdaptiveLoadScheduler'
             continuous_fill:
                 default: true
                 description: |+
