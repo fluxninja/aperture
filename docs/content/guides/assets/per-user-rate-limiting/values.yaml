@@ -2,12 +2,13 @@
 blueprint: rate-limiting/base
 uri: ../../../../../blueprints
 policy:
-  policy_name: "static-rate-limiting"
+  policy_name: "rate-limit-test"
   rate_limiter:
-    bucket_capacity: 40
-    fill_amount: 2
-    selectors:
-      - control_point: "awesomeFeature"
+    bucket_capacity: 10
+    fill_amount: 10
     parameters:
+      interval: 30s
       limit_by_label_key: "user_id"
-      interval: 1s
+    selectors:
+      - control_point: "my-feature"
+

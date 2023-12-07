@@ -123,19 +123,25 @@ flow.
 </Tabs>
 ```
 
-## Create a Rate Limiting Policy in Aperture Cloud
+## Create a Rate Limiting Policy
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="Aperture Cloud UI">
+```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
 in the upper right corner. Next, choose the Rate Limiting blueprint and complete
 the form with these specific values:
 
-1. `Policy name`: Unique for each policy, this field allows users to define
+1. `Policy name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
    `rate-limit-test`.
 2. `Fill amount`: Configures the number of tokens added to the bucket within the
    selected interval. Set `Fill amount` to `10`.
 3. `Bucket Capacity`: Defines the maximum capacity of the bucket in the rate
-   limiter. Clear the `same value for bucket capacity option` and input `10`.
+   limiter. Check the option `same value for bucket capacity option` to set the
+   same value for bucket capacity and fill amount.
 4. `Interval`: Specifies the time amount of time `Fill amount` will take to
    refill tokens in the bucket. Set `Interval` to `30 seconds`.
 5. `Limit By Label Key`: Determines the specific label key used for enforcing
@@ -153,6 +159,58 @@ their `user_id`. Users are permitted to make up to 10 requests in a burst before
 encountering rate limiting. As the bucket gradually refills with 10 requests
 over a span of 30 seconds, users can make a restricted number of successive
 requests.
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="aperturectl (Aperture Cloud)">
+```
+
+If you haven't installed aperturectl yet, begin by following the
+[Set up CLI aperturectl guide](/reference/aperture-cli/aperture-cli.md). Once
+aperturectl is installed, generate the values file necessary for creating the
+rate limiting policy using the command below:
+
+<CodeBlock language="bash"> aperturectl blueprints values
+--name=rate-limiting/base --output-file=rate-limit-test.yaml </CodeBlock>
+
+Following are the fields that need to be filled for creating a rate limiting
+policy:
+
+1. `policy_name`: Unique for each policy, this field can be used to define
+   policies tailored for different use cases. Set the policy name to
+   `rate-limit-test`.
+2. `fill_amount`: Configures the number of tokens added to the bucket within the
+   selected interval. Set `Fill amount` to `10`.
+3. `bucket_capacity`: Defines the maximum capacity of the bucket in the rate
+   limiter. Set `bucket_capacity` to `10`.
+4. `interval`: Specifies the time amount of time `Fill amount` will take to
+   refill tokens in the bucket. Set `Interval` to `30 seconds`.
+5. `limit_by_label_key`: Determines the specific label key used for enforcing
+   rate limits. We'll use `user_id` as an example.
+6. `control_point`: It can be a particular feature or execution block within a
+   service. We'll use `my-feature` as an example.
+
+Here is how the complete values file would look:
+
+```yaml
+{@include: ./assets/per-user-rate-limiting/values.yaml}
+```
+
+The last step is to apply the policy using the following command:
+
+<CodeBlock language="bash"> aperturectl cloud blueprints apply
+--values-file=rate-limit-test.yaml </CodeBlock>
+
+For this policy, a unique token bucket is created for each user identified by
+their `user_id`. Users are permitted to make up to 10 requests in a burst before
+encountering rate limiting. As the bucket gradually refills with 10 requests
+over a span of 30 seconds, users can make a restricted number of successive
+requests.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 Next, we'll proceed to run an example to observe the newly implemented policy in
 action.
@@ -173,9 +231,8 @@ Follow these steps to set up and run the example:
 
 Once the example is running, it will prompt you for your Organization address
 and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
-menu. Copy both your Organization address and API Key. and enter these details
-in the Command Line Interface (CLI) where the example is running. This ensures
-the creation and connection of an Aperture Client instance to your organization.
+menu. Copy and enter both your Organization address and API Key to establish a
+connection between the SDK and Aperture Cloud.
 
 ## Monitoring Rate Limiting Policy
 
@@ -189,6 +246,7 @@ Once you've clicked on the policy, you will see the following dashboard:
 ![Rate Limiter Graph](./assets/per-user-rate-limiting/rate-limiter-graph.png)
 
 These two panels provide insights into how the policy is performing by
-monitoring the number of accepted and rejected requests along with the accept
-percentage. Observing these graphs will help you understand the effectiveness of
-your rate limiting setup and guide any necessary adjustments or optimizations.
+monitoring the number of accepted and rejected requests along with the
+acceptance percentage. Observing these graphs will help you understand the
+effectiveness of your rate limiting setup and help in making any necessary
+adjustments or optimizations.
