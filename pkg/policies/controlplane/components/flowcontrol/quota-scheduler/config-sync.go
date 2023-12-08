@@ -24,7 +24,7 @@ type quotaSchedulerSync struct {
 	configEtcdPaths     []string
 }
 
-// NewConfigSyncOptions creates fx options for syncing LoadScheduler objects with agent groups.
+// NewConfigSyncOptions creates fx options for syncing QuotaScheduler objects with agent groups.
 func NewConfigSyncOptions(
 	quotaSchedulerProto *policylangv1.QuotaScheduler,
 	componentID runtime.ComponentID,

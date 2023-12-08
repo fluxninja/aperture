@@ -1,10 +1,16 @@
-local ratelimiterins = import './ratelimiterins.libsonnet';
-local ratelimiterouts = import './ratelimiterouts.libsonnet';
+local concurrencylimiterins = import './concurrencylimiterins.libsonnet';
+local concurrencylimiterouts = import './concurrencylimiterouts.libsonnet';
 {
   new():: {
   },
-  inPorts:: ratelimiterins,
-  outPorts:: ratelimiterouts,
+  inPorts:: concurrencylimiterins,
+  outPorts:: concurrencylimiterouts,
+  withConcurrencyLimiter(concurrency_limiter):: {
+    concurrency_limiter: concurrency_limiter,
+  },
+  withConcurrencyLimiterMixin(concurrency_limiter):: {
+    concurrency_limiter+: concurrency_limiter,
+  },
   withInPorts(in_ports):: {
     in_ports: in_ports,
   },
@@ -16,12 +22,6 @@ local ratelimiterouts = import './ratelimiterouts.libsonnet';
   },
   withOutPortsMixin(out_ports):: {
     out_ports+: out_ports,
-  },
-  withRateLimiter(rate_limiter):: {
-    rate_limiter: rate_limiter,
-  },
-  withRateLimiterMixin(rate_limiter):: {
-    rate_limiter+: rate_limiter,
   },
   withScheduler(scheduler):: {
     scheduler: scheduler,

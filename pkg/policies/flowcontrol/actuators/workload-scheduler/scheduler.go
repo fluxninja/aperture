@@ -625,6 +625,9 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 		tokensConsumed = req.Tokens
 	}
 
+	// TODO: for testing only, remove before commit
+	log.Info().Msgf("DeniedResponseStatusCode: %d", s.proto.GetDeniedResponseStatusCode())
+
 	return &flowcontrolv1.LimiterDecision{
 		PolicyName:               s.component.GetPolicyName(),
 		PolicyHash:               s.component.GetPolicyHash(),

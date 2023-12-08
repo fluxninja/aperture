@@ -19,6 +19,18 @@
   withAimdLoadSchedulerMixin(aimd_load_scheduler):: {
     aimd_load_scheduler+: aimd_load_scheduler,
   },
+  withConcurrencyLimiter(concurrency_limiter):: {
+    concurrency_limiter: concurrency_limiter,
+  },
+  withConcurrencyLimiterMixin(concurrency_limiter):: {
+    concurrency_limiter+: concurrency_limiter,
+  },
+  withConcurrencyScheduler(concurrency_scheduler):: {
+    concurrency_scheduler: concurrency_scheduler,
+  },
+  withConcurrencySchedulerMixin(concurrency_scheduler):: {
+    concurrency_scheduler+: concurrency_scheduler,
+  },
   withLoadRamp(load_ramp):: {
     load_ramp: load_ramp,
   },

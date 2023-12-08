@@ -32,6 +32,8 @@ const (
 	ClassifierCounterTotalMetricName = "classifier_counter_total"
 	// SamplerCounterTotalMetricName - name of the counter describing times sampler was triggered.
 	SamplerCounterTotalMetricName = "sampler_counter_total"
+	// ConcurrencyLimiterCounterTotalMetricName - name of the counter describing times concurrency limiter was triggered.
+	ConcurrencyLimiterCounterTotalMetricName = "concurrency_limiter_counter_total"
 
 	// DistCache metrics scraped from Olric DMaps statistics.
 
