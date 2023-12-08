@@ -75,8 +75,8 @@ You can obtain your organization address and API Key within the Aperture Cloud
 UI by clicking the `Aperture` tab in the sidebar menu.
 
 The next step is making a `startFlow` call to Aperture. For this call, it's
-crucial to designate the `control point` (`my-feature` in our example) and the
-`resultCacheKey`, which facilitates access to the cache in Aperture Cloud.
+crucial to designate the `control point` (`caching-example` in our example) and
+the `resultCacheKey`, which facilitates access to the cache in Aperture Cloud.
 Additionally, to obtain detailed telemetry data for each Aperture request,
 include the labels related to business logic.
 
@@ -133,3 +133,10 @@ Once the example is running, it will prompt you for your Organization address
 and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
 menu. Copy and enter both your Organization address and API Key to establish a
 connection between the SDK and Aperture Cloud.
+
+Aperture will cache and serve the response for the duration specified by the
+TTL. Once the TTL expires, and cache lookup returns a miss, Aperture will reset
+the response in the cache.
+
+Using Aperture's caching feature, developers can enhance application performance
+by storing commonly requested data, thereby reducing system load.

@@ -30,7 +30,7 @@ let flow: Flow;
 async function monitorCacheAndUpdate(apertureClient: ApertureClient) {
     while (true) {
         // START: CStartFlow
-        flow = await apertureClient.startFlow("my-feature", {
+        flow = await apertureClient.startFlow("caching-example", {
             labels: {
                 user_id: "some_user_id",
             },
@@ -49,16 +49,15 @@ async function monitorCacheAndUpdate(apertureClient: ApertureClient) {
         } else {
             console.log("Cache miss, setting cache value");
 
-            const resString = "foo";
+            const resString = "Hello, world!";
             const buffer = Buffer.from(resString);
             const setResp = await flow.setResultCache({
                 value: buffer,
                 ttl: {
-                    seconds: 20,
+                    seconds: 10,
                     nanos: 0,
                 },
             });
-            console.log(JSON.stringify(flow.resultCache().getError()?.message));
         }
 
         flow.end();

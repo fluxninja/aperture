@@ -26,7 +26,7 @@ async function initializeApertureClient() {
 async function handleRequestRateLimit(apertureClient: ApertureClient) {
     while (true) {
         // START: RLStartFlow
-        const flow = await apertureClient.startFlow("my-feature", {
+        const flow = await apertureClient.startFlow("rate-limiting-example", {
             labels: {
                 user_id: "some_user_id",
             },
