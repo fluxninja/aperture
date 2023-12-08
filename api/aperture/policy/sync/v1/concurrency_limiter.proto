@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package aperture.policy.sync.v1;
+
+import "aperture/policy/language/v1/flowcontrol.proto";
+import "aperture/policy/sync/v1/common_attributes.proto";
+
+message ConcurrencyLimiterWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Concurrency Limiter
+  policy.language.v1.ConcurrencyLimiter concurrency_limiter = 2;
+}
+
+message ConcurrencyLimiterDecisionWrapper {
+  // CommonAttributes
+  CommonAttributes common_attributes = 1;
+  // Concurrency Limiter Decision
+  ConcurrencyLimiterDecision concurrency_limiter_decision = 2;
+}
+
+message ConcurrencyLimiterDecision {
+  double max_concurrency = 1;
+  bool pass_through = 2;
+}
