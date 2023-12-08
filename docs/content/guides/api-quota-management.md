@@ -175,7 +175,7 @@ finalize the policy setup.
 
 ```mdx-code-block
   </TabItem>
-  <TabItem value="aperturectl (Aperture Cloud)">
+  <TabItem value="aperturectl">
 ```
 
 If you haven't installed aperturectl yet, begin by following the
@@ -235,13 +235,13 @@ Begin by cloning the
 [Aperture JS SDK](https://github.com/fluxninja/aperture-js). Look for the
 `quota_scheduler_example.ts` in the example directory within the SDK.
 
-Follow these steps to set up and run the example:
+Switch to the example directory and follow these steps to run the example:
 
 1. Install the necessary packages:
    - Run `npm install` to install the base dependencies.
    - Run `npm install @fluxninja/aperture-js` to install the Aperture SDK.
 2. Run `npx tsc` to compile the TypeScript example.
-3. Run `node dist/quota_scheduler_example.ts` to start the compiled example.
+3. Run `node dist/quota_scheduler_example.js` to start the compiled example.
 
 Once the example is running, it will prompt you for your Organization address
 and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
