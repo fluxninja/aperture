@@ -136,8 +136,8 @@ menu. Copy and enter both your Organization address and API Key to establish a
 connection between the SDK and Aperture Cloud.
 
 Aperture will cache and serve the response for the duration specified by the
-TTL. Once the TTL expires, and cache lookup returns a miss, Aperture will reset
-the response in the cache.
+TTL. Once the TTL expires, and the cache lookup returns a miss, Aperture will
+reset the response in the cache.
 
 Using Aperture's caching feature, developers can enhance application performance
 by storing commonly requested data, thereby reducing system load.
