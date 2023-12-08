@@ -96,9 +96,9 @@ After making a `startFlow` call, we check for cached responses in Aperture Cloud
 using `flow.resultCache().getLookupStatus()`matching it to (`LookupStatus.Hit`).
 Otherwise, in the case of a cache miss, developers can store a new response in
 the cache. This is where setting the `ttl` (Time to Live) becomes important, as
-it dictates how long the response will be stored in the cache. A longer ttl is
+it dictates how long the response will be stored in the cache. A longer TTL is
 ideal for stable data that doesn't change often, ensuring it's readily available
-for frequent access. Conversely, a shorter ttl is more suitable for dynamic data
+for frequent access. Conversely, a shorter TTL is more suitable for dynamic data
 that requires regular updates, maintaining the cache's relevance and accuracy.
 It is important to make the `end` call made after processing each request, in
 order to send telemetry data that would provide granular visibility for each
@@ -133,7 +133,3 @@ Once the example is running, it will prompt you for your Organization address
 and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
 menu. Copy and enter both your Organization address and API Key to establish a
 connection between the SDK and Aperture Cloud.
-
-## Monitoring Caching
-
-// TODO Once you've clicked on the policy, you will see the following dashboard:
