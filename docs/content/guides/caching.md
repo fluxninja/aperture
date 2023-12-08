@@ -20,11 +20,12 @@ import CodeSnippet from '../codeSnippet.js'
 ## Overview
 
 Caching is a critical technology that significantly speeds up applications by
-storing frequently accessed data for quick retrieval. This approach reduces the
-need to repeatedly fetch data that might be slow to process. A common example is
-web caching, where content from often-visited web pages is stored and served to
-users. This method avoids the repeated loading of the entire webpage, thereby
-enhancing the user experience and application performance.
+storing frequently accessed data in memory for quick retrieval. This approach
+reduces the need to repeatedly fetch data that might be slow to process. A
+common example is web caching, where content from often-visited web pages is
+stored and served to users. This method avoids the repeated loading of the
+entire webpage, thereby enhancing the user experience and application
+performance.
 
 Caching can be integrated into various application layers, for example, the
 database layer. By caching frequently requested data, it reduces the load on the
@@ -40,8 +41,8 @@ leading to significant cost savings and performance improvements.
 ```
 
 The diagram above shows how developers using the Aperture SDK can connect to
-Aperture Cloud, to set the cache or lookup a store response before processing an
-incoming request.
+Aperture Cloud, to set the cache or lookup a stored response before processing
+an incoming request.
 
 </Zoom>
 
