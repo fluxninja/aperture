@@ -1,4 +1,4 @@
-import { ApertureClient, LookupStatus } from "@fluxninja/aperture-js";
+import { ApertureClient, LookupStatus, Flow } from "@fluxninja/aperture-js";
 import inquirer from 'inquirer';
 
 async function initializeApertureClient() {
@@ -25,15 +25,17 @@ async function initializeApertureClient() {
 
 const intervalTime = 1000;
 
+let flow: Flow;
+
 async function monitorCacheAndUpdate(apertureClient: ApertureClient) {
     while (true) {
         // START: CStartFlow
-        const flow = await apertureClient.startFlow("my-feature", {
+        flow = await apertureClient.startFlow("my-feature", {
             labels: {
                 user_id: "some_user_id",
             },
             grpcCallOptions: {
-                deadline: Date.now() + 120000, // ms
+                deadline: Date.now() + 5000, // ms
             },
             resultCacheKey: "cache",
         });
@@ -41,31 +43,26 @@ async function monitorCacheAndUpdate(apertureClient: ApertureClient) {
 
         await new Promise(resolve => setTimeout(resolve, intervalTime));
 
-        // START: CFlowShouldRun
-        if (flow.shouldRun()) {
-            if (flow.resultCache().getLookupStatus() === LookupStatus.Hit) {
-                console.log(flow.resultCache().getValue()?.toString());
-            } else {
-                console.log("Cache miss, setting cache value");
+        // START: CacheLookup
+        if (flow.resultCache().getLookupStatus() === LookupStatus.Hit) {
+            console.log(flow.resultCache().getValue()?.toString());
+        } else {
+            console.log("Cache miss, setting cache value");
 
-                const resString = "foo";
-                const buffer = Buffer.from(resString);
-                const setResp = await flow.setResultCache({
-                    value: buffer,
-                    ttl: {
-                        seconds: 10,
-                        nanos: 0,
-                    },
-                });
-                if (setResp.getError()) {
-                    console.log(`Error setting cache value: ${setResp.getError()}`);
-                }
-                console.log(resString);
-            }
+            const resString = "foo";
+            const buffer = Buffer.from(resString);
+            const setResp = await flow.setResultCache({
+                value: buffer,
+                ttl: {
+                    seconds: 20,
+                    nanos: 0,
+                },
+            });
+            console.log(JSON.stringify(flow.resultCache().getError()?.message));
         }
 
         flow.end();
-        // END: CFlowShouldRun
+        // END: CacheLookup
     }
 }
 
