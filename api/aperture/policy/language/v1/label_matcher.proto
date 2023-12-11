@@ -23,7 +23,7 @@ message LabelMatcher {
   // List of Kubernetes-style label matcher requirements.
   //
   // Note: The requirements are combined using the logical AND operator.
-  // Deprecated: v2.27.0. Use `match_list` instead.
+  // Deprecated: v3.0.0. Use `match_list` instead.
   repeated MatchRequirement match_expressions = 2; // @gotags: validate:"dive"
 
   // An arbitrary expression to be evaluated on the labels.

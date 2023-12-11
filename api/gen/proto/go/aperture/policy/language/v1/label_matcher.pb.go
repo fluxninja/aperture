@@ -44,7 +44,7 @@ type LabelMatcher struct {
 	// List of Kubernetes-style label matcher requirements.
 	//
 	// Note: The requirements are combined using the logical AND operator.
-	// Deprecated: v2.27.0. Use `match_list` instead.
+	// Deprecated: v3.0.0. Use `match_list` instead.
 	MatchExpressions []*MatchRequirement `protobuf:"bytes,2,rep,name=match_expressions,json=matchExpressions,proto3" json:"match_expressions,omitempty" validate:"dive"` // @gotags: validate:"dive"
 	// An arbitrary expression to be evaluated on the labels.
 	Expression *Expression `protobuf:"bytes,3,opt,name=expression,proto3" json:"expression,omitempty"`
