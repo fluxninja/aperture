@@ -17,11 +17,12 @@ class Selectors Green
 
 
 subgraph Components
-    Classifiers --> FluxMeters --> Samplers--"accept"--> Rate-Limiters --"accept"--> Schedulers
+    Classifiers --> FluxMeters --> Samplers--"accept"--> Rate-Limiters --> Caches --"accept"--> Schedulers
 class Classifiers Orange
 class FluxMeters Orange
 class Samplers Orange
 class Rate-Limiters Orange
+class Caches Orange
 class Schedulers Orange
 end
 class Components Green

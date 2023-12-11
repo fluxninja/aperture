@@ -3,28 +3,31 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: rate-limit-test
+  name: quota-scheduling-test
 spec:
   circuit:
     components:
     - flow_control:
-        rate_limiter:
+        quota_scheduler:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 10
+                value: 30
             fill_amount:
               constant_signal:
-                value: 10
+                value: 15
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
-          parameters:
-            interval: 30s
+          rate_limiter:
+            interval: 60s
             limit_by_label_key: user_id
-          request_parameters: {}
+          scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
           selectors:
-          - control_point: rate-limiting-example
+          - control_point: quota-scheduling-example
     - decider:
         in_ports:
           lhs:
