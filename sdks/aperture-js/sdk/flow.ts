@@ -61,7 +61,7 @@ export interface Flow {
   span(): Span;
   end(): void;
   httpResponseCode(): Number | undefined;
-  retryAfter(): {seconds: string | undefined, nanos: number | undefined}
+  retryAfter(): { seconds: string | undefined, nanos: number | undefined }
 }
 
 /**
@@ -95,7 +95,7 @@ export class _Flow implements Flow {
     if (
       (!this.rampMode && this._checkResponse === null) ||
       this._checkResponse?.decisionType ===
-        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+      _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -360,9 +360,9 @@ export class _Flow implements Flow {
    */
   retryAfter() {
     if (this._checkResponse) {
-      return {seconds: this._checkResponse?.waitTime?.seconds.toString(), nanos: this._checkResponse?.waitTime?.nanos };
+      return { seconds: this._checkResponse?.waitTime?.seconds.toString(), nanos: this._checkResponse?.waitTime?.nanos };
     }
-    return {seconds: undefined, nanos: undefined};
+    return { seconds: undefined, nanos: undefined };
   }
 
   /**
@@ -403,6 +403,24 @@ export class _Flow implements Flow {
       // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
       const localCheckResponse = this._checkResponse as any;
 
+      if (this._checkResponse.cacheLookupResponse?.resultCacheResponse?.value) {
+        localCheckResponse.cacheLookupResponse.resultCacheResponse.value = bufferToByteArrayJson(
+          this._checkResponse.cacheLookupResponse.resultCacheResponse.value,
+        );
+      }
+
+      if (this._checkResponse.cacheLookupResponse?.globalCacheResponses) {
+        Object.entries(
+          this._checkResponse.cacheLookupResponse.globalCacheResponses,
+        ).forEach(([key, value]) => {
+          if (value.value) {
+            localCheckResponse.cacheLookupResponse.globalCacheResponses[
+              key
+            ].value = bufferToByteArrayJson(value.value);
+          }
+        });
+      }
+
       localCheckResponse.start = protoTimestampToJSON(
         this._checkResponse.start,
       );
@@ -435,6 +453,15 @@ export class _Flow implements Flow {
     this._span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
     this._span.end();
   }
+}
+
+function bufferToByteArrayJson(buffer: Buffer) {
+  const byteArray = buffer.toJSON().data;
+  var hash = "";
+  for (var i = 0; i < byteArray.length; i++) {
+    hash += String.fromCharCode(byteArray[i]);
+  }
+  return Buffer.from(hash).toString('base64');
 }
 
 function protoTimestampToJSON(
