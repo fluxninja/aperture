@@ -138,6 +138,42 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 			otelconsts.ApertureClassifierErrorsLabel: []interface{}{"ERROR_MULTI_EXPRESSION,policy_name:foo,classifier_index:42,policy_hash:bar"},
 		},
 	),
+
+	Entry("Sets result cache dimensions",
+		&flowcontrolv1.CheckResponse{
+			CacheLookupResponse: &flowcontrolv1.CacheLookupResponse{
+				ResultCacheResponse: &flowcontrolv1.KeyLookupResponse{
+					LookupStatus:    flowcontrolv1.CacheLookupStatus_MISS,
+					OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+				},
+			},
+		},
+		map[string]interface{}{
+			otelconsts.ApertureResultCacheLookupStatusLabel:    "MISS",
+			otelconsts.ApertureResultCacheOperationStatusLabel: "ERROR",
+		},
+	),
+
+	Entry("Sets global cache dimensions",
+		&flowcontrolv1.CheckResponse{
+			CacheLookupResponse: &flowcontrolv1.CacheLookupResponse{
+				GlobalCacheResponses: map[string]*flowcontrolv1.KeyLookupResponse{
+					"foo": {
+						LookupStatus:    flowcontrolv1.CacheLookupStatus_HIT,
+						OperationStatus: flowcontrolv1.CacheOperationStatus_SUCCESS,
+					},
+					"bar": {
+						LookupStatus:    flowcontrolv1.CacheLookupStatus_MISS,
+						OperationStatus: flowcontrolv1.CacheOperationStatus_ERROR,
+					},
+				},
+			},
+		},
+		map[string]interface{}{
+			otelconsts.ApertureGlobalCacheLookupStatusesLabel:    []interface{}{"HIT", "MISS"},
+			otelconsts.ApertureGlobalCacheOperationStatusesLabel: []interface{}{"SUCCESS", "ERROR"},
+		},
+	),
 )
 
 var _ = Describe("AddFlowLabels", func() {
