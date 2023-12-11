@@ -40,10 +40,6 @@ var (
 		otelconsts.ResponseReceivedLabel,
 		otelconsts.ApertureSourceServiceLabel,
 		otelconsts.ApertureDestinationServiceLabel,
-		otelconsts.ApertureResultCacheLookupStatusLabel,
-		otelconsts.ApertureResultCacheOperationStatusLabel,
-		otelconsts.ApertureGlobalCacheLookupStatusLabel,
-		otelconsts.ApertureGlobalCacheOperationStatusLabel,
 	}
 
 	_includeAttributesHTTP = []string{
@@ -54,6 +50,10 @@ var (
 
 	_includeAttributesSDK = []string{
 		otelconsts.ApertureFlowStatusLabel,
+		otelconsts.ApertureResultCacheLookupStatusLabel,
+		otelconsts.ApertureResultCacheOperationStatusLabel,
+		otelconsts.ApertureGlobalCacheLookupStatusLabel,
+		otelconsts.ApertureGlobalCacheOperationStatusLabel,
 	}
 
 	includeListHTTP = utils.SliceToSet(append(_includeAttributesCommon, _includeAttributesHTTP...))

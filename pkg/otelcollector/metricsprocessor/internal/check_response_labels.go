@@ -29,6 +29,10 @@ import (
 // * otelconsts.ApertureClassifierErrorsLabel
 // * otelconsts.ApertureDecisionTypeLabel
 // * otelconsts.ApertureRejectReasonLabel
+// * otelconsts.ApertureResultCacheLookupStatusLabel
+// * otelconsts.ApertureResultCacheOperationStatusLabel
+// * otelconsts.ApertureGlobalCacheLookupStatusLabel
+// * otelconsts.ApertureGlobalCacheOperationStatusLabel
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
