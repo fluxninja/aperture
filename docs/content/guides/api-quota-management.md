@@ -1,6 +1,6 @@
 ---
 title: API Quota Management
-sidebar_position: 3
+sidebar_position: 2
 keywords:
   - api quota management
   - guides
@@ -108,12 +108,12 @@ classifications:
 ```
 
 The next step is making a `startFlow` call to Aperture. For this call, it is
-important to specify the control point (`my-feature` in our example) and the
-labels that will align with the quota scheduling policy. The `priority` label is
-necessary for request prioritization, while the `workload` label differentiates
-each request. In this example, we're only tracking and logging requests sent to
-Aperture. However, after making the `startFlow` call, you can execute relevant
-business operations.
+important to specify the control point (`quota-scheduling-example` in our
+example) and the labels that will align with the quota scheduling policy. The
+`priority` label is necessary for request prioritization, while the `workload`
+label differentiates each request. In this example, we're only tracking and
+logging requests sent to Aperture. However, after making the `startFlow` call,
+you can execute relevant business operations.
 
 According to the policy logic designed to prevent third-party API rate limit
 breaches, Aperture will, on each `startFlow` call, either give precedence to a
@@ -149,7 +149,7 @@ these specific values:
 
 1. `Policy name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
-   `rate-limit-test`.
+   `quota-scheduling-test`.
 2. `Fill amount`: Configures the number of tokens added to the bucket within the
    selected interval. Set `Fill amount` to `15`.
 3. `Bucket Capacity`: Defines the maximum capacity of the bucket in the rate
@@ -166,7 +166,7 @@ these specific values:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `Control point`: It can be a particular feature or execution block within a
-   service. We'll use `my-feature` as an example.
+   service. We'll use `quota-scheduling-example` as an example.
 
 ![Quota Scheduling Policy](./assets/managing-quotas/quota-scheduling-test.png)
 
@@ -192,11 +192,11 @@ policy:
 
 1. `policy_name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
-   `rate-limit-test`.
-2. `fill_amount`: Configures the number of tokens added to the bucket within the
-   selected interval. Set `Fill amount` to `15`.
-3. `bucket_capacity`: Defines the maximum capacity of the bucket in the rate
+   `quota-scheduling-test`.
+2. `bucket_capacity`: Defines the maximum capacity of the bucket in the rate
    limiter. Set `bucket_capacity` to `30`.
+3. `fill_amount`: Configures the number of tokens added to the bucket within the
+   selected interval. Set `Fill amount` to `15`.
 4. `interval`: Specifies the time amount of time `Fill amount` will take to
    refill tokens in the bucket. Set `Interval` to `60 seconds`.
 5. `limit_by_label_key`: Determines the specific label key used for enforcing
@@ -208,7 +208,7 @@ policy:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `control_point`: It can be a particular feature or execution block within a
-   service. We'll use `my-feature` as an example.
+   service. We'll use `quota-scheduling-example` as an example.
 
 Here is how the complete values file would look:
 
