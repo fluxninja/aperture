@@ -66,10 +66,7 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 				1 + // FlowStatus
 				21 + // CheckResponse
 				len(checkResponse.GetTelemetryFlowLabels())
-			_ = capacity
-			// Not calling EnsureCapacity as it's broken:
-			// https://github.com/open-telemetry/opentelemetry-collector/issues/7955
-			// attributes.EnsureCapacity(capacity)
+			attributes.EnsureCapacity(capacity)
 		}
 
 		// Source specific processing
