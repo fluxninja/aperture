@@ -67,13 +67,13 @@ and behavior. The stream can be stored and visualized in
 
 <!-- vale off -->
 
-| Name                                   | Type   | Example Values | Description                                      | Flow Control Integrations |
-| -------------------------------------- | ------ | -------------- | ------------------------------------------------ | ------------------------- |
-| aperture.cache_lookup_status           | single | HIT, MISS      | Result of result cache lookup                    | SDKs                      |
-| aperture.cache_operation_status        | single | SUCCESS, ERROR | Result of result cache operation                 | SDKs                      |
-| aperture.global_cache_lookup_status    | single | HIT, MISS      | Result of global cache lookup                    | SDKs                      |
-| aperture.global_cache_operation_status | single | SUCCESS, ERROR | Result of global cache operation                 | SDKs                      |
-| {user-defined-labels}                  |        |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
+| Name                                     | Type        | Example Values | Description                                      | Flow Control Integrations |
+| ---------------------------------------- | ----------- | -------------- | ------------------------------------------------ | ------------------------- |
+| aperture.cache_lookup_status             | single      | HIT, MISS      | Result of result cache lookup                    | SDKs                      |
+| aperture.cache_operation_status          | single      | SUCCESS, ERROR | Result of result cache operation                 | SDKs                      |
+| aperture.global_cache_lookup_statuses    | multi-value | HIT, MISS      | Results of global cache lookups                  | SDKs                      |
+| aperture.global_cache_operation_statuses | multi-value | SUCCESS, ERROR | Results of global cache operations               | SDKs                      |
+| {user-defined-labels}                    |             |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
 
 <!-- vale on -->
 

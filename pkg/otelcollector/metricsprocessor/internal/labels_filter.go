@@ -52,8 +52,8 @@ var (
 		otelconsts.ApertureFlowStatusLabel,
 		otelconsts.ApertureResultCacheLookupStatusLabel,
 		otelconsts.ApertureResultCacheOperationStatusLabel,
-		otelconsts.ApertureGlobalCacheLookupStatusLabel,
-		otelconsts.ApertureGlobalCacheOperationStatusLabel,
+		otelconsts.ApertureGlobalCacheLookupStatusesLabel,
+		otelconsts.ApertureGlobalCacheOperationStatusesLabel,
 	}
 
 	includeListHTTP = utils.SliceToSet(append(_includeAttributesCommon, _includeAttributesHTTP...))

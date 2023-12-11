@@ -91,10 +91,10 @@ const (
 	ApertureResultCacheLookupStatusLabel = "aperture.cache_lookup_status"
 	// ApertureResultCacheOperationStatusLabel describes status of the cache operation.
 	ApertureResultCacheOperationStatusLabel = "aperture.cache_operation_status"
-	// ApertureGlobalCacheLookupStatusLabel describes status of the cache lookup.
-	ApertureGlobalCacheLookupStatusLabel = "aperture.global_cache_lookup_status"
-	// ApertureGlobalCacheOperationStatusLabel describes status of the cache operation.
-	ApertureGlobalCacheOperationStatusLabel = "aperture.global_cache_operation_status"
+	// ApertureGlobalCacheLookupStatusesLabel describes statuses of the global cache lookups.
+	ApertureGlobalCacheLookupStatusesLabel = "aperture.global_cache_lookup_statuses"
+	// ApertureGlobalCacheOperationStatusesLabel describes statuses of the global cache operations.
+	ApertureGlobalCacheOperationStatusesLabel = "aperture.global_cache_operation_statuses"
 
 	/* HTTP Specific labels. */
 

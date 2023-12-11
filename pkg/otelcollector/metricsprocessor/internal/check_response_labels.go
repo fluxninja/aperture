@@ -31,8 +31,8 @@ import (
 // * otelconsts.ApertureRejectReasonLabel
 // * otelconsts.ApertureResultCacheLookupStatusLabel
 // * otelconsts.ApertureResultCacheOperationStatusLabel
-// * otelconsts.ApertureGlobalCacheLookupStatusLabel
-// * otelconsts.ApertureGlobalCacheOperationStatusLabel
+// * otelconsts.ApertureGlobalCacheLookupStatusesLabel
+// * otelconsts.ApertureGlobalCacheOperationStatusesLabel
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
@@ -69,12 +69,14 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 			attributes.PutStr(otelconsts.ApertureResultCacheLookupStatusLabel, resultCacheResponse.LookupStatus.String())
 			attributes.PutStr(otelconsts.ApertureResultCacheOperationStatusLabel, resultCacheResponse.OperationStatus.String())
 		}
+		globalCacheLookupStatuses := attributes.PutEmptySlice(otelconsts.ApertureGlobalCacheLookupStatusesLabel)
+		globalCacheOperationStatuses := attributes.PutEmptySlice(otelconsts.ApertureGlobalCacheOperationStatusesLabel)
 		for _, globalCacheResponse := range checkResponse.CacheLookupResponse.GlobalCacheResponses {
 			if globalCacheResponse == nil {
 				continue
 			}
-			attributes.PutStr(otelconsts.ApertureGlobalCacheLookupStatusLabel, globalCacheResponse.LookupStatus.String())
-			attributes.PutStr(otelconsts.ApertureGlobalCacheOperationStatusLabel, globalCacheResponse.OperationStatus.String())
+			globalCacheLookupStatuses.AppendEmpty().SetStr(globalCacheResponse.LookupStatus.String())
+			globalCacheOperationStatuses.AppendEmpty().SetStr(globalCacheResponse.OperationStatus.String())
 		}
 	}
 
