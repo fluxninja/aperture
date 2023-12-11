@@ -1996,15 +1996,6 @@
           "$ref": "#/definitions/Expression",
           "description": "An arbitrary expression to be evaluated on the labels."
         },
-        "match_expressions": {
-          "description": "List of Kubernetes-style label matcher requirements.\n\nNote: The requirements are combined using the logical AND operator.\nDeprecated: v2.27.0. Use `match_list` instead.\n\n",
-          "items": {
-            "$ref": "#/definitions/MatchRequirement",
-            "type": "object"
-          },
-          "type": "array",
-          "x-go-tag-validate": "dive"
-        },
         "match_labels": {
           "additionalProperties": {
             "type": "string"

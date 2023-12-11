@@ -20,12 +20,6 @@ message LabelMatcher {
   // Note: The requirements are combined using the logical AND operator.
   map<string, string> match_labels = 1;
 
-  // List of Kubernetes-style label matcher requirements.
-  //
-  // Note: The requirements are combined using the logical AND operator.
-  // Deprecated: v2.27.0. Use `match_list` instead.
-  repeated MatchRequirement match_expressions = 2; // @gotags: validate:"dive"
-
   // An arbitrary expression to be evaluated on the labels.
   Expression expression = 3;
 
