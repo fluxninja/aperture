@@ -29,6 +29,10 @@ import (
 // * otelconsts.ApertureClassifierErrorsLabel
 // * otelconsts.ApertureDecisionTypeLabel
 // * otelconsts.ApertureRejectReasonLabel
+// * otelconsts.ApertureResultCacheLookupStatusLabel
+// * otelconsts.ApertureResultCacheOperationStatusLabel
+// * otelconsts.ApertureGlobalCacheLookupStatusesLabel
+// * otelconsts.ApertureGlobalCacheOperationStatusesLabel
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
@@ -59,10 +63,21 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	)
 
 	// Cache
-	if checkResponse.CacheLookupResponse != nil && checkResponse.CacheLookupResponse.ResultCacheResponse != nil {
-		resultCacheResponse := checkResponse.CacheLookupResponse.ResultCacheResponse
-		attributes.PutStr(otelconsts.ApertureCacheLookupStatusLabel, resultCacheResponse.LookupStatus.String())
-		attributes.PutStr(otelconsts.ApertureCacheOperationStatusLabel, resultCacheResponse.OperationStatus.String())
+	if checkResponse.CacheLookupResponse != nil {
+		if checkResponse.CacheLookupResponse.ResultCacheResponse != nil {
+			resultCacheResponse := checkResponse.CacheLookupResponse.ResultCacheResponse
+			attributes.PutStr(otelconsts.ApertureResultCacheLookupStatusLabel, resultCacheResponse.LookupStatus.String())
+			attributes.PutStr(otelconsts.ApertureResultCacheOperationStatusLabel, resultCacheResponse.OperationStatus.String())
+		}
+		globalCacheLookupStatuses := attributes.PutEmptySlice(otelconsts.ApertureGlobalCacheLookupStatusesLabel)
+		globalCacheOperationStatuses := attributes.PutEmptySlice(otelconsts.ApertureGlobalCacheOperationStatusesLabel)
+		for _, globalCacheResponse := range checkResponse.CacheLookupResponse.GlobalCacheResponses {
+			if globalCacheResponse == nil {
+				continue
+			}
+			globalCacheLookupStatuses.AppendEmpty().SetStr(globalCacheResponse.LookupStatus.String())
+			globalCacheOperationStatuses.AppendEmpty().SetStr(globalCacheResponse.OperationStatus.String())
+		}
 	}
 
 	// Note: Sorted alphabetically to help sorting attributes in rollupprocessor.key at least a bit.
