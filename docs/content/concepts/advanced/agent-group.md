@@ -7,11 +7,9 @@ keywords:
   - Configuration
 ---
 
-## Agent Group {#agent-group}
-
 The agent group is a versatile label that defines a collection of Agents
-operating as peers. It serves as a means to organize and manage Agents within
-Aperture. The agent group can be associated with different entities based on the
+operating as peers. It is used to organize and manage Agents within Aperture.
+The agent group can be associated with different entities based on the
 deployment mode of the Agents.
 
 In sidecar mode, it is recommended to name the agent group based on the service.
@@ -33,7 +31,7 @@ details.
 
 <!-- vale off -->
 
-### Benefits of Agent Group
+## Benefits of Agent Group
 
 <!-- vale on -->
 
