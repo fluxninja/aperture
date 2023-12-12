@@ -55,8 +55,7 @@ To sign-up to Aperture Cloud, [click here][sign-up].
   request queuing. This feature regulates requests aimed at external services,
   ensuring that the usage remains within prescribed rate limits and avoids
   penalties or additional costs. Refer to the
-  [API Quota Management](guides/api-quota-management/api-quota-management.md)
-  guide for more details.
+  [API Quota Management](guides/api-quota-management.md) guide for more details.
 - 🛡️ [**Adaptive Queuing**](concepts/scheduler/load-scheduler.md): Enhance
   resource utilization and safeguard against abrupt service overloads with an
   intelligent queue at the entry point of services. This queue dynamically

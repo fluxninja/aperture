@@ -5011,7 +5011,7 @@ An arbitrary expression to be evaluated on the labels.
 List of Kubernetes-style label matcher requirements.
 
 Note: The requirements are combined using the logical AND operator. Deprecated:
-v2.27.0. Use `match_list` instead.
+v3.0.0. Use `match_list` instead.
 
 </dd>
 <dt>match_labels</dt>
@@ -7555,16 +7555,6 @@ The percentage of flows being accepted by the _Rate Limiter_.
 <!-- vale on -->
 
 <dl>
-<dt>adaptive_load_scheduler</dt>
-<dd>
-
-<!-- vale off -->
-
-([AdaptiveLoadScheduler](#adaptive-load-scheduler))
-
-<!-- vale on -->
-
-</dd>
 <dt>continuous_fill</dt>
 <dd>
 

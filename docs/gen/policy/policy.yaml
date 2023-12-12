@@ -2134,7 +2134,7 @@ definitions:
                     List of Kubernetes-style label matcher requirements.
 
                     Note: The requirements are combined using the logical AND operator.
-                    Deprecated: v2.27.0. Use `match_list` instead.
+                    Deprecated: v3.0.0. Use `match_list` instead.
 
                 items:
                     $ref: '#/definitions/MatchRequirement'
@@ -3164,8 +3164,6 @@ definitions:
         type: object
     RateLimiterParameters:
         properties:
-            adaptive_load_scheduler:
-                $ref: '#/definitions/AdaptiveLoadScheduler'
             continuous_fill:
                 default: true
                 description: |+
