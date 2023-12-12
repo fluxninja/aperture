@@ -103,7 +103,7 @@ beneficial.
 
 <!-- vale on -->
 
-[cloud]: https://www.fluxninja.com/product
+[cloud]: https://www.fluxninja.com
 [sign-up]: https://app.fluxninja.com/sign-up
 [architecture]: /aperture-for-infra/architecture.md
 [self-hosted]: /aperture-for-infra/aperture-for-infra.md
