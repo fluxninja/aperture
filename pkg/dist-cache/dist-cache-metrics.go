@@ -19,6 +19,8 @@ type DistCacheMetrics struct {
 	BackupPartitionsCount        *prometheus.GaugeVec
 	FragmentMigrationEventsTotal *prometheus.CounterVec
 	FragmentReceivedEventsTotal  *prometheus.CounterVec
+	PartitionsLength             *prometheus.GaugeVec
+	BackupPartitionsLength       *prometheus.GaugeVec
 }
 
 func newDistCacheMetrics() *DistCacheMetrics {
@@ -64,6 +66,14 @@ func newDistCacheMetrics() *DistCacheMetrics {
 			Name: metrics.DistCacheFragmentReceivedEventsTotalMetricsName,
 			Help: "Cumulative number of fragment received (incoming) events.",
 		}, distCacheMetricsLabels),
+		PartitionsLength: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: metrics.DistCachePartitionsLength,
+			Help: "Current length of partitions of given node.",
+		}, distCacheMetricsLabels),
+		BackupPartitionsLength: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: metrics.DistCacheBackupPartitionsLength,
+			Help: "Current length of backup partitions of given node.",
+		}, distCacheMetricsLabels),
 	}
 }
 
@@ -79,6 +89,8 @@ func (dm *DistCacheMetrics) allMetrics() []prometheus.Collector {
 		dm.BackupPartitionsCount,
 		dm.FragmentMigrationEventsTotal,
 		dm.FragmentReceivedEventsTotal,
+		dm.PartitionsLength,
+		dm.BackupPartitionsLength,
 	}
 }
 
