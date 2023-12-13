@@ -27,8 +27,8 @@ function names, the general idea is as follows:
    - `GetError` - retrieve the error that occurred during the lookup operation.
    - `GetValue` - retrieve the cached value.
 
-4. While the flow is active, following additional cache related operations can
-   be performed on the `Flow` object:
+4. While the flow is active, the following additional _Cache_ related operations
+   can be performed on the `Flow` object:
 
    - `SetResultCache` - set the cached value.
    - `DeleteResultCache` - delete the cached value.
