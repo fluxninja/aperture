@@ -58,6 +58,20 @@ consisting of two main components:
   scheduler that prioritizes the requests based on multiple factors such as the
   number of tokens, priority levels and workload labels.
 
+<Zoom>
+
+```mermaid
+{@include: ./assets/openai/graph.mmd}
+```
+
+</Zoom>
+
+The graph above shows how requests are scheduled using Aperture, based on
+priorities and other critical business labels, which will be shown in the
+upcoming code snippets. Scheduled requests are either executed immediately if
+they are high priority, or queued if they are of lower priority, specially when
+nearing OpenAI's rate limits.
+
 ## Configuration
 
 :::note Pre-Requisites
@@ -100,10 +114,6 @@ Import and setup Aperture Client:
 <CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
-
-```typescript
-
-```
 
 ```typescript
 const PRIORITIES: Record<string, number> = {

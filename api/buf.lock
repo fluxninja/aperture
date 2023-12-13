@@ -4,18 +4,23 @@ deps:
   - remote: buf.build
     owner: cncf
     repository: xds
-    commit: 0854ece19e074011b852eae66d145ebf
-    digest: shake256:941cfbc204d282051e6dd424695835b8220389c29f983bce97b117b68013c2424a1e0f9abf1911992a92f0b95cd666722f10658fc8d3bbb9f686c098ed2bb084
+    commit: 23263dcfaa964430bbca2ff54c81215c
+    digest: shake256:33a6ce59eb3d36c807edbaef7b0af2193765f981d7e625ac28f2d780da0f8e92d4a70b64e6ccb8484528e3b85365a716863ce90afc6008e46056ade717da4c78
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: f0246d9af7a545ddab59a7e75ef4ab93
-    digest: shake256:1dc740771af4cb0ef8a0d964c6f7854bf4c49db416d0ca40c5b91cd6482547b7e6d5b0b33929ba86864d706cddf85f8a2c7aec1915476c03aeac7c640b85744c
+    commit: 9da8c72a2b5c431f90cca12e12682d4b
+    digest: shake256:cac7e388dd2d63e7b373a06a16a786e05b9db431b44f85b0ac26738c9a79f6a3852a0a072cd49393e7b67859c346968d0f89f246a8d1146faa88fd668c9b9ba5
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
     commit: 71881f09a0c5420a9545a07987a86728
     digest: shake256:d320bbf06653b1b2b45a1f95bfa82bf7b998221a777a042708c50d6f86a30d1a85b50c5704c597142d9b308280efe1295d39d76d1abea5f7046d3df4c8cc3cef
+  - remote: buf.build
+    owner: google
+    repository: cel-spec
+    commit: f53499f1d3a943dd992429d381e99ab3
+    digest: shake256:8fc347b32704c6873d0d75dbcc505ec0bfe34570f9e6a7ec27f95693631aed8016a3fe83b0fadfe97ae51d04127a70a812e5f75e33b615074f4a5f0831f8e2e7
   - remote: buf.build
     owner: googleapis
     repository: googleapis
