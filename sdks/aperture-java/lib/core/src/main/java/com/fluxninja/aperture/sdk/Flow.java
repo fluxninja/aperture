@@ -4,12 +4,6 @@ import static com.fluxninja.aperture.sdk.Constants.CHECK_RESPONSE_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.FLOW_STATUS_LABEL;
 import static com.fluxninja.aperture.sdk.Constants.FLOW_STOP_TIMESTAMP_LABEL;
 
-import java.time.Duration;
-
-import org.apache.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fluxninja.aperture.sdk.cache.KeyDeleteResponse;
 import com.fluxninja.aperture.sdk.cache.KeyLookupResponse;
 import com.fluxninja.aperture.sdk.cache.KeyUpsertResponse;
@@ -17,8 +11,11 @@ import com.fluxninja.aperture.sdk.cache.LookupStatus;
 import com.fluxninja.generated.aperture.flowcontrol.check.v1.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
-
 import io.opentelemetry.api.trace.Span;
+import java.time.Duration;
+import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A Flow that can be accepted or rejected by Aperture Agent based on provided labels. */
 public final class Flow {
@@ -226,17 +223,17 @@ public final class Flow {
         }
 
         if (this.checkResponse == null) {
-        return new KeyLookupResponse(
-                null,
-                LookupStatus.MISS,
-                new IllegalArgumentException("No cache lookup response"));
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
         }
 
         if (!this.shouldRun()) {
             return new KeyLookupResponse(
                     null, LookupStatus.MISS, new IllegalStateException("Flow was rejected"));
         }
-        
+
         if (!this.checkResponse.hasCacheLookupResponse()
                 || !this.checkResponse.getCacheLookupResponse().hasResultCacheResponse()) {
             return new KeyLookupResponse(
@@ -244,8 +241,6 @@ public final class Flow {
                     LookupStatus.MISS,
                     new IllegalArgumentException("No cache lookup response"));
         }
-
-        
 
         com.fluxninja.generated.aperture.flowcontrol.check.v1.KeyLookupResponse lookupResponse =
                 this.checkResponse.getCacheLookupResponse().getResultCacheResponse();
@@ -342,10 +337,10 @@ public final class Flow {
         }
 
         if (this.checkResponse == null) {
-        return new KeyLookupResponse(
-                null,
-                LookupStatus.MISS,
-                new IllegalArgumentException("No cache lookup response"));
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
         }
 
         if (!this.shouldRun()) {

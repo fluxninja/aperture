@@ -187,11 +187,16 @@ class Flow(AbstractContextManager):
         if self._error is not None:
             return KeyLookupResponse(None, LookupStatus.MISS, self._error)
         if not self.check_response:
-            return KeyLookupResponse(None, LookupStatus.MISS, ValueError("response is null"))
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("response is null")
+            )
         if not self.should_run():
-            return KeyLookupResponse(None, LookupStatus.MISS, ValueError("flow was rejected"))
-        
-        if ( not self.check_response.cache_lookup_response
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("flow was rejected")
+            )
+
+        if (
+            not self.check_response.cache_lookup_response
             or not self.check_response.cache_lookup_response.result_cache_response
         ):
             return KeyLookupResponse(
@@ -268,11 +273,16 @@ class Flow(AbstractContextManager):
         if self._error is not None:
             return KeyLookupResponse(None, LookupStatus.MISS, self._error)
         if not self.check_response:
-            return KeyLookupResponse(None, LookupStatus.MISS, ValueError("response is null"))
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("response is null")
+            )
         if not self.should_run():
-            return KeyLookupResponse(None, LookupStatus.MISS, ValueError("flow was rejected"))
+            return KeyLookupResponse(
+                None, LookupStatus.MISS, ValueError("flow was rejected")
+            )
 
-        if ( not self.check_response.cache_lookup_response
+        if (
+            not self.check_response.cache_lookup_response
             or not self.check_response.cache_lookup_response.global_cache_responses
         ):
             return KeyLookupResponse(
