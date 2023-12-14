@@ -108,7 +108,7 @@ classifications:
 ```
 
 The next step is making a `startFlow` call to Aperture. For this call, it is
-important to specify the control point (`quota-scheduling-example` in our
+important to specify the control point (`quota-scheduling-feature` in our
 example) and the labels that will align with the quota scheduling policy. The
 `priority` label is necessary for request prioritization, while the `workload`
 label differentiates each request. In this example, we're only tracking and
@@ -166,7 +166,7 @@ these specific values:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `Control point`: It can be a particular feature or execution block within a
-   service. We'll use `quota-scheduling-example` as an example.
+   service. We'll use `quota-scheduling-feature` as an example.
 
 ![Quota Scheduling Policy](./assets/managing-quotas/quota-scheduling-test.png)
 
@@ -208,7 +208,7 @@ policy:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `control_point`: It can be a particular feature or execution block within a
-   service. We'll use `quota-scheduling-example` as an example.
+   service. We'll use `quota-scheduling-feature` as an example.
 
 Here is how the complete values file would look:
 

@@ -86,7 +86,7 @@ You can obtain your organization address and API Key within the Aperture Cloud
 UI by clicking the `Aperture` tab in the sidebar menu.
 
 The next step is making a `startFlow` call to Aperture. For this call, it is
-important to specify the control point (`rate-limiting-example` in our example)
+important to specify the control point (`rate-limiting-feature` in our example)
 and the labels that will align with the rate limiting policy, which we will
 create in Aperture Cloud in one of the next steps.
 
@@ -147,7 +147,7 @@ the form with these specific values:
 5. `Limit By Label Key`: Determines the specific label key used for enforcing
    rate limits. We'll use `user_id` as an example.
 6. `Control point`: It can be a particular feature or execution block within a
-   service. We'll use `rate-limiting-example` as an example.
+   service. We'll use `rate-limiting-feature` as an example.
 
 ![Rate Limit Test](./assets/per-user-rate-limiting/rate-limit-test.png)
 
@@ -188,7 +188,7 @@ policy:
 5. `limit_by_label_key`: Determines the specific label key used for enforcing
    rate limits. We'll use `user_id` as an example.
 6. `control_point`: It can be a particular feature or execution block within a
-   service. We'll use `rate-limiting-example` as an example.
+   service. We'll use `rate-limiting-feature` as an example.
 
 Here is how the complete values file would look:
 

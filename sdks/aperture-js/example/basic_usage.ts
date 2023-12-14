@@ -79,14 +79,16 @@ async function handleRequestRateLimit(req: Request, res: Response) {
   if (flow.shouldRun()) {
     // Add business logic to process incoming request
     console.log("Request accepted. Processing...");
+    const resString = "foo";
+    res.send({ message: resString });
+
   } else {
     console.log("Request rate-limited. Try again later.");
     // Handle flow rejection
     flow.setStatus(FlowStatus.Error);
+    res.status(429).send({ message: "Too many requests" });
   }
 
-  if (flow) {
-    flow.end();
-  }
+  flow.end();
 }
 // END: handleRequestRateLimit
