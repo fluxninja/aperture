@@ -147,6 +147,28 @@ func (dc *DistCache) scrapeMetrics(ctx context.Context) (proto.Message, error) {
 	} else {
 		backupPartitionsCountGauge.Set(float64(countNotEmptyPartitions(stats.Backups)))
 	}
+
+	partitionsLength := 0
+	for _, v := range stats.Partitions {
+		partitionsLength += v.Length
+	}
+	partitionsLengthGauge, err := dc.metrics.PartitionsLength.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract partitions length gauge metric from olric instance: %v", err)
+	} else {
+		partitionsLengthGauge.Set(float64(partitionsLength))
+	}
+
+	backupPartitionsLength := 0
+	for _, v := range stats.Backups {
+		backupPartitionsLength += v.Length
+	}
+	backupPartitionsLengthGauge, err := dc.metrics.BackupPartitionsLength.GetMetricWith(metricLabels)
+	if err != nil {
+		log.Debug().Msgf("Could not extract backup partitions length gauge metric from olric instance: %v", err)
+	} else {
+		backupPartitionsLengthGauge.Set(float64(backupPartitionsLength))
+	}
 	return nil, nil
 }
 
