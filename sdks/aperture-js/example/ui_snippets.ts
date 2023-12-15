@@ -26,25 +26,21 @@ async function UIRLLabelMatcher(apertureClient: ApertureClient){
 
 }
 
-async function UIQSBlueprint(req: Request, res: Response) {
-    const userTiers = {
-        "platinum": 8,
-        "gold": 4,
-        "silver": 2,
-        "free": 1,
-    };
-    // START: UIQSBlueprint
+async function QSUI(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: QSUI
     const flow = await apertureClient.startFlow("quota-scheduling-feature", {
         labels: {
             user_id: "some_user_id",
-            priority: "8",
-            workload: `platinum`,
+            priority: "100",
+            workload: `platinum user`,
         },
         grpcCallOptions: {
             deadline: Date.now() + 120000, // ms
         },
     });
-    // END: UIQSBlueprint
+    console.log(`Request sent for ${tier} tier with priority ${priority}.`);
+    flow.end();
+    // END: QSUI
 }
 
 async function UIRLTokens(apertureClient: ApertureClient){

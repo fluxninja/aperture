@@ -36,7 +36,9 @@ async def super_handler():
     # START: manualFlow
     # business logic produces labels
     labels = {
-        "key": "value",
+        "userId": "some_user_id",
+        "userTier": "gold",
+        "priority": "100",
     }
     flow_params = FlowParams(
         check_timeout=timedelta(seconds=200),

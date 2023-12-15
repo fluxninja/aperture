@@ -131,7 +131,9 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// business logic produces labels
 	labels := map[string]string{
-		"key": "value",
+		"userId":   "some_user_id",
+		"userTier": "premium",
+		"priority": "100",
 	}
 	// END: defineLabels
 
