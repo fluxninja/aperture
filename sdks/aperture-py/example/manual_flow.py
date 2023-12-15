@@ -38,7 +38,7 @@ async def super_handler():
     labels = {
         "userId": "some_user_id",
         "userTier": "gold",
-        "prioritu": "100",
+        "priority": "100",
     }
     flow_params = FlowParams(
         check_timeout=timedelta(seconds=200),

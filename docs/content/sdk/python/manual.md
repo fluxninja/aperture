@@ -21,8 +21,8 @@ Run the command below to install the SDK:
 pip install aperture-py
 ```
 
-The next step is to create an ApertureClient instance, for which, the address of
-the organization created in Aperture Cloud and API key are needed. You can
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
 locate both these details by clicking on the Aperture tab in the sidebar menu of
 Aperture Cloud.
 
@@ -68,11 +68,12 @@ snippetName="manualFlow"
 </Tabs>
 ```
 
-The above code snippets starts by defining business critical labels that can be
-passed to Aperture as `FlowParams` when making `start_flow` calls. Labels will
-be matched to the labels set the policy created in Aperture Cloud, and a
-decision will be returned on whether a flow `should_run` or not. It is important
-to make the `end` call made after processing each request, in order to send
+The above code snippets is making `start_flow` calls to Aperture. For this call,
+it is important to specify the control point (`AwesomeFeature` in the example)
+and `FlowParams` that will be aligned with the policy created in Aperture Cloud.
+For each flow that is started, a `should_run` decision is made, determining
+whether to allow the request into the system or to rate limit it. It is
+important to make the `end` call made after processing each request, to send
 telemetry data that would provide granular visibility for each flow.
 
 You can also use the flow as a context manager:

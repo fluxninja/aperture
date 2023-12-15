@@ -47,14 +47,15 @@ The created instance can then be used to start a flow:
 
 <CodeSnippet lang="java" snippetName="StandaloneExampleFlow" />
 
-The above code snippets starts by defining business critical labels that can be
-passed to Aperture as `FeatureFlowParameters` when making `startFlow` calls.
-Labels will be matched to the labels set in the policy created in Aperture
-Cloud, and a decision will be returned on whether a flow `shouldRun` or not. In
-this example, we only see log returns, but in a production environment, actual
-business logic could be executed when a request is allowed. It is important to
-make the `end` call made after processing each request, in order to send
-telemetry data that would provide granular visibility for each flow.
+The above code snippets is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`featureName` in the example) and
+business labels that will be aligned with the policy created in Aperture Cloud.
+For each flow that is started, a `shouldRun` decision is made, determining
+whether to allow the request into the system or to rate limit it. In this
+example, we only see response returns, but in a production environment, actual
+business logic can be executed when a request is allowed. It is important to
+make the `end` call made after processing each request, to send telemetry data
+that would provide granular visibility for each flow.
 
 For more context on using Aperture Java SDK to set feature control points, refer
 to the [example app][example] available in the repository.
