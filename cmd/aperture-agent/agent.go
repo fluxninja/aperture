@@ -11,6 +11,7 @@
 package main
 
 import (
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
@@ -43,11 +44,13 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			fx.Annotate(objectstorage.Provide, fx.As(new(objectstorage.ObjectStorageIface))),
 			fx.Annotate(AgentElectionPath, fx.ResultTags(config.NameTag(etcdclient.ElectionPathFxTag))),
 		),
 		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
+			objectstorage.Invoke,
 		),
 		distcache.Module(),
 		flowcontrol.Module(),

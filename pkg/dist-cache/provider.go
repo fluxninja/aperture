@@ -3,6 +3,7 @@ package distcache
 import (
 	"context"
 	"errors"
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 	stdlog "log"
 	"net"
 	"strconv"
@@ -51,6 +52,7 @@ type DistCacheConstructorIn struct {
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
 	Shutdowner         fx.Shutdowner
+	ObjectStorage      objectstorage.ObjectStorageIface
 	Logger             *log.Logger
 }
 
@@ -146,7 +148,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		return nil, err
 	}
 
-	dc := NewDistCache(oc, o, newDistCacheMetrics(), in.Shutdowner)
+	dc := NewDistCache(oc, o, in.ObjectStorage, newDistCacheMetrics(), in.Shutdowner)
 
 	// Context used by goroutine listening for Olric events. Should be canceled in fx.Stop.
 	eventListenerCtx, eventListenerCancel := context.WithCancel(context.Background())

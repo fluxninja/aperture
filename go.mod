@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	cloud.google.com/go/secretmanager v1.11.4
+	cloud.google.com/go/storage v1.30.1
 	github.com/BurntSushi/toml v1.3.2
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/Masterminds/semver/v3 v3.2.1
@@ -655,7 +656,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.12
+	github.com/buraksezer/olric => ../olric
 	github.com/fluxninja/aperture/api/v2 => ./api
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter => github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1

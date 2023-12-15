@@ -3,6 +3,7 @@ package distcache
 import (
 	"context"
 	"fmt"
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 	"strconv"
 	"sync"
 	"time"
@@ -29,6 +30,7 @@ type DistCache struct {
 	lock              sync.Mutex
 	config            *olricconfig.Config
 	olric             *olric.Olric
+	objStorage        objectstorage.ObjectStorageIface
 	client            olric.Client
 	metrics           *DistCacheMetrics
 	shutDowner        fx.Shutdowner
@@ -40,10 +42,11 @@ type DistCache struct {
 }
 
 // NewDistCache creates a new instance of DistCache.
-func NewDistCache(config *olricconfig.Config, olric *olric.Olric, metrics *DistCacheMetrics, shutDowner fx.Shutdowner) *DistCache {
+func NewDistCache(config *olricconfig.Config, olric *olric.Olric, objStorage objectstorage.ObjectStorageIface, metrics *DistCacheMetrics, shutDowner fx.Shutdowner) *DistCache {
 	return &DistCache{
 		config:     config,
 		olric:      olric,
+		objStorage: objStorage,
 		client:     olric.NewEmbeddedClient(),
 		metrics:    metrics,
 		shutDowner: shutDowner,
