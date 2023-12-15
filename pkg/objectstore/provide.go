@@ -1,8 +1,10 @@
 package objectstorage
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
+
+	"cloud.google.com/go/storage"
+
 	olricstorage "github.com/buraksezer/olric/pkg/storage"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -14,11 +16,13 @@ const (
 	objectStorageOpDelete = iota
 )
 
-type oper int
-type Operation struct {
-	op    oper
-	entry PersistedEntry
-}
+type (
+	oper      int
+	Operation struct {
+		op    oper
+		entry PersistedEntry
+	}
+)
 
 type ObjectStorage struct {
 	keyPrefix      string
@@ -78,7 +82,7 @@ func (o *ObjectStorage) Delete(_ context.Context, key string) error {
 }
 
 func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error) {
-	//TODO implement me
+
 	panic("implement me")
 }
 

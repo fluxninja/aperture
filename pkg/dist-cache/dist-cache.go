@@ -3,10 +3,11 @@ package distcache
 import (
 	"context"
 	"fmt"
-	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 	"strconv"
 	"sync"
 	"time"
+
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
@@ -65,7 +66,9 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (olric.DMap, 
 		_ = dc.shutDowner.Shutdown()
 		return nil, err
 	}
-	return d, nil
+
+	persistentDMap := objectstorage.NewPersistentDMap(d, dc.objStorage)
+	return persistentDMap, nil
 }
 
 // DeleteDMap deletes a DMap.

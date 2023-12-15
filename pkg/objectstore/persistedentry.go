@@ -33,32 +33,32 @@ func (p PersistedEntry) TTL() int64 {
 }
 
 func (p PersistedEntry) SetTimestamp(i int64) {
-	//TODO implement me
+
 	panic("implement me")
 }
 
 func (p PersistedEntry) Timestamp() int64 {
-	//TODO implement me
+
 	panic("implement me")
 }
 
 func (p PersistedEntry) SetLastAccess(i int64) {
-	//TODO implement me
+
 	panic("implement me")
 }
 
 func (p PersistedEntry) LastAccess() int64 {
-	//TODO implement me
+
 	panic("implement me")
 }
 
 func (p PersistedEntry) Encode() []byte {
-	//TODO implement me
+
 	panic("implement me")
 }
 
 func (p PersistedEntry) Decode(bytes []byte) {
-	//TODO implement me
+
 	panic("implement me")
 }
 

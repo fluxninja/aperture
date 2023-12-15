@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/fluxninja/aperture/v2/pkg/log"
 	"time"
+
+	"github.com/fluxninja/aperture/v2/pkg/log"
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/pkg/storage"
@@ -110,6 +111,13 @@ func (o ObjectStoreBackedDMap) Put(ctx context.Context, key string, value interf
 	}
 
 	return o.dmap.Put(ctx, key, value, options...)
+}
+
+func NewPersistentDMap(dmap olric.DMap, backingStorage ObjectStorageIface) ObjectStoreBackedDMap {
+	return ObjectStoreBackedDMap{
+		dmap:           dmap,
+		backingStorage: backingStorage,
+	}
 }
 
 var _ olric.DMap = ObjectStoreBackedDMap{}

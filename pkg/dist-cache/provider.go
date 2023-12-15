@@ -3,10 +3,11 @@ package distcache
 import (
 	"context"
 	"errors"
-	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 	stdlog "log"
 	"net"
 	"strconv"
+
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"
