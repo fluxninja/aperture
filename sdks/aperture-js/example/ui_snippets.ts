@@ -31,7 +31,7 @@ async function QSUI(apertureClient: ApertureClient, tier: string, priority: numb
         labels: {
             user_id: "some_user_id",
             priority: "100",
-            workload: `gold user`,
+            workload: "gold user",
         },
         grpcCallOptions: {
             deadline: Date.now() + 120000, // ms
@@ -101,7 +101,7 @@ async function UIQSTokens(apertureClient: ApertureClient, tier: string, priority
         labels: {
             user_id: "some_user_id",
             product_tier: "trial",
-            priority: priority.toString(),
+            priority: "100",
             tokens: userTokens.toString(),
         },
         grpcCallOptions: {
