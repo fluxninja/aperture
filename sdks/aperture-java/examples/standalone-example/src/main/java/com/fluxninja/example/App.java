@@ -136,7 +136,9 @@ public class App {
         Map<String, String> labels = new HashMap<>();
 
         // business logic produces labels
-        labels.put("key", "value");
+        labels.put("userId", "some_user_id");
+        labels.put("userTier", "gold");
+        labels.put("priority", "100");
 
         Boolean rampMode = false;
 

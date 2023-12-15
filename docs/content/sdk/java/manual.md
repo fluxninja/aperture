@@ -1,7 +1,7 @@
 ---
-title: Manually setting feature control points
+title: Define Control Points
 sidebar_position: 1
-slug: manually-setting-feature-control-points-using-java-sdk
+slug: define-feature-control-points-using-java-sdk
 keywords:
   - java
   - sdk
@@ -20,10 +20,13 @@ description:
 import CodeSnippet from '../../codeSnippet.js'
 ```
 
-[Aperture Java SDK core library][SDK-Library] can be used to manually set
-feature control points within a Java service.
+[Aperture Java SDK core library][SDK-Library] can be used to define feature
+control points within a Java service.
 
-To do so, first create an instance of ApertureSDK:
+The next step is to create an Aperture Client instance, for which the address of
+the organization created in Aperture Cloud and API key are needed. You can
+locate these both details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
 
 :::info API Key
 
@@ -43,6 +46,15 @@ section.
 The created instance can then be used to start a flow:
 
 <CodeSnippet lang="java" snippetName="StandaloneExampleFlow" />
+
+The above code snippets starts by defining business critical labels that can be
+passed to Aperture as `FeatureFlowParameters` when making `startFlow` calls.
+Labels will be matched to the labels set in the policy created in Aperture
+Cloud, and a decision will be returned on whether a flow `shouldRun` or not. In
+this example, we only see log returns, but in a production environment, actual
+business logic could be executed when a request is allowed. It is important to
+make the `end` call made after processing each request, in order to send
+telemetry data that would provide granular visibility for each flow.
 
 For more context on using Aperture Java SDK to set feature control points, refer
 to the [example app][example] available in the repository.

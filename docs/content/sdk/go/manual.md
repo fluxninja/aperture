@@ -1,5 +1,5 @@
 ---
-title: Manually setting feature control points
+title: Define Control Points
 sidebar_position: 1
 slug: manually-setting-feature-control-points-using-golang-sdk
 keywords:
@@ -17,9 +17,9 @@ import CodeSnippet from '../../codeSnippet.js'
 ```
 
 <a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go/v2`}>Aperture Go
-SDK</a> can be used to manually set feature control points within a Go service.
+SDK</a> can be used to define feature control points within a Go service.
 
-To do so, first install the SDK:
+Below are the steps to install and use the SDK.
 
 ## Install SDK
 
@@ -31,8 +31,9 @@ Now, create an instance of ApertureClient.
 
 ## Create ApertureClient Instance
 
-To create an instance of ApertureClient, you need to provide the address of your
-Aperture Cloud instance and an API key.
+To create an ApertureClient instance, the address of the organization created in
+Aperture Cloud and API key are needed. You can locate these both details by
+clicking on the Aperture tab in the sidebar menu of Aperture Cloud.
 
 Address of your Aperture Cloud is made of Organization ID. For example, if your
 organization ID is `ORGANIZATION` and available at port `443` then the address
