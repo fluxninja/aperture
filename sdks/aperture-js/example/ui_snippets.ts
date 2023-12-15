@@ -14,7 +14,6 @@ async function UIRLLabelMatcher(apertureClient: ApertureClient){
     const flow = await apertureClient.startFlow("rate-limiting-feature", {
         labels: {
             user_id: "user1",
-            user_agent: "user_agent1",
             customer_tier: "gold",
             product_tier: "trial",
           },
@@ -32,7 +31,7 @@ async function QSUI(apertureClient: ApertureClient, tier: string, priority: numb
         labels: {
             user_id: "some_user_id",
             priority: "100",
-            workload: `platinum user`,
+            workload: `gold user`,
         },
         grpcCallOptions: {
             deadline: Date.now() + 120000, // ms
@@ -47,7 +46,7 @@ async function UIRLTokens(apertureClient: ApertureClient){
     // START: UIRLTokens
     const flow = await apertureClient.startFlow("rate-limiting-feature", {
         labels: {
-          limit_key: "user1",
+          user_id: "user1",
           tier: "premium",
           tokens: "50",
 
@@ -57,6 +56,32 @@ async function UIRLTokens(apertureClient: ApertureClient){
         },
       });
     // END: UIRLTokens
+}
+
+const userTiers: { [key: string]: number } = {
+    "platinum": 8,
+    "gold": 4,
+    "silver": 2,
+    "free": 1,
+};
+
+async function QSPriority(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: QSPriority
+    const userPriority = userTiers[tier] || 1;
+
+    const flow = await apertureClient.startFlow("quota-scheduling-feature", {
+        labels: {
+            user_id: "some_user_id",
+            priority: userPriority.toString(),
+            workload: `${tier} user`,
+        },
+        grpcCallOptions: {
+            deadline: Date.now() + 120000, // ms
+        },
+    });
+    console.log(`Request sent for ${tier} tier with priority ${userPriority}.`);
+    flow.end();
+    // END: QSPriority
 }
 
 async function UIQSTokens(apertureClient: ApertureClient, tier: string, priority: number, userType: string) {
