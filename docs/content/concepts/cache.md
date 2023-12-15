@@ -42,6 +42,15 @@ _Cache_ via [aperture-js][aperture-js] SDK.
 
 :::
 
+Additionally, Aperture also provides a _Global Cache_ that can be used to access
+cached data across multiple flows. This is useful when the same data is required
+by multiple flows. The _Global Cache_ can be accessed via the `GlobalCache`
+method with `key` parameter on the `Flow` object. It returns the same object as
+the `ResultCache` method.
+
+Similar to the `ResultCache`, `Set` and `Delete` methods can be used to set and
+delete entries in the _Global Cache_.
+
 [skds]: /sdk/sdk.md
 [flow-label]: /concepts/flow-label.md
 [guide]: /guides/caching.md
