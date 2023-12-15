@@ -32,7 +32,7 @@ Now, create an instance of ApertureClient.
 ## Create ApertureClient Instance
 
 To create an ApertureClient instance, the address of the organization created in
-Aperture Cloud and API key are needed. You can locate these both details by
+Aperture Cloud and API key are needed. You can locate both these details by
 clicking on the Aperture tab in the sidebar menu of Aperture Cloud.
 
 Address of your Aperture Cloud is made of Organization ID. For example, if your

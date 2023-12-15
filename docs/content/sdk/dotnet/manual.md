@@ -18,7 +18,7 @@ import CodeSnippet from '../../codeSnippet.js'
 ```
 
 [Aperture C# SDK](https://www.nuget.org/packages/ApertureSDK/) can be used to
-manually set feature control points within a .NET service.
+define feature control points within a .NET service.
 
 Run the command below to install the SDK:
 
@@ -28,7 +28,7 @@ dotnet add package ApertureSDK --version 2.23.1
 
 The next step is to create an ApertureClient instance, for which, the address of
 the organization created in Aperture Cloud and API key are needed. You can
-locate these both details by clicking on the Aperture tab in the sidebar menu of
+locate both these details by clicking on the Aperture tab in the sidebar menu of
 Aperture Cloud.
 
 :::info API Key

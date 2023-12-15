@@ -12,8 +12,8 @@ keywords:
   - manual
 ---
 
-[Aperture Python SDK][pythonsdk] can be used to manually set feature control
-points within a Python service.
+[Aperture Python SDK][pythonsdk] can be used to define feature control points
+within a Python service.
 
 Run the command below to install the SDK:
 
@@ -23,7 +23,7 @@ pip install aperture-py
 
 The next step is to create an ApertureClient instance, for which, the address of
 the organization created in Aperture Cloud and API key are needed. You can
-locate these both details by clicking on the Aperture tab in the sidebar menu of
+locate both these details by clicking on the Aperture tab in the sidebar menu of
 Aperture Cloud.
 
 :::info API Key

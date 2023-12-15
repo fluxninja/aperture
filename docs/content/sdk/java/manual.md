@@ -25,7 +25,7 @@ control points within a Java service.
 
 The next step is to create an Aperture Client instance, for which the address of
 the organization created in Aperture Cloud and API key are needed. You can
-locate these both details by clicking on the Aperture tab in the sidebar menu of
+locate both these details by clicking on the Aperture tab in the sidebar menu of
 Aperture Cloud.
 
 :::info API Key
