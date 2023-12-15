@@ -68,7 +68,7 @@ snippetName="manualFlow"
 </Tabs>
 ```
 
-The above code snippets is making `start_flow` calls to Aperture. For this call,
+The above code snippet is making `start_flow` calls to Aperture. For this call,
 it is important to specify the control point (`AwesomeFeature` in the example)
 and `FlowParams` that will be aligned with the policy created in Aperture Cloud.
 For each flow that is started, a `should_run` decision is made, determining

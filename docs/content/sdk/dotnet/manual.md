@@ -51,7 +51,7 @@ The created instance can then be used to start a flow:
 
 <CodeSnippet lang="cs" snippetName="handleRequest" highlightLanguage="cpp"/>
 
-The above code snippets is making `StartFlow` calls to Aperture. For this call,
+The above code snippet is making `StartFlow` calls to Aperture. For this call,
 it is important to specify the control point (`featureName` in the example) and
 business labels that will be aligned with the policy created in Aperture Cloud.
 For each flow that is started, a `ShouldRun` decision is made, determining
