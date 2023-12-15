@@ -120,6 +120,9 @@ func (f *flow) ResultCache() KeyLookupResponse {
 	if f.checkResponse == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("check response is nil"))
 	}
+	if !f.ShouldRun() {
+		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("flow was rejected"))
+	}
 	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetResultCacheResponse() == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("result cache is nil"))
 	}
@@ -190,6 +193,9 @@ func (f *flow) GlobalCache(key string) KeyLookupResponse {
 	}
 	if f.checkResponse == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("check response is nil"))
+	}
+	if !f.ShouldRun() {
+		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("flow was rejected"))
 	}
 	if f.checkResponse.CacheLookupResponse == nil || f.checkResponse.CacheLookupResponse.GetGlobalCacheResponses() == nil {
 		return newKeyLookupResponse(nil, LookupStatusMiss, errors.New("global cache is nil"))
