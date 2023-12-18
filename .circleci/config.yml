@@ -811,6 +811,15 @@ workflows:
 
       - update-environment:
           filters: *release_aperture_filters
+          name: aperture-update-environment-everything-production
+          environment-path: environments/production-saas/
+          skip-component: demo-app
+          update: everything
+          release-train: final-release
+          requires: *release_required
+
+      - update-environment:
+          filters: *release_aperture_filters
           requires: *release_required
           name: aperture-update-environment-demoapp-customer-demo
           environment-path: environments/customer-demo/
