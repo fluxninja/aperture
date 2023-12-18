@@ -2,6 +2,7 @@ package objectstorage
 
 import (
 	"context"
+	"strconv"
 
 	"cloud.google.com/go/storage"
 
@@ -66,7 +67,31 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		return nil, err
 	}
 
-	return PersistedEntry{key: key, value: &data}, nil
+	entry := PersistedEntry{key: key, value: &data}
+	attrs, err := obj.Attrs(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get object storage object attributes")
+	} else {
+		timestamp, err := strconv.ParseInt(attrs.Metadata["timestamp"], 10, 64)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse object storage object timestamp")
+			// XXX: Should we use current time instead?
+			entry.SetTimestamp(0)
+		} else {
+			entry.SetTimestamp(timestamp)
+		}
+
+		ttl, err := strconv.ParseInt(attrs.Metadata["ttl"], 10, 64)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse object storage object ttl")
+			// XXX: What timestamp can we use here as default?
+			entry.SetTTL(60)
+		} else {
+			entry.SetTTL(ttl)
+		}
+	}
+
+	return entry, nil
 }
 
 func (o *ObjectStorage) Delete(_ context.Context, key string) error {
@@ -82,7 +107,6 @@ func (o *ObjectStorage) Delete(_ context.Context, key string) error {
 }
 
 func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error) {
-
 	panic("implement me")
 }
 
@@ -119,11 +143,27 @@ func (o *ObjectStorage) Start(ctx context.Context) {
 				_, err := w.Write(*op.entry.value)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
+					continue
 				}
+
 				err = w.Close()
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to close writer for cache object")
+					continue
 				}
+
+				_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
+					Metadata: map[string]string{
+						"timestamp": strconv.FormatInt(op.entry.Timestamp(), 10),
+						"ttl":       strconv.FormatInt(op.entry.TTL(), 10),
+					},
+				})
+
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to set object metadata")
+					continue
+				}
+
 			case objectStorageOpDelete:
 				obj := o.bucket.Object(op.entry.key)
 				err := obj.Delete(o.cancellableCtx)

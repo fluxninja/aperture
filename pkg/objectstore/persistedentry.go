@@ -3,9 +3,10 @@ package objectstorage
 import olricstorage "github.com/buraksezer/olric/pkg/storage"
 
 type PersistedEntry struct {
-	key   string
-	value *[]byte
-	ttl   int64
+	key       string
+	value     *[]byte
+	ttl       int64
+	timestamp int64
 }
 
 func (p PersistedEntry) SetKey(s string) {
@@ -33,32 +34,26 @@ func (p PersistedEntry) TTL() int64 {
 }
 
 func (p PersistedEntry) SetTimestamp(i int64) {
-
-	panic("implement me")
+	p.timestamp = i
 }
 
 func (p PersistedEntry) Timestamp() int64 {
-
-	panic("implement me")
+	return p.timestamp
 }
 
 func (p PersistedEntry) SetLastAccess(i int64) {
-
 	panic("implement me")
 }
 
 func (p PersistedEntry) LastAccess() int64 {
-
 	panic("implement me")
 }
 
 func (p PersistedEntry) Encode() []byte {
-
 	panic("implement me")
 }
 
 func (p PersistedEntry) Decode(bytes []byte) {
-
 	panic("implement me")
 }
 
