@@ -19,18 +19,18 @@ const (
 )
 
 type (
-	oper      int
+	oper int
+	// Operation executed on object storage.
 	Operation struct {
 		op    oper
-		entry PersistedEntry
+		entry *PersistedEntry
 	}
 )
 
-var (
-	// ErrKeyNotFound means that given key is not present in the object storage.
-	ErrKeyNotFound = errors.New("key not found")
-)
+// ErrKeyNotFound means that given key is not present in the object storage.
+var ErrKeyNotFound = errors.New("key not found")
 
+// ObjectStorageIface is an abstract over persistent storage for Olric DMap.
 type ObjectStorageIface interface {
 	KeyPrefix() string
 	SetContextWithCancel(ctx context.Context, cancel context.CancelFunc)
@@ -42,6 +42,7 @@ type ObjectStorageIface interface {
 	List(ctx context.Context, prefix string) (string, error)
 }
 
+// ObjectStorage is an ObjectStorageIface implementation using GCP storage.
 type ObjectStorage struct {
 	keyPrefix      string
 	cancellableCtx context.Context
@@ -52,17 +53,20 @@ type ObjectStorage struct {
 	operations chan *Operation
 }
 
+// SetContextWithCancel sets long running context and cancel function.
 func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context.CancelFunc) {
 	o.cancellableCtx = ctx
 	o.cancel = cancel
 }
 
+// Config for object storage.
 type Config struct {
 	Backend   string `json:"backend" validate:"oneof=gcs" default:"gcs"`
 	Bucket    string `json:"bucket" validate:"required"`
 	KeyPrefix string `json:"key_prefix" validate:"required"`
 }
 
+// Get gets object from object storage.
 func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry, error) {
 	obj := o.bucket.Object(key)
 	reader, err := obj.NewReader(ctx)
@@ -74,9 +78,9 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	}
 
 	defer func() {
-		err := reader.Close()
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to close object storage reader")
+		closeErr := reader.Close()
+		if closeErr != nil {
+			log.Error().Err(closeErr).Msg("Failed to close object storage reader")
 		}
 	}()
 
@@ -87,7 +91,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		return nil, err
 	}
 
-	entry := PersistedEntry{key: key, value: &data}
+	entry := &PersistedEntry{key: key, value: &data}
 	attrs, err := obj.Attrs(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
@@ -114,10 +118,11 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	return entry, nil
 }
 
+// Delete queues delete operation from object storage.
 func (o *ObjectStorage) Delete(_ context.Context, key string) error {
 	o.operations <- &Operation{
 		op: objectStorageOpDelete,
-		entry: PersistedEntry{
+		entry: &PersistedEntry{
 			key:   key,
 			value: nil,
 		},
@@ -126,14 +131,16 @@ func (o *ObjectStorage) Delete(_ context.Context, key string) error {
 	return nil
 }
 
+// List lists object storage.
 func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error) {
 	panic("implement me")
 }
 
+// Put queues put operation to object storage.
 func (o *ObjectStorage) Put(_ context.Context, key string, data []byte) error {
 	o.operations <- &Operation{
 		op: objectStorageOpPut,
-		entry: PersistedEntry{
+		entry: &PersistedEntry{
 			key:   key,
 			value: &data,
 		},
@@ -142,70 +149,78 @@ func (o *ObjectStorage) Put(_ context.Context, key string, data []byte) error {
 	return nil
 }
 
+// KeyPrefix getter.
 func (o *ObjectStorage) KeyPrefix() string {
 	return o.keyPrefix
 }
 
 var _ ObjectStorageIface = (*ObjectStorage)(nil)
 
+// Start starts a goroutine which performs operations on object storage.
 func (o *ObjectStorage) Start(ctx context.Context) {
-	for {
-		select {
-		case <-o.cancellableCtx.Done():
-		case <-ctx.Done():
-			return
-		case op := <-o.operations:
-			switch op.op {
-			case objectStorageOpPut:
-				obj := o.bucket.Object(op.entry.key)
+	go func() {
+		for {
+			select {
+			case <-o.cancellableCtx.Done():
+			case <-ctx.Done():
+				return
+			case op := <-o.operations:
+				switch op.op {
+				case objectStorageOpPut:
+					obj := o.bucket.Object(op.entry.key)
 
-				w := obj.NewWriter(ctx)
-				_, err := w.Write(*op.entry.value)
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
-					continue
-				}
+					w := obj.NewWriter(ctx)
+					_, err := w.Write(*op.entry.value)
+					if err != nil {
+						log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
+						continue
+					}
 
-				err = w.Close()
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to close writer for cache object")
-					continue
-				}
+					err = w.Close()
+					if err != nil {
+						log.Error().Err(err).Msg("Failed to close writer for cache object")
+						continue
+					}
 
-				_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
-					Metadata: map[string]string{
-						"timestamp": strconv.FormatInt(op.entry.Timestamp(), 10),
-						"ttl":       strconv.FormatInt(op.entry.TTL(), 10),
-					},
-				})
+					_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
+						Metadata: map[string]string{
+							"timestamp": strconv.FormatInt(op.entry.Timestamp(), 10),
+							"ttl":       strconv.FormatInt(op.entry.TTL(), 10),
+						},
+					})
 
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to set object metadata")
-					continue
-				}
+					if err != nil {
+						log.Error().Err(err).Msg("Failed to set object metadata")
+						continue
+					}
 
-			case objectStorageOpDelete:
-				obj := o.bucket.Object(op.entry.key)
-				err := obj.Delete(o.cancellableCtx)
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
+				case objectStorageOpDelete:
+					obj := o.bucket.Object(op.entry.key)
+					err := obj.Delete(o.cancellableCtx)
+					if err != nil {
+						log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
+					}
 				}
 			}
 		}
-	}
+	}()
 }
 
+// Stop kills the goroutine started in Start().
+// TODO - add graceful shutdown to wait for the operations' queue to be empty.
 func (o *ObjectStorage) Stop(_ context.Context) error {
 	o.cancel()
 	return o.client.Close()
 }
 
+// ProvideParams for object storage.
 type ProvideParams struct {
 	fx.In
 
 	Unmarshaller config.Unmarshaller
 }
 
+// Provide ObjectStorage.
 func Provide(in ProvideParams) (*ObjectStorage, error) {
 	var cfg Config
 	err := in.Unmarshaller.UnmarshalKey("object_storage", &cfg)
@@ -230,6 +245,7 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 	return objStorage, nil
 }
 
+// InvokeParams for object storage.
 type InvokeParams struct {
 	fx.In
 
@@ -237,12 +253,13 @@ type InvokeParams struct {
 	ObjectStorage ObjectStorageIface
 }
 
+// Invoke ObjectStorage.
 func Invoke(in InvokeParams) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			cancellableCtx, cancel := context.WithCancel(ctx)
 			in.ObjectStorage.SetContextWithCancel(cancellableCtx, cancel)
-			go in.ObjectStorage.Start(ctx)
+			in.ObjectStorage.Start(ctx)
 
 			return nil
 		},

@@ -149,7 +149,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		return nil, err
 	}
 
-	dc := NewDistCache(oc, o, in.ObjectStorage, newDistCacheMetrics(), in.Shutdowner)
+	dc := NewDistCache(oc, o, in.ObjectStorage, newDistCacheMetrics(), in.Shutdowner, in.PrometheusRegistry)
 
 	// Context used by goroutine listening for Olric events. Should be canceled in fx.Stop.
 	eventListenerCtx, eventListenerCancel := context.WithCancel(context.Background())

@@ -13,6 +13,7 @@ import (
 	"github.com/buraksezer/olric"
 )
 
+// ObjectStoreBackedDMap is a wrapper around olric.DMap with a second layer persistent storage.
 type ObjectStoreBackedDMap struct {
 	dmap           olric.DMap
 	backingStorage ObjectStorageIface
@@ -26,6 +27,7 @@ func (o *ObjectStoreBackedDMap) generateObjectKey(key string) string {
 	return fmt.Sprintf("%s-%s-%s", o.backingStorage.KeyPrefix(), o.dmap.Name(), key)
 }
 
+// Delete deletes keys from in-memory and backed storage.
 func (o *ObjectStoreBackedDMap) Delete(ctx context.Context, keys ...string) (int, error) {
 	for _, key := range keys {
 		err := o.backingStorage.Delete(ctx, o.generateObjectKey(key))
@@ -37,10 +39,12 @@ func (o *ObjectStoreBackedDMap) Delete(ctx context.Context, keys ...string) (int
 	return o.dmap.Delete(ctx, keys...)
 }
 
+// Destroy destroys persistent dmap.
 func (o *ObjectStoreBackedDMap) Destroy(ctx context.Context) error {
 	return o.dmap.Destroy(ctx)
 }
 
+// Expire deletes key from backing storage and expires it in in-memory storage.
 func (o *ObjectStoreBackedDMap) Expire(ctx context.Context, key string, timeout time.Duration) error {
 	err := o.backingStorage.Delete(ctx, o.generateObjectKey(key))
 	if err != nil {
@@ -50,10 +54,12 @@ func (o *ObjectStoreBackedDMap) Expire(ctx context.Context, key string, timeout 
 	return o.dmap.Expire(ctx, key, timeout)
 }
 
+// Function executes function on dmap.
 func (o *ObjectStoreBackedDMap) Function(ctx context.Context, label string, function string, arg []byte) ([]byte, error) {
 	return o.dmap.Function(ctx, label, function, arg)
 }
 
+// Get tries to get key from in-memory storage and then from backing storage if that fails.
 func (o *ObjectStoreBackedDMap) Get(ctx context.Context, key string) (*olric.GetResponse, error) {
 	resp, err := o.dmap.Get(ctx, key)
 	if err == nil {
@@ -101,18 +107,22 @@ func (o *ObjectStoreBackedDMap) Get(ctx context.Context, key string) (*olric.Get
 	return olric.NewResponse(entry), nil
 }
 
+// Lock locks dmap.
 func (o *ObjectStoreBackedDMap) Lock(ctx context.Context, key string, deadline time.Duration) (olric.LockContext, error) {
-	return o.Lock(ctx, key, deadline)
+	return o.dmap.Lock(ctx, key, deadline)
 }
 
+// LockWithTimeout locks dmap with timeout.
 func (o *ObjectStoreBackedDMap) LockWithTimeout(ctx context.Context, key string, timeout time.Duration, deadline time.Duration) (olric.LockContext, error) {
-	return o.LockWithTimeout(ctx, key, timeout, deadline)
+	return o.dmap.LockWithTimeout(ctx, key, timeout, deadline)
 }
 
+// Name of the dmap.
 func (o *ObjectStoreBackedDMap) Name() string {
 	return o.dmap.Name()
 }
 
+// Put puts k/v pair to in-memory and backing storage.
 func (o *ObjectStoreBackedDMap) Put(ctx context.Context, key string, value interface{}, options ...olric.PutOption) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -147,6 +157,7 @@ func (o *ObjectStoreBackedDMap) getHitsTotalMetric(cacheType string) (prometheus
 	return o.getHitsTotal.With(labels), true
 }
 
+// NewPersistentDMap returns new persistent dmap.
 func NewPersistentDMap(
 	dmap olric.DMap,
 	backingStorage ObjectStorageIface,

@@ -2,6 +2,7 @@ package objectstorage
 
 import olricstorage "github.com/buraksezer/olric/pkg/storage"
 
+// PersistedEntry is an implementation of Olric entry used for persistent storage.
 type PersistedEntry struct {
 	key       string
 	value     *[]byte
@@ -9,51 +10,63 @@ type PersistedEntry struct {
 	timestamp int64
 }
 
-func (p PersistedEntry) SetKey(s string) {
+// SetKey is a key setter.
+func (p *PersistedEntry) SetKey(s string) {
 	p.key = s
 }
 
-func (p PersistedEntry) Key() string {
+// Key is a key getter.
+func (p *PersistedEntry) Key() string {
 	return p.key
 }
 
-func (p PersistedEntry) SetValue(bytes []byte) {
+// SetValue is a value setter.
+func (p *PersistedEntry) SetValue(bytes []byte) {
 	p.value = &bytes
 }
 
-func (p PersistedEntry) Value() []byte {
+// Value is a value getter.
+func (p *PersistedEntry) Value() []byte {
 	return *p.value
 }
 
-func (p PersistedEntry) SetTTL(i int64) {
+// SetTTL is a ttl setter.
+func (p *PersistedEntry) SetTTL(i int64) {
 	p.ttl = i
 }
 
-func (p PersistedEntry) TTL() int64 {
+// TTL is a ttl getter.
+func (p *PersistedEntry) TTL() int64 {
 	return p.ttl
 }
 
-func (p PersistedEntry) SetTimestamp(i int64) {
+// SetTimestamp is a timestamp setter.
+func (p *PersistedEntry) SetTimestamp(i int64) {
 	p.timestamp = i
 }
 
-func (p PersistedEntry) Timestamp() int64 {
+// Timestamp is a timestamp getter.
+func (p *PersistedEntry) Timestamp() int64 {
 	return p.timestamp
 }
 
-func (p PersistedEntry) SetLastAccess(i int64) {
+// SetLastAccess is a last access setter.
+func (p *PersistedEntry) SetLastAccess(i int64) {
 	panic("implement me")
 }
 
-func (p PersistedEntry) LastAccess() int64 {
+// LastAccess is a last access getter.
+func (p *PersistedEntry) LastAccess() int64 {
 	panic("implement me")
 }
 
-func (p PersistedEntry) Encode() []byte {
+// Encode encodes entry.
+func (p *PersistedEntry) Encode() []byte {
 	panic("implement me")
 }
 
-func (p PersistedEntry) Decode(bytes []byte) {
+// Decode decodes entry.
+func (p *PersistedEntry) Decode(bytes []byte) {
 	panic("implement me")
 }
 
