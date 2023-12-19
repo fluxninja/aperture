@@ -28,14 +28,15 @@ import (
 // DistCache is a peer to peer distributed cache.
 type DistCache struct {
 	distcachev1.UnimplementedDistCacheServiceServer
-	lock              sync.Mutex
-	config            *olricconfig.Config
-	olric             *olric.Olric
-	objStorage        objectstorage.ObjectStorageIface
-	client            olric.Client
-	metrics           *DistCacheMetrics
-	shutDowner        fx.Shutdowner
-	statsFailureCount uint8
+	lock               sync.Mutex
+	config             *olricconfig.Config
+	olric              *olric.Olric
+	objStorage         objectstorage.ObjectStorageIface
+	client             olric.Client
+	metrics            *DistCacheMetrics
+	shutDowner         fx.Shutdowner
+	statsFailureCount  uint8
+	prometheusRegistry *prometheus.Registry
 
 	// These are periodically update by the scapeMetrics function.
 	memberID   string
@@ -43,19 +44,27 @@ type DistCache struct {
 }
 
 // NewDistCache creates a new instance of DistCache.
-func NewDistCache(config *olricconfig.Config, olric *olric.Olric, objStorage objectstorage.ObjectStorageIface, metrics *DistCacheMetrics, shutDowner fx.Shutdowner) *DistCache {
+func NewDistCache(
+	config *olricconfig.Config,
+	olric *olric.Olric,
+	objStorage objectstorage.ObjectStorageIface,
+	metrics *DistCacheMetrics,
+	shutDowner fx.Shutdowner,
+	prometheusRegistry *prometheus.Registry,
+) *DistCache {
 	return &DistCache{
-		config:     config,
-		olric:      olric,
-		objStorage: objStorage,
-		client:     olric.NewEmbeddedClient(),
-		metrics:    metrics,
-		shutDowner: shutDowner,
+		config:             config,
+		olric:              olric,
+		objStorage:         objStorage,
+		client:             olric.NewEmbeddedClient(),
+		metrics:            metrics,
+		shutDowner:         shutDowner,
+		prometheusRegistry: prometheusRegistry,
 	}
 }
 
 // NewDMap creates a new DMap.
-func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (olric.DMap, error) {
+func (dc *DistCache) NewDMap(name string, config olricconfig.DMap, persistent bool) (olric.DMap, error) {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 	dc.config.DMaps.Custom[name] = config
@@ -67,8 +76,15 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap) (olric.DMap, 
 		return nil, err
 	}
 
-	persistentDMap := objectstorage.NewPersistentDMap(d, dc.objStorage)
-	return persistentDMap, nil
+	if persistent {
+		return objectstorage.NewPersistentDMap(
+			d,
+			dc.objStorage,
+			dc.prometheusRegistry,
+			dc.getMetricsLabels,
+		)
+	}
+	return d, nil
 }
 
 // DeleteDMap deletes a DMap.

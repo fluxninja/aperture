@@ -79,7 +79,7 @@ func NewCache(dc *distcache.DistCache, lc fx.Lifecycle, pr *prometheus.Registry)
 					}
 				}
 			}
-			dmapCache, err := dc.NewDMap("control_point_cache", olricconfig.DMap{})
+			dmapCache, err := dc.NewDMap("control_point_cache", olricconfig.DMap{}, true)
 			if err != nil {
 				return err
 			}

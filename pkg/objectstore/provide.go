@@ -2,6 +2,7 @@ package objectstorage
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"cloud.google.com/go/storage"
@@ -24,6 +25,22 @@ type (
 		entry PersistedEntry
 	}
 )
+
+var (
+	// ErrKeyNotFound means that given key is not present in the object storage.
+	ErrKeyNotFound = errors.New("key not found")
+)
+
+type ObjectStorageIface interface {
+	KeyPrefix() string
+	SetContextWithCancel(ctx context.Context, cancel context.CancelFunc)
+	Start(ctx context.Context)
+	Stop(ctx context.Context) error
+	Put(ctx context.Context, key string, data []byte) error
+	Get(ctx context.Context, key string) (olricstorage.Entry, error)
+	Delete(ctx context.Context, key string) error
+	List(ctx context.Context, prefix string) (string, error)
+}
 
 type ObjectStorage struct {
 	keyPrefix      string
@@ -50,6 +67,9 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	obj := o.bucket.Object(key)
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
+		if errors.Is(err, storage.ErrObjectNotExist) {
+			return nil, ErrKeyNotFound
+		}
 		return nil, err
 	}
 

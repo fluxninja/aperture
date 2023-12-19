@@ -7,25 +7,19 @@ import (
 	"time"
 
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/buraksezer/olric"
-	"github.com/buraksezer/olric/pkg/storage"
 )
-
-type ObjectStorageIface interface {
-	KeyPrefix() string
-	SetContextWithCancel(ctx context.Context, cancel context.CancelFunc)
-	Start(ctx context.Context)
-	Stop(ctx context.Context) error
-	Put(ctx context.Context, key string, data []byte) error
-	Get(ctx context.Context, key string) (storage.Entry, error)
-	Delete(ctx context.Context, key string) error
-	List(ctx context.Context, prefix string) (string, error)
-}
 
 type ObjectStoreBackedDMap struct {
 	dmap           olric.DMap
 	backingStorage ObjectStorageIface
+
+	getDistCacheLabels func() (prometheus.Labels, bool)
+	getMissesTotal     *prometheus.CounterVec
+	getHitsTotal       *prometheus.CounterVec
 }
 
 func (o *ObjectStoreBackedDMap) generateObjectKey(key string) string {
@@ -62,27 +56,49 @@ func (o *ObjectStoreBackedDMap) Function(ctx context.Context, label string, func
 
 func (o *ObjectStoreBackedDMap) Get(ctx context.Context, key string) (*olric.GetResponse, error) {
 	resp, err := o.dmap.Get(ctx, key)
-	if err != nil {
-		if errors.Is(err, olric.ErrKeyNotFound) {
-			objectKey := o.generateObjectKey(key)
-			entry, innerErr := o.backingStorage.Get(ctx, objectKey)
-			if innerErr != nil {
-				return nil, innerErr
-			}
-
-			expireAt := time.Duration(entry.TTL()) * time.Second
-			innerErr = o.dmap.Put(ctx, key, entry.Value(), olric.EXAT(expireAt))
-			if innerErr != nil {
-				return nil, innerErr
-			}
-
-			resp = olric.NewResponse(entry)
-		} else {
-			return nil, err
+	if err == nil {
+		// Got hit in in-memory cache, no need to get from backing storage.
+		metric, ready := o.getHitsTotalMetric(metrics.PersistentCacheTypeInMemory)
+		if ready {
+			metric.Inc()
 		}
+		return resp, nil
+	}
+	if !errors.Is(err, olric.ErrKeyNotFound) {
+		// Some error from in-memory cache.
+		return nil, err
+	}
+	// Key not found in in-memory cache. Need to check backing storage.
+	metric, ready := o.getMissesTotalMetric(metrics.PersistentCacheTypeInMemory)
+	if ready {
+		metric.Inc()
 	}
 
-	return resp, nil
+	objectKey := o.generateObjectKey(key)
+	entry, innerErr := o.backingStorage.Get(ctx, objectKey)
+	if innerErr != nil {
+		if errors.Is(innerErr, ErrKeyNotFound) {
+			metric, ready = o.getMissesTotalMetric(metrics.PersistentCacheTypeObjectStorage)
+			if ready {
+				metric.Inc()
+			}
+		}
+		return nil, innerErr
+	}
+
+	// Got hit in backing cache, need to save this result in in-memory cache.
+	metric, ready = o.getHitsTotalMetric(metrics.PersistentCacheTypeObjectStorage)
+	if ready {
+		metric.Inc()
+	}
+
+	expireAt := time.Duration(entry.TTL()) * time.Second
+	innerErr = o.dmap.Put(ctx, key, entry.Value(), olric.EXAT(expireAt))
+	if innerErr != nil {
+		return nil, innerErr
+	}
+
+	return olric.NewResponse(entry), nil
 }
 
 func (o *ObjectStoreBackedDMap) Lock(ctx context.Context, key string, deadline time.Duration) (olric.LockContext, error) {
@@ -113,11 +129,58 @@ func (o *ObjectStoreBackedDMap) Put(ctx context.Context, key string, value inter
 	return o.dmap.Put(ctx, key, value, options...)
 }
 
-func NewPersistentDMap(dmap olric.DMap, backingStorage ObjectStorageIface) *ObjectStoreBackedDMap {
-	return &ObjectStoreBackedDMap{
-		dmap:           dmap,
-		backingStorage: backingStorage,
+func (o *ObjectStoreBackedDMap) getMissesTotalMetric(cacheType string) (prometheus.Counter, bool) {
+	labels, ready := o.getDistCacheLabels()
+	if !ready {
+		return nil, false
 	}
+	labels[metrics.PersistentCacheTypeLabel] = cacheType
+	return o.getMissesTotal.With(labels), true
+}
+
+func (o *ObjectStoreBackedDMap) getHitsTotalMetric(cacheType string) (prometheus.Counter, bool) {
+	labels, ready := o.getDistCacheLabels()
+	if !ready {
+		return nil, false
+	}
+	labels[metrics.PersistentCacheTypeLabel] = cacheType
+	return o.getHitsTotal.With(labels), true
+}
+
+func NewPersistentDMap(
+	dmap olric.DMap,
+	backingStorage ObjectStorageIface,
+	prometheusRegistry *prometheus.Registry,
+	getDistCacheLabels func() (prometheus.Labels, bool),
+) (*ObjectStoreBackedDMap, error) {
+	labels := []string{
+		metrics.DistCacheMemberIDLabel,
+		metrics.DistCacheMemberNameLabel,
+		metrics.PersistentCacheTypeLabel,
+	}
+	getMissesTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.PersistentCacheGetMissesMetricName,
+		Help: "Cumulative number of persistent cache misses.",
+	}, labels)
+	getHitsTotal := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.PersistentCacheGetHitsMetricName,
+		Help: "Cumulative number of persistent cache hits.",
+	}, labels)
+	for _, m := range []prometheus.Collector{getMissesTotal, getHitsTotal} {
+		err := prometheusRegistry.Register(m)
+		if err != nil {
+			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+				return nil, fmt.Errorf("unable to register persistent cache metrics: %v", err)
+			}
+		}
+	}
+	return &ObjectStoreBackedDMap{
+		dmap:               dmap,
+		backingStorage:     backingStorage,
+		getMissesTotal:     getMissesTotal,
+		getHitsTotal:       getHitsTotal,
+		getDistCacheLabels: getDistCacheLabels,
+	}, nil
 }
 
 var _ olric.DMap = &ObjectStoreBackedDMap{}
