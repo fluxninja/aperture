@@ -75,7 +75,7 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 	oc.WriteQuorum = 1
 	oc.ReadQuorum = 1
 	oc.MemberCountQuorum = 1
-	oc.ReadRepair = false
+	oc.ReadRepair = true
 
 	oc.ReplicaCount = defaultConfig.ReplicaCount
 	if defaultConfig.SyncReplication {
