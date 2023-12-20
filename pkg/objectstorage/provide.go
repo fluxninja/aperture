@@ -205,8 +205,10 @@ var _ ObjectStorageIface = (*ObjectStorage)(nil)
 
 func (o *ObjectStorage) getObjectTimestamp(ctx context.Context, obj *storage.ObjectHandle) (int64, error) {
 	attrs, err := obj.Attrs(ctx)
-	if err != nil && !errors.Is(err, storage.ErrObjectNotExist) {
-		log.Error().Err(err).Msg("Failed to query storage bucket for object attributes")
+	if err != nil {
+		if !errors.Is(err, storage.ErrObjectNotExist) {
+			log.Error().Err(err).Msg("Failed to query storage bucket for object attributes")
+		}
 		return 0, err
 	}
 	if attrs == nil {
@@ -230,7 +232,7 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 	obj := o.bucket.Object(entry.key)
 
 	timestamp, err := o.getObjectTimestamp(ctx, obj)
-	if err != nil && !errors.Is(err, errObjectTimestampMissing) {
+	if err != nil && !errors.Is(err, errObjectTimestampMissing) && !errors.Is(err, storage.ErrObjectNotExist) {
 		return err
 	}
 
@@ -271,8 +273,17 @@ func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEnt
 	obj := o.bucket.Object(entry.key)
 
 	timestamp, err := o.getObjectTimestamp(ctx, obj)
-	if err != nil && !errors.Is(err, errObjectTimestampMissing) {
-		return err
+	if err != nil {
+		// If the object is not found in the storage, just return
+		if errors.Is(err, storage.ErrObjectNotExist) {
+			return nil
+		}
+
+		// Ignore errObjectTimestampMissing and return all the other errors. If timestamp is missing, we'll
+		// just use 0 instead.
+		if !errors.Is(err, errObjectTimestampMissing) {
+			return err
+		}
 	}
 
 	if timestamp > entry.Timestamp() {
