@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/sourcegraph/conc/pool"
 
@@ -70,6 +71,9 @@ func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context
 
 // Get gets object from object storage.
 func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry, error) {
+	// If the object is missing timestamp, we will use timestamp of when the Get() was called.
+	timestampDefault := time.Now().UTC().UnixNano()
+
 	obj := o.bucket.Object(key)
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
@@ -102,7 +106,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to parse object storage object timestamp")
 			// XXX: Should we use current time instead?
-			entry.SetTimestamp(0)
+			entry.SetTimestamp(timestampDefault)
 		} else {
 			entry.SetTimestamp(timestamp)
 		}
