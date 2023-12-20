@@ -52,6 +52,7 @@ Generated File Starts
 | `liveness`          | [Liveness](#liveness)                  |
 | `log`               | [Log](#log)                            |
 | `metrics`           | [Metrics](#metrics)                    |
+| `object_storage`    | [ObjectStorage](#object-storage)       |
 | `peer_discovery`    | [PeerDiscovery](#peer-discovery)       |
 | `profilers`         | [Profilers](#profilers)                |
 | `prometheus`        | [Prometheus](#prometheus)              |
@@ -386,6 +387,30 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 
 ([AgentOTelConfig](#agent-o-tel-config)) Environment variable prefix:
 `APERTURE_AGENT_OTEL_`
+
+</dd>
+
+<!-- vale off -->
+
+</dl>
+
+---
+
+<!-- vale off -->
+
+### _object_storage_ {#object-storage}
+
+<!-- vale on -->
+
+<dl>
+
+<!-- vale off -->
+
+<dt></dt>
+<dd>
+
+([Config](#config)) Environment variable prefix:
+`APERTURE_AGENT_OBJECT_STORAGE_`
 
 </dd>
 
@@ -1202,6 +1227,49 @@ ClientTLSConfig is the configuration for client TLS.
 <!-- vale off -->
 
 (string)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### Config {#config}
+
+<!-- vale on -->
+
+Config for object storage.
+
+<dl>
+<dt>backend</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gcs`, default: `"gcs"`)
+
+<!-- vale on -->
+
+</dd>
+<dt>bucket</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+</dd>
+<dt>key_prefix</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
 
 <!-- vale on -->
 

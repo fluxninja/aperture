@@ -375,6 +375,34 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
+    Config:
+        properties:
+            backend:
+                default: gcs
+                enum:
+                    - gcs
+                type: string
+                x-go-name: Backend
+                x-go-tag-default: gcs
+                x-go-tag-json: backend
+                x-go-tag-validate: oneof=gcs
+                x-oneof: gcs
+            bucket:
+                type: string
+                x-go-name: Bucket
+                x-go-tag-json: bucket
+                x-go-tag-validate: required
+            key_prefix:
+                type: string
+                x-go-name: KeyPrefix
+                x-go-tag-json: key_prefix
+                x-go-tag-validate: required
+        required:
+            - bucket
+            - key_prefix
+        title: Config for object storage.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstore/config
     DistCacheConfig:
         properties:
             bind_addr:
@@ -1570,6 +1598,16 @@ paths:
                 - in: body
                   schema:
                     $ref: '#/definitions/MetricsConfig'
+            tags:
+                - common-configuration
+            x-fn-config-env: true
+    /object_storage:
+        post:
+            operationId: ObjectStorage
+            parameters:
+                - in: body
+                  schema:
+                    $ref: '#/definitions/Config'
             tags:
                 - common-configuration
             x-fn-config-env: true

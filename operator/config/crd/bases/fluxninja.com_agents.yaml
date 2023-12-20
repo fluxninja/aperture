@@ -1498,6 +1498,16 @@ spec:
                           is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                         type: boolean
                     type: object
+                  object_storage:
+                    description: ObjectStorage configuration.
+                    properties:
+                      backend:
+                        type: string
+                      bucket:
+                        type: string
+                      key_prefix:
+                        type: string
+                    type: object
                   otel:
                     description: OTel configuration.
                     properties:

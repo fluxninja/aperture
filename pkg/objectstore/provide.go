@@ -10,6 +10,7 @@ import (
 	olricstorage "github.com/buraksezer/olric/pkg/storage"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	storageconfig "github.com/fluxninja/aperture/v2/pkg/objectstore/config"
 	"go.uber.org/fx"
 )
 
@@ -57,13 +58,6 @@ type ObjectStorage struct {
 func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context.CancelFunc) {
 	o.cancellableCtx = ctx
 	o.cancel = cancel
-}
-
-// Config for object storage.
-type Config struct {
-	Backend   string `json:"backend" validate:"oneof=gcs" default:"gcs"`
-	Bucket    string `json:"bucket" validate:"required"`
-	KeyPrefix string `json:"key_prefix" validate:"required"`
 }
 
 // Get gets object from object storage.
@@ -222,7 +216,7 @@ type ProvideParams struct {
 
 // Provide ObjectStorage.
 func Provide(in ProvideParams) (*ObjectStorage, error) {
-	var cfg Config
+	var cfg storageconfig.Config
 	err := in.Unmarshaller.UnmarshalKey("object_storage", &cfg)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal object_storage config")
