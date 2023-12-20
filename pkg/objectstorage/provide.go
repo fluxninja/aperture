@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"sync"
+
+	"github.com/sourcegraph/conc/pool"
 
 	"cloud.google.com/go/storage"
 
@@ -51,10 +54,11 @@ type ObjectStorage struct {
 	client         *storage.Client
 	bucket         *storage.BucketHandle
 
-	operations chan *Operation
+	inFlightOpsMutex sync.Mutex
+	operations       chan *Operation
 }
 
-// SetContextWithCancel sets long running context and cancel function.
+// SetContextWithCancel sets long-running context and cancel function.
 func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context.CancelFunc) {
 	o.cancellableCtx = ctx
 	o.cancel = cancel
@@ -150,60 +154,86 @@ func (o *ObjectStorage) KeyPrefix() string {
 
 var _ ObjectStorageIface = (*ObjectStorage)(nil)
 
+func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry) error {
+	obj := o.bucket.Object(entry.key)
+
+	w := obj.NewWriter(ctx)
+	_, err := w.Write(*entry.value)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
+		return err
+	}
+
+	err = w.Close()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to close writer for cache object")
+		return nil
+	}
+
+	_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
+		Metadata: map[string]string{
+			"timestamp": strconv.FormatInt(entry.Timestamp(), 10),
+			"ttl":       strconv.FormatInt(entry.TTL(), 10),
+		},
+	})
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to set object metadata")
+		return nil
+	}
+
+	return nil
+}
+
+func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEntry) error {
+	obj := o.bucket.Object(entry.key)
+	err := obj.Delete(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
+	}
+
+	return nil
+}
+
+func (o *ObjectStorage) handleOp(ctx context.Context, op *Operation) error {
+	switch op.op {
+	case objectStorageOpPut:
+		return o.handleOpPut(ctx, op.entry)
+
+	case objectStorageOpDelete:
+		return o.handleOpDelete(ctx, op.entry)
+	}
+
+	return nil
+}
+
 // Start starts a goroutine which performs operations on object storage.
 func (o *ObjectStorage) Start(ctx context.Context) {
 	go func() {
-		for {
-			select {
-			case <-o.cancellableCtx.Done():
-			case <-ctx.Done():
-				return
-			case op := <-o.operations:
-				switch op.op {
-				case objectStorageOpPut:
-					obj := o.bucket.Object(op.entry.key)
+		p := pool.New().WithMaxGoroutines(10)
 
-					w := obj.NewWriter(ctx)
-					_, err := w.Write(*op.entry.value)
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
-						continue
-					}
+		o.inFlightOpsMutex.Lock()
 
-					err = w.Close()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to close writer for cache object")
-						continue
-					}
+		defer o.inFlightOpsMutex.Unlock()
+		defer p.Wait()
 
-					_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
-						Metadata: map[string]string{
-							"timestamp": strconv.FormatInt(op.entry.Timestamp(), 10),
-							"ttl":       strconv.FormatInt(op.entry.TTL(), 10),
-						},
-					})
-
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to set object metadata")
-						continue
-					}
-
-				case objectStorageOpDelete:
-					obj := o.bucket.Object(op.entry.key)
-					err := obj.Delete(o.cancellableCtx)
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
-					}
-				}
-			}
+		for oper := range o.operations {
+			_ = o.handleOp(ctx, oper)
 		}
 	}()
+
+	<-o.cancellableCtx.Done()
+	close(o.operations)
 }
 
 // Stop kills the goroutine started in Start().
-// TODO - add graceful shutdown to wait for the operations' queue to be empty.
 func (o *ObjectStorage) Stop(_ context.Context) error {
 	o.cancel()
+	// The lock is held by the go-routine responsible for handling operations. Once the channel is closed (by calling o.cancel())
+	// the go-routine will finish processing operations, and then exit, releasing the lock in the process.
+	o.inFlightOpsMutex.Lock()
+	defer o.inFlightOpsMutex.Unlock()
+
 	return o.client.Close()
 }
 
@@ -251,7 +281,7 @@ type InvokeParams struct {
 func Invoke(in InvokeParams) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			cancellableCtx, cancel := context.WithCancel(ctx)
+			cancellableCtx, cancel := context.WithCancel(context.Background())
 			in.ObjectStorage.SetContextWithCancel(cancellableCtx, cancel)
 			in.ObjectStorage.Start(ctx)
 
