@@ -71,9 +71,11 @@ snippetName="manualFlow"
 The above code snippet is making `start_flow` calls to Aperture. For this call,
 it is important to specify the control point (`AwesomeFeature` in the example)
 and `FlowParams` that will be aligned with the policy created in Aperture Cloud.
-For each flow that is started, a `should_run` decision is made, determining
-whether to allow the request into the system or to rate limit it. It is
-important to make the `end` call made after processing each request, to send
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `should_run` decision is made,
+determining whether to allow the request into the system or to rate limit it. It
+is important to make the `end` call made after processing each request, to send
 telemetry data that would provide granular visibility for each flow.
 
 You can also use the flow as a context manager:

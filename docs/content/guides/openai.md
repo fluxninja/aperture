@@ -195,6 +195,12 @@ Aperture, we also attach the following labels to each request:
   this label. For example, requests from `paid_user` can be given precedence
   over those from `trial_user` and `free_user` in example code.
 
+In the `startFlow` call, it's important to define the gRPC deadline. This
+parameter sets limit for how long a request can remain queued. In our case, a
+deadline of `120000` milliseconds means the request might stay in the queue for
+up to 20 minutes. After this interval, the request will either be processed or
+discarded, depending on its position in the queue.
+
 ### Policies
 
 You can generate a policy using quota scheduler blueprint, either via Aperture

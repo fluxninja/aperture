@@ -51,7 +51,9 @@ section.
 
 Aperture Go SDK uses gRPC to communicate with Aperture Cloud. You can configure
 gRPC client options by passing a list of gRPC client options to the
-ApertureClient constructor.
+ApertureClient constructor. For request prioritization use cases, it's important
+to set a high gRPC deadline. This parameter specifies the maximum duration a
+request can remain in the queue.
 
 <CodeSnippet lang="go" snippetName="grpcOptions" />
 
