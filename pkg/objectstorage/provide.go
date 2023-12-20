@@ -3,6 +3,7 @@ package objectstorage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -336,6 +337,12 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 	}
 	if !cfg.Enabled {
 		return nil, nil
+	}
+	if cfg.Bucket == "" {
+		return nil, fmt.Errorf("bucket cannot be empty")
+	}
+	if cfg.KeyPrefix == "" {
+		return nil, fmt.Errorf("key prefix cannot be empty")
 	}
 
 	client, err := storage.NewClient(context.Background())

@@ -1502,12 +1502,18 @@ spec:
                     description: ObjectStorage configuration.
                     properties:
                       backend:
+                        description: Backend which provides the object storage.
                         type: string
                       bucket:
+                        description: Bucket name of the bucket to use. Required if
+                          enabled is true.
                         type: string
                       enabled:
+                        description: Enabled denotes if object storage is enabled.
                         type: boolean
                       key_prefix:
+                        description: KeyPrefix to use when writing to bucket. Required
+                          if enabled is true.
                         type: string
                     type: object
                   otel:

@@ -13,8 +13,12 @@ package config
 // swagger:model
 // +kubebuilder:object:generate=true
 type Config struct {
-	Enabled   bool   `json:"enabled" default:"false"`
-	Backend   string `json:"backend" validate:"oneof=gcs" default:"gcs"`
-	Bucket    string `json:"bucket" validate:"required"`
-	KeyPrefix string `json:"key_prefix" validate:"required"`
+	// Enabled denotes if object storage is enabled.
+	Enabled bool `json:"enabled" default:"false"`
+	// Backend which provides the object storage.
+	Backend string `json:"backend" validate:"oneof=gcs" default:"gcs"`
+	// Bucket name of the bucket to use. Required if enabled is true.
+	Bucket string `json:"bucket"`
+	// KeyPrefix to use when writing to bucket. Required if enabled is true.
+	KeyPrefix string `json:"key_prefix"`
 }

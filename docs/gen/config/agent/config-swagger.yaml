@@ -379,6 +379,7 @@ definitions:
         properties:
             backend:
                 default: gcs
+                description: Backend which provides the object storage.
                 enum:
                     - gcs
                 type: string
@@ -388,24 +389,22 @@ definitions:
                 x-go-tag-validate: oneof=gcs
                 x-oneof: gcs
             bucket:
+                description: Bucket name of the bucket to use. Required if enabled is true.
                 type: string
                 x-go-name: Bucket
                 x-go-tag-json: bucket
-                x-go-tag-validate: required
             enabled:
                 default: false
+                description: Enabled denotes if object storage is enabled.
                 type: boolean
                 x-go-name: Enabled
                 x-go-tag-default: "false"
                 x-go-tag-json: enabled
             key_prefix:
+                description: KeyPrefix to use when writing to bucket. Required if enabled is true.
                 type: string
                 x-go-name: KeyPrefix
                 x-go-tag-json: key_prefix
-                x-go-tag-validate: required
-        required:
-            - bucket
-            - key_prefix
         title: Config for object storage.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config

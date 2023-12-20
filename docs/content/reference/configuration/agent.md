@@ -1253,15 +1253,19 @@ Config for object storage.
 
 <!-- vale on -->
 
+Backend which provides the object storage.
+
 </dd>
 <dt>bucket</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, **required**)
+(string)
 
 <!-- vale on -->
+
+Bucket name of the bucket to use. Required if enabled is true.
 
 </dd>
 <dt>enabled</dt>
@@ -1273,15 +1277,19 @@ Config for object storage.
 
 <!-- vale on -->
 
+Enabled denotes if object storage is enabled.
+
 </dd>
 <dt>key_prefix</dt>
 <dd>
 
 <!-- vale off -->
 
-(string, **required**)
+(string)
 
 <!-- vale on -->
+
+KeyPrefix to use when writing to bucket. Required if enabled is true.
 
 </dd>
 </dl>
