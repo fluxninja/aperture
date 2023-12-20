@@ -31,7 +31,7 @@ import (
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
-	objectstorageconfig "github.com/fluxninja/aperture/v2/pkg/objectstore/config"
+	objectstorageconfig "github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
 	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"

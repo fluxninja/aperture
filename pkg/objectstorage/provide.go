@@ -10,7 +10,7 @@ import (
 	olricstorage "github.com/buraksezer/olric/pkg/storage"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	storageconfig "github.com/fluxninja/aperture/v2/pkg/objectstore/config"
+	storageconfig "github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
 	"go.uber.org/fx"
 )
 
@@ -24,7 +24,7 @@ type (
 	// Operation executed on object storage.
 	Operation struct {
 		op    oper
-		entry *PersistedEntry
+		entry *PersistentEntry
 	}
 )
 
@@ -85,7 +85,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		return nil, err
 	}
 
-	entry := &PersistedEntry{key: key, value: &data}
+	entry := &PersistentEntry{key: key, value: &data}
 	attrs, err := obj.Attrs(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
@@ -116,7 +116,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 func (o *ObjectStorage) Delete(_ context.Context, key string) error {
 	o.operations <- &Operation{
 		op: objectStorageOpDelete,
-		entry: &PersistedEntry{
+		entry: &PersistentEntry{
 			key:   key,
 			value: nil,
 		},
@@ -134,7 +134,7 @@ func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error)
 func (o *ObjectStorage) Put(_ context.Context, key string, data []byte) error {
 	o.operations <- &Operation{
 		op: objectStorageOpPut,
-		entry: &PersistedEntry{
+		entry: &PersistentEntry{
 			key:   key,
 			value: &data,
 		},

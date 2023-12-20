@@ -7,7 +7,7 @@ import (
 	"net"
 	"strconv"
 
-	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstorage"
 
 	"github.com/buraksezer/olric"
 	olricconfig "github.com/buraksezer/olric/config"

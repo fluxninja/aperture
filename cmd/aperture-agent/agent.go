@@ -11,7 +11,7 @@
 package main
 
 import (
-	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstore"
+	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstorage"
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
