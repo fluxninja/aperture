@@ -81,6 +81,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return nil, ErrKeyNotFound
 		}
+		log.Error().Err(err).Msg("Failed to create object storage reader")
 		return nil, err
 	}
 
@@ -91,7 +92,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		}
 	}()
 
-	var data []byte
+	data := make([]byte, reader.Attrs.Size)
 	_, err = reader.Read(data)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read object storage object")
