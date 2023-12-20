@@ -31,8 +31,12 @@ type (
 	}
 )
 
-// ErrKeyNotFound means that given key is not present in the object storage.
-var ErrKeyNotFound = errors.New("key not found")
+var (
+	// ErrKeyNotFound means that given key is not present in the object storage.
+	ErrKeyNotFound = errors.New("key not found")
+	// ErrObjectTimestampMissing means that either object is not present, or its metadata is incomplete.
+	errObjectTimestampMissing = errors.New("object or its timestamp does not exist")
+)
 
 // ObjectStorageIface is an abstract over persistent storage for Olric DMap.
 type ObjectStorageIface interface {
@@ -154,11 +158,41 @@ func (o *ObjectStorage) KeyPrefix() string {
 
 var _ ObjectStorageIface = (*ObjectStorage)(nil)
 
+func (o *ObjectStorage) getObjectTimestamp(ctx context.Context, obj *storage.ObjectHandle) (int64, error) {
+	attrs, err := obj.Attrs(ctx)
+	if err != nil && !errors.Is(err, storage.ErrObjectNotExist) {
+		log.Error().Err(err).Msg("Failed to query storage bucket for object attributes")
+		return 0, err
+	}
+
+	timeStamp, ok := attrs.Metadata["timestamp"]
+	if ok {
+		i, err := strconv.ParseInt(timeStamp, 10, 64)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse object timestamp")
+			return 0, err
+		}
+		return i, nil
+	} else {
+		return 0, errObjectTimestampMissing
+	}
+}
+
 func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry) error {
 	obj := o.bucket.Object(entry.key)
 
+	timestamp, err := o.getObjectTimestamp(ctx, obj)
+	if err != nil && !errors.Is(err, errObjectTimestampMissing) {
+		return err
+	}
+
+	if timestamp > entry.Timestamp() {
+		log.Debug().Msg("Object in storage is more recent than the entry being created")
+		return nil
+	}
+
 	w := obj.NewWriter(ctx)
-	_, err := w.Write(*entry.value)
+	_, err = w.Write(*entry.value)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
 		return err
@@ -187,7 +221,18 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 
 func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEntry) error {
 	obj := o.bucket.Object(entry.key)
-	err := obj.Delete(ctx)
+
+	timestamp, err := o.getObjectTimestamp(ctx, obj)
+	if err != nil && !errors.Is(err, errObjectTimestampMissing) {
+		return err
+	}
+
+	if timestamp > entry.Timestamp() {
+		log.Debug().Msg("Object in storage is more recent than the entry being deleted")
+		return nil
+	}
+
+	err = obj.Delete(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
 	}
