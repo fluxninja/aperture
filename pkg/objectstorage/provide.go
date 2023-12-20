@@ -32,8 +32,6 @@ type (
 	}
 )
 
-const defaultTTL = 60
-
 var (
 	// ErrKeyNotFound means that given key is not present in the object storage.
 	ErrKeyNotFound = errors.New("key not found")
@@ -118,17 +116,36 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 			}
 		}
 
+		deleteStaleCacheEntry := func(entry *PersistentEntry) {
+			err := o.internalDelete(ctx, entry)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to queue expired cache entry for deletion from object storage")
+			}
+		}
+
 		ttlMetadata, ok := attrs.Metadata["ttl"]
+		// If the TTL is either missing from metadata, or cannot be parsed we must assume that the entry is expired.
+		// Otherwise, we would be always returning potentially stale entry until it's either overwritten, or bucket
+		// lifecycle policy deletes it for us.
+		// XXX: Another approach would be to use a default TTL (but what would be a good default?) and update the
+		//      metadata.
 		if !ok {
-			log.Error().Msg("Missing object TTL in metadata, using default TTL instead")
-			entry.SetTTL(defaultTTL)
+			log.Error().Msg("Missing object TTL in metadata, assume that the persisted cache entry is stale")
+			deleteStaleCacheEntry(entry)
+			return nil, ErrKeyNotFound
 		} else {
 			ttl, err := strconv.ParseInt(ttlMetadata, 10, 64)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to parse object TTL, using default TTL instead")
-				entry.SetTTL(defaultTTL)
+				log.Error().Err(err).Msg("Failed to parse object TTL, assuming that the persisted cache entry is stale")
+				deleteStaleCacheEntry(entry)
 			} else {
 				entry.SetTTL(ttl)
+
+				if time.UnixMilli(ttl).Before(time.Now()) {
+					log.Debug().Msg("Object in storage has expired, deleting it and returning ErrKeyNotFound")
+					deleteStaleCacheEntry(entry)
+					return nil, ErrKeyNotFound
+				}
 			}
 		}
 	}
@@ -136,17 +153,21 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	return entry, nil
 }
 
-// Delete queues delete operation from object storage.
-func (o *ObjectStorage) Delete(_ context.Context, key string) error {
+func (o *ObjectStorage) internalDelete(_ context.Context, entry *PersistentEntry) error {
 	o.operations <- &Operation{
-		op: objectStorageOpDelete,
-		entry: &PersistentEntry{
-			key:   key,
-			value: nil,
-		},
+		op:    objectStorageOpDelete,
+		entry: entry,
 	}
 
 	return nil
+}
+
+// Delete queues delete operation from object storage.
+func (o *ObjectStorage) Delete(ctx context.Context, key string) error {
+	return o.internalDelete(ctx, &PersistentEntry{
+		key:   key,
+		value: nil,
+	})
 }
 
 // List lists object storage.
