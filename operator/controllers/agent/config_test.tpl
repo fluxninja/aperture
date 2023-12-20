@@ -275,3 +275,8 @@ watchdog:
       - 0.9
       - 0.95
       - 0.99
+object_storage:
+  enabled: true
+  backend: gcs
+  bucket: list
+  key_prefix: asdf
