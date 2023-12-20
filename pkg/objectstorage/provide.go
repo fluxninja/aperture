@@ -142,8 +142,12 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 			} else {
 				entry.SetTTL(ttl)
 
-				if time.UnixMilli(ttl).Before(time.Now()) {
-					log.Debug().Msg("Object in storage has expired, deleting it and returning ErrKeyNotFound")
+				now := time.Now()
+				if time.UnixMilli(ttl).Before(now) {
+					log.Warn().
+						Time("ttl", time.UnixMilli(ttl)).
+						Time("now", now).
+						Msg("Object in storage has expired, deleting it and returning ErrKeyNotFound")
 					deleteStaleCacheEntry(entry)
 					return nil, ErrKeyNotFound
 				}
@@ -178,12 +182,15 @@ func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error)
 
 // Put queues put operation to object storage.
 func (o *ObjectStorage) Put(_ context.Context, key string, data []byte) error {
+	entry := &PersistentEntry{
+		key:   key,
+		value: &data,
+	}
+	entry.SetTimestamp(time.Now().UnixNano())
+	// TODO handle ttl
 	o.operations <- &Operation{
-		op: objectStorageOpPut,
-		entry: &PersistentEntry{
-			key:   key,
-			value: &data,
-		},
+		op:    objectStorageOpPut,
+		entry: entry,
 	}
 
 	return nil
@@ -304,7 +311,12 @@ func (o *ObjectStorage) Start(_ context.Context) {
 		defer p.Wait()
 
 		for oper := range o.operations {
-			_ = o.handleOp(o.cancellableCtx, oper)
+			p.Go(func() {
+				err := o.handleOp(o.cancellableCtx, oper)
+				if err != nil {
+					log.Warn().Err(err).Msg("Failed handling operation")
+				}
+			})
 		}
 	}()
 

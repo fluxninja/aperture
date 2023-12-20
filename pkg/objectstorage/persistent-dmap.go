@@ -130,6 +130,7 @@ func (o *ObjectStorageBackedDMap) Put(ctx context.Context, key string, value int
 		return fmt.Errorf("invalid type for object storage backed cache: %T", value)
 	}
 
+	// TODO need to modify olric embedded client/interface to return &dmap.PutConfig{}
 	objectKey := o.generateObjectKey(key)
 	err := o.backingStorage.Put(ctx, objectKey, bytes)
 	if err != nil {
