@@ -32,6 +32,8 @@ type (
 	}
 )
 
+const defaultTTL = 60
+
 var (
 	// ErrKeyNotFound means that given key is not present in the object storage.
 	ErrKeyNotFound = errors.New("key not found")
@@ -72,7 +74,7 @@ func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context
 // Get gets object from object storage.
 func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry, error) {
 	// If the object is missing timestamp, we will use timestamp of when the Get() was called.
-	timestampDefault := time.Now().UTC().UnixNano()
+	timestampDefault := time.Now().UnixNano()
 
 	obj := o.bucket.Object(key)
 	reader, err := obj.NewReader(ctx)
@@ -102,22 +104,32 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
 	} else {
-		timestamp, err := strconv.ParseInt(attrs.Metadata["timestamp"], 10, 64)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to parse object storage object timestamp")
-			// XXX: Should we use current time instead?
+		timestampMetadata, ok := attrs.Metadata["timestamp"]
+		if !ok {
+			log.Error().Msg("Missing object timestamp in metadata, using time of the Get() call instead")
 			entry.SetTimestamp(timestampDefault)
 		} else {
-			entry.SetTimestamp(timestamp)
+			timestamp, err := strconv.ParseInt(timestampMetadata, 10, 64)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to parse object timestamp, using time of the Get() call instead")
+				entry.SetTimestamp(timestampDefault)
+			} else {
+				entry.SetTimestamp(timestamp)
+			}
 		}
 
-		ttl, err := strconv.ParseInt(attrs.Metadata["ttl"], 10, 64)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed to parse object storage object ttl")
-			// XXX: What timestamp can we use here as default?
-			entry.SetTTL(60)
+		ttlMetadata, ok := attrs.Metadata["ttl"]
+		if !ok {
+			log.Error().Msg("Missing object TTL in metadata, using default TTL instead")
+			entry.SetTTL(defaultTTL)
 		} else {
-			entry.SetTTL(ttl)
+			ttl, err := strconv.ParseInt(ttlMetadata, 10, 64)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to parse object TTL, using default TTL instead")
+				entry.SetTTL(defaultTTL)
+			} else {
+				entry.SetTTL(ttl)
+			}
 		}
 	}
 
