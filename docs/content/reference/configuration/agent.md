@@ -1264,6 +1264,16 @@ Config for object storage.
 <!-- vale on -->
 
 </dd>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+</dd>
 <dt>key_prefix</dt>
 <dd>
 

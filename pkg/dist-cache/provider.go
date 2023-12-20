@@ -53,7 +53,7 @@ type DistCacheConstructorIn struct {
 	Unmarshaller       config.Unmarshaller
 	Lifecycle          fx.Lifecycle
 	Shutdowner         fx.Shutdowner
-	ObjectStorage      objectstorage.ObjectStorageIface
+	ObjectStorage      objectstorage.ObjectStorageIface `optional:"true"`
 	Logger             *log.Logger
 }
 

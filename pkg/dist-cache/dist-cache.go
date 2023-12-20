@@ -77,6 +77,9 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap, persistent bo
 	}
 
 	if persistent {
+		if dc.objStorage == nil {
+			return nil, fmt.Errorf("object storage not enabled in config")
+		}
 		return objectstorage.NewPersistentDMap(
 			d,
 			dc.objStorage,

@@ -1505,6 +1505,8 @@ spec:
                         type: string
                       bucket:
                         type: string
+                      enabled:
+                        type: boolean
                       key_prefix:
                         type: string
                     type: object

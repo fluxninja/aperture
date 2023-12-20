@@ -334,6 +334,9 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 		log.Error().Err(err).Msg("Failed to unmarshal object_storage config")
 		return nil, err
 	}
+	if !cfg.Enabled {
+		return nil, nil
+	}
 
 	client, err := storage.NewClient(context.Background())
 	if err != nil {

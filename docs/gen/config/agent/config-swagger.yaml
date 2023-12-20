@@ -392,6 +392,12 @@ definitions:
                 x-go-name: Bucket
                 x-go-tag-json: bucket
                 x-go-tag-validate: required
+            enabled:
+                default: false
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
             key_prefix:
                 type: string
                 x-go-name: KeyPrefix

@@ -13,6 +13,7 @@ package config
 // swagger:model
 // +kubebuilder:object:generate=true
 type Config struct {
+	Enabled   bool   `json:"enabled" default:"false"`
 	Backend   string `json:"backend" validate:"oneof=gcs" default:"gcs"`
 	Bucket    string `json:"bucket" validate:"required"`
 	KeyPrefix string `json:"key_prefix" validate:"required"`
