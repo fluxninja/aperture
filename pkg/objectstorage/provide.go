@@ -202,6 +202,9 @@ func (o *ObjectStorage) getObjectTimestamp(ctx context.Context, obj *storage.Obj
 		log.Error().Err(err).Msg("Failed to query storage bucket for object attributes")
 		return 0, err
 	}
+	if attrs == nil {
+		return 0, nil
+	}
 
 	timeStamp, ok := attrs.Metadata["timestamp"]
 	if ok {
@@ -291,7 +294,7 @@ func (o *ObjectStorage) handleOp(ctx context.Context, op *Operation) error {
 }
 
 // Start starts a goroutine which performs operations on object storage.
-func (o *ObjectStorage) Start(ctx context.Context) {
+func (o *ObjectStorage) Start(_ context.Context) {
 	go func() {
 		p := pool.New().WithMaxGoroutines(10)
 
@@ -301,12 +304,14 @@ func (o *ObjectStorage) Start(ctx context.Context) {
 		defer p.Wait()
 
 		for oper := range o.operations {
-			_ = o.handleOp(ctx, oper)
+			_ = o.handleOp(o.cancellableCtx, oper)
 		}
 	}()
 
-	<-o.cancellableCtx.Done()
-	close(o.operations)
+	go func() {
+		<-o.cancellableCtx.Done()
+		close(o.operations)
+	}()
 }
 
 // Stop kills the goroutine started in Start().
