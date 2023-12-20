@@ -3,7 +3,7 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: quota-scheduling-test
+  name: gpt-4-rpm
 spec:
   circuit:
     components:
@@ -12,22 +12,26 @@ spec:
           in_ports:
             bucket_capacity:
               constant_signal:
-                value: 30
+                value: 200
             fill_amount:
               constant_signal:
-                value: 15
+                value: 200
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
           rate_limiter:
             interval: 60s
-            limit_by_label_key: user_id
+            limit_by_label_key: api_key
           scheduler:
             priority_label_key: priority
             tokens_label_key: tokens
             workload_label_key: workload
           selectors:
-          - control_point: quota-scheduling-feature
+          - control_point: openai
+            label_matcher:
+              match_labels:
+                product_reason: paid_user
+                prompt_type: chat
     - decider:
         in_ports:
           lhs:
