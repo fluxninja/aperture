@@ -76,7 +76,10 @@ apertureRoute.get("/", async (_: express.Request, res: express.Response) => {
     res.status(500).send(`Error occurred: ${e}`);
   } finally {
     if (flow) {
-      flow.end();
+      const flowEndResponse = await flow.end();
+      if (flowEndResponse) {
+        console.log(`Flow end response: ${flowEndResponse}`);
+      }
     }
   }
 });
