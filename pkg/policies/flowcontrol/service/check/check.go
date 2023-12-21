@@ -78,6 +78,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			Services:           services,
 			RampMode:           req.RampMode,
 			CacheLookupRequest: req.CacheLookupRequest,
+			ExpectEnd:          req.ExpectEnd,
 		},
 	)
 	end := time.Now()

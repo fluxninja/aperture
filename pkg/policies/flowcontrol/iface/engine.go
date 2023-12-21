@@ -17,6 +17,7 @@ type RequestContext struct {
 	CacheLookupRequest *flowcontrolv1.CacheLookupRequest
 	Services           []string
 	RampMode           bool
+	ExpectEnd          bool
 }
 
 // Engine is an interface for registering fluxmeters and schedulers.

@@ -69,6 +69,9 @@ message CheckHTTPRequest {
 
   // A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
   bool ramp_mode = 5;
+
+  // Expect End denotes whether to expect a FlowEnd call for this flow.
+  bool expect_end = 6;
 }
 
 // HTTP attributes for a denied response.

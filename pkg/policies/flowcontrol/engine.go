@@ -96,6 +96,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		FlowLabelKeys: labelKeys,
 		Services:      services,
 		ControlPoint:  controlPoint,
+		ExpectEnd:     requestContext.ExpectEnd,
 	}
 
 	mmr := e.getMatches(controlPoint, services, flowLabels)
