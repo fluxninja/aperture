@@ -972,7 +972,7 @@
     "ConcurrencyLimiterParameters": {
       "properties": {
         "limit_by_label_key": {
-          "description": "Specifies which label the concurrency calculation should be keyed by.\n\nConcurrency limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each API Key a separate limit, assuming you\nhave a _api_key_ flow\nlabel set up, set `limit_by_label_key: \"api_key\"`.\nIf no label key is specified, then all requests matching the\nselectors will be concurrency limited based on the global concurrency count.",
+          "description": "Specifies which label the concurrency calculation should be keyed by.\n\nConcurrency limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each API Key a separate limit, assuming you\nhave a \"api_key\" flow\nlabel set up, set `limit_by_label_key: \"api_key\"`.\nIf no label key is specified, then all requests matching the\nselectors will be concurrency limited based on the global concurrency count.",
           "type": "string"
         },
         "max_idle_time": {
@@ -982,7 +982,7 @@
           "x-go-tag-default": "7200s"
         },
         "max_inflight_duration": {
-          "description": "max_inflight_duration defines the time duration after which flow is assumed ended in case the end call gets missed\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
+          "description": "The time duration after which flow is assumed to have ended in case the end call gets missed.\nThis field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an \"s\" to indicate 'seconds.' For example, a value of \"10s\" would signify a duration of 10 seconds.\n\n",
           "type": "string",
           "x-go-tag-validate": "required"
         }
