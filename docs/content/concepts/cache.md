@@ -48,7 +48,7 @@ by multiple flows. The _Global Cache_ can be accessed via the `GlobalCache`
 method with `key` parameter on the `Flow` object. It returns the same object as
 the `ResultCache` method.
 
-Similar to the `ResultCache`, `Set` and `Delete` methods can be used to set and
+Similar to `ResultCache`, `Set` and `Delete` methods can be used to set and
 delete entries in the _Global Cache_.
 
 [skds]: /sdk/sdk.md
