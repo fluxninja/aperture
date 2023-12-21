@@ -93,7 +93,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		return nil, err
 	}
 
-	entry := &PersistentEntry{key: key, value: &data}
+	entry := &PersistentEntry{key: key, value: data}
 	attrs, err := obj.Attrs(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
@@ -186,7 +186,7 @@ func (o *ObjectStorage) Put(
 ) error {
 	entry := &PersistentEntry{
 		key:       key,
-		value:     &data,
+		value:     data,
 		timestamp: timestamp,
 		ttl:       ttl,
 	}
@@ -244,7 +244,7 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 	}
 
 	w := obj.NewWriter(ctx)
-	_, err = w.Write(*entry.value)
+	_, err = w.Write(entry.value)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
 		return err
