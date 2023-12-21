@@ -10,5 +10,5 @@ policy:
       interval: 30s
       limit_by_label_key: "user_id"
     selectors:
-      - control_point: "rate-limiting-example"
+      - control_point: "rate-limiting-feature"
 

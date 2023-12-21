@@ -195,6 +195,12 @@ Aperture, we also attach the following labels to each request:
   this label. For example, requests from `paid_user` can be given precedence
   over those from `trial_user` and `free_user` in example code.
 
+In the `startFlow` call, it's important to define the gRPC deadline. This
+parameter sets limit for how long a request can remain queued. In our case, a
+deadline of `120000` milliseconds means the request might stay in the queue for
+up to 20 minutes. After this interval, the request will either be processed or
+discarded, depending on its position in the queue.
+
 ### Policies
 
 You can generate a policy using quota scheduler blueprint, either via Aperture
@@ -317,47 +323,7 @@ control point labels.
 ```
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-tpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 40000
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 40000
-    # Rate Limiter Parameters
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-      tokens_label_key: estimated_tokens
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
+{@include: ./assets/openai/values1.yaml}
 ```
 
 ```mdx-code-block
@@ -366,46 +332,7 @@ policy:
 ```
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-rpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 200
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 200
-    # Rate Limiter Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
+{@include: ./assets/openai/values2.yaml}
 ```
 
 ```mdx-code-block

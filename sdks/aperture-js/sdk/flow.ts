@@ -275,6 +275,25 @@ export class _Flow implements Flow {
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
       return resp;
     }
+
+    if (!this._checkResponse) {
+      const resp = new _KeyLookupResponse(
+        LookupStatus.Miss,
+        new Error("Check response was nil"),
+        null,
+      );
+      return resp;
+    }
+
+    if (!this.shouldRun()) {
+      const resp = new _KeyLookupResponse(
+        LookupStatus.Miss,
+        new Error("Flow was rejected"),
+        null,
+      );
+      return resp;
+    }
+
     const resultCacheResponse =
       this._checkResponse?.cacheLookupResponse?.resultCacheResponse;
     if (!resultCacheResponse) {
@@ -304,6 +323,25 @@ export class _Flow implements Flow {
       const resp = new _KeyLookupResponse(LookupStatus.Miss, this._error, null);
       return resp;
     }
+
+    if (!this._checkResponse) {
+      const resp = new _KeyLookupResponse(
+        LookupStatus.Miss,
+        new Error("Check response was nil"),
+        null,
+      );
+      return resp;
+    }
+
+    if (!this.shouldRun()) {
+      const resp = new _KeyLookupResponse(
+        LookupStatus.Miss,
+        new Error("Flow was rejected"),
+        null,
+      );
+      return resp;
+    }
+
     if (!this._checkResponse?.cacheLookupResponse?.globalCacheResponses) {
       // invoke constructor of CachedValueResponse
       const resp = new _KeyLookupResponse(

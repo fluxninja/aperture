@@ -1,5 +1,5 @@
 ---
-title: Manually setting feature control points
+title: Define Control Points
 sidebar_position: 1
 slug: manually-setting-feature-control-points-using-golang-sdk
 keywords:
@@ -17,9 +17,9 @@ import CodeSnippet from '../../codeSnippet.js'
 ```
 
 <a href={`https://pkg.go.dev/github.com/fluxninja/aperture-go/v2`}>Aperture Go
-SDK</a> can be used to manually set feature control points within a Go service.
+SDK</a> can be used to define feature control points within a Go service.
 
-To do so, first install the SDK:
+Below are the steps to install and use the SDK.
 
 ## Install SDK
 
@@ -27,12 +27,13 @@ To do so, first install the SDK:
 go get github.com/fluxninja/aperture-go/v2
 ```
 
-Now, create an instance of ApertureClient.
+Now, create an instance of Aperture Client.
 
 ## Create ApertureClient Instance
 
-To create an instance of ApertureClient, you need to provide the address of your
-Aperture Cloud instance and an API key.
+To create an Aperture Client instance, the address of the organization created
+in Aperture Cloud and API key are needed. You can locate both these details by
+clicking on the Aperture tab in the sidebar menu of Aperture Cloud.
 
 Address of your Aperture Cloud is made of Organization ID. For example, if your
 organization ID is `ORGANIZATION` and available at port `443` then the address
@@ -50,7 +51,9 @@ section.
 
 Aperture Go SDK uses gRPC to communicate with Aperture Cloud. You can configure
 gRPC client options by passing a list of gRPC client options to the
-ApertureClient constructor.
+ApertureClient constructor. For request prioritization use cases, it's important
+to set a high gRPC deadline. This parameter specifies the maximum duration a
+request can remain in the queue.
 
 <CodeSnippet lang="go" snippetName="grpcOptions" />
 
@@ -66,7 +69,7 @@ points.
 ### Define Labels
 
 You can define labels for your control points. These labels can be produced by
-business logic or can be static. For example, you define a label `user_id` which
+business logic or can be static. For example, you define a label `userId` which
 is the user ID of the user making the request. You can also define a static
 label `version` which is the version of your service. Depending on your use
 case, you can define any number of labels.

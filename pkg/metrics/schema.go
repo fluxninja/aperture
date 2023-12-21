@@ -55,6 +55,10 @@ const (
 	DistCacheFragmentMigrationEventsTotalMetricsName = "distcache_fragment_migration_events_total"
 	// DistCacheFragmentReceivedEventsTotalMetricsName - metric for cumulative number of fragment received (incoming) events.
 	DistCacheFragmentReceivedEventsTotalMetricsName = "distcache_fragment_received_events_total"
+	// DistCachePartitionsLength - metric for current length of partitions on given node.
+	DistCachePartitionsLength = "distcache_partitions_length"
+	// DistCacheBackupPartitionsLength - metric for current length of backup partitions on given node.
+	DistCacheBackupPartitionsLength = "distcache_backup_partitions_length"
 
 	// Cache metrics.
 

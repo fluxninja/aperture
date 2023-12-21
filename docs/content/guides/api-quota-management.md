@@ -108,7 +108,7 @@ classifications:
 ```
 
 The next step is making a `startFlow` call to Aperture. For this call, it is
-important to specify the control point (`quota-scheduling-example` in our
+important to specify the control point (`quota-scheduling-feature` in our
 example) and the labels that will align with the quota scheduling policy. The
 `priority` label is necessary for request prioritization, while the `workload`
 label differentiates each request. In this example, we're only tracking and
@@ -117,7 +117,12 @@ you can execute relevant business operations.
 
 According to the policy logic designed to prevent third-party API rate limit
 breaches, Aperture will, on each `startFlow` call, either give precedence to a
-critical request or queue a less urgent one when approaching API limits.
+critical request or queue a less urgent one when approaching API limits. The
+duration a request remains in the queue is determined by the gRPC deadline, set
+within the `startFlow` call. Setting this deadline to `120000` milliseconds, for
+example, indicates that the request can be queued for a maximum of 2 minutes.
+After this interval, the request will either be processed or discarded,
+depending on its position in the queue.
 
 ```mdx-code-block
 <Tabs>
@@ -166,7 +171,7 @@ these specific values:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `Control point`: It can be a particular feature or execution block within a
-   service. We'll use `quota-scheduling-example` as an example.
+   service. We'll use `quota-scheduling-feature` as an example.
 
 ![Quota Scheduling Policy](./assets/managing-quotas/quota-scheduling-test.png)
 
@@ -208,7 +213,7 @@ policy:
    determine the workload. It is set to `workload` in the policy and SDK code
    example.
 8. `control_point`: It can be a particular feature or execution block within a
-   service. We'll use `quota-scheduling-example` as an example.
+   service. We'll use `quota-scheduling-feature` as an example.
 
 Here is how the complete values file would look:
 

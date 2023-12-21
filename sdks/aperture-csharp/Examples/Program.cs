@@ -66,7 +66,9 @@ using (var listener = new HttpListener())
             // START: handleRequest
             // do some business logic to collect labels
             var labels = new Dictionary<string, string>();
-            labels.Add("key", "value");
+            labels.Add("userId", "some_user_id");
+            labels.Add("userTier", "gold");
+            labels.Add("priority", "100");
 
             var rampMode = false;
             var flowTimeout = TimeSpan.FromSeconds(5);

@@ -222,8 +222,19 @@ public final class Flow {
             return new KeyLookupResponse(null, LookupStatus.MISS, this.error);
         }
 
-        if (this.checkResponse == null
-                || !this.checkResponse.hasCacheLookupResponse()
+        if (this.checkResponse == null) {
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
+        }
+
+        if (!this.shouldRun()) {
+            return new KeyLookupResponse(
+                    null, LookupStatus.MISS, new IllegalStateException("Flow was rejected"));
+        }
+
+        if (!this.checkResponse.hasCacheLookupResponse()
                 || !this.checkResponse.getCacheLookupResponse().hasResultCacheResponse()) {
             return new KeyLookupResponse(
                     null,
@@ -325,8 +336,19 @@ public final class Flow {
             return new KeyLookupResponse(null, LookupStatus.MISS, this.error);
         }
 
-        if (this.checkResponse == null
-                || !this.checkResponse.hasCacheLookupResponse()
+        if (this.checkResponse == null) {
+            return new KeyLookupResponse(
+                    null,
+                    LookupStatus.MISS,
+                    new IllegalArgumentException("No cache lookup response"));
+        }
+
+        if (!this.shouldRun()) {
+            return new KeyLookupResponse(
+                    null, LookupStatus.MISS, new IllegalStateException("Flow was rejected"));
+        }
+
+        if (!this.checkResponse.hasCacheLookupResponse()
                 || this.checkResponse.getCacheLookupResponse().getGlobalCacheResponsesCount()
                         == 0) {
             return new KeyLookupResponse(
