@@ -68,11 +68,17 @@ ___
 
 ### end
 
-▸ **end**(): `void`
+▸ **end**(`grpcOptions?`): `Promise`\<`FlowEndResponse`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `grpcOptions?` | `CallOptions` |
 
 #### Returns
 
-`void`
+`Promise`\<`FlowEndResponse`\>
 
 ___
 
