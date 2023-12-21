@@ -165,8 +165,9 @@ func (o *ObjectStorage) internalDelete(_ context.Context, entry *PersistentEntry
 // Delete queues delete operation from object storage.
 func (o *ObjectStorage) Delete(ctx context.Context, key string) error {
 	return o.internalDelete(ctx, &PersistentEntry{
-		key:   key,
-		value: nil,
+		key:       key,
+		value:     nil,
+		timestamp: time.Now().UnixNano(),
 	})
 }
 
@@ -287,7 +288,7 @@ func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEnt
 		}
 	}
 
-	if timestamp > entry.Timestamp() {
+	if entry.Timestamp() > 0 && timestamp > entry.Timestamp() {
 		log.Debug().Msg("Object in storage is more recent than the entry being deleted")
 		return nil
 	}
