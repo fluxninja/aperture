@@ -50,12 +50,14 @@ The created instance can then be used to start a flow:
 The above code snippet is making `startFlow` calls to Aperture. For this call,
 it is important to specify the control point (`featureName` in the example) and
 business labels that will be aligned with the policy created in Aperture Cloud.
-For each flow that is started, a `shouldRun` decision is made, determining
-whether to allow the request into the system or to rate limit it. In this
-example, we only see response returns, but in a production environment, actual
-business logic can be executed when a request is allowed. It is important to
-make the `end` call made after processing each request, to send telemetry data
-that would provide granular visibility for each flow.
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see response returns, but in a production environment,
+actual business logic can be executed when a request is allowed. It is important
+to make the `end` call made after processing each request, to send telemetry
+data that would provide granular visibility for each flow.
 
 For more context on using Aperture Java SDK to set feature control points, refer
 to the [example app][example] available in the repository.
