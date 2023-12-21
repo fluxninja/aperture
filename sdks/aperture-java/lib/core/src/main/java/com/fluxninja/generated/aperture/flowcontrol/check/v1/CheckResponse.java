@@ -983,6 +983,21 @@ java.lang.String defaultValue) {
     return cacheLookupResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponse.getDefaultInstance() : cacheLookupResponse_;
   }
 
+  public static final int EXPECT_END_FIELD_NUMBER = 16;
+  private boolean expectEnd_ = false;
+  /**
+   * <pre>
+   * Expected End for this request.
+   * </pre>
+   *
+   * <code>bool expect_end = 16 [json_name = "expectEnd"];</code>
+   * @return The expectEnd.
+   */
+  @java.lang.Override
+  public boolean getExpectEnd() {
+    return expectEnd_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -1041,6 +1056,9 @@ java.lang.String defaultValue) {
     }
     if (((bitField0_ & 0x00000008) != 0)) {
       output.writeMessage(15, getCacheLookupResponse());
+    }
+    if (expectEnd_ != false) {
+      output.writeBool(16, expectEnd_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -1120,6 +1138,10 @@ java.lang.String defaultValue) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(15, getCacheLookupResponse());
     }
+    if (expectEnd_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(16, expectEnd_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1172,6 +1194,8 @@ java.lang.String defaultValue) {
       if (!getCacheLookupResponse()
           .equals(other.getCacheLookupResponse())) return false;
     }
+    if (getExpectEnd()
+        != other.getExpectEnd()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1231,6 +1255,9 @@ java.lang.String defaultValue) {
       hash = (37 * hash) + CACHE_LOOKUP_RESPONSE_FIELD_NUMBER;
       hash = (53 * hash) + getCacheLookupResponse().hashCode();
     }
+    hash = (37 * hash) + EXPECT_END_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getExpectEnd());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -1450,6 +1477,7 @@ java.lang.String defaultValue) {
         cacheLookupResponseBuilder_.dispose();
         cacheLookupResponseBuilder_ = null;
       }
+      expectEnd_ = false;
       return this;
     }
 
@@ -1562,6 +1590,9 @@ java.lang.String defaultValue) {
             ? cacheLookupResponse_
             : cacheLookupResponseBuilder_.build();
         to_bitField0_ |= 0x00000008;
+      }
+      if (((from_bitField0_ & 0x00004000) != 0)) {
+        result.expectEnd_ = expectEnd_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -1737,6 +1768,9 @@ java.lang.String defaultValue) {
       if (other.hasCacheLookupResponse()) {
         mergeCacheLookupResponse(other.getCacheLookupResponse());
       }
+      if (other.getExpectEnd() != false) {
+        setExpectEnd(other.getExpectEnd());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -1871,6 +1905,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00002000;
               break;
             } // case 122
+            case 128: {
+              expectEnd_ = input.readBool();
+              bitField0_ |= 0x00004000;
+              break;
+            } // case 128
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -4224,6 +4263,50 @@ java.lang.String defaultValue) {
         cacheLookupResponse_ = null;
       }
       return cacheLookupResponseBuilder_;
+    }
+
+    private boolean expectEnd_ ;
+    /**
+     * <pre>
+     * Expected End for this request.
+     * </pre>
+     *
+     * <code>bool expect_end = 16 [json_name = "expectEnd"];</code>
+     * @return The expectEnd.
+     */
+    @java.lang.Override
+    public boolean getExpectEnd() {
+      return expectEnd_;
+    }
+    /**
+     * <pre>
+     * Expected End for this request.
+     * </pre>
+     *
+     * <code>bool expect_end = 16 [json_name = "expectEnd"];</code>
+     * @param value The expectEnd to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExpectEnd(boolean value) {
+
+      expectEnd_ = value;
+      bitField0_ |= 0x00004000;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Expected End for this request.
+     * </pre>
+     *
+     * <code>bool expect_end = 16 [json_name = "expectEnd"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExpectEnd() {
+      bitField0_ = (bitField0_ & ~0x00004000);
+      expectEnd_ = false;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

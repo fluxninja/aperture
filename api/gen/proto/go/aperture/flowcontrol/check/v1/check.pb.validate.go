@@ -92,6 +92,8 @@ func (m *CheckRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ExpectEnd
+
 	if len(errors) > 0 {
 		return CheckRequestMultiError(errors)
 	}
@@ -418,6 +420,8 @@ func (m *CheckResponse) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for ExpectEnd
 
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
@@ -2209,6 +2213,88 @@ func (m *LimiterDecision) validate(all bool) error {
 			}
 		}
 
+	case *LimiterDecision_ConcurrencyLimiterInfo_:
+		if v == nil {
+			err := LimiterDecisionValidationError{
+				field:  "Details",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetConcurrencyLimiterInfo()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LimiterDecisionValidationError{
+						field:  "ConcurrencyLimiterInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LimiterDecisionValidationError{
+						field:  "ConcurrencyLimiterInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetConcurrencyLimiterInfo()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LimiterDecisionValidationError{
+					field:  "ConcurrencyLimiterInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *LimiterDecision_ConcurrencySchedulerInfo_:
+		if v == nil {
+			err := LimiterDecisionValidationError{
+				field:  "Details",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetConcurrencySchedulerInfo()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LimiterDecisionValidationError{
+						field:  "ConcurrencySchedulerInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LimiterDecisionValidationError{
+						field:  "ConcurrencySchedulerInfo",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetConcurrencySchedulerInfo()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LimiterDecisionValidationError{
+					field:  "ConcurrencySchedulerInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -2392,6 +2478,525 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FluxMeterInfoValidationError{}
+
+// Validate checks the field values on InflightRequestRef with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *InflightRequestRef) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InflightRequestRef with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InflightRequestRefMultiError, or nil if none found.
+func (m *InflightRequestRef) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InflightRequestRef) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PolicyName
+
+	// no validation rules for PolicyHash
+
+	// no validation rules for ComponentId
+
+	// no validation rules for Label
+
+	// no validation rules for RequestId
+
+	// no validation rules for Tokens
+
+	if len(errors) > 0 {
+		return InflightRequestRefMultiError(errors)
+	}
+
+	return nil
+}
+
+// InflightRequestRefMultiError is an error wrapping multiple validation errors
+// returned by InflightRequestRef.ValidateAll() if the designated constraints
+// aren't met.
+type InflightRequestRefMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InflightRequestRefMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InflightRequestRefMultiError) AllErrors() []error { return m }
+
+// InflightRequestRefValidationError is the validation error returned by
+// InflightRequestRef.Validate if the designated constraints aren't met.
+type InflightRequestRefValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InflightRequestRefValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InflightRequestRefValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InflightRequestRefValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InflightRequestRefValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InflightRequestRefValidationError) ErrorName() string {
+	return "InflightRequestRefValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e InflightRequestRefValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInflightRequestRef.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InflightRequestRefValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InflightRequestRefValidationError{}
+
+// Validate checks the field values on TokenReturnStatus with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TokenReturnStatus) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TokenReturnStatus with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TokenReturnStatusMultiError, or nil if none found.
+func (m *TokenReturnStatus) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TokenReturnStatus) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInflightRequestRef()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TokenReturnStatusValidationError{
+					field:  "InflightRequestRef",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TokenReturnStatusValidationError{
+					field:  "InflightRequestRef",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInflightRequestRef()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TokenReturnStatusValidationError{
+				field:  "InflightRequestRef",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Returned
+
+	// no validation rules for Error
+
+	if len(errors) > 0 {
+		return TokenReturnStatusMultiError(errors)
+	}
+
+	return nil
+}
+
+// TokenReturnStatusMultiError is an error wrapping multiple validation errors
+// returned by TokenReturnStatus.ValidateAll() if the designated constraints
+// aren't met.
+type TokenReturnStatusMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TokenReturnStatusMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TokenReturnStatusMultiError) AllErrors() []error { return m }
+
+// TokenReturnStatusValidationError is the validation error returned by
+// TokenReturnStatus.Validate if the designated constraints aren't met.
+type TokenReturnStatusValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TokenReturnStatusValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TokenReturnStatusValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TokenReturnStatusValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TokenReturnStatusValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TokenReturnStatusValidationError) ErrorName() string {
+	return "TokenReturnStatusValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TokenReturnStatusValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTokenReturnStatus.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TokenReturnStatusValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TokenReturnStatusValidationError{}
+
+// Validate checks the field values on FlowEndRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *FlowEndRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FlowEndRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FlowEndRequestMultiError,
+// or nil if none found.
+func (m *FlowEndRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FlowEndRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ControlPoint
+
+	for idx, item := range m.GetInflightRequests() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowEndRequestValidationError{
+						field:  fmt.Sprintf("InflightRequests[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowEndRequestValidationError{
+						field:  fmt.Sprintf("InflightRequests[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowEndRequestValidationError{
+					field:  fmt.Sprintf("InflightRequests[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return FlowEndRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// FlowEndRequestMultiError is an error wrapping multiple validation errors
+// returned by FlowEndRequest.ValidateAll() if the designated constraints
+// aren't met.
+type FlowEndRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FlowEndRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FlowEndRequestMultiError) AllErrors() []error { return m }
+
+// FlowEndRequestValidationError is the validation error returned by
+// FlowEndRequest.Validate if the designated constraints aren't met.
+type FlowEndRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FlowEndRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FlowEndRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FlowEndRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FlowEndRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FlowEndRequestValidationError) ErrorName() string { return "FlowEndRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FlowEndRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFlowEndRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FlowEndRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FlowEndRequestValidationError{}
+
+// Validate checks the field values on FlowEndResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *FlowEndResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FlowEndResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// FlowEndResponseMultiError, or nil if none found.
+func (m *FlowEndResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FlowEndResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetTokenReturnStatuses() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, FlowEndResponseValidationError{
+						field:  fmt.Sprintf("TokenReturnStatuses[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, FlowEndResponseValidationError{
+						field:  fmt.Sprintf("TokenReturnStatuses[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FlowEndResponseValidationError{
+					field:  fmt.Sprintf("TokenReturnStatuses[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return FlowEndResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// FlowEndResponseMultiError is an error wrapping multiple validation errors
+// returned by FlowEndResponse.ValidateAll() if the designated constraints
+// aren't met.
+type FlowEndResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FlowEndResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FlowEndResponseMultiError) AllErrors() []error { return m }
+
+// FlowEndResponseValidationError is the validation error returned by
+// FlowEndResponse.Validate if the designated constraints aren't met.
+type FlowEndResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FlowEndResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FlowEndResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FlowEndResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FlowEndResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FlowEndResponseValidationError) ErrorName() string { return "FlowEndResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FlowEndResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFlowEndResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FlowEndResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FlowEndResponseValidationError{}
 
 // Validate checks the field values on LimiterDecision_TokensInfo with the
 // rules defined in the proto definition for this message. If any rules are
@@ -3015,3 +3620,285 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LimiterDecision_QuotaSchedulerInfoValidationError{}
+
+// Validate checks the field values on LimiterDecision_ConcurrencyLimiterInfo
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *LimiterDecision_ConcurrencyLimiterInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// LimiterDecision_ConcurrencyLimiterInfo with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// LimiterDecision_ConcurrencyLimiterInfoMultiError, or nil if none found.
+func (m *LimiterDecision_ConcurrencyLimiterInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LimiterDecision_ConcurrencyLimiterInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Label
+
+	if all {
+		switch v := interface{}(m.GetTokensInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LimiterDecision_ConcurrencyLimiterInfoValidationError{
+					field:  "TokensInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LimiterDecision_ConcurrencyLimiterInfoValidationError{
+					field:  "TokensInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTokensInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LimiterDecision_ConcurrencyLimiterInfoValidationError{
+				field:  "TokensInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for RequestId
+
+	if len(errors) > 0 {
+		return LimiterDecision_ConcurrencyLimiterInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// LimiterDecision_ConcurrencyLimiterInfoMultiError is an error wrapping
+// multiple validation errors returned by
+// LimiterDecision_ConcurrencyLimiterInfo.ValidateAll() if the designated
+// constraints aren't met.
+type LimiterDecision_ConcurrencyLimiterInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LimiterDecision_ConcurrencyLimiterInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LimiterDecision_ConcurrencyLimiterInfoMultiError) AllErrors() []error { return m }
+
+// LimiterDecision_ConcurrencyLimiterInfoValidationError is the validation
+// error returned by LimiterDecision_ConcurrencyLimiterInfo.Validate if the
+// designated constraints aren't met.
+type LimiterDecision_ConcurrencyLimiterInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) ErrorName() string {
+	return "LimiterDecision_ConcurrencyLimiterInfoValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LimiterDecision_ConcurrencyLimiterInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLimiterDecision_ConcurrencyLimiterInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LimiterDecision_ConcurrencyLimiterInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LimiterDecision_ConcurrencyLimiterInfoValidationError{}
+
+// Validate checks the field values on LimiterDecision_ConcurrencySchedulerInfo
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *LimiterDecision_ConcurrencySchedulerInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// LimiterDecision_ConcurrencySchedulerInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// LimiterDecision_ConcurrencySchedulerInfoMultiError, or nil if none found.
+func (m *LimiterDecision_ConcurrencySchedulerInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *LimiterDecision_ConcurrencySchedulerInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Label
+
+	// no validation rules for WorkloadIndex
+
+	if all {
+		switch v := interface{}(m.GetTokensInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LimiterDecision_ConcurrencySchedulerInfoValidationError{
+					field:  "TokensInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LimiterDecision_ConcurrencySchedulerInfoValidationError{
+					field:  "TokensInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTokensInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LimiterDecision_ConcurrencySchedulerInfoValidationError{
+				field:  "TokensInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Priority
+
+	// no validation rules for RequestId
+
+	if len(errors) > 0 {
+		return LimiterDecision_ConcurrencySchedulerInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// LimiterDecision_ConcurrencySchedulerInfoMultiError is an error wrapping
+// multiple validation errors returned by
+// LimiterDecision_ConcurrencySchedulerInfo.ValidateAll() if the designated
+// constraints aren't met.
+type LimiterDecision_ConcurrencySchedulerInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LimiterDecision_ConcurrencySchedulerInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LimiterDecision_ConcurrencySchedulerInfoMultiError) AllErrors() []error { return m }
+
+// LimiterDecision_ConcurrencySchedulerInfoValidationError is the validation
+// error returned by LimiterDecision_ConcurrencySchedulerInfo.Validate if the
+// designated constraints aren't met.
+type LimiterDecision_ConcurrencySchedulerInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) ErrorName() string {
+	return "LimiterDecision_ConcurrencySchedulerInfoValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LimiterDecision_ConcurrencySchedulerInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLimiterDecision_ConcurrencySchedulerInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LimiterDecision_ConcurrencySchedulerInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LimiterDecision_ConcurrencySchedulerInfoValidationError{}

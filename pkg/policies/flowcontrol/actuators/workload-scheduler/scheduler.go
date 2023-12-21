@@ -509,7 +509,7 @@ func (wsFactory *Factory) NewScheduler(
 
 // Decide processes a single flow by load scheduler in a blocking manner.
 // Context is used to ensure that requests are not scheduled for longer than its deadline allows.
-func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
+func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcontrolv1.LimiterDecision, string) {
 	var matchedWorkloadParametersProto *policylangv1.Scheduler_Workload_Parameters
 	var invPriority float64
 	var priority float64
@@ -618,15 +618,12 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 
 	req := scheduler.NewRequest(matchedWorkloadLabel, tokens, invPriority)
 
-	accepted, remaining, current := s.scheduler.Schedule(reqCtx, req)
+	accepted, remaining, current, reqID := s.scheduler.Schedule(reqCtx, req)
 
 	tokensConsumed := float64(0)
 	if accepted {
 		tokensConsumed = req.Tokens
 	}
-
-	// TODO: for testing only, remove before commit
-	log.Info().Msgf("DeniedResponseStatusCode: %d", s.proto.GetDeniedResponseStatusCode())
 
 	return &flowcontrolv1.LimiterDecision{
 		PolicyName:               s.component.GetPolicyName(),
@@ -645,17 +642,7 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontr
 				Priority: priority,
 			},
 		},
-	}
-}
-
-// Revert reverts the decision made by the limiter.
-func (s *Scheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
-	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
-		tokens := lsDecision.LoadSchedulerInfo.TokensInfo.Consumed
-		if tokens > 0 {
-			s.scheduler.Revert(ctx, tokens)
-		}
-	}
+	}, reqID
 }
 
 // GetLatencyObserver returns histogram for specific workload.
@@ -666,11 +653,6 @@ func (s *Scheduler) GetLatencyObserver(labels map[string]string) prometheus.Obse
 // GetRequestCounter returns request counter for specific workload.
 func (s *Scheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
 	return s.metrics.wsFactory.GetRequestCounter(labels)
-}
-
-// GetRampMode is always false for Schedulers.
-func (s *Scheduler) GetRampMode() bool {
-	return false
 }
 
 // GetEstimatedTokens returns estimated tokens for specific workload.

@@ -142,6 +142,37 @@ public final class FlowControlServiceGrpc {
     return getCacheDeleteMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest,
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> getFlowEndMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "FlowEnd",
+      requestType = com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest.class,
+      responseType = com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest,
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> getFlowEndMethod() {
+    io.grpc.MethodDescriptor<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> getFlowEndMethod;
+    if ((getFlowEndMethod = FlowControlServiceGrpc.getFlowEndMethod) == null) {
+      synchronized (FlowControlServiceGrpc.class) {
+        if ((getFlowEndMethod = FlowControlServiceGrpc.getFlowEndMethod) == null) {
+          FlowControlServiceGrpc.getFlowEndMethod = getFlowEndMethod =
+              io.grpc.MethodDescriptor.<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest, com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "FlowEnd"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new FlowControlServiceMethodDescriptorSupplier("FlowEnd"))
+              .build();
+        }
+      }
+    }
+    return getFlowEndMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -223,6 +254,13 @@ public final class FlowControlServiceGrpc {
         io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCacheDeleteMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void flowEnd(com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getFlowEndMethod(), responseObserver);
+    }
   }
 
   /**
@@ -292,6 +330,14 @@ public final class FlowControlServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getCacheDeleteMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void flowEnd(com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest request,
+        io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getFlowEndMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -342,6 +388,13 @@ public final class FlowControlServiceGrpc {
     public com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse cacheDelete(com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getCacheDeleteMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse flowEnd(com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getFlowEndMethod(), getCallOptions(), request);
     }
   }
 
@@ -398,12 +451,21 @@ public final class FlowControlServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getCacheDeleteMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse> flowEnd(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getFlowEndMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_CHECK = 0;
   private static final int METHODID_CACHE_LOOKUP = 1;
   private static final int METHODID_CACHE_UPSERT = 2;
   private static final int METHODID_CACHE_DELETE = 3;
+  private static final int METHODID_FLOW_END = 4;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -437,6 +499,10 @@ public final class FlowControlServiceGrpc {
         case METHODID_CACHE_DELETE:
           serviceImpl.cacheDelete((com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest) request,
               (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse>) responseObserver);
+          break;
+        case METHODID_FLOW_END:
+          serviceImpl.flowEnd((com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest) request,
+              (io.grpc.stub.StreamObserver<com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -484,6 +550,13 @@ public final class FlowControlServiceGrpc {
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteRequest,
               com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheDeleteResponse>(
                 service, METHODID_CACHE_DELETE)))
+        .addMethod(
+          getFlowEndMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndRequest,
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.FlowEndResponse>(
+                service, METHODID_FLOW_END)))
         .build();
   }
 
@@ -536,6 +609,7 @@ public final class FlowControlServiceGrpc {
               .addMethod(getCacheLookupMethod())
               .addMethod(getCacheUpsertMethod())
               .addMethod(getCacheDeleteMethod())
+              .addMethod(getFlowEndMethod())
               .build();
         }
       }

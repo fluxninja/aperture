@@ -967,6 +967,9 @@ definitions:
                 format: date-time
                 title: end timestamp
                 type: string
+            expect_end:
+                description: Expected End for this request.
+                type: boolean
             flow_label_keys:
                 description: flow label keys that were matched for this request.
                 items:
@@ -2046,6 +2049,14 @@ definitions:
                 x-go-tag-validate: dive
         title: FlowControl Resources
         type: object
+    FlowEndResponse:
+        properties:
+            token_return_statuses:
+                items:
+                    $ref: '#/definitions/TokenReturnStatus'
+                    type: object
+                type: array
+        type: object
     FluxMeter:
         description: |-
             Flux Meter gathers metrics for the traffic that matches its selector.
@@ -2541,6 +2552,22 @@ definitions:
                 type: number
                 x-go-tag-default: "1.0"
         type: object
+    InflightRequestRef:
+        properties:
+            component_id:
+                type: string
+            label:
+                type: string
+            policy_hash:
+                type: string
+            policy_name:
+                type: string
+            request_id:
+                type: string
+            tokens:
+                format: double
+                type: number
+        type: object
     InfraMeter:
         description: |-
             InfraMeter is a resource that sets up OpenTelemetry pipelines.
@@ -2863,6 +2890,10 @@ definitions:
         properties:
             component_id:
                 type: string
+            concurrency_limiter_info:
+                $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
+            concurrency_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionConcurrencySchedulerInfo'
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
             dropped:
@@ -2882,6 +2913,29 @@ definitions:
             sampler_info:
                 $ref: '#/definitions/LimiterDecisionSamplerInfo'
             wait_time:
+                type: string
+        type: object
+    LimiterDecisionConcurrencyLimiterInfo:
+        properties:
+            label:
+                type: string
+            request_id:
+                type: string
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+        type: object
+    LimiterDecisionConcurrencySchedulerInfo:
+        properties:
+            label:
+                type: string
+            priority:
+                format: double
+                type: number
+            request_id:
+                type: string
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
                 type: string
         type: object
     LimiterDecisionLimiterReason:
@@ -5160,6 +5214,15 @@ definitions:
             It consists of two parts:
             - Agent Group: Agent group to sync telemetry configuration with
             - Infra Meters: OTel compatible metrics pipelines
+        type: object
+    TokenReturnStatus:
+        properties:
+            error:
+                type: string
+            inflight_request_ref:
+                $ref: '#/definitions/InflightRequestRef'
+            returned:
+                type: boolean
         type: object
     UnaryOperator:
         description: |-

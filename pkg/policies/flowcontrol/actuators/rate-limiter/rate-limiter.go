@@ -7,17 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"go.uber.org/fx"
-	"go.uber.org/multierr"
-	"google.golang.org/protobuf/types/known/durationpb"
-
 	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/sync/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/global-token-bucket"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/lazy-sync"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
@@ -27,10 +25,11 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
-	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
-	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/status"
+	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/fx"
+	"go.uber.org/multierr"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const rateLimiterStatusRoot = "rate_limiters"
@@ -188,17 +187,17 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, un
 	}
 
 	rlProto := wrapperMessage.RateLimiter
-	lb := &rateLimiter{
+	rl := &rateLimiter{
 		Component: wrapperMessage.GetCommonAttributes(),
-		lbProto:   rlProto,
-		lbFactory: rlFactory,
+		rlProto:   rlProto,
+		rlFactory: rlFactory,
 		registry:  reg,
 	}
-	lb.name = iface.ComponentKey(lb)
+	rl.name = iface.ComponentKey(rl)
 
 	return fx.Options(
 		fx.Invoke(
-			lb.setup,
+			rl.setup,
 		),
 	), nil
 }
@@ -207,20 +206,20 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, un
 type rateLimiter struct {
 	iface.Component
 	registry  status.Registry
-	lbFactory *rateLimiterFactory
+	rlFactory *rateLimiterFactory
 	limiter   ratelimiter.RateLimiter
 	inner     *globaltokenbucket.GlobalTokenBucket
-	lbProto   *policylangv1.RateLimiter
+	rlProto   *policylangv1.RateLimiter
 	name      string
 }
 
 // Make sure rateLimiter implements iface.Limiter.
-var _ iface.RateLimiter = (*rateLimiter)(nil)
+var _ iface.Limiter = (*rateLimiter)(nil)
 
 func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	logger := rl.registry.GetLogger()
 	etcdKey := paths.AgentComponentKey(
-		rl.lbFactory.agentGroupName,
+		rl.rlFactory.agentGroupName,
 		rl.GetPolicyName(),
 		rl.GetComponentId(),
 	)
@@ -247,12 +246,12 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		OnStart: func(context.Context) error {
 			var err error
 			rl.inner, err = globaltokenbucket.NewGlobalTokenBucket(
-				rl.lbFactory.distCache,
+				rl.rlFactory.distCache,
 				rl.name,
-				rl.lbProto.Parameters.GetInterval().AsDuration(),
-				rl.lbProto.Parameters.GetMaxIdleTime().AsDuration(),
-				rl.lbProto.Parameters.GetContinuousFill(),
-				rl.lbProto.Parameters.GetDelayInitialFill(),
+				rl.rlProto.Parameters.GetInterval().AsDuration(),
+				rl.rlProto.Parameters.GetMaxIdleTime().AsDuration(),
+				rl.rlProto.Parameters.GetContinuousFill(),
+				rl.rlProto.Parameters.GetDelayInitialFill(),
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
@@ -260,12 +259,12 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 			rl.limiter = rl.inner
 			// check whether lazy limiter is enabled
-			if lazySyncConfig := rl.lbProto.Parameters.GetLazySync(); lazySyncConfig != nil {
+			if lazySyncConfig := rl.rlProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
 					rl.limiter, err = lazysync.NewLazySyncRateLimiter(rl.limiter,
-						rl.lbProto.Parameters.GetInterval().AsDuration(),
+						rl.rlProto.Parameters.GetInterval().AsDuration(),
 						lazySyncConfig.GetNumSync(),
-						rl.lbFactory.lazySyncJobGroup)
+						rl.rlFactory.lazySyncJobGroup)
 					if err != nil {
 						logger.Error().Err(err).Msg("Failed to create lazy limiter")
 						return err
@@ -274,14 +273,14 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// add decisions notifier
-			err = rl.lbFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
+			err = rl.rlFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to add decision notifier")
 				return err
 			}
 
 			// add to data engine
-			err = rl.lbFactory.engineAPI.RegisterRateLimiter(rl)
+			err = rl.rlFactory.engineAPI.RegisterRateLimiter(rl)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to register rate limiter")
 				return err
@@ -291,18 +290,18 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := rl.lbFactory.counterVector.DeletePartialMatch(metricLabels)
+			deleted := rl.rlFactory.counterVector.DeletePartialMatch(metricLabels)
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
 			// remove from data engine
-			err = rl.lbFactory.engineAPI.UnregisterRateLimiter(rl)
+			err = rl.rlFactory.engineAPI.UnregisterRateLimiter(rl)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)
 			}
 			// remove decisions notifier
-			err = rl.lbFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
+			err = rl.rlFactory.decisionsWatcher.RemoveKeyNotifier(decisionNotifier)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
@@ -318,7 +317,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 
 // GetSelectors returns the selectors for the rate limiter.
 func (rl *rateLimiter) GetSelectors() []*policylangv1.Selector {
-	return rl.lbProto.GetSelectors()
+	return rl.rlProto.GetSelectors()
 }
 
 // Decide runs the limiter.
@@ -327,7 +326,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 
 	tokens := float64(1)
 	// get tokens from labels
-	rParams := rl.lbProto.GetRequestParameters()
+	rParams := rl.rlProto.GetRequestParameters()
 	var deniedResponseStatusCode flowcontrolv1.StatusCode
 	if rParams != nil {
 		deniedResponseStatusCode = rParams.GetDeniedResponseStatusCode()
@@ -341,7 +340,7 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 		}
 	}
 
-	label, ok, waitTime, remaining, current := rl.TakeIfAvailable(ctx, labels, tokens)
+	label, ok, waitTime, remaining, current := rl.takeIfAvailable(ctx, labels, tokens)
 
 	tokensConsumed := float64(0)
 	if ok {
@@ -375,16 +374,20 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 
 // Revert returns the tokens to the limiter.
 func (rl *rateLimiter) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
+	if rl.limiter.GetPassThrough() {
+		return
+	}
+
 	if rateLimiterDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_RateLimiterInfo_); ok {
 		tokens := rateLimiterDecision.RateLimiterInfo.TokensInfo.Consumed
 		if tokens > 0 {
-			rl.TakeIfAvailable(ctx, labels, -tokens)
+			rl.takeIfAvailable(ctx, labels, -tokens)
 		}
 	}
 }
 
-// TakeIfAvailable takes n tokens from the limiter.
-func (rl *rateLimiter) TakeIfAvailable(
+// takeIfAvailable takes n tokens from the limiter.
+func (rl *rateLimiter) takeIfAvailable(
 	ctx context.Context,
 	labels labels.Labels,
 	n float64,
@@ -393,10 +396,10 @@ func (rl *rateLimiter) TakeIfAvailable(
 		return label, true, 0, 0, 0
 	}
 
-	labelKey := rl.lbProto.Parameters.GetLimitByLabelKey()
+	labelKey := rl.rlProto.Parameters.GetLimitByLabelKey()
 	if labelKey == "" {
 		// Deprecated: Remove in v3.0.0
-		labelKey = rl.lbProto.Parameters.GetLabelKey()
+		labelKey = rl.rlProto.Parameters.GetLabelKey()
 	}
 	if labelKey == "" {
 		label = "default"
@@ -450,7 +453,7 @@ func (rl *rateLimiter) GetLimiterID() iface.LimiterID {
 
 // GetRequestCounter returns counter for tracking number of times rateLimiter was triggered.
 func (rl *rateLimiter) GetRequestCounter(labels map[string]string) prometheus.Counter {
-	counter, err := rl.lbFactory.counterVector.GetMetricWith(labels)
+	counter, err := rl.rlFactory.counterVector.GetMetricWith(labels)
 	if err != nil {
 		log.Warn().Err(err).Msg("Failed to get counter")
 		return nil

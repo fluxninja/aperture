@@ -3,6 +3,8 @@ package actuators
 import (
 	"go.uber.org/fx"
 
+	concurrencylimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/concurrency-limiter"
+	concurrencyscheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/concurrency-scheduler"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/rate-limiter"
@@ -18,5 +20,7 @@ func Module() fx.Option {
 		ratelimiter.Module(),
 		sampler.Module(),
 		quotascheduler.Module(),
+		concurrencylimiter.Module(),
+		concurrencyscheduler.Module(),
 	)
 }

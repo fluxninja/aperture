@@ -32,7 +32,7 @@ var _ = Describe("Metrics Processor", func() {
 		engine            *mocks.MockEngine
 		clasEngine        *mocks.MockClassificationEngine
 		scheduler         *mocks.MockScheduler
-		rateLimiter       *mocks.MockRateLimiter
+		rateLimiter       *mocks.MockLimiter
 		classifier        *mocks.MockClassifier
 		summaryVec        *prometheus.SummaryVec
 		counterVec        *prometheus.CounterVec
@@ -54,7 +54,7 @@ var _ = Describe("Metrics Processor", func() {
 		engine = mocks.NewMockEngine(ctrl)
 		clasEngine = mocks.NewMockClassificationEngine(ctrl)
 		scheduler = mocks.NewMockScheduler(ctrl)
-		rateLimiter = mocks.NewMockRateLimiter(ctrl)
+		rateLimiter = mocks.NewMockLimiter(ctrl)
 		classifier = mocks.NewMockClassifier(ctrl)
 		expectedLabels = make(map[string]interface{})
 		cfg = &Config{

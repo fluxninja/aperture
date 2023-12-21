@@ -62,6 +62,7 @@ export interface CheckResponse {
   'waitTime'?: (_google_protobuf_Duration | null);
   'deniedResponseStatusCode'?: (_aperture_flowcontrol_check_v1_StatusCode);
   'cacheLookupResponse'?: (_aperture_flowcontrol_check_v1_CacheLookupResponse | null);
+  'expectEnd'?: (boolean);
 }
 
 export interface CheckResponse__Output {
@@ -79,4 +80,5 @@ export interface CheckResponse__Output {
   'waitTime': (_google_protobuf_Duration__Output | null);
   'deniedResponseStatusCode': (_aperture_flowcontrol_check_v1_StatusCode__Output);
   'cacheLookupResponse': (_aperture_flowcontrol_check_v1_CacheLookupResponse__Output | null);
+  'expectEnd': (boolean);
 }

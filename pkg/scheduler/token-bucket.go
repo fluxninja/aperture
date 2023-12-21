@@ -158,23 +158,25 @@ func NewBasicTokenBucket(clk clockwork.Clock, fillRate float64, metrics *TokenBu
 }
 
 // TakeIfAvailable takes tokens from the basic token bucket if available, otherwise return false.
-func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) (bool, time.Duration, float64, float64) {
+func (btb *BasicTokenBucket) TakeIfAvailable(_ context.Context, tokens float64) (bool, time.Duration, float64, float64, string) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	return btb.tbb.takeIfAvailable(tokens)
+	ok, waitTime, remaining, current := btb.tbb.takeIfAvailable(tokens)
+	return ok, waitTime, remaining, current, ""
 }
 
 // Take takes tokens from the basic token bucket even if available tokens are less than asked.
 // If tokens are not available at the moment, it will return amount of wait time and checks
 // whether the operation was successful or not.
-func (btb *BasicTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
+func (btb *BasicTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64, string) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
-	return btb.tbb.take(ctx, tokens)
+	ok, waitTime, remaining, current := btb.tbb.take(ctx, tokens)
+	return ok, waitTime, remaining, current, ""
 }
 
 // Return returns tokens to the basic token bucket.
-func (btb *BasicTokenBucket) Return(_ context.Context, tokens float64) {
+func (btb *BasicTokenBucket) Return(_ context.Context, tokens float64, _ string) {
 	btb.lock.Lock()
 	defer btb.lock.Unlock()
 	btb.tbb.returnTokens(tokens)

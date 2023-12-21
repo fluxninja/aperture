@@ -10,6 +10,8 @@ import type { CacheUpsertRequest as _aperture_flowcontrol_check_v1_CacheUpsertRe
 import type { CacheUpsertResponse as _aperture_flowcontrol_check_v1_CacheUpsertResponse, CacheUpsertResponse__Output as _aperture_flowcontrol_check_v1_CacheUpsertResponse__Output } from '../../../../aperture/flowcontrol/check/v1/CacheUpsertResponse';
 import type { CheckRequest as _aperture_flowcontrol_check_v1_CheckRequest, CheckRequest__Output as _aperture_flowcontrol_check_v1_CheckRequest__Output } from '../../../../aperture/flowcontrol/check/v1/CheckRequest';
 import type { CheckResponse as _aperture_flowcontrol_check_v1_CheckResponse, CheckResponse__Output as _aperture_flowcontrol_check_v1_CheckResponse__Output } from '../../../../aperture/flowcontrol/check/v1/CheckResponse';
+import type { FlowEndRequest as _aperture_flowcontrol_check_v1_FlowEndRequest, FlowEndRequest__Output as _aperture_flowcontrol_check_v1_FlowEndRequest__Output } from '../../../../aperture/flowcontrol/check/v1/FlowEndRequest';
+import type { FlowEndResponse as _aperture_flowcontrol_check_v1_FlowEndResponse, FlowEndResponse__Output as _aperture_flowcontrol_check_v1_FlowEndResponse__Output } from '../../../../aperture/flowcontrol/check/v1/FlowEndResponse';
 
 export interface FlowControlServiceClient extends grpc.Client {
   CacheDelete(argument: _aperture_flowcontrol_check_v1_CacheDeleteRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_CacheDeleteResponse__Output>): grpc.ClientUnaryCall;
@@ -48,6 +50,15 @@ export interface FlowControlServiceClient extends grpc.Client {
   check(argument: _aperture_flowcontrol_check_v1_CheckRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_CheckResponse__Output>): grpc.ClientUnaryCall;
   check(argument: _aperture_flowcontrol_check_v1_CheckRequest, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_CheckResponse__Output>): grpc.ClientUnaryCall;
   
+  FlowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  FlowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  FlowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  FlowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  flowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  flowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  flowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  flowEnd(argument: _aperture_flowcontrol_check_v1_FlowEndRequest, callback: grpc.requestCallback<_aperture_flowcontrol_check_v1_FlowEndResponse__Output>): grpc.ClientUnaryCall;
+  
 }
 
 export interface FlowControlServiceHandlers extends grpc.UntypedServiceImplementation {
@@ -59,6 +70,8 @@ export interface FlowControlServiceHandlers extends grpc.UntypedServiceImplement
   
   Check: grpc.handleUnaryCall<_aperture_flowcontrol_check_v1_CheckRequest__Output, _aperture_flowcontrol_check_v1_CheckResponse>;
   
+  FlowEnd: grpc.handleUnaryCall<_aperture_flowcontrol_check_v1_FlowEndRequest__Output, _aperture_flowcontrol_check_v1_FlowEndResponse>;
+  
 }
 
 export interface FlowControlServiceDefinition extends grpc.ServiceDefinition {
@@ -66,4 +79,5 @@ export interface FlowControlServiceDefinition extends grpc.ServiceDefinition {
   CacheLookup: MethodDefinition<_aperture_flowcontrol_check_v1_CacheLookupRequest, _aperture_flowcontrol_check_v1_CacheLookupResponse, _aperture_flowcontrol_check_v1_CacheLookupRequest__Output, _aperture_flowcontrol_check_v1_CacheLookupResponse__Output>
   CacheUpsert: MethodDefinition<_aperture_flowcontrol_check_v1_CacheUpsertRequest, _aperture_flowcontrol_check_v1_CacheUpsertResponse, _aperture_flowcontrol_check_v1_CacheUpsertRequest__Output, _aperture_flowcontrol_check_v1_CacheUpsertResponse__Output>
   Check: MethodDefinition<_aperture_flowcontrol_check_v1_CheckRequest, _aperture_flowcontrol_check_v1_CheckResponse, _aperture_flowcontrol_check_v1_CheckRequest__Output, _aperture_flowcontrol_check_v1_CheckResponse__Output>
+  FlowEnd: MethodDefinition<_aperture_flowcontrol_check_v1_FlowEndRequest, _aperture_flowcontrol_check_v1_FlowEndResponse, _aperture_flowcontrol_check_v1_FlowEndRequest__Output, _aperture_flowcontrol_check_v1_FlowEndResponse__Output>
 }

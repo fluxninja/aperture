@@ -23,6 +23,7 @@ const (
 	FlowControlService_CacheLookup_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheLookup"
 	FlowControlService_CacheUpsert_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheUpsert"
 	FlowControlService_CacheDelete_FullMethodName = "/aperture.flowcontrol.check.v1.FlowControlService/CacheDelete"
+	FlowControlService_FlowEnd_FullMethodName     = "/aperture.flowcontrol.check.v1.FlowControlService/FlowEnd"
 )
 
 // FlowControlServiceClient is the client API for FlowControlService service.
@@ -34,6 +35,7 @@ type FlowControlServiceClient interface {
 	CacheLookup(ctx context.Context, in *CacheLookupRequest, opts ...grpc.CallOption) (*CacheLookupResponse, error)
 	CacheUpsert(ctx context.Context, in *CacheUpsertRequest, opts ...grpc.CallOption) (*CacheUpsertResponse, error)
 	CacheDelete(ctx context.Context, in *CacheDeleteRequest, opts ...grpc.CallOption) (*CacheDeleteResponse, error)
+	FlowEnd(ctx context.Context, in *FlowEndRequest, opts ...grpc.CallOption) (*FlowEndResponse, error)
 }
 
 type flowControlServiceClient struct {
@@ -80,6 +82,15 @@ func (c *flowControlServiceClient) CacheDelete(ctx context.Context, in *CacheDel
 	return out, nil
 }
 
+func (c *flowControlServiceClient) FlowEnd(ctx context.Context, in *FlowEndRequest, opts ...grpc.CallOption) (*FlowEndResponse, error) {
+	out := new(FlowEndResponse)
+	err := c.cc.Invoke(ctx, FlowControlService_FlowEnd_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FlowControlServiceServer is the server API for FlowControlService service.
 // All implementations should embed UnimplementedFlowControlServiceServer
 // for forward compatibility
@@ -89,6 +100,7 @@ type FlowControlServiceServer interface {
 	CacheLookup(context.Context, *CacheLookupRequest) (*CacheLookupResponse, error)
 	CacheUpsert(context.Context, *CacheUpsertRequest) (*CacheUpsertResponse, error)
 	CacheDelete(context.Context, *CacheDeleteRequest) (*CacheDeleteResponse, error)
+	FlowEnd(context.Context, *FlowEndRequest) (*FlowEndResponse, error)
 }
 
 // UnimplementedFlowControlServiceServer should be embedded to have forward compatible implementations.
@@ -106,6 +118,9 @@ func (UnimplementedFlowControlServiceServer) CacheUpsert(context.Context, *Cache
 }
 func (UnimplementedFlowControlServiceServer) CacheDelete(context.Context, *CacheDeleteRequest) (*CacheDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CacheDelete not implemented")
+}
+func (UnimplementedFlowControlServiceServer) FlowEnd(context.Context, *FlowEndRequest) (*FlowEndResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FlowEnd not implemented")
 }
 
 // UnsafeFlowControlServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -191,6 +206,24 @@ func _FlowControlService_CacheDelete_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FlowControlService_FlowEnd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlowEndRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowControlServiceServer).FlowEnd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FlowControlService_FlowEnd_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowControlServiceServer).FlowEnd(ctx, req.(*FlowEndRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FlowControlService_ServiceDesc is the grpc.ServiceDesc for FlowControlService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var FlowControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheDelete",
 			Handler:    _FlowControlService_CacheDelete_Handler,
+		},
+		{
+			MethodName: "FlowEnd",
+			Handler:    _FlowControlService_FlowEnd_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -15,6 +15,12 @@ type Metrics interface {
 	CheckResponse(
 		decision flowcontrolv1.CheckResponse_DecisionType,
 		rejectReason flowcontrolv1.CheckResponse_RejectReason,
+		controlPoint string,
+		agentInfo *agentinfo.AgentInfo,
+	)
+
+	FlowEnd(
+		controlPoint string,
 		agentInfo *agentinfo.AgentInfo,
 	)
 }
@@ -29,6 +35,14 @@ var _ Metrics = NopMetrics{}
 func (NopMetrics) CheckResponse(
 	decision flowcontrolv1.CheckResponse_DecisionType,
 	rejectReason flowcontrolv1.CheckResponse_RejectReason,
+	controlPoint string,
+	agentInfo *agentinfo.AgentInfo,
+) {
+}
+
+// FlowEnd is no-op method for NopMetrics.
+func (NopMetrics) FlowEnd(
+	controlPoint string,
 	agentInfo *agentinfo.AgentInfo,
 ) {
 }
@@ -42,6 +56,7 @@ type PrometheusMetrics struct {
 	checkReceivedTotal prometheus.Counter
 	checkDecision      prometheus.CounterVec
 	rejectReason       prometheus.CounterVec
+	flowEndTotal       prometheus.CounterVec
 }
 
 // Ensure PrometheusMetrics implements Metrics interface.
@@ -52,6 +67,7 @@ func (pm *PrometheusMetrics) allMetrics() []prometheus.Collector {
 		pm.checkReceivedTotal,
 		pm.checkDecision,
 		pm.rejectReason,
+		pm.flowEndTotal,
 	}
 }
 
@@ -69,13 +85,19 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 			prometheus.CounterOpts{
 				Name: metrics.FlowControlDecisionsMetricName,
 				Help: "Number of aperture check decisions",
-			}, []string{metrics.FlowControlCheckDecisionTypeLabel, metrics.AgentGroupLabel},
+			}, []string{metrics.ControlPointLabel, metrics.FlowControlCheckDecisionTypeLabel, metrics.AgentGroupLabel},
 		),
 		rejectReason: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: metrics.FlowControlRejectReasonsMetricName,
 				Help: "Number of reject reasons other than unspecified",
-			}, []string{metrics.FlowControlCheckRejectReasonLabel},
+			}, []string{metrics.ControlPointLabel, metrics.FlowControlCheckRejectReasonLabel, metrics.AgentGroupLabel},
+		),
+		flowEndTotal: *prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: metrics.FlowControlEndsMetricName,
+				Help: "Total number of aperture flow ends",
+			}, []string{metrics.ControlPointLabel, metrics.AgentGroupLabel},
 		),
 	}
 
@@ -94,14 +116,31 @@ func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, er
 func (pm *PrometheusMetrics) CheckResponse(
 	decision flowcontrolv1.CheckResponse_DecisionType,
 	rejectReason flowcontrolv1.CheckResponse_RejectReason,
+	controlPoint string,
 	agentInfo *agentinfo.AgentInfo,
 ) {
 	pm.checkReceivedTotal.Inc()
 	pm.checkDecision.With(prometheus.Labels{
+		metrics.ControlPointLabel:                 controlPoint,
 		metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String(),
 		metrics.AgentGroupLabel:                   agentInfo.GetAgentGroup(),
 	}).Inc()
 	if rejectReason != flowcontrolv1.CheckResponse_REJECT_REASON_NONE {
-		pm.rejectReason.With(prometheus.Labels{metrics.FlowControlCheckRejectReasonLabel: rejectReason.Enum().String()}).Inc()
+		pm.rejectReason.With(prometheus.Labels{
+			metrics.ControlPointLabel:                 controlPoint,
+			metrics.FlowControlCheckRejectReasonLabel: rejectReason.Enum().String(),
+			metrics.AgentGroupLabel:                   agentInfo.GetAgentGroup(),
+		}).Inc()
 	}
+}
+
+// FlowEnd collects metrics about Aperture FlowEnd call.
+func (pm *PrometheusMetrics) FlowEnd(
+	controlPoint string,
+	agentInfo *agentinfo.AgentInfo,
+) {
+	pm.flowEndTotal.With(prometheus.Labels{
+		metrics.ControlPointLabel: controlPoint,
+		metrics.AgentGroupLabel:   agentInfo.GetAgentGroup(),
+	}).Inc()
 }

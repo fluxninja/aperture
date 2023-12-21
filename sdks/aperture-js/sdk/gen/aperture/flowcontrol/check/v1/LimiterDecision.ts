@@ -3,6 +3,34 @@
 import type { StatusCode as _aperture_flowcontrol_check_v1_StatusCode, StatusCode__Output as _aperture_flowcontrol_check_v1_StatusCode__Output } from '../../../../aperture/flowcontrol/check/v1/StatusCode';
 import type { Duration as _google_protobuf_Duration, Duration__Output as _google_protobuf_Duration__Output } from '../../../../google/protobuf/Duration';
 
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo {
+  'label'?: (string);
+  'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
+  'requestId'?: (string);
+}
+
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo__Output {
+  'label': (string);
+  'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
+  'requestId': (string);
+}
+
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo {
+  'label'?: (string);
+  'workloadIndex'?: (string);
+  'tokensInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo | null);
+  'priority'?: (number | string);
+  'requestId'?: (string);
+}
+
+export interface _aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo__Output {
+  'label': (string);
+  'workloadIndex': (string);
+  'tokensInfo': (_aperture_flowcontrol_check_v1_LimiterDecision_TokensInfo__Output | null);
+  'priority': (number);
+  'requestId': (string);
+}
+
 // Original file: proto/flowcontrol/check/v1/check.proto
 
 export const _aperture_flowcontrol_check_v1_LimiterDecision_LimiterReason = {
@@ -86,7 +114,9 @@ export interface LimiterDecision {
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo | null);
   'quotaSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo | null);
-  'details'?: "rateLimiterInfo"|"loadSchedulerInfo"|"samplerInfo"|"quotaSchedulerInfo";
+  'concurrencyLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo | null);
+  'concurrencySchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo | null);
+  'details'?: "rateLimiterInfo"|"loadSchedulerInfo"|"samplerInfo"|"quotaSchedulerInfo"|"concurrencyLimiterInfo"|"concurrencySchedulerInfo";
 }
 
 export interface LimiterDecision__Output {
@@ -101,4 +131,6 @@ export interface LimiterDecision__Output {
   'loadSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SchedulerInfo__Output | null);
   'samplerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_SamplerInfo__Output | null);
   'quotaSchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_QuotaSchedulerInfo__Output | null);
+  'concurrencyLimiterInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo__Output | null);
+  'concurrencySchedulerInfo'?: (_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo__Output | null);
 }

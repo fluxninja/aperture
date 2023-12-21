@@ -464,4 +464,14 @@ java.lang.String defaultValue);
    * <code>.aperture.flowcontrol.check.v1.CacheLookupResponse cache_lookup_response = 15 [json_name = "cacheLookupResponse"];</code>
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.CacheLookupResponseOrBuilder getCacheLookupResponseOrBuilder();
+
+  /**
+   * <pre>
+   * Expected End for this request.
+   * </pre>
+   *
+   * <code>bool expect_end = 16 [json_name = "expectEnd"];</code>
+   * @return The expectEnd.
+   */
+  boolean getExpectEnd();
 }

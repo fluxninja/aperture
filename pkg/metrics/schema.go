@@ -119,6 +119,8 @@ const (
 	FlowControlDecisionsMetricName = "flowcontrol_decisions_total"
 	// FlowControlRejectReasonsMetricName - metric for reject reason on FCS Check requests.
 	FlowControlRejectReasonsMetricName = "flowcontrol_reject_reasons_total"
+	// FlowControlEndsMetricName - counter for flow ends.
+	FlowControlEndsMetricName = "flowcontrol_ends_total"
 
 	// Check flow metrics.
 

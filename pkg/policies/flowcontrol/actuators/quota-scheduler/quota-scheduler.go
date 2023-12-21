@@ -18,6 +18,9 @@ import (
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/global-token-bucket"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/lazy-sync"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
@@ -28,9 +31,6 @@ import (
 	workloadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/workload-scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
-	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
-	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/scheduler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
@@ -425,7 +425,7 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 
 	s := existing.(*workloadscheduler.Scheduler)
 
-	schedulerDecision := s.Decide(ctx, labels)
+	schedulerDecision, _ := s.Decide(ctx, labels)
 	schedulerInfo = schedulerDecision.GetLoadSchedulerInfo()
 	dropped = schedulerDecision.GetDropped()
 
@@ -434,6 +434,10 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 
 // Revert returns the tokens to the limiter.
 func (qs *quotaScheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
+	if qs.limiter.GetPassThrough() {
+		return
+	}
+
 	// return to the underlying rate limiter
 	if qsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_QuotaSchedulerInfo_); ok {
 		tokens := qsDecision.QuotaSchedulerInfo.TokensInfo.Consumed
