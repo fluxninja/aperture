@@ -487,7 +487,7 @@ export class _Flow implements Flow {
           );
           localCheckResponse.limiterDecisions = decisions;
 
-          this._checkResponse.limiterDecisions.forEach((decision, index) => {
+          this._checkResponse.limiterDecisions.forEach((decision) => {
             if (decision.concurrencyLimiterInfo) {
               inflightRequestRefs.push({
                 policyName: decision.policyName,
