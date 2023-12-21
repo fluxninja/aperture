@@ -36,7 +36,6 @@ const intervalTime = 1000;
 
 async function sendRequestForTier(apertureClient: ApertureClient, tier: string, priority: number) {
     // START: QSStartFlow
-    // START: QSUI
     const flow = await apertureClient.startFlow("quota-scheduling-feature", {
         labels: {
             user_id: "some_user_id",
@@ -47,7 +46,6 @@ async function sendRequestForTier(apertureClient: ApertureClient, tier: string, 
             deadline: Date.now() + 120000, // ms
         },
     });
-    // END: QSUI
     console.log(`Request sent for ${tier} tier with priority ${priority}.`);
     flow.end();
     // END: QSStartFlow

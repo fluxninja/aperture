@@ -1,27 +1,37 @@
 flowchart LR
-classDef Orange fill:#F8773D,stroke:#000000,stroke-width:2px;
-classDef Green fill:#56AE89,stroke:#000000,stroke-width:2px;
-classDef Red fill:#F13C15,stroke:#000000,stroke-width:1px;
-classDef Pink fill:#ffb6c1,stroke:#000000,stroke-width:1px;
-
-TB[\Token Bucket/]
-class TB Orange
-
-Scheduler
-class Scheduler Orange
-
-SDK
-class SDK Orange
-
-OpenAI
-class OpenAI Green
-subgraph Aperture_Cloud ["Aperture Cloud"]
-    Scheduler -- "Counting" --> TB
+subgraph root.0[<center>QuotaScheduler<br/>1 selectors</center>]
+subgraph root.0_inports[ ]
+style root.0_inports fill:none,stroke:none
+root.0bucket_capacity[bucket_capacity]
+root.0fill_amount[fill_amount]
 end
-class Aperture_Cloud Green
-
-subgraph App ["Application"]
-SDK -- "Schedule Request" --> Scheduler
+subgraph root.0_outports[ ]
+style root.0_outports fill:none,stroke:none
+root.0accept_percentage[accept_percentage]
 end
-class App Green
-App -- "Prompt" --> OpenAI
+end
+root.0_bucket_capacity_FakeConstantout((200.00))
+root.0_fill_amount_FakeConstantout((200.00))
+subgraph root.1[<center>Decider<br/>gte for 0s</center>]
+subgraph root.1_inports[ ]
+style root.1_inports fill:none,stroke:none
+root.1lhs[lhs]
+root.1rhs[rhs]
+end
+subgraph root.1_outports[ ]
+style root.1_outports fill:none,stroke:none
+root.1output[output]
+end
+end
+root.1_rhs_FakeConstantout((90.00))
+subgraph root.2[<center>Alerter<br/>More than 90% of requests a...</center>]
+subgraph root.2_inports[ ]
+style root.2_inports fill:none,stroke:none
+root.2signal[signal]
+end
+end
+root.0accept_percentage --> |ACCEPT_PERCENTAGE| root.1lhs
+root.0_bucket_capacity_FakeConstantout --> root.0bucket_capacity
+root.0_fill_amount_FakeConstantout --> root.0fill_amount
+root.1output --> |ACCEPT_PERCENTAGE_ALERT| root.2signal
+root.1_rhs_FakeConstantout --> root.1rhs
