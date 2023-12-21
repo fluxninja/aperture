@@ -497,7 +497,8 @@ export class _Flow implements Flow {
                 requestId: decision.concurrencyLimiterInfo.requestId,
                 tokens: decision.concurrencyLimiterInfo.tokensInfo?.consumed,
               });
-            } else if (decision.concurrencySchedulerInfo) {
+            }
+            if (decision.concurrencySchedulerInfo) {
               inflightRequestRefs.push({
                 policyName: decision.policyName,
                 policyHash: decision.policyHash,
