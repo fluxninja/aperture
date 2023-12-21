@@ -123,21 +123,28 @@ func (o *ObjectStorageBackedDMap) Name() string {
 }
 
 // Put puts k/v pair to in-memory and backing storage.
-func (o *ObjectStorageBackedDMap) Put(ctx context.Context, key string, value interface{}, options ...olric.PutOption) error {
+func (o *ObjectStorageBackedDMap) Put(
+	ctx context.Context,
+	key string,
+	value interface{},
+	options ...olric.PutOption,
+) error {
+	err := o.dmap.Put(ctx, key, value, options...)
+	if err != nil {
+		return err
+	}
+	getResponse, err := o.dmap.Get(ctx, key)
+	if err != nil {
+		// TODO do we really need to return err here? Key is set in in-memory cache already.
+		return err
+	}
 	bytes, ok := value.([]byte)
 	if !ok {
 		log.Error().Msg("Object storage backed cache only supports []byte values")
 		return fmt.Errorf("invalid type for object storage backed cache: %T", value)
 	}
-
-	// TODO need to modify olric embedded client/interface to return &dmap.PutConfig{}
 	objectKey := o.generateObjectKey(key)
-	err := o.backingStorage.Put(ctx, objectKey, bytes)
-	if err != nil {
-		return err
-	}
-
-	return o.dmap.Put(ctx, key, value, options...)
+	return o.backingStorage.Put(ctx, objectKey, bytes, getResponse.Timestamp(), getResponse.TTL())
 }
 
 func (o *ObjectStorageBackedDMap) getMissesTotalMetric(cacheType string) (prometheus.Counter, bool) {

@@ -40,7 +40,7 @@ type ObjectStorageIface interface {
 	SetContextWithCancel(ctx context.Context, cancel context.CancelFunc)
 	Start(ctx context.Context)
 	Stop(ctx context.Context) error
-	Put(ctx context.Context, key string, data []byte) error
+	Put(ctx context.Context, key string, data []byte, timestamp, ttl int64) error
 	Get(ctx context.Context, key string) (olricstorage.Entry, error)
 	Delete(ctx context.Context, key string) error
 	List(ctx context.Context, prefix string) (string, error)
@@ -176,13 +176,19 @@ func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error)
 }
 
 // Put queues put operation to object storage.
-func (o *ObjectStorage) Put(_ context.Context, key string, data []byte) error {
+func (o *ObjectStorage) Put(
+	_ context.Context,
+	key string,
+	data []byte,
+	timestamp int64,
+	ttl int64,
+) error {
 	entry := &PersistentEntry{
 		key:   key,
 		value: &data,
 	}
-	entry.SetTimestamp(time.Now().UnixNano())
-	// TODO handle ttl
+	entry.SetTimestamp(timestamp)
+	entry.SetTTL(ttl)
 	o.operations <- &Operation{
 		op:    objectStorageOpPut,
 		entry: entry,
