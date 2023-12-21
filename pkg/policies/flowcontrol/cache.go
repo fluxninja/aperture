@@ -129,7 +129,8 @@ func (c *Cache) upsert(ctx context.Context, controlPoint string, cacheType iface
 	if err != nil {
 		return err
 	}
-	return c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
+	_, err = c.dmapCache.Put(ctx, cacheKey, value, olric.EX(ttl))
+	return err
 }
 
 // delete deletes the value for the given key.

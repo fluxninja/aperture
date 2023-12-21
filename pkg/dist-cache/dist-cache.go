@@ -82,6 +82,7 @@ func (dc *DistCache) NewDMap(name string, config olricconfig.DMap, persistent bo
 		}
 		return objectstorage.NewPersistentDMap(
 			d,
+			config.TTLDuration,
 			dc.objStorage,
 			dc.prometheusRegistry,
 			dc.getMetricsLabels,

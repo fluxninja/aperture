@@ -656,7 +656,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.16
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.5-0.20231221120357-181f78b00be8
 	github.com/fluxninja/aperture/api/v2 => ./api
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter => github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1

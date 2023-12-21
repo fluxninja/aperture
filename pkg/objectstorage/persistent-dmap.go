@@ -15,6 +15,7 @@ import (
 
 // ObjectStorageBackedDMap is a wrapper around olric.DMap with a second layer persistent storage.
 type ObjectStorageBackedDMap struct {
+	defaultTTL     time.Duration
 	dmap           olric.DMap
 	backingStorage ObjectStorageIface
 
@@ -114,7 +115,8 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 	}
 
 	expireAt := time.Duration(entry.TTL()) * time.Second
-	innerErr = o.dmap.Put(ctx, key, entry.Value(), olric.EXAT(expireAt))
+	log.Trace().Str("expireAt", expireAt.String()).Msg("Entry from storage expiration time/TTL")
+	_, innerErr = o.dmap.Put(ctx, key, entry.Value(), olric.EXAT(expireAt), olric.TS(entry.Timestamp()))
 	if innerErr != nil {
 		return nil, innerErr
 	}
@@ -143,30 +145,57 @@ func (o *ObjectStorageBackedDMap) Put(
 	key string,
 	value interface{},
 	options ...olric.PutOption,
-) error {
+) (*olric.PutConfig, error) {
 	startTime := time.Now()
+
 	defer func() {
 		durationMetric, ready := o.getOperationDurationMetric(metrics.PersistentCacheOperationPut)
 		if ready {
 			durationMetric.Observe(float64(time.Since(startTime).Milliseconds()))
 		}
 	}()
-	err := o.dmap.Put(ctx, key, value, options...)
-	if err != nil {
-		return err
-	}
-	getResponse, err := o.dmap.Get(ctx, key)
-	if err != nil {
-		// TODO do we really need to return err here? Key is set in in-memory cache already.
-		return err
-	}
+
 	bytes, ok := value.([]byte)
 	if !ok {
 		log.Error().Msg("Object storage backed cache only supports []byte values")
-		return fmt.Errorf("invalid type for object storage backed cache: %T", value)
+		return nil, fmt.Errorf("invalid type for object storage backed cache: %T", value)
 	}
+
+	entryCfg, err := o.dmap.Put(ctx, key, value, options...)
+	if err != nil {
+		return nil, err
+	}
+
+	timestamp := entryCfg.Timestamp
+	ttl := o.prepareTTL(entryCfg)
+
 	objectKey := o.generateObjectKey(key)
-	return o.backingStorage.Put(ctx, objectKey, bytes, getResponse.Timestamp(), getResponse.TTL())
+	err = o.backingStorage.Put(ctx, objectKey, bytes, timestamp, ttl)
+	if err != nil {
+		return nil, err
+	}
+
+	return entryCfg, nil
+}
+
+func (o *ObjectStorageBackedDMap) prepareTTL(putConfig *olric.PutConfig) int64 {
+	var ttl int64
+	switch {
+	case putConfig.HasEX:
+		ttl = (putConfig.EX.Nanoseconds() + time.Now().UnixNano()) / 1000000
+	case putConfig.HasPX:
+		ttl = (putConfig.PX.Nanoseconds() + time.Now().UnixNano()) / 1000000
+	case putConfig.HasEXAT:
+		ttl = putConfig.EXAT.Nanoseconds() / 1000000
+	case putConfig.HasPXAT:
+		ttl = putConfig.PXAT.Nanoseconds() / 1000000
+	default:
+		ns := o.defaultTTL.Nanoseconds()
+		if ns != 0 {
+			ttl = (ns + time.Now().UnixNano()) / 1000000
+		}
+	}
+	return ttl
 }
 
 func (o *ObjectStorageBackedDMap) getMissesTotalMetric(cacheType string) (prometheus.Counter, bool) {
@@ -199,6 +228,7 @@ func (o *ObjectStorageBackedDMap) getOperationDurationMetric(operation string) (
 // NewPersistentDMap returns new persistent dmap.
 func NewPersistentDMap(
 	dmap olric.DMap,
+	defaultTTL time.Duration,
 	backingStorage ObjectStorageIface,
 	prometheusRegistry *prometheus.Registry,
 	getDistCacheLabels func() (prometheus.Labels, bool),

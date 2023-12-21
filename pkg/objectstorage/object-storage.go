@@ -184,11 +184,11 @@ func (o *ObjectStorage) Put(
 	ttl int64,
 ) error {
 	entry := &PersistentEntry{
-		key:   key,
-		value: &data,
+		key:       key,
+		value:     &data,
+		timestamp: timestamp,
+		ttl:       ttl,
 	}
-	entry.SetTimestamp(timestamp)
-	entry.SetTTL(ttl)
 	o.operations <- &Operation{
 		op:    objectStorageOpPut,
 		entry: entry,
