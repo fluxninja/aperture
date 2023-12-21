@@ -72,6 +72,16 @@ const (
 	PersistentCacheTypeInMemory = "in_memory"
 	// PersistentCacheTypeObjectStorage - object_storage layer of persistent cache.
 	PersistentCacheTypeObjectStorage = "object_storage"
+	// PersistentCacheOperationDurationMetricName - metric for duration of persistent cache operations.
+	PersistentCacheOperationDurationMetricName = "persistent_cache_operation_duration_ms"
+	// PersistentCacheOperationLabel - label to define type of operation performed on persistent cache.
+	PersistentCacheOperationLabel = "operation"
+	// PersistentCacheOperationGet - get operation.
+	PersistentCacheOperationGet = "get"
+	// PersistentCacheOperationPut - put operation.
+	PersistentCacheOperationPut = "put"
+	// PersistentCacheOperationDelete - delete operation.
+	PersistentCacheOperationDelete = "delete"
 
 	// Cache metrics.
 

@@ -21,6 +21,7 @@ type ObjectStorageBackedDMap struct {
 	getDistCacheLabels func() (prometheus.Labels, bool)
 	getMissesTotal     *prometheus.CounterVec
 	getHitsTotal       *prometheus.CounterVec
+	operationDuration  *prometheus.SummaryVec
 }
 
 func (o *ObjectStorageBackedDMap) generateObjectKey(key string) string {
@@ -29,6 +30,13 @@ func (o *ObjectStorageBackedDMap) generateObjectKey(key string) string {
 
 // Delete deletes keys from in-memory and backed storage.
 func (o *ObjectStorageBackedDMap) Delete(ctx context.Context, keys ...string) (int, error) {
+	startTime := time.Now()
+	defer func() {
+		durationMetric, ready := o.getOperationDurationMetric(metrics.PersistentCacheOperationDelete)
+		if ready {
+			durationMetric.Observe(float64(time.Since(startTime).Milliseconds()))
+		}
+	}()
 	for _, key := range keys {
 		err := o.backingStorage.Delete(ctx, o.generateObjectKey(key))
 		if err != nil {
@@ -61,6 +69,13 @@ func (o *ObjectStorageBackedDMap) Function(ctx context.Context, label string, fu
 
 // Get tries to get key from in-memory storage and then from backing storage if that fails.
 func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.GetResponse, error) {
+	startTime := time.Now()
+	defer func() {
+		durationMetric, ready := o.getOperationDurationMetric(metrics.PersistentCacheOperationGet)
+		if ready {
+			durationMetric.Observe(float64(time.Since(startTime).Milliseconds()))
+		}
+	}()
 	resp, err := o.dmap.Get(ctx, key)
 	if err == nil {
 		// Got hit in in-memory cache, no need to get from backing storage.
@@ -129,6 +144,13 @@ func (o *ObjectStorageBackedDMap) Put(
 	value interface{},
 	options ...olric.PutOption,
 ) error {
+	startTime := time.Now()
+	defer func() {
+		durationMetric, ready := o.getOperationDurationMetric(metrics.PersistentCacheOperationPut)
+		if ready {
+			durationMetric.Observe(float64(time.Since(startTime).Milliseconds()))
+		}
+	}()
 	err := o.dmap.Put(ctx, key, value, options...)
 	if err != nil {
 		return err
@@ -165,6 +187,15 @@ func (o *ObjectStorageBackedDMap) getHitsTotalMetric(cacheType string) (promethe
 	return o.getHitsTotal.With(labels), true
 }
 
+func (o *ObjectStorageBackedDMap) getOperationDurationMetric(operation string) (prometheus.Observer, bool) {
+	labels, ready := o.getDistCacheLabels()
+	if !ready {
+		return nil, false
+	}
+	labels[metrics.PersistentCacheOperationLabel] = operation
+	return o.operationDuration.With(labels), true
+}
+
 // NewPersistentDMap returns new persistent dmap.
 func NewPersistentDMap(
 	dmap olric.DMap,
@@ -185,7 +216,16 @@ func NewPersistentDMap(
 		Name: metrics.PersistentCacheGetHitsMetricName,
 		Help: "Cumulative number of persistent cache hits.",
 	}, labels)
-	for _, m := range []prometheus.Collector{getMissesTotal, getHitsTotal} {
+	durationLabels := []string{
+		metrics.DistCacheMemberIDLabel,
+		metrics.DistCacheMemberNameLabel,
+		metrics.PersistentCacheOperationLabel,
+	}
+	operationDuration := prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.PersistentCacheOperationDurationMetricName,
+		Help: "Duration of persistent cache operations.",
+	}, durationLabels)
+	for _, m := range []prometheus.Collector{getMissesTotal, getHitsTotal, operationDuration} {
 		err := prometheusRegistry.Register(m)
 		if err != nil {
 			if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
@@ -198,6 +238,7 @@ func NewPersistentDMap(
 		backingStorage:     backingStorage,
 		getMissesTotal:     getMissesTotal,
 		getHitsTotal:       getHitsTotal,
+		operationDuration:  operationDuration,
 		getDistCacheLabels: getDistCacheLabels,
 	}, nil
 }
