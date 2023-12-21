@@ -21,7 +21,7 @@ type ProvideParams struct {
 
 // Provide ObjectStorage.
 func Provide(in ProvideParams) (*ObjectStorage, error) {
-	var cfg storageconfig.Config
+	var cfg storageconfig.ObjectStorageConfig
 	err := in.Unmarshaller.UnmarshalKey("object_storage", &cfg)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to unmarshal object_storage config")

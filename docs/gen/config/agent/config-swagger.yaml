@@ -375,39 +375,6 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
-    Config:
-        properties:
-            backend:
-                default: gcs
-                description: Backend which provides the object storage.
-                enum:
-                    - gcs
-                type: string
-                x-go-name: Backend
-                x-go-tag-default: gcs
-                x-go-tag-json: backend
-                x-go-tag-validate: oneof=gcs
-                x-oneof: gcs
-            bucket:
-                description: Bucket name of the bucket to use. Required if enabled is true.
-                type: string
-                x-go-name: Bucket
-                x-go-tag-json: bucket
-            enabled:
-                default: false
-                description: Enabled denotes if object storage is enabled.
-                type: boolean
-                x-go-name: Enabled
-                x-go-tag-default: "false"
-                x-go-tag-json: enabled
-            key_prefix:
-                description: KeyPrefix to use when writing to bucket. Required if enabled is true.
-                type: string
-                x-go-name: KeyPrefix
-                x-go-tag-json: key_prefix
-        title: Config for object storage.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     DistCacheConfig:
         properties:
             bind_addr:
@@ -1204,6 +1171,39 @@ definitions:
         title: MultiJobConfig holds configuration for MultiJob.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs
+    ObjectStorageConfig:
+        properties:
+            backend:
+                default: gcs
+                description: Backend which provides the object storage.
+                enum:
+                    - gcs
+                type: string
+                x-go-name: Backend
+                x-go-tag-default: gcs
+                x-go-tag-json: backend
+                x-go-tag-validate: oneof=gcs
+                x-oneof: gcs
+            bucket:
+                description: Bucket name of the bucket to use. Required if enabled is true.
+                type: string
+                x-go-name: Bucket
+                x-go-tag-json: bucket
+            enabled:
+                default: false
+                description: Enabled denotes if object storage is enabled.
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+            key_prefix:
+                description: KeyPrefix to use when writing to bucket. Required if enabled is true.
+                type: string
+                x-go-name: KeyPrefix
+                x-go-tag-json: key_prefix
+        title: ObjectStorageConfig configures object storage structure.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     PeerDiscoveryConfig:
         properties:
             advertisement_addr:
@@ -1612,7 +1612,7 @@ paths:
             parameters:
                 - in: body
                   schema:
-                    $ref: '#/definitions/Config'
+                    $ref: '#/definitions/ObjectStorageConfig'
             tags:
                 - common-configuration
             x-fn-config-env: true

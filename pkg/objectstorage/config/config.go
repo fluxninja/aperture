@@ -7,12 +7,12 @@ package config
 // parameters:
 // - in: body
 //   schema:
-//     "$ref": "#/definitions/Config"
+//     "$ref": "#/definitions/ObjectStorageConfig"
 
-// Config for object storage.
+// ObjectStorageConfig configures object storage structure.
 // swagger:model
 // +kubebuilder:object:generate=true
-type Config struct {
+type ObjectStorageConfig struct {
 	// Enabled denotes if object storage is enabled.
 	Enabled bool `json:"enabled" default:"false"`
 	// Backend which provides the object storage.

@@ -409,7 +409,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 <dt></dt>
 <dd>
 
-([Config](#config)) Environment variable prefix:
+([ObjectStorageConfig](#object-storage-config)) Environment variable prefix:
 `APERTURE_AGENT_OBJECT_STORAGE_`
 
 </dd>
@@ -1229,67 +1229,6 @@ ClientTLSConfig is the configuration for client TLS.
 (string)
 
 <!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### Config {#config}
-
-<!-- vale on -->
-
-Config for object storage.
-
-<dl>
-<dt>backend</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, one of: `gcs`, default: `"gcs"`)
-
-<!-- vale on -->
-
-Backend which provides the object storage.
-
-</dd>
-<dt>bucket</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Bucket name of the bucket to use. Required if enabled is true.
-
-</dd>
-<dt>enabled</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `false`)
-
-<!-- vale on -->
-
-Enabled denotes if object storage is enabled.
-
-</dd>
-<dt>key_prefix</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-KeyPrefix to use when writing to bucket. Required if enabled is true.
 
 </dd>
 </dl>
@@ -2541,6 +2480,67 @@ startup. See
 
 Pedantic controls whether a pedantic registry is used. See
 <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ObjectStorageConfig {#object-storage-config}
+
+<!-- vale on -->
+
+ObjectStorageConfig configures object storage structure.
+
+<dl>
+<dt>backend</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gcs`, default: `"gcs"`)
+
+<!-- vale on -->
+
+Backend which provides the object storage.
+
+</dd>
+<dt>bucket</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Bucket name of the bucket to use. Required if enabled is true.
+
+</dd>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Enabled denotes if object storage is enabled.
+
+</dd>
+<dt>key_prefix</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+KeyPrefix to use when writing to bucket. Required if enabled is true.
 
 </dd>
 </dl>
