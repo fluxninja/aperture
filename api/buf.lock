@@ -4,23 +4,28 @@ deps:
   - remote: buf.build
     owner: cncf
     repository: xds
-    commit: 0854ece19e074011b852eae66d145ebf
-    digest: shake256:941cfbc204d282051e6dd424695835b8220389c29f983bce97b117b68013c2424a1e0f9abf1911992a92f0b95cd666722f10658fc8d3bbb9f686c098ed2bb084
+    commit: 23263dcfaa964430bbca2ff54c81215c
+    digest: shake256:33a6ce59eb3d36c807edbaef7b0af2193765f981d7e625ac28f2d780da0f8e92d4a70b64e6ccb8484528e3b85365a716863ce90afc6008e46056ade717da4c78
   - remote: buf.build
     owner: envoyproxy
     repository: envoy
-    commit: 6450fee5a417498a907f0702016e334c
-    digest: shake256:5241c7db78dbe26632168791bb4cde2126230d7d7a8926ae0cf1b496fe9b9279c5ec97507199be70f2b055af8f34a0f47022aa580c819f6e45609023617aadfa
+    commit: 42d6db477a6345e785079497e2834237
+    digest: shake256:b37ed478613ee16d263beef629590b9c0a1efe0f4fffaecad222ddf462801f86dedbf814a1194a2a8c8627121c2ec4632f22b37192486be7e2dad3d458ce7d29
   - remote: buf.build
     owner: envoyproxy
     repository: protoc-gen-validate
     commit: 71881f09a0c5420a9545a07987a86728
     digest: shake256:d320bbf06653b1b2b45a1f95bfa82bf7b998221a777a042708c50d6f86a30d1a85b50c5704c597142d9b308280efe1295d39d76d1abea5f7046d3df4c8cc3cef
   - remote: buf.build
+    owner: google
+    repository: cel-spec
+    commit: f53499f1d3a943dd992429d381e99ab3
+    digest: shake256:8fc347b32704c6873d0d75dbcc505ec0bfe34570f9e6a7ec27f95693631aed8016a3fe83b0fadfe97ae51d04127a70a812e5f75e33b615074f4a5f0831f8e2e7
+  - remote: buf.build
     owner: googleapis
     repository: googleapis
-    commit: b30c5775bfb3485d9da2e87b26590ac9
-    digest: shake256:9d0caaf056949a0e1c883b9849d8a2fa66e22f18a2a48f867d1a8c700aa22abee50ad3ef0d8171637457cadc43c584998bdf3adac55da0f9e4614c72686b057d
+    commit: a86849a25cc04f4dbe9b15ddddfbc488
+    digest: shake256:e19143328f8cbfe13fc226aeee5e63773ca494693a72740a7560664270039a380d94a1344234b88c7691311460df9a9b1c2982190d0a2612eae80368718e1943
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway

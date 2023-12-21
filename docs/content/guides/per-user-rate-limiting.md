@@ -86,9 +86,9 @@ You can obtain your organization address and API Key within the Aperture Cloud
 UI by clicking the `Aperture` tab in the sidebar menu.
 
 The next step is making a `startFlow` call to Aperture. For this call, it is
-important to specify the control point (`my-feature` in our example) and the
-labels that will align with the rate limiting policy, which we will create in
-Aperture Cloud in one of the next steps.
+important to specify the control point (`rate-limiting-feature` in our example)
+and the labels that will align with the rate limiting policy, which we will
+create in Aperture Cloud in one of the next steps.
 
 ```mdx-code-block
 <Tabs>
@@ -147,7 +147,7 @@ the form with these specific values:
 5. `Limit By Label Key`: Determines the specific label key used for enforcing
    rate limits. We'll use `user_id` as an example.
 6. `Control point`: It can be a particular feature or execution block within a
-   service. We'll use `my-feature` as an example.
+   service. We'll use `rate-limiting-feature` as an example.
 
 ![Rate Limit Test](./assets/per-user-rate-limiting/rate-limit-test.png)
 
@@ -162,7 +162,7 @@ requests.
 
 ```mdx-code-block
   </TabItem>
-  <TabItem value="aperturectl (Aperture Cloud)">
+  <TabItem value="aperturectl">
 ```
 
 If you haven't installed aperturectl yet, begin by following the
@@ -188,7 +188,7 @@ policy:
 5. `limit_by_label_key`: Determines the specific label key used for enforcing
    rate limits. We'll use `user_id` as an example.
 6. `control_point`: It can be a particular feature or execution block within a
-   service. We'll use `my-feature` as an example.
+   service. We'll use `rate-limiting-feature` as an example.
 
 Here is how the complete values file would look:
 
@@ -218,16 +218,15 @@ action.
 ## Rate Limiting in Action
 
 Begin by cloning the
-[Aperture JS SDK](https://github.com/fluxninja/aperture-js). Look for the
-`rate_limit_example.ts` in the example directory within the SDK.
+[Aperture JS SDK](https://github.com/fluxninja/aperture-js).
 
-Follow these steps to set up and run the example:
+Switch to the example directory and follow these steps to run the example:
 
 1. Install the necessary packages:
    - Run `npm install` to install the base dependencies.
    - Run `npm install @fluxninja/aperture-js` to install the Aperture SDK.
 2. Run `npx tsc` to compile the TypeScript example.
-3. Run `node dist/rate_limit_example.ts` to start the compiled example.
+3. Run `node dist/rate_limit_example.js` to start the compiled example.
 
 Once the example is running, it will prompt you for your Organization address
 and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar

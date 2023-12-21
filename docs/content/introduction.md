@@ -96,14 +96,14 @@ beneficial.
 
 <!-- vale off -->
 
-[**💬 Consult with an expert**](https://calendly.com/desaijai/fluxninja-meeting)
+[**💬 Consult with an expert**](https://calendly.com/fluxninja/fluxninja-meeting)
 |
 [**👥 Join our Slack Community**](https://join.slack.com/t/fluxninja-aperture/shared_invite/zt-1vm2t2yjb-AG8rzKkB5TpPmqihJB6YYw)
 | ✉️ Email: [**support@fluxninja.com**](mailto:support@fluxninja.com)
 
 <!-- vale on -->
 
-[cloud]: https://www.fluxninja.com/product
+[cloud]: https://www.fluxninja.com
 [sign-up]: https://app.fluxninja.com/sign-up
 [architecture]: /aperture-for-infra/architecture.md
 [self-hosted]: /aperture-for-infra/aperture-for-infra.md

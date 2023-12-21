@@ -58,6 +58,20 @@ consisting of two main components:
   scheduler that prioritizes the requests based on multiple factors such as the
   number of tokens, priority levels and workload labels.
 
+<Zoom>
+
+```mermaid
+{@include: ./assets/openai/graph.mmd}
+```
+
+</Zoom>
+
+The graph above shows how requests are scheduled using Aperture, based on
+priorities and other critical business labels, which will be shown in the
+upcoming code snippets. Scheduled requests are either executed immediately if
+they are high priority, or queued if they are of lower priority, specially when
+nearing OpenAI's rate limits.
+
 ## Configuration
 
 :::note Pre-Requisites
@@ -100,10 +114,6 @@ Import and setup Aperture Client:
 <CodeSnippet lang="ts" snippetName="clientConstructor" />
 
 Wrap the OpenAI API call with Aperture Client's `StartFlow` and `End` methods:
-
-```typescript
-
-```
 
 ```typescript
 const PRIORITIES: Record<string, number> = {
@@ -307,47 +317,7 @@ control point labels.
 ```
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-tpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 40000
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 40000
-    # Rate Limiter Parameters
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-      tokens_label_key: estimated_tokens
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
+{@include: ./assets/openai/values1.yaml}
 ```
 
 ```mdx-code-block
@@ -356,46 +326,7 @@ policy:
 ```
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxninja/aperture/latest/blueprints/quota-scheduling/base/gen/definitions.json
-# Generated values file for quota-scheduling/base blueprint
-# Documentation/Reference for objects and parameters can be found at:
-# https://docs.fluxninja.com/reference/blueprints/quota-scheduling/base
-
-blueprint: quota-scheduling/base
-policy:
-  # Name of the policy.
-  # Type: string
-  # Required: True
-  policy_name: gpt-4-rpm
-  quota_scheduler:
-    # Bucket capacity.
-    # Type: float64
-    # Required: True
-    bucket_capacity: 200
-    # Fill amount.
-    # Type: float64
-    # Required: True
-    fill_amount: 200
-    # Rate Limiter Parameters.
-    # Type: aperture.spec.v1.RateLimiterParameters
-    # Required: True
-    rate_limiter:
-      interval: 60s
-      limit_by_label_key: api_key
-    scheduler:
-      priority_label_key: priority
-    # Flow selectors to match requests against
-    # Type: []aperture.spec.v1.Selector
-    # Required: True
-    selectors:
-      - control_point: openai
-      - label_matcher:
-          match_labels:
-            model_variant: gpt-4
-      - label_matcher:
-          match_labels:
-            product_reason: paid_user
-            prompt_type: chat
+{@include: ./assets/openai/values2.yaml}
 ```
 
 ```mdx-code-block

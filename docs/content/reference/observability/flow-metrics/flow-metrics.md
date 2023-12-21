@@ -25,13 +25,13 @@ and behavior. The stream can be stored and visualized in
 | --------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------- |
 | aperture.source                   | single      | sdk, envoy                                                                                                                                                                | Aperture Flow source                               | SDKs, Envoy               |
 | aperture.decision_type            | single      | DECISION_TYPE_ACCEPTED, DECISION_TYPE_REJECTED                                                                                                                            | Decision type taken by policy                      | SDKs, Envoy               |
-| aperture.reject_reason            | single      | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_NO_TOKENS, REJECT_REASON_NOT_SAMPLED                                                                          | Reject reason of the decision taken by policy      | SDKs, Envoy               |
+| aperture.reject_reason            | single      | REJECT_REASON_NONE, REJECT_REASON_RATE_LIMITED, REJECT_REASON_NO_TOKENS, REJECT_REASON_NOT_SAMPLED                                                                        | Reject reason of the decision taken by policy      | SDKs, Envoy               |
 | aperture.rate_limiters            | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Rate limiters matched to the traffic               | SDKs, Envoy               |
 | aperture.dropping_rate_limiters   | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Rate limiters dropping the traffic                 | SDKs, Envoy               |
 | aperture.load_schedulers          | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters matched to the traffic        | SDKs, Envoy               |
 | aperture.dropping_load_schedulers | multi-value | "policy_name:s1, component_id:13, policy_hash:5kZjj"                                                                                                                      | Concurrency limiters dropping the traffic          | SDKs, Envoy               |
-| aperture.samplers          | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers matched to the traffic             | SDKs, Envoy               |
-| aperture.dropping_samplers | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers dropping the traffic               | SDKs, Envoy               |
+| aperture.samplers                 | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers matched to the traffic                    | SDKs, Envoy               |
+| aperture.dropping_samplers        | multi-value | "policy_name:s1, component_id:18, policy_hash:5kZjj"                                                                                                                      | Samplers dropping the traffic                      | SDKs, Envoy               |
 | aperture.workloads                | multi-value | "policy_name:s1, component_id:13, workload_index:0, policy_hash:5kZjj"                                                                                                    | Workloads matched to the traffic                   | SDKs, Envoy               |
 | aperture.dropping_workloads       | multi-value | "policy_name:s1, component_id:13, workload_index:0, policy_hash:5kZjj"                                                                                                    | Workloads dropping the traffic                     | SDKs, Envoy               |
 | aperture.flux_meters              | multi-value | s1                                                                                                                                                                        | Flux Meters matched to the traffic                 | SDKs, Envoy               |
@@ -41,7 +41,7 @@ and behavior. The stream can be stored and visualized in
 | aperture.services                 | multi-value | s1.demoapp.svc.cluster.local, s2.demoapp.svc.cluster.local                                                                                                                | Services to which metrics refer                    | SDKs, Envoy               |
 | aperture.control_point            | single      | type:TYPE_INGRESS, type:TYPE_EGRESS                                                                                                                                       | Control point to which metrics refer               | SDKs, Envoy               |
 | aperture.flow.status              | single      | OK, Error                                                                                                                                                                 | Denotes OK or Error across all protocols           | SDKs, Envoy               |
-| response_received                 | single      | true, false                                                                                                                                                               | Designates whether a response was received         | SDKs, envoy               |
+| response_received                 | single      | true, false                                                                                                                                                               | Designates whether a response was received         | SDKs, Envoy               |
 
 <!-- vale on -->
 
@@ -67,9 +67,13 @@ and behavior. The stream can be stored and visualized in
 
 <!-- vale off -->
 
-| Name                  | Type | Example Values | Description                                      | Flow Control Integrations |
-| --------------------- | ---- | -------------- | ------------------------------------------------ | ------------------------- |
-| {user-defined-labels} |      |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
+| Name                                     | Type        | Example Values | Description                                      | Flow Control Integrations |
+| ---------------------------------------- | ----------- | -------------- | ------------------------------------------------ | ------------------------- |
+| aperture.cache_lookup_status             | single      | HIT, MISS      | Result of result cache lookup                    | SDKs                      |
+| aperture.cache_operation_status          | single      | SUCCESS, ERROR | Result of result cache operation                 | SDKs                      |
+| aperture.global_cache_lookup_statuses    | multi-value | HIT, MISS      | Results of global cache lookups                  | SDKs                      |
+| aperture.global_cache_operation_statuses | multi-value | SUCCESS, ERROR | Results of global cache operations               | SDKs                      |
+| {user-defined-labels}                    |             |                | Explicitly passed through FlowStart call in SDKs | SDKs                      |
 
 <!-- vale on -->
 

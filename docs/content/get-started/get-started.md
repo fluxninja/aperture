@@ -266,7 +266,7 @@ guide][policies].
 </TabItem>
 </Tabs>
 
-[cloud]: https://www.fluxninja.com/product
+[cloud]: https://www.fluxninja.com
 [aperture-for-infra]: /aperture-for-infra/aperture-for-infra.md
 [sign-up]: /reference/cloud-ui/sign-up.md
 [policies]: /reference/cloud-ui/policies/policy-creation.md
