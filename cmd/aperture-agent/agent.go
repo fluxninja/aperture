@@ -50,7 +50,6 @@ func main() {
 		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
 		fx.Invoke(
 			agent.AddAgentInfoAttribute,
-			objectstorage.Invoke,
 		),
 		distcache.Module(),
 		flowcontrol.Module(),

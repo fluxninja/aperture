@@ -14,6 +14,7 @@ import (
 type ProvideParams struct {
 	fx.In
 
+	Lifecycle    fx.Lifecycle
 	Unmarshaller config.Unmarshaller
 }
 
@@ -42,29 +43,16 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 		operations: make(chan *Operation, cfg.OperationsChannelSize),
 	}
 
-	return objStorage, nil
-}
-
-// InvokeParams for object storage.
-type InvokeParams struct {
-	fx.In
-
-	Lifecycle     fx.Lifecycle
-	ObjectStorage ObjectStorageIface
-}
-
-// Invoke ObjectStorage.
-func Invoke(in InvokeParams) error {
 	in.Lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			cancellableCtx, cancel := context.WithCancel(context.Background())
-			in.ObjectStorage.SetContextWithCancel(cancellableCtx, cancel)
-			return in.ObjectStorage.Start(ctx)
+			objStorage.SetContextWithCancel(cancellableCtx, cancel)
+			return objStorage.Start(ctx)
 		},
 		OnStop: func(ctx context.Context) error {
-			return in.ObjectStorage.Stop(ctx)
+			return objStorage.Stop(ctx)
 		},
 	})
 
-	return nil
+	return objStorage, nil
 }
