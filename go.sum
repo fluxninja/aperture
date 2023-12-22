@@ -469,8 +469,8 @@ github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1 h1:aZbbKMGqnRUQubdJS5tfoZ
 github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
-github.com/fluxninja/olric v0.5.5-0.20231221120357-181f78b00be8 h1:ixUL1nLHQ5O3GZQPYJO5j1UXiavzfvilAvoz119PBlY=
-github.com/fluxninja/olric v0.5.5-0.20231221120357-181f78b00be8/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
+github.com/fluxninja/olric v0.5.4-fn.patch.17 h1:Z1VR9EqPb6J+vTIcQzgzfLkgKaRnN4whGn3OOvOPJC4=
+github.com/fluxninja/olric v0.5.4-fn.patch.17/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
 github.com/fluxninja/opentelemetry-collector v0.90.0-fn.patch.2 h1:rnn1nD9JDMD7EygV0pAVKi19HjC+SWio0h6ss4yjasA=
 github.com/fluxninja/opentelemetry-collector v0.90.0-fn.patch.2/go.mod h1:w8gyH9neR4INnLmcILvIQI1f1XV5dAEIYYXA1BMM38Y=
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1 h1:2JT05bz6InX8RU1iqMXNc0ZL9RyV5M3KX6c+0goCYP0=
