@@ -11,7 +11,6 @@
 package main
 
 import (
-	objectstorage "github.com/fluxninja/aperture/v2/pkg/objectstorage"
 	"github.com/jonboulle/clockwork"
 	"go.uber.org/fx"
 
@@ -25,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/objectstorage"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
