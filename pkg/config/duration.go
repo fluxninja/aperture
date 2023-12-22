@@ -11,7 +11,7 @@ import (
 )
 
 // Duration is encoded as a string message which represents a signed span of time.
-// It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
+// It holds `*durationpb.Duration` which is generated type for google/protobuf/duration.proto.
 // swagger:strfmt string
 // +kubebuilder:validation:Type=string
 type Duration struct {

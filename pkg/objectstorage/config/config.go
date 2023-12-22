@@ -1,7 +1,7 @@
 // +kubebuilder:validation:Optional
 package config
 
-import "time"
+import "github.com/fluxninja/aperture/v2/pkg/config"
 
 // swagger:operation POST /object_storage common-configuration ObjectStorage
 // ---
@@ -33,7 +33,7 @@ type ObjectStorageConfig struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ObjectStorageRetryPolicy struct {
-	Timeout time.Duration              `json:"timeout" default:"10s"`
+	Timeout config.Duration            `json:"timeout" default:"10s"`
 	Backoff ObjectStorageBackoffConfig `json:"backoff,omitempty"`
 }
 
@@ -41,7 +41,7 @@ type ObjectStorageRetryPolicy struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ObjectStorageBackoffConfig struct {
-	Initial    time.Duration `json:"initial" default:"500ms"`
-	Multiplier float64       `json:"multiplier" default:"1.5"`
-	Maximum    time.Duration `json:"maximum" default:"2s"`
+	Initial    config.Duration `json:"initial" default:"500ms"`
+	Multiplier float64         `json:"multiplier" default:"1.5"`
+	Maximum    config.Duration `json:"maximum" default:"2s"`
 }

@@ -82,14 +82,14 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	timeout := o.retryPolicy.Timeout
 	obj := o.bucket.Object(key).Retryer(
 		storage.WithBackoff(gax.Backoff{
-			Initial:    backoff.Initial,
+			Initial:    backoff.Initial.AsDuration(),
 			Multiplier: backoff.Multiplier,
-			Max:        backoff.Maximum,
+			Max:        backoff.Maximum.AsDuration(),
 		}),
 		storage.WithPolicy(storage.RetryIdempotent),
 	)
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout.AsDuration())
 	defer cancel()
 
 	reader, err := obj.NewReader(timeoutCtx)
@@ -267,14 +267,14 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 	timeout := o.retryPolicy.Timeout
 	obj := o.bucket.Object(entry.key).Retryer(
 		storage.WithBackoff(gax.Backoff{
-			Initial:    backoff.Initial,
+			Initial:    backoff.Initial.AsDuration(),
 			Multiplier: backoff.Multiplier,
-			Max:        backoff.Maximum,
+			Max:        backoff.Maximum.AsDuration(),
 		}),
 		storage.WithPolicy(storage.RetryIdempotent),
 	)
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout.AsDuration())
 	defer cancel()
 
 	timestamp, err := o.getObjectTimestamp(timeoutCtx, obj)
@@ -320,14 +320,14 @@ func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEnt
 	timeout := o.retryPolicy.Timeout
 	obj := o.bucket.Object(entry.key).Retryer(
 		storage.WithBackoff(gax.Backoff{
-			Initial:    backoff.Initial,
+			Initial:    backoff.Initial.AsDuration(),
 			Multiplier: backoff.Multiplier,
-			Max:        backoff.Maximum,
+			Max:        backoff.Maximum.AsDuration(),
 		}),
 		storage.WithPolicy(storage.RetryIdempotent),
 	)
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout.AsDuration())
 	defer cancel()
 
 	timestamp, err := o.getObjectTimestamp(timeoutCtx, obj)

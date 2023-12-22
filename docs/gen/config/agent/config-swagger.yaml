@@ -424,7 +424,7 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/dist-cache/config
     Duration:
-        description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
+        description: It holds `*durationpb.Duration` which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/config
@@ -1174,11 +1174,17 @@ definitions:
     ObjectStorageBackoffConfig:
         properties:
             initial:
-                $ref: '#/definitions/Duration'
+                default: 500ms
+                format: string
+                type: string
+                x-go-name: Initial
                 x-go-tag-default: 500ms
                 x-go-tag-json: initial
             maximum:
-                $ref: '#/definitions/Duration'
+                default: 2s
+                format: string
+                type: string
+                x-go-name: Maximum
                 x-go-tag-default: 2s
                 x-go-tag-json: maximum
             multiplier:
@@ -1242,7 +1248,10 @@ definitions:
                 $ref: '#/definitions/ObjectStorageBackoffConfig'
                 x-go-tag-json: backoff,omitempty
             timeout:
-                $ref: '#/definitions/Duration'
+                default: 10s
+                format: string
+                type: string
+                x-go-name: Timeout
                 x-go-tag-default: 10s
                 x-go-tag-json: timeout
         title: ObjectStorageRetryPolicy for object storage retry configuration.

@@ -1315,21 +1315,6 @@ asynchronous.
 
 <!-- vale off -->
 
-### Duration {#duration}
-
-<!-- vale on -->
-
-Duration is encoded as a string message which represents a signed span of time.
-
-It holds \*durationpb.Duration which is generated type for
-google/protobuf/duration.proto.
-
-[interface{}](#interface)
-
----
-
-<!-- vale off -->
-
 ### EtcdConfig {#etcd-config}
 
 <!-- vale on -->
@@ -2510,22 +2495,12 @@ Pedantic controls whether a pedantic registry is used. See
 ObjectStorageBackoffConfig for object storage backoff configuration.
 
 <dl>
-<dt>multiplier</dt>
-<dd>
-
-<!-- vale off -->
-
-(float64, default: `1.5`)
-
-<!-- vale on -->
-
-</dd>
 <dt>initial</dt>
 <dd>
 
 <!-- vale off -->
 
-([Duration](#duration))
+(string, default: `"500ms"`)
 
 <!-- vale on -->
 
@@ -2535,7 +2510,17 @@ ObjectStorageBackoffConfig for object storage backoff configuration.
 
 <!-- vale off -->
 
-([Duration](#duration))
+(string, default: `"2s"`)
+
+<!-- vale on -->
+
+</dd>
+<dt>multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `1.5`)
 
 <!-- vale on -->
 
@@ -2639,22 +2624,22 @@ RetryPolicy to configure retries and timeouts for object storage requests.
 ObjectStorageRetryPolicy for object storage retry configuration.
 
 <dl>
+<dt>timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"10s"`)
+
+<!-- vale on -->
+
+</dd>
 <dt>backoff</dt>
 <dd>
 
 <!-- vale off -->
 
 ([ObjectStorageBackoffConfig](#object-storage-backoff-config))
-
-<!-- vale on -->
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-<!-- vale off -->
-
-([Duration](#duration))
 
 <!-- vale on -->
 
