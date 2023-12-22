@@ -3,18 +3,13 @@
   "type": "object",
   "title": "concurrency-scheduling/base blueprint",
   "additionalProperties": false,
-  "required": [
-    "blueprint",
-    "policy"
-  ],
+  "required": ["blueprint", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",
       "type": "string",
       "default": "concurrency-scheduling/base",
-      "enum": [
-        "concurrency-scheduling/base"
-      ]
+      "enum": ["concurrency-scheduling/base"]
     },
     "uri": {
       "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
@@ -24,10 +19,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "concurrency_scheduler"
-      ],
+      "required": ["policy_name", "concurrency_scheduler"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -56,11 +48,7 @@
         "concurrency_scheduler": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "concurrency_limiter",
-            "max_concurrency",
-            "selectors"
-          ],
+          "required": ["concurrency_limiter", "max_concurrency", "selectors"],
           "properties": {
             "alerter": {
               "description": "Alerter.",
