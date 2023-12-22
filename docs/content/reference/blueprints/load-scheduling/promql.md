@@ -7,20 +7,18 @@ sidebar_label: Load Scheduling Based on PromQL Query
 ---
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/promql`}>load-scheduling/promql</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/promql`}>load-scheduling/promql</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 
@@ -340,13 +338,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 ## Dynamic Configuration
 
+
+
 :::note
 
-The following configuration parameters can be
-[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
-at runtime, without reloading the policy.
+The following configuration parameters can be [dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.
 
 :::
+
+
 
 ### Parameters
 

@@ -16,20 +16,18 @@ component that is used within this blueprint.
 :::
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scaling/pod-auto-scaler`}>auto-scaling/pod-auto-scaler</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scaling/pod-auto-scaler`}>auto-scaling/pod-auto-scaler</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 
@@ -385,13 +383,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/auto-scalin
 
 ## Dynamic Configuration
 
+
+
 :::note
 
-The following configuration parameters can be
-[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
-at runtime, without reloading the policy.
+The following configuration parameters can be [dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.
 
 :::
+
+
 
 ### Parameters
 

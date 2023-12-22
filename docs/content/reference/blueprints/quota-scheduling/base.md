@@ -13,20 +13,18 @@ policy and a dashboard. This policy uses the
 [`QuotaScheduler`](/reference/configuration/spec.md#quota-scheduler) component.
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-scheduling/base`}>quota-scheduling/base</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-scheduling/base`}>quota-scheduling/base</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 

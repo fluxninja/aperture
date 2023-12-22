@@ -1,0 +1,35 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/demo-app",
+  "needs": ["istio"],
+  "aperture_policies": [
+    {
+      "policy_name": "concurrency-limiting",
+      "values_file": "policies/concurrency-limiting.yaml"
+    }
+  ],
+  "images": [
+    {
+      "ref": "demo-app",
+      "context": "playground/resources/demo-app/",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "service1-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service1-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service2-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service2-demo-app:serviceaccount"]
+    },
+    {
+      "workload": "service3-demo-app",
+      "resource_deps": ["cluster-bootstrap", "istiod"],
+      "extra_objects": ["service3-demo-app:serviceaccount"]
+    }
+  ]
+}

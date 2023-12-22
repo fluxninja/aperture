@@ -58,20 +58,18 @@ to see this blueprint in use.
 :::
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/average-latency`}>load-scheduling/average-latency</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/average-latency`}>load-scheduling/average-latency</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 
@@ -411,13 +409,15 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-schedu
 
 ## Dynamic Configuration
 
+
+
 :::note
 
-The following configuration parameters can be
-[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
-at runtime, without reloading the policy.
+The following configuration parameters can be [dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.
 
 :::
+
+
 
 ### Parameters
 

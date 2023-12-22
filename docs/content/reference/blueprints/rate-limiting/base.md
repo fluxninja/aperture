@@ -13,20 +13,18 @@ policy and a dashboard. This policy uses the
 [`RateLimiter`](/reference/configuration/spec.md#rate-limiter) component.
 
 <!-- Configuration Marker -->
-
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
-
 <!-- vale off -->
 
-Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiting/base`}>rate-limiting/base</a>
+Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiting/base`}>rate-limiting/base</a>
 
 <!-- vale on -->
+
 
 ### Parameters
 
