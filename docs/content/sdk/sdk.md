@@ -1,5 +1,5 @@
 ---
-title: 📦 SDKs
+title: SDKs
 description: Setup Control Points using SDK libraries
 keywords:
   - setup
@@ -24,7 +24,7 @@ code. This approach allows for fine-grained flow control.
 
 <a
 href={`https://github.com/fluxninja/aperture/tree/${apertureVersion}/sdks/`}>Aperture
-SDKs</a> available for popular languages, such as :-
+SDKs</a> are available for popular languages:
 
 - [Golang][golang]
 - [Java][java]
