@@ -31,6 +31,7 @@ import (
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/net/http"
+	objectstorageconfig "github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
 	peers "github.com/fluxninja/aperture/v2/pkg/peers/config"
 	autoscalek8sconfig "github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config"
 	preview "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/service/preview/config"
@@ -139,6 +140,10 @@ type AgentConfigSpec struct {
 	// Agent functions configuration.
 	//+kubebuilder:validation:Optional
 	AgentFunctions afconfig.AgentFunctionsConfig `json:"agent_functions"`
+
+	// ObjectStorage configuration.
+	//+kubebuilder:validation:Optional
+	ObjectStorage objectstorageconfig.ObjectStorageConfig `json:"object_storage"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

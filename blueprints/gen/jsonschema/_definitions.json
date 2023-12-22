@@ -972,7 +972,7 @@
     "ConcurrencyLimiterParameters": {
       "properties": {
         "limit_by_label_key": {
-          "description": "Specifies which label the concurrency calculation should be keyed by.\n\nConcurrency limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each API Key a separate limit, assuming you\nhave a \"api_key\" flow\nlabel set up, set `limit_by_label_key: \"api_key\"`.\nIf no label key is specified, then all requests matching the\nselectors will be concurrency limited based on the global concurrency count.",
+          "description": "Specifies which label the concurrency calculation should be keyed by.\n\nConcurrency limiting is done independently for each value of the\n[label](/concepts/flow-label.md) with given key.\nFor example, to give each API Key a separate limit, assuming you\nhave a `api_key` flow\nlabel set up, set `limit_by_label_key: \"api_key\"`.\nIf no label key is specified, then all requests matching the\nselectors will be concurrency limited based on the global concurrency count.",
           "type": "string"
         },
         "max_idle_time": {

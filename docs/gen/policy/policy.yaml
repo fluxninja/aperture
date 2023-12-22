@@ -1039,7 +1039,7 @@ definitions:
                     Concurrency limiting is done independently for each value of the
                     [label](/concepts/flow-label.md) with given key.
                     For example, to give each API Key a separate limit, assuming you
-                    have a "api_key" flow
+                    have a `api_key` flow
                     label set up, set `limit_by_label_key: "api_key"`.
                     If no label key is specified, then all requests matching the
                     selectors will be concurrency limited based on the global concurrency count.

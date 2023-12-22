@@ -1,0 +1,41 @@
+# Generated values file for concurrency-limiting/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/concurrency-limiting/base
+blueprint: concurrency-limiting/base
+
+policy:
+  # List of additional circuit components.
+  # Type: []aperture.spec.v1.Component
+  components: []
+  # Name of the policy.
+  # Type: string
+  # Required: True
+  policy_name: __REQUIRED_FIELD__
+  # Additional resources.
+  # Type: aperture.spec.v1.Resources
+  resources:
+    flow_control:
+      classifiers: []
+  concurrency_limiter:
+    # Alerter.
+    # Type: aperture.spec.v1.AlerterParameters
+    alerter:
+      alert_name: "Too many inflight requests"
+    # Max concurrency.
+    # Type: float64
+    # Required: True
+    max_concurrency: __REQUIRED_FIELD__
+    # Parameters.
+    # Type: aperture.spec.v1.ConcurrencyLimiterParameters
+    # Required: True
+    parameters:
+      limit_by_label_key: "limit_by_label_key"
+      max_inflight_duration: __REQUIRED_FIELD__
+    # Request Parameters.
+    # Type: aperture.spec.v1.ConcurrencyLimiterRequestParameters
+    request_parameters: {}
+    # Flow selectors to match requests against
+    # Type: []aperture.spec.v1.Selector
+    # Required: True
+    selectors:
+      - control_point: __REQUIRED_FIELD__

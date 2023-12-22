@@ -60,7 +60,7 @@ func NewGlobalTokenBucket(dc *distcache.DistCache,
 		},
 	}
 
-	dMap, err := dc.NewDMap(name, dmapConfig)
+	dMap, err := dc.NewDMap(name, dmapConfig, false)
 	if err != nil {
 		return nil, err
 	}
