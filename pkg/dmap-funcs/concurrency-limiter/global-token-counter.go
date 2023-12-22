@@ -73,7 +73,7 @@ func NewGlobalTokenCounter(dc *distcache.DistCache,
 		},
 	}
 
-	dmap, err := dc.NewDMap(name, dmapConfig)
+	dmap, err := dc.NewDMap(name, dmapConfig, false)
 	if err != nil {
 		return nil, err
 	}

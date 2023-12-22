@@ -1,16 +1,16 @@
 ---
-title: Base Quota Scheduling Policy
+title: Base Concurrency Limiting Policy
 keywords:
   - blueprints
-sidebar_label: Base Quota Scheduling Policy
+sidebar_label: Base Concurrency Limiting Policy
 ---
 
 ## Introduction
 
-This blueprint provides a
-[token bucket](https://en.wikipedia.org/wiki/Token_bucket) based quota scheduler
-policy and a dashboard. This policy uses the
-[`QuotaScheduler`](/reference/configuration/spec.md#quota-scheduler) component.
+This blueprint provides a concurrency limiting policy and a dashboard. This
+policy uses the
+[`ConcurrencyLimiter`](/reference/configuration/spec.md#concurrency-limiter)
+component.
 
 <!-- Configuration Marker -->
 
@@ -24,7 +24,7 @@ import {ParameterDescription} from '../../../parameterComponents.js'
 <!-- vale off -->
 
 Blueprint name: <a
-href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-scheduling/base`}>quota-scheduling/base</a>
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/concurrency-limiting/base`}>concurrency-limiting/base</a>
 
 <!-- vale on -->
 
@@ -80,31 +80,31 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <!-- vale off -->
 
-##### policy.quota_scheduler {#policy-quota-scheduler}
+##### policy.concurrency_limiter {#policy-concurrency-limiter}
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-alerter"></a>
+<a id="policy-concurrency-limiter-alerter"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.alerter'
+    name='policy.concurrency_limiter.alerter'
     description='Alerter.'
     type='Object (aperture.spec.v1.AlerterParameters)'
     reference='../../configuration/spec#alerter-parameters'
-    value='{"alert_name": "More than 90% of requests are being rate limited"}'
+    value='{"alert_name": "Too many inflight requests"}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-bucket-capacity"></a>
+<a id="policy-concurrency-limiter-max-concurrency"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.bucket_capacity'
-    description='Bucket capacity.'
+    name='policy.concurrency_limiter.max_concurrency'
+    description='Max concurrency.'
     type='Number (double)'
     reference=''
     value='"__REQUIRED_FIELD__"'
@@ -114,53 +114,39 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-fill-amount"></a>
+<a id="policy-concurrency-limiter-parameters"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.fill_amount'
-    description='Fill amount.'
-    type='Number (double)'
-    reference=''
-    value='"__REQUIRED_FIELD__"'
+    name='policy.concurrency_limiter.parameters'
+    description='Parameters.'
+    type='Object (aperture.spec.v1.ConcurrencyLimiterParameters)'
+    reference='../../configuration/spec#concurrency-limiter-parameters'
+    value='{"limit_by_label_key": "limit_by_label_key", "max_inflight_duration": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-rate-limiter"></a>
+<a id="policy-concurrency-limiter-request-parameters"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.rate_limiter'
-    description='Rate Limiter Parameters.'
-    type='Object (aperture.spec.v1.RateLimiterParameters)'
-    reference='../../configuration/spec#rate-limiter-parameters'
-    value='{"interval": "__REQUIRED_FIELD__", "limit_by_label_key": "limit_key"}'
+    name='policy.concurrency_limiter.request_parameters'
+    description='Request Parameters.'
+    type='Object (aperture.spec.v1.ConcurrencyLimiterRequestParameters)'
+    reference='../../configuration/spec#concurrency-limiter-request-parameters'
+    value='{}'
 />
 
 <!-- vale on -->
 
 <!-- vale off -->
 
-<a id="policy-quota-scheduler-scheduler"></a>
+<a id="policy-concurrency-limiter-selectors"></a>
 
 <ParameterDescription
-    name='policy.quota_scheduler.scheduler'
-    description='Scheduler configuration.'
-    type='Object (aperture.spec.v1.Scheduler)'
-    reference='../../configuration/spec#scheduler'
-    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
-/>
-
-<!-- vale on -->
-
-<!-- vale off -->
-
-<a id="policy-quota-scheduler-selectors"></a>
-
-<ParameterDescription
-    name='policy.quota_scheduler.selectors'
-    description='Flow selectors to match requests against.'
+    name='policy.concurrency_limiter.selectors'
+    description='Flow selectors to match requests against'
     type='Array of Object (aperture.spec.v1.Selector)'
     reference='../../configuration/spec#selector'
     value='[{"control_point": "__REQUIRED_FIELD__"}]'

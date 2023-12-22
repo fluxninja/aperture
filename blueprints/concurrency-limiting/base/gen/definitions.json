@@ -3,18 +3,13 @@
   "type": "object",
   "title": "concurrency-limiting/base blueprint",
   "additionalProperties": false,
-  "required": [
-    "blueprint",
-    "policy"
-  ],
+  "required": ["blueprint", "policy"],
   "properties": {
     "blueprint": {
       "description": "Blueprint name",
       "type": "string",
       "default": "concurrency-limiting/base",
-      "enum": [
-        "concurrency-limiting/base"
-      ]
+      "enum": ["concurrency-limiting/base"]
     },
     "uri": {
       "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
@@ -24,10 +19,7 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "policy_name",
-        "concurrency_limiter"
-      ],
+      "required": ["policy_name", "concurrency_limiter"],
       "properties": {
         "components": {
           "description": "List of additional circuit components.",
@@ -56,11 +48,7 @@
         "concurrency_limiter": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "max_concurrency",
-            "parameters",
-            "selectors"
-          ],
+          "required": ["max_concurrency", "parameters", "selectors"],
           "properties": {
             "alerter": {
               "description": "Alerter.",

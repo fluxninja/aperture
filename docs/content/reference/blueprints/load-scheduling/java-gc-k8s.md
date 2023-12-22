@@ -15,18 +15,20 @@ avg(java_lang_G1_Young_Generation_LastGcInfo_duration)
 ```
 
 <!-- Configuration Marker -->
+
 ```mdx-code-block
 import {apertureVersion as aver} from '../../../apertureVersion.js'
 import {ParameterDescription} from '../../../parameterComponents.js'
 ```
 
 ## Configuration
+
 <!-- vale off -->
 
-Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/java-gc-k8s`}>load-scheduling/java-gc-k8s</a>
+Blueprint name: <a
+href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/load-scheduling/java-gc-k8s`}>load-scheduling/java-gc-k8s</a>
 
 <!-- vale on -->
-
 
 ### Parameters
 
@@ -366,15 +368,13 @@ Blueprint name: <a href={`https://github.com/fluxninja/aperture/tree/${aver}/blu
 
 ## Dynamic Configuration
 
-
-
 :::note
 
-The following configuration parameters can be [dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md) at runtime, without reloading the policy.
+The following configuration parameters can be
+[dynamically configured](/reference/aperture-cli/aperturectl/dynamic-config/apply/apply.md)
+at runtime, without reloading the policy.
 
 :::
-
-
 
 ### Parameters
 
