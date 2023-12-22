@@ -12,6 +12,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components"
 	"github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/autoscale/podscaler"
+	concurrencylimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/concurrency-limiter"
+	concurrencyscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/concurrency-scheduler"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
@@ -128,6 +130,18 @@ func NewComponentAndOptions(
 					return Tree{}, nil, nil, err
 				}
 				ctor = mkCtor(qs, quotascheduler.NewQuotaSchedulerAndOptions)
+			case "type.googleapis.com/aperture.policy.private.v1.ConcurrencyLimiter":
+				cl := &policyprivatev1.ConcurrencyLimiter{}
+				if err := anypb.UnmarshalTo(flowControlConfig.Private, cl, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(cl, concurrencylimiter.NewConcurrencyLimiterAndOptions)
+			case "type.googleapis.com/aperture.policy.private.v1.ConcurrencyScheduler":
+				cs := &policyprivatev1.ConcurrencyScheduler{}
+				if err := anypb.UnmarshalTo(flowControlConfig.Private, cs, proto.UnmarshalOptions{}); err != nil {
+					return Tree{}, nil, nil, err
+				}
+				ctor = mkCtor(cs, concurrencyscheduler.NewConcurrencySchedulerAndOptions)
 			default:
 				err := fmt.Errorf("unknown flow control type: %s", flowControlConfig.Private.TypeUrl)
 				log.Error().Err(err).Msg("unknown flow control type")
