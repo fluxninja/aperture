@@ -25,8 +25,7 @@ public class NettyServerAdvice {
                             wrapper.apertureSDK,
                             wrapper.controlPointName,
                             wrapper.rampMode,
-                            wrapper.flowTimeout,
-                            wrapper.expectEnd);
+                            wrapper.flowTimeout);
             String hname = handlerName;
             if (hname == null) {
                 ChannelHandlerContext ctx = pipeline.context(handler);

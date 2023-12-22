@@ -71,7 +71,6 @@ class Flow(AbstractContextManager):
         cache_key: Optional[str],
         error: Optional[Exception],
         grpc_channel: grpc.Channel,
-        expect_end: bool = True,
     ):
         self._fcs_stub = fcs_stub
         self._control_point = control_point
@@ -83,7 +82,6 @@ class Flow(AbstractContextManager):
         self._ramp_mode = ramp_mode
         self._error = error
         self._grpc_channel = grpc_channel
-        self._expect_end = expect_end
         self.logger = logging.getLogger("aperture-py-sdk-flow")
 
     def should_run(self) -> bool:

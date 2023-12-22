@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 import java.time.Duration;
 import java.util.Collections;
@@ -27,7 +28,6 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private boolean rampMode = false;
-    private boolean expectEnd = false;
     private Duration flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
 
     public ApertureServerHandler(ApertureSDK sdk, String controlPointName) {
@@ -42,11 +42,7 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
     }
 
     public ApertureServerHandler(
-            ApertureSDK sdk,
-            String controlPointName,
-            boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            ApertureSDK sdk, String controlPointName, boolean rampMode, Duration flowTimeout) {
         if (controlPointName == null || controlPointName.trim().isEmpty()) {
             throw new IllegalArgumentException("Control Point name must not be null or empty");
         }
@@ -57,14 +53,13 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
         this.flowTimeout = flowTimeout;
-        this.expectEnd = expectEnd;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
         TrafficFlowRequest trafficFlowRequest =
-                NettyUtils.trafficFlowRequestFromRequest(
-                        ctx, req, controlPointName, flowTimeout, rampMode, expectEnd);
+                NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName, flowTimeout);
+        String path = new QueryStringDecoder(req.uri()).path();
 
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 

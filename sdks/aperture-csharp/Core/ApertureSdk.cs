@@ -30,7 +30,6 @@ public class ApertureSdk : IApertureSdk
         var controlPoint = parameters.ControlPoint;
         var explicitLabels = parameters.ExplicitLabels;
         var rampMode = parameters.RampMode;
-        var expectEnd = parameters.ExpectEnd;
         var flowTimeout = parameters.FlowTimeout;
         var labels = new Dictionary<string, string>();
 
@@ -57,7 +56,7 @@ public class ApertureSdk : IApertureSdk
         {
             ControlPoint = controlPoint,
             RampMode = rampMode,
-            ExpectEnd = expectEnd,
+            ExpectEnd = true,
             CacheLookupRequest = new CacheLookupRequest
             {
                 ResultCacheKey = parameters.ResultCacheKey,

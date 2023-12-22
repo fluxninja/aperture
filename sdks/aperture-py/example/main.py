@@ -28,8 +28,6 @@ logging.basicConfig(level=logging.DEBUG)
 # START: apertureDecorator
 flow_params = FlowParams(
     check_timeout=timedelta(seconds=200),
-    ramp_mode=False,
-    expect_end=True,
 )
 
 

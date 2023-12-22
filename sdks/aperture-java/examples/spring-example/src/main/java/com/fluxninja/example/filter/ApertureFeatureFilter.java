@@ -22,7 +22,6 @@ public class ApertureFeatureFilter implements Filter {
 
     private ApertureSDK apertureSDK;
     private boolean rampMode;
-    private boolean expectEnd;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -35,7 +34,6 @@ public class ApertureFeatureFilter implements Filter {
                 FeatureFlowParameters.newBuilder("awesomeFeature")
                         .setExplicitLabels(labels)
                         .setRampMode(this.rampMode)
-                        .setExpectEnd(this.expectEnd)
                         .setFlowTimeout(Duration.ofMillis(1000))
                         .build();
         Flow flow = this.apertureSDK.startFlow(params);
@@ -76,8 +74,6 @@ public class ApertureFeatureFilter implements Filter {
             insecureGrpc = Boolean.parseBoolean(filterConfig.getInitParameter("insecure_grpc"));
             rootCertificateFile = filterConfig.getInitParameter("root_certificate_file");
             this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
-            this.expectEnd =
-                    Boolean.parseBoolean(filterConfig.getInitParameter("enable_expect_end"));
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);
         }

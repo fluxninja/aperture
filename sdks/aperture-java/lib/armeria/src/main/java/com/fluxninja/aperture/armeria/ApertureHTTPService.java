@@ -16,7 +16,6 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private final boolean rampMode;
-    private final boolean expectEnd;
     private final Duration flowTimeout;
 
     public static Function<? super HttpService, ApertureHTTPService> newDecorator(
@@ -30,14 +29,12 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            Duration flowTimeout) {
         ApertureHTTPServiceBuilder builder = new ApertureHTTPServiceBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
                 .setEnableRampMode(rampMode)
-                .setFlowTimeout(flowTimeout)
-                .setEnableExpectEnd(expectEnd);
+                .setFlowTimeout(flowTimeout);
         return builder::build;
     }
 
@@ -46,21 +43,18 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
-        this.expectEnd = expectEnd;
         this.flowTimeout = flowTimeout;
     }
 
     @Override
     public HttpResponse serve(ServiceRequestContext ctx, HttpRequest req) throws Exception {
         TrafficFlowRequest request =
-                HttpUtils.trafficFlowRequestFromRequest(
-                        ctx, req, controlPointName, flowTimeout, rampMode, expectEnd);
+                HttpUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName, flowTimeout);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {
@@ -87,7 +81,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
             }
             return res;
         } else {

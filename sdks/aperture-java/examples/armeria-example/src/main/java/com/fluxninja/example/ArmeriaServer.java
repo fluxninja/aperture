@@ -18,7 +18,6 @@ public class ArmeriaServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
-    public static final String DEFAULT_EXPECT_END = "true";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -67,9 +66,6 @@ public class ArmeriaServer {
         String rampModeString = getEnv("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
         boolean rampMode = Boolean.parseBoolean(rampModeString);
 
-        String expectEndString = getEnv("APERTURE_ENABLE_EXPECT_END", DEFAULT_EXPECT_END);
-        boolean expectEnd = Boolean.parseBoolean(expectEndString);
-
         String controlPointName = getEnv("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
 
         String insecureGrpcString = getEnv("APERTURE_AGENT_INSECURE", DEFAULT_INSECURE_GRPC);
@@ -109,8 +105,7 @@ public class ArmeriaServer {
                                         apertureSDK,
                                         controlPointName,
                                         rampMode,
-                                        Duration.ofMillis(1000),
-                                        expectEnd));
+                                        Duration.ofMillis(1000)));
         serverBuilder.service("/super", decoratedService);
         // END: ArmeriadecorateService
 

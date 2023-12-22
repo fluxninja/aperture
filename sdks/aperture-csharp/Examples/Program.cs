@@ -51,7 +51,6 @@ using (var listener = new HttpListener())
                 false,
                 TimeSpan.FromSeconds(5),
                 new Grpc.Core.CallOptions(),
-                true,
                 "test",
                 new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);
@@ -77,7 +76,6 @@ using (var listener = new HttpListener())
             labels.Add("priority", "100");
 
             var rampMode = false;
-            var expectEnd = true;
             var flowTimeout = TimeSpan.FromSeconds(5);
             var pms = new FeatureFlowParams(
                 "featureName",
@@ -85,7 +83,6 @@ using (var listener = new HttpListener())
                 rampMode,
                 flowTimeout,
                 new Grpc.Core.CallOptions(),
-                expectEnd,
                 "test",
                 new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);

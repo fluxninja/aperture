@@ -16,7 +16,6 @@ public class ArmeriaClientAdvice {
                         wrapper.apertureSDK,
                         wrapper.controlPointName,
                         wrapper.rampMode,
-                        wrapper.flowTimeout,
-                        wrapper.expectEnd));
+                        wrapper.flowTimeout));
     }
 }

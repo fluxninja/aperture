@@ -20,7 +20,6 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     private final ApertureSDK apertureSDK;
     private final String controlPointName;
     private final boolean rampMode;
-    private final boolean expectEnd;
     private final Duration flowTimeout;
 
     public static Function<? super HttpClient, ApertureHTTPClient> newDecorator(
@@ -34,14 +33,12 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            Duration flowTimeout) {
         ApertureHTTPClientBuilder builder = new ApertureHTTPClientBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
                 .setEnableRampMode(rampMode)
-                .setFlowTimeout(flowTimeout)
-                .setEnableExpectEnd(expectEnd);
+                .setFlowTimeout(flowTimeout);
         return builder::build;
     }
 
@@ -50,13 +47,11 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
-        this.expectEnd = expectEnd;
         this.flowTimeout = flowTimeout;
     }
 
@@ -64,12 +59,7 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
     public HttpResponse execute(ClientRequestContext ctx, HttpRequest req) throws Exception {
         TrafficFlowRequest request =
                 HttpUtils.trafficFlowRequestFromRequest(
-                        ctx,
-                        req,
-                        this.controlPointName,
-                        this.flowTimeout,
-                        this.rampMode,
-                        this.expectEnd);
+                        ctx, req, this.controlPointName, this.flowTimeout);
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(request);
 
         if (flow.ignored()) {

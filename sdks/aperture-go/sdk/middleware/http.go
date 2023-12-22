@@ -151,7 +151,6 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger *slog.Logger, cont
 		},
 		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
-		ExpectEnd:    flowParams.ExpectEnd,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
 			Path:     req.URL.Path,

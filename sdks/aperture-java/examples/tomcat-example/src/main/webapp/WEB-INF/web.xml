@@ -50,10 +50,6 @@
             <param-name>enable_ramp_mode</param-name>
             <param-value>false</param-value>
         </init-param>
-        <init-param>
-            <param-name>enable_expect_end</param-name>
-            <param-value>true</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>ApertureFeatureFilter</filter-name>

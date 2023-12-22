@@ -86,17 +86,6 @@ public class TrafficFlowRequestBuilder {
     }
 
     /**
-     * Sets the expect end of the traffic flow request.
-     *
-     * @param enabled Whether the flow should expect an end of the request.
-     * @return The TrafficFlowRequestBuilder object itself.
-     */
-    public TrafficFlowRequestBuilder setExpectEnd(Boolean enabled) {
-        checkHTTPRequestBuilder.setExpectEnd(enabled);
-        return this;
-    }
-
-    /**
      * Sets the HTTP method of the traffic flow request.
      *
      * @param httpMethod The HTTP method to be set.

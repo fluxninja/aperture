@@ -139,9 +139,8 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// START: defineFlowParams
 	flowParams := aperture.FlowParams{
-		Labels:    labels,
-		RampMode:  false,
-		ExpectEnd: true,
+		Labels:   labels,
+		RampMode: false,
 	}
 	// END: defineFlowParams
 

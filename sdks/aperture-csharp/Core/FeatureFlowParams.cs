@@ -11,7 +11,6 @@ public class FeatureFlowParams
         bool rampMode,
         TimeSpan flowTimeout,
         CallOptions callOptions,
-        bool expectEnd,
         string resultCacheKey,
         RepeatedField<string> globalCacheKeys)
     {
@@ -21,7 +20,6 @@ public class FeatureFlowParams
         RampMode = rampMode;
         FlowTimeout = flowTimeout;
         CallOptions = callOptions;
-        ExpectEnd = expectEnd;
         ResultCacheKey = resultCacheKey;
         GlobalCacheKeys = globalCacheKeys;
     }
@@ -31,7 +29,6 @@ public class FeatureFlowParams
     public TimeSpan FlowTimeout { get; set; }
     public bool RampMode { get; set; }
     public CallOptions CallOptions { get; set; }
-    public bool ExpectEnd { get; set; }
     public string ResultCacheKey { get; set; }
     public RepeatedField<string> GlobalCacheKeys { get; set; }
 }

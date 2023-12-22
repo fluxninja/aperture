@@ -10,7 +10,6 @@ public class ApertureHTTPServiceBuilder {
     private ApertureSDK apertureSDK;
     private String controlPointName;
     private boolean enableRampMode = false;
-    private boolean enableExpectEnd = true;
     private Duration flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
 
     /**
@@ -58,17 +57,6 @@ public class ApertureHTTPServiceBuilder {
         return this;
     }
 
-    /**
-     * Marks started flows as expecting an end of the request.
-     *
-     * @param enableExpectEnd whether all started flows should be expecting end of request
-     * @return the builder object.
-     */
-    public ApertureHTTPServiceBuilder setEnableExpectEnd(boolean enableExpectEnd) {
-        this.enableExpectEnd = enableExpectEnd;
-        return this;
-    }
-
     public ApertureHTTPService build(HttpService delegate) {
         if (this.controlPointName == null || this.controlPointName.trim().isEmpty()) {
             throw new IllegalArgumentException("Control Point name must be set");
@@ -77,11 +65,6 @@ public class ApertureHTTPServiceBuilder {
             throw new IllegalArgumentException("Aperture SDK must be set");
         }
         return new ApertureHTTPService(
-                delegate,
-                apertureSDK,
-                controlPointName,
-                enableRampMode,
-                flowTimeout,
-                enableExpectEnd);
+                delegate, apertureSDK, controlPointName, enableRampMode, flowTimeout);
     }
 }

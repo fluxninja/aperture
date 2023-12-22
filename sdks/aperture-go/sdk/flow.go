@@ -68,7 +68,6 @@ type flow struct {
 	statusCode        FlowStatus
 	ended             bool
 	rampMode          bool
-	expectEnd         bool
 	callOptions       []grpc.CallOption
 }
 
@@ -82,7 +81,6 @@ func newFlow(
 	rampMode bool,
 	resultCacheKey string,
 	globalCacheKeys []string,
-	expectEnd bool,
 	callOptions []grpc.CallOption) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
@@ -93,7 +91,6 @@ func newFlow(
 		rampMode:          rampMode,
 		resultCacheKey:    resultCacheKey,
 		globalCacheKeys:   globalCacheKeys,
-		expectEnd:         expectEnd,
 		callOptions:       callOptions,
 	}
 }

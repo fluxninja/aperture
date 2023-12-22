@@ -16,7 +16,6 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
     String agentAddress;
     String agentAPIKey;
     boolean rampMode;
-    boolean expectEnd;
     Duration flowTimeout;
     String controlPointName;
     boolean insecureGrpc;
@@ -29,12 +28,10 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
             Duration flowTimeout,
             String controlPointName,
             boolean insecureGrpc,
-            String rootCertFile,
-            boolean expectEnd) {
+            String rootCertFile) {
         this.agentAddress = agentAddress;
         this.agentAPIKey = agentAPIKey;
         this.rampMode = rampMode;
-        this.expectEnd = expectEnd;
         this.flowTimeout = flowTimeout;
         this.controlPointName = controlPointName;
         this.insecureGrpc = insecureGrpc;
@@ -67,8 +64,7 @@ public class ServerInitializer extends ChannelInitializer<Channel> {
         // ApertureServerHandler must be added before the response-generating
         // HelloWorldHandler,
         // but after the codec handler.
-        pipeline.addLast(
-                new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout, expectEnd));
+        pipeline.addLast(new ApertureServerHandler(sdk, controlPointName, rampMode, flowTimeout));
         pipeline.addLast(new HelloWorldHandler());
     }
     // END: NettyInitChannel

@@ -14,8 +14,8 @@ import java.util.function.Function;
 /** Decorates an {@link RpcService} to enable flow control using provided {@link ApertureSDK} */
 public class ApertureRPCService extends SimpleDecoratingRpcService {
     private final ApertureSDK apertureSDK;
+    private final String controlPointName;
     private final boolean rampMode;
-    private final boolean expectEnd;
     private final Duration flowTimeout;
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
@@ -26,12 +26,11 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
     }
 
     public static Function<? super RpcService, ApertureRPCService> newDecorator(
-            ApertureSDK apertureSDK, String controlPointName, boolean rampMode, boolean expectEnd) {
+            ApertureSDK apertureSDK, String controlPointName, boolean rampMode) {
         ApertureRPCServiceBuilder builder = new ApertureRPCServiceBuilder();
         builder.setApertureSDK(apertureSDK)
                 .setControlPointName(controlPointName)
-                .setEnableRampMode(rampMode)
-                .setEnableExpectEnd(expectEnd);
+                .setEnableRampMode(rampMode);
         return builder::build;
     }
 
@@ -40,13 +39,12 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout,
-            boolean expectEnd) {
+            Duration flowTimeout) {
         super(delegate);
         this.apertureSDK = apertureSDK;
+        this.controlPointName = controlPointName;
         this.rampMode = rampMode;
         this.flowTimeout = flowTimeout;
-        this.expectEnd = expectEnd;
     }
 
     @Override
@@ -57,7 +55,6 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
                 FeatureFlowParameters.newBuilder("awesomeFeature")
                         .setExplicitLabels(labels)
                         .setRampMode(this.rampMode)
-                        .setExpectEnd(this.expectEnd)
                         .setFlowTimeout(this.flowTimeout)
                         .build();
         Flow flow = this.apertureSDK.startFlow(params);
