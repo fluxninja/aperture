@@ -167,9 +167,12 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 	}
 
-	if err := flow.End(); err != nil {
-		log.Printf("failed to end flow: %v", err)
+	endResponse, err := flow.End(flowParams.CallOptions)
+	if err != nil {
+		log.Printf("Failed to end flow: %+v", err)
 	}
+
+	log.Printf("Flow ended with response: %s", endResponse.String())
 
 	// END: manualFlowNoCaching
 }

@@ -43,7 +43,7 @@ type Flow interface {
 	DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse
 	Error() error
 	Span() trace.Span
-	End() error
+	End(grpcCallOptions []grpc.CallOption) (*checkv1.FlowEndResponse, error)
 	CheckResponse() *checkv1.CheckResponse
 	RetryAfter() time.Duration
 	HTTPResponseCode() int
@@ -263,15 +263,15 @@ func (f *flow) Span() trace.Span {
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.
-func (f *flow) End() error {
+func (f *flow) End(grpcCallOptions []grpc.CallOption) (*checkv1.FlowEndResponse, error) {
 	if f.ended {
-		return errors.New("flow already ended")
+		return nil, errors.New("flow already ended")
 	}
 	f.ended = true
 
 	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	f.span.SetAttributes(
 		attribute.String(flowStatusLabel, f.statusCode.String()),
@@ -279,5 +279,35 @@ func (f *flow) End() error {
 		attribute.Int64(flowEndTimestampLabel, time.Now().UnixNano()),
 	)
 	f.span.End()
-	return nil
+
+	inflightRequestRef := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
+
+	for _, decision := range f.checkResponse.GetLimiterDecisions() {
+		ref := &checkv1.InflightRequestRef{
+			PolicyName:  decision.PolicyName,
+			PolicyHash:  decision.PolicyHash,
+			ComponentId: decision.ComponentId,
+		}
+
+		if decision.GetConcurrencyLimiterInfo() != nil {
+			ref.Label = decision.GetConcurrencyLimiterInfo().GetLabel()
+			ref.RequestId = decision.GetConcurrencyLimiterInfo().GetRequestId()
+			if decision.GetConcurrencyLimiterInfo().GetTokensInfo() != nil {
+				ref.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
+			}
+
+			inflightRequestRef = append(inflightRequestRef, ref)
+		}
+	}
+
+	if len(inflightRequestRef) == 0 {
+		return nil, nil
+	}
+
+	flowEndResponse, err := f.flowControlClient.FlowEnd(context.Background(), &checkv1.FlowEndRequest{
+		ControlPoint:     f.checkResponse.ControlPoint,
+		InflightRequests: inflightRequestRef,
+	}, grpcCallOptions...)
+
+	return flowEndResponse, err
 }
