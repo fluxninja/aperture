@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=../../../../blueprints/concurrency-scheduling/base/gen/definitions.json
+# Generated values file for concurrency-scheduling/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base
+
+blueprint: concurrency-scheduling/base
+uri: ../../../../blueprints
+policy:
+  components: []
+  policy_name: concurrency-scheduler
+  resources:
+    flow_control:
+      classifiers: []
+  concurrency_scheduler:
+    alerter:
+      alert_name: "Too many inflight requests"
+    concurrency_limiter:
+      limit_by_label_key: "limit_by_label_key"
+      max_inflight_duration: 1s
+    max_concurrency: 10
+    scheduler:
+      workloads:
+        - label_matcher:
+            match_labels:
+              http.request.header.user_type: guest
+          parameters:
+            priority: 50.0
+          name: guest
+        - label_matcher:
+            match_labels:
+              http.request.header.user_type: subscriber
+          parameters:
+            priority: 200.0
+          name: subscriber
+    selectors:
+      - agent_group: default
+        service: service1-demo-app.demoapp.svc.cluster.local
+        control_point: ingress

@@ -1,0 +1,3 @@
+blueprint: Concurrency Scheduling Policy
+sources:
+  policy: concurrency-scheduling/base/policy.libsonnet

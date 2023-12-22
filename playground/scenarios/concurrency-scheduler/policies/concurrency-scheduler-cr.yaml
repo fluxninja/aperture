@@ -1,0 +1,63 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: concurrency-scheduler
+spec:
+  circuit:
+    components:
+    - flow_control:
+        concurrency_scheduler:
+          concurrency_limiter:
+            limit_by_label_key: limit_by_label_key
+            max_inflight_duration: 1s
+          in_ports:
+            max_concurrency:
+              constant_signal:
+                value: 10
+          out_ports:
+            accept_percentage:
+              signal_name: ACCEPT_PERCENTAGE
+          scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
+            workloads:
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: guest
+              name: guest
+              parameters:
+                priority: 50
+            - label_matcher:
+                match_labels:
+                  http.request.header.user_type: subscriber
+              name: subscriber
+              parameters:
+                priority: 200
+          selectors:
+          - agent_group: default
+            control_point: ingress
+            service: service1-demo-app.demoapp.svc.cluster.local
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: ACCEPT_PERCENTAGE
+          rhs:
+            constant_signal:
+              value: 90
+        operator: gte
+        out_ports:
+          output:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+    - alerter:
+        in_ports:
+          signal:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+        parameters:
+          alert_name: Too many inflight requests
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
