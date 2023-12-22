@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"cloud.google.com/go/storage"
-
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	storageconfig "github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
@@ -37,15 +35,8 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 		return nil, fmt.Errorf("key prefix cannot be empty")
 	}
 
-	client, err := storage.NewClient(context.Background())
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to create GCS client")
-		return nil, err
-	}
-	bucket := client.Bucket(cfg.Bucket)
-
 	objStorage := &ObjectStorage{
-		bucket:     bucket,
+		bucketName: cfg.Bucket,
 		keyPrefix:  cfg.KeyPrefix,
 		operations: make(chan *Operation, cfg.OperationsChannelSize),
 	}
@@ -67,9 +58,7 @@ func Invoke(in InvokeParams) error {
 		OnStart: func(ctx context.Context) error {
 			cancellableCtx, cancel := context.WithCancel(context.Background())
 			in.ObjectStorage.SetContextWithCancel(cancellableCtx, cancel)
-			in.ObjectStorage.Start(ctx)
-
-			return nil
+			return in.ObjectStorage.Start(ctx)
 		},
 		OnStop: func(ctx context.Context) error {
 			return in.ObjectStorage.Stop(ctx)
