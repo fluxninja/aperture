@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"cloud.google.com/go/storage"
 	"go.uber.org/fx"
 
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
@@ -41,17 +40,10 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 		return nil, fmt.Errorf("key prefix cannot be empty")
 	}
 
-	client, err := storage.NewClient(context.Background())
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to create GCS client")
-		return nil, err
-	}
-	bucket := client.Bucket(cfg.Bucket)
-
 	keyPrefix := fmt.Sprintf("%s-%s", cfg.KeyPrefix, in.AgentInfo.GetAgentGroup())
 
 	objStorage := &ObjectStorage{
-		bucket:      bucket,
+		bucketName:  cfg.Bucket,
 		keyPrefix:   keyPrefix,
 		operations:  make(chan *Operation, cfg.OperationsChannelSize),
 		retryPolicy: cfg.RetryPolicy,

@@ -41,7 +41,7 @@ type ObjectStorageRetryPolicy struct {
 // swagger:model
 // +kubebuilder:object:generate=true
 type ObjectStorageBackoffConfig struct {
-	Initial    config.Duration `json:"initial" default:"500ms"`
+	Initial    config.Duration `json:"initial" default:"0.5s"`
 	Multiplier float64         `json:"multiplier" default:"1.5"`
 	Maximum    config.Duration `json:"maximum" default:"2s"`
 }

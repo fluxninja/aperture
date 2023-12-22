@@ -1174,11 +1174,11 @@ definitions:
     ObjectStorageBackoffConfig:
         properties:
             initial:
-                default: 500ms
+                default: 0.5s
                 format: string
                 type: string
                 x-go-name: Initial
-                x-go-tag-default: 500ms
+                x-go-tag-default: 0.5s
                 x-go-tag-json: initial
             maximum:
                 default: 2s

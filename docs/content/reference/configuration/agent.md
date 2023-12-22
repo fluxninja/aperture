@@ -2500,7 +2500,7 @@ ObjectStorageBackoffConfig for object storage backoff configuration.
 
 <!-- vale off -->
 
-(string, default: `"500ms"`)
+(string, default: `"0.5s"`)
 
 <!-- vale on -->
 
