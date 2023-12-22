@@ -25,7 +25,7 @@ import {
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
 import { InflightRequestRef } from "./gen/aperture/flowcontrol/check/v1/InflightRequestRef.js";
 import { FlowEndRequest } from "./gen/aperture/flowcontrol/check/v1/FlowEndRequest.js";
-import { FlowEndResponse } from "./gen/aperture/flowcontrol/check/v1/FlowEndResponse.js";
+import { FlowEndResponse as FlowEndResponseProto } from "./gen/aperture/flowcontrol/check/v1/FlowEndResponse.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
@@ -154,7 +154,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyUpsertResponse(
-            convertCacheError(res.resultCacheResponse?.error),
+            convertError(res.resultCacheResponse?.error),
           );
           resolve(resp);
         },
@@ -199,7 +199,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyUpsertResponse(
-            convertCacheError(res.globalCacheResponses[key]?.error),
+            convertError(res.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -232,7 +232,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyDeleteResponse(
-            convertCacheError(res?.resultCacheResponse?.error),
+            convertError(res?.resultCacheResponse?.error),
           );
           resolve(resp);
         },
@@ -260,7 +260,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyDeleteResponse(
-            convertCacheError(res?.globalCacheResponses[key]?.error),
+            convertError(res?.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -310,7 +310,7 @@ export class _Flow implements Flow {
     }
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(resultCacheResponse?.lookupStatus),
-      convertCacheError(resultCacheResponse?.error),
+      convertError(resultCacheResponse?.error),
       resultCacheResponse?.value ?? null,
     );
     return resp;
@@ -372,7 +372,7 @@ export class _Flow implements Flow {
       this._checkResponse?.cacheLookupResponse?.globalCacheResponses?.[key];
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(lookupResp?.lookupStatus),
-      convertCacheError(lookupResp?.error),
+      convertError(lookupResp?.error),
       lookupResp?.value.byteLength ? lookupResp?.value : null,
     );
 
@@ -531,21 +531,55 @@ export class _Flow implements Flow {
           grpcCallOptions ?? {},
           (err, res) => {
             if (err) {
-              throw err;
+              const resp = new _FlowEndResponse(
+                err,
+                {},
+              );
+              resolve(resp);
+              return;
             }
             if (!res) {
-              throw new Error("No flow end response");
+              const resp = new _FlowEndResponse(
+                new Error("No flow end response"),
+                {},
+              );
+              resolve(resp);
+              return;
             }
-            const resp: FlowEndResponse = {
-              tokenReturnStatuses: res.tokenReturnStatuses,
-            };
+            const resp = new _FlowEndResponse(
+              null,
+              res,
+            );
             resolve(resp);
+            return;
           });
       } else {
+        const resp = new _FlowEndResponse(
+          new Error("Check response was nil"),
+          {},
+        );
+        resolve(resp);
         return;
       }
     });
   }
+}
+
+/**
+ * Represents a flow end response.
+ */
+interface FlowEndResponse {
+  /**
+   * Gets the response.
+   * @returns FlowEndResponseProto.
+   */
+  getResponse(): FlowEndResponseProto;
+
+  /**
+   * Gets the error, if any.
+   * @returns The error, or null if no error occurred.
+   */
+  getError(): Error | null;
 }
 
 function bufferToByteArrayJson(buffer: Buffer) {
@@ -601,7 +635,7 @@ function convertCacheLookupStatus(
  * @param error - The cache error string.
  * @returns The Error object representing the cache error, or null if the error string is empty.
  */
-function convertCacheError(error: string | undefined): Error | null {
+function convertError(error: string | undefined): Error | null {
   if (!error) {
     return null;
   }
@@ -696,6 +730,36 @@ class _KeyDeleteResponse {
 
   /**
    * Gets the error that occurred during the delete operation, if any.
+   * @returns The error object or null if no error occurred.
+   */
+  getError(): Error | null {
+    return this.error;
+  }
+}
+
+class _FlowEndResponse implements FlowEndResponse {
+  private error: Error | null;
+  private response: FlowEndResponseProto;
+
+  /**
+   * Creates a new instance of FlowEndResponse.
+   * @param error The error that occurred during the operation, if any.
+   */
+  constructor(error: Error | null, response: FlowEndResponseProto) {
+    this.error = error;
+    this.response = response;
+  }
+
+  /**
+   * Gets the response.
+   * @returns FlowEndResponseProto.
+   */
+  getResponse(): FlowEndResponseProto {
+    return this.response;
+  }
+
+  /**
+   * Gets the error that occurred during the operation, if any.
    * @returns The error object or null if no error occurred.
    */
   getError(): Error | null {
