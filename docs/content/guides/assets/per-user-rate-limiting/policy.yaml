@@ -24,7 +24,7 @@ spec:
             limit_by_label_key: user_id
           request_parameters: {}
           selectors:
-          - control_point: rate-limiting-example
+          - control_point: rate-limiting-feature
     - decider:
         in_ports:
           lhs:

@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../../../../../blueprints/rate-limiting/base/gen/definitions.json
+blueprint: quota-scheduling/base
+uri: ../../../../../blueprints
+policy:
+  policy_name: gpt-4-tpm
+  quota_scheduler:
+    bucket_capacity: 40000
+    fill_amount: 40000
+    rate_limiter:
+      interval: 60s
+      limit_by_label_key: api_key
+    scheduler:
+      priority_label_key: priority
+      tokens_label_key: estimated_tokens
+    selectors:
+      - control_point: openai
+        label_matcher:
+          match_labels:
+            model_variant: gpt-4
+            product_reason: paid_user
+            prompt_type: chat

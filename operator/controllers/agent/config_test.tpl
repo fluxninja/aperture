@@ -280,3 +280,4 @@ object_storage:
   backend: gcs
   bucket: list
   key_prefix: asdf
+  operations_channel_size: 1000

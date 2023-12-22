@@ -143,7 +143,7 @@ type AgentConfigSpec struct {
 
 	// ObjectStorage configuration.
 	//+kubebuilder:validation:Optional
-	ObjectStorage objectstorageconfig.Config `json:"object_storage"`
+	ObjectStorage objectstorageconfig.ObjectStorageConfig `json:"object_storage"`
 }
 
 // FlowControlConfigSpec holds flow control configuration.

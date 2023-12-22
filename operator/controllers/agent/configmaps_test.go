@@ -107,7 +107,7 @@ var _ = Describe("ConfigMap for Agent", func() {
 							},
 							EnableHighCardinalityPlatformMetrics: false,
 						},
-						ObjectStorage: objectstorageconfig.Config{
+						ObjectStorage: objectstorageconfig.ObjectStorageConfig{
 							Enabled:   true,
 							Backend:   "gcs",
 							KeyPrefix: "asdf",

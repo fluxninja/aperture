@@ -176,50 +176,28 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/policies/autoscale/kubernetes/config
     BackoffConfig:
+        description: BackoffConfig for object storage backoff configuration
         properties:
-            base_delay:
-                default: 1s
-                description: Base Delay
-                format: string
-                minLength: 0
-                type: string
-                x-go-name: BaseDelay
-                x-go-tag-default: 1s
-                x-go-tag-json: base_delay
-                x-go-tag-validate: gte=0
-            jitter:
-                default: 0.2
-                description: Jitter
-                format: double
-                minimum: 0
-                type: number
-                x-go-name: Jitter
-                x-go-tag-default: "0.2"
-                x-go-tag-json: jitter
-                x-go-tag-validate: gte=0
-            max_delay:
-                default: 120s
-                description: Max Delay
-                format: string
-                minLength: 0
-                type: string
-                x-go-name: MaxDelay
-                x-go-tag-default: 120s
-                x-go-tag-json: max_delay
-                x-go-tag-validate: gte=0
+            initial:
+                $ref: '#/definitions/Duration'
+                x-go-tag-default: 500ms
+                x-go-tag-json: initial
+            maximum:
+                $ref: '#/definitions/Duration'
+                x-go-tag-default: 2s
+                x-go-tag-json: maximum
             multiplier:
-                default: 1.6
+                default: 1.5
                 description: Backoff multiplier
                 format: double
                 minimum: 0
                 type: number
                 x-go-name: Multiplier
-                x-go-tag-default: "1.6"
+                x-go-tag-default: "1.5"
                 x-go-tag-json: multiplier
                 x-go-tag-validate: gte=0
-        title: BackoffConfig holds configuration for gRPC client backoff.
         type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/net/grpc
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     BatchAlertsConfig:
         properties:
             send_batch_max_size:
@@ -375,43 +353,6 @@ definitions:
         title: CommonOTelConfig is the configuration for the OTel collector.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/otelcollector/config
-    Config:
-        properties:
-            backend:
-                default: gcs
-                description: Backend which provides the object storage.
-                enum:
-                    - gcs
-                type: string
-                x-go-name: Backend
-                x-go-tag-default: gcs
-                x-go-tag-json: backend
-                x-go-tag-validate: oneof=gcs
-                x-oneof: gcs
-            bucket:
-                description: Bucket name of the bucket to use. Required if enabled is true.
-                type: string
-                x-go-name: Bucket
-                x-go-tag-json: bucket
-            enabled:
-                default: false
-                description: Enabled denotes if object storage is enabled.
-                type: boolean
-                x-go-name: Enabled
-                x-go-tag-default: "false"
-                x-go-tag-json: enabled
-            key_prefix:
-                description: KeyPrefix to use when writing to bucket. Required if enabled is true.
-                type: string
-                x-go-name: KeyPrefix
-                x-go-tag-json: key_prefix
-            retry_policy:
-                $ref: '#/definitions/RetryPolicy'
-                description: RetryPolicy to configure retries and timeouts for object storage requests.
-                x-go-tag-json: retry_policy,omitempty
-        title: Config for object storage.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     DistCacheConfig:
         properties:
             bind_addr:
@@ -461,10 +402,13 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/dist-cache/config
     Duration:
-        description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
-        title: Duration is encoded as a string message which represents a signed span of time.
-        type: object
-        x-go-package: github.com/fluxninja/aperture/v2/pkg/config
+        description: |-
+            A Duration represents the elapsed time between two instants
+            as an int64 nanosecond count. The representation limits the
+            largest representable duration to approximately 290 years.
+        format: int64
+        type: integer
+        x-go-package: time
     EtcdConfig:
         properties:
             endpoints:
@@ -1208,6 +1152,51 @@ definitions:
         title: MultiJobConfig holds configuration for MultiJob.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/jobs
+    ObjectStorageConfig:
+        properties:
+            backend:
+                default: gcs
+                description: Backend which provides the object storage.
+                enum:
+                    - gcs
+                type: string
+                x-go-name: Backend
+                x-go-tag-default: gcs
+                x-go-tag-json: backend
+                x-go-tag-validate: oneof=gcs
+                x-oneof: gcs
+            bucket:
+                description: Bucket name of the bucket to use. Required if enabled is true.
+                type: string
+                x-go-name: Bucket
+                x-go-tag-json: bucket
+            enabled:
+                default: false
+                description: Enabled denotes if object storage is enabled.
+                type: boolean
+                x-go-name: Enabled
+                x-go-tag-default: "false"
+                x-go-tag-json: enabled
+            key_prefix:
+                description: KeyPrefix to use when writing to bucket. Required if enabled is true.
+                type: string
+                x-go-name: KeyPrefix
+                x-go-tag-json: key_prefix
+            operations_channel_size:
+                default: 1000
+                description: OperationsChannelSize controls size of the channel used for asynchronous puts and deletes.
+                format: int64
+                type: integer
+                x-go-name: OperationsChannelSize
+                x-go-tag-default: "1000"
+                x-go-tag-json: operations_channel_size
+            retry_policy:
+                $ref: '#/definitions/RetryPolicy'
+                description: RetryPolicy to configure retries and timeouts for object storage requests.
+                x-go-tag-json: retry_policy,omitempty
+        title: ObjectStorageConfig configures object storage structure.
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     PeerDiscoveryConfig:
         properties:
             advertisement_addr:
@@ -1628,7 +1617,7 @@ paths:
             parameters:
                 - in: body
                   schema:
-                    $ref: '#/definitions/Config'
+                    $ref: '#/definitions/ObjectStorageConfig'
             tags:
                 - common-configuration
             x-fn-config-env: true

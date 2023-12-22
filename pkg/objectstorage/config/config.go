@@ -9,7 +9,7 @@ import "time"
 // parameters:
 // - in: body
 //   schema:
-//     "$ref": "#/definitions/Config"
+//     "$ref": "#/definitions/ObjectStorageConfig"
 
 // BackoffConfig for object storage backoff configuration
 // swagger:model
@@ -28,10 +28,10 @@ type RetryPolicy struct {
 	Backoff BackoffConfig `json:"backoff,omitempty"`
 }
 
-// Config for object storage.
+// ObjectStorageConfig configures object storage structure.
 // swagger:model
 // +kubebuilder:object:generate=true
-type Config struct {
+type ObjectStorageConfig struct {
 	// Enabled denotes if object storage is enabled.
 	Enabled bool `json:"enabled" default:"false"`
 	// Backend which provides the object storage.
@@ -42,4 +42,6 @@ type Config struct {
 	KeyPrefix string `json:"key_prefix"`
 	// RetryPolicy to configure retries and timeouts for object storage requests.
 	RetryPolicy RetryPolicy `json:"retry_policy,omitempty"`
+	// OperationsChannelSize controls size of the channel used for asynchronous puts and deletes.
+	OperationsChannelSize int `json:"operations_channel_size" default:"1000"`
 }

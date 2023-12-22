@@ -409,7 +409,7 @@ prefix: `APERTURE_AGENT_FLUXNINJA_`
 <dt></dt>
 <dd>
 
-([Config](#config)) Environment variable prefix:
+([ObjectStorageConfig](#object-storage-config)) Environment variable prefix:
 `APERTURE_AGENT_OBJECT_STORAGE_`
 
 </dd>
@@ -931,6 +931,8 @@ Enables the Kubernetes auto-scale capability.
 
 BackoffConfig holds configuration for gRPC client backoff.
 
+BackoffConfig for object storage backoff configuration
+
 <dl>
 <dt>base_delay</dt>
 <dd>
@@ -978,6 +980,26 @@ Max Delay
 <!-- vale on -->
 
 Backoff multiplier
+
+</dd>
+<dt>initial</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
+
+<!-- vale on -->
+
+</dd>
+<dt>maximum</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
+
+<!-- vale on -->
 
 </dd>
 </dl>
@@ -1229,79 +1251,6 @@ ClientTLSConfig is the configuration for client TLS.
 (string)
 
 <!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### Config {#config}
-
-<!-- vale on -->
-
-Config for object storage.
-
-<dl>
-<dt>backend</dt>
-<dd>
-
-<!-- vale off -->
-
-(string, one of: `gcs`, default: `"gcs"`)
-
-<!-- vale on -->
-
-Backend which provides the object storage.
-
-</dd>
-<dt>bucket</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-Bucket name of the bucket to use. Required if enabled is true.
-
-</dd>
-<dt>enabled</dt>
-<dd>
-
-<!-- vale off -->
-
-(bool, default: `false`)
-
-<!-- vale on -->
-
-Enabled denotes if object storage is enabled.
-
-</dd>
-<dt>key_prefix</dt>
-<dd>
-
-<!-- vale off -->
-
-(string)
-
-<!-- vale on -->
-
-KeyPrefix to use when writing to bucket. Required if enabled is true.
-
-</dd>
-<dt>retry_policy</dt>
-<dd>
-
-<!-- vale off -->
-
-([RetryPolicy](#retry-policy))
-
-<!-- vale on -->
-
-RetryPolicy to configure retries and timeouts for object storage requests.
 
 </dd>
 </dl>
@@ -2568,6 +2517,92 @@ startup. See
 
 Pedantic controls whether a pedantic registry is used. See
 <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ObjectStorageConfig {#object-storage-config}
+
+<!-- vale on -->
+
+ObjectStorageConfig configures object storage structure.
+
+<dl>
+<dt>backend</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, one of: `gcs`, default: `"gcs"`)
+
+<!-- vale on -->
+
+Backend which provides the object storage.
+
+</dd>
+<dt>bucket</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Bucket name of the bucket to use. Required if enabled is true.
+
+</dd>
+<dt>enabled</dt>
+<dd>
+
+<!-- vale off -->
+
+(bool, default: `false`)
+
+<!-- vale on -->
+
+Enabled denotes if object storage is enabled.
+
+</dd>
+<dt>key_prefix</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+KeyPrefix to use when writing to bucket. Required if enabled is true.
+
+</dd>
+<dt>operations_channel_size</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, default: `1000`)
+
+<!-- vale on -->
+
+OperationsChannelSize controls size of the channel used for asynchronous puts
+and deletes.
+
+</dd>
+<dt>retry_policy</dt>
+<dd>
+
+<!-- vale off -->
+
+([RetryPolicy](#retry-policy))
+
+<!-- vale on -->
+
+RetryPolicy to configure retries and timeouts for object storage requests.
 
 </dd>
 </dl>

@@ -3,6 +3,7 @@ package objectstorage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -41,7 +42,7 @@ var (
 type ObjectStorageIface interface {
 	KeyPrefix() string
 	SetContextWithCancel(ctx context.Context, cancel context.CancelFunc)
-	Start(ctx context.Context)
+	Start(ctx context.Context) error
 	Stop(ctx context.Context) error
 	Put(ctx context.Context, key string, data []byte, timestamp, ttl int64) error
 	Get(ctx context.Context, key string) (olricstorage.Entry, error)
@@ -55,6 +56,7 @@ type ObjectStorage struct {
 	cancellableCtx context.Context
 	cancel         context.CancelFunc
 	client         *storage.Client
+	bucketName     string
 	bucket         *storage.BucketHandle
 	retryPolicy    config.RetryPolicy
 
@@ -70,6 +72,9 @@ func (o *ObjectStorage) SetContextWithCancel(ctx context.Context, cancel context
 
 // Get gets object from object storage.
 func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry, error) {
+	if !o.isStarted() {
+		return nil, fmt.Errorf("storage not yet started")
+	}
 	// If the object is missing timestamp, we will use timestamp of when the Get() was called.
 	timestampDefault := time.Now().UnixNano()
 
@@ -110,7 +115,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		return nil, err
 	}
 
-	entry := &PersistentEntry{key: key, value: &data}
+	entry := &PersistentEntry{key: key, value: data}
 	attrs, err := obj.Attrs(timeoutCtx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
@@ -182,14 +187,21 @@ func (o *ObjectStorage) internalDelete(_ context.Context, entry *PersistentEntry
 
 // Delete queues delete operation from object storage.
 func (o *ObjectStorage) Delete(ctx context.Context, key string) error {
+	if !o.isStarted() {
+		return fmt.Errorf("storage not yet started")
+	}
 	return o.internalDelete(ctx, &PersistentEntry{
-		key:   key,
-		value: nil,
+		key:       key,
+		value:     nil,
+		timestamp: time.Now().UnixNano(),
 	})
 }
 
 // List lists object storage.
 func (o *ObjectStorage) List(ctx context.Context, prefix string) (string, error) {
+	if !o.isStarted() {
+		return "", fmt.Errorf("storage not yet started")
+	}
 	panic("implement me")
 }
 
@@ -201,9 +213,12 @@ func (o *ObjectStorage) Put(
 	timestamp int64,
 	ttl int64,
 ) error {
+	if !o.isStarted() {
+		return fmt.Errorf("storage not yet started")
+	}
 	entry := &PersistentEntry{
 		key:       key,
-		value:     &data,
+		value:     data,
 		timestamp: timestamp,
 		ttl:       ttl,
 	}
@@ -273,7 +288,7 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 	}
 
 	w := obj.NewWriter(timeoutCtx)
-	_, err = w.Write(*entry.value)
+	_, err = w.Write(entry.value)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
 		return err
@@ -329,7 +344,7 @@ func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEnt
 		}
 	}
 
-	if timestamp > entry.Timestamp() {
+	if entry.Timestamp() > 0 && timestamp > entry.Timestamp() {
 		log.Debug().Msg("Object in storage is more recent than the entry being deleted")
 		return nil
 	}
@@ -355,7 +370,14 @@ func (o *ObjectStorage) handleOp(ctx context.Context, op *Operation) error {
 }
 
 // Start starts a goroutine which performs operations on object storage.
-func (o *ObjectStorage) Start(_ context.Context) {
+func (o *ObjectStorage) Start(ctx context.Context) error {
+	client, err := storage.NewClient(context.Background())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create GCS client")
+		return err
+	}
+	bucket := client.Bucket(o.bucketName)
+	o.bucket = bucket
 	go func() {
 		p := pool.New().WithMaxGoroutines(10)
 
@@ -378,6 +400,11 @@ func (o *ObjectStorage) Start(_ context.Context) {
 		<-o.cancellableCtx.Done()
 		close(o.operations)
 	}()
+	return nil
+}
+
+func (o *ObjectStorage) isStarted() bool {
+	return o.bucket != nil
 }
 
 // Stop kills the goroutine started in Start().
