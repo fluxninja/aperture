@@ -186,6 +186,7 @@ class ApertureClient:
             ramp_mode=params.ramp_mode,
             cache_key=params.result_cache_key,
             error=error,
+            grpc_channel=self.grpc_channel,
         )
 
     def decorate(
