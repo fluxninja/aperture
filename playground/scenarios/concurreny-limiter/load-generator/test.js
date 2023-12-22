@@ -4,11 +4,11 @@ import { vu } from "k6/execution";
 import http from "k6/http";
 
 export let vuStages = [
-  { duration: "10s", target: 5 },
-  { duration: "2m", target: 5 },
-  { duration: "1m", target: 50 },
-  { duration: "2m", target: 50 },
-  { duration: "10s", target: 5 },
+  { duration: "10s", target: 10 },
+  { duration: "2m", target: 250 },
+  { duration: "1m", target: 500 },
+  { duration: "2m", target: 300 },
+  { duration: "10s", target: 50 },
   { duration: "2m", target: 5 },
 ];
 
