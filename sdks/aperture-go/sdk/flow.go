@@ -5,12 +5,13 @@ import (
 	"errors"
 	"time"
 
-	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 var (
@@ -81,7 +82,8 @@ func newFlow(
 	rampMode bool,
 	resultCacheKey string,
 	globalCacheKeys []string,
-	callOptions []grpc.CallOption) *flow {
+	callOptions []grpc.CallOption,
+) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
 		span:              span,
@@ -308,11 +310,11 @@ func (f *flow) End() EndResponse {
 	)
 	f.span.End()
 
-	inflightRequestRef := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
+	inflightRequests := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {
-			ref := &checkv1.InflightRequestRef{
+			inflightRequest := &checkv1.InflightRequestRef{
 				PolicyName:  decision.PolicyName,
 				PolicyHash:  decision.PolicyHash,
 				ComponentId: decision.ComponentId,
@@ -320,10 +322,10 @@ func (f *flow) End() EndResponse {
 				RequestId:   decision.GetConcurrencyLimiterInfo().GetRequestId(),
 			}
 			if decision.GetConcurrencyLimiterInfo().GetTokensInfo() != nil {
-				ref.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
+				inflightRequest.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
 			}
 
-			inflightRequestRef = append(inflightRequestRef, ref)
+			inflightRequests = append(inflightRequests, inflightRequest)
 		}
 
 		if decision.GetConcurrencySchedulerInfo() != nil {
@@ -338,17 +340,17 @@ func (f *flow) End() EndResponse {
 				ref.Tokens = decision.GetConcurrencySchedulerInfo().GetTokensInfo().GetConsumed()
 			}
 
-			inflightRequestRef = append(inflightRequestRef, ref)
+			inflightRequests = append(inflightRequests, ref)
 		}
 	}
 
-	if len(inflightRequestRef) == 0 {
+	if len(inflightRequests) == 0 {
 		return EndResponse{}
 	}
 
 	flowEndResponse, err := f.flowControlClient.FlowEnd(context.Background(), &checkv1.FlowEndRequest{
 		ControlPoint:     f.checkResponse.ControlPoint,
-		InflightRequests: inflightRequestRef,
+		InflightRequests: inflightRequests,
 	}, f.callOptions...)
 
 	return EndResponse{
