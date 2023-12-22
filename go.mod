@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	cloud.google.com/go/secretmanager v1.11.4
+	cloud.google.com/go/storage v1.30.1
 	github.com/BurntSushi/toml v1.3.2
 	github.com/Henry-Sarabia/sliceconv v1.0.2
 	github.com/Masterminds/semver/v3 v3.2.1
@@ -557,7 +558,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
-	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.12.0
 	github.com/gophercloud/gophercloud v1.7.0 // indirect
 	github.com/grafana/regexp v0.0.0-20221122212121-6b5c0a4cb7fd // indirect
 	github.com/hashicorp/consul/api v1.26.1 // indirect
@@ -655,7 +656,7 @@ require (
 )
 
 replace (
-	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.15
+	github.com/buraksezer/olric => github.com/fluxninja/olric v0.5.4-fn.patch.17
 	github.com/fluxninja/aperture/api/v2 => ./api
 	github.com/jsonnet-bundler/jsonnet-bundler => github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter => github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1

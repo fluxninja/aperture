@@ -40,6 +40,7 @@ import (
 	distcacheconfig "github.com/fluxninja/aperture/v2/pkg/dist-cache/config"
 	"github.com/fluxninja/aperture/v2/pkg/etcd"
 	"github.com/fluxninja/aperture/v2/pkg/net/listener"
+	objectstorageconfig "github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
 	otelconfig "github.com/fluxninja/aperture/v2/pkg/otelcollector/config"
 	prometheus "github.com/fluxninja/aperture/v2/pkg/prometheus/config"
 )
@@ -105,6 +106,12 @@ var _ = Describe("ConfigMap for Agent", func() {
 								SendBatchMaxSize: 200,
 							},
 							EnableHighCardinalityPlatformMetrics: false,
+						},
+						ObjectStorage: objectstorageconfig.ObjectStorageConfig{
+							Enabled:   true,
+							Backend:   "gcs",
+							KeyPrefix: "asdf",
+							Bucket:    "list",
 						},
 					},
 				},

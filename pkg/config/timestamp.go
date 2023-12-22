@@ -11,7 +11,7 @@ import (
 )
 
 // Time is encoded as a string message which represents a point in time independent of any time zone.
-// It holds *timestamppb.Time which is generated types for google/protobuf/timestamp.proto.
+// It holds `*timestamppb.Time` which is generated types for google/protobuf/timestamp.proto.
 // swagger:strfmt string
 type Time struct {
 	// swagger:ignore

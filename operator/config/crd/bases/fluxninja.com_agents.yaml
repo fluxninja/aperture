@@ -1498,6 +1498,46 @@ spec:
                           is used. See <https://godoc.org/github.com/prometheus/client_golang/prometheus#NewPedanticRegistry>
                         type: boolean
                     type: object
+                  object_storage:
+                    description: ObjectStorage configuration.
+                    properties:
+                      backend:
+                        description: Backend which provides the object storage.
+                        type: string
+                      bucket:
+                        description: Bucket name of the bucket to use. Required if
+                          enabled is true.
+                        type: string
+                      enabled:
+                        description: Enabled denotes if object storage is enabled.
+                        type: boolean
+                      key_prefix:
+                        description: KeyPrefix to use when writing to bucket. Required
+                          if enabled is true.
+                        type: string
+                      operations_channel_size:
+                        description: OperationsChannelSize controls size of the channel
+                          used for asynchronous puts and deletes.
+                        type: integer
+                      retry_policy:
+                        description: RetryPolicy to configure retries and timeouts
+                          for object storage requests.
+                        properties:
+                          backoff:
+                            description: ObjectStorageBackoffConfig for object storage
+                              backoff configuration. swagger:model
+                            properties:
+                              initial:
+                                type: string
+                              maximum:
+                                type: string
+                              multiplier:
+                                type: number
+                            type: object
+                          timeout:
+                            type: string
+                        type: object
+                    type: object
                   otel:
                     description: OTel configuration.
                     properties:

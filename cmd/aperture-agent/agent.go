@@ -24,6 +24,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/etcd/transport"
 	"github.com/fluxninja/aperture/v2/pkg/k8s"
 	"github.com/fluxninja/aperture/v2/pkg/log"
+	"github.com/fluxninja/aperture/v2/pkg/objectstorage"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	"github.com/fluxninja/aperture/v2/pkg/peers"
 	"github.com/fluxninja/aperture/v2/pkg/platform"
@@ -43,6 +44,7 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
+			fx.Annotate(objectstorage.Provide, fx.As(new(objectstorage.ObjectStorageIface))),
 			fx.Annotate(AgentElectionPath, fx.ResultTags(config.NameTag(etcdclient.ElectionPathFxTag))),
 		),
 		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
