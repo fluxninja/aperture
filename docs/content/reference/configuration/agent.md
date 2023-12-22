@@ -1292,6 +1292,18 @@ Enabled denotes if object storage is enabled.
 KeyPrefix to use when writing to bucket. Required if enabled is true.
 
 </dd>
+<dt>retry_policy</dt>
+<dd>
+
+<!-- vale off -->
+
+([RetryPolicy](#retry-policy))
+
+<!-- vale on -->
+
+RetryPolicy to configure retries and timeouts for object storage requests.
+
+</dd>
 </dl>
 
 ---
@@ -1371,6 +1383,21 @@ asynchronous.
 
 </dd>
 </dl>
+
+---
+
+<!-- vale off -->
+
+### Duration {#duration}
+
+<!-- vale on -->
+
+Duration is encoded as a string message which represents a signed span of time.
+
+It holds \*durationpb.Duration which is generated type for
+google/protobuf/duration.proto.
+
+[interface{}](#interface)
 
 ---
 
@@ -2797,6 +2824,39 @@ HTTPS_PROXY or NO_PROXY. See
 <!-- vale off -->
 
 ([]string)
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### RetryPolicy {#retry-policy}
+
+<!-- vale on -->
+
+RetryPolicy for object storage retry configuration
+
+<dl>
+<dt>backoff</dt>
+<dd>
+
+<!-- vale off -->
+
+([BackoffConfig](#backoff-config))
+
+<!-- vale on -->
+
+</dd>
+<dt>timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
 
 <!-- vale on -->
 

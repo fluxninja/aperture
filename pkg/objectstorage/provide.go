@@ -50,9 +50,10 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 	keyPrefix := fmt.Sprintf("%s-%s", cfg.KeyPrefix, in.AgentInfo.GetAgentGroup())
 
 	objStorage := &ObjectStorage{
-		bucket:     bucket,
-		keyPrefix:  keyPrefix,
-		operations: make(chan *Operation),
+		bucket:      bucket,
+		keyPrefix:   keyPrefix,
+		operations:  make(chan *Operation),
+		retryPolicy: cfg.RetryPolicy,
 	}
 
 	return objStorage, nil

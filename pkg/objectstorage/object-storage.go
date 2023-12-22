@@ -7,6 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fluxninja/aperture/v2/pkg/objectstorage/config"
+	"github.com/googleapis/gax-go/v2"
+
 	"cloud.google.com/go/storage"
 	olricstorage "github.com/buraksezer/olric/pkg/storage"
 	"github.com/fluxninja/aperture/v2/pkg/log"
@@ -53,6 +56,7 @@ type ObjectStorage struct {
 	cancel         context.CancelFunc
 	client         *storage.Client
 	bucket         *storage.BucketHandle
+	retryPolicy    config.RetryPolicy
 
 	inFlightOpsMutex sync.Mutex
 	operations       chan *Operation
@@ -69,8 +73,21 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	// If the object is missing timestamp, we will use timestamp of when the Get() was called.
 	timestampDefault := time.Now().UnixNano()
 
-	obj := o.bucket.Object(key)
-	reader, err := obj.NewReader(ctx)
+	backoff := o.retryPolicy.Backoff
+	timeout := o.retryPolicy.Timeout
+	obj := o.bucket.Object(key).Retryer(
+		storage.WithBackoff(gax.Backoff{
+			Initial:    backoff.Initial,
+			Multiplier: backoff.Multiplier,
+			Max:        backoff.Maximum,
+		}),
+		storage.WithPolicy(storage.RetryIdempotent),
+	)
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	reader, err := obj.NewReader(timeoutCtx)
 	if err != nil {
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return nil, ErrKeyNotFound
@@ -94,7 +111,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	}
 
 	entry := &PersistentEntry{key: key, value: &data}
-	attrs, err := obj.Attrs(ctx)
+	attrs, err := obj.Attrs(timeoutCtx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get object storage object attributes")
 	} else {
@@ -113,6 +130,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		}
 
 		deleteStaleCacheEntry := func(entry *PersistentEntry) {
+			// We handle deletion of stale cache entries outside the main context with timeout.
 			err := o.internalDelete(ctx, entry)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to queue expired cache entry for deletion from object storage")
@@ -230,9 +248,21 @@ func (o *ObjectStorage) getObjectTimestamp(ctx context.Context, obj *storage.Obj
 }
 
 func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry) error {
-	obj := o.bucket.Object(entry.key)
+	backoff := o.retryPolicy.Backoff
+	timeout := o.retryPolicy.Timeout
+	obj := o.bucket.Object(entry.key).Retryer(
+		storage.WithBackoff(gax.Backoff{
+			Initial:    backoff.Initial,
+			Multiplier: backoff.Multiplier,
+			Max:        backoff.Maximum,
+		}),
+		storage.WithPolicy(storage.RetryIdempotent),
+	)
 
-	timestamp, err := o.getObjectTimestamp(ctx, obj)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	timestamp, err := o.getObjectTimestamp(timeoutCtx, obj)
 	if err != nil && !errors.Is(err, errObjectTimestampMissing) && !errors.Is(err, storage.ErrObjectNotExist) {
 		return err
 	}
@@ -242,7 +272,7 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 		return nil
 	}
 
-	w := obj.NewWriter(ctx)
+	w := obj.NewWriter(timeoutCtx)
 	_, err = w.Write(*entry.value)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to write cache object to the storage bucket")
@@ -255,7 +285,7 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 		return nil
 	}
 
-	_, err = obj.Update(ctx, storage.ObjectAttrsToUpdate{
+	_, err = obj.Update(timeoutCtx, storage.ObjectAttrsToUpdate{
 		Metadata: map[string]string{
 			"timestamp": strconv.FormatInt(entry.Timestamp(), 10),
 			"ttl":       strconv.FormatInt(entry.TTL(), 10),
@@ -271,9 +301,21 @@ func (o *ObjectStorage) handleOpPut(ctx context.Context, entry *PersistentEntry)
 }
 
 func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEntry) error {
-	obj := o.bucket.Object(entry.key)
+	backoff := o.retryPolicy.Backoff
+	timeout := o.retryPolicy.Timeout
+	obj := o.bucket.Object(entry.key).Retryer(
+		storage.WithBackoff(gax.Backoff{
+			Initial:    backoff.Initial,
+			Multiplier: backoff.Multiplier,
+			Max:        backoff.Maximum,
+		}),
+		storage.WithPolicy(storage.RetryIdempotent),
+	)
 
-	timestamp, err := o.getObjectTimestamp(ctx, obj)
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	timestamp, err := o.getObjectTimestamp(timeoutCtx, obj)
 	if err != nil {
 		// If the object is not found in the storage, just return
 		if errors.Is(err, storage.ErrObjectNotExist) {
@@ -292,7 +334,7 @@ func (o *ObjectStorage) handleOpDelete(ctx context.Context, entry *PersistentEnt
 		return nil
 	}
 
-	err = obj.Delete(ctx)
+	err = obj.Delete(timeoutCtx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete cache object from the storage bucket")
 	}

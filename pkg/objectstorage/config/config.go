@@ -1,6 +1,8 @@
 // +kubebuilder:validation:Optional
 package config
 
+import "time"
+
 // swagger:operation POST /object_storage common-configuration ObjectStorage
 // ---
 // x-fn-config-env: true
@@ -8,6 +10,23 @@ package config
 // - in: body
 //   schema:
 //     "$ref": "#/definitions/Config"
+
+// BackoffConfig for object storage backoff configuration
+// swagger:model
+// +kubebuilder:object:generate=true
+type BackoffConfig struct {
+	Initial    time.Duration `json:"initial" default:"500ms"`
+	Multiplier float64       `json:"multiplier" default:"1.5"`
+	Maximum    time.Duration `json:"maximum" default:"2s"`
+}
+
+// RetryPolicy for object storage retry configuration
+// swagger:model
+// +kubebuilder:object:generate=true
+type RetryPolicy struct {
+	Timeout time.Duration `json:"timeout" default:"10s"`
+	Backoff BackoffConfig `json:"backoff,omitempty"`
+}
 
 // Config for object storage.
 // swagger:model
@@ -21,4 +40,6 @@ type Config struct {
 	Bucket string `json:"bucket"`
 	// KeyPrefix to use when writing to bucket. Required if enabled is true.
 	KeyPrefix string `json:"key_prefix"`
+	// RetryPolicy to configure retries and timeouts for object storage requests.
+	RetryPolicy RetryPolicy `json:"retry_policy,omitempty"`
 }

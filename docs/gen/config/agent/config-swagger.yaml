@@ -405,6 +405,10 @@ definitions:
                 type: string
                 x-go-name: KeyPrefix
                 x-go-tag-json: key_prefix
+            retry_policy:
+                $ref: '#/definitions/RetryPolicy'
+                description: RetryPolicy to configure retries and timeouts for object storage requests.
+                x-go-tag-json: retry_policy,omitempty
         title: Config for object storage.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
@@ -1361,6 +1365,18 @@ definitions:
         title: ProxyConfig holds proxy configuration.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/net/http
+    RetryPolicy:
+        description: RetryPolicy for object storage retry configuration
+        properties:
+            backoff:
+                $ref: '#/definitions/BackoffConfig'
+                x-go-tag-json: backoff,omitempty
+            timeout:
+                $ref: '#/definitions/Duration'
+                x-go-tag-default: 10s
+                x-go-tag-json: timeout
+        type: object
+        x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config
     SchedulerConfig:
         properties:
             blocking_execution:

@@ -38,6 +38,7 @@ func (o *ObjectStorageBackedDMap) Delete(ctx context.Context, keys ...string) (i
 			durationMetric.Observe(float64(time.Since(startTime).Milliseconds()))
 		}
 	}()
+
 	for _, key := range keys {
 		err := o.backingStorage.Delete(ctx, o.generateObjectKey(key))
 		if err != nil {
