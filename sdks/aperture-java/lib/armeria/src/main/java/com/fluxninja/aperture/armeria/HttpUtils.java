@@ -55,7 +55,12 @@ class HttpUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            RequestContext ctx, HttpRequest req, String controlPointName, Duration flowTimeout) {
+            RequestContext ctx,
+            HttpRequest req,
+            String controlPointName,
+            Duration flowTimeout,
+            boolean rampMode,
+            boolean expectEnd) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -74,6 +79,8 @@ class HttpUtils {
 
         return addHttpAttributes(baggageLabels, ctx, req, controlPointName)
                 .setFlowTimeout(flowTimeout)
+                .setRampMode(rampMode)
+                .setExpectEnd(expectEnd)
                 .build();
     }
 
@@ -129,7 +136,8 @@ class HttpUtils {
                 .setHttpScheme(req.scheme())
                 .setHttpSize(originalHeaders.contentLength())
                 .setHttpProtocol("HTTP/2")
-                .setHttpHeaders(headers);
+                .setHttpHeaders(headers)
+                .setExpectEnd(true);
 
         if (sourceIp != null) {
             builder.setSource(sourceIp, sourcePort, "TCP");

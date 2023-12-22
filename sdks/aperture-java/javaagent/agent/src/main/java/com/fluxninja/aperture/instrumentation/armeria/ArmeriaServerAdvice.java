@@ -16,6 +16,7 @@ public class ArmeriaServerAdvice {
                         wrapper.apertureSDK,
                         wrapper.controlPointName,
                         wrapper.rampMode,
-                        wrapper.flowTimeout));
+                        wrapper.flowTimeout,
+                        wrapper.expectEnd));
     }
 }

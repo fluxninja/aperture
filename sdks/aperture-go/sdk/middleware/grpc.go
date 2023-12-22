@@ -156,6 +156,7 @@ func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, logger
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    flowParams.ExpectEnd,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     fullMethod,

@@ -25,13 +25,15 @@ public class ApertureFilter implements Filter {
     private ApertureSDK apertureSDK;
     private String controlPointName;
     private boolean rampMode;
+    private boolean expectEnd;
     private Duration flowTimeout;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         TrafficFlowRequest trafficFlowRequest =
-                ServletUtils.trafficFlowRequestFromRequest(req, controlPointName, flowTimeout);
+                ServletUtils.trafficFlowRequestFromRequest(
+                        req, controlPointName, flowTimeout, rampMode, expectEnd);
 
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
@@ -95,6 +97,8 @@ public class ApertureFilter implements Filter {
                 this.flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
             }
             this.rampMode = Boolean.parseBoolean(filterConfig.getInitParameter("enable_ramp_mode"));
+            this.expectEnd =
+                    Boolean.parseBoolean(filterConfig.getInitParameter("enable_expect_end"));
 
         } catch (Exception e) {
             throw new ServletException("Could not read config parameters", e);

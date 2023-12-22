@@ -139,8 +139,9 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 	// START: defineFlowParams
 	flowParams := aperture.FlowParams{
-		Labels:   labels,
-		RampMode: false,
+		Labels:    labels,
+		RampMode:  false,
+		ExpectEnd: true,
 	}
 	// END: defineFlowParams
 
@@ -172,7 +173,7 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to end flow: %+v", err)
 	}
 
-	log.Printf("Flow ended with response: %s", endResponse.String())
+	log.Printf("Flow ended with response: %+v", endResponse)
 
 	// END: manualFlowNoCaching
 }

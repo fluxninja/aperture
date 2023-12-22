@@ -48,6 +48,8 @@ public class AppController {
         registrationBean.addInitParameter("api_key", apiKey);
         String rampMode = env.getProperty("APERTURE_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
+        String expectEnd = env.getProperty("APERTURE_ENABLE_EXPECT_END");
+        registrationBean.addInitParameter("enable_expect_end", expectEnd);
         String controlPointName = env.getProperty("APERTURE_CONTROL_POINT_NAME");
         registrationBean.addInitParameter("control_point_name", controlPointName);
         String grpcTimeoutMs = env.getProperty("APERTURE_GRPC_TIMEOUT_MS");
@@ -75,6 +77,8 @@ public class AppController {
         registrationBean.addInitParameter("api_key", apiKey);
         String rampMode = env.getProperty("APERTURE_ENABLE_RAMP_MODE");
         registrationBean.addInitParameter("enable_ramp_mode", rampMode);
+        String expectEnd = env.getProperty("APERTURE_ENABLE_EXPECT_END");
+        registrationBean.addInitParameter("enable_expect_end", expectEnd);
         String insecureGrpc = env.getProperty("APERTURE_AGENT_INSECURE");
         registrationBean.addInitParameter("insecure_grpc", insecureGrpc);
         String rootCertificateFile = env.getProperty("APERTURE_ROOT_CERTIFICATE_FILE");

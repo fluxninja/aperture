@@ -42,7 +42,11 @@ public class ServletUtils {
     }
 
     protected static TrafficFlowRequest trafficFlowRequestFromRequest(
-            ServletRequest req, String controlPointName, Duration flowTimeout) {
+            ServletRequest req,
+            String controlPointName,
+            Duration flowTimeout,
+            boolean rampMode,
+            boolean expectEnd) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -60,7 +64,10 @@ public class ServletUtils {
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, req);
-        builder.setControlPoint(controlPointName).setRampMode(false).setFlowTimeout(flowTimeout);
+        builder.setControlPoint(controlPointName)
+                .setRampMode(rampMode)
+                .setExpectEnd(expectEnd)
+                .setFlowTimeout(flowTimeout);
         return builder.build();
     }
 

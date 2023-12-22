@@ -51,6 +51,8 @@ type FlowParams struct {
 	ResultCacheKey string
 	// GlobalCacheKeys are keys to global cache entries that need to be fetched at flow start.
 	GlobalCacheKeys []string
+	// If ExpectEnd is set to true, then the end of the request is expected.
+	ExpectEnd bool
 }
 
 // Client is the interface that is provided to the user upon which they can perform Check calls for their service and eventually shut down in case of error.
@@ -157,6 +159,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    flowParams.ExpectEnd,
 		CacheLookupRequest: &checkv1.CacheLookupRequest{
 			ResultCacheKey:  flowParams.ResultCacheKey,
 			GlobalCacheKeys: flowParams.GlobalCacheKeys,
@@ -165,7 +168,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.GlobalCacheKeys)
+	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.GlobalCacheKeys, flowParams.ExpectEnd)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),

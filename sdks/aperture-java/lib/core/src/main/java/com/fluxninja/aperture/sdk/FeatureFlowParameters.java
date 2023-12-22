@@ -12,6 +12,7 @@ public class FeatureFlowParameters {
     private Boolean rampMode;
     private Duration flowTimeout;
     private String resultCacheKey;
+    private Boolean expectEnd;
 
     private List<String> globalCacheKeys;
 
@@ -35,6 +36,10 @@ public class FeatureFlowParameters {
         return rampMode;
     }
 
+    public Boolean getExpectEnd() {
+        return expectEnd;
+    }
+
     public Duration getFlowTimeout() {
         return flowTimeout;
     }
@@ -56,6 +61,7 @@ public class FeatureFlowParameters {
             params.controlPoint = controlPoint;
             params.explicitLabels = new HashMap<>();
             params.rampMode = false;
+            params.expectEnd = true;
             params.flowTimeout = Constants.DEFAULT_RPC_TIMEOUT;
             params.resultCacheKey = "";
             params.globalCacheKeys = Collections.emptyList();
@@ -80,6 +86,17 @@ public class FeatureFlowParameters {
          */
         public Builder setRampMode(Boolean rampMode) {
             params.rampMode = rampMode;
+            return this;
+        }
+
+        /**
+         * Set whether the flow should expect an end of the request.
+         *
+         * @param expectEnd Whether the flow should expect an end of the request
+         * @return This builder for method chaining
+         */
+        public Builder setExpectEnd(Boolean expectEnd) {
+            params.expectEnd = expectEnd;
             return this;
         }
 

@@ -102,6 +102,7 @@ public class App {
                 FeatureFlowParameters.newBuilder("awesomeFeature")
                         .setExplicitLabels(labels)
                         .setRampMode(false)
+                        .setExpectEnd(true)
                         .setFlowTimeout(Duration.ofMillis(1000))
                         .build();
         // StartFlow performs a flowcontrolv1.Check call to Aperture Agent. It returns a
@@ -147,11 +148,13 @@ public class App {
         labels.put("priority", "100");
 
         Boolean rampMode = false;
+        Boolean expectEnd = true;
 
         FeatureFlowParameters params =
                 FeatureFlowParameters.newBuilder("featureName")
                         .setExplicitLabels(labels)
                         .setRampMode(rampMode)
+                        .setExpectEnd(expectEnd)
                         .setFlowTimeout(Duration.ofMillis(1000))
                         .build();
         // StartFlow performs a flowcontrolv1.Check call to Aperture. It returns a Flow.

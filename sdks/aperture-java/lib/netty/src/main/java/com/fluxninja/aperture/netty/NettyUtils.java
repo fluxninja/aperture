@@ -31,7 +31,9 @@ public class NettyUtils {
             ChannelHandlerContext ctx,
             HttpRequest req,
             String controlPointName,
-            Duration flowTimeout) {
+            Duration flowTimeout,
+            boolean rampMode,
+            boolean expectEnd) {
         Map<String, String> baggageLabels = new HashMap<>();
 
         for (Map.Entry<String, BaggageEntry> entry : Baggage.current().asMap().entrySet()) {
@@ -49,7 +51,10 @@ public class NettyUtils {
         }
 
         TrafficFlowRequestBuilder builder = addHttpAttributes(baggageLabels, ctx, req);
-        builder.setControlPoint(controlPointName).setRampMode(false).setFlowTimeout(flowTimeout);
+        builder.setControlPoint(controlPointName)
+                .setRampMode(rampMode)
+                .setExpectEnd(expectEnd)
+                .setFlowTimeout(flowTimeout);
         return builder.build();
     }
 

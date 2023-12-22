@@ -13,6 +13,7 @@ public class NettyServer {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
+    public static final String DEFAULT_EXPECT_END = "true";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_INSECURE_GRPC = "true";
     public static final String DEFAULT_ROOT_CERT = "";
@@ -35,6 +36,12 @@ public class NettyServer {
             rampModeString = DEFAULT_RAMP_MODE;
         }
         boolean rampMode = Boolean.parseBoolean(rampModeString);
+
+        String expectEndString = System.getenv("APERTURE_ENABLE_EXPECT_END");
+        if (expectEndString == null) {
+            expectEndString = DEFAULT_RAMP_MODE;
+        }
+        boolean expectEnd = Boolean.parseBoolean(expectEndString);
 
         String controlPointName = System.getenv("APERTURE_CONTROL_POINT_NAME");
         if (controlPointName == null) {
@@ -71,7 +78,8 @@ public class NettyServer {
                                     flowTimeout,
                                     controlPointName,
                                     insecureGrpc,
-                                    rootCertFile))
+                                    rootCertFile,
+                                    expectEnd))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 

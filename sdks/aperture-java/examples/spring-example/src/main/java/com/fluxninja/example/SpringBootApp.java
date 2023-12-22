@@ -10,6 +10,7 @@ public class SpringBootApp {
     public static final String DEFAULT_APP_PORT = "8080";
     public static final String DEFAULT_AGENT_ADDRESS = "localhost:8089";
     public static final String DEFAULT_RAMP_MODE = "false";
+    public static final String DEFAULT_EXPECT_END = "true";
     public static final String DEFAULT_CONTROL_POINT_NAME = "awesome_feature";
     public static final String DEFAULT_GRPC_TIMEOUT_MS = "1000";
     public static final String DEFAULT_INSECURE_GRPC = "true";
@@ -29,6 +30,7 @@ public class SpringBootApp {
         getEnvOrDefault("APERTURE_API_KEY", "");
         getEnvOrDefault("APERTURE_CONTROL_POINT_NAME", DEFAULT_CONTROL_POINT_NAME);
         getEnvOrDefault("APERTURE_ENABLE_RAMP_MODE", DEFAULT_RAMP_MODE);
+        getEnvOrDefault("APERTURE_ENABLE_EXPECT_END", DEFAULT_EXPECT_END);
         getEnvOrDefault("APERTURE_GRPC_TIMEOUT_MS", DEFAULT_GRPC_TIMEOUT_MS);
         getEnvOrDefault("APERTURE_AGENT_INSECURE", DEFAULT_INSECURE_GRPC);
         getEnvOrDefault("APERTURE_ROOT_CERTIFICATE_FILE", DEFAULT_ROOT_CERT);

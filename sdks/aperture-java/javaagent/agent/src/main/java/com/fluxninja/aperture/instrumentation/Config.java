@@ -16,6 +16,7 @@ public class Config {
     public static final String AGENT_ADDRESS_PROPERTY = "aperture.agent.address";
     public static final String API_KEY_PROPERTY = "aperture.api.key";
     public static final String RAMP_MODE_PROPERTY = "aperture.javaagent.enable.ramp.mode";
+    public static final String EXPECT_END_PROPERTY = "aperture.javaagent.enable.expect.end";
     public static final String CONNECTION_TIMEOUT_MILLIS_PROPERTY =
             "aperture.connection.timeout.millis";
     public static final String CONTROL_POINT_NAME_PROPERTY = "aperture.control.point.name";
@@ -29,6 +30,7 @@ public class Config {
     private static final String AGENT_ADDRESS_DEFAULT_VALUE = "localhost:8080";
     private static final String API_KEY_DEFAULT_VALUE = "";
     private static final String RAMP_MODE_PROPERTY_DEFAULT_VALUE = "false";
+    private static final String EXPECT_END_PROPERTY_DEFAULT_VALUE = "true";
     private static final String CONNECTION_TIMEOUT_MILLIS_DEFAULT_VALUE = "1000";
     private static final String IGNORED_PATHS_DEFAULT_VALUE = "";
     private static final String IGNORED_PATHS_REGEX_DEFAULT_VALUE = "false";
@@ -41,6 +43,7 @@ public class Config {
                     add(AGENT_ADDRESS_PROPERTY);
                     add(API_KEY_PROPERTY);
                     add(RAMP_MODE_PROPERTY);
+                    add(EXPECT_END_PROPERTY);
                     add(CONNECTION_TIMEOUT_MILLIS_PROPERTY);
                     add(CONTROL_POINT_NAME_PROPERTY);
                     add(IGNORED_PATHS_PROPERTY);
@@ -91,6 +94,7 @@ public class Config {
         ApertureSDK sdk;
         String controlPointName;
         boolean rampMode;
+        boolean expectEnd;
         Duration flowTimeout;
         try {
             controlPointName = config.getProperty(CONTROL_POINT_NAME_PROPERTY);
@@ -98,6 +102,11 @@ public class Config {
                     Boolean.parseBoolean(
                             config.getProperty(
                                     RAMP_MODE_PROPERTY, RAMP_MODE_PROPERTY_DEFAULT_VALUE));
+
+            expectEnd =
+                    Boolean.parseBoolean(
+                            config.getProperty(
+                                    EXPECT_END_PROPERTY, EXPECT_END_PROPERTY_DEFAULT_VALUE));
 
             flowTimeout =
                     Duration.ofMillis(
@@ -141,7 +150,7 @@ public class Config {
             throw new IllegalArgumentException("Control Point name must be set");
         }
 
-        return new ApertureSDKWrapper(sdk, controlPointName, rampMode, flowTimeout);
+        return new ApertureSDKWrapper(sdk, controlPointName, rampMode, flowTimeout, expectEnd);
     }
 
     private static String envNameFromPropertyName(String propertyName) {

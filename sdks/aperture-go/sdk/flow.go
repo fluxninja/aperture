@@ -59,13 +59,14 @@ type flow struct {
 	statusCode        FlowStatus
 	ended             bool
 	rampMode          bool
+	expectEnd         bool
 }
 
 // flow implements the Flow interface.
 var _ Flow = (*flow)(nil)
 
 // newFlow creates a new flow with default field values.
-func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, globalCacheKeys []string) *flow {
+func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, globalCacheKeys []string, expectEnd bool) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
 		span:              span,
@@ -75,6 +76,7 @@ func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span
 		rampMode:          rampMode,
 		resultCacheKey:    resultCacheKey,
 		globalCacheKeys:   globalCacheKeys,
+		expectEnd:         expectEnd,
 	}
 }
 

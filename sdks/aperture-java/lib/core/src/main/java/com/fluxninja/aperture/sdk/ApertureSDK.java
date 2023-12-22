@@ -108,6 +108,7 @@ public final class ApertureSDK {
                         .setControlPoint(parameters.getControlPoint())
                         .putAllLabels(labels)
                         .setRampMode(parameters.getRampMode())
+                        .setExpectEnd(parameters.getExpectEnd())
                         .setCacheLookupRequest(
                                 CacheLookupRequest.newBuilder()
                                         .addAllGlobalCacheKeys(parameters.getGlobalCacheKeys())

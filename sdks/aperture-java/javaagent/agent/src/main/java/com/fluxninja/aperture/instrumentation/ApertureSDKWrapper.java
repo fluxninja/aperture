@@ -7,16 +7,19 @@ public class ApertureSDKWrapper {
     public ApertureSDK apertureSDK;
     public String controlPointName;
     public boolean rampMode;
+    public boolean expectEnd;
     public Duration flowTimeout;
 
     public ApertureSDKWrapper(
             ApertureSDK apertureSDK,
             String controlPointName,
             boolean rampMode,
-            Duration flowTimeout) {
+            Duration flowTimeout,
+            boolean expectEnd) {
         this.apertureSDK = apertureSDK;
         this.controlPointName = controlPointName;
         this.rampMode = rampMode;
         this.flowTimeout = flowTimeout;
+        this.expectEnd = expectEnd;
     }
 }

@@ -113,6 +113,7 @@ public class App {
                 .setSource(req.ip(), req.port(), "TCP")
                 .setDestination(req.raw().getLocalAddr(), req.raw().getLocalPort(), "TCP")
                 .setRampMode(false)
+                .setExpectEnd(true)
                 .setFlowTimeout(Duration.ofMillis(1000));
 
         TrafficFlowRequest apertureRequest = trafficFlowRequestBuilder.build();
