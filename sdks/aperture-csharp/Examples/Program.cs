@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text;
 using ApertureSDK.Core;
+using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using log4net;
 using log4net.Config;
 
@@ -50,8 +52,8 @@ using (var listener = new HttpListener())
                 TimeSpan.FromSeconds(5),
                 new Grpc.Core.CallOptions(),
                 true,
-                null,
-                null);
+                "test",
+                new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {
@@ -84,8 +86,8 @@ using (var listener = new HttpListener())
                 flowTimeout,
                 new Grpc.Core.CallOptions(),
                 expectEnd,
-                null,
-                null);
+                "test",
+                new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {

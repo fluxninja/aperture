@@ -12,8 +12,8 @@ public class FeatureFlowParams
         TimeSpan flowTimeout,
         CallOptions callOptions,
         bool expectEnd,
-        string? resultCacheKey,
-        RepeatedField<string>? globalCacheKeys)
+        string resultCacheKey,
+        RepeatedField<string> globalCacheKeys)
     {
         ControlPoint = controlPoint ?? throw new ArgumentNullException(nameof(controlPoint));
         ExplicitLabels = new Dictionary<string, string>(
@@ -32,6 +32,6 @@ public class FeatureFlowParams
     public bool RampMode { get; set; }
     public CallOptions CallOptions { get; set; }
     public bool ExpectEnd { get; set; }
-    public string? ResultCacheKey { get; set; }
-    public RepeatedField<string>? GlobalCacheKeys { get; set; }
+    public string ResultCacheKey { get; set; }
+    public RepeatedField<string> GlobalCacheKeys { get; set; }
 }

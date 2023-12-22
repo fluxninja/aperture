@@ -19,10 +19,10 @@ public class FeatureFlow : IFlow
     private FlowStatus _flowStatus;
     private FlowControlService.FlowControlServiceClient _flowControlServiceClient;
     private CallOptions _callOptions;
-    private readonly string? _resultCacheKey;
-    private readonly RepeatedField<string>? _globalCacheKeys;
+    private readonly string _resultCacheKey;
+    private readonly RepeatedField<string> _globalCacheKeys;
 
-    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode, FlowControlService.FlowControlServiceClient flowControlServiceClient, CallOptions callOptions, string? resultCacheKey, RepeatedField<string>? globalCacheKeys)
+    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode, FlowControlService.FlowControlServiceClient flowControlServiceClient, CallOptions callOptions, string resultCacheKey, RepeatedField<string> globalCacheKeys)
     {
         _checkResponse = checkResponse;
         _span = span;
@@ -66,9 +66,9 @@ public class FeatureFlow : IFlow
 
     public UpsertResponse SetResultCache(Object value, Duration ttl)
     {
-        if (_resultCacheKey == null)
+        if (_resultCacheKey == "")
         {
-            return new UpsertResponse(new Exception("result cache key is null"));
+            return new UpsertResponse(new Exception("result cache key is empty"));
         }
 
         if (_checkResponse == null)
@@ -102,9 +102,9 @@ public class FeatureFlow : IFlow
 
     public DeleteResponse DeleteResultCache()
     {
-        if (_resultCacheKey == null)
+        if (_resultCacheKey == "")
         {
-            return new DeleteResponse(new Exception("result cache key is null"));
+            return new DeleteResponse(new Exception("result cache key is empty"));
         }
 
         if (_checkResponse == null)
@@ -171,6 +171,7 @@ public class FeatureFlow : IFlow
         var request = new CacheUpsertRequest
         {
             ControlPoint = _checkResponse.ControlPoint,
+            GlobalCacheEntries = { }
         };
         request.GlobalCacheEntries.Add(key, new CacheEntry
         {

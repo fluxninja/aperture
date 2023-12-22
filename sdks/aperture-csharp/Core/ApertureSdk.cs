@@ -61,9 +61,9 @@ public class ApertureSdk : IApertureSdk
             CacheLookupRequest = new CacheLookupRequest
             {
                 ResultCacheKey = parameters.ResultCacheKey,
+                GlobalCacheKeys = { parameters.GlobalCacheKeys }
             }
         };
-        checkReq.CacheLookupRequest.GlobalCacheKeys.AddRange(parameters.GlobalCacheKeys);
 
         foreach (var label in labels) checkReq.Labels.Add(label.Key, label.Value);
 
