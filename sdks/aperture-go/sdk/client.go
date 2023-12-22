@@ -157,6 +157,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    true,
 		CacheLookupRequest: &checkv1.CacheLookupRequest{
 			ResultCacheKey:  flowParams.ResultCacheKey,
 			GlobalCacheKeys: flowParams.GlobalCacheKeys,

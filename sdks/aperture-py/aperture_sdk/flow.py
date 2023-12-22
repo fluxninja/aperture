@@ -132,6 +132,12 @@ class Flow(AbstractContextManager):
                 error=Exception("attempting to end an already ended flow"),
                 flow_end_response=None,
             )
+        if not self.check_response:
+            self.logger.warning("attempting to end a flow with no check response")
+            return EndResponse(
+                error=Exception("attempting to end a flow with no check response"),
+                flow_end_response=None,
+            )
         self._ended = True
 
         check_response_json = (
@@ -152,22 +158,35 @@ class Flow(AbstractContextManager):
 
         if self.check_response:
             for decision in self.check_response.limiter_decisions:
-                ref: InflightRequestRef = InflightRequestRef(
-                    policy_name=decision.policy_name,
-                    policy_hash=decision.policy_hash,
-                    component_id=decision.component_id,
-                )
-
                 if decision.concurrency_limiter_info:
-                    ref.label = decision.concurrency_limiter_info.label
-                    ref.request_id = decision.concurrency_limiter_info.request_id
+                    ref: InflightRequestRef = InflightRequestRef(
+                        policy_name=decision.policy_name,
+                        policy_hash=decision.policy_hash,
+                        component_id=decision.component_id,
+                        label=decision.concurrency_limiter_info.label,
+                        request_id=decision.concurrency_limiter_info.request_id,
+                    )
 
                     if decision.concurrency_limiter_info.tokens_info:
                         ref.tokens = (
                             decision.concurrency_limiter_info.tokens_info.consumed
                         )
+                    inflight_request_ref.append(ref)
 
-                inflight_request_ref.append(ref)
+                if decision.concurrency_scheduler_info:
+                    ref: InflightRequestRef = InflightRequestRef(
+                        policy_name=decision.policy_name,
+                        policy_hash=decision.policy_hash,
+                        component_id=decision.component_id,
+                        label=decision.concurrency_scheduler_info.label,
+                        request_id=decision.concurrency_scheduler_info.request_id,
+                    )
+
+                    if decision.concurrency_scheduler_info.tokens_info:
+                        ref.tokens = (
+                            decision.concurrency_scheduler_info.tokens_info.consumed
+                        )
+                    inflight_request_ref.append(ref)
 
         if inflight_request_ref:
             flow_end_request = FlowEndRequest(

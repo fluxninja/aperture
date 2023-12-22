@@ -286,6 +286,13 @@ func (f *flow) End() EndResponse {
 			Error: errors.New("flow already ended"),
 		}
 	}
+
+	if f.checkResponse == nil {
+		return EndResponse{
+			Error: errors.New("check response is nil"),
+		}
+	}
+
 	f.ended = true
 
 	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
@@ -304,17 +311,31 @@ func (f *flow) End() EndResponse {
 	inflightRequestRef := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
-		ref := &checkv1.InflightRequestRef{
-			PolicyName:  decision.PolicyName,
-			PolicyHash:  decision.PolicyHash,
-			ComponentId: decision.ComponentId,
-		}
-
 		if decision.GetConcurrencyLimiterInfo() != nil {
-			ref.Label = decision.GetConcurrencyLimiterInfo().GetLabel()
-			ref.RequestId = decision.GetConcurrencyLimiterInfo().GetRequestId()
+			ref := &checkv1.InflightRequestRef{
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentId: decision.ComponentId,
+				Label:       decision.GetConcurrencyLimiterInfo().GetLabel(),
+				RequestId:   decision.GetConcurrencyLimiterInfo().GetRequestId(),
+			}
 			if decision.GetConcurrencyLimiterInfo().GetTokensInfo() != nil {
 				ref.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
+			}
+
+			inflightRequestRef = append(inflightRequestRef, ref)
+		}
+
+		if decision.GetConcurrencySchedulerInfo() != nil {
+			ref := &checkv1.InflightRequestRef{
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentId: decision.ComponentId,
+				Label:       decision.GetConcurrencySchedulerInfo().GetLabel(),
+				RequestId:   decision.GetConcurrencySchedulerInfo().GetRequestId(),
+			}
+			if decision.GetConcurrencySchedulerInfo().GetTokensInfo() != nil {
+				ref.Tokens = decision.GetConcurrencySchedulerInfo().GetTokensInfo().GetConsumed()
 			}
 
 			inflightRequestRef = append(inflightRequestRef, ref)

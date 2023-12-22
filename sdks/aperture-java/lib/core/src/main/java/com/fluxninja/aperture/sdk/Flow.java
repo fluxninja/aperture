@@ -412,22 +412,38 @@ public final class Flow {
         ArrayList<InflightRequestRef> inflightRequestRef = new ArrayList<InflightRequestRef>();
 
         for (LimiterDecision decision : this.checkResponse.getLimiterDecisionsList()) {
-            InflightRequestRef.Builder refBuilder =
-                    InflightRequestRef.newBuilder()
-                            .setPolicyName(decision.getPolicyName())
-                            .setPolicyHash(decision.getPolicyHash())
-                            .setComponentId(decision.getComponentId());
-
             if (decision.getConcurrencyLimiterInfo() != null) {
-                refBuilder.setLabel(decision.getConcurrencyLimiterInfo().getLabel());
+                InflightRequestRef.Builder refBuilder =
+                        InflightRequestRef.newBuilder()
+                                .setPolicyName(decision.getPolicyName())
+                                .setPolicyHash(decision.getPolicyHash())
+                                .setComponentId(decision.getComponentId())
+                                .setLabel(decision.getConcurrencyLimiterInfo().getLabel())
+                                .setRequestId(decision.getConcurrencyLimiterInfo().getRequestId());
 
                 if (decision.getConcurrencyLimiterInfo().getTokensInfo() != null) {
                     refBuilder.setTokens(
                             decision.getConcurrencyLimiterInfo().getTokensInfo().getConsumed());
                 }
+                inflightRequestRef.add(refBuilder.build());
             }
 
-            inflightRequestRef.add(refBuilder.build());
+            if (decision.getConcurrencySchedulerInfo() != null) {
+                InflightRequestRef.Builder refBuilder =
+                        InflightRequestRef.newBuilder()
+                                .setPolicyName(decision.getPolicyName())
+                                .setPolicyHash(decision.getPolicyHash())
+                                .setComponentId(decision.getComponentId())
+                                .setLabel(decision.getConcurrencySchedulerInfo().getLabel())
+                                .setRequestId(
+                                        decision.getConcurrencySchedulerInfo().getRequestId());
+
+                if (decision.getConcurrencySchedulerInfo().getTokensInfo() != null) {
+                    refBuilder.setTokens(
+                            decision.getConcurrencySchedulerInfo().getTokensInfo().getConsumed());
+                }
+                inflightRequestRef.add(refBuilder.build());
+            }
         }
 
         if (inflightRequestRef.size() > 0) {

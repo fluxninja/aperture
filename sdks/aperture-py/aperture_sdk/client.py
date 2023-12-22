@@ -152,6 +152,7 @@ class ApertureClient:
             control_point=control_point,
             labels=labels,
             ramp_mode=params.ramp_mode,
+            expect_end=True,
             cache_lookup_request=CacheLookupRequest(
                 result_cache_key=params.result_cache_key,
                 global_cache_keys=params.global_cache_keys,

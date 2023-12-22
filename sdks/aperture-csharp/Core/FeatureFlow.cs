@@ -224,6 +224,12 @@ public class FeatureFlow : IFlow
             return new FeatureFlowEndResponse(new Exception("Attempting to end an already ended Flow"), null);
         }
 
+        if (_checkResponse == null)
+        {
+            _logger.Warn("Attempting to end a Flow without a check response");
+            return new FeatureFlowEndResponse(new Exception("Attempting to end a Flow without a check response"), null);
+        }
+
         _ended = true;
 
         var checkResponseJsonBytes = string.Empty;
@@ -250,24 +256,43 @@ public class FeatureFlow : IFlow
 
         for (var i = 0; i < _checkResponse?.LimiterDecisions.Count; i++)
         {
-            var inflightRequest = new InflightRequestRef
-            {
-                PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
-                PolicyName = _checkResponse.LimiterDecisions[i].PolicyName,
-                ComponentId = _checkResponse.LimiterDecisions[i].ComponentId
-            };
 
             if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo != null)
             {
-                inflightRequest.Label = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.Label;
+                var inflightRequest = new InflightRequestRef
+                {
+                    PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
+                    PolicyName = _checkResponse.LimiterDecisions[i].PolicyName,
+                    ComponentId = _checkResponse.LimiterDecisions[i].ComponentId,
+                    Label = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.Label,
+                    RequestId = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.RequestId
+                };
 
                 if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.TokensInfo != null)
                 {
                     inflightRequest.Tokens = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.TokensInfo.Consumed;
                 }
+                inflightRequestRef.Add(inflightRequest);
             }
 
-            inflightRequestRef.Add(inflightRequest);
+            if (_checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo != null)
+            {
+                var inflightRequest = new InflightRequestRef
+                {
+                    PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
+                    PolicyName = _checkResponse.LimiterDecisions[i].PolicyName,
+                    ComponentId = _checkResponse.LimiterDecisions[i].ComponentId,
+                    Label = _checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo.Label,
+                    RequestId = _checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo.RequestId
+                };
+
+                if (_checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo.TokensInfo != null)
+                {
+                    inflightRequest.Tokens = _checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo.TokensInfo.Consumed;
+                }
+                inflightRequestRef.Add(inflightRequest);
+            }
+
         }
 
         if (inflightRequestRef.Count > 0)
