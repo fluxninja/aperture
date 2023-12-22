@@ -72,7 +72,13 @@ public class ApertureRPCClient extends SimpleDecoratingRpcClient {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
+                if (endResponse.getError() != null) {
+                    throw new Exception("Error ending flow", endResponse.getError());
+                }
+
+                // Handle flow end response
+                System.out.println("Flow End response: " + endResponse.getFlowEndResponse());
             }
             return res;
         } else {

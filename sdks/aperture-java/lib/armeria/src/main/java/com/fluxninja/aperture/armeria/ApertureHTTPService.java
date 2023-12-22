@@ -81,7 +81,7 @@ public class ApertureHTTPService extends SimpleDecoratingHttpService {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
             }
             return res;
         } else {
