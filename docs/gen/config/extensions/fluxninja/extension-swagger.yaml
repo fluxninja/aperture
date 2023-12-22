@@ -83,7 +83,7 @@ definitions:
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/net/tlsconfig
     Duration:
-        description: It holds *durationpb.Duration which is generated type for google/protobuf/duration.proto.
+        description: It holds `*durationpb.Duration` which is generated type for google/protobuf/duration.proto.
         title: Duration is encoded as a string message which represents a signed span of time.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/config

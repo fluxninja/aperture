@@ -52,6 +52,8 @@ cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0Zeo
 cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohlUTyfDhBk=
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
+cloud.google.com/go/storage v1.30.1 h1:uOdMxAs8HExqBlnLtnQyP0YkvbiDpdGShGKtx6U/oNM=
+cloud.google.com/go/storage v1.30.1/go.mod h1:NfxhC0UJE1aXSx7CIIbCf7y9HKT7BiccwkR7+P7gN8E=
 code.cloudfoundry.org/go-diodes v0.0.0-20211115184647-b584dd5df32c h1:N2GMlHc/SJQk7BkaME/kDHaciVTy4NuRmxVJLhnqKK8=
 code.cloudfoundry.org/go-diodes v0.0.0-20211115184647-b584dd5df32c/go.mod h1:o7lq/SmHshDVxHdRJ/fMT3VPcoXyE1HcRXbG8QibO3k=
 code.cloudfoundry.org/go-loggregator v7.4.0+incompatible h1:KqZYloMQWM5Zg/BQKunOIA4OODh7djZbk48qqbowNFI=
@@ -467,8 +469,8 @@ github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1 h1:aZbbKMGqnRUQubdJS5tfoZ
 github.com/fluxninja/jsonnet-bundler v0.5.1-fn.patch.1/go.mod h1:Qrdw/7mOFS2SKCOALKFfEH8gdvXJi8XZjw9g5ilpf4I=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814 h1:AHC1PtYLUw9PWqmgB9VHcxzGEm1GDYGXzC1PRtgIqqs=
 github.com/fluxninja/lumberjack v0.0.0-20220729045908-655029e4d814/go.mod h1:kARLh/xWGaisrwkOGOWKcqk7fagFUFthOTX7mIFVJlw=
-github.com/fluxninja/olric v0.5.4-fn.patch.15 h1:xPsbNHqZORv9gn9EQsWbYJR273EXbFiW07CWz4DdnUQ=
-github.com/fluxninja/olric v0.5.4-fn.patch.15/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
+github.com/fluxninja/olric v0.5.5-0.20231221120357-181f78b00be8 h1:ixUL1nLHQ5O3GZQPYJO5j1UXiavzfvilAvoz119PBlY=
+github.com/fluxninja/olric v0.5.5-0.20231221120357-181f78b00be8/go.mod h1:ndjlnRvJfFrE8eJlQNBJsDJa11tIsb5BXSfPmTi7qjE=
 github.com/fluxninja/opentelemetry-collector v0.90.0-fn.patch.2 h1:rnn1nD9JDMD7EygV0pAVKi19HjC+SWio0h6ss4yjasA=
 github.com/fluxninja/opentelemetry-collector v0.90.0-fn.patch.2/go.mod h1:w8gyH9neR4INnLmcILvIQI1f1XV5dAEIYYXA1BMM38Y=
 github.com/fluxninja/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0-fn.patch.1 h1:2JT05bz6InX8RU1iqMXNc0ZL9RyV5M3KX6c+0goCYP0=
@@ -1028,9 +1030,12 @@ github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/gofuzz v1.2.0 h1:xRy4A+RhZaiKjJ1bPfwQ8sedCA+YS2YcCHW6ec7JMi0=
 github.com/google/gofuzz v1.2.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/google/martian v2.1.0+incompatible h1:/CP5g8u/VJHijgedC/Legn3BAbAaWPgecwXBIDzw5no=
 github.com/google/martian v2.1.0+incompatible/go.mod h1:9I4somxYTbIHy5NJKHRl3wXiIaQGbYVAs8BPL6v8lEs=
 github.com/google/martian/v3 v3.0.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIGO+w/tUAp0=
 github.com/google/martian/v3 v3.1.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIGO+w/tUAp0=
+github.com/google/martian/v3 v3.3.2 h1:IqNFLAmvJOgVlpdEBiQbDc2EwKW77amAycfTuWKdfvw=
+github.com/google/martian/v3 v3.3.2/go.mod h1:oBOf6HBosgwRXnUGWUB05QECsc6uvmMiJ3+6W4l/CUk=
 github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/pprof v0.0.0-20190515194954-54271f7e092f/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/pprof v0.0.0-20191218002539-d4f498aebedc/go.mod h1:ZgVRPoUq/hfqzAqh7sHMqb3I9Rq5C59dIz2SbBwJ4eM=

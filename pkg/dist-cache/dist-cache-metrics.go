@@ -24,7 +24,10 @@ type DistCacheMetrics struct {
 }
 
 func newDistCacheMetrics() *DistCacheMetrics {
-	distCacheMetricsLabels := []string{metrics.DistCacheMemberIDLabel, metrics.DistCacheMemberNameLabel}
+	distCacheMetricsLabels := []string{
+		metrics.DistCacheMemberIDLabel,
+		metrics.DistCacheMemberNameLabel,
+	}
 	return &DistCacheMetrics{
 		EntriesTotal: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: metrics.DistCacheEntriesTotalMetricName,

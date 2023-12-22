@@ -60,6 +60,29 @@ const (
 	// DistCacheBackupPartitionsLength - metric for current length of backup partitions on given node.
 	DistCacheBackupPartitionsLength = "distcache_backup_partitions_length"
 
+	// Persistent cache metrics.
+
+	// PersistentCacheGetMissesMetricName - metric for cumulative number of persistent cache misses.
+	PersistentCacheGetMissesMetricName = "persistent_cache_get_misses_total"
+	// PersistentCacheGetHitsMetricName - metric for cumulative number of persistent cache hits.
+	PersistentCacheGetHitsMetricName = "persistent_cache_get_hits_total"
+	// PersistentCacheTypeLabel - denotes if hit or miss sources from in_memory of object_storage layer.
+	PersistentCacheTypeLabel = "cache_type"
+	// PersistentCacheTypeInMemory - in_memory layer of persistent cache.
+	PersistentCacheTypeInMemory = "in_memory"
+	// PersistentCacheTypeObjectStorage - object_storage layer of persistent cache.
+	PersistentCacheTypeObjectStorage = "object_storage"
+	// PersistentCacheOperationDurationMetricName - metric for duration of persistent cache operations.
+	PersistentCacheOperationDurationMetricName = "persistent_cache_operation_duration_ms"
+	// PersistentCacheOperationLabel - label to define type of operation performed on persistent cache.
+	PersistentCacheOperationLabel = "operation"
+	// PersistentCacheOperationGet - get operation.
+	PersistentCacheOperationGet = "get"
+	// PersistentCacheOperationPut - put operation.
+	PersistentCacheOperationPut = "put"
+	// PersistentCacheOperationDelete - delete operation.
+	PersistentCacheOperationDelete = "delete"
+
 	// Cache metrics.
 
 	// CacheLookupHitsTotalMetricName - metric for cumulative number of cache lookup hits.
