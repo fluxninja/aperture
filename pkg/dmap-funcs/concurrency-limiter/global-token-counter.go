@@ -8,13 +8,14 @@ import (
 
 	"github.com/buraksezer/olric"
 	"github.com/buraksezer/olric/config"
+	guuid "github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	tokencounterv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/tokencounter/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	deadlinemargin "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/deadline-margin"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	guuid "github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -256,10 +257,13 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 			waitTime = MinimumWaitTime
 		}
 
+		// TODO: check if waitTime is larger than the deadline and return false if it is
+
 		// Pause until waitTime has elapsed or context is canceled
 		select {
 		case <-time.After(waitTime):
 		case <-ctx.Done():
+			log.Info().Msg("Context canceled while waiting for tokens")
 			ok = false
 			cancelQueued()
 			return
@@ -332,6 +336,9 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 		return nil, nil, err
 	}
 
+	stateJSON, _ := state.MarshalJSON()
+	log.Info().Str("state", string(stateJSON)).Str("key", key).Msg("takeN state")
+
 	// Decode takeNReq from proto encoded argBytes
 	var takeNReq tokencounterv1.TakeNRequest
 	if argBytes != nil {
@@ -341,6 +348,9 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 			return nil, nil, err
 		}
 	}
+
+	takeNReqJSON, _ := takeNReq.MarshalJSON()
+	log.Info().Str("takeNReqJSON", string(takeNReqJSON)).Str("key", key).Msg("takeN takeNReqJSON")
 
 	now := time.Now()
 	takeNResp := tokencounterv1.TakeNResponse{
@@ -476,6 +486,9 @@ func (gtc *GlobalTokenCounter) returnTokens(key string, stateBytes, argBytes []b
 		return nil, nil, err
 	}
 
+	stateJSON, _ := state.MarshalJSON()
+	log.Info().Str("state", string(stateJSON)).Str("key", key).Msg("returnTokens state")
+
 	// Decode returnNReq from proto encoded argBytes
 	var returnNReq tokencounterv1.ReturnNRequest
 	if argBytes != nil {
@@ -531,7 +544,7 @@ func (gtc *GlobalTokenCounter) returnTokens(key string, stateBytes, argBytes []b
 
 	if tokenWindow.Count >= TokenRateWindowSize {
 		if state.TokenRate == 0 {
-			state.TokenRate = tokenWindow.Sum / tokenWindow.Start.AsTime().Sub(tokenWindow.End.AsTime()).Seconds()
+			state.TokenRate = tokenWindow.Sum / tokenWindow.End.AsTime().Sub(tokenWindow.Start.AsTime()).Seconds()
 		}
 		tokenWindow.Start = tokenWindow.End
 		tokenWindow.End = nil

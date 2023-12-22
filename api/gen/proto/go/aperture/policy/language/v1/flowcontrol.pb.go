@@ -2473,12 +2473,12 @@ type ConcurrencyLimiter_Parameters struct {
 	// Concurrency limiting is done independently for each value of the
 	// [label](/concepts/flow-label.md) with given key.
 	// For example, to give each API Key a separate limit, assuming you
-	// have a _api_key_ flow
+	// have a "api_key" flow
 	// label set up, set `limit_by_label_key: "api_key"`.
 	// If no label key is specified, then all requests matching the
 	// selectors will be concurrency limited based on the global concurrency count.
 	LimitByLabelKey string `protobuf:"bytes,1,opt,name=limit_by_label_key,json=limitByLabelKey,proto3" json:"limit_by_label_key,omitempty"`
-	// max_inflight_duration defines the time duration after which flow is assumed ended in case the end call gets missed
+	// The time duration after which flow is assumed to have ended in case the end call gets missed.
 	// This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
 	MaxInflightDuration *durationpb.Duration `protobuf:"bytes,2,opt,name=max_inflight_duration,json=maxInflightDuration,proto3" json:"max_inflight_duration,omitempty" validate:"required"` // @gotags: validate:"required"
 	// Max idle time before concurrency count for a label is removed.

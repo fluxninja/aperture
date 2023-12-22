@@ -23,6 +23,9 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
+import { InflightRequestRef } from "./gen/aperture/flowcontrol/check/v1/InflightRequestRef.js";
+import { FlowEndRequest } from "./gen/aperture/flowcontrol/check/v1/FlowEndRequest.js";
+import { FlowEndResponse as FlowEndResponseProto } from "./gen/aperture/flowcontrol/check/v1/FlowEndResponse.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
@@ -59,7 +62,7 @@ export interface Flow {
   globalCache(key: string): KeyLookupResponse;
   error(): Error | null;
   span(): Span;
-  end(): void;
+  end(grpcOptions?: grpc.CallOptions): Promise<FlowEndResponse>;
   httpResponseCode(): Number | undefined;
   retryAfter(): { seconds: string | undefined, nanos: number | undefined }
 }
@@ -151,7 +154,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyUpsertResponse(
-            convertCacheError(res.resultCacheResponse?.error),
+            convertError(res.resultCacheResponse?.error),
           );
           resolve(resp);
         },
@@ -196,7 +199,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyUpsertResponse(
-            convertCacheError(res.globalCacheResponses[key]?.error),
+            convertError(res.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -229,7 +232,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyDeleteResponse(
-            convertCacheError(res?.resultCacheResponse?.error),
+            convertError(res?.resultCacheResponse?.error),
           );
           resolve(resp);
         },
@@ -257,7 +260,7 @@ export class _Flow implements Flow {
             return;
           }
           const resp = new _KeyDeleteResponse(
-            convertCacheError(res?.globalCacheResponses[key]?.error),
+            convertError(res?.globalCacheResponses[key]?.error),
           );
           resolve(resp);
         },
@@ -307,7 +310,7 @@ export class _Flow implements Flow {
     }
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(resultCacheResponse?.lookupStatus),
-      convertCacheError(resultCacheResponse?.error),
+      convertError(resultCacheResponse?.error),
       resultCacheResponse?.value ?? null,
     );
     return resp;
@@ -369,7 +372,7 @@ export class _Flow implements Flow {
       this._checkResponse?.cacheLookupResponse?.globalCacheResponses?.[key];
     const resp = new _KeyLookupResponse(
       convertCacheLookupStatus(lookupResp?.lookupStatus),
-      convertCacheError(lookupResp?.error),
+      convertError(lookupResp?.error),
       lookupResp?.value.byteLength ? lookupResp?.value : null,
     );
 
@@ -427,70 +430,156 @@ export class _Flow implements Flow {
 
   /**
    * Ends the flow and performs necessary cleanup.
+   * @returns A promise that resolves to the response of the flow end operation. In the case of no ConcurrencyLimiter or ConcurrencyScheduler in limiter decisions, the promise resolves immediately.
    */
-  end() {
-    if (this.ended) {
-      return;
-    }
-    this.ended = true;
+  async end(grpcCallOptions?: grpc.CallOptions) {
+    return new Promise<FlowEndResponse>((resolve) => {
+      if (this.ended) {
+        return;
+      }
+      this.ended = true;
 
-    if (this._checkResponse) {
-      // HACK: Change timestamps to ISO strings since the protobufjs library uses it in a different format
-      // Issue: https://github.com/protobufjs/protobuf.js/issues/893
-      // PR: https://github.com/protobufjs/protobuf.js/pull/1258
-      // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
-      const localCheckResponse = this._checkResponse as any;
+      var inflightRequestRefs = new Array<InflightRequestRef>();
 
-      if (this._checkResponse.cacheLookupResponse?.resultCacheResponse?.value) {
-        localCheckResponse.cacheLookupResponse.resultCacheResponse.value = bufferToByteArrayJson(
-          this._checkResponse.cacheLookupResponse.resultCacheResponse.value,
+      if (this._checkResponse) {
+        // HACK: Change timestamps to ISO strings since the protobufjs library uses it in a different format
+        // Issue: https://github.com/protobufjs/protobuf.js/issues/893
+        // PR: https://github.com/protobufjs/protobuf.js/pull/1258
+        // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
+        const localCheckResponse = this._checkResponse as any;
+
+        if (this._checkResponse.cacheLookupResponse?.resultCacheResponse?.value) {
+          localCheckResponse.cacheLookupResponse.resultCacheResponse.value = bufferToByteArrayJson(
+            this._checkResponse.cacheLookupResponse.resultCacheResponse.value,
+          );
+        }
+
+        if (this._checkResponse.cacheLookupResponse?.globalCacheResponses) {
+          Object.entries(
+            this._checkResponse.cacheLookupResponse.globalCacheResponses,
+          ).forEach(([key, value]) => {
+            if (value.value) {
+              localCheckResponse.cacheLookupResponse.globalCacheResponses[
+                key
+              ].value = bufferToByteArrayJson(value.value);
+            }
+          });
+        }
+
+        localCheckResponse.start = protoTimestampToJSON(
+          this._checkResponse.start,
+        );
+        localCheckResponse.end = protoTimestampToJSON(this._checkResponse.end);
+        localCheckResponse.waitTime = protoDurationToJSON(
+          this._checkResponse.waitTime,
+        );
+
+        // Walk through individual decisions and convert waitTime fields,
+        // then add to localCheckResponse, preserving immutability.
+        if (this._checkResponse.limiterDecisions) {
+          const decisions = this._checkResponse.limiterDecisions.map(
+            (decision) => {
+              return {
+                ...decision,
+                waitTime: protoDurationToJSON(decision.waitTime),
+              };
+            },
+          );
+          localCheckResponse.limiterDecisions = decisions;
+
+          this._checkResponse.limiterDecisions.forEach((decision) => {
+            if (decision.concurrencyLimiterInfo) {
+              inflightRequestRefs.push({
+                policyName: decision.policyName,
+                policyHash: decision.policyHash,
+                componentId: decision.componentId,
+                label: decision.concurrencyLimiterInfo.label,
+                requestId: decision.concurrencyLimiterInfo.requestId,
+                tokens: decision.concurrencyLimiterInfo.tokensInfo?.consumed,
+              });
+            }
+            if (decision.concurrencySchedulerInfo) {
+              inflightRequestRefs.push({
+                policyName: decision.policyName,
+                policyHash: decision.policyHash,
+                componentId: decision.componentId,
+                label: decision.concurrencySchedulerInfo.label,
+                requestId: decision.concurrencySchedulerInfo.requestId,
+                tokens: decision.concurrencySchedulerInfo.tokensInfo?.consumed,
+              });
+            }
+          });
+        }
+
+        this._span.setAttribute(
+          CHECK_RESPONSE_LABEL,
+          JSON.stringify(localCheckResponse),
         );
       }
 
-      if (this._checkResponse.cacheLookupResponse?.globalCacheResponses) {
-        Object.entries(
-          this._checkResponse.cacheLookupResponse.globalCacheResponses,
-        ).forEach(([key, value]) => {
-          if (value.value) {
-            localCheckResponse.cacheLookupResponse.globalCacheResponses[
-              key
-            ].value = bufferToByteArrayJson(value.value);
-          }
-        });
+      this._span.setAttribute(FLOW_STATUS_LABEL, this.status);
+      this._span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
+      this._span.end();
+
+      const flowEndRequest: FlowEndRequest = {
+        controlPoint: this.controlPoint,
+        inflightRequests: inflightRequestRefs,
       }
-
-      localCheckResponse.start = protoTimestampToJSON(
-        this._checkResponse.start,
-      );
-      localCheckResponse.end = protoTimestampToJSON(this._checkResponse.end);
-      localCheckResponse.waitTime = protoDurationToJSON(
-        this._checkResponse.waitTime,
-      );
-
-      // Walk through individual decisions and convert waitTime fields,
-      // then add to localCheckResponse, preserving immutability.
-      if (this._checkResponse.limiterDecisions) {
-        const decisions = this._checkResponse.limiterDecisions.map(
-          (decision) => {
-            return {
-              ...decision,
-              waitTime: protoDurationToJSON(decision.waitTime),
-            };
-          },
+      if (inflightRequestRefs.length > 0) {
+        this.fcsClient.FlowEnd(
+          flowEndRequest,
+          grpcCallOptions ?? {},
+          (err, res) => {
+            if (err) {
+              const resp = new _FlowEndResponse(
+                err,
+                {},
+              );
+              resolve(resp);
+              return;
+            }
+            if (!res) {
+              const resp = new _FlowEndResponse(
+                new Error("No flow end response"),
+                {},
+              );
+              resolve(resp);
+              return;
+            }
+            const resp = new _FlowEndResponse(
+              null,
+              res,
+            );
+            resolve(resp);
+            return;
+          });
+      } else {
+        const resp = new _FlowEndResponse(
+          new Error("Check response was nil"),
+          {},
         );
-        localCheckResponse.limiterDecisions = decisions;
+        resolve(resp);
+        return;
       }
-
-      this._span.setAttribute(
-        CHECK_RESPONSE_LABEL,
-        JSON.stringify(localCheckResponse),
-      );
-    }
-
-    this._span.setAttribute(FLOW_STATUS_LABEL, this.status);
-    this._span.setAttribute(FLOW_END_TIMESTAMP_LABEL, Date.now());
-    this._span.end();
+    });
   }
+}
+
+/**
+ * Represents a flow end response.
+ */
+interface FlowEndResponse {
+  /**
+   * Gets the response.
+   * @returns FlowEndResponseProto.
+   */
+  getResponse(): FlowEndResponseProto;
+
+  /**
+   * Gets the error, if any.
+   * @returns The error, or null if no error occurred.
+   */
+  getError(): Error | null;
 }
 
 function bufferToByteArrayJson(buffer: Buffer) {
@@ -546,7 +635,7 @@ function convertCacheLookupStatus(
  * @param error - The cache error string.
  * @returns The Error object representing the cache error, or null if the error string is empty.
  */
-function convertCacheError(error: string | undefined): Error | null {
+function convertError(error: string | undefined): Error | null {
   if (!error) {
     return null;
   }
@@ -641,6 +730,36 @@ class _KeyDeleteResponse {
 
   /**
    * Gets the error that occurred during the delete operation, if any.
+   * @returns The error object or null if no error occurred.
+   */
+  getError(): Error | null {
+    return this.error;
+  }
+}
+
+class _FlowEndResponse implements FlowEndResponse {
+  private error: Error | null;
+  private response: FlowEndResponseProto;
+
+  /**
+   * Creates a new instance of FlowEndResponse.
+   * @param error The error that occurred during the operation, if any.
+   */
+  constructor(error: Error | null, response: FlowEndResponseProto) {
+    this.error = error;
+    this.response = response;
+  }
+
+  /**
+   * Gets the response.
+   * @returns FlowEndResponseProto.
+   */
+  getResponse(): FlowEndResponseProto {
+    return this.response;
+  }
+
+  /**
+   * Gets the error that occurred during the operation, if any.
    * @returns The error object or null if no error occurred.
    */
   getError(): Error | null {

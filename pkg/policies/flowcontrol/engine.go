@@ -58,6 +58,7 @@ func NewEngine(agentInfo *agentinfo.AgentInfo) iface.Engine {
 		samplers:      make(map[iface.LimiterID]iface.Limiter),
 		rampSamplers:  make(map[iface.LimiterID]iface.Limiter),
 		labelPreviews: make(map[iface.PreviewID]iface.LabelPreview),
+		flowEnders:    make(map[iface.LimiterID]iface.FlowEnder),
 	}
 	return e
 }
@@ -296,6 +297,11 @@ func revertRemaining(
 func (e *Engine) RegisterScheduler(cl iface.Scheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
+	return e.registerSchedulerUnsafe(cl)
+}
+
+// registerSchedulerUnsafe is not thread safe.
+func (e *Engine) registerSchedulerUnsafe(cl iface.Scheduler) error {
 	if _, ok := e.schedulers[cl.GetLimiterID()]; !ok {
 		e.schedulers[cl.GetLimiterID()] = cl
 	} else {
@@ -313,8 +319,12 @@ func (e *Engine) RegisterScheduler(cl iface.Scheduler) error {
 func (e *Engine) UnregisterScheduler(cl iface.Scheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.schedulers, cl.GetLimiterID())
+	return e.unregisterSchedulerUnsafe(cl)
+}
 
+// unregisterSchedulerUnsafe is not thread safe.
+func (e *Engine) unregisterSchedulerUnsafe(cl iface.Scheduler) error {
+	delete(e.schedulers, cl.GetLimiterID())
 	return e.unregister(cl.GetLimiterID().String(), cl.GetSelectors())
 }
 
@@ -396,6 +406,11 @@ func (e *Engine) GetScheduler(limiterID iface.LimiterID) iface.Scheduler {
 func (e *Engine) RegisterRateLimiter(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
+	return e.registerRateLimiterUnsafe(rl)
+}
+
+// registerRateLimiterUnsafe is not thread safe.
+func (e *Engine) registerRateLimiterUnsafe(rl iface.Limiter) error {
 	if _, ok := e.rateLimiters[rl.GetLimiterID()]; !ok {
 		e.rateLimiters[rl.GetLimiterID()] = rl
 	} else {
@@ -414,8 +429,12 @@ func (e *Engine) RegisterRateLimiter(rl iface.Limiter) error {
 func (e *Engine) UnregisterRateLimiter(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.rateLimiters, rl.GetLimiterID())
+	return e.unregisterRateLimiterUnsafe(rl)
+}
 
+// unregisterRateLimiterUnsafe is not thread safe.
+func (e *Engine) unregisterRateLimiterUnsafe(rl iface.Limiter) error {
+	delete(e.rateLimiters, rl.GetLimiterID())
 	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
 
@@ -556,10 +575,8 @@ func (e *Engine) RegisterCache(cache iface.Cache) {
 	e.cache = cache
 }
 
-func (e *Engine) registerFlowEnder(cl iface.ConcurrencyLimiter) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
+// registerFlowEnderUnsafe is not thread safe.
+func (e *Engine) registerFlowEnderUnsafe(cl iface.ConcurrencyLimiter) error {
 	if _, ok := e.flowEnders[cl.GetLimiterID()]; !ok {
 		e.flowEnders[cl.GetLimiterID()] = cl
 	} else {
@@ -568,10 +585,8 @@ func (e *Engine) registerFlowEnder(cl iface.ConcurrencyLimiter) error {
 	return nil
 }
 
-func (e *Engine) unregisterFlowEnder(cl iface.ConcurrencyLimiter) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
+// unregisterFlowEnderUnsafe is not thread safe.
+func (e *Engine) unregisterFlowEnderUnsafe(cl iface.ConcurrencyLimiter) error {
 	delete(e.flowEnders, cl.GetLimiterID())
 	return nil
 }
@@ -589,13 +604,13 @@ func (e *Engine) RegisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
 	defer e.mutex.Unlock()
 
 	// Register as a RateLimiter
-	err := e.RegisterRateLimiter(cl)
+	err := e.registerRateLimiterUnsafe(cl)
 	if err != nil {
 		return err
 	}
 
 	// Register as a FlowEnder
-	err = e.registerFlowEnder(cl)
+	err = e.registerFlowEnderUnsafe(cl)
 	if err != nil {
 		return err
 	}
@@ -609,13 +624,13 @@ func (e *Engine) UnregisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error
 	defer e.mutex.Unlock()
 
 	// Unregister as a RateLimiter
-	err := e.UnregisterRateLimiter(cl)
+	err := e.unregisterRateLimiterUnsafe(cl)
 	if err != nil {
 		return err
 	}
 
 	// Unregister as a FlowEnder
-	err = e.unregisterFlowEnder(cl)
+	err = e.unregisterFlowEnderUnsafe(cl)
 	if err != nil {
 		return err
 	}
@@ -629,13 +644,13 @@ func (e *Engine) RegisterConcurrencyScheduler(cl iface.ConcurrencyScheduler) err
 	defer e.mutex.Unlock()
 
 	// Register as a Scheduler
-	err := e.RegisterScheduler(cl)
+	err := e.registerSchedulerUnsafe(cl)
 	if err != nil {
 		return err
 	}
 
 	// Register as a FlowEnder
-	err = e.registerFlowEnder(cl)
+	err = e.registerFlowEnderUnsafe(cl)
 	if err != nil {
 		return err
 	}
@@ -649,13 +664,13 @@ func (e *Engine) UnregisterConcurrencyScheduler(cl iface.ConcurrencyScheduler) e
 	defer e.mutex.Unlock()
 
 	// Unregister as a Scheduler
-	err := e.UnregisterScheduler(cl)
+	err := e.unregisterSchedulerUnsafe(cl)
 	if err != nil {
 		return err
 	}
 
 	// Unregister as a FlowEnder
-	err = e.unregisterFlowEnder(cl)
+	err = e.unregisterFlowEnderUnsafe(cl)
 	if err != nil {
 		return err
 	}
