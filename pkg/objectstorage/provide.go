@@ -26,6 +26,7 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 		return nil, err
 	}
 	if !cfg.Enabled {
+		log.Warn().Msg("Object storage not enabled. Creating persistent dmap will result in regular dmap")
 		return nil, nil
 	}
 	if cfg.Bucket == "" {
