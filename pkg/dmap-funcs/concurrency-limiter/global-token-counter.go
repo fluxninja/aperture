@@ -121,6 +121,8 @@ func (gtc *GlobalTokenCounter) TakeIfAvailable(ctx context.Context, label string
 	}
 
 	if deadlinemargin.IsMarginExceeded(ctx) {
+		d, _ := ctx.Deadline()
+		log.Info().Str("deadline", d.String()).Msg("Deadline exceeded")
 		ok = false
 		return
 	}
@@ -140,7 +142,7 @@ func (gtc *GlobalTokenCounter) TakeIfAvailable(ctx context.Context, label string
 
 	resultBytes, err := gtc.dMap.Function(ctx, label, TakeNFunction, reqBytes)
 	if err != nil {
-		log.Autosample().Error().Err(err).Str("dmapName", gtc.dMap.Name()).Float64("tokens", n).Msg("error taking from token counter")
+		log.Error().Err(err).Str("dmapName", gtc.dMap.Name()).Float64("tokens", n).Msg("error taking from token counter")
 		return
 	}
 
@@ -159,7 +161,7 @@ func (gtc *GlobalTokenCounter) TakeIfAvailable(ctx context.Context, label string
 		}
 	}
 
-	return resp.Ok, waitTime, resp.Remaining, resp.Current, req.RequestId
+	return resp.AvailableNow, waitTime, resp.Remaining, resp.Current, req.RequestId
 }
 
 // Take takes N tokens from the global token counter.
@@ -185,6 +187,7 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 	reqBytes, err := req.MarshalVT()
 	if err != nil {
 		log.Autosample().Errorf("error encoding request: %v", err)
+		ok = true
 		return
 	}
 
@@ -220,6 +223,7 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 		if err != nil {
 			log.Autosample().Error().Err(err).Str("dmapName", gtc.dMap.Name()).Float64("tokens", count).Msg("error taking from token counter")
 			cancelQueued()
+			ok = true
 			return
 		}
 		isQueued = true
@@ -229,12 +233,21 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 		if err != nil {
 			log.Autosample().Errorf("error decoding response: %v", err)
 			cancelQueued()
+			ok = true
 			return
 		}
 
-		if resp.GetOk() {
+		if !resp.GetOk() {
 			current = resp.GetCurrent()
 			remaining = resp.GetRemaining()
+			ok = false
+			return
+		}
+
+		if resp.GetAvailableNow() {
+			current = resp.GetCurrent()
+			remaining = resp.GetRemaining()
+			ok = true
 			return
 		}
 
@@ -263,7 +276,6 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 		select {
 		case <-time.After(waitTime):
 		case <-ctx.Done():
-			log.Info().Msg("Context canceled while waiting for tokens")
 			ok = false
 			cancelQueued()
 			return
@@ -336,9 +348,6 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 		return nil, nil, err
 	}
 
-	stateJSON, _ := state.MarshalJSON()
-	log.Info().Str("state", string(stateJSON)).Str("key", key).Msg("takeN state")
-
 	// Decode takeNReq from proto encoded argBytes
 	var takeNReq tokencounterv1.TakeNRequest
 	if argBytes != nil {
@@ -348,9 +357,6 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 			return nil, nil, err
 		}
 	}
-
-	takeNReqJSON, _ := takeNReq.MarshalJSON()
-	log.Info().Str("takeNReqJSON", string(takeNReqJSON)).Str("key", key).Msg("takeN takeNReqJSON")
 
 	now := time.Now()
 	takeNResp := tokencounterv1.TakeNResponse{
@@ -366,7 +372,7 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 	var tokensAhead float64
 
 	for i, r := range state.RequestsQueued {
-		if !audit(r, now) {
+		if isExpired(r, now) {
 			continue
 		}
 		if !found && r.RequestId == takeNReq.RequestId && takeNReq.CanWait {
@@ -415,7 +421,7 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 	var requestsInflight []*tokencounterv1.Request
 	var tokensInflight float64
 	for _, r := range state.RequestsInflight {
-		if !audit(r, now) {
+		if isExpired(r, now) {
 			continue
 		}
 		requestsInflight = append(requestsInflight, r)
@@ -486,9 +492,6 @@ func (gtc *GlobalTokenCounter) returnTokens(key string, stateBytes, argBytes []b
 		return nil, nil, err
 	}
 
-	stateJSON, _ := state.MarshalJSON()
-	log.Info().Str("state", string(stateJSON)).Str("key", key).Msg("returnTokens state")
-
 	// Decode returnNReq from proto encoded argBytes
 	var returnNReq tokencounterv1.ReturnNRequest
 	if argBytes != nil {
@@ -507,7 +510,7 @@ func (gtc *GlobalTokenCounter) returnTokens(key string, stateBytes, argBytes []b
 	var tokens float64
 
 	for _, r := range state.RequestsInflight {
-		if !audit(r, now) {
+		if isExpired(r, now) {
 			continue
 		}
 		if r.RequestId == returnNReq.RequestId {
@@ -593,7 +596,7 @@ func (gtc *GlobalTokenCounter) cancelQueued(key string, stateBytes, argBytes []b
 	var requestsQueued []*tokencounterv1.Request
 
 	for _, r := range state.RequestsQueued {
-		if !audit(r, now) {
+		if isExpired(r, now) {
 			continue
 		}
 		if r.RequestId == cancelQueuedReq.RequestId {
@@ -646,7 +649,7 @@ func (gtc *GlobalTokenCounter) cancelInflight(key string, stateBytes, argBytes [
 	var requestsInflight []*tokencounterv1.Request
 
 	for _, r := range state.RequestsInflight {
-		if !audit(r, now) {
+		if isExpired(r, now) {
 			continue
 		}
 		if r.RequestId == cancelInflightReq.RequestId {
@@ -690,6 +693,6 @@ func (gtc *GlobalTokenCounter) decodeState(stateBytes []byte, key string) (*toke
 	return &state, nil
 }
 
-func audit(r *tokencounterv1.Request, now time.Time) bool {
-	return !r.ExpiresAt.AsTime().Before(now)
+func isExpired(r *tokencounterv1.Request, now time.Time) bool {
+	return r.ExpiresAt.AsTime().Before(now)
 }

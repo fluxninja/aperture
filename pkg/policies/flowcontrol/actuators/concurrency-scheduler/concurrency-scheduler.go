@@ -254,7 +254,6 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
-			logger.Info().Msg("Creating limiter")
 			cs.inner, err = concurrencylimiter.NewGlobalTokenCounter(
 				cs.csFactory.distCache,
 				cs.name,
@@ -266,7 +265,6 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 			cs.limiter = cs.inner
-			logger.Info().Msg("Finished creating limiter")
 
 			// add decisions notifier
 			err = cs.csFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
