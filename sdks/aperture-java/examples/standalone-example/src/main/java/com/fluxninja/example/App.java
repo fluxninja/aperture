@@ -1,6 +1,7 @@
 package com.fluxninja.example;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FeatureFlowParameters;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
@@ -124,7 +125,12 @@ public class App {
             flow.setStatus(FlowStatus.Error);
             logger.error("Error in flow execution", e);
         } finally {
-            flow.end();
+            EndResponse endResponse = flow.end();
+            if (endResponse.getError() != null) {
+                logger.error("Error ending flow", endResponse.getError());
+            }
+
+            logger.info("Flow End response: {}", endResponse.getFlowEndResponse());
         }
         return "";
     }
@@ -167,7 +173,12 @@ public class App {
             flow.setStatus(FlowStatus.Error);
             logger.error("Error in flow execution", e);
         } finally {
-            flow.end();
+            EndResponse endResponse = flow.end();
+            if (endResponse.getError() != null) {
+                logger.error("Error ending flow", endResponse.getError());
+            }
+
+            logger.info("Flow End response: {}", endResponse.getFlowEndResponse());
         }
 
         // END: StandaloneExampleFlow

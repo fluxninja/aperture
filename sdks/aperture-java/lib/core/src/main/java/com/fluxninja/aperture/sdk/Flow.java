@@ -13,6 +13,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.api.trace.Span;
 import java.time.Duration;
+import java.util.ArrayList;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -383,11 +384,17 @@ public final class Flow {
      * Ends the flow, notifying the Aperture Agent whether it succeeded. Flow's Status is assumed to
      * be "OK" and can be set using {@link #setStatus}.
      */
-    public void end() {
+    public EndResponse end() {
         if (this.ended) {
             logger.warn("Trying to end an already ended flow with status " + this.flowStatus);
-            return;
+            return new EndResponse(null, new IllegalStateException("Flow already ended"));
         }
+
+        if (this.checkResponse == null) {
+            logger.warn("Trying to end a flow without a check response");
+            return new EndResponse(null, new IllegalStateException("Flow without check response"));
+        }
+
         this.ended = true;
 
         String checkResponseJSONBytes = "";
@@ -407,5 +414,62 @@ public final class Flow {
                 .setAttribute(FLOW_STOP_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
         this.span.end();
+
+        ArrayList<InflightRequestRef> inflightRequestRef = new ArrayList<InflightRequestRef>();
+
+        for (LimiterDecision decision : this.checkResponse.getLimiterDecisionsList()) {
+            if (decision.getConcurrencyLimiterInfo() != null) {
+                InflightRequestRef.Builder refBuilder =
+                        InflightRequestRef.newBuilder()
+                                .setPolicyName(decision.getPolicyName())
+                                .setPolicyHash(decision.getPolicyHash())
+                                .setComponentId(decision.getComponentId())
+                                .setLabel(decision.getConcurrencyLimiterInfo().getLabel())
+                                .setRequestId(decision.getConcurrencyLimiterInfo().getRequestId());
+
+                if (decision.getConcurrencyLimiterInfo().getTokensInfo() != null) {
+                    refBuilder.setTokens(
+                            decision.getConcurrencyLimiterInfo().getTokensInfo().getConsumed());
+                }
+                inflightRequestRef.add(refBuilder.build());
+            }
+
+            if (decision.getConcurrencySchedulerInfo() != null) {
+                InflightRequestRef.Builder refBuilder =
+                        InflightRequestRef.newBuilder()
+                                .setPolicyName(decision.getPolicyName())
+                                .setPolicyHash(decision.getPolicyHash())
+                                .setComponentId(decision.getComponentId())
+                                .setLabel(decision.getConcurrencySchedulerInfo().getLabel())
+                                .setRequestId(
+                                        decision.getConcurrencySchedulerInfo().getRequestId());
+
+                if (decision.getConcurrencySchedulerInfo().getTokensInfo() != null) {
+                    refBuilder.setTokens(
+                            decision.getConcurrencySchedulerInfo().getTokensInfo().getConsumed());
+                }
+                inflightRequestRef.add(refBuilder.build());
+            }
+        }
+
+        if (inflightRequestRef.size() > 0) {
+            FlowEndRequest flowEndRequest =
+                    FlowEndRequest.newBuilder()
+                            .setControlPoint(this.controlPoint)
+                            .addAllInflightRequests(inflightRequestRef)
+                            .build();
+
+            FlowEndResponse res;
+            try {
+                res = this.flowControlClient.flowEnd(flowEndRequest);
+            } catch (Exception e) {
+                logger.debug("Aperture gRPC call failed", e);
+                return new EndResponse(null, e);
+            }
+
+            return new EndResponse(res, null);
+        }
+
+        return new EndResponse(null, null);
     }
 }

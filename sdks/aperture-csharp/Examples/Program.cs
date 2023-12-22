@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text;
 using ApertureSDK.Core;
+using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using log4net;
 using log4net.Config;
 
@@ -47,7 +49,10 @@ using (var listener = new HttpListener())
                 featureName,
                 labels,
                 false,
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(5),
+                new Grpc.Core.CallOptions(),
+                "test",
+                new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {
@@ -76,7 +81,10 @@ using (var listener = new HttpListener())
                 "featureName",
                 labels,
                 rampMode,
-                flowTimeout);
+                flowTimeout,
+                new Grpc.Core.CallOptions(),
+                "test",
+                new RepeatedField<string> { "test" });
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {
@@ -91,7 +99,17 @@ using (var listener = new HttpListener())
                 SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
             }
 
-            flow.End();
+            var endResponse = flow.End();
+            if (endResponse.Error != null)
+            {
+                // handle end failure
+                log.Error("Failed to end flow: {e}", endResponse.Error);
+            }
+            else if (endResponse.FlowEndResponse != null)
+            {
+                // handle end success
+                log.Info("Ended flow with response: " + endResponse.FlowEndResponse.ToString());
+            }
             // END: handleRequest
         }
         else if (request.Url.AbsolutePath == "/notsuper")
