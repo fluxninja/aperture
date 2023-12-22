@@ -389,6 +389,12 @@ public final class Flow {
             logger.warn("Trying to end an already ended flow with status " + this.flowStatus);
             return new EndResponse(null, new IllegalStateException("Flow already ended"));
         }
+
+        if (this.checkResponse == null) {
+            logger.warn("Trying to end a flow without a check response");
+            return new EndResponse(null, new IllegalStateException("Flow without check response"));
+        }
+
         this.ended = true;
 
         String checkResponseJSONBytes = "";
