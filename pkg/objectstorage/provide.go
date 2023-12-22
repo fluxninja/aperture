@@ -47,7 +47,7 @@ func Provide(in ProvideParams) (*ObjectStorage, error) {
 	objStorage := &ObjectStorage{
 		bucket:     bucket,
 		keyPrefix:  cfg.KeyPrefix,
-		operations: make(chan *Operation),
+		operations: make(chan *Operation, cfg.OperationsChannelSize),
 	}
 
 	return objStorage, nil

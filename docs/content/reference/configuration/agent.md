@@ -2543,6 +2543,19 @@ Enabled denotes if object storage is enabled.
 KeyPrefix to use when writing to bucket. Required if enabled is true.
 
 </dd>
+<dt>operations_channel_size</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, default: `1000`)
+
+<!-- vale on -->
+
+OperationsChannelSize controls size of the channel used for asynchronous puts
+and deletes.
+
+</dd>
 </dl>
 
 ---

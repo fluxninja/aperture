@@ -1201,6 +1201,14 @@ definitions:
                 type: string
                 x-go-name: KeyPrefix
                 x-go-tag-json: key_prefix
+            operations_channel_size:
+                default: 1000
+                description: OperationsChannelSize controls size of the channel used for asynchronous puts and deletes.
+                format: int64
+                type: integer
+                x-go-name: OperationsChannelSize
+                x-go-tag-default: "1000"
+                x-go-tag-json: operations_channel_size
         title: ObjectStorageConfig configures object storage structure.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/objectstorage/config

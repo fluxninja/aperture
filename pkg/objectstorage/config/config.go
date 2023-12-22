@@ -21,4 +21,6 @@ type ObjectStorageConfig struct {
 	Bucket string `json:"bucket"`
 	// KeyPrefix to use when writing to bucket. Required if enabled is true.
 	KeyPrefix string `json:"key_prefix"`
+	// OperationsChannelSize controls size of the channel used for asynchronous puts and deletes.
+	OperationsChannelSize int `json:"operations_channel_size" default:"1000"`
 }

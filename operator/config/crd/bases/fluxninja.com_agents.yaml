@@ -1515,6 +1515,10 @@ spec:
                         description: KeyPrefix to use when writing to bucket. Required
                           if enabled is true.
                         type: string
+                      operations_channel_size:
+                        description: OperationsChannelSize controls size of the channel
+                          used for asynchronous puts and deletes.
+                        type: integer
                     type: object
                   otel:
                     description: OTel configuration.
