@@ -58,7 +58,7 @@ type ObjectStorage struct {
 	client         *storage.Client
 	bucketName     string
 	bucket         *storage.BucketHandle
-	retryPolicy    config.RetryPolicy
+	retryPolicy    config.ObjectStorageRetryPolicy
 
 	inFlightOpsMutex sync.Mutex
 	operations       chan *Operation

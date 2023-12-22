@@ -1524,8 +1524,8 @@ spec:
                           for object storage requests.
                         properties:
                           backoff:
-                            description: BackoffConfig for object storage backoff
-                              configuration swagger:model
+                            description: ObjectStorageBackoffConfig for object storage
+                              backoff configuration. swagger:model
                             properties:
                               initial:
                                 description: A Duration represents the elapsed time

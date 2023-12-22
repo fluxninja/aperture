@@ -931,8 +931,6 @@ Enables the Kubernetes auto-scale capability.
 
 BackoffConfig holds configuration for gRPC client backoff.
 
-BackoffConfig for object storage backoff configuration
-
 <dl>
 <dt>base_delay</dt>
 <dd>
@@ -980,26 +978,6 @@ Max Delay
 <!-- vale on -->
 
 Backoff multiplier
-
-</dd>
-<dt>initial</dt>
-<dd>
-
-<!-- vale off -->
-
-([Duration](#duration))
-
-<!-- vale on -->
-
-</dd>
-<dt>maximum</dt>
-<dd>
-
-<!-- vale off -->
-
-([Duration](#duration))
-
-<!-- vale on -->
 
 </dd>
 </dl>
@@ -2525,6 +2503,49 @@ Pedantic controls whether a pedantic registry is used. See
 
 <!-- vale off -->
 
+### ObjectStorageBackoffConfig {#object-storage-backoff-config}
+
+<!-- vale on -->
+
+ObjectStorageBackoffConfig for object storage backoff configuration.
+
+<dl>
+<dt>multiplier</dt>
+<dd>
+
+<!-- vale off -->
+
+(float64, default: `1.5`)
+
+<!-- vale on -->
+
+</dd>
+<dt>initial</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
+
+<!-- vale on -->
+
+</dd>
+<dt>maximum</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
+
+<!-- vale on -->
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### ObjectStorageConfig {#object-storage-config}
 
 <!-- vale on -->
@@ -2598,11 +2619,44 @@ and deletes.
 
 <!-- vale off -->
 
-([RetryPolicy](#retry-policy))
+([ObjectStorageRetryPolicy](#object-storage-retry-policy))
 
 <!-- vale on -->
 
 RetryPolicy to configure retries and timeouts for object storage requests.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ObjectStorageRetryPolicy {#object-storage-retry-policy}
+
+<!-- vale on -->
+
+ObjectStorageRetryPolicy for object storage retry configuration.
+
+<dl>
+<dt>backoff</dt>
+<dd>
+
+<!-- vale off -->
+
+([ObjectStorageBackoffConfig](#object-storage-backoff-config))
+
+<!-- vale on -->
+
+</dd>
+<dt>timeout</dt>
+<dd>
+
+<!-- vale off -->
+
+([Duration](#duration))
+
+<!-- vale on -->
 
 </dd>
 </dl>
@@ -2859,39 +2913,6 @@ HTTPS_PROXY or NO_PROXY. See
 <!-- vale off -->
 
 ([]string)
-
-<!-- vale on -->
-
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### RetryPolicy {#retry-policy}
-
-<!-- vale on -->
-
-RetryPolicy for object storage retry configuration
-
-<dl>
-<dt>backoff</dt>
-<dd>
-
-<!-- vale off -->
-
-([BackoffConfig](#backoff-config))
-
-<!-- vale on -->
-
-</dd>
-<dt>timeout</dt>
-<dd>
-
-<!-- vale off -->
-
-([Duration](#duration))
 
 <!-- vale on -->
 
