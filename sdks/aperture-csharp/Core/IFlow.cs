@@ -4,7 +4,7 @@ public interface IFlow
 {
     bool ShouldRun();
 
-    void End();
+    FeatureFlowEndResponse End();
 
     void SetStatus(FlowStatus status);
 

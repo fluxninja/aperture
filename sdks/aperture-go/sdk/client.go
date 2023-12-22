@@ -168,7 +168,15 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.GlobalCacheKeys, flowParams.ExpectEnd)
+	f := newFlow(
+		c.flowControlClient,
+		span,
+		flowParams.RampMode,
+		flowParams.ResultCacheKey,
+		flowParams.GlobalCacheKeys,
+		flowParams.ExpectEnd,
+		flowParams.CallOptions,
+	)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),

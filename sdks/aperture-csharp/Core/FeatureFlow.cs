@@ -1,6 +1,7 @@
 using System.Net;
 using Aperture.Flowcontrol.Check.V1;
 using Google.Protobuf;
+using Grpc.Core;
 using log4net;
 using OpenTelemetry.Trace;
 
@@ -14,14 +15,18 @@ public class FeatureFlow : IFlow
     private readonly TelemetrySpan _span;
     private bool _ended;
     private FlowStatus _flowStatus;
+    private FlowControlService.FlowControlServiceClient _flowControlServiceClient;
+    private CallOptions _callOptions;
 
-    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode)
+    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode, FlowControlService.FlowControlServiceClient flowControlServiceClient, CallOptions callOptions)
     {
         _checkResponse = checkResponse;
         _span = span;
         _ended = ended;
         _rampMode = rampMode;
         _flowStatus = FlowStatus.Ok;
+        _flowControlServiceClient = flowControlServiceClient;
+        _callOptions = callOptions;
     }
 
     public bool ShouldRun()
@@ -29,12 +34,12 @@ public class FeatureFlow : IFlow
         return GetDecision() == FlowDecision.Accepted || (GetDecision() == FlowDecision.Unreachable && !_rampMode);
     }
 
-    public void End()
+    public FeatureFlowEndResponse End()
     {
         if (_ended)
         {
             _logger.Warn("Attempting to end an already ended Flow");
-            return;
+            return new FeatureFlowEndResponse(new Exception("Attempting to end an already ended Flow"), null);
         }
 
         _ended = true;
@@ -56,6 +61,54 @@ public class FeatureFlow : IFlow
             .SetAttribute(Constants.FLOW_STATUS_LABEL, _flowStatus.ToString())
             .SetAttribute(Constants.CHECK_RESPONSE_LABEL, checkResponseJsonBytes)
             .SetAttribute(Constants.FLOW_STOP_TIMESTAMP_LABEL, Utils.GetCurrentEpochNanos());
+
+        _span.End();
+
+        var inflightRequestRef = new List<InflightRequestRef>();
+
+        for (var i = 0; i < _checkResponse?.LimiterDecisions.Count; i++)
+        {
+            var inflightRequest = new InflightRequestRef
+            {
+                PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
+                PolicyName = _checkResponse.LimiterDecisions[i].PolicyName,
+                ComponentId = _checkResponse.LimiterDecisions[i].ComponentId
+            };
+
+            if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo != null) {
+                inflightRequest.Label = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.Label;
+
+                if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.TokensInfo != null)
+                {
+                    inflightRequest.Tokens = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.TokensInfo.Consumed;
+                }
+            }
+
+            inflightRequestRef.Add(inflightRequest);
+        }
+
+        if (inflightRequestRef.Count > 0)
+        {
+            var flowEndRequest = new FlowEndRequest
+            {
+                ControlPoint = _checkResponse!.ControlPoint
+            };
+            flowEndRequest.InflightRequests.AddRange(inflightRequestRef);
+
+            try
+            {
+                var flowEndResponse = _flowControlServiceClient.FlowEnd(flowEndRequest, _callOptions);
+                return new FeatureFlowEndResponse(null, flowEndResponse);
+            }
+            catch (Exception e)
+            {
+                _logger.Warn("Could not end flow: {e}", e);
+                return new FeatureFlowEndResponse(e, null);
+            }
+
+        }
+
+        return new FeatureFlowEndResponse(null, null);
     }
 
     public void SetStatus(FlowStatus status)

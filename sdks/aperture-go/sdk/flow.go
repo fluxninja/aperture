@@ -30,6 +30,15 @@ type CacheEntry struct {
 	TTL   time.Duration
 }
 
+// EndResponse is the response returned by the End method of the Flow interface.
+type EndResponse struct {
+	// FlowEndResponse is populated if the flow end request succeeded.
+	FlowEndResponse *checkv1.FlowEndResponse
+
+	// Error is populated if the flow end request failed.
+	Error error
+}
+
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
 // The user can check the status of the check call, response from the server, and end the flow once the workload is executed.
 type Flow interface {
@@ -43,7 +52,7 @@ type Flow interface {
 	DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse
 	Error() error
 	Span() trace.Span
-	End(grpcCallOptions []grpc.CallOption) (*checkv1.FlowEndResponse, error)
+	End() EndResponse
 	CheckResponse() *checkv1.CheckResponse
 	RetryAfter() time.Duration
 	HTTPResponseCode() int
@@ -60,13 +69,21 @@ type flow struct {
 	ended             bool
 	rampMode          bool
 	expectEnd         bool
+	callOptions       []grpc.CallOption
 }
 
 // flow implements the Flow interface.
 var _ Flow = (*flow)(nil)
 
 // newFlow creates a new flow with default field values.
-func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, globalCacheKeys []string, expectEnd bool) *flow {
+func newFlow(
+	flowControlClient checkv1.FlowControlServiceClient,
+	span trace.Span,
+	rampMode bool,
+	resultCacheKey string,
+	globalCacheKeys []string,
+	expectEnd bool,
+	callOptions []grpc.CallOption) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
 		span:              span,
@@ -77,6 +94,7 @@ func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span
 		resultCacheKey:    resultCacheKey,
 		globalCacheKeys:   globalCacheKeys,
 		expectEnd:         expectEnd,
+		callOptions:       callOptions,
 	}
 }
 
@@ -265,15 +283,19 @@ func (f *flow) Span() trace.Span {
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.
-func (f *flow) End(grpcCallOptions []grpc.CallOption) (*checkv1.FlowEndResponse, error) {
+func (f *flow) End() EndResponse {
 	if f.ended {
-		return nil, errors.New("flow already ended")
+		return EndResponse{
+			Error: errors.New("flow already ended"),
+		}
 	}
 	f.ended = true
 
 	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
 	if err != nil {
-		return nil, err
+		return EndResponse{
+			Error: err,
+		}
 	}
 	f.span.SetAttributes(
 		attribute.String(flowStatusLabel, f.statusCode.String()),
@@ -303,13 +325,16 @@ func (f *flow) End(grpcCallOptions []grpc.CallOption) (*checkv1.FlowEndResponse,
 	}
 
 	if len(inflightRequestRef) == 0 {
-		return nil, nil
+		return EndResponse{}
 	}
 
 	flowEndResponse, err := f.flowControlClient.FlowEnd(context.Background(), &checkv1.FlowEndRequest{
 		ControlPoint:     f.checkResponse.ControlPoint,
 		InflightRequests: inflightRequestRef,
-	}, grpcCallOptions...)
+	}, f.callOptions...)
 
-	return flowEndResponse, err
+	return EndResponse{
+		FlowEndResponse: flowEndResponse,
+		Error:           err,
+	}
 }
