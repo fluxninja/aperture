@@ -57,8 +57,14 @@ public class ApertureSdk : IApertureSdk
         {
             ControlPoint = controlPoint,
             RampMode = rampMode,
-            ExpectEnd = expectEnd
+            ExpectEnd = expectEnd,
+            CacheLookupRequest = new CacheLookupRequest
+            {
+                ResultCacheKey = parameters.ResultCacheKey,
+            }
         };
+        checkReq.CacheLookupRequest.GlobalCacheKeys.AddRange(parameters.GlobalCacheKeys);
+
         foreach (var label in labels) checkReq.Labels.Add(label.Key, label.Value);
 
         using var span = _tracer.StartSpan("Aperture Check");
@@ -88,7 +94,7 @@ public class ApertureSdk : IApertureSdk
 
         span.SetAttribute(Constants.WORKLOAD_START_TIMESTAMP_LABEL, Utils.GetCurrentEpochNanos());
 
-        return new FeatureFlow(res, span, false, rampMode, _flowControlClient, parameters.CallOptions);
+        return new FeatureFlow(res, span, false, rampMode, _flowControlClient, parameters.CallOptions, parameters.ResultCacheKey, parameters.GlobalCacheKeys);
     }
 
     public static ApertureSdkBuilder Builder()

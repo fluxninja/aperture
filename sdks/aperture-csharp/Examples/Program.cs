@@ -49,7 +49,9 @@ using (var listener = new HttpListener())
                 false,
                 TimeSpan.FromSeconds(5),
                 new Grpc.Core.CallOptions(),
-                true);
+                true,
+                null,
+                null);
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {
@@ -81,7 +83,9 @@ using (var listener = new HttpListener())
                 rampMode,
                 flowTimeout,
                 new Grpc.Core.CallOptions(),
-                expectEnd);
+                expectEnd,
+                null,
+                null);
             var flow = sdk.StartFlow(pms);
             if (flow.ShouldRun())
             {

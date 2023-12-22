@@ -2,8 +2,10 @@ using System.Net;
 using Aperture.Flowcontrol.Check.V1;
 using Google.Protobuf;
 using Grpc.Core;
+using Google.Protobuf.Collections;
 using log4net;
 using OpenTelemetry.Trace;
+using Google.Protobuf.WellKnownTypes;
 
 namespace ApertureSDK.Core;
 
@@ -17,8 +19,10 @@ public class FeatureFlow : IFlow
     private FlowStatus _flowStatus;
     private FlowControlService.FlowControlServiceClient _flowControlServiceClient;
     private CallOptions _callOptions;
+    private readonly string? _resultCacheKey;
+    private readonly RepeatedField<string>? _globalCacheKeys;
 
-    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode, FlowControlService.FlowControlServiceClient flowControlServiceClient, CallOptions callOptions)
+    public FeatureFlow(CheckResponse? checkResponse, TelemetrySpan span, bool ended, bool rampMode, FlowControlService.FlowControlServiceClient flowControlServiceClient, CallOptions callOptions, string? resultCacheKey, RepeatedField<string>? globalCacheKeys)
     {
         _checkResponse = checkResponse;
         _span = span;
@@ -27,11 +31,188 @@ public class FeatureFlow : IFlow
         _flowStatus = FlowStatus.Ok;
         _flowControlServiceClient = flowControlServiceClient;
         _callOptions = callOptions;
+        _resultCacheKey = resultCacheKey;
+        _globalCacheKeys = globalCacheKeys;
     }
 
     public bool ShouldRun()
     {
         return GetDecision() == FlowDecision.Accepted || (GetDecision() == FlowDecision.Unreachable && !_rampMode);
+    }
+
+    public LookupResponse ResultCache()
+    {
+        if (_checkResponse == null)
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("check response is null"));
+        }
+
+        if (!ShouldRun())
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("flow was rejected"));
+        }
+
+        if (_checkResponse.CacheLookupResponse == null || _checkResponse.CacheLookupResponse.ResultCacheResponse == null)
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("result cache is null"));
+        }
+
+        var cacheLookupResponse = _checkResponse.CacheLookupResponse.ResultCacheResponse;
+        return new LookupResponse(
+            cacheLookupResponse.Value.ToStringUtf8(),
+            CacheLookupStatusConverter.ConvertCacheLookupStatus(cacheLookupResponse.LookupStatus),
+            CacheErrorConverter.ConvertCacheError(cacheLookupResponse.Error));
+    }
+
+    public UpsertResponse SetResultCache(Object value, Duration ttl)
+    {
+        if (_resultCacheKey == null)
+        {
+            return new UpsertResponse(new Exception("result cache key is null"));
+        }
+
+        if (_checkResponse == null)
+        {
+            return new UpsertResponse(new Exception("check response is null"));
+        }
+
+        var request = new CacheUpsertRequest
+        {
+            ControlPoint = _checkResponse.ControlPoint,
+            ResultCacheEntry = new CacheEntry
+            {
+                Key = _resultCacheKey,
+                Value = ByteString.CopyFromUtf8(value.ToString()),
+                Ttl = ttl
+            }
+        };
+
+        try
+        {
+            var cacheUpsertResponse = _flowControlServiceClient.CacheUpsert(request, _callOptions);
+            return new UpsertResponse(null);
+        }
+        catch (Exception e)
+        {
+            _logger.Warn("Could not set result cache: {e}", e);
+            return new UpsertResponse(e);
+        }
+
+    }
+
+    public DeleteResponse DeleteResultCache()
+    {
+        if (_resultCacheKey == null)
+        {
+            return new DeleteResponse(new Exception("result cache key is null"));
+        }
+
+        if (_checkResponse == null)
+        {
+            return new DeleteResponse(new Exception("check response is null"));
+        }
+
+        var request = new CacheDeleteRequest
+        {
+            ControlPoint = _checkResponse.ControlPoint,
+            ResultCacheKey = _resultCacheKey
+        };
+
+        try
+        {
+            var cacheDeleteResponse = _flowControlServiceClient.CacheDelete(request, _callOptions);
+            return new DeleteResponse(null);
+        }
+        catch (Exception e)
+        {
+            _logger.Warn("Could not delete result cache: {e}", e);
+            return new DeleteResponse(e);
+        }
+    }
+
+    public LookupResponse GlobalCache(string key)
+    {
+        if (_checkResponse == null)
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("check response is null"));
+        }
+
+        if (!ShouldRun())
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("flow was rejected"));
+        }
+
+        if (_checkResponse.CacheLookupResponse == null || _checkResponse.CacheLookupResponse.GlobalCacheResponses == null)
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("global cache is null"));
+        }
+
+        var cacheLookupResponses = _checkResponse.CacheLookupResponse.GlobalCacheResponses;
+        var cacheLookupResponse = cacheLookupResponses.GetValueOrDefault(key);
+
+        if (cacheLookupResponse == null)
+        {
+            return new LookupResponse(null, LookupStatus.MISS, new Exception("global cache is null"));
+        }
+
+        return new LookupResponse(
+            cacheLookupResponse.Value.ToStringUtf8(),
+            CacheLookupStatusConverter.ConvertCacheLookupStatus(cacheLookupResponse.LookupStatus),
+            CacheErrorConverter.ConvertCacheError(cacheLookupResponse.Error));
+    }
+
+    public UpsertResponse SetGlobalCache(string key, Object value, Duration ttl)
+    {
+        if (_checkResponse == null)
+        {
+            return new UpsertResponse(new Exception("check response is null"));
+        }
+
+        var request = new CacheUpsertRequest
+        {
+            ControlPoint = _checkResponse.ControlPoint,
+        };
+        request.GlobalCacheEntries.Add(key, new CacheEntry
+        {
+            Value = ByteString.CopyFromUtf8(value.ToString()),
+            Ttl = ttl
+        });
+
+        try
+        {
+            var cacheUpsertResponse = _flowControlServiceClient.CacheUpsert(request, _callOptions);
+            return new UpsertResponse(null);
+        }
+        catch (Exception e)
+        {
+            _logger.Warn("Could not set global cache: {e}", e);
+            return new UpsertResponse(e);
+        }
+    }
+
+    public DeleteResponse DeleteGlobalCache(string key)
+    {
+        if (_checkResponse == null)
+        {
+            return new DeleteResponse(new Exception("check response is null"));
+        }
+
+        var request = new CacheDeleteRequest
+        {
+            ControlPoint = _checkResponse.ControlPoint,
+            GlobalCacheKeys = { key }
+        };
+
+        try
+        {
+            var cacheDeleteResponse = _flowControlServiceClient.CacheDelete(request, _callOptions);
+            return new DeleteResponse(null);
+        }
+        catch (Exception e)
+        {
+            _logger.Warn("Could not delete global cache: {e}", e);
+            return new DeleteResponse(e);
+        }
     }
 
     public FeatureFlowEndResponse End()
@@ -75,7 +256,8 @@ public class FeatureFlow : IFlow
                 ComponentId = _checkResponse.LimiterDecisions[i].ComponentId
             };
 
-            if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo != null) {
+            if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo != null)
+            {
                 inflightRequest.Label = _checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.Label;
 
                 if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.TokensInfo != null)

@@ -1,5 +1,6 @@
 namespace ApertureSDK.Core;
 
+using Google.Protobuf.Collections;
 using Grpc.Core;
 
 public class FeatureFlowParams
@@ -10,7 +11,9 @@ public class FeatureFlowParams
         bool rampMode,
         TimeSpan flowTimeout,
         CallOptions callOptions,
-        bool expectEnd)
+        bool expectEnd,
+        string? resultCacheKey,
+        RepeatedField<string>? globalCacheKeys)
     {
         ControlPoint = controlPoint ?? throw new ArgumentNullException(nameof(controlPoint));
         ExplicitLabels = new Dictionary<string, string>(
@@ -19,6 +22,8 @@ public class FeatureFlowParams
         FlowTimeout = flowTimeout;
         CallOptions = callOptions;
         ExpectEnd = expectEnd;
+        ResultCacheKey = resultCacheKey;
+        GlobalCacheKeys = globalCacheKeys;
     }
 
     public string ControlPoint { get; set; }
@@ -27,4 +32,6 @@ public class FeatureFlowParams
     public bool RampMode { get; set; }
     public CallOptions CallOptions { get; set; }
     public bool ExpectEnd { get; set; }
+    public string? ResultCacheKey { get; set; }
+    public RepeatedField<string>? GlobalCacheKeys { get; set; }
 }
