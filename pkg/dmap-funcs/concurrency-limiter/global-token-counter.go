@@ -122,6 +122,7 @@ func (gtc *GlobalTokenCounter) TakeIfAvailable(ctx context.Context, label string
 
 	if deadlinemargin.IsMarginExceeded(ctx) {
 		d, _ := ctx.Deadline()
+		// TODO: remove this log
 		log.Info().Str("deadline", d.String()).Msg("Deadline exceeded")
 		ok = false
 		return
