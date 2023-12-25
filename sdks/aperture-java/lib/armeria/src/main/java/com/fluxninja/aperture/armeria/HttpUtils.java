@@ -1,5 +1,6 @@
 package com.fluxninja.aperture.armeria;
 
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
 import com.fluxninja.aperture.sdk.TrafficFlowRequest;
@@ -24,7 +25,11 @@ import java.util.Map;
 class HttpUtils {
     protected static HttpResponse handleRejectedFlow(TrafficFlow flow) {
         flow.setStatus(FlowStatus.Unset);
-        flow.end();
+        EndResponse endResponse = flow.end();
+        if (endResponse.getError() != null) {
+            System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+        }
+
         if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
             int httpStatusCode = flow.getRejectionHttpStatusCode();
             HttpResponseBuilder resBuilder = HttpResponse.builder();

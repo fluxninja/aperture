@@ -928,6 +928,9 @@ definitions:
         type: object
     CheckHTTPResponse:
         properties:
+            check_response:
+                $ref: '#/definitions/CheckResponse'
+                description: The response from the check call.
             denied_response:
                 $ref: '#/definitions/DeniedHttpResponse'
                 description: Supplies http attributes for a denied response.
