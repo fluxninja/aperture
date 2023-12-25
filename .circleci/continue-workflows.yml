@@ -1252,6 +1252,17 @@ workflows:
           environment-path: environments/latest/
           component: cloud-agent
           update: images
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: aperture-agent-update-environment-saas
+          requires:
+            - image-build-aperture-agent
+          environment-path: environments/latest-saas/
+          component: aperture-agent
+          update: images
 
       - build-push-add-tag:
           name: image-build-aperture-controller
@@ -1403,6 +1414,17 @@ workflows:
           environment-path: environments/latest/
           component: aperture-operator
           update: images
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: aperture-operator-update-environment-saas
+          requires:
+            - image-build-aperture-operator
+          environment-path: environments/latest-saas/
+          component: aperture-operator
+          update: images
 
   demo-app:
     when: << pipeline.parameters.updated-demo-app >>
@@ -1490,6 +1512,14 @@ workflows:
           name: push-blueprints-changes-update-environment
           update: blueprints
           environment-path: environments/latest/
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: push-blueprints-changes-update-environment-saas
+          update: blueprints
+          environment-path: environments/latest-saas/
 
   push-deployment-changes:
     when:
@@ -1514,6 +1544,16 @@ workflows:
             - push-deployment-changes
           update: deployment-code
           environment-path: environments/latest/
+      - update-environment:
+          filters:
+            branches:
+              only:
+                - main
+          name: push-deployment-changes-update-environment-saas
+          requires:
+            - push-deployment-changes
+          update: deployment-code
+          environment-path: environments/latest-saas/
 
   preview-deployment-changes:
     when:
