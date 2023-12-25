@@ -23,9 +23,9 @@ import {
   _aperture_flowcontrol_check_v1_CheckResponse_DecisionType,
 } from "./gen/aperture/flowcontrol/check/v1/CheckResponse.js";
 import { FlowControlServiceClient } from "./gen/aperture/flowcontrol/check/v1/FlowControlService.js";
-import { InflightRequestRef } from "./gen/aperture/flowcontrol/check/v1/InflightRequestRef.js";
 import { FlowEndRequest } from "./gen/aperture/flowcontrol/check/v1/FlowEndRequest.js";
 import { FlowEndResponse as FlowEndResponseProto } from "./gen/aperture/flowcontrol/check/v1/FlowEndResponse.js";
+import { InflightRequestRef } from "./gen/aperture/flowcontrol/check/v1/InflightRequestRef.js";
 import type { Duration__Output as _google_protobuf_Duration__Output } from "./gen/google/protobuf/Duration";
 import type { Timestamp__Output as _google_protobuf_Timestamp__Output } from "./gen/google/protobuf/Timestamp";
 
@@ -64,7 +64,7 @@ export interface Flow {
   span(): Span;
   end(grpcOptions?: grpc.CallOptions): Promise<FlowEndResponse>;
   httpResponseCode(): Number | undefined;
-  retryAfter(): { seconds: string | undefined, nanos: number | undefined }
+  retryAfter(): { seconds: string | undefined; nanos: number | undefined };
 }
 
 /**
@@ -89,7 +89,6 @@ export class _Flow implements Flow {
     _span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Date.now());
   }
 
-
   /**
    * Determines whether the flow should run based on the check response and ramp mode.
    * @returns A boolean value indicating whether the flow should run.
@@ -98,7 +97,7 @@ export class _Flow implements Flow {
     if (
       (!this.rampMode && this._checkResponse === null) ||
       this._checkResponse?.decisionType ===
-      _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -401,7 +400,10 @@ export class _Flow implements Flow {
    */
   retryAfter() {
     if (this._checkResponse) {
-      return { seconds: this._checkResponse?.waitTime?.seconds.toString(), nanos: this._checkResponse?.waitTime?.nanos };
+      return {
+        seconds: this._checkResponse?.waitTime?.seconds.toString(),
+        nanos: this._checkResponse?.waitTime?.nanos,
+      };
     }
     return { seconds: undefined, nanos: undefined };
   }
@@ -413,8 +415,7 @@ export class _Flow implements Flow {
   httpResponseCode() {
     if (this._checkResponse) {
       let statusCode = this._checkResponse?.deniedResponseStatusCode;
-      if (statusCode == 0)
-        return 200;
+      if (statusCode == 0) return 200;
       return Number(this._checkResponse?.deniedResponseStatusCode);
     }
     return 0;
@@ -448,10 +449,13 @@ export class _Flow implements Flow {
         // Current timestamp type: https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/timestamp.proto
         const localCheckResponse = this._checkResponse as any;
 
-        if (this._checkResponse.cacheLookupResponse?.resultCacheResponse?.value) {
-          localCheckResponse.cacheLookupResponse.resultCacheResponse.value = bufferToByteArrayJson(
-            this._checkResponse.cacheLookupResponse.resultCacheResponse.value,
-          );
+        if (
+          this._checkResponse.cacheLookupResponse?.resultCacheResponse?.value
+        ) {
+          localCheckResponse.cacheLookupResponse.resultCacheResponse.value =
+            bufferToByteArrayJson(
+              this._checkResponse.cacheLookupResponse.resultCacheResponse.value,
+            );
         }
 
         if (this._checkResponse.cacheLookupResponse?.globalCacheResponses) {
@@ -524,17 +528,14 @@ export class _Flow implements Flow {
       const flowEndRequest: FlowEndRequest = {
         controlPoint: this.controlPoint,
         inflightRequests: inflightRequestRefs,
-      }
+      };
       if (inflightRequestRefs.length > 0) {
         this.fcsClient.FlowEnd(
           flowEndRequest,
           grpcCallOptions ?? {},
           (err, res) => {
             if (err) {
-              const resp = new _FlowEndResponse(
-                err,
-                {},
-              );
+              const resp = new _FlowEndResponse(err, {});
               resolve(resp);
               return;
             }
@@ -546,18 +547,21 @@ export class _Flow implements Flow {
               resolve(resp);
               return;
             }
-            const resp = new _FlowEndResponse(
-              null,
-              res,
-            );
+            const resp = new _FlowEndResponse(null, res);
             resolve(resp);
             return;
-          });
-      } else {
-        const resp = new _FlowEndResponse(
-          new Error("Check response was nil"),
-          {},
+          },
         );
+      } else {
+        if (!this._checkResponse) {
+          const resp = new _FlowEndResponse(
+            new Error("Check response was nil"),
+            {},
+          );
+          resolve(resp);
+          return;
+        }
+        const resp = new _FlowEndResponse(null, {});
         resolve(resp);
         return;
       }
@@ -588,7 +592,7 @@ function bufferToByteArrayJson(buffer: Buffer) {
   for (var i = 0; i < byteArray.length; i++) {
     hash += String.fromCharCode(byteArray[i]);
   }
-  return Buffer.from(hash).toString('base64');
+  return Buffer.from(hash).toString("base64");
 }
 
 function protoTimestampToJSON(

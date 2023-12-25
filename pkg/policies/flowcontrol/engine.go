@@ -693,16 +693,21 @@ func (e *Engine) FlowEnd(ctx context.Context, request *flowcontrolv1.FlowEndRequ
 		}
 		flowEnder := e.flowEnders[limiterID]
 		var err error
+		var errStr string
 		var returned bool
 		if flowEnder != nil {
 			returned, err = flowEnder.Return(ctx, inflightRequest.Label, inflightRequest.Tokens, inflightRequest.RequestId)
+			if err != nil {
+				errStr = err.Error()
+			}
 		} else {
 			err = errors.New("flow ender not found for limiter id")
+			errStr = err.Error()
 		}
 		response.TokenReturnStatuses = append(response.TokenReturnStatuses, &flowcontrolv1.TokenReturnStatus{
 			InflightRequestRef: inflightRequest,
 			Returned:           returned,
-			Error:              err.Error(),
+			Error:              errStr,
 		})
 	}
 

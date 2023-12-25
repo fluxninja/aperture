@@ -1,4 +1,4 @@
-import { ApertureClient } from "@fluxninja/aperture-js";
+import {ApertureClient} from "@fluxninja/aperture-js";
 import grpc from "@grpc/grpc-js";
 
 async function initializeApertureClient() {
@@ -47,7 +47,7 @@ async function sendRequestForTier(
     console.log(`[${tier} Tier] Request rejected. Priority was ${priority}.`);
   }
 
-  flow.end();
+  const flowEndResponse = await flow.end();
 }
 
 async function scheduleRequests(apertureClient: ApertureClient) {

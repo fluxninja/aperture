@@ -121,9 +121,6 @@ func (gtc *GlobalTokenCounter) TakeIfAvailable(ctx context.Context, label string
 	}
 
 	if deadlinemargin.IsMarginExceeded(ctx) {
-		d, _ := ctx.Deadline()
-		// TODO: remove this log
-		log.Info().Str("deadline", d.String()).Msg("Deadline exceeded")
 		ok = false
 		return
 	}
@@ -248,6 +245,7 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 		if resp.GetAvailableNow() {
 			current = resp.GetCurrent()
 			remaining = resp.GetRemaining()
+			reqID = req.RequestId
 			ok = true
 			return
 		}
@@ -271,7 +269,11 @@ func (gtc *GlobalTokenCounter) Take(ctx context.Context, label string, count flo
 			waitTime = MinimumWaitTime
 		}
 
-		// TODO: check if waitTime is larger than the deadline and return false if it is
+		if deadlinemargin.IsWaitMarginExceeded(ctx, waitTime) {
+			cancelQueued()
+			ok = false
+			return
+		}
 
 		// Pause until waitTime has elapsed or context is canceled
 		select {
