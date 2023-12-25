@@ -195,7 +195,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, middlewareParams MiddlewareParams) HTTPFlow {
 	span := c.getSpan(ctx)
 
-	f := newHTTPFlow(span, middlewareParams.FlowParams)
+	f := newHTTPFlow(span, middlewareParams.FlowParams, c.flowControlClient)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
