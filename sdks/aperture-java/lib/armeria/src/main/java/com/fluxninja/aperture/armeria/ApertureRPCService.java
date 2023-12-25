@@ -74,7 +74,7 @@ public class ApertureRPCService extends SimpleDecoratingRpcService {
             } finally {
                 EndResponse endResponse = flow.end();
                 if (endResponse.getError() != null) {
-                    throw new Exception("Error ending flow", endResponse.getError());
+                    System.err.println("Error ending flow: " + endResponse.getError().getMessage());
                 }
 
                 // Handle flow end response

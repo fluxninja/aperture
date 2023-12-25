@@ -3,6 +3,7 @@ package com.fluxninja.aperture.servlet.javax;
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.ApertureSDKBuilder;
 import com.fluxninja.aperture.sdk.Constants;
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FlowDecision;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
@@ -60,7 +61,10 @@ public class ApertureFilter implements Filter {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
+                if (endResponse.getError() != null) {
+                    System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+                }
             }
         } else {
             ServletUtils.handleRejectedFlow(flow, response);

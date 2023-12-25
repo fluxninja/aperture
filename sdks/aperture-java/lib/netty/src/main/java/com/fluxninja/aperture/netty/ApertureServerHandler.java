@@ -2,6 +2,7 @@ package com.fluxninja.aperture.netty;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.Constants;
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FlowDecision;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
@@ -16,7 +17,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 import java.time.Duration;
 import java.util.Collections;
@@ -59,7 +59,6 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest req) {
         TrafficFlowRequest trafficFlowRequest =
                 NettyUtils.trafficFlowRequestFromRequest(ctx, req, controlPointName, flowTimeout);
-        String path = new QueryStringDecoder(req.uri()).path();
 
         TrafficFlow flow = this.apertureSDK.startTrafficFlow(trafficFlowRequest);
 
@@ -86,11 +85,18 @@ public class ApertureServerHandler extends SimpleChannelInboundHandler<HttpReque
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
+                if (endResponse.getError() != null) {
+                    System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+                }
             }
         } else {
             flow.setStatus(FlowStatus.Unset);
-            flow.end();
+            EndResponse endResponse = flow.end();
+            if (endResponse.getError() != null) {
+                System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+            }
+
             HttpResponseStatus status;
             Map<String, String> headers;
             if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {

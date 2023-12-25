@@ -54,11 +54,8 @@ public class ApertureFeatureFilter implements Filter {
         } finally {
             EndResponse endResponse = flow.end();
             if (endResponse.getError() != null) {
-                throw new ServletException("Error ending flow", endResponse.getError());
+                System.err.println("Error ending flow: " + endResponse.getError().getMessage());
             }
-
-            // Handle flow end response
-            System.out.println("Flow End response: " + endResponse.getFlowEndResponse());
         }
     }
 

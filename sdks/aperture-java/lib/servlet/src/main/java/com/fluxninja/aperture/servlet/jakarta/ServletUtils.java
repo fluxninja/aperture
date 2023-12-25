@@ -1,5 +1,6 @@
 package com.fluxninja.aperture.servlet.jakarta;
 
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
 import com.fluxninja.aperture.sdk.TrafficFlowRequest;
@@ -27,7 +28,10 @@ public class ServletUtils {
     protected static void handleRejectedFlow(TrafficFlow flow, HttpServletResponse response)
             throws IOException {
         flow.setStatus(FlowStatus.Unset);
-        flow.end();
+        EndResponse endResponse = flow.end();
+        if (endResponse.getError() != null) {
+            System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+        }
 
         int code = 403;
         if (flow.checkResponse() != null && flow.checkResponse().hasDeniedResponse()) {
