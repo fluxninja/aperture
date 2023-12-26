@@ -549,8 +549,9 @@ func (gtc *GlobalTokenCounter) returnTokens(key string, stateBytes, argBytes []b
 	tokenWindow.Count += 1
 
 	if tokenWindow.Count >= TokenRateWindowSize {
-		if state.TokenRate == 0 {
-			state.TokenRate = tokenWindow.Sum / tokenWindow.End.AsTime().Sub(tokenWindow.Start.AsTime()).Seconds()
+		timeElapsed := tokenWindow.End.AsTime().Sub(tokenWindow.Start.AsTime()).Seconds()
+		if timeElapsed != 0 {
+			state.TokenRate = tokenWindow.Sum / timeElapsed
 		}
 		tokenWindow.Start = tokenWindow.End
 		tokenWindow.End = nil
@@ -699,3 +700,8 @@ func (gtc *GlobalTokenCounter) decodeState(stateBytes []byte, key string) (*toke
 func isExpired(r *tokencounterv1.Request, now time.Time) bool {
 	return r.ExpiresAt.AsTime().Before(now)
 }
+
+/*func debugState(state *tokencounterv1.State, location string) {
+	// print the number of queued and inflight requests and token rate
+	log.Info().Msgf("%s: queued: %d, inflight: %d, token rate: %f", location, len(state.RequestsQueued), len(state.RequestsInflight), state.TokenRate)
+}*/
