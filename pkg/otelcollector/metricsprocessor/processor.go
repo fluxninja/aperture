@@ -367,8 +367,6 @@ func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv
 }
 
 func (p *metricsProcessor) returnInflightTokens(expectEnd bool, limiterID iface.LimiterID, label string, tokensInfo *flowcontrolv1.LimiterDecision_TokensInfo, reqID string) {
-	// TODO: Remove this log
-	log.Info().Msg("returnInflightTokens")
 	if reqID == "" {
 		log.Warn().Msg("Request ID is empty")
 		return
