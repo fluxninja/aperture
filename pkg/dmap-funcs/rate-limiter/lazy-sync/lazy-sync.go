@@ -8,8 +8,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/fluxninja/aperture/v2/pkg/config"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
 )
 
 type counter struct {

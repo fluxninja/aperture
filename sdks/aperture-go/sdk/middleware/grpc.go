@@ -87,10 +87,12 @@ func GRPCUnaryInterceptor(c aperture.Client, controlPoint string, middlewarePara
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
 			// SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error.
 			// If not set, status defaults to OK.
-			err := flow.End()
-			if err != nil {
-				c.GetLogger().Info("Aperture flow control end got error.", "error", err)
+			resp := flow.End()
+			if resp.Error != nil {
+				c.GetLogger().Info("Aperture flow control end got error.", "error", resp.Error)
 			}
+
+			c.GetLogger().Info("Aperture flow control end.", "resp", resp)
 		}()
 
 		if !flow.ShouldRun() {
@@ -156,6 +158,7 @@ func prepareCheckHTTPRequestForGRPC(ctx context.Context, req interface{}, logger
 		Destination:  destinationSocket,
 		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    true,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   method,
 			Path:     fullMethod,

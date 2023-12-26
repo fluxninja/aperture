@@ -25,12 +25,16 @@ export interface ProtoGrpcType {
           CheckResponse: MessageTypeDefinition
           ClassifierInfo: MessageTypeDefinition
           FlowControlService: SubtypeConstructor<typeof grpc.Client, _aperture_flowcontrol_check_v1_FlowControlServiceClient> & { service: _aperture_flowcontrol_check_v1_FlowControlServiceDefinition }
+          FlowEndRequest: MessageTypeDefinition
+          FlowEndResponse: MessageTypeDefinition
           FluxMeterInfo: MessageTypeDefinition
+          InflightRequestRef: MessageTypeDefinition
           KeyDeleteResponse: MessageTypeDefinition
           KeyLookupResponse: MessageTypeDefinition
           KeyUpsertResponse: MessageTypeDefinition
           LimiterDecision: MessageTypeDefinition
           StatusCode: EnumTypeDefinition
+          TokenReturnStatus: MessageTypeDefinition
         }
       }
     }

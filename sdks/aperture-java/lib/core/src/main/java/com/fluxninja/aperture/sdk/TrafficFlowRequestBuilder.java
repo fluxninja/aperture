@@ -168,7 +168,7 @@ public class TrafficFlowRequestBuilder {
      * @return The constructed TrafficFlowRequest object.
      */
     public TrafficFlowRequest build() {
-        checkHTTPRequestBuilder.setRequest(httpRequestBuilder.build());
+        checkHTTPRequestBuilder.setRequest(httpRequestBuilder.build()).setExpectEnd(true);
         CheckHTTPRequest checkHTTPRequest = checkHTTPRequestBuilder.build();
         return new TrafficFlowRequest(checkHTTPRequest, this.flowTimeout);
     }

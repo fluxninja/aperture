@@ -12,6 +12,7 @@ service FlowControlService {
   rpc CacheLookup(CacheLookupRequest) returns (CacheLookupResponse) {}
   rpc CacheUpsert(CacheUpsertRequest) returns (CacheUpsertResponse) {}
   rpc CacheDelete(CacheDeleteRequest) returns (CacheDeleteResponse) {}
+  rpc FlowEnd(FlowEndRequest) returns (FlowEndResponse) {}
 }
 
 // CheckRequest contains fields required to perform Check call.
@@ -20,6 +21,7 @@ message CheckRequest {
   map<string, string> labels = 2;
   bool ramp_mode = 3;
   CacheLookupRequest cache_lookup_request = 4;
+  bool expect_end = 5;
 }
 
 // CheckResponse contains fields that represent decision made by Check call.
@@ -69,6 +71,8 @@ message CheckResponse {
   StatusCode denied_response_status_code = 14;
   // CacheLookupResponse contains the result of the cache lookup.
   CacheLookupResponse cache_lookup_response = 15;
+  // Expected End for this request.
+  bool expect_end = 16;
 }
 
 message KeyLookupResponse {
@@ -191,6 +195,20 @@ message LimiterDecision {
     double priority = 4;
   }
 
+  message ConcurrencyLimiterInfo {
+    string label = 1;
+    TokensInfo tokens_info = 2;
+    string request_id = 3;
+  }
+
+  message ConcurrencySchedulerInfo {
+    string label = 1;
+    string workload_index = 2;
+    TokensInfo tokens_info = 3;
+    double priority = 4;
+    string request_id = 5;
+  }
+
   enum LimiterReason {
     LIMITER_REASON_UNSPECIFIED = 0;
     LIMITER_REASON_KEY_NOT_FOUND = 1;
@@ -208,6 +226,8 @@ message LimiterDecision {
     SchedulerInfo load_scheduler_info = 21;
     SamplerInfo sampler_info = 22;
     QuotaSchedulerInfo quota_scheduler_info = 23;
+    ConcurrencyLimiterInfo concurrency_limiter_info = 24;
+    ConcurrencySchedulerInfo concurrency_scheduler_info = 25;
   }
 }
 
@@ -333,4 +353,28 @@ enum StatusCode {
   NotExtended = 510;
 
   NetworkAuthenticationRequired = 511;
+}
+
+message InflightRequestRef {
+  string policy_name = 1;
+  string policy_hash = 2;
+  string component_id = 3;
+  string label = 4;
+  string request_id = 5;
+  double tokens = 6;
+}
+
+message TokenReturnStatus {
+  InflightRequestRef inflight_request_ref = 1;
+  bool returned = 2;
+  string error = 3;
+}
+
+message FlowEndRequest {
+  string control_point = 1; // needed for telemetry
+  repeated InflightRequestRef inflight_requests = 2;
+}
+
+message FlowEndResponse {
+  repeated TokenReturnStatus token_return_statuses = 1;
 }

@@ -205,6 +205,44 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse.getDefaultInstance();
   }
 
+  public static final int CHECK_RESPONSE_FIELD_NUMBER = 5;
+  private com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse checkResponse_;
+  /**
+   * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   * @return Whether the checkResponse field is set.
+   */
+  @java.lang.Override
+  public boolean hasCheckResponse() {
+    return ((bitField0_ & 0x00000002) != 0);
+  }
+  /**
+   * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   * @return The checkResponse.
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse getCheckResponse() {
+    return checkResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDefaultInstance() : checkResponse_;
+  }
+  /**
+   * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder getCheckResponseOrBuilder() {
+    return checkResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDefaultInstance() : checkResponse_;
+  }
+
   public static final int DYNAMIC_METADATA_FIELD_NUMBER = 4;
   private com.google.protobuf.Struct dynamicMetadata_;
   /**
@@ -218,7 +256,7 @@ private static final long serialVersionUID = 0L;
    */
   @java.lang.Override
   public boolean hasDynamicMetadata() {
-    return ((bitField0_ & 0x00000002) != 0);
+    return ((bitField0_ & 0x00000004) != 0);
   }
   /**
    * <pre>
@@ -269,8 +307,11 @@ private static final long serialVersionUID = 0L;
     if (httpResponseCase_ == 3) {
       output.writeMessage(3, (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_);
     }
-    if (((bitField0_ & 0x00000002) != 0)) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       output.writeMessage(4, getDynamicMetadata());
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      output.writeMessage(5, getCheckResponse());
     }
     getUnknownFields().writeTo(output);
   }
@@ -293,9 +334,13 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, (com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.OkHttpResponse) httpResponse_);
     }
-    if (((bitField0_ & 0x00000002) != 0)) {
+    if (((bitField0_ & 0x00000004) != 0)) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, getDynamicMetadata());
+    }
+    if (((bitField0_ & 0x00000002) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(5, getCheckResponse());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -316,6 +361,11 @@ private static final long serialVersionUID = 0L;
     if (hasStatus()) {
       if (!getStatus()
           .equals(other.getStatus())) return false;
+    }
+    if (hasCheckResponse() != other.hasCheckResponse()) return false;
+    if (hasCheckResponse()) {
+      if (!getCheckResponse()
+          .equals(other.getCheckResponse())) return false;
     }
     if (hasDynamicMetadata() != other.hasDynamicMetadata()) return false;
     if (hasDynamicMetadata()) {
@@ -349,6 +399,10 @@ private static final long serialVersionUID = 0L;
     if (hasStatus()) {
       hash = (37 * hash) + STATUS_FIELD_NUMBER;
       hash = (53 * hash) + getStatus().hashCode();
+    }
+    if (hasCheckResponse()) {
+      hash = (37 * hash) + CHECK_RESPONSE_FIELD_NUMBER;
+      hash = (53 * hash) + getCheckResponse().hashCode();
     }
     if (hasDynamicMetadata()) {
       hash = (37 * hash) + DYNAMIC_METADATA_FIELD_NUMBER;
@@ -497,6 +551,7 @@ private static final long serialVersionUID = 0L;
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
         getStatusFieldBuilder();
+        getCheckResponseFieldBuilder();
         getDynamicMetadataFieldBuilder();
       }
     }
@@ -514,6 +569,11 @@ private static final long serialVersionUID = 0L;
       }
       if (okResponseBuilder_ != null) {
         okResponseBuilder_.clear();
+      }
+      checkResponse_ = null;
+      if (checkResponseBuilder_ != null) {
+        checkResponseBuilder_.dispose();
+        checkResponseBuilder_ = null;
       }
       dynamicMetadata_ = null;
       if (dynamicMetadataBuilder_ != null) {
@@ -564,10 +624,16 @@ private static final long serialVersionUID = 0L;
         to_bitField0_ |= 0x00000001;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
+        result.checkResponse_ = checkResponseBuilder_ == null
+            ? checkResponse_
+            : checkResponseBuilder_.build();
+        to_bitField0_ |= 0x00000002;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
         result.dynamicMetadata_ = dynamicMetadataBuilder_ == null
             ? dynamicMetadata_
             : dynamicMetadataBuilder_.build();
-        to_bitField0_ |= 0x00000002;
+        to_bitField0_ |= 0x00000004;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -631,6 +697,9 @@ private static final long serialVersionUID = 0L;
       if (other == com.fluxninja.generated.aperture.flowcontrol.checkhttp.v1.CheckHTTPResponse.getDefaultInstance()) return this;
       if (other.hasStatus()) {
         mergeStatus(other.getStatus());
+      }
+      if (other.hasCheckResponse()) {
+        mergeCheckResponse(other.getCheckResponse());
       }
       if (other.hasDynamicMetadata()) {
         mergeDynamicMetadata(other.getDynamicMetadata());
@@ -699,9 +768,16 @@ private static final long serialVersionUID = 0L;
               input.readMessage(
                   getDynamicMetadataFieldBuilder().getBuilder(),
                   extensionRegistry);
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               break;
             } // case 34
+            case 42: {
+              input.readMessage(
+                  getCheckResponseFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              bitField0_ |= 0x00000008;
+              break;
+            } // case 42
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1247,6 +1323,163 @@ private static final long serialVersionUID = 0L;
       return okResponseBuilder_;
     }
 
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse checkResponse_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder> checkResponseBuilder_;
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     * @return Whether the checkResponse field is set.
+     */
+    public boolean hasCheckResponse() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     * @return The checkResponse.
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse getCheckResponse() {
+      if (checkResponseBuilder_ == null) {
+        return checkResponse_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDefaultInstance() : checkResponse_;
+      } else {
+        return checkResponseBuilder_.getMessage();
+      }
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public Builder setCheckResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse value) {
+      if (checkResponseBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        checkResponse_ = value;
+      } else {
+        checkResponseBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public Builder setCheckResponse(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Builder builderForValue) {
+      if (checkResponseBuilder_ == null) {
+        checkResponse_ = builderForValue.build();
+      } else {
+        checkResponseBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public Builder mergeCheckResponse(com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse value) {
+      if (checkResponseBuilder_ == null) {
+        if (((bitField0_ & 0x00000008) != 0) &&
+          checkResponse_ != null &&
+          checkResponse_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDefaultInstance()) {
+          getCheckResponseBuilder().mergeFrom(value);
+        } else {
+          checkResponse_ = value;
+        }
+      } else {
+        checkResponseBuilder_.mergeFrom(value);
+      }
+      if (checkResponse_ != null) {
+        bitField0_ |= 0x00000008;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public Builder clearCheckResponse() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      checkResponse_ = null;
+      if (checkResponseBuilder_ != null) {
+        checkResponseBuilder_.dispose();
+        checkResponseBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Builder getCheckResponseBuilder() {
+      bitField0_ |= 0x00000008;
+      onChanged();
+      return getCheckResponseFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder getCheckResponseOrBuilder() {
+      if (checkResponseBuilder_ != null) {
+        return checkResponseBuilder_.getMessageOrBuilder();
+      } else {
+        return checkResponse_ == null ?
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.getDefaultInstance() : checkResponse_;
+      }
+    }
+    /**
+     * <pre>
+     * The response from the check call.
+     * </pre>
+     *
+     * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder> 
+        getCheckResponseFieldBuilder() {
+      if (checkResponseBuilder_ == null) {
+        checkResponseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder>(
+                getCheckResponse(),
+                getParentForChildren(),
+                isClean());
+        checkResponse_ = null;
+      }
+      return checkResponseBuilder_;
+    }
+
     private com.google.protobuf.Struct dynamicMetadata_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> dynamicMetadataBuilder_;
@@ -1260,7 +1493,7 @@ private static final long serialVersionUID = 0L;
      * @return Whether the dynamicMetadata field is set.
      */
     public boolean hasDynamicMetadata() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
      * <pre>
@@ -1295,7 +1528,7 @@ private static final long serialVersionUID = 0L;
       } else {
         dynamicMetadataBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
@@ -1314,7 +1547,7 @@ private static final long serialVersionUID = 0L;
       } else {
         dynamicMetadataBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
@@ -1328,7 +1561,7 @@ private static final long serialVersionUID = 0L;
      */
     public Builder mergeDynamicMetadata(com.google.protobuf.Struct value) {
       if (dynamicMetadataBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) != 0) &&
+        if (((bitField0_ & 0x00000010) != 0) &&
           dynamicMetadata_ != null &&
           dynamicMetadata_ != com.google.protobuf.Struct.getDefaultInstance()) {
           getDynamicMetadataBuilder().mergeFrom(value);
@@ -1339,7 +1572,7 @@ private static final long serialVersionUID = 0L;
         dynamicMetadataBuilder_.mergeFrom(value);
       }
       if (dynamicMetadata_ != null) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
       }
       return this;
@@ -1353,7 +1586,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Struct dynamic_metadata = 4 [json_name = "dynamicMetadata"];</code>
      */
     public Builder clearDynamicMetadata() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000010);
       dynamicMetadata_ = null;
       if (dynamicMetadataBuilder_ != null) {
         dynamicMetadataBuilder_.dispose();
@@ -1371,7 +1604,7 @@ private static final long serialVersionUID = 0L;
      * <code>.google.protobuf.Struct dynamic_metadata = 4 [json_name = "dynamicMetadata"];</code>
      */
     public com.google.protobuf.Struct.Builder getDynamicMetadataBuilder() {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000010;
       onChanged();
       return getDynamicMetadataFieldBuilder().getBuilder();
     }

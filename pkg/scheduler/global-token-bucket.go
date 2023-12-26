@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
 )
 
 var _ TokenManager = &GlobalTokenBucket{}
@@ -15,7 +15,7 @@ type GlobalTokenBucket struct {
 	key     string
 }
 
-// NewGlobalTokenBucket creates a new instance of RateLimiterTokenBucket.
+// NewGlobalTokenBucket creates a new instance of GlobalTokenBucket.
 func NewGlobalTokenBucket(key string, limiter ratelimiter.RateLimiter) *GlobalTokenBucket {
 	return &GlobalTokenBucket{
 		key:     key,
@@ -24,31 +24,33 @@ func NewGlobalTokenBucket(key string, limiter ratelimiter.RateLimiter) *GlobalTo
 }
 
 // SetPassThrough sets the passthrough value.
-func (rltb *GlobalTokenBucket) SetPassThrough(passthrough bool) {
-	rltb.limiter.SetPassThrough(passthrough)
+func (gtb *GlobalTokenBucket) SetPassThrough(passthrough bool) {
+	gtb.limiter.SetPassThrough(passthrough)
 }
 
 // GetPassThrough returns the passthrough value.
-func (rltb *GlobalTokenBucket) GetPassThrough() bool {
-	return rltb.limiter.GetPassThrough()
+func (gtb *GlobalTokenBucket) GetPassThrough() bool {
+	return gtb.limiter.GetPassThrough()
 }
 
 // PreprocessRequest is a no-op.
-func (rltb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
-	return rltb.GetPassThrough()
+func (gtb *GlobalTokenBucket) PreprocessRequest(_ context.Context, request *Request) bool {
+	return gtb.GetPassThrough()
 }
 
 // TakeIfAvailable takes tokens if available.
-func (rltb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
-	return rltb.limiter.TakeIfAvailable(ctx, rltb.key, tokens)
+func (gtb *GlobalTokenBucket) TakeIfAvailable(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64, string) {
+	ok, waitTime, remaining, current := gtb.limiter.TakeIfAvailable(ctx, gtb.key, tokens)
+	return ok, waitTime, remaining, current, ""
 }
 
 // Take takes tokens.
-func (rltb *GlobalTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64) {
-	return rltb.limiter.Take(ctx, rltb.key, tokens)
+func (gtb *GlobalTokenBucket) Take(ctx context.Context, tokens float64) (bool, time.Duration, float64, float64, string) {
+	ok, waitTime, remaining, current := gtb.limiter.Take(ctx, gtb.key, tokens)
+	return ok, waitTime, remaining, current, ""
 }
 
 // Return returns tokens.
-func (rltb *GlobalTokenBucket) Return(ctx context.Context, tokens float64) {
-	rltb.limiter.Return(ctx, rltb.key, tokens)
+func (gtb *GlobalTokenBucket) Return(ctx context.Context, tokens float64, _ string) {
+	gtb.limiter.Return(ctx, gtb.key, tokens)
 }

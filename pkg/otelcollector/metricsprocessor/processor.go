@@ -3,6 +3,7 @@ package metricsprocessor
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -15,6 +16,7 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector"
 	otelconsts "github.com/fluxninja/aperture/v2/pkg/otelcollector/consts"
 	"github.com/fluxninja/aperture/v2/pkg/otelcollector/metricsprocessor/internal"
+	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/selectors"
 )
@@ -129,13 +131,13 @@ func (p *metricsProcessor) ConsumeLogs(ctx context.Context, ld plog.Logs) (plog.
 
 		// Update metrics and enforce include list to eliminate any excess attributes
 		if sourceStr == otelconsts.ApertureSourceSDK {
-			p.updateMetrics(attributes, checkResponse, []string{})
+			p.processDecisions(attributes, checkResponse, []string{})
 			internal.EnforceIncludeListSDK(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceEnvoy {
-			p.updateMetrics(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
+			p.processDecisions(attributes, checkResponse, []string{otelconsts.EnvoyMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		} else if sourceStr == otelconsts.ApertureSourceLua {
-			p.updateMetrics(attributes, checkResponse, []string{otelconsts.LuaMissingAttributeValue})
+			p.processDecisions(attributes, checkResponse, []string{otelconsts.LuaMissingAttributeValue})
 			internal.EnforceIncludeListHTTP(attributes)
 		}
 
@@ -155,7 +157,7 @@ var (
 	noControlPointTypeSampler      = log.NewRatelimitingSampler()
 )
 
-func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, treatAsMissing []string) {
+func (p *metricsProcessor) processDecisions(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, treatAsMissing []string) {
 	if checkResponse == nil {
 		return
 	}
@@ -176,20 +178,30 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 
 			// All the infos are mutually exclusive.
 			// Update load scheduler metrics.
-			if cl := decision.GetLoadSchedulerInfo(); cl != nil {
-				labels[metrics.WorkloadIndexLabel] = cl.GetWorkloadIndex()
-				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
+			if ls := decision.GetLoadSchedulerInfo(); ls != nil {
+				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound, ls.WorkloadIndex)
 			}
 
 			// Update quota scheduler metrics.
 			if qs := decision.GetQuotaSchedulerInfo(); qs != nil {
-				labels[metrics.WorkloadIndexLabel] = qs.GetWorkloadIndex()
-				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound)
+				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound, qs.WorkloadIndex)
+			}
+
+			// Update concurrency scheduler metrics.
+			if cs := decision.GetConcurrencySchedulerInfo(); cs != nil {
+				p.updateMetricsForWorkload(limiterID, labels, decision.Dropped, checkResponse.DecisionType, latency, latencyFound, cs.WorkloadIndex)
+				p.returnInflightTokens(checkResponse.ExpectEnd, limiterID, cs.Label, cs.TokensInfo, cs.RequestId)
 			}
 
 			// Update rate limiter metrics.
 			if rl := decision.GetRateLimiterInfo(); rl != nil {
 				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+			}
+
+			// Update concurrency limiter metrics.
+			if cl := decision.GetConcurrencyLimiterInfo(); cl != nil {
+				p.updateMetricsForRateLimiter(limiterID, labels, decision.Dropped, checkResponse.DecisionType)
+				p.returnInflightTokens(checkResponse.ExpectEnd, limiterID, cl.Label, cl.TokensInfo, cl.RequestId)
 			}
 
 			// Update flow sampler metrics.
@@ -225,7 +237,8 @@ func (p *metricsProcessor) updateMetrics(attributes pcommon.Map, checkResponse *
 	}
 }
 
-func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool) {
+func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, labels map[string]string, dropped bool, decisionType flowcontrolv1.CheckResponse_DecisionType, latency float64, latencyFound bool, workloadIndex string) {
+	labels[metrics.WorkloadIndexLabel] = workloadIndex
 	loadScheduler := p.cfg.engine.GetScheduler(limiterID)
 	if loadScheduler == nil {
 		log.Sample(noLoadSchedulerSampler).Warn().
@@ -353,10 +366,47 @@ func (p *metricsProcessor) populateControlPointCache(checkResponse *flowcontrolv
 	}
 }
 
+func (p *metricsProcessor) returnInflightTokens(expectEnd bool, limiterID iface.LimiterID, label string, tokensInfo *flowcontrolv1.LimiterDecision_TokensInfo, reqID string) {
+	if reqID == "" {
+		log.Warn().Msg("Request ID is empty")
+		return
+	}
+	if expectEnd {
+		return
+	}
+	var tokens float64
+	if tokensInfo != nil {
+		tokens = tokensInfo.Consumed
+	}
+	flowEnder := p.cfg.engine.GetFlowEnder(limiterID)
+	if flowEnder == nil {
+		log.Sample(noFlowEnderSampler).Warn().
+			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
+			Msg("FlowEnder not found")
+		return
+	}
+	// Launch a goroutine to return tokens to the limiter.
+	panichandler.Go(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_, err := flowEnder.Return(ctx, label, tokens, reqID)
+		if err != nil {
+			log.Sample(noFlowEnderSampler).Error().Err(err).
+				Str(metrics.PolicyNameLabel, limiterID.PolicyName).
+				Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
+				Str(metrics.ComponentIDLabel, limiterID.ComponentID).
+				Msg("Error returning tokens")
+		}
+	})
+}
+
 var (
 	noLoadSchedulerSampler = log.NewRatelimitingSampler()
 	noRateLimiterSampler   = log.NewRatelimitingSampler()
 	noSamplerSampler       = log.NewRatelimitingSampler()
 	noClassifierSampler    = log.NewRatelimitingSampler()
 	noFluxMeterSampler     = log.NewRatelimitingSampler()
+	noFlowEnderSampler     = log.NewRatelimitingSampler()
 )

@@ -5,12 +5,13 @@ import (
 	"errors"
 	"time"
 
-	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 var (
@@ -30,6 +31,15 @@ type CacheEntry struct {
 	TTL   time.Duration
 }
 
+// EndResponse is the response returned by the End method of the Flow interface.
+type EndResponse struct {
+	// FlowEndResponse is populated if the flow end request succeeded.
+	FlowEndResponse *checkv1.FlowEndResponse
+
+	// Error is populated if the flow end request failed.
+	Error error
+}
+
 // Flow is the interface that is returned to the user every time a CheckHTTP call through ApertureClient is made.
 // The user can check the status of the check call, response from the server, and end the flow once the workload is executed.
 type Flow interface {
@@ -43,7 +53,7 @@ type Flow interface {
 	DeleteGlobalCache(ctx context.Context, key string, opts ...grpc.CallOption) KeyDeleteResponse
 	Error() error
 	Span() trace.Span
-	End() error
+	End() EndResponse
 	CheckResponse() *checkv1.CheckResponse
 	RetryAfter() time.Duration
 	HTTPResponseCode() int
@@ -59,13 +69,21 @@ type flow struct {
 	statusCode        FlowStatus
 	ended             bool
 	rampMode          bool
+	callOptions       []grpc.CallOption
 }
 
 // flow implements the Flow interface.
 var _ Flow = (*flow)(nil)
 
 // newFlow creates a new flow with default field values.
-func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span, rampMode bool, resultCacheKey string, globalCacheKeys []string) *flow {
+func newFlow(
+	flowControlClient checkv1.FlowControlServiceClient,
+	span trace.Span,
+	rampMode bool,
+	resultCacheKey string,
+	globalCacheKeys []string,
+	callOptions []grpc.CallOption,
+) *flow {
 	return &flow{
 		flowControlClient: flowControlClient,
 		span:              span,
@@ -75,6 +93,7 @@ func newFlow(flowControlClient checkv1.FlowControlServiceClient, span trace.Span
 		rampMode:          rampMode,
 		resultCacheKey:    resultCacheKey,
 		globalCacheKeys:   globalCacheKeys,
+		callOptions:       callOptions,
 	}
 }
 
@@ -263,15 +282,26 @@ func (f *flow) Span() trace.Span {
 }
 
 // End is used to end the flow, using the status code previously set using SetStatus method.
-func (f *flow) End() error {
+func (f *flow) End() EndResponse {
 	if f.ended {
-		return errors.New("flow already ended")
+		return EndResponse{
+			Error: errors.New("flow already ended"),
+		}
 	}
+
+	if f.checkResponse == nil {
+		return EndResponse{
+			Error: errors.New("check response is nil"),
+		}
+	}
+
 	f.ended = true
 
 	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
 	if err != nil {
-		return err
+		return EndResponse{
+			Error: err,
+		}
 	}
 	f.span.SetAttributes(
 		attribute.String(flowStatusLabel, f.statusCode.String()),
@@ -279,5 +309,52 @@ func (f *flow) End() error {
 		attribute.Int64(flowEndTimestampLabel, time.Now().UnixNano()),
 	)
 	f.span.End()
-	return nil
+
+	inflightRequests := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
+
+	for _, decision := range f.checkResponse.GetLimiterDecisions() {
+		if decision.GetConcurrencyLimiterInfo() != nil {
+			inflightRequest := &checkv1.InflightRequestRef{
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentId: decision.ComponentId,
+				Label:       decision.GetConcurrencyLimiterInfo().GetLabel(),
+				RequestId:   decision.GetConcurrencyLimiterInfo().GetRequestId(),
+			}
+			if decision.GetConcurrencyLimiterInfo().GetTokensInfo() != nil {
+				inflightRequest.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
+			}
+
+			inflightRequests = append(inflightRequests, inflightRequest)
+		}
+
+		if decision.GetConcurrencySchedulerInfo() != nil {
+			ref := &checkv1.InflightRequestRef{
+				PolicyName:  decision.PolicyName,
+				PolicyHash:  decision.PolicyHash,
+				ComponentId: decision.ComponentId,
+				Label:       decision.GetConcurrencySchedulerInfo().GetLabel(),
+				RequestId:   decision.GetConcurrencySchedulerInfo().GetRequestId(),
+			}
+			if decision.GetConcurrencySchedulerInfo().GetTokensInfo() != nil {
+				ref.Tokens = decision.GetConcurrencySchedulerInfo().GetTokensInfo().GetConsumed()
+			}
+
+			inflightRequests = append(inflightRequests, ref)
+		}
+	}
+
+	if len(inflightRequests) == 0 {
+		return EndResponse{}
+	}
+
+	flowEndResponse, err := f.flowControlClient.FlowEnd(context.Background(), &checkv1.FlowEndRequest{
+		ControlPoint:     f.checkResponse.ControlPoint,
+		InflightRequests: inflightRequests,
+	}, f.callOptions...)
+
+	return EndResponse{
+		FlowEndResponse: flowEndResponse,
+		Error:           err,
+	}
 }

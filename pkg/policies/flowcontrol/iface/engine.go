@@ -17,6 +17,7 @@ type RequestContext struct {
 	CacheLookupRequest *flowcontrolv1.CacheLookupRequest
 	Services           []string
 	RampMode           bool
+	ExpectEnd          bool
 }
 
 // Engine is an interface for registering fluxmeters and schedulers.
@@ -36,9 +37,9 @@ type Engine interface {
 	UnregisterFluxMeter(fm FluxMeter) error
 	GetFluxMeter(fluxMeterName string) FluxMeter
 
-	RegisterRateLimiter(l RateLimiter) error
-	UnregisterRateLimiter(l RateLimiter) error
-	GetRateLimiter(limiterID LimiterID) RateLimiter
+	RegisterRateLimiter(l Limiter) error
+	UnregisterRateLimiter(l Limiter) error
+	GetRateLimiter(limiterID LimiterID) Limiter
 
 	RegisterSampler(l Limiter) error
 	UnregisterSampler(l Limiter) error
@@ -48,4 +49,19 @@ type Engine interface {
 	UnregisterLabelPreview(l LabelPreview) error
 
 	RegisterCache(c Cache)
+
+	RegisterConcurrencyLimiter(l ConcurrencyLimiter) error
+	UnregisterConcurrencyLimiter(l ConcurrencyLimiter) error
+	// Note: Use GetRateLimiter and GetFlowEnder for retrieving the limiter and flowender respectively.
+
+	RegisterConcurrencyScheduler(l ConcurrencyScheduler) error
+	UnregisterConcurrencyScheduler(l ConcurrencyScheduler) error
+	// Note: Use GetScheduler and GetFlowEnder for retrieving the scheduler and flowender respectively.
+
+	GetFlowEnder(limiterID LimiterID) FlowEnder
+
+	FlowEnd(
+		ctx context.Context,
+		request *flowcontrolv1.FlowEndRequest,
+	) *flowcontrolv1.FlowEndResponse
 }

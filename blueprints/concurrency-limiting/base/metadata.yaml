@@ -1,0 +1,3 @@
+blueprint: Concurrency Limiting Policy
+sources:
+  policy: concurrency-limiting/base/policy.libsonnet

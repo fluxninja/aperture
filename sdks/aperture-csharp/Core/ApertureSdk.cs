@@ -52,9 +52,18 @@ public class ApertureSdk : IApertureSdk
 
         foreach (var explicitLabel in explicitLabels) labels[explicitLabel.Key] = explicitLabel.Value;
 
-        var checkReq = new CheckRequest();
-        checkReq.ControlPoint = controlPoint;
-        checkReq.RampMode = rampMode;
+        var checkReq = new CheckRequest
+        {
+            ControlPoint = controlPoint,
+            RampMode = rampMode,
+            ExpectEnd = true,
+            CacheLookupRequest = new CacheLookupRequest
+            {
+                ResultCacheKey = parameters.ResultCacheKey,
+                GlobalCacheKeys = { parameters.GlobalCacheKeys }
+            }
+        };
+
         foreach (var label in labels) checkReq.Labels.Add(label.Key, label.Value);
 
         using var span = _tracer.StartSpan("Aperture Check");
@@ -65,7 +74,7 @@ public class ApertureSdk : IApertureSdk
         CheckResponse? res = null;
         try
         {
-            var opts = new CallOptions();
+            var opts = parameters.CallOptions;
             if (flowTimeout != TimeSpan.Zero) opts = opts.WithDeadline(DateTime.UtcNow.Add(flowTimeout));
             if (_apiKey != null)
             {
@@ -76,7 +85,7 @@ public class ApertureSdk : IApertureSdk
 
             res = _flowControlClient.Check(checkReq, opts);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // Deadline exceeded or couldn't reach the agent - request should not be blocked
             _logger.Debug("Check call caused an exception");
@@ -84,7 +93,7 @@ public class ApertureSdk : IApertureSdk
 
         span.SetAttribute(Constants.WORKLOAD_START_TIMESTAMP_LABEL, Utils.GetCurrentEpochNanos());
 
-        return new FeatureFlow(res, span, false, rampMode);
+        return new FeatureFlow(res, span, false, rampMode, _flowControlClient, parameters.CallOptions, parameters.ResultCacheKey, parameters.GlobalCacheKeys);
     }
 
     public static ApertureSdkBuilder Builder()

@@ -72,15 +72,9 @@ func ParseRateLimiter(
 		policyParams,
 	)
 
-	labelKey := rateLimiter.Parameters.GetLimitByLabelKey()
-	if labelKey == "" {
-		// Deprecated: Remove in v3.0.0
-		labelKey = rateLimiter.Parameters.GetLabelKey()
-	}
-
 	rateLimiterAnyProto, err := anypb.New(
 		&policyprivatev1.RateLimiter{
-			InPorts: &policyprivatev1.RateLimiter_Ins{
+			InPorts: &policylangv1.RateLimiter_Ins{
 				BucketCapacity: &policylangv1.InPort{
 					Value: &policylangv1.InPort_SignalName{
 						SignalName: "BUCKET_CAPACITY",
@@ -97,22 +91,7 @@ func ParseRateLimiter(
 					},
 				},
 			},
-			Selectors: rateLimiter.GetSelectors(),
-			Parameters: &policyprivatev1.RateLimiter_Parameters{
-				LimitByLabelKey: labelKey,
-				Interval:        rateLimiter.Parameters.GetInterval(),
-				ContinuousFill:  rateLimiter.Parameters.GetContinuousFill(),
-				MaxIdleTime:     rateLimiter.Parameters.GetMaxIdleTime(),
-				LazySync: &policyprivatev1.RateLimiter_Parameters_LazySync{
-					Enabled: rateLimiter.Parameters.GetLazySync().GetEnabled(),
-					NumSync: rateLimiter.Parameters.GetLazySync().GetNumSync(),
-				},
-				DelayInitialFill: rateLimiter.Parameters.GetDelayInitialFill(),
-			},
-			RequestParameters: &policyprivatev1.RateLimiter_RequestParameters{
-				TokensLabelKey:           rateLimiter.RequestParameters.GetTokensLabelKey(),
-				DeniedResponseStatusCode: rateLimiter.RequestParameters.GetDeniedResponseStatusCode(),
-			},
+			Selectors:         rateLimiter.GetSelectors(),
 			ParentComponentId: componentID.String(),
 		})
 	if err != nil {

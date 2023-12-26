@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package aperture.tokencounter.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message State {
+  message TokenWindow {
+    google.protobuf.Timestamp start = 1;
+    google.protobuf.Timestamp end = 2;
+    double sum = 3;
+    double count = 4;
+  }
+  repeated Request requests_queued = 1;
+  repeated Request requests_inflight = 2;
+  TokenWindow token_window = 3;
+  double token_rate = 4;
+}
+
+message Request {
+  string request_id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  double tokens = 3;
+  google.protobuf.Duration wait_for = 4;
+  int32 num_retries = 5;
+}
+
+message TakeNRequest {
+  string request_id = 1;
+  google.protobuf.Timestamp deadline = 2;
+  double tokens = 3;
+  bool can_wait = 4;
+}
+
+message TakeNResponse {
+  bool available_now = 1;
+  double current = 2;
+  double remaining = 3;
+  google.protobuf.Timestamp check_back_at = 4;
+  bool ok = 5;
+}
+
+message ReturnNRequest {
+  string request_id = 1;
+  double tokens = 2;
+}
+
+message ReturnNResponse {
+  bool ok = 1;
+}
+
+message CancelQueuedRequest {
+  string request_id = 1;
+}
+
+message CancelQueuedResponse {
+  bool ok = 1;
+}
+
+message CancelInflightRequest {
+  string request_id = 1;
+}
+
+message CancelInflightResponse {
+  bool ok = 1;
+}

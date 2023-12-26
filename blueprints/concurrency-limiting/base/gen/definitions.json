@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "concurrency-limiting/base blueprint",
+  "additionalProperties": false,
+  "required": ["blueprint", "policy"],
+  "properties": {
+    "blueprint": {
+      "description": "Blueprint name",
+      "type": "string",
+      "default": "concurrency-limiting/base",
+      "enum": ["concurrency-limiting/base"]
+    },
+    "uri": {
+      "description": "Blueprint URI. E.g. github.com/fluxninja/aperture/blueprints@latest.",
+      "default": "github.com/fluxninja/aperture/blueprints@latest",
+      "type": "string"
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "concurrency_limiter"],
+      "properties": {
+        "components": {
+          "description": "List of additional circuit components.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Component"
+          }
+        },
+        "policy_name": {
+          "description": "Name of the policy.",
+          "default": "__REQUIRED_FIELD__",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Additional resources.",
+          "default": {
+            "flow_control": {
+              "classifiers": []
+            }
+          },
+          "type": "object",
+          "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Resources"
+        },
+        "concurrency_limiter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_concurrency", "parameters", "selectors"],
+          "properties": {
+            "alerter": {
+              "description": "Alerter.",
+              "default": {
+                "alert_name": "Too many inflight requests"
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/AlerterParameters"
+            },
+            "max_concurrency": {
+              "description": "Max concurrency.",
+              "default": "__REQUIRED_FIELD__",
+              "type": "number",
+              "format": "double"
+            },
+            "parameters": {
+              "description": "Parameters.",
+              "default": {
+                "limit_by_label_key": "limit_by_label_key",
+                "max_inflight_duration": "__REQUIRED_FIELD__"
+              },
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/ConcurrencyLimiterParameters"
+            },
+            "request_parameters": {
+              "description": "Request Parameters.",
+              "default": {},
+              "type": "object",
+              "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/ConcurrencyLimiterRequestParameters"
+            },
+            "selectors": {
+              "description": "Flow selectors to match requests against",
+              "default": [
+                {
+                  "control_point": "__REQUIRED_FIELD__"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Selector"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": null
+}

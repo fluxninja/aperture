@@ -7,6 +7,7 @@ export interface CheckRequest {
   'labels'?: ({[key: string]: string});
   'rampMode'?: (boolean);
   'cacheLookupRequest'?: (_aperture_flowcontrol_check_v1_CacheLookupRequest | null);
+  'expectEnd'?: (boolean);
 }
 
 export interface CheckRequest__Output {
@@ -14,4 +15,5 @@ export interface CheckRequest__Output {
   'labels': ({[key: string]: string});
   'rampMode': (boolean);
   'cacheLookupRequest': (_aperture_flowcontrol_check_v1_CacheLookupRequest__Output | null);
+  'expectEnd': (boolean);
 }

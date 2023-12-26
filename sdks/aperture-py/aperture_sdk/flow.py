@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 from contextlib import AbstractContextManager
-from typing import Optional, TypeVar
+from typing import List, Optional, TypeVar
 
 import grpc
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
@@ -13,6 +13,9 @@ from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
     CacheDeleteResponse,
     CacheEntry,
     CacheUpsertRequest,
+    FlowEndRequest,
+    FlowEndResponse,
+    InflightRequestRef,
     StatusCode,
 )
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2_grpc import (
@@ -40,6 +43,20 @@ class FlowStatus(enum.Enum):
     Error = enum.auto()
 
 
+class EndResponse:
+    def __init__(
+        self, error: Optional[Exception], flow_end_response: Optional[FlowEndResponse]
+    ):
+        self.error = error
+        self.flow_end_response = flow_end_response
+
+    def get_error(self) -> Optional[Exception]:
+        return self.error
+
+    def get_flow_end_response(self) -> Optional[FlowEndResponse]:
+        return self.flow_end_response
+
+
 TFlow = TypeVar("TFlow", bound="Flow")
 
 
@@ -53,6 +70,7 @@ class Flow(AbstractContextManager):
         ramp_mode: bool,
         cache_key: Optional[str],
         error: Optional[Exception],
+        grpc_channel: grpc.Channel,
     ):
         self._fcs_stub = fcs_stub
         self._control_point = control_point
@@ -63,6 +81,7 @@ class Flow(AbstractContextManager):
         self._ended = False
         self._ramp_mode = ramp_mode
         self._error = error
+        self._grpc_channel = grpc_channel
         self.logger = logging.getLogger("aperture-py-sdk-flow")
 
     def should_run(self) -> bool:
@@ -106,10 +125,19 @@ class Flow(AbstractContextManager):
     def set_status(self, status_code: FlowStatus) -> None:
         self._status_code = status_code
 
-    def end(self) -> None:
+    def end(self) -> EndResponse:
         if self._ended:
             self.logger.warning("attempting to end an already ended flow")
-            return
+            return EndResponse(
+                error=Exception("attempting to end an already ended flow"),
+                flow_end_response=None,
+            )
+        if not self.check_response:
+            self.logger.warning("attempting to end a flow with no check response")
+            return EndResponse(
+                error=Exception("attempting to end a flow with no check response"),
+                flow_end_response=None,
+            )
         self._ended = True
 
         check_response_json = (
@@ -125,6 +153,65 @@ class Flow(AbstractContextManager):
             }
         )
         self._span.end()
+
+        inflight_request_ref: List[InflightRequestRef] = list()
+
+        if self.check_response:
+            for decision in self.check_response.limiter_decisions:
+                if decision.concurrency_limiter_info:
+                    ref: InflightRequestRef = InflightRequestRef(
+                        policy_name=decision.policy_name,
+                        policy_hash=decision.policy_hash,
+                        component_id=decision.component_id,
+                        label=decision.concurrency_limiter_info.label,
+                        request_id=decision.concurrency_limiter_info.request_id,
+                    )
+
+                    if decision.concurrency_limiter_info.tokens_info:
+                        ref.tokens = (
+                            decision.concurrency_limiter_info.tokens_info.consumed
+                        )
+                    inflight_request_ref.append(ref)
+
+                if decision.concurrency_scheduler_info:
+                    ref: InflightRequestRef = InflightRequestRef(
+                        policy_name=decision.policy_name,
+                        policy_hash=decision.policy_hash,
+                        component_id=decision.component_id,
+                        label=decision.concurrency_scheduler_info.label,
+                        request_id=decision.concurrency_scheduler_info.request_id,
+                    )
+
+                    if decision.concurrency_scheduler_info.tokens_info:
+                        ref.tokens = (
+                            decision.concurrency_scheduler_info.tokens_info.consumed
+                        )
+                    inflight_request_ref.append(ref)
+
+        if inflight_request_ref:
+            flow_end_request = FlowEndRequest(
+                control_point=self._control_point,
+                inflight_request_refs=inflight_request_ref,
+            )
+
+            try:
+                res = self._fcs_stub.FlowEnd(flow_end_request)
+            except grpc.RpcError as e:
+                self.logger.error(f"Aperture gRPC call failed: {e.details()}")
+                return EndResponse(
+                    error=e,
+                    flow_end_response=None,
+                )
+
+            return EndResponse(
+                error=None,
+                flow_end_response=res,
+            )
+        else:
+            return EndResponse(
+                error=None,
+                flow_end_response=None,
+            )
 
     def error(self) -> Optional[Exception]:
         return self._error
@@ -312,4 +399,10 @@ class Flow(AbstractContextManager):
             return
         if exc_type is not None:
             self.set_status(FlowStatus.Error)
-        self.end()
+        res = self.end()
+
+        if res.get_error():
+            self.logger.warning(f"Failed to end flow: {res.get_error()}")
+
+        if res.get_flow_end_response():
+            print(f"Ended flow: {res.get_flow_end_response()}")

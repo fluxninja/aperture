@@ -148,6 +148,8 @@ func (m *CheckHTTPRequest) validate(all bool) error {
 
 	// no validation rules for RampMode
 
+	// no validation rules for ExpectEnd
+
 	if len(errors) > 0 {
 		return CheckHTTPRequestMultiError(errors)
 	}
@@ -510,6 +512,35 @@ func (m *CheckHTTPResponse) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return CheckHTTPResponseValidationError{
 				field:  "Status",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCheckResponse()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CheckHTTPResponseValidationError{
+					field:  "CheckResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CheckHTTPResponseValidationError{
+					field:  "CheckResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCheckResponse()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckHTTPResponseValidationError{
+				field:  "CheckResponse",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

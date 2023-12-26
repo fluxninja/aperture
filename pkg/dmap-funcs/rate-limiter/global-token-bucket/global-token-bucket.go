@@ -12,14 +12,14 @@ import (
 
 	tokenbucketv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/tokenbucket/v1"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	deadlinemargin "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/deadline-margin"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
 )
 
 const (
 	// TakeNFunction is the name of the function used to take N tokens from the bucket.
 	TakeNFunction = "TakeN"
-	lookupMargin  = 10 * time.Millisecond
 )
 
 // GlobalTokenBucket implements Limiter.
@@ -84,16 +84,6 @@ func (gtb *GlobalTokenBucket) GetBucketCapacity() float64 {
 	return gtb.bucketCapacity
 }
 
-func isMarginExceeded(ctx context.Context) bool {
-	deadline, deadlineOK := ctx.Deadline()
-	if deadlineOK {
-		// check if deadline will be passed in the next 10ms
-		deadline = deadline.Add(-lookupMargin)
-		return time.Now().After(deadline)
-	}
-	return false
-}
-
 // SetFillAmount sets the default fill amount for the rate limiter.
 func (gtb *GlobalTokenBucket) SetFillAmount(fillAmount float64) {
 	gtb.mu.Lock()
@@ -122,7 +112,7 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return true, 0, 0, 0
 	}
 
-	if isMarginExceeded(ctx) {
+	if deadlinemargin.IsMarginExceeded(ctx) {
 		return false, 0, 0, 0
 	}
 

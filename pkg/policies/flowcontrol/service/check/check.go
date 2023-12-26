@@ -52,7 +52,7 @@ type HandlerWithValues interface {
 // CheckRequest makes decision using collected inferred fields from authz or Handler.
 func (h *Handler) CheckRequest(ctx context.Context, requestContext iface.RequestContext) *flowcontrolv1.CheckResponse {
 	checkResponse := h.engine.ProcessRequest(ctx, requestContext)
-	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), h.engine.GetAgentInfo())
+	h.metrics.CheckResponse(checkResponse.DecisionType, checkResponse.GetRejectReason(), requestContext.ControlPoint, h.engine.GetAgentInfo())
 	return checkResponse
 }
 
@@ -78,6 +78,7 @@ func (h *Handler) Check(ctx context.Context, req *flowcontrolv1.CheckRequest) (*
 			Services:           services,
 			RampMode:           req.RampMode,
 			CacheLookupRequest: req.CacheLookupRequest,
+			ExpectEnd:          req.ExpectEnd,
 		},
 	)
 	end := time.Now()
@@ -111,4 +112,11 @@ func (h *Handler) CacheLookup(ctx context.Context, req *flowcontrolv1.CacheLooku
 		return nil, nil
 	}
 	return h.cache.Lookup(ctx, req), nil
+}
+
+// FlowEnd is the FlowEnd method of Flow Control service which takes a FlowEndRequest and returns a FlowEndResponse.
+func (h *Handler) FlowEnd(ctx context.Context, req *flowcontrolv1.FlowEndRequest) (*flowcontrolv1.FlowEndResponse, error) {
+	flowEndResponse := h.engine.FlowEnd(ctx, req)
+	h.metrics.FlowEnd(req.ControlPoint, h.engine.GetAgentInfo())
+	return flowEndResponse, nil
 }

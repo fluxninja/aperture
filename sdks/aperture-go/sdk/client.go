@@ -157,6 +157,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 		ControlPoint: controlPoint,
 		Labels:       labels,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    true,
 		CacheLookupRequest: &checkv1.CacheLookupRequest{
 			ResultCacheKey:  flowParams.ResultCacheKey,
 			GlobalCacheKeys: flowParams.GlobalCacheKeys,
@@ -165,7 +166,14 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 
 	span := c.getSpan(ctx)
 
-	f := newFlow(c.flowControlClient, span, flowParams.RampMode, flowParams.ResultCacheKey, flowParams.GlobalCacheKeys)
+	f := newFlow(
+		c.flowControlClient,
+		span,
+		flowParams.RampMode,
+		flowParams.ResultCacheKey,
+		flowParams.GlobalCacheKeys,
+		flowParams.CallOptions,
+	)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),
@@ -187,7 +195,7 @@ func (c *apertureClient) StartFlow(ctx context.Context, controlPoint string, flo
 func (c *apertureClient) StartHTTPFlow(ctx context.Context, request *checkhttpv1.CheckHTTPRequest, middlewareParams MiddlewareParams) HTTPFlow {
 	span := c.getSpan(ctx)
 
-	f := newHTTPFlow(span, middlewareParams.FlowParams)
+	f := newHTTPFlow(span, middlewareParams.FlowParams, c.flowControlClient)
 
 	defer f.Span().SetAttributes(
 		attribute.Int64(workloadStartTimestampLabel, time.Now().UnixNano()),

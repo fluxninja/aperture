@@ -972,6 +972,147 @@ definitions:
                 description: Emits a variable signal which can be changed at runtime through dynamic configuration.
         title: Computational block that forms the circuit
         type: object
+    ConcurrencyLimiter:
+        properties:
+            in_ports:
+                $ref: '#/definitions/ConcurrencyLimiterIns'
+                description: |+
+                    Input ports for the _Concurrency Limiter_ component.
+
+                x-go-tag-validate: required
+            out_ports:
+                $ref: '#/definitions/ConcurrencyLimiterOuts'
+                description: Output ports for the _Concurrency Limiter_ component.
+            parameters:
+                $ref: '#/definitions/ConcurrencyLimiterParameters'
+                description: |+
+                    Parameters for the _Concurrency Limiter_ component.
+
+                x-go-tag-validate: required
+            request_parameters:
+                $ref: '#/definitions/ConcurrencyLimiterRequestParameters'
+                title: RequestParameters for the component
+            selectors:
+                description: |+
+                    Selectors for the component.
+
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                minItems: 1
+                type: array
+                x-go-tag-validate: required,gt=0,dive
+        required:
+            - in_ports
+            - parameters
+            - selectors
+        type: object
+    ConcurrencyLimiterIns:
+        properties:
+            max_concurrency:
+                $ref: '#/definitions/InPort'
+                description: |+
+                    The maximum number of concurrent requests to be allowed.
+
+                x-go-tag-validate: required
+            pass_through:
+                $ref: '#/definitions/InPort'
+                title: PassThrough port determines whether to accept all requests instantaneously
+        required:
+            - max_concurrency
+        title: Inputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component
+        type: object
+    ConcurrencyLimiterOuts:
+        description: Outputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component.
+        properties:
+            accept_percentage:
+                $ref: '#/definitions/OutPort'
+                description: The percentage of flows being accepted by the _Concurrency Limiter_.
+        type: object
+    ConcurrencyLimiterParameters:
+        properties:
+            limit_by_label_key:
+                description: |-
+                    Specifies which label the concurrency calculation should be keyed by.
+
+                    Concurrency limiting is done independently for each value of the
+                    [label](/concepts/flow-label.md) with given key.
+                    For example, to give each API Key a separate limit, assuming you
+                    have a `api_key` flow
+                    label set up, set `limit_by_label_key: "api_key"`.
+                    If no label key is specified, then all requests matching the
+                    selectors will be concurrency limited based on the global concurrency count.
+                type: string
+            max_idle_time:
+                default: 7200s
+                description: |+
+                    Max idle time before concurrency count for a label is removed.
+                    If set to 0, the state is never removed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+
+                type: string
+                x-go-tag-default: 7200s
+            max_inflight_duration:
+                description: |+
+                    The time duration after which flow is assumed to have ended in case the end call gets missed.
+                    This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+
+                type: string
+                x-go-tag-validate: required
+        required:
+            - max_inflight_duration
+        type: object
+    ConcurrencyLimiterRequestParameters:
+        properties:
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: |+
+                    This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+
+                x-go-tag-default: TooManyRequests
+            tokens_label_key:
+                description: |-
+                    Flow label key that will be used to override the number of tokens
+                    for this request.
+                    This is an optional parameter and takes highest precedence
+                    when assigning tokens to a request.
+                    The label value must be a valid number.
+                type: string
+        type: object
+    ConcurrencyScheduler:
+        description: Schedules the traffic based on in-flight request concurrency.
+        properties:
+            concurrency_limiter:
+                $ref: '#/definitions/ConcurrencyLimiterParameters'
+                description: |+
+                    Parameter to configure concurrency limiting.
+
+                x-go-tag-validate: required
+            in_ports:
+                $ref: '#/definitions/ConcurrencyLimiterIns'
+                title: Input ports for the _Concurrency Scheduler_ component
+                x-go-tag-validate: required
+            out_ports:
+                $ref: '#/definitions/ConcurrencyLimiterOuts'
+                description: Output ports for the _Concurrency Scheduler_ component.
+            scheduler:
+                $ref: '#/definitions/Scheduler'
+                description: Scheduler is used to schedule the requests when the concurrency limit is reached.
+            selectors:
+                description: |+
+                    Flow selection criteria.
+
+                items:
+                    $ref: '#/definitions/Selector'
+                    type: object
+                minItems: 1
+                type: array
+                x-go-tag-validate: required,gt=0,dive
+        required:
+            - concurrency_limiter
+            - in_ports
+            - selectors
+        type: object
     ConstantSignal:
         description: Special constant input for ports and Variable component. Can provide either a constant value or special Nan/+-Inf value.
         properties:
@@ -1439,6 +1580,12 @@ definitions:
             aimd_load_scheduler:
                 $ref: '#/definitions/AIMDLoadScheduler'
                 description: AIMD Load Scheduler.
+            concurrency_limiter:
+                $ref: '#/definitions/ConcurrencyLimiter'
+                title: _Concurrency Limiter_ provides service protection by limiting the number of concurrent requests to a service
+            concurrency_scheduler:
+                $ref: '#/definitions/ConcurrencyScheduler'
+                title: _Concurrency Scheduler_ provides service protection by limiting the number of concurrent requests to a service and scheduling requests when the limit is reached
             load_ramp:
                 $ref: '#/definitions/LoadRamp'
                 description: _Load Ramp_ smoothly regulates the flow of requests over specified steps.
@@ -2314,9 +2461,6 @@ definitions:
         type: object
     LoadRampParametersStep:
         properties:
-            denied_response_status_code:
-                $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
             duration:
                 description: |+
                     Duration for which the step is active.
@@ -3045,16 +3189,24 @@ definitions:
         properties:
             in_ports:
                 $ref: '#/definitions/RateLimiterIns'
+                title: Input ports for the _Quota Scheduler_ component
                 x-go-tag-validate: required
             out_ports:
-                $ref: '#/definitions/QuotaSchedulerOuts'
+                $ref: '#/definitions/RateLimiterOuts'
                 description: Output ports for the _Quota Scheduler_ component.
             rate_limiter:
                 $ref: '#/definitions/RateLimiterParameters'
+                description: |+
+                    Parameter to configure rate limiting quotas.
+
                 x-go-tag-validate: required
             scheduler:
                 $ref: '#/definitions/Scheduler'
+                description: Scheduler is used to schedule the requests when the quota is exhausted.
             selectors:
+                description: |+
+                    Flow selection criteria.
+
                 items:
                     $ref: '#/definitions/Selector'
                     type: object
@@ -3065,13 +3217,6 @@ definitions:
             - in_ports
             - rate_limiter
             - selectors
-        type: object
-    QuotaSchedulerOuts:
-        description: Outputs for the _Quota Scheduler_ component.
-        properties:
-            accept_percentage:
-                $ref: '#/definitions/OutPort'
-                description: The percentage of flows being accepted by the _Quota Scheduler_.
         type: object
     RangeDrivenLoadScheduler:
         description: _Range Load Scheduler_ uses the [polynomial range function](#polynomial-range-function) to throttle the token rate based on the range of the signal.
@@ -3235,18 +3380,18 @@ definitions:
                 x-go-tag-validate: required
             pass_through:
                 $ref: '#/definitions/InPort'
-                title: PassThrough port determines whether all requests
+                title: PassThrough port determines whether to accept all requests instantaneously
         required:
             - bucket_capacity
             - fill_amount
-        title: Inputs for the _Rate Limiter_ component
+        title: Inputs for the _Rate Limiter_ or _Quota Scheduler_ component
         type: object
     RateLimiterOuts:
-        description: Outputs for the _Rate Limiter_ component.
+        description: Outputs for the _Rate Limiter_ or _Quota Scheduler_ component.
         properties:
             accept_percentage:
                 $ref: '#/definitions/OutPort'
-                description: The percentage of flows being accepted by the _Rate Limiter_.
+                description: The percentage of flows being accepted.
         type: object
     RateLimiterParameters:
         properties:
@@ -3346,7 +3491,10 @@ definitions:
         properties:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+                description: |+
+                    This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+
+                x-go-tag-default: TooManyRequests
             tokens_label_key:
                 description: |-
                     Flow label key that will be used to override the number of tokens
@@ -3628,7 +3776,10 @@ definitions:
         properties:
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+                description: |+
+                    This field allows you to override the default HTTP status code (`403 Forbidden`) that is returned when a request is denied.
+
+                x-go-tag-default: Forbidden
             ramp_mode:
                 default: false
                 description: |+
@@ -3735,7 +3886,10 @@ definitions:
                 description: Parameters to be used if none of workloads specified in `workloads` match.
             denied_response_status_code:
                 $ref: '#/definitions/StatusCode'
-                description: This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+                description: |+
+                    This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
+
+                x-go-tag-default: ServiceUnavailable
             priority_label_key:
                 description: |-
                     Key for a flow label that can be used to override the default priority for this flow.

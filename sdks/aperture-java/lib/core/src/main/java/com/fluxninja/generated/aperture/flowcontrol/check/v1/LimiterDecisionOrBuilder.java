@@ -146,5 +146,35 @@ public interface LimiterDecisionOrBuilder extends
    */
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfoOrBuilder getQuotaSchedulerInfoOrBuilder();
 
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   * @return Whether the concurrencyLimiterInfo field is set.
+   */
+  boolean hasConcurrencyLimiterInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   * @return The concurrencyLimiterInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder();
+
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   * @return Whether the concurrencySchedulerInfo field is set.
+   */
+  boolean hasConcurrencySchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   * @return The concurrencySchedulerInfo.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getConcurrencySchedulerInfo();
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder getConcurrencySchedulerInfoOrBuilder();
+
   com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.DetailsCase getDetailsCase();
 }

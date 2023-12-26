@@ -131,4 +131,14 @@ public interface CheckHTTPRequestOrBuilder extends
    * @return The rampMode.
    */
   boolean getRampMode();
+
+  /**
+   * <pre>
+   * Expect End denotes whether to expect a FlowEnd call for this flow.
+   * </pre>
+   *
+   * <code>bool expect_end = 6 [json_name = "expectEnd"];</code>
+   * @return The expectEnd.
+   */
+  boolean getExpectEnd();
 }

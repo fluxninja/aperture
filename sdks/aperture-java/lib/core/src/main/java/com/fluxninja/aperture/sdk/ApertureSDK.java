@@ -108,6 +108,7 @@ public final class ApertureSDK {
                         .setControlPoint(parameters.getControlPoint())
                         .putAllLabels(labels)
                         .setRampMode(parameters.getRampMode())
+                        .setExpectEnd(true)
                         .setCacheLookupRequest(
                                 CacheLookupRequest.newBuilder()
                                         .addAllGlobalCacheKeys(parameters.getGlobalCacheKeys())
@@ -197,7 +198,8 @@ public final class ApertureSDK {
         }
         span.setAttribute(WORKLOAD_START_TIMESTAMP_LABEL, Utils.getCurrentEpochNanos());
 
-        return new TrafficFlow(res, span, false, req.getCheckHTTPRequest().getRampMode());
+        return new TrafficFlow(
+                res, span, false, req.getCheckHTTPRequest().getRampMode(), this.flowControlClient);
     }
 
     private boolean isIgnored(String path) {

@@ -90,6 +90,33 @@ public interface CheckHTTPResponseOrBuilder extends
 
   /**
    * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   * @return Whether the checkResponse field is set.
+   */
+  boolean hasCheckResponse();
+  /**
+   * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   * @return The checkResponse.
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponse getCheckResponse();
+  /**
+   * <pre>
+   * The response from the check call.
+   * </pre>
+   *
+   * <code>.aperture.flowcontrol.check.v1.CheckResponse check_response = 5 [json_name = "checkResponse"];</code>
+   */
+  com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckResponseOrBuilder getCheckResponseOrBuilder();
+
+  /**
+   * <pre>
    * Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
    * filter.
    * </pre>

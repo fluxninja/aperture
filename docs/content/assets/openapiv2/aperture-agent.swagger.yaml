@@ -20,6 +20,27 @@ definitions:
                     type: object
                 type: array
         type: object
+    CacheLookupResponse:
+        properties:
+            global_cache_responses:
+                additionalProperties:
+                    $ref: '#/definitions/KeyLookupResponse'
+                type: object
+            result_cache_response:
+                $ref: '#/definitions/KeyLookupResponse'
+        type: object
+    CacheLookupStatus:
+        default: HIT
+        enum:
+            - HIT
+            - MISS
+        type: string
+    CacheOperationStatus:
+        default: SUCCESS
+        enum:
+            - SUCCESS
+            - ERROR
+        type: string
     CheckHTTPRequest:
         properties:
             control_point:
@@ -33,6 +54,9 @@ definitions:
                     The destination of a network activity, such as accepting a TCP connection.
                     In a multi hop network activity, the destination represents the receiver of
                     the last hop.
+            expect_end:
+                description: Expect End denotes whether to expect a FlowEnd call for this flow.
+                type: boolean
             ramp_mode:
                 description: A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
                 type: boolean
@@ -83,6 +107,9 @@ definitions:
         type: object
     CheckHTTPResponse:
         properties:
+            check_response:
+                $ref: '#/definitions/CheckResponse'
+                description: The response from the check call.
             denied_response:
                 $ref: '#/definitions/DeniedHttpResponse'
                 description: Supplies http attributes for a denied response.
@@ -98,6 +125,117 @@ definitions:
                 $ref: '#/definitions/googlerpcStatus'
                 title: Status `OK` allows the request. Any other status indicates the request should be denied
         type: object
+    CheckResponse:
+        description: CheckResponse contains fields that represent decision made by Check call.
+        properties:
+            cache_lookup_response:
+                $ref: '#/definitions/CacheLookupResponse'
+                description: CacheLookupResponse contains the result of the cache lookup.
+            classifier_infos:
+                description: classifiers that were matched for this request.
+                items:
+                    $ref: '#/definitions/ClassifierInfo'
+                    type: object
+                type: array
+            control_point:
+                title: control_point of request
+                type: string
+            decision_type:
+                $ref: '#/definitions/CheckResponseDecisionType'
+                description: decision_type contains what the decision was.
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+                description: |-
+                    http_status contains the http status code to be returned to the client, if
+                    decision_type is REJECTED. Optional.
+            end:
+                format: date-time
+                title: end timestamp
+                type: string
+            expect_end:
+                description: Expected End for this request.
+                type: boolean
+            flow_label_keys:
+                description: flow label keys that were matched for this request.
+                items:
+                    type: string
+                type: array
+            flux_meter_infos:
+                description: flux meters that were matched for this request.
+                items:
+                    $ref: '#/definitions/FluxMeterInfo'
+                    type: object
+                type: array
+            limiter_decisions:
+                description: limiter_decisions contains information about decision made by each limiter.
+                items:
+                    $ref: '#/definitions/LimiterDecision'
+                    type: object
+                type: array
+            reject_reason:
+                $ref: '#/definitions/CheckResponseRejectReason'
+                description: reject_reason contains the reason for the rejection.
+            services:
+                items:
+                    type: string
+                title: services that matched
+                type: array
+            start:
+                format: date-time
+                title: start timestamp
+                type: string
+            telemetry_flow_labels:
+                additionalProperties:
+                    type: string
+                description: telemetry_flow_labels are labels for telemetry purpose. The keys in telemetry_flow_labels is subset of flow_label_keys.
+                type: object
+            wait_time:
+                description: |-
+                    Recommended minimal amount of time to wait when retrying the request, if
+                    decision_type is REJECTED. Optional.
+                type: string
+        type: object
+    CheckResponseDecisionType:
+        default: DECISION_TYPE_ACCEPTED
+        description: DecisionType contains fields that represent decision made by Check call.
+        enum:
+            - DECISION_TYPE_ACCEPTED
+            - DECISION_TYPE_REJECTED
+        type: string
+    CheckResponseRejectReason:
+        default: REJECT_REASON_NONE
+        description: RejectReason contains fields that give further information about rejection.
+        enum:
+            - REJECT_REASON_NONE
+            - REJECT_REASON_RATE_LIMITED
+            - REJECT_REASON_NO_TOKENS
+            - REJECT_REASON_NOT_SAMPLED
+            - REJECT_REASON_NO_MATCHING_RAMP
+        type: string
+    ClassifierInfo:
+        description: ClassifierInfo describes details for each ClassifierInfo.
+        properties:
+            classifier_index:
+                format: int64
+                type: string
+            error:
+                $ref: '#/definitions/ClassifierInfoError'
+            policy_hash:
+                type: string
+            policy_name:
+                type: string
+        type: object
+    ClassifierInfoError:
+        default: ERROR_NONE
+        description: Error information.
+        enum:
+            - ERROR_NONE
+            - ERROR_EVAL_FAILED
+            - ERROR_EMPTY_RESULTSET
+            - ERROR_AMBIGUOUS_RESULTSET
+            - ERROR_MULTI_EXPRESSION
+            - ERROR_EXPRESSION_NOT_MAP
+        type: string
     DeniedHttpResponse:
         description: HTTP attributes for a denied response.
         properties:
@@ -251,6 +389,12 @@ definitions:
                     type: object
                 type: array
         type: object
+    FluxMeterInfo:
+        description: FluxMeterInfo describes detail for each FluxMeterInfo.
+        properties:
+            flux_meter_name:
+                type: string
+        type: object
     GroupStatus:
         description: |-
             Groups is nested structure that holds status information about the node and a
@@ -270,6 +414,18 @@ definitions:
             local_ip:
                 type: string
             uuid:
+                type: string
+        type: object
+    KeyLookupResponse:
+        properties:
+            error:
+                type: string
+            lookup_status:
+                $ref: '#/definitions/CacheLookupStatus'
+            operation_status:
+                $ref: '#/definitions/CacheOperationStatus'
+            value:
+                format: byte
                 type: string
         type: object
     LabelMatcher:
@@ -321,6 +477,116 @@ definitions:
             Allows to define rules whether a map of
             [labels](/concepts/flow-label.md)
             should be considered a match or not
+        type: object
+    LimiterDecision:
+        description: LimiterDecision describes details for each limiter.
+        properties:
+            component_id:
+                type: string
+            concurrency_limiter_info:
+                $ref: '#/definitions/LimiterDecisionConcurrencyLimiterInfo'
+            concurrency_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionConcurrencySchedulerInfo'
+            denied_response_status_code:
+                $ref: '#/definitions/StatusCode'
+            dropped:
+                type: boolean
+            load_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionSchedulerInfo'
+            policy_hash:
+                type: string
+            policy_name:
+                type: string
+            quota_scheduler_info:
+                $ref: '#/definitions/LimiterDecisionQuotaSchedulerInfo'
+            rate_limiter_info:
+                $ref: '#/definitions/LimiterDecisionRateLimiterInfo'
+            reason:
+                $ref: '#/definitions/LimiterDecisionLimiterReason'
+            sampler_info:
+                $ref: '#/definitions/LimiterDecisionSamplerInfo'
+            wait_time:
+                type: string
+        type: object
+    LimiterDecisionConcurrencyLimiterInfo:
+        properties:
+            label:
+                type: string
+            request_id:
+                type: string
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+        type: object
+    LimiterDecisionConcurrencySchedulerInfo:
+        properties:
+            label:
+                type: string
+            priority:
+                format: double
+                type: number
+            request_id:
+                type: string
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
+                type: string
+        type: object
+    LimiterDecisionLimiterReason:
+        default: LIMITER_REASON_UNSPECIFIED
+        enum:
+            - LIMITER_REASON_UNSPECIFIED
+            - LIMITER_REASON_KEY_NOT_FOUND
+        type: string
+    LimiterDecisionQuotaSchedulerInfo:
+        properties:
+            label:
+                type: string
+            priority:
+                format: double
+                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
+                type: string
+        type: object
+    LimiterDecisionRateLimiterInfo:
+        properties:
+            label:
+                type: string
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+        type: object
+    LimiterDecisionSamplerInfo:
+        properties:
+            label:
+                type: string
+        type: object
+    LimiterDecisionSchedulerInfo:
+        properties:
+            priority:
+                format: double
+                type: number
+            tokens_info:
+                $ref: '#/definitions/LimiterDecisionTokensInfo'
+            workload_index:
+                type: string
+        type: object
+    LimiterDecisionTokensInfo:
+        properties:
+            consumed:
+                format: double
+                type: number
+            current:
+                format: double
+                type: number
+            remaining:
+                description: |-
+                    remaining and current may not
+                    provide accurate values in case
+                    the request times out while waiting
+                    for tokens.
+                format: double
+                type: number
         type: object
     MatchRequirement:
         description: |-
@@ -474,6 +740,71 @@ definitions:
                 format: date-time
                 type: string
         type: object
+    StatusCode:
+        default: Empty
+        description: '- Empty: Empty - This code not part of the HTTP status code specification, but it is needed for `enum` type.'
+        enum:
+            - Empty
+            - Continue
+            - OK
+            - Created
+            - Accepted
+            - NonAuthoritativeInformation
+            - NoContent
+            - ResetContent
+            - PartialContent
+            - MultiStatus
+            - AlreadyReported
+            - IMUsed
+            - MultipleChoices
+            - MovedPermanently
+            - Found
+            - SeeOther
+            - NotModified
+            - UseProxy
+            - TemporaryRedirect
+            - PermanentRedirect
+            - BadRequest
+            - Unauthorized
+            - PaymentRequired
+            - Forbidden
+            - NotFound
+            - MethodNotAllowed
+            - NotAcceptable
+            - ProxyAuthenticationRequired
+            - RequestTimeout
+            - Conflict
+            - Gone
+            - LengthRequired
+            - PreconditionFailed
+            - PayloadTooLarge
+            - URITooLong
+            - UnsupportedMediaType
+            - RangeNotSatisfiable
+            - ExpectationFailed
+            - MisdirectedRequest
+            - UnprocessableEntity
+            - Locked
+            - FailedDependency
+            - UpgradeRequired
+            - PreconditionRequired
+            - TooManyRequests
+            - RequestHeaderFieldsTooLarge
+            - InternalServerError
+            - NotImplemented
+            - BadGateway
+            - ServiceUnavailable
+            - GatewayTimeout
+            - HTTPVersionNotSupported
+            - VariantAlsoNegotiates
+            - InsufficientStorage
+            - LoopDetected
+            - NotExtended
+            - NetworkAuthenticationRequired
+        title: |-
+            HTTP response codes.
+            For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+        type: string
     StatusError:
         description: Error holds raw error message and its cause in a nested field.
         properties:

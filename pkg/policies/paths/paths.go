@@ -34,6 +34,14 @@ var (
 	QuotaSchedulerConfigPath = path.Join(ConfigPrefix, "quota_scheduler")
 	// QuotaSchedulerDecisionsPath is decision path in etcd for quota scheduler decisions.
 	QuotaSchedulerDecisionsPath = path.Join(DecisionsPrefix, "quota_scheduler")
+	// ConcurrencyLimiterConfigPath is config path in etcd for concurrency limiter.
+	ConcurrencyLimiterConfigPath = path.Join(ConfigPrefix, "concurrency_limiter")
+	// ConcurrencyLimiterDecisionsPath is decision path in etcd for concurrency limiter decisions.
+	ConcurrencyLimiterDecisionsPath = path.Join(DecisionsPrefix, "concurrency_limiter")
+	// ConcurrencySchedulerConfigPath is config path in etcd for concurrency scheduler.
+	ConcurrencySchedulerConfigPath = path.Join(ConfigPrefix, "concurrency_scheduler")
+	// ConcurrencySchedulerDecisionsPath is decision path in etcd for concurrency scheduler decisions.
+	ConcurrencySchedulerDecisionsPath = path.Join(DecisionsPrefix, "concurrency_scheduler")
 	// FluxMeterConfigPath is config path in etcd for flux meters.
 	FluxMeterConfigPath = path.Join(ConfigPrefix, "flux_meter")
 	// InfraMeterConfigPath is config path in etcd for infra meter.

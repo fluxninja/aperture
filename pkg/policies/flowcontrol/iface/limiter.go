@@ -2,7 +2,6 @@ package iface
 
 import (
 	"context"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -37,14 +36,25 @@ type Limiter interface {
 	GetRampMode() bool
 }
 
-// RateLimiter interface.
-type RateLimiter interface {
-	Limiter
-	TakeIfAvailable(ctx context.Context, labels labels.Labels, count float64) (label string, ok bool, waitTime time.Duration, remaining float64, current float64)
-}
-
 // Scheduler interface.
 type Scheduler interface {
 	Limiter
 	GetLatencyObserver(labels map[string]string) prometheus.Observer
+}
+
+// FlowEnder interface.
+type FlowEnder interface {
+	Return(ctx context.Context, label string, tokens float64, requestID string) (bool, error)
+}
+
+// ConcurrencyLimiter interface.
+type ConcurrencyLimiter interface {
+	Limiter
+	FlowEnder
+}
+
+// ConcurrencyScheduler interface.
+type ConcurrencyScheduler interface {
+	Scheduler
+	FlowEnder
 }

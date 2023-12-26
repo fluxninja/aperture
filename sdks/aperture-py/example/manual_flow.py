@@ -62,7 +62,12 @@ async def super_handler():
     else:
         # handle flow rejection by Aperture Agent
         flow.set_status(FlowStatus.Error)
-    flow.end()
+    res = flow.end()
+    if res.get_error():
+        logger.error("Error: {}".format(res.get_error()))
+    elif res.get_flow_end_response():
+        logger.info("Flow End Response: {}".format(res.get_flow_end_response()))
+
     # Simulate work being done
     await asyncio.sleep(2)
     return "", 202

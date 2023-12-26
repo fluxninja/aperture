@@ -2,6 +2,7 @@ package flowcontrol
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -53,10 +54,11 @@ func NewEngine(agentInfo *agentinfo.AgentInfo) iface.Engine {
 		multiMatchers: make(map[selectors.ControlPointID]*multiMatcher),
 		fluxMeters:    make(map[iface.FluxMeterID]iface.FluxMeter),
 		schedulers:    make(map[iface.LimiterID]iface.Scheduler),
-		rateLimiters:  make(map[iface.LimiterID]iface.RateLimiter),
+		rateLimiters:  make(map[iface.LimiterID]iface.Limiter),
 		samplers:      make(map[iface.LimiterID]iface.Limiter),
 		rampSamplers:  make(map[iface.LimiterID]iface.Limiter),
 		labelPreviews: make(map[iface.PreviewID]iface.LabelPreview),
+		flowEnders:    make(map[iface.LimiterID]iface.FlowEnder),
 	}
 	return e
 }
@@ -74,15 +76,16 @@ type Engine struct {
 	agentInfo     *agentinfo.AgentInfo
 	fluxMeters    map[iface.FluxMeterID]iface.FluxMeter
 	schedulers    map[iface.LimiterID]iface.Scheduler
-	rateLimiters  map[iface.LimiterID]iface.RateLimiter
+	rateLimiters  map[iface.LimiterID]iface.Limiter
 	samplers      map[iface.LimiterID]iface.Limiter
 	rampSamplers  map[iface.LimiterID]iface.Limiter
 	labelPreviews map[iface.PreviewID]iface.LabelPreview
 	multiMatchers map[selectors.ControlPointID]*multiMatcher
+	flowEnders    map[iface.LimiterID]iface.FlowEnder
 	mutex         sync.RWMutex
 }
 
-// ProcessRequest .
+// ProcessRequest implements Engine.ProcessRequest.
 func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.RequestContext) (response *flowcontrolv1.CheckResponse) {
 	controlPoint := requestContext.ControlPoint
 	services := requestContext.Services
@@ -94,6 +97,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		FlowLabelKeys: labelKeys,
 		Services:      services,
 		ControlPoint:  controlPoint,
+		ExpectEnd:     requestContext.ExpectEnd,
 	}
 
 	mmr := e.getMatches(controlPoint, services, flowLabels)
@@ -169,7 +173,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
-	resultCacheHit, globalWg := e.cacheLookup(ctx, requestContext, controlPoint, response)
+	resultCacheHit, wgGlobal := e.cacheLookup(ctx, requestContext, controlPoint, response)
 	if resultCacheHit {
 		return
 	}
@@ -178,8 +182,8 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
 	}
 	runLimiters(limiterTypes)
-	if globalWg != nil {
-		globalWg.Wait()
+	if wgGlobal != nil {
+		wgGlobal.Wait()
 	}
 
 	return
@@ -293,6 +297,11 @@ func revertRemaining(
 func (e *Engine) RegisterScheduler(cl iface.Scheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
+	return e.registerSchedulerUnsafe(cl)
+}
+
+// registerSchedulerUnsafe is not thread safe.
+func (e *Engine) registerSchedulerUnsafe(cl iface.Scheduler) error {
 	if _, ok := e.schedulers[cl.GetLimiterID()]; !ok {
 		e.schedulers[cl.GetLimiterID()] = cl
 	} else {
@@ -310,8 +319,12 @@ func (e *Engine) RegisterScheduler(cl iface.Scheduler) error {
 func (e *Engine) UnregisterScheduler(cl iface.Scheduler) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.schedulers, cl.GetLimiterID())
+	return e.unregisterSchedulerUnsafe(cl)
+}
 
+// unregisterSchedulerUnsafe is not thread safe.
+func (e *Engine) unregisterSchedulerUnsafe(cl iface.Scheduler) error {
+	delete(e.schedulers, cl.GetLimiterID())
 	return e.unregister(cl.GetLimiterID().String(), cl.GetSelectors())
 }
 
@@ -390,9 +403,14 @@ func (e *Engine) GetScheduler(limiterID iface.LimiterID) iface.Scheduler {
 }
 
 // RegisterRateLimiter adds limiter actuator to multimatcher.
-func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
+func (e *Engine) RegisterRateLimiter(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
+	return e.registerRateLimiterUnsafe(rl)
+}
+
+// registerRateLimiterUnsafe is not thread safe.
+func (e *Engine) registerRateLimiterUnsafe(rl iface.Limiter) error {
 	if _, ok := e.rateLimiters[rl.GetLimiterID()]; !ok {
 		e.rateLimiters[rl.GetLimiterID()] = rl
 	} else {
@@ -408,16 +426,20 @@ func (e *Engine) RegisterRateLimiter(rl iface.RateLimiter) error {
 }
 
 // UnregisterRateLimiter removes limiter actuator from multimatcher.
-func (e *Engine) UnregisterRateLimiter(rl iface.RateLimiter) error {
+func (e *Engine) UnregisterRateLimiter(rl iface.Limiter) error {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
-	delete(e.rateLimiters, rl.GetLimiterID())
+	return e.unregisterRateLimiterUnsafe(rl)
+}
 
+// unregisterRateLimiterUnsafe is not thread safe.
+func (e *Engine) unregisterRateLimiterUnsafe(rl iface.Limiter) error {
+	delete(e.rateLimiters, rl.GetLimiterID())
 	return e.unregister(rl.GetLimiterID().String(), rl.GetSelectors())
 }
 
 // GetRateLimiter Lookup function for getting rate limiter.
-func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.RateLimiter {
+func (e *Engine) GetRateLimiter(limiterID iface.LimiterID) iface.Limiter {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
 	return e.rateLimiters[limiterID]
@@ -551,4 +573,143 @@ func (e *Engine) unregister(key string, selectorsProto []*policylangv1.Selector)
 // RegisterCache .
 func (e *Engine) RegisterCache(cache iface.Cache) {
 	e.cache = cache
+}
+
+// registerFlowEnderUnsafe is not thread safe.
+func (e *Engine) registerFlowEnderUnsafe(cl iface.ConcurrencyLimiter) error {
+	if _, ok := e.flowEnders[cl.GetLimiterID()]; !ok {
+		e.flowEnders[cl.GetLimiterID()] = cl
+	} else {
+		return fmt.Errorf("concurrency limiter already registered")
+	}
+	return nil
+}
+
+// unregisterFlowEnderUnsafe is not thread safe.
+func (e *Engine) unregisterFlowEnderUnsafe(cl iface.ConcurrencyLimiter) error {
+	delete(e.flowEnders, cl.GetLimiterID())
+	return nil
+}
+
+// GetFlowEnder Lookup function for getting a flow ender.
+func (e *Engine) GetFlowEnder(limiterID iface.LimiterID) iface.FlowEnder {
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
+	return e.flowEnders[limiterID]
+}
+
+// RegisterConcurrencyLimiter adds limiter actuator to multimatcher and flow enders.
+func (e *Engine) RegisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	// Register as a RateLimiter
+	err := e.registerRateLimiterUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	// Register as a FlowEnder
+	err = e.registerFlowEnderUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UnregisterConcurrencyLimiter removes limiter actuator from multimatcher and flow enders.
+func (e *Engine) UnregisterConcurrencyLimiter(cl iface.ConcurrencyLimiter) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	// Unregister as a RateLimiter
+	err := e.unregisterRateLimiterUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	// Unregister as a FlowEnder
+	err = e.unregisterFlowEnderUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RegisterConcurrencyScheduler adds limiter actuator to multimatcher and registers the flow ender.
+func (e *Engine) RegisterConcurrencyScheduler(cl iface.ConcurrencyScheduler) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	// Register as a Scheduler
+	err := e.registerSchedulerUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	// Register as a FlowEnder
+	err = e.registerFlowEnderUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UnregisterConcurrencyScheduler removes limiter actuator from multimatcher and flow enders.
+func (e *Engine) UnregisterConcurrencyScheduler(cl iface.ConcurrencyScheduler) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	// Unregister as a Scheduler
+	err := e.unregisterSchedulerUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	// Unregister as a FlowEnder
+	err = e.unregisterFlowEnderUnsafe(cl)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FlowEnd implements Engine.FlowEnd.
+func (e *Engine) FlowEnd(ctx context.Context, request *flowcontrolv1.FlowEndRequest) *flowcontrolv1.FlowEndResponse {
+	e.mutex.RLock()
+	defer e.mutex.RUnlock()
+
+	response := &flowcontrolv1.FlowEndResponse{}
+
+	for _, inflightRequest := range request.InflightRequests {
+		limiterID := iface.LimiterID{
+			PolicyName:  inflightRequest.PolicyName,
+			PolicyHash:  inflightRequest.PolicyHash,
+			ComponentID: inflightRequest.ComponentId,
+		}
+		flowEnder := e.flowEnders[limiterID]
+		var err error
+		var errStr string
+		var returned bool
+		if flowEnder != nil {
+			returned, err = flowEnder.Return(ctx, inflightRequest.Label, inflightRequest.Tokens, inflightRequest.RequestId)
+			if err != nil {
+				errStr = err.Error()
+			}
+		} else {
+			err = errors.New("flow ender not found for limiter id")
+			errStr = err.Error()
+		}
+		response.TokenReturnStatuses = append(response.TokenReturnStatuses, &flowcontrolv1.TokenReturnStatus{
+			InflightRequestRef: inflightRequest,
+			Returned:           returned,
+			Error:              errStr,
+		})
+	}
+
+	return response
 }

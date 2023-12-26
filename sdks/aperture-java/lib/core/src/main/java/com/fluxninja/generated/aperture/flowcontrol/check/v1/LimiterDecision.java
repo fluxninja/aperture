@@ -3944,6 +3944,2044 @@ private static final long serialVersionUID = 0L;
 
   }
 
+  public interface ConcurrencyLimiterInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    java.lang.String getLabel();
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    com.google.protobuf.ByteString
+        getLabelBytes();
+
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     * @return Whether the tokensInfo field is set.
+     */
+    boolean hasTokensInfo();
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     * @return The tokensInfo.
+     */
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo();
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     */
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder();
+
+    /**
+     * <code>string request_id = 3 [json_name = "requestId"];</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 3 [json_name = "requestId"];</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+  }
+  /**
+   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo}
+   */
+  public static final class ConcurrencyLimiterInfo extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+      ConcurrencyLimiterInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ConcurrencyLimiterInfo.newBuilder() to construct.
+    private ConcurrencyLimiterInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ConcurrencyLimiterInfo() {
+      label_ = "";
+      requestId_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ConcurrencyLimiterInfo();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int LABEL_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object label_ = "";
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    @java.lang.Override
+    public java.lang.String getLabel() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        label_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLabelBytes() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        label_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TOKENS_INFO_FIELD_NUMBER = 2;
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokensInfo_;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     * @return Whether the tokensInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasTokensInfo() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     * @return The tokensInfo.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo() {
+      return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder() {
+      return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 3 [json_name = "requestId"];</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 3 [json_name = "requestId"];</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, label_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getTokensInfo());
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, requestId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, label_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getTokensInfo());
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, requestId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)) {
+        return super.equals(obj);
+      }
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) obj;
+
+      if (!getLabel()
+          .equals(other.getLabel())) return false;
+      if (hasTokensInfo() != other.hasTokensInfo()) return false;
+      if (hasTokensInfo()) {
+        if (!getTokensInfo()
+            .equals(other.getTokensInfo())) return false;
+      }
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + LABEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLabel().hashCode();
+      if (hasTokensInfo()) {
+        hash = (37 * hash) + TOKENS_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getTokensInfo().hashCode();
+      }
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder.class);
+      }
+
+      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getTokensInfoFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        label_ = "";
+        tokensInfo_ = null;
+        if (tokensInfoBuilder_ != null) {
+          tokensInfoBuilder_.dispose();
+          tokensInfoBuilder_ = null;
+        }
+        requestId_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencyLimiterInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstanceForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo build() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo buildPartial() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.label_ = label_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.tokensInfo_ = tokensInfoBuilder_ == null
+              ? tokensInfo_
+              : tokensInfoBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) {
+          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo other) {
+        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance()) return this;
+        if (!other.getLabel().isEmpty()) {
+          label_ = other.label_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.hasTokensInfo()) {
+          mergeTokensInfo(other.getTokensInfo());
+        }
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                label_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                input.readMessage(
+                    getTokensInfoFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object label_ = "";
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The label.
+       */
+      public java.lang.String getLabel() {
+        java.lang.Object ref = label_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          label_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The bytes for label.
+       */
+      public com.google.protobuf.ByteString
+          getLabelBytes() {
+        java.lang.Object ref = label_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          label_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabel(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        label_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLabel() {
+        label_ = getDefaultInstance().getLabel();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The bytes for label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        label_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokensInfo_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder> tokensInfoBuilder_;
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       * @return Whether the tokensInfo field is set.
+       */
+      public boolean hasTokensInfo() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       * @return The tokensInfo.
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo() {
+        if (tokensInfoBuilder_ == null) {
+          return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+        } else {
+          return tokensInfoBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public Builder setTokensInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo value) {
+        if (tokensInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          tokensInfo_ = value;
+        } else {
+          tokensInfoBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public Builder setTokensInfo(
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder builderForValue) {
+        if (tokensInfoBuilder_ == null) {
+          tokensInfo_ = builderForValue.build();
+        } else {
+          tokensInfoBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public Builder mergeTokensInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo value) {
+        if (tokensInfoBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            tokensInfo_ != null &&
+            tokensInfo_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance()) {
+            getTokensInfoBuilder().mergeFrom(value);
+          } else {
+            tokensInfo_ = value;
+          }
+        } else {
+          tokensInfoBuilder_.mergeFrom(value);
+        }
+        if (tokensInfo_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public Builder clearTokensInfo() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        tokensInfo_ = null;
+        if (tokensInfoBuilder_ != null) {
+          tokensInfoBuilder_.dispose();
+          tokensInfoBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder getTokensInfoBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getTokensInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder() {
+        if (tokensInfoBuilder_ != null) {
+          return tokensInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return tokensInfo_ == null ?
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+        }
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 2 [json_name = "tokensInfo"];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder> 
+          getTokensInfoFieldBuilder() {
+        if (tokensInfoBuilder_ == null) {
+          tokensInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder>(
+                  getTokensInfo(),
+                  getParentForChildren(),
+                  isClean());
+          tokensInfo_ = null;
+        }
+        return tokensInfoBuilder_;
+      }
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 3 [json_name = "requestId"];</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 3 [json_name = "requestId"];</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 3 [json_name = "requestId"];</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 3 [json_name = "requestId"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 3 [json_name = "requestId"];</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo)
+    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo();
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ConcurrencyLimiterInfo>
+        PARSER = new com.google.protobuf.AbstractParser<ConcurrencyLimiterInfo>() {
+      @java.lang.Override
+      public ConcurrencyLimiterInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ConcurrencyLimiterInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ConcurrencyLimiterInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ConcurrencySchedulerInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    java.lang.String getLabel();
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    com.google.protobuf.ByteString
+        getLabelBytes();
+
+    /**
+     * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+     * @return The workloadIndex.
+     */
+    java.lang.String getWorkloadIndex();
+    /**
+     * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+     * @return The bytes for workloadIndex.
+     */
+    com.google.protobuf.ByteString
+        getWorkloadIndexBytes();
+
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     * @return Whether the tokensInfo field is set.
+     */
+    boolean hasTokensInfo();
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     * @return The tokensInfo.
+     */
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo();
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     */
+    com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder();
+
+    /**
+     * <code>double priority = 4 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    double getPriority();
+
+    /**
+     * <code>string request_id = 5 [json_name = "requestId"];</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 5 [json_name = "requestId"];</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+  }
+  /**
+   * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo}
+   */
+  public static final class ConcurrencySchedulerInfo extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)
+      ConcurrencySchedulerInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ConcurrencySchedulerInfo.newBuilder() to construct.
+    private ConcurrencySchedulerInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ConcurrencySchedulerInfo() {
+      label_ = "";
+      workloadIndex_ = "";
+      requestId_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ConcurrencySchedulerInfo();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int LABEL_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object label_ = "";
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The label.
+     */
+    @java.lang.Override
+    public java.lang.String getLabel() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        label_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string label = 1 [json_name = "label"];</code>
+     * @return The bytes for label.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLabelBytes() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        label_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int WORKLOAD_INDEX_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object workloadIndex_ = "";
+    /**
+     * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+     * @return The workloadIndex.
+     */
+    @java.lang.Override
+    public java.lang.String getWorkloadIndex() {
+      java.lang.Object ref = workloadIndex_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        workloadIndex_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+     * @return The bytes for workloadIndex.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getWorkloadIndexBytes() {
+      java.lang.Object ref = workloadIndex_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        workloadIndex_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TOKENS_INFO_FIELD_NUMBER = 3;
+    private com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokensInfo_;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     * @return Whether the tokensInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasTokensInfo() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     * @return The tokensInfo.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo() {
+      return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder() {
+      return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+    }
+
+    public static final int PRIORITY_FIELD_NUMBER = 4;
+    private double priority_ = 0D;
+    /**
+     * <code>double priority = 4 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    @java.lang.Override
+    public double getPriority() {
+      return priority_;
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 5 [json_name = "requestId"];</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 5 [json_name = "requestId"];</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, label_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, workloadIndex_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(3, getTokensInfo());
+      }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        output.writeDouble(4, priority_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, requestId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(label_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, label_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(workloadIndex_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, workloadIndex_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getTokensInfo());
+      }
+      if (java.lang.Double.doubleToRawLongBits(priority_) != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(4, priority_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, requestId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)) {
+        return super.equals(obj);
+      }
+      com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo other = (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) obj;
+
+      if (!getLabel()
+          .equals(other.getLabel())) return false;
+      if (!getWorkloadIndex()
+          .equals(other.getWorkloadIndex())) return false;
+      if (hasTokensInfo() != other.hasTokensInfo()) return false;
+      if (hasTokensInfo()) {
+        if (!getTokensInfo()
+            .equals(other.getTokensInfo())) return false;
+      }
+      if (java.lang.Double.doubleToLongBits(getPriority())
+          != java.lang.Double.doubleToLongBits(
+              other.getPriority())) return false;
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + LABEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLabel().hashCode();
+      hash = (37 * hash) + WORKLOAD_INDEX_FIELD_NUMBER;
+      hash = (53 * hash) + getWorkloadIndex().hashCode();
+      if (hasTokensInfo()) {
+        hash = (37 * hash) + TOKENS_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getTokensInfo().hashCode();
+      }
+      hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          java.lang.Double.doubleToLongBits(getPriority()));
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.class, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder.class);
+      }
+
+      // Construct using com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getTokensInfoFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        label_ = "";
+        workloadIndex_ = "";
+        tokensInfo_ = null;
+        if (tokensInfoBuilder_ != null) {
+          tokensInfoBuilder_.dispose();
+          tokensInfoBuilder_ = null;
+        }
+        priority_ = 0D;
+        requestId_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.CheckProto.internal_static_aperture_flowcontrol_check_v1_LimiterDecision_ConcurrencySchedulerInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getDefaultInstanceForType() {
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo build() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo buildPartial() {
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo result = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.label_ = label_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.workloadIndex_ = workloadIndex_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.tokensInfo_ = tokensInfoBuilder_ == null
+              ? tokensInfo_
+              : tokensInfoBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.priority_ = priority_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) {
+          return mergeFrom((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo other) {
+        if (other == com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance()) return this;
+        if (!other.getLabel().isEmpty()) {
+          label_ = other.label_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getWorkloadIndex().isEmpty()) {
+          workloadIndex_ = other.workloadIndex_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (other.hasTokensInfo()) {
+          mergeTokensInfo(other.getTokensInfo());
+        }
+        if (other.getPriority() != 0D) {
+          setPriority(other.getPriority());
+        }
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                label_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                workloadIndex_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                input.readMessage(
+                    getTokensInfoFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 33: {
+                priority_ = input.readDouble();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 33
+              case 42: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object label_ = "";
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The label.
+       */
+      public java.lang.String getLabel() {
+        java.lang.Object ref = label_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          label_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return The bytes for label.
+       */
+      public com.google.protobuf.ByteString
+          getLabelBytes() {
+        java.lang.Object ref = label_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          label_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabel(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        label_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLabel() {
+        label_ = getDefaultInstance().getLabel();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string label = 1 [json_name = "label"];</code>
+       * @param value The bytes for label to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLabelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        label_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object workloadIndex_ = "";
+      /**
+       * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+       * @return The workloadIndex.
+       */
+      public java.lang.String getWorkloadIndex() {
+        java.lang.Object ref = workloadIndex_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          workloadIndex_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+       * @return The bytes for workloadIndex.
+       */
+      public com.google.protobuf.ByteString
+          getWorkloadIndexBytes() {
+        java.lang.Object ref = workloadIndex_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          workloadIndex_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+       * @param value The workloadIndex to set.
+       * @return This builder for chaining.
+       */
+      public Builder setWorkloadIndex(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        workloadIndex_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearWorkloadIndex() {
+        workloadIndex_ = getDefaultInstance().getWorkloadIndex();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string workload_index = 2 [json_name = "workloadIndex"];</code>
+       * @param value The bytes for workloadIndex to set.
+       * @return This builder for chaining.
+       */
+      public Builder setWorkloadIndexBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        workloadIndex_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokensInfo_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder> tokensInfoBuilder_;
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       * @return Whether the tokensInfo field is set.
+       */
+      public boolean hasTokensInfo() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       * @return The tokensInfo.
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo getTokensInfo() {
+        if (tokensInfoBuilder_ == null) {
+          return tokensInfo_ == null ? com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+        } else {
+          return tokensInfoBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public Builder setTokensInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo value) {
+        if (tokensInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          tokensInfo_ = value;
+        } else {
+          tokensInfoBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public Builder setTokensInfo(
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder builderForValue) {
+        if (tokensInfoBuilder_ == null) {
+          tokensInfo_ = builderForValue.build();
+        } else {
+          tokensInfoBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public Builder mergeTokensInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo value) {
+        if (tokensInfoBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0) &&
+            tokensInfo_ != null &&
+            tokensInfo_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance()) {
+            getTokensInfoBuilder().mergeFrom(value);
+          } else {
+            tokensInfo_ = value;
+          }
+        } else {
+          tokensInfoBuilder_.mergeFrom(value);
+        }
+        if (tokensInfo_ != null) {
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public Builder clearTokensInfo() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        tokensInfo_ = null;
+        if (tokensInfoBuilder_ != null) {
+          tokensInfoBuilder_.dispose();
+          tokensInfoBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder getTokensInfoBuilder() {
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return getTokensInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder getTokensInfoOrBuilder() {
+        if (tokensInfoBuilder_ != null) {
+          return tokensInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return tokensInfo_ == null ?
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.getDefaultInstance() : tokensInfo_;
+        }
+      }
+      /**
+       * <code>.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo tokens_info = 3 [json_name = "tokensInfo"];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder> 
+          getTokensInfoFieldBuilder() {
+        if (tokensInfoBuilder_ == null) {
+          tokensInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.TokensInfoOrBuilder>(
+                  getTokensInfo(),
+                  getParentForChildren(),
+                  isClean());
+          tokensInfo_ = null;
+        }
+        return tokensInfoBuilder_;
+      }
+
+      private double priority_ ;
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @return The priority.
+       */
+      @java.lang.Override
+      public double getPriority() {
+        return priority_;
+      }
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @param value The priority to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPriority(double value) {
+
+        priority_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>double priority = 4 [json_name = "priority"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPriority() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        priority_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 5 [json_name = "requestId"];</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 5 [json_name = "requestId"];</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 5 [json_name = "requestId"];</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 5 [json_name = "requestId"];</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 5 [json_name = "requestId"];</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo)
+    private static final com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo();
+    }
+
+    public static com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ConcurrencySchedulerInfo>
+        PARSER = new com.google.protobuf.AbstractParser<ConcurrencySchedulerInfo>() {
+      @java.lang.Override
+      public ConcurrencySchedulerInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ConcurrencySchedulerInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ConcurrencySchedulerInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private int bitField0_;
   private int detailsCase_ = 0;
   @SuppressWarnings("serial")
@@ -3955,6 +5993,8 @@ private static final long serialVersionUID = 0L;
     LOAD_SCHEDULER_INFO(21),
     SAMPLER_INFO(22),
     QUOTA_SCHEDULER_INFO(23),
+    CONCURRENCY_LIMITER_INFO(24),
+    CONCURRENCY_SCHEDULER_INFO(25),
     DETAILS_NOT_SET(0);
     private final int value;
     private DetailsCase(int value) {
@@ -3976,6 +6016,8 @@ private static final long serialVersionUID = 0L;
         case 21: return LOAD_SCHEDULER_INFO;
         case 22: return SAMPLER_INFO;
         case 23: return QUOTA_SCHEDULER_INFO;
+        case 24: return CONCURRENCY_LIMITER_INFO;
+        case 25: return CONCURRENCY_SCHEDULER_INFO;
         case 0: return DETAILS_NOT_SET;
         default: return null;
       }
@@ -4305,6 +6347,68 @@ private static final long serialVersionUID = 0L;
     return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo.getDefaultInstance();
   }
 
+  public static final int CONCURRENCY_LIMITER_INFO_FIELD_NUMBER = 24;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   * @return Whether the concurrencyLimiterInfo field is set.
+   */
+  @java.lang.Override
+  public boolean hasConcurrencyLimiterInfo() {
+    return detailsCase_ == 24;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   * @return The concurrencyLimiterInfo.
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo() {
+    if (detailsCase_ == 24) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
+    if (detailsCase_ == 24) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+  }
+
+  public static final int CONCURRENCY_SCHEDULER_INFO_FIELD_NUMBER = 25;
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   * @return Whether the concurrencySchedulerInfo field is set.
+   */
+  @java.lang.Override
+  public boolean hasConcurrencySchedulerInfo() {
+    return detailsCase_ == 25;
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   * @return The concurrencySchedulerInfo.
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getConcurrencySchedulerInfo() {
+    if (detailsCase_ == 25) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+  }
+  /**
+   * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+   */
+  @java.lang.Override
+  public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder getConcurrencySchedulerInfoOrBuilder() {
+    if (detailsCase_ == 25) {
+       return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_;
+    }
+    return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -4351,6 +6455,12 @@ private static final long serialVersionUID = 0L;
     }
     if (detailsCase_ == 23) {
       output.writeMessage(23, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo) details_);
+    }
+    if (detailsCase_ == 24) {
+      output.writeMessage(24, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
+    }
+    if (detailsCase_ == 25) {
+      output.writeMessage(25, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -4402,6 +6512,14 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(23, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.QuotaSchedulerInfo) details_);
     }
+    if (detailsCase_ == 24) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(24, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_);
+    }
+    if (detailsCase_ == 25) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(25, (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -4450,6 +6568,14 @@ private static final long serialVersionUID = 0L;
         if (!getQuotaSchedulerInfo()
             .equals(other.getQuotaSchedulerInfo())) return false;
         break;
+      case 24:
+        if (!getConcurrencyLimiterInfo()
+            .equals(other.getConcurrencyLimiterInfo())) return false;
+        break;
+      case 25:
+        if (!getConcurrencySchedulerInfo()
+            .equals(other.getConcurrencySchedulerInfo())) return false;
+        break;
       case 0:
       default:
     }
@@ -4497,6 +6623,14 @@ private static final long serialVersionUID = 0L;
       case 23:
         hash = (37 * hash) + QUOTA_SCHEDULER_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getQuotaSchedulerInfo().hashCode();
+        break;
+      case 24:
+        hash = (37 * hash) + CONCURRENCY_LIMITER_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getConcurrencyLimiterInfo().hashCode();
+        break;
+      case 25:
+        hash = (37 * hash) + CONCURRENCY_SCHEDULER_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getConcurrencySchedulerInfo().hashCode();
         break;
       case 0:
       default:
@@ -4665,6 +6799,12 @@ private static final long serialVersionUID = 0L;
       if (quotaSchedulerInfoBuilder_ != null) {
         quotaSchedulerInfoBuilder_.clear();
       }
+      if (concurrencyLimiterInfoBuilder_ != null) {
+        concurrencyLimiterInfoBuilder_.clear();
+      }
+      if (concurrencySchedulerInfoBuilder_ != null) {
+        concurrencySchedulerInfoBuilder_.clear();
+      }
       detailsCase_ = 0;
       details_ = null;
       return this;
@@ -4747,6 +6887,14 @@ private static final long serialVersionUID = 0L;
       if (detailsCase_ == 23 &&
           quotaSchedulerInfoBuilder_ != null) {
         result.details_ = quotaSchedulerInfoBuilder_.build();
+      }
+      if (detailsCase_ == 24 &&
+          concurrencyLimiterInfoBuilder_ != null) {
+        result.details_ = concurrencyLimiterInfoBuilder_.build();
+      }
+      if (detailsCase_ == 25 &&
+          concurrencySchedulerInfoBuilder_ != null) {
+        result.details_ = concurrencySchedulerInfoBuilder_.build();
       }
     }
 
@@ -4836,6 +6984,14 @@ private static final long serialVersionUID = 0L;
         }
         case QUOTA_SCHEDULER_INFO: {
           mergeQuotaSchedulerInfo(other.getQuotaSchedulerInfo());
+          break;
+        }
+        case CONCURRENCY_LIMITER_INFO: {
+          mergeConcurrencyLimiterInfo(other.getConcurrencyLimiterInfo());
+          break;
+        }
+        case CONCURRENCY_SCHEDULER_INFO: {
+          mergeConcurrencySchedulerInfo(other.getConcurrencySchedulerInfo());
           break;
         }
         case DETAILS_NOT_SET: {
@@ -4933,6 +7089,20 @@ private static final long serialVersionUID = 0L;
               detailsCase_ = 23;
               break;
             } // case 186
+            case 194: {
+              input.readMessage(
+                  getConcurrencyLimiterInfoFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              detailsCase_ = 24;
+              break;
+            } // case 194
+            case 202: {
+              input.readMessage(
+                  getConcurrencySchedulerInfoFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              detailsCase_ = 25;
+              break;
+            } // case 202
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -6006,6 +8176,290 @@ private static final long serialVersionUID = 0L;
       detailsCase_ = 23;
       onChanged();
       return quotaSchedulerInfoBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder> concurrencyLimiterInfoBuilder_;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     * @return Whether the concurrencyLimiterInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasConcurrencyLimiterInfo() {
+      return detailsCase_ == 24;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     * @return The concurrencyLimiterInfo.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo getConcurrencyLimiterInfo() {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        if (detailsCase_ == 24) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+      } else {
+        if (detailsCase_ == 24) {
+          return concurrencyLimiterInfoBuilder_.getMessage();
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    public Builder setConcurrencyLimiterInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        details_ = value;
+        onChanged();
+      } else {
+        concurrencyLimiterInfoBuilder_.setMessage(value);
+      }
+      detailsCase_ = 24;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    public Builder setConcurrencyLimiterInfo(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder builderForValue) {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        details_ = builderForValue.build();
+        onChanged();
+      } else {
+        concurrencyLimiterInfoBuilder_.setMessage(builderForValue.build());
+      }
+      detailsCase_ = 24;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    public Builder mergeConcurrencyLimiterInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo value) {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        if (detailsCase_ == 24 &&
+            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance()) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          details_ = value;
+        }
+        onChanged();
+      } else {
+        if (detailsCase_ == 24) {
+          concurrencyLimiterInfoBuilder_.mergeFrom(value);
+        } else {
+          concurrencyLimiterInfoBuilder_.setMessage(value);
+        }
+      }
+      detailsCase_ = 24;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    public Builder clearConcurrencyLimiterInfo() {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        if (detailsCase_ == 24) {
+          detailsCase_ = 0;
+          details_ = null;
+          onChanged();
+        }
+      } else {
+        if (detailsCase_ == 24) {
+          detailsCase_ = 0;
+          details_ = null;
+        }
+        concurrencyLimiterInfoBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder getConcurrencyLimiterInfoBuilder() {
+      return getConcurrencyLimiterInfoFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder getConcurrencyLimiterInfoOrBuilder() {
+      if ((detailsCase_ == 24) && (concurrencyLimiterInfoBuilder_ != null)) {
+        return concurrencyLimiterInfoBuilder_.getMessageOrBuilder();
+      } else {
+        if (detailsCase_ == 24) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo concurrency_limiter_info = 24 [json_name = "concurrencyLimiterInfo"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder> 
+        getConcurrencyLimiterInfoFieldBuilder() {
+      if (concurrencyLimiterInfoBuilder_ == null) {
+        if (!(detailsCase_ == 24)) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.getDefaultInstance();
+        }
+        concurrencyLimiterInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfoOrBuilder>(
+                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencyLimiterInfo) details_,
+                getParentForChildren(),
+                isClean());
+        details_ = null;
+      }
+      detailsCase_ = 24;
+      onChanged();
+      return concurrencyLimiterInfoBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder> concurrencySchedulerInfoBuilder_;
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     * @return Whether the concurrencySchedulerInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasConcurrencySchedulerInfo() {
+      return detailsCase_ == 25;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     * @return The concurrencySchedulerInfo.
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo getConcurrencySchedulerInfo() {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        if (detailsCase_ == 25) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+      } else {
+        if (detailsCase_ == 25) {
+          return concurrencySchedulerInfoBuilder_.getMessage();
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    public Builder setConcurrencySchedulerInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo value) {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        details_ = value;
+        onChanged();
+      } else {
+        concurrencySchedulerInfoBuilder_.setMessage(value);
+      }
+      detailsCase_ = 25;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    public Builder setConcurrencySchedulerInfo(
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder builderForValue) {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        details_ = builderForValue.build();
+        onChanged();
+      } else {
+        concurrencySchedulerInfoBuilder_.setMessage(builderForValue.build());
+      }
+      detailsCase_ = 25;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    public Builder mergeConcurrencySchedulerInfo(com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo value) {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        if (detailsCase_ == 25 &&
+            details_ != com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance()) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.newBuilder((com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          details_ = value;
+        }
+        onChanged();
+      } else {
+        if (detailsCase_ == 25) {
+          concurrencySchedulerInfoBuilder_.mergeFrom(value);
+        } else {
+          concurrencySchedulerInfoBuilder_.setMessage(value);
+        }
+      }
+      detailsCase_ = 25;
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    public Builder clearConcurrencySchedulerInfo() {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        if (detailsCase_ == 25) {
+          detailsCase_ = 0;
+          details_ = null;
+          onChanged();
+        }
+      } else {
+        if (detailsCase_ == 25) {
+          detailsCase_ = 0;
+          details_ = null;
+        }
+        concurrencySchedulerInfoBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder getConcurrencySchedulerInfoBuilder() {
+      return getConcurrencySchedulerInfoFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    @java.lang.Override
+    public com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder getConcurrencySchedulerInfoOrBuilder() {
+      if ((detailsCase_ == 25) && (concurrencySchedulerInfoBuilder_ != null)) {
+        return concurrencySchedulerInfoBuilder_.getMessageOrBuilder();
+      } else {
+        if (detailsCase_ == 25) {
+          return (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_;
+        }
+        return com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo concurrency_scheduler_info = 25 [json_name = "concurrencySchedulerInfo"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder> 
+        getConcurrencySchedulerInfoFieldBuilder() {
+      if (concurrencySchedulerInfoBuilder_ == null) {
+        if (!(detailsCase_ == 25)) {
+          details_ = com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.getDefaultInstance();
+        }
+        concurrencySchedulerInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo.Builder, com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfoOrBuilder>(
+                (com.fluxninja.generated.aperture.flowcontrol.check.v1.LimiterDecision.ConcurrencySchedulerInfo) details_,
+                getParentForChildren(),
+                isClean());
+        details_ = null;
+      }
+      detailsCase_ = 25;
+      onChanged();
+      return concurrencySchedulerInfoBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

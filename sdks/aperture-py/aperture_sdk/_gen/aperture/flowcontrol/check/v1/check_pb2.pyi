@@ -140,7 +140,7 @@ NotExtended: StatusCode
 NetworkAuthenticationRequired: StatusCode
 
 class CheckRequest(_message.Message):
-    __slots__ = ("control_point", "labels", "ramp_mode", "cache_lookup_request")
+    __slots__ = ("control_point", "labels", "ramp_mode", "cache_lookup_request", "expect_end")
     class LabelsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -152,14 +152,16 @@ class CheckRequest(_message.Message):
     LABELS_FIELD_NUMBER: _ClassVar[int]
     RAMP_MODE_FIELD_NUMBER: _ClassVar[int]
     CACHE_LOOKUP_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    EXPECT_END_FIELD_NUMBER: _ClassVar[int]
     control_point: str
     labels: _containers.ScalarMap[str, str]
     ramp_mode: bool
     cache_lookup_request: CacheLookupRequest
-    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., ramp_mode: bool = ..., cache_lookup_request: _Optional[_Union[CacheLookupRequest, _Mapping]] = ...) -> None: ...
+    expect_end: bool
+    def __init__(self, control_point: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., ramp_mode: bool = ..., cache_lookup_request: _Optional[_Union[CacheLookupRequest, _Mapping]] = ..., expect_end: bool = ...) -> None: ...
 
 class CheckResponse(_message.Message):
-    __slots__ = ("start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time", "denied_response_status_code", "cache_lookup_response")
+    __slots__ = ("start", "end", "services", "control_point", "flow_label_keys", "telemetry_flow_labels", "decision_type", "reject_reason", "classifier_infos", "flux_meter_infos", "limiter_decisions", "wait_time", "denied_response_status_code", "cache_lookup_response", "expect_end")
     class RejectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         REJECT_REASON_NONE: _ClassVar[CheckResponse.RejectReason]
@@ -199,6 +201,7 @@ class CheckResponse(_message.Message):
     WAIT_TIME_FIELD_NUMBER: _ClassVar[int]
     DENIED_RESPONSE_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
     CACHE_LOOKUP_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    EXPECT_END_FIELD_NUMBER: _ClassVar[int]
     start: _timestamp_pb2.Timestamp
     end: _timestamp_pb2.Timestamp
     services: _containers.RepeatedScalarFieldContainer[str]
@@ -213,7 +216,8 @@ class CheckResponse(_message.Message):
     wait_time: _duration_pb2.Duration
     denied_response_status_code: StatusCode
     cache_lookup_response: CacheLookupResponse
-    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., cache_lookup_response: _Optional[_Union[CacheLookupResponse, _Mapping]] = ...) -> None: ...
+    expect_end: bool
+    def __init__(self, start: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., services: _Optional[_Iterable[str]] = ..., control_point: _Optional[str] = ..., flow_label_keys: _Optional[_Iterable[str]] = ..., telemetry_flow_labels: _Optional[_Mapping[str, str]] = ..., decision_type: _Optional[_Union[CheckResponse.DecisionType, str]] = ..., reject_reason: _Optional[_Union[CheckResponse.RejectReason, str]] = ..., classifier_infos: _Optional[_Iterable[_Union[ClassifierInfo, _Mapping]]] = ..., flux_meter_infos: _Optional[_Iterable[_Union[FluxMeterInfo, _Mapping]]] = ..., limiter_decisions: _Optional[_Iterable[_Union[LimiterDecision, _Mapping]]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., cache_lookup_response: _Optional[_Union[CacheLookupResponse, _Mapping]] = ..., expect_end: bool = ...) -> None: ...
 
 class KeyLookupResponse(_message.Message):
     __slots__ = ("value", "lookup_status", "operation_status", "error")
@@ -362,7 +366,7 @@ class ClassifierInfo(_message.Message):
     def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., classifier_index: _Optional[int] = ..., error: _Optional[_Union[ClassifierInfo.Error, str]] = ...) -> None: ...
 
 class LimiterDecision(_message.Message):
-    __slots__ = ("policy_name", "policy_hash", "component_id", "dropped", "reason", "denied_response_status_code", "wait_time", "rate_limiter_info", "load_scheduler_info", "sampler_info", "quota_scheduler_info")
+    __slots__ = ("policy_name", "policy_hash", "component_id", "dropped", "reason", "denied_response_status_code", "wait_time", "rate_limiter_info", "load_scheduler_info", "sampler_info", "quota_scheduler_info", "concurrency_limiter_info", "concurrency_scheduler_info")
     class LimiterReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         LIMITER_REASON_UNSPECIFIED: _ClassVar[LimiterDecision.LimiterReason]
@@ -410,6 +414,28 @@ class LimiterDecision(_message.Message):
         tokens_info: LimiterDecision.TokensInfo
         priority: float
         def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ...) -> None: ...
+    class ConcurrencyLimiterInfo(_message.Message):
+        __slots__ = ("label", "tokens_info", "request_id")
+        LABEL_FIELD_NUMBER: _ClassVar[int]
+        TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+        label: str
+        tokens_info: LimiterDecision.TokensInfo
+        request_id: str
+        def __init__(self, label: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., request_id: _Optional[str] = ...) -> None: ...
+    class ConcurrencySchedulerInfo(_message.Message):
+        __slots__ = ("label", "workload_index", "tokens_info", "priority", "request_id")
+        LABEL_FIELD_NUMBER: _ClassVar[int]
+        WORKLOAD_INDEX_FIELD_NUMBER: _ClassVar[int]
+        TOKENS_INFO_FIELD_NUMBER: _ClassVar[int]
+        PRIORITY_FIELD_NUMBER: _ClassVar[int]
+        REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+        label: str
+        workload_index: str
+        tokens_info: LimiterDecision.TokensInfo
+        priority: float
+        request_id: str
+        def __init__(self, label: _Optional[str] = ..., workload_index: _Optional[str] = ..., tokens_info: _Optional[_Union[LimiterDecision.TokensInfo, _Mapping]] = ..., priority: _Optional[float] = ..., request_id: _Optional[str] = ...) -> None: ...
     POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
     POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
     COMPONENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -421,6 +447,8 @@ class LimiterDecision(_message.Message):
     LOAD_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
     SAMPLER_INFO_FIELD_NUMBER: _ClassVar[int]
     QUOTA_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
+    CONCURRENCY_LIMITER_INFO_FIELD_NUMBER: _ClassVar[int]
+    CONCURRENCY_SCHEDULER_INFO_FIELD_NUMBER: _ClassVar[int]
     policy_name: str
     policy_hash: str
     component_id: str
@@ -432,10 +460,52 @@ class LimiterDecision(_message.Message):
     load_scheduler_info: LimiterDecision.SchedulerInfo
     sampler_info: LimiterDecision.SamplerInfo
     quota_scheduler_info: LimiterDecision.QuotaSchedulerInfo
-    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., sampler_info: _Optional[_Union[LimiterDecision.SamplerInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ...) -> None: ...
+    concurrency_limiter_info: LimiterDecision.ConcurrencyLimiterInfo
+    concurrency_scheduler_info: LimiterDecision.ConcurrencySchedulerInfo
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., dropped: bool = ..., reason: _Optional[_Union[LimiterDecision.LimiterReason, str]] = ..., denied_response_status_code: _Optional[_Union[StatusCode, str]] = ..., wait_time: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., rate_limiter_info: _Optional[_Union[LimiterDecision.RateLimiterInfo, _Mapping]] = ..., load_scheduler_info: _Optional[_Union[LimiterDecision.SchedulerInfo, _Mapping]] = ..., sampler_info: _Optional[_Union[LimiterDecision.SamplerInfo, _Mapping]] = ..., quota_scheduler_info: _Optional[_Union[LimiterDecision.QuotaSchedulerInfo, _Mapping]] = ..., concurrency_limiter_info: _Optional[_Union[LimiterDecision.ConcurrencyLimiterInfo, _Mapping]] = ..., concurrency_scheduler_info: _Optional[_Union[LimiterDecision.ConcurrencySchedulerInfo, _Mapping]] = ...) -> None: ...
 
 class FluxMeterInfo(_message.Message):
     __slots__ = ("flux_meter_name",)
     FLUX_METER_NAME_FIELD_NUMBER: _ClassVar[int]
     flux_meter_name: str
     def __init__(self, flux_meter_name: _Optional[str] = ...) -> None: ...
+
+class InflightRequestRef(_message.Message):
+    __slots__ = ("policy_name", "policy_hash", "component_id", "label", "request_id", "tokens")
+    POLICY_NAME_FIELD_NUMBER: _ClassVar[int]
+    POLICY_HASH_FIELD_NUMBER: _ClassVar[int]
+    COMPONENT_ID_FIELD_NUMBER: _ClassVar[int]
+    LABEL_FIELD_NUMBER: _ClassVar[int]
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    TOKENS_FIELD_NUMBER: _ClassVar[int]
+    policy_name: str
+    policy_hash: str
+    component_id: str
+    label: str
+    request_id: str
+    tokens: float
+    def __init__(self, policy_name: _Optional[str] = ..., policy_hash: _Optional[str] = ..., component_id: _Optional[str] = ..., label: _Optional[str] = ..., request_id: _Optional[str] = ..., tokens: _Optional[float] = ...) -> None: ...
+
+class TokenReturnStatus(_message.Message):
+    __slots__ = ("inflight_request_ref", "returned", "error")
+    INFLIGHT_REQUEST_REF_FIELD_NUMBER: _ClassVar[int]
+    RETURNED_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    inflight_request_ref: InflightRequestRef
+    returned: bool
+    error: str
+    def __init__(self, inflight_request_ref: _Optional[_Union[InflightRequestRef, _Mapping]] = ..., returned: bool = ..., error: _Optional[str] = ...) -> None: ...
+
+class FlowEndRequest(_message.Message):
+    __slots__ = ("control_point", "inflight_requests")
+    CONTROL_POINT_FIELD_NUMBER: _ClassVar[int]
+    INFLIGHT_REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    control_point: str
+    inflight_requests: _containers.RepeatedCompositeFieldContainer[InflightRequestRef]
+    def __init__(self, control_point: _Optional[str] = ..., inflight_requests: _Optional[_Iterable[_Union[InflightRequestRef, _Mapping]]] = ...) -> None: ...
+
+class FlowEndResponse(_message.Message):
+    __slots__ = ("token_return_statuses",)
+    TOKEN_RETURN_STATUSES_FIELD_NUMBER: _ClassVar[int]
+    token_return_statuses: _containers.RepeatedCompositeFieldContainer[TokenReturnStatus]
+    def __init__(self, token_return_statuses: _Optional[_Iterable[_Union[TokenReturnStatus, _Mapping]]] = ...) -> None: ...

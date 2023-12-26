@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package aperture.flowcontrol.checkhttp.v1;
 
+import "aperture/flowcontrol/check/v1/check.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/rpc/status.proto";
@@ -69,6 +70,9 @@ message CheckHTTPRequest {
 
   // A flow with ramp_mode flag will only be accepted if at least one ramp component matches and accepts the flow.
   bool ramp_mode = 5;
+
+  // Expect End denotes whether to expect a FlowEnd call for this flow.
+  bool expect_end = 6;
 }
 
 // HTTP attributes for a denied response.
@@ -106,6 +110,9 @@ message CheckHTTPResponse {
     // Supplies http attributes for an ok response.
     OkHttpResponse ok_response = 3;
   }
+
+  // The response from the check call.
+  aperture.flowcontrol.check.v1.CheckResponse check_response = 5;
 
   // Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
   // filter.

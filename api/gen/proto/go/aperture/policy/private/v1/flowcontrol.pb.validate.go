@@ -17,8 +17,6 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
-
-	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 )
 
 // ensure the imports are used
@@ -35,8 +33,6 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
-
-	_ = checkv1.StatusCode(0)
 )
 
 // Validate checks the field values on LoadActuator with the rules defined in
@@ -256,35 +252,6 @@ func (m *RateLimiter) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "Parameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiterValidationError{
-				field:  "Parameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	for idx, item := range m.GetSelectors() {
 		_, _ = idx, item
 
@@ -317,35 +284,6 @@ func (m *RateLimiter) validate(all bool) error {
 			}
 		}
 
-	}
-
-	if all {
-		switch v := interface{}(m.GetRequestParameters()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "RequestParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiterValidationError{
-					field:  "RequestParameters",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRequestParameters()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiterValidationError{
-				field:  "RequestParameters",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
 	}
 
 	// no validation rules for ParentComponentId
@@ -512,64 +450,6 @@ func (m *QuotaScheduler) validate(all bool) error {
 
 	}
 
-	if all {
-		switch v := interface{}(m.GetRateLimiter()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "RateLimiter",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "RateLimiter",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetRateLimiter()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return QuotaSchedulerValidationError{
-				field:  "RateLimiter",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetScheduler()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "Scheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, QuotaSchedulerValidationError{
-					field:  "Scheduler",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetScheduler()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return QuotaSchedulerValidationError{
-				field:  "Scheduler",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	// no validation rules for ParentComponentId
 
 	if len(errors) > 0 {
@@ -649,6 +529,340 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = QuotaSchedulerValidationError{}
+
+// Validate checks the field values on ConcurrencyLimiter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ConcurrencyLimiter) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConcurrencyLimiter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ConcurrencyLimiterMultiError, or nil if none found.
+func (m *ConcurrencyLimiter) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConcurrencyLimiter) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConcurrencyLimiterValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConcurrencyLimiterValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConcurrencyLimiterValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ConcurrencyLimiterValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ConcurrencyLimiterValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConcurrencyLimiterValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ParentComponentId
+
+	if len(errors) > 0 {
+		return ConcurrencyLimiterMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConcurrencyLimiterMultiError is an error wrapping multiple validation errors
+// returned by ConcurrencyLimiter.ValidateAll() if the designated constraints
+// aren't met.
+type ConcurrencyLimiterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConcurrencyLimiterMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConcurrencyLimiterMultiError) AllErrors() []error { return m }
+
+// ConcurrencyLimiterValidationError is the validation error returned by
+// ConcurrencyLimiter.Validate if the designated constraints aren't met.
+type ConcurrencyLimiterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConcurrencyLimiterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConcurrencyLimiterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConcurrencyLimiterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConcurrencyLimiterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConcurrencyLimiterValidationError) ErrorName() string {
+	return "ConcurrencyLimiterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ConcurrencyLimiterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConcurrencyLimiter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConcurrencyLimiterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConcurrencyLimiterValidationError{}
+
+// Validate checks the field values on ConcurrencyScheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ConcurrencyScheduler) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConcurrencyScheduler with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ConcurrencySchedulerMultiError, or nil if none found.
+func (m *ConcurrencyScheduler) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConcurrencyScheduler) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetInPorts()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConcurrencySchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConcurrencySchedulerValidationError{
+					field:  "InPorts",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetInPorts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConcurrencySchedulerValidationError{
+				field:  "InPorts",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetSelectors() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ConcurrencySchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ConcurrencySchedulerValidationError{
+						field:  fmt.Sprintf("Selectors[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConcurrencySchedulerValidationError{
+					field:  fmt.Sprintf("Selectors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for ParentComponentId
+
+	if len(errors) > 0 {
+		return ConcurrencySchedulerMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConcurrencySchedulerMultiError is an error wrapping multiple validation
+// errors returned by ConcurrencyScheduler.ValidateAll() if the designated
+// constraints aren't met.
+type ConcurrencySchedulerMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConcurrencySchedulerMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConcurrencySchedulerMultiError) AllErrors() []error { return m }
+
+// ConcurrencySchedulerValidationError is the validation error returned by
+// ConcurrencyScheduler.Validate if the designated constraints aren't met.
+type ConcurrencySchedulerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConcurrencySchedulerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConcurrencySchedulerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConcurrencySchedulerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConcurrencySchedulerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConcurrencySchedulerValidationError) ErrorName() string {
+	return "ConcurrencySchedulerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ConcurrencySchedulerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConcurrencyScheduler.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConcurrencySchedulerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConcurrencySchedulerValidationError{}
 
 // Validate checks the field values on LoadActuator_Ins with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -778,599 +992,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LoadActuator_InsValidationError{}
-
-// Validate checks the field values on RateLimiter_Parameters with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RateLimiter_Parameters) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RateLimiter_Parameters with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// RateLimiter_ParametersMultiError, or nil if none found.
-func (m *RateLimiter_Parameters) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RateLimiter_Parameters) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for LimitByLabelKey
-
-	if all {
-		switch v := interface{}(m.GetInterval()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "Interval",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "Interval",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_ParametersValidationError{
-				field:  "Interval",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for ContinuousFill
-
-	if all {
-		switch v := interface{}(m.GetMaxIdleTime()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "MaxIdleTime",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "MaxIdleTime",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMaxIdleTime()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_ParametersValidationError{
-				field:  "MaxIdleTime",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetLazySync()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LazySync",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_ParametersValidationError{
-					field:  "LazySync",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetLazySync()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_ParametersValidationError{
-				field:  "LazySync",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for DelayInitialFill
-
-	if len(errors) > 0 {
-		return RateLimiter_ParametersMultiError(errors)
-	}
-
-	return nil
-}
-
-// RateLimiter_ParametersMultiError is an error wrapping multiple validation
-// errors returned by RateLimiter_Parameters.ValidateAll() if the designated
-// constraints aren't met.
-type RateLimiter_ParametersMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RateLimiter_ParametersMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RateLimiter_ParametersMultiError) AllErrors() []error { return m }
-
-// RateLimiter_ParametersValidationError is the validation error returned by
-// RateLimiter_Parameters.Validate if the designated constraints aren't met.
-type RateLimiter_ParametersValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RateLimiter_ParametersValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RateLimiter_ParametersValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RateLimiter_ParametersValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RateLimiter_ParametersValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RateLimiter_ParametersValidationError) ErrorName() string {
-	return "RateLimiter_ParametersValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RateLimiter_ParametersValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRateLimiter_Parameters.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RateLimiter_ParametersValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RateLimiter_ParametersValidationError{}
-
-// Validate checks the field values on RateLimiter_RequestParameters with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RateLimiter_RequestParameters) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RateLimiter_RequestParameters with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// RateLimiter_RequestParametersMultiError, or nil if none found.
-func (m *RateLimiter_RequestParameters) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RateLimiter_RequestParameters) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for TokensLabelKey
-
-	// no validation rules for DeniedResponseStatusCode
-
-	if len(errors) > 0 {
-		return RateLimiter_RequestParametersMultiError(errors)
-	}
-
-	return nil
-}
-
-// RateLimiter_RequestParametersMultiError is an error wrapping multiple
-// validation errors returned by RateLimiter_RequestParameters.ValidateAll()
-// if the designated constraints aren't met.
-type RateLimiter_RequestParametersMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RateLimiter_RequestParametersMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RateLimiter_RequestParametersMultiError) AllErrors() []error { return m }
-
-// RateLimiter_RequestParametersValidationError is the validation error
-// returned by RateLimiter_RequestParameters.Validate if the designated
-// constraints aren't met.
-type RateLimiter_RequestParametersValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RateLimiter_RequestParametersValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RateLimiter_RequestParametersValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RateLimiter_RequestParametersValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RateLimiter_RequestParametersValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RateLimiter_RequestParametersValidationError) ErrorName() string {
-	return "RateLimiter_RequestParametersValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RateLimiter_RequestParametersValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRateLimiter_RequestParameters.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RateLimiter_RequestParametersValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RateLimiter_RequestParametersValidationError{}
-
-// Validate checks the field values on RateLimiter_Ins with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *RateLimiter_Ins) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RateLimiter_Ins with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// RateLimiter_InsMultiError, or nil if none found.
-func (m *RateLimiter_Ins) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RateLimiter_Ins) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetBucketCapacity()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "BucketCapacity",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "BucketCapacity",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetBucketCapacity()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_InsValidationError{
-				field:  "BucketCapacity",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetFillAmount()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "FillAmount",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "FillAmount",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetFillAmount()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_InsValidationError{
-				field:  "FillAmount",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetPassThrough()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "PassThrough",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RateLimiter_InsValidationError{
-					field:  "PassThrough",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPassThrough()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimiter_InsValidationError{
-				field:  "PassThrough",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return RateLimiter_InsMultiError(errors)
-	}
-
-	return nil
-}
-
-// RateLimiter_InsMultiError is an error wrapping multiple validation errors
-// returned by RateLimiter_Ins.ValidateAll() if the designated constraints
-// aren't met.
-type RateLimiter_InsMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RateLimiter_InsMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RateLimiter_InsMultiError) AllErrors() []error { return m }
-
-// RateLimiter_InsValidationError is the validation error returned by
-// RateLimiter_Ins.Validate if the designated constraints aren't met.
-type RateLimiter_InsValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RateLimiter_InsValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RateLimiter_InsValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RateLimiter_InsValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RateLimiter_InsValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RateLimiter_InsValidationError) ErrorName() string { return "RateLimiter_InsValidationError" }
-
-// Error satisfies the builtin error interface
-func (e RateLimiter_InsValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRateLimiter_Ins.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RateLimiter_InsValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RateLimiter_InsValidationError{}
-
-// Validate checks the field values on RateLimiter_Parameters_LazySync with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *RateLimiter_Parameters_LazySync) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on RateLimiter_Parameters_LazySync with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, the result is a list of violation errors wrapped in
-// RateLimiter_Parameters_LazySyncMultiError, or nil if none found.
-func (m *RateLimiter_Parameters_LazySync) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *RateLimiter_Parameters_LazySync) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Enabled
-
-	// no validation rules for NumSync
-
-	if len(errors) > 0 {
-		return RateLimiter_Parameters_LazySyncMultiError(errors)
-	}
-
-	return nil
-}
-
-// RateLimiter_Parameters_LazySyncMultiError is an error wrapping multiple
-// validation errors returned by RateLimiter_Parameters_LazySync.ValidateAll()
-// if the designated constraints aren't met.
-type RateLimiter_Parameters_LazySyncMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m RateLimiter_Parameters_LazySyncMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m RateLimiter_Parameters_LazySyncMultiError) AllErrors() []error { return m }
-
-// RateLimiter_Parameters_LazySyncValidationError is the validation error
-// returned by RateLimiter_Parameters_LazySync.Validate if the designated
-// constraints aren't met.
-type RateLimiter_Parameters_LazySyncValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RateLimiter_Parameters_LazySyncValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RateLimiter_Parameters_LazySyncValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RateLimiter_Parameters_LazySyncValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RateLimiter_Parameters_LazySyncValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RateLimiter_Parameters_LazySyncValidationError) ErrorName() string {
-	return "RateLimiter_Parameters_LazySyncValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RateLimiter_Parameters_LazySyncValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRateLimiter_Parameters_LazySync.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RateLimiter_Parameters_LazySyncValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RateLimiter_Parameters_LazySyncValidationError{}

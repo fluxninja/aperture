@@ -1,6 +1,7 @@
 package com.fluxninja.example.filter;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FeatureFlowParameters;
 import com.fluxninja.aperture.sdk.Flow;
 import com.fluxninja.aperture.sdk.FlowStatus;
@@ -51,7 +52,13 @@ public class ApertureFeatureFilter implements Filter {
             flow.setStatus(FlowStatus.Error);
             throw e;
         } finally {
-            flow.end();
+            EndResponse endResponse = flow.end();
+            if (endResponse.getError() != null) {
+                System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+            }
+
+            // Log flow end response
+            System.out.println("Flow End response: " + endResponse.getFlowEndResponse());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.fluxninja.aperture.armeria;
 
 import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.EndResponse;
 import com.fluxninja.aperture.sdk.FlowDecision;
 import com.fluxninja.aperture.sdk.FlowStatus;
 import com.fluxninja.aperture.sdk.TrafficFlow;
@@ -86,7 +87,13 @@ public class ApertureHTTPClient extends SimpleDecoratingHttpClient {
                 flow.setStatus(FlowStatus.Error);
                 throw e;
             } finally {
-                flow.end();
+                EndResponse endResponse = flow.end();
+                if (endResponse.getError() != null) {
+                    System.err.println("Error ending flow: " + endResponse.getError().getMessage());
+                }
+
+                // Log flow end response
+                System.out.println("Flow End response: " + endResponse.getFlowEndResponse());
             }
             return res;
         } else {

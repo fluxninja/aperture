@@ -51,29 +51,116 @@ message FlowControl {
     // AIAD Load Scheduler.
     AIADLoadScheduler aiad_load_scheduler = 13;
 
+    // _Concurrency Limiter_ provides service protection by limiting the number of concurrent requests to a service
+    ConcurrencyLimiter concurrency_limiter = 14;
+
+    // _Concurrency Scheduler_ provides service protection by limiting the number of concurrent requests to a service and scheduling requests when the limit is reached
+    ConcurrencyScheduler concurrency_scheduler = 15;
+
     // Extends flow control with private components.
     google.protobuf.Any private = 1000;
   }
 }
 
-// Schedules the traffic based on token-bucket based quotas.
-message QuotaScheduler {
-  RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+// Schedules the traffic based on in-flight request concurrency.
+message ConcurrencyScheduler {
+  // Input ports for the _Concurrency Scheduler_ component
+  ConcurrencyLimiter.Ins in_ports = 1; // @gotags: validate:"required"
 
+  // Flow selection criteria.
   repeated Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
 
-  RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
+  // Parameter to configure concurrency limiting.
+  ConcurrencyLimiter.Parameters concurrency_limiter = 3; // @gotags: validate:"required"
 
+  // Scheduler is used to schedule the requests when the concurrency limit is reached.
   Scheduler scheduler = 4;
 
-  // Outputs for the _Quota Scheduler_ component.
+  // Output ports for the _Concurrency Scheduler_ component.
+  ConcurrencyLimiter.Outs out_ports = 5;
+}
+
+message ConcurrencyLimiter {
+  message Parameters {
+    // Specifies which label the concurrency calculation should be keyed by.
+    //
+    // Concurrency limiting is done independently for each value of the
+    // [label](/concepts/flow-label.md) with given key.
+    // For example, to give each API Key a separate limit, assuming you
+    // have a `api_key` flow
+    // label set up, set `limit_by_label_key: "api_key"`.
+    // If no label key is specified, then all requests matching the
+    // selectors will be concurrency limited based on the global concurrency count.
+    string limit_by_label_key = 1;
+
+    // The time duration after which flow is assumed to have ended in case the end call gets missed.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+    google.protobuf.Duration max_inflight_duration = 2; // @gotags: validate:"required"
+
+    // Max idle time before concurrency count for a label is removed.
+    // If set to 0, the state is never removed.
+    // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
+    google.protobuf.Duration max_idle_time = 3; // @gotags: default:"7200s"
+  }
+
+  message RequestParameters {
+    // Flow label key that will be used to override the number of tokens
+    // for this request.
+    // This is an optional parameter and takes highest precedence
+    // when assigning tokens to a request.
+    // The label value must be a valid number.
+    string tokens_label_key = 1;
+
+    // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 2; // @gotags: default:"TooManyRequests"
+  }
+
+  // Inputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component
+  message Ins {
+    // The maximum number of concurrent requests to be allowed.
+    InPort max_concurrency = 1; // @gotags: validate:"required"
+    // PassThrough port determines whether to accept all requests instantaneously
+    InPort pass_through = 2;
+  }
+
+  // Outputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component.
   message Outs {
-    // The percentage of flows being accepted by the _Quota Scheduler_.
+    // The percentage of flows being accepted by the _Concurrency Limiter_.
     OutPort accept_percentage = 1;
   }
 
-  // Output ports for the _Quota Scheduler_ component.
+  // Input ports for the _Concurrency Limiter_ component.
+  Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Parameters for the _Concurrency Limiter_ component.
+  Parameters parameters = 2; // @gotags: validate:"required"
+
+  // Selectors for the component.
+  repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
+
+  // RequestParameters for the component
+  RequestParameters request_parameters = 4;
+
+  // Output ports for the _Concurrency Limiter_ component.
   Outs out_ports = 5;
+}
+
+// Schedules the traffic based on token-bucket based quotas.
+message QuotaScheduler {
+  // Input ports for the _Quota Scheduler_ component
+  RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+
+  // Flow selection criteria.
+  repeated Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
+
+  // Parameter to configure rate limiting quotas.
+  RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
+
+  // Scheduler is used to schedule the requests when the quota is exhausted.
+  Scheduler scheduler = 4;
+
+  // Output ports for the _Quota Scheduler_ component.
+  RateLimiter.Outs out_ports = 5;
 }
 
 // Limits the traffic on a control point to specified rate
@@ -155,22 +242,22 @@ message RateLimiter {
     string tokens_label_key = 1;
 
     // This field allows you to override the default HTTP status code (`429 Too Many Requests`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 2;
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 2; // @gotags: default:"TooManyRequests"
   }
 
-  // Inputs for the _Rate Limiter_ component
+  // Inputs for the _Rate Limiter_ or _Quota Scheduler_ component
   message Ins {
     // Capacity of the bucket to allow for bursty traffic.
     InPort bucket_capacity = 1; // @gotags: validate:"required"
     // Number of tokens to fill within an `interval`.
     InPort fill_amount = 2; // @gotags: validate:"required"
-    // PassThrough port determines whether all requests
+    // PassThrough port determines whether to accept all requests instantaneously
     InPort pass_through = 3;
   }
 
-  // Outputs for the _Rate Limiter_ component.
+  // Outputs for the _Rate Limiter_ or _Quota Scheduler_ component.
   message Outs {
-    // The percentage of flows being accepted by the _Rate Limiter_.
+    // The percentage of flows being accepted.
     OutPort accept_percentage = 1;
   }
 
@@ -363,7 +450,7 @@ message Scheduler {
   string priority_label_key = 8;
 
   // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-  flowcontrol.check.v1.StatusCode denied_response_status_code = 9;
+  flowcontrol.check.v1.StatusCode denied_response_status_code = 9; // @gotags: default:"ServiceUnavailable"
 
   // Key for a flow label that can be used to provide workloads for this request.
   // If this parameter is not provided, the workloads for the flow will be determined by the matched workload's name in the policy.
@@ -656,8 +743,8 @@ message Sampler {
     // Selectors for the component.
     repeated Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
 
-    // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 4;
+    // This field allows you to override the default HTTP status code (`403 Forbidden`) that is returned when a request is denied.
+    flowcontrol.check.v1.StatusCode denied_response_status_code = 4; // @gotags: default:"Forbidden"
 
     // Ramp component can accept flows with `ramp_mode` flag set.
     bool ramp_mode = 5; // @gotags: default:"false"
@@ -703,8 +790,6 @@ message LoadRamp {
       // Duration for which the step is active.
       // This field employs the [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON representation from Protocol Buffers. The format accommodates fractional seconds up to nine digits after the decimal point, offering nanosecond precision. Every duration value must be suffixed with an "s" to indicate 'seconds.' For example, a value of "10s" would signify a duration of 10 seconds.
       google.protobuf.Duration duration = 2; // @gotags: validate:"required"
-      // This field allows you to override the default HTTP status code (`503 Service Unavailable`) that is returned when a request is denied.
-      flowcontrol.check.v1.StatusCode denied_response_status_code = 3;
     }
 
     // Parameters for the _Sampler_.

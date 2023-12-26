@@ -6,4 +6,6 @@
   Sampler: import './sampler/rows.libsonnet',
   QuotaScheduler: import './quota-scheduler/rows.libsonnet',
   LoadActuator: import './load-actuator/rows.libsonnet',
+  ConcurrencyLimiter: import './concurrency-limiter/rows.libsonnet',
+  ConcurrencyScheduler: import './concurrency-scheduler/rows.libsonnet',
 }

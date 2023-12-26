@@ -6,6 +6,8 @@ import (
 	"go.uber.org/fx"
 
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
+	concurrencylimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/concurrency-limiter"
+	concurrencyscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/concurrency-scheduler"
 	loadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/load-scheduler"
 	quotascheduler "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/quota-scheduler"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/policies/controlplane/components/flowcontrol/rate-limiter"
@@ -78,6 +80,20 @@ func newFlowControlNestedAndOptions(
 	if proto := flowControlComponentProto.GetQuotaScheduler(); proto != nil {
 		quotaSchedulerProto = proto
 		isQuotaScheduler = true
+	}
+
+	concurrencyLimiterProto := &policylangv1.ConcurrencyLimiter{}
+	isConcurrencyLimiter := false
+	if proto := flowControlComponentProto.GetConcurrencyLimiter(); proto != nil {
+		concurrencyLimiterProto = proto
+		isConcurrencyLimiter = true
+	}
+
+	concurrencySchedulerProto := &policylangv1.ConcurrencyScheduler{}
+	isConcurrencyScheduler := false
+	if proto := flowControlComponentProto.GetConcurrencyScheduler(); proto != nil {
+		concurrencySchedulerProto = proto
+		isConcurrencyScheduler = true
 	}
 
 	// Factory parser to determine what kind of composite component to create
@@ -184,6 +200,51 @@ func newFlowControlNestedAndOptions(
 		options = append(options, configSyncOptions)
 
 		configuredComponent, nestedCircuit, err := quotascheduler.ParseQuotaScheduler(quotaSchedulerProto, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, nestedOptions)
+
+		return tree, configuredComponents, fx.Options(options...), nil
+	} else if isConcurrencyLimiter {
+		var options []fx.Option
+		// sync config
+		configSyncOptions, err := concurrencylimiter.NewConfigSyncOptions(
+			concurrencyLimiterProto,
+			componentID,
+			policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, configSyncOptions)
+
+		configuredComponent, nestedCircuit, err := concurrencylimiter.ParseConcurrencyLimiter(concurrencyLimiterProto, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+
+		tree, configuredComponents, nestedOptions, err := ParseNestedCircuit(configuredComponent, nestedCircuit, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, nestedOptions)
+
+		return tree, configuredComponents, fx.Options(options...), nil
+	} else if isConcurrencyScheduler {
+		var options []fx.Option
+		// sync config
+		configSyncOptions, err := concurrencyscheduler.NewConfigSyncOptions(concurrencySchedulerProto, componentID, policyReadAPI)
+		if err != nil {
+			return retErr(err)
+		}
+		options = append(options, configSyncOptions)
+
+		configuredComponent, nestedCircuit, err := concurrencyscheduler.ParseConcurrencyScheduler(concurrencySchedulerProto, componentID, policyReadAPI)
 		if err != nil {
 			return retErr(err)
 		}

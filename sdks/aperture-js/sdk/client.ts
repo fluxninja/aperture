@@ -202,6 +202,7 @@ export class ApertureClient {
             resultCacheKey: params.resultCacheKey,
             globalCacheKeys: params.globalCacheKeys,
           },
+          expectEnd: true,
         };
 
         const cb: grpc.requestCallback<CheckResponse__Output> = (

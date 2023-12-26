@@ -12,11 +12,11 @@ import (
 
 	"github.com/fluxninja/aperture/v2/pkg/alerts"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
+	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
+	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/global-token-bucket"
+	lazysync "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
-	ratelimiter "github.com/fluxninja/aperture/v2/pkg/rate-limiter"
-	globaltokenbucket "github.com/fluxninja/aperture/v2/pkg/rate-limiter/global-token-bucket"
-	lazysync "github.com/fluxninja/aperture/v2/pkg/rate-limiter/lazy-sync"
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 

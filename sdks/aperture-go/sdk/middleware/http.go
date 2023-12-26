@@ -74,10 +74,12 @@ func (m *httpMiddleware) Handle(next http.Handler) http.Handler {
 			// Need to call End() on the Flow in order to provide telemetry to Aperture Agent for completing the control loop.
 			// SetStatus() method of Flow object can be used to capture whether the Flow was successful or resulted in an error.
 			// If not set, status defaults to OK.
-			err := flow.End()
-			if err != nil {
-				m.client.GetLogger().Info("Aperture flow control end got error.", "error", err)
+			resp := flow.End()
+			if resp.Error != nil {
+				m.client.GetLogger().Info("Aperture flow control end got error.", "error", resp.Error)
 			}
+
+			m.client.GetLogger().Info("Aperture flow control end.", "resp", resp)
 		}()
 
 		if flow.ShouldRun() {
@@ -151,6 +153,7 @@ func prepareCheckHTTPRequestForHTTP(req *http.Request, logger *slog.Logger, cont
 		},
 		ControlPoint: controlPoint,
 		RampMode:     flowParams.RampMode,
+		ExpectEnd:    true,
 		Request: &checkhttpv1.CheckHTTPRequest_HttpRequest{
 			Method:   req.Method,
 			Path:     req.URL.Path,

@@ -98,6 +98,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 					otelconsts.ApertureCheckResponseLabel: structpb.NewStringValue(checkResponseBase64),
 				},
 			},
+			CheckResponse: checkResponse,
 		}
 	}
 
@@ -161,6 +162,7 @@ func (h *Handler) CheckHTTP(ctx context.Context, req *flowcontrolhttpv1.CheckHTT
 			ControlPoint: ctrlPt,
 			FlowLabels:   mergedFlowLabels,
 			RampMode:     req.RampMode,
+			ExpectEnd:    req.ExpectEnd,
 		},
 	)
 	checkResponse.ClassifierInfos = classifierMsgs

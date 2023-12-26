@@ -2227,6 +2227,21 @@ java.lang.String defaultValue) {
     return rampMode_;
   }
 
+  public static final int EXPECT_END_FIELD_NUMBER = 6;
+  private boolean expectEnd_ = false;
+  /**
+   * <pre>
+   * Expect End denotes whether to expect a FlowEnd call for this flow.
+   * </pre>
+   *
+   * <code>bool expect_end = 6 [json_name = "expectEnd"];</code>
+   * @return The expectEnd.
+   */
+  @java.lang.Override
+  public boolean getExpectEnd() {
+    return expectEnd_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -2256,6 +2271,9 @@ java.lang.String defaultValue) {
     if (rampMode_ != false) {
       output.writeBool(5, rampMode_);
     }
+    if (expectEnd_ != false) {
+      output.writeBool(6, expectEnd_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -2283,6 +2301,10 @@ java.lang.String defaultValue) {
     if (rampMode_ != false) {
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(5, rampMode_);
+    }
+    if (expectEnd_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(6, expectEnd_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -2318,6 +2340,8 @@ java.lang.String defaultValue) {
         .equals(other.getControlPoint())) return false;
     if (getRampMode()
         != other.getRampMode()) return false;
+    if (getExpectEnd()
+        != other.getExpectEnd()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -2346,6 +2370,9 @@ java.lang.String defaultValue) {
     hash = (37 * hash) + RAMP_MODE_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getRampMode());
+    hash = (37 * hash) + EXPECT_END_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getExpectEnd());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -2502,6 +2529,7 @@ java.lang.String defaultValue) {
       }
       controlPoint_ = "";
       rampMode_ = false;
+      expectEnd_ = false;
       return this;
     }
 
@@ -2559,6 +2587,9 @@ java.lang.String defaultValue) {
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
         result.rampMode_ = rampMode_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.expectEnd_ = expectEnd_;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -2624,6 +2655,9 @@ java.lang.String defaultValue) {
       if (other.getRampMode() != false) {
         setRampMode(other.getRampMode());
       }
+      if (other.getExpectEnd() != false) {
+        setExpectEnd(other.getExpectEnd());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -2681,6 +2715,11 @@ java.lang.String defaultValue) {
               bitField0_ |= 0x00000010;
               break;
             } // case 40
+            case 48: {
+              expectEnd_ = input.readBool();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 48
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -3342,6 +3381,50 @@ java.lang.String defaultValue) {
     public Builder clearRampMode() {
       bitField0_ = (bitField0_ & ~0x00000010);
       rampMode_ = false;
+      onChanged();
+      return this;
+    }
+
+    private boolean expectEnd_ ;
+    /**
+     * <pre>
+     * Expect End denotes whether to expect a FlowEnd call for this flow.
+     * </pre>
+     *
+     * <code>bool expect_end = 6 [json_name = "expectEnd"];</code>
+     * @return The expectEnd.
+     */
+    @java.lang.Override
+    public boolean getExpectEnd() {
+      return expectEnd_;
+    }
+    /**
+     * <pre>
+     * Expect End denotes whether to expect a FlowEnd call for this flow.
+     * </pre>
+     *
+     * <code>bool expect_end = 6 [json_name = "expectEnd"];</code>
+     * @param value The expectEnd to set.
+     * @return This builder for chaining.
+     */
+    public Builder setExpectEnd(boolean value) {
+
+      expectEnd_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Expect End denotes whether to expect a FlowEnd call for this flow.
+     * </pre>
+     *
+     * <code>bool expect_end = 6 [json_name = "expectEnd"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearExpectEnd() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      expectEnd_ = false;
       onChanged();
       return this;
     }

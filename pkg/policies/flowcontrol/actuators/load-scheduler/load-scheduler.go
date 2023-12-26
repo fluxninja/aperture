@@ -12,12 +12,14 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
+	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/sync/v1"
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/labels"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	workloadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/workload-scheduler"
@@ -245,8 +247,9 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 
 // loadScheduler implements load scheduler on the flowcontrol side.
 type loadScheduler struct {
-	*workloadscheduler.Scheduler
+	// TODO: comment to self: why do we depend on Scheduler to implement Decide and Revert in this case?
 	iface.Component
+	scheduler            *workloadscheduler.Scheduler
 	registry             status.Registry
 	proto                *policylangv1.LoadScheduler
 	loadSchedulerFactory *loadSchedulerFactory
@@ -332,7 +335,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 			}
 
 			// Create a new scheduler
-			ls.Scheduler, err = wsFactory.NewScheduler(
+			ls.scheduler, err = wsFactory.NewScheduler(
 				ls.clock,
 				ls.registry,
 				ls.proto.Parameters.Scheduler,
@@ -462,5 +465,36 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	logger.Autosample().Debug().Bool("passThrough", loadDecision.PassThrough).Float64("loadMultiplier", loadDecision.LoadMultiplier).Msg("Setting load multiplier")
 	ls.tokenBucket.SetLoadDecisionValues(loadDecision)
 	ls.tokenBucket.SetPassThrough(loadDecision.PassThrough)
-	ls.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
+	ls.scheduler.SetEstimatedTokens(loadDecision.TokensByWorkloadIndex)
+}
+
+// Decide implements iface.Limiter.
+func (ls *loadScheduler) Decide(ctx context.Context, labels labels.Labels) *flowcontrolv1.LimiterDecision {
+	limiterDecision, _ := ls.scheduler.Decide(ctx, labels)
+	return limiterDecision
+}
+
+// Revert implements iface.Limiter.
+func (ls *loadScheduler) Revert(ctx context.Context, labels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
+	if lsDecision, ok := decision.GetDetails().(*flowcontrolv1.LimiterDecision_LoadSchedulerInfo); ok {
+		tokens := lsDecision.LoadSchedulerInfo.TokensInfo.Consumed
+		if tokens > 0 {
+			ls.tokenBucket.Return(ctx, tokens, "")
+		}
+	}
+}
+
+// GetRampMode is required by iface.Limiter.
+func (ls *loadScheduler) GetRampMode() bool {
+	return false
+}
+
+// GetRequestCounter is required by iface.Limiter.
+func (ls *loadScheduler) GetRequestCounter(labels map[string]string) prometheus.Counter {
+	return ls.scheduler.GetRequestCounter(labels)
+}
+
+// GetLatencyObserver is required by iface.Scheduler.
+func (ls *loadScheduler) GetLatencyObserver(labels map[string]string) prometheus.Observer {
+	return ls.scheduler.GetLatencyObserver(labels)
 }

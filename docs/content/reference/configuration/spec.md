@@ -2252,6 +2252,317 @@ configuration.
 
 <!-- vale off -->
 
+### ConcurrencyLimiter {#concurrency-limiter}
+
+<!-- vale on -->
+
+<dl>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterIns](#concurrency-limiter-ins), **required**)
+
+<!-- vale on -->
+
+Input ports for the _Concurrency Limiter_ component.
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterOuts](#concurrency-limiter-outs))
+
+<!-- vale on -->
+
+Output ports for the _Concurrency Limiter_ component.
+
+</dd>
+<dt>parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterParameters](#concurrency-limiter-parameters), **required**)
+
+<!-- vale on -->
+
+Parameters for the _Concurrency Limiter_ component.
+
+</dd>
+<dt>request_parameters</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterRequestParameters](#concurrency-limiter-request-parameters))
+
+<!-- vale on -->
+
+RequestParameters for the component
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+Selectors for the component.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ConcurrencyLimiterIns {#concurrency-limiter-ins}
+
+<!-- vale on -->
+
+Inputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component
+
+<dl>
+<dt>max_concurrency</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port), **required**)
+
+<!-- vale on -->
+
+The maximum number of concurrent requests to be allowed.
+
+</dd>
+<dt>pass_through</dt>
+<dd>
+
+<!-- vale off -->
+
+([InPort](#in-port))
+
+<!-- vale on -->
+
+PassThrough port determines whether to accept all requests instantaneously
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ConcurrencyLimiterOuts {#concurrency-limiter-outs}
+
+<!-- vale on -->
+
+Outputs for the _Concurrency Limiter_ or _Concurrency Scheduler_ component.
+
+<dl>
+<dt>accept_percentage</dt>
+<dd>
+
+<!-- vale off -->
+
+([OutPort](#out-port))
+
+<!-- vale on -->
+
+The percentage of flows being accepted by the _Concurrency Limiter_.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ConcurrencyLimiterParameters {#concurrency-limiter-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>limit_by_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Specifies which label the concurrency calculation should be keyed by.
+
+Concurrency limiting is done independently for each value of the
+[label](/concepts/flow-label.md) with given key. For example, to give each API
+Key a separate limit, assuming you have a `api_key` flow label set up, set
+`limit_by_label_key: "api_key"`. If no label key is specified, then all requests
+matching the selectors will be concurrency limited based on the global
+concurrency count.
+
+</dd>
+<dt>max_idle_time</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, default: `"7200s"`)
+
+<!-- vale on -->
+
+Max idle time before concurrency count for a label is removed. If set to 0, the
+state is never removed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
+<dt>max_inflight_duration</dt>
+<dd>
+
+<!-- vale off -->
+
+(string, **required**)
+
+<!-- vale on -->
+
+The time duration after which flow is assumed to have ended in case the end call
+gets missed. This field employs the
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json) JSON
+representation from Protocol Buffers. The format accommodates fractional seconds
+up to nine digits after the decimal point, offering nanosecond precision. Every
+duration value must be suffixed with an "s" to indicate 'seconds.' For example,
+a value of "10s" would signify a duration of 10 seconds.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ConcurrencyLimiterRequestParameters {#concurrency-limiter-request-parameters}
+
+<!-- vale on -->
+
+<dl>
+<dt>denied_response_status_code</dt>
+<dd>
+
+<!-- vale off -->
+
+([StatusCode](#status-code))
+
+<!-- vale on -->
+
+This field allows you to override the default HTTP status code
+(`429 Too Many Requests`) that is returned when a request is denied.
+
+</dd>
+<dt>tokens_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Flow label key that will be used to override the number of tokens for this
+request. This is an optional parameter and takes highest precedence when
+assigning tokens to a request. The label value must be a valid number.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
+### ConcurrencyScheduler {#concurrency-scheduler}
+
+<!-- vale on -->
+
+Schedules the traffic based on in-flight request concurrency.
+
+<dl>
+<dt>concurrency_limiter</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterParameters](#concurrency-limiter-parameters), **required**)
+
+<!-- vale on -->
+
+Parameter to configure concurrency limiting.
+
+</dd>
+<dt>in_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterIns](#concurrency-limiter-ins), **required**)
+
+<!-- vale on -->
+
+Input ports for the _Concurrency Scheduler_ component
+
+</dd>
+<dt>out_ports</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiterOuts](#concurrency-limiter-outs))
+
+<!-- vale on -->
+
+Output ports for the _Concurrency Scheduler_ component.
+
+</dd>
+<dt>scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([Scheduler](#scheduler))
+
+<!-- vale on -->
+
+Scheduler is used to schedule the requests when the concurrency limit is
+reached.
+
+</dd>
+<dt>selectors</dt>
+<dd>
+
+<!-- vale off -->
+
+([[]Selector](#selector), **required**)
+
+<!-- vale on -->
+
+Flow selection criteria.
+
+</dd>
+</dl>
+
+---
+
+<!-- vale off -->
+
 ### ConstantSignal {#constant-signal}
 
 <!-- vale on -->
@@ -3435,6 +3746,33 @@ AIAD Load Scheduler.
 <!-- vale on -->
 
 AIMD Load Scheduler.
+
+</dd>
+<dt>concurrency_limiter</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyLimiter](#concurrency-limiter))
+
+<!-- vale on -->
+
+_Concurrency Limiter_ provides service protection by limiting the number of
+concurrent requests to a service
+
+</dd>
+<dt>concurrency_scheduler</dt>
+<dd>
+
+<!-- vale off -->
+
+([ConcurrencyScheduler](#concurrency-scheduler))
+
+<!-- vale on -->
+
+_Concurrency Scheduler_ provides service protection by limiting the number of
+concurrent requests to a service and scheduling requests when the limit is
+reached
 
 </dd>
 <dt>load_ramp</dt>
@@ -5271,19 +5609,6 @@ Parameters for the _Sampler_.
 <!-- vale on -->
 
 <dl>
-<dt>denied_response_status_code</dt>
-<dd>
-
-<!-- vale off -->
-
-([StatusCode](#status-code))
-
-<!-- vale on -->
-
-This field allows you to override the default HTTP status code
-(`503 Service Unavailable`) that is returned when a request is denied.
-
-</dd>
 <dt>duration</dt>
 <dd>
 
@@ -7047,13 +7372,15 @@ Schedules the traffic based on token-bucket based quotas.
 
 <!-- vale on -->
 
+Input ports for the _Quota Scheduler_ component
+
 </dd>
 <dt>out_ports</dt>
 <dd>
 
 <!-- vale off -->
 
-([QuotaSchedulerOuts](#quota-scheduler-outs))
+([RateLimiterOuts](#rate-limiter-outs))
 
 <!-- vale on -->
 
@@ -7069,6 +7396,8 @@ Output ports for the _Quota Scheduler_ component.
 
 <!-- vale on -->
 
+Parameter to configure rate limiting quotas.
+
 </dd>
 <dt>scheduler</dt>
 <dd>
@@ -7078,6 +7407,8 @@ Output ports for the _Quota Scheduler_ component.
 ([Scheduler](#scheduler))
 
 <!-- vale on -->
+
+Scheduler is used to schedule the requests when the quota is exhausted.
 
 </dd>
 <dt>selectors</dt>
@@ -7089,30 +7420,7 @@ Output ports for the _Quota Scheduler_ component.
 
 <!-- vale on -->
 
-</dd>
-</dl>
-
----
-
-<!-- vale off -->
-
-### QuotaSchedulerOuts {#quota-scheduler-outs}
-
-<!-- vale on -->
-
-Outputs for the _Quota Scheduler_ component.
-
-<dl>
-<dt>accept_percentage</dt>
-<dd>
-
-<!-- vale off -->
-
-([OutPort](#out-port))
-
-<!-- vale on -->
-
-The percentage of flows being accepted by the _Quota Scheduler_.
+Flow selection criteria.
 
 </dd>
 </dl>
@@ -7480,7 +7788,7 @@ Selectors for the component.
 
 <!-- vale on -->
 
-Inputs for the _Rate Limiter_ component
+Inputs for the _Rate Limiter_ or _Quota Scheduler_ component
 
 <dl>
 <dt>bucket_capacity</dt>
@@ -7516,7 +7824,7 @@ Number of tokens to fill within an `interval`.
 
 <!-- vale on -->
 
-PassThrough port determines whether all requests
+PassThrough port determines whether to accept all requests instantaneously
 
 </dd>
 </dl>
@@ -7529,7 +7837,7 @@ PassThrough port determines whether all requests
 
 <!-- vale on -->
 
-Outputs for the _Rate Limiter_ component.
+Outputs for the _Rate Limiter_ or _Quota Scheduler_ component.
 
 <dl>
 <dt>accept_percentage</dt>
@@ -7541,7 +7849,7 @@ Outputs for the _Rate Limiter_ component.
 
 <!-- vale on -->
 
-The percentage of flows being accepted by the _Rate Limiter_.
+The percentage of flows being accepted.
 
 </dd>
 </dl>
@@ -8258,8 +8566,8 @@ The percentage of requests to accept.
 
 <!-- vale on -->
 
-This field allows you to override the default HTTP status code
-(`503 Service Unavailable`) that is returned when a request is denied.
+This field allows you to override the default HTTP status code (`403 Forbidden`)
+that is returned when a request is denied.
 
 </dd>
 <dt>ramp_mode</dt>

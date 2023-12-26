@@ -24,7 +24,7 @@ type rateLimiterSync struct {
 	configEtcdPaths  []string
 }
 
-// NewConfigSyncOptions creates fx options for syncing LoadScheduler objects with agent groups.
+// NewConfigSyncOptions creates fx options for syncing RateLimiter objects with agent groups.
 func NewConfigSyncOptions(
 	rateLimiterProto *policylangv1.RateLimiter,
 	componentID runtime.ComponentID,

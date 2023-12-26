@@ -2,10 +2,8 @@ syntax = "proto3";
 
 package aperture.policy.private.v1;
 
-import "aperture/flowcontrol/check/v1/check.proto";
 import "aperture/policy/language/v1/flowcontrol.proto";
 import "aperture/policy/language/v1/ports.proto";
-import "google/protobuf/duration.proto";
 
 message LoadActuator {
   message Ins {
@@ -19,42 +17,25 @@ message LoadActuator {
 }
 
 message RateLimiter {
-  message Parameters {
-    message LazySync {
-      bool enabled = 1; // @gotags: default:"false"
-      uint32 num_sync = 2; // @gotags: default:"4" validate:"gt=0"
-    }
-
-    string limit_by_label_key = 1;
-    google.protobuf.Duration interval = 3; // @gotags: validate:"required"
-    bool continuous_fill = 4; // @gotags: default:"true"
-    google.protobuf.Duration max_idle_time = 5; // @gotags: default:"7200s"
-    LazySync lazy_sync = 6;
-    bool delay_initial_fill = 7; // @gotags: default:"false"
-  }
-
-  message RequestParameters {
-    string tokens_label_key = 1;
-    flowcontrol.check.v1.StatusCode denied_response_status_code = 2;
-  }
-
-  message Ins {
-    aperture.policy.language.v1.InPort bucket_capacity = 1; // @gotags: validate:"required"
-    aperture.policy.language.v1.InPort fill_amount = 2; // @gotags: validate:"required"
-    aperture.policy.language.v1.InPort pass_through = 3;
-  }
-
-  Ins in_ports = 1; // @gotags: validate:"required"
-  Parameters parameters = 2; // @gotags: validate:"required"
-  repeated aperture.policy.language.v1.Selector selectors = 3; // @gotags: validate:"required,gt=0,dive"
-  RequestParameters request_parameters = 4;
-  string parent_component_id = 5;
+  aperture.policy.language.v1.RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+  repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
+  string parent_component_id = 3;
 }
 
 message QuotaScheduler {
   aperture.policy.language.v1.RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
   repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
-  aperture.policy.language.v1.RateLimiter.Parameters rate_limiter = 3; // @gotags: validate:"required"
-  aperture.policy.language.v1.Scheduler scheduler = 4;
-  string parent_component_id = 5;
+  string parent_component_id = 3;
+}
+
+message ConcurrencyLimiter {
+  aperture.policy.language.v1.ConcurrencyLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+  repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
+  string parent_component_id = 3;
+}
+
+message ConcurrencyScheduler {
+  aperture.policy.language.v1.ConcurrencyLimiter.Ins in_ports = 1; // @gotags: validate:"required"
+  repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
+  string parent_component_id = 3;
 }
