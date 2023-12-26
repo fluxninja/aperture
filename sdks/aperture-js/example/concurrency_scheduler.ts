@@ -27,6 +27,7 @@ async function sendRequestForTier(
   tier: string,
   priority: number,
 ) {
+  console.log(`[${tier} Tier] Sending request with priority ${priority}...`);
   const flow = await apertureClient.startFlow(
     "concurrency-scheduling-feature",
     {
@@ -43,25 +44,32 @@ async function sendRequestForTier(
 
   if (flow.shouldRun()) {
     console.log(`[${tier} Tier] Request accepted with priority ${priority}.`);
+    // sleep for 5 seconds to simulate a long-running request
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   } else {
     console.log(`[${tier} Tier] Request rejected. Priority was ${priority}.`);
   }
 
-  const flowEndResponse = await flow.end();
+  await flow.end();
 }
 
+// Launch each batch in parallel
 async function scheduleRequests(apertureClient: ApertureClient) {
   const requestsPerBatch = 10;
   const batchInterval = 1000; // ms
 
-  setInterval(() => {
+  while (true) {
     console.log("Sending new batch of requests...");
-    Object.entries(userTiers).forEach(([tier, priority]) => {
-      for (let i = 0; i < requestsPerBatch; i++) {
-        sendRequestForTier(apertureClient, tier, priority);
-      }
+    // Send requests for each tier
+    const promises = Object.entries(userTiers).flatMap(([tier, priority]) => {
+      return Array(requestsPerBatch)
+        .fill(null)
+        .map(() => sendRequestForTier(apertureClient, tier, priority));
     });
-  }, batchInterval);
+
+    await Promise.all(promises);
+    await new Promise((resolve) => setTimeout(resolve, batchInterval));
+  }
 }
 
 async function main() {
