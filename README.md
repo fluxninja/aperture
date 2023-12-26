@@ -80,9 +80,10 @@ cloud application:
   Aperture aligns resource distribution with business value and urgency of
   requests. Workload prioritization applies to API Quota Management and Adaptive
   Queuing use cases.
-- 💾 **Caching**: Boost application performance and reduce costs by caching
-  costly operations, preventing duplicate requests to pay-per-use services, and
-  easing the load on constrained services.
+- 💾 [**Caching**](https://docs.fluxninja.com/concepts/cache): Boost application
+  performance and reduce costs by caching costly operations, preventing
+  duplicate requests to pay-per-use services, and easing the load on constrained
+  services.
 
 ## 🏗️ Architecture
 
