@@ -361,10 +361,9 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 		}
 	}
 
-	now := time.Now()
 	takeNResp := tokencounterv1.TakeNResponse{
 		Ok:          true,
-		CheckBackAt: timestamppb.New(now),
+		CheckBackAt: timestamppb.New(time.Time{}),
 	}
 
 	// Audit and find requestID in the queued requests
@@ -373,6 +372,7 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 	var requestQueued *tokencounterv1.Request
 	var reqIndex int
 	var tokensAhead float64
+	now := time.Now()
 
 	for i, r := range state.RequestsQueued {
 		if isExpired(r, now) {
@@ -409,15 +409,18 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 	} else {
 		waitTime = MinimumWaitTime
 	}
-
+	if waitTime < MinimumWaitTime {
+		waitTime = MinimumWaitTime
+	}
 	if requestQueued != nil {
+		if requestQueued.NumRetries >= 5 {
+			// override wait time if the request has been retried more than 5 times
+			waitTime = requestQueued.WaitFor.AsDuration()
+		}
 		requestQueued.NumRetries += 1
 		if requestQueued.NumRetries%5 == 0 {
 			// Increase wait time exponentially after every 5 re-tries
-			newWaitTime := requestQueued.WaitFor.AsDuration() * 2
-			if newWaitTime > waitTime {
-				waitTime = newWaitTime
-			}
+			waitTime = requestQueued.WaitFor.AsDuration() * 2
 		}
 	}
 
@@ -700,8 +703,3 @@ func (gtc *GlobalTokenCounter) decodeState(stateBytes []byte, key string) (*toke
 func isExpired(r *tokencounterv1.Request, now time.Time) bool {
 	return r.ExpiresAt.AsTime().Before(now)
 }
-
-/*func debugState(state *tokencounterv1.State, location string) {
-	// print the number of queued and inflight requests and token rate
-	log.Info().Msgf("%s: queued: %d, inflight: %d, token rate: %f", location, len(state.RequestsQueued), len(state.RequestsInflight), state.TokenRate)
-}*/
