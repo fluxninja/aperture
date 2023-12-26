@@ -22,7 +22,7 @@ type ProvideParams struct {
 }
 
 // Provide ObjectStorage.
-func Provide(in ProvideParams) (*ObjectStorage, error) {
+func Provide(in ProvideParams) (ObjectStorageIface, error) {
 	var cfg storageconfig.ObjectStorageConfig
 	err := in.Unmarshaller.UnmarshalKey("object_storage", &cfg)
 	if err != nil {
