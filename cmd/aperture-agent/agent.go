@@ -44,7 +44,7 @@ func main() {
 			agentinfo.ProvideAgentInfo,
 			clockwork.NewRealClock,
 			agent.ProvidePeersPrefix,
-			fx.Annotate(objectstorage.Provide, fx.As(new(objectstorage.ObjectStorageIface))),
+			objectstorage.Provide,
 			fx.Annotate(AgentElectionPath, fx.ResultTags(config.NameTag(etcdclient.ElectionPathFxTag))),
 		),
 		fx.Supply(fx.Annotate(false, fx.ResultTags(config.NameTag(etcdclient.EnforceLeaderOnlyFxTag)))),
