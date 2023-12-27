@@ -24,6 +24,7 @@ async function initializeApertureClient() {
 }
 
 async function sendRequest(apertureClient: ApertureClient) {
+  // START: CLR
   const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
     labels: {
       user_id: "some_user_id",
@@ -32,22 +33,22 @@ async function sendRequest(apertureClient: ApertureClient) {
       deadline: Date.now() + 300,
     },
   });
+  // END: CLR
 
+  // START: CFlowShouldRun
   if (flow.shouldRun()) {
-    //console.log("Request accepted. Processing..." + flow.checkResponse());
+    console.log("Request accepted. Processing..." + flow.checkResponse());
   } else {
     console.log("Request rejected due to concurrency limit. Try again later.");
   }
-  // do a json stringify for checkResponse() to work
-  console.log(JSON.stringify(flow.checkResponse()));
 
   flow.end();
+  // END: CFlowShouldRun
 }
 
 async function handleConcurrencyLimit(apertureClient: ApertureClient) {
-  const requestsPerSecond = 10;
-  const durationInSeconds = 200;
-
+  const requestsPerSecond = 5;
+  const durationInSeconds = 1000;
   for (let i = 0; i < durationInSeconds; i++) {
     const requests = Array.from({ length: requestsPerSecond }, () =>
       sendRequest(apertureClient),

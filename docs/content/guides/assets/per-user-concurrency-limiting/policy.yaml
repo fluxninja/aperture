@@ -1,0 +1,45 @@
+apiVersion: fluxninja.com/v1alpha1
+kind: Policy
+metadata:
+  labels:
+    fluxninja.com/validate: "true"
+  name: concurrency-limit-test
+spec:
+  circuit:
+    components:
+    - flow_control:
+        concurrency_limiter:
+          in_ports:
+            max_concurrency:
+              constant_signal:
+                value: 10
+          out_ports:
+            accept_percentage:
+              signal_name: ACCEPT_PERCENTAGE
+          parameters:
+            limit_by_label_key: user_id
+            max_inflight_duration: 60s
+          request_parameters: {}
+          selectors:
+          - control_point: concurrency-limiting-feature
+    - decider:
+        in_ports:
+          lhs:
+            signal_name: ACCEPT_PERCENTAGE
+          rhs:
+            constant_signal:
+              value: 90
+        operator: gte
+        out_ports:
+          output:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+    - alerter:
+        in_ports:
+          signal:
+            signal_name: ACCEPT_PERCENTAGE_ALERT
+        parameters:
+          alert_name: Too many inflight requests
+    evaluation_interval: 1s
+  resources:
+    flow_control:
+      classifiers: []
