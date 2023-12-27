@@ -28,17 +28,20 @@ blueprint.
 ## Overview
 
 Concurrency limiting is a critical strategy for managing the load on an API. By
-setting limits on the number of concurrent requests a API consumers can make,
-concurrency limiting ensures balanced resource utilization, preventing any users
-from monopolizing the system. This approach is key to maintaining service
-reliability and fair access for all API consumers.
+setting limits on the number of concurrent requests API consumers can make,
+concurrency limiting ensures balanced resource utilization, preventing a single
+user or small groups of users from monopolizing resources, which can lead to
+overloading the API. This approach is key to maintaining service reliability and
+fair access for all API consumers.
 
 Aperture enforces per-key concurrency limits, offering precise control over API
 usage. Each unique key is assigned a maximum concurrency limit, which dictates
 the maximum number of concurrent requests allowed. When this limit is reached,
-new requests are either queued or rejected. Aperture also allows setting a
-maximum 'in-flight' duration for each request, controlling the impact of
-long-running requests on overall system performance.
+new requests are either queued or rejected. Additionally, Aperture allows for
+the configuration of a maximum duration for each request to remain in processing
+(in-flight), allowing to mitigate the effects of long-running requests on system
+performance and ensuring efficient management of resources during high-load
+conditions.
 
 <Zoom>
 
@@ -49,8 +52,8 @@ long-running requests on overall system performance.
 </Zoom>
 
 The diagram shows how the Aperture SDK interacts with Aperture Cloud to
-determine whether to allow or reject in-flight requests based on the max
-concurrency that is set in the policy.
+determine whether to allow or reject a request based on policy logic that
+described in one of the next sections.
 
 :::note Pre-Requisites
 
@@ -141,12 +144,12 @@ limiting policy:
 1. `policy_name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
    `concurrency-limit-test`.
-2. `max_concurrency`: Configures the max number of concurrent requests allowed.
-   Set `max_concurrency` to `10`.
+2. `max_concurrency`: Configures the maximum number of concurrent requests
+   allowed. Set `max_concurrency` to `10`.
 3. `limit_by_label_key`: Determines the specific label key used for enforcing
    concurrency limits. We'll use `user_id` as an example.
-4. `max_inflight_duration`: Configures the max time in flight requests can stay
-   in queue. Set `max_inflight_duration` to `60s`.
+4. `max_inflight_duration`: Configures the maximum time in flight requests can
+   stay in queue. Set `max_inflight_duration` to `60s`.
 5. `control_point`: It can be a particular feature or execution block within a
    service. We'll use `concurrency-limiting-feature` as an example.
 
@@ -161,11 +164,10 @@ The last step is to apply the policy using the following command:
 <CodeBlock language="bash"> aperturectl cloud blueprints apply
 --values-file=concurrency-limit-test.yaml </CodeBlock>
 
-For this policy, a unique token bucket is created for each user identified by
-their `user_id`. Users are permitted to make up to 10 requests in a burst before
-encountering concurrency limiting. As the bucket gradually refills with 10
-requests over a span of 30 seconds, users can make a restricted number of
-successive requests.
+For this policy, users are permitted to make up to 10 concurrent requests in
+before encountering concurrency limiting. If additional requests are made while
+the maximum number of concurrent requests is already reached, Aperture will
+limit those new requests.
 
 ```mdx-code-block
   </TabItem>
@@ -206,7 +208,7 @@ Once you've clicked on the policy, you will see the following dashboard:
 ![Concurrency Limiter Graph 2](./assets/per-user-concurrency-limiting/concurrency-limiter-graph2.png)
 
 These panels provide insights into how the policy is performing by monitoring
-the number of accepted and rejected requests along with the acceptance
+the number of total, accepted and rejected requests along with the acceptance
 percentage. Observing these graphs will help you understand the effectiveness of
 your concurrency limiting setup and help in making any necessary adjustments or
 optimizations.

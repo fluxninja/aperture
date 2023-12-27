@@ -30,7 +30,7 @@ async function sendRequest(apertureClient: ApertureClient) {
       user_id: "some_user_id",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 300,
+      deadline: Date.now() + 1000,
     },
   });
   // END: CLR
