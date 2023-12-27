@@ -85,12 +85,12 @@ inaccuracy within a (small) time window (sync interval).
 The _Rate Limiter_ component accepts or rejects incoming flows based on
 per-label limits, configured as the maximum number of requests per a given
 period of time. The rate-limiting label is chosen from the
-[flow-label][flow-label] with a specific key, enabling distinct limits per user
+[flow-label][flow-label] with a specific key, enabling distinct limits per-user
 as identified by unique values of the label.
 
 :::info
 
-Refer to the [Per User Rate Limiting guide][guide] for more information on how
+Refer to the [Per-user Rate Limiting guide][guide] for more information on how
 to use the _Rate Limiter_ using [aperture-js][aperture-js] SDK.
 
 :::

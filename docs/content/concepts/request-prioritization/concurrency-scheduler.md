@@ -20,9 +20,9 @@ while ensuring that the application adheres to concurrency limits.
 The _Concurrency Scheduler_ can be thought of as a combination of a
 [_Scheduler_](../scheduler.md) and a
 [_Concurrency Limiter_](../concurrency-limiter.md). It essentially provides
-scheduling capabilities atop a _Concurrency Limiter_. Similar to _Concurrency
-Limiter_, this component takes `max_concurrency` as an input port which
-determines the maximum number of in-flight requests in the global request
+scheduling capabilities atop a _Concurrency Limiter_. Similar to the
+_Concurrency Limiter_, this component takes `max_concurrency` as an input port
+which determines the maximum number of in-flight requests in the global request
 ledger.
 
 The global request ledger is shared among Agents in an
