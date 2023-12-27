@@ -36,12 +36,8 @@ fair access for all API consumers.
 
 Aperture enforces per-key concurrency limits, offering precise control over API
 usage. Each unique key is assigned a maximum concurrency limit, which dictates
-the maximum number of concurrent requests allowed. When this limit is reached,
-new requests are either queued or rejected. Additionally, Aperture allows for
-the configuration of a maximum duration for each request to remain in processing
-(in-flight), allowing to mitigate the effects of long-running requests on system
-performance and ensuring efficient management of resources during high-load
-conditions.
+the maximum number of concurrent requests allowed. When this limit is reached
+new requests are rejected.
 
 <Zoom>
 
@@ -52,8 +48,8 @@ conditions.
 </Zoom>
 
 The diagram shows how the Aperture SDK interacts with Aperture Cloud to
-determine whether to allow or reject a request based on policy logic that
-described in one of the next sections.
+determine whether to allow or reject incoming requests based on the defined
+maximum concurrency parameters.
 
 :::note Pre-Requisites
 
@@ -94,7 +90,7 @@ which we will create in Aperture Cloud in one of the next steps.
   <TabItem value="TypeScript">
 ```
 
-<CodeSnippet lang="ts" snippetName="CLR" />
+<CodeSnippet lang="ts" snippetName="CLStartFlow" />
 
 ```mdx-code-block
   </TabItem>
@@ -103,11 +99,11 @@ which we will create in Aperture Cloud in one of the next steps.
 
 Now, the next part is assessing whether a request is permissible or not by
 checking the decision returned by the `ShouldRun` call. Developers can leverage
-this decision to either limit requests made by abusive users or to allow
-requests that are not overwhelming the system. While our current example only
-logs the request, in real-world applications, you can execute relevant business
-logic when a request is allowed. It is important to make the `end` call made
-after processing each request, in order to send telemetry data that would
+this decision to either reject requests made by abusive users or to allow
+requests if the concurrent limit has not been crossed. While our current example
+only logs the request, in real-world applications, you can execute relevant
+business logic when a request is allowed. It is important to make the `end` call
+made after processing each request, in order to send telemetry data that would
 provide granular visibility for each flow.
 
 ```mdx-code-block
@@ -115,7 +111,7 @@ provide granular visibility for each flow.
   <TabItem value="TypeScript">
 ```
 
-<CodeSnippet lang="ts" snippetName="CFlowShouldRun" />
+<CodeSnippet lang="ts" snippetName="CLFlowShouldRun" />
 
 ```mdx-code-block
   </TabItem>
@@ -148,8 +144,9 @@ limiting policy:
    allowed. Set `max_concurrency` to `10`.
 3. `limit_by_label_key`: Determines the specific label key used for enforcing
    concurrency limits. We'll use `user_id` as an example.
-4. `max_inflight_duration`: Configures the maximum time in flight requests can
-   stay in queue. Set `max_inflight_duration` to `60s`.
+4. `max_inflight_duration`: Configures the time duration after which a flow is
+   assumed to have ended in case end call is missed. Set `max_inflight_duration`
+   to `60s`.
 5. `control_point`: It can be a particular feature or execution block within a
    service. We'll use `concurrency-limiting-feature` as an example.
 
@@ -165,9 +162,8 @@ The last step is to apply the policy using the following command:
 --values-file=concurrency-limit-test.yaml </CodeBlock>
 
 For this policy, users are permitted to make up to 10 concurrent requests in
-before encountering concurrency limiting. If additional requests are made while
-the maximum number of concurrent requests is already reached, Aperture will
-limit those new requests.
+before hitting the concurrency limit. Additional requests made after the maximum
+number of concurrent requests is reached are rejected.
 
 ```mdx-code-block
   </TabItem>
