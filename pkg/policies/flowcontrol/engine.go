@@ -124,9 +124,10 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	response.FluxMeterInfos = fluxMeterProtos
 
 	type LimiterType struct {
-		limiters      map[iface.Limiter]struct{}
-		rejectReason  flowcontrolv1.CheckResponse_RejectReason
-		rampComponent bool
+		limiters                        map[iface.Limiter]struct{}
+		rejectReason                    flowcontrolv1.CheckResponse_RejectReason
+		rampComponent                   bool
+		defaultDeniedResponseStatusCode flowcontrolv1.StatusCode
 	}
 
 	runLimiters := func(limiterTypes []LimiterType) bool {
@@ -140,8 +141,12 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 			limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
 			for _, limiterDecision := range limiterDecisions {
 				response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
-				if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
-					response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
+				if limiterDecision.Dropped {
+					if limiterDecision.DeniedResponseStatusCode != 0 {
+						response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
+					} else {
+						response.DeniedResponseStatusCode = limiterType.defaultDeniedResponseStatusCode
+					}
 				}
 			}
 
@@ -164,9 +169,9 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 
 	limiterTypes := []LimiterType{
-		{mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP, true},
-		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED, false},
-		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED, false},
+		{mmr.rampSamplers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_MATCHING_RAMP, true, flowcontrolv1.StatusCode_Forbidden},
+		{mmr.samplers, flowcontrolv1.CheckResponse_REJECT_REASON_NOT_SAMPLED, false, flowcontrolv1.StatusCode_Forbidden},
+		{mmr.rateLimiters, flowcontrolv1.CheckResponse_REJECT_REASON_RATE_LIMITED, false, flowcontrolv1.StatusCode_TooManyRequests},
 	}
 	rejected := runLimiters(limiterTypes)
 	if rejected {
@@ -179,7 +184,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 	}
 
 	limiterTypes = []LimiterType{
-		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false},
+		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false, flowcontrolv1.StatusCode_ServiceUnavailable},
 	}
 	runLimiters(limiterTypes)
 	if wgGlobal != nil {
