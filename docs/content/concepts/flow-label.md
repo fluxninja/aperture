@@ -219,9 +219,9 @@ For _Classifier_ created labels, you can disable this behavior by setting
 
 [selectors]: ./selector.md
 [classifier]: ./advanced/classifier.md
-[workload]: ./scheduler/scheduler.md#workload
+[workload]: ./scheduler.md#workload
 [ratelimiter]: ./rate-limiter.md
-[quota-scheduler]: ./scheduler/quota-scheduler.md
+[quota-scheduler]: ./request-prioritization/quota-scheduler.md
 [flux-meter]: ./advanced/flux-meter.md
 [baggage]: https://www.w3.org/TR/baggage/#baggage-http-header-format
 [traces]:

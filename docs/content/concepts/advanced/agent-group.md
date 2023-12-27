@@ -45,7 +45,8 @@ details.
   synchronization. Agents within the same group form a peer-to-peer network to
   synchronize fine-grained per label counters. These counters are crucial for
   [rate-limiting](/concepts/rate-limiter.md) and for implementing global token
-  buckets used in [quota scheduling](/concepts/scheduler/quota-scheduler.md).
+  buckets used in
+  [quota scheduling](/concepts/request-prioritization/quota-scheduler.md).
   Additionally, all Agents within an agent group instantiate the same set of
   flow control components as defined in the
   [policies](/concepts/advanced/policy.md) running at the Controller. This
