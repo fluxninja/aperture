@@ -52,7 +52,8 @@ type GlobalTokenCounter struct {
 var _ ConcurrencyLimiter = (*GlobalTokenCounter)(nil)
 
 // NewGlobalTokenCounter creates a new GlobalTokenCounter.
-func NewGlobalTokenCounter(dc *distcache.DistCache,
+func NewGlobalTokenCounter(
+	dc *distcache.DistCache,
 	name string,
 	maxIdleDuration time.Duration,
 	maxInflightDuration time.Duration,
