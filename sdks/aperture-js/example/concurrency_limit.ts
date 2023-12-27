@@ -15,6 +15,7 @@ async function initializeApertureClient() {
 }
 
 async function sendRequest(apertureClient: ApertureClient) {
+  // START: CLStartFlow
   const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
     labels: {
       user_id: "some_user_id",
@@ -23,7 +24,9 @@ async function sendRequest(apertureClient: ApertureClient) {
       deadline: Date.now() + 300,
     },
   });
+  // END: CLStartFlow
 
+  // START: CLFlowShouldRun
   if (flow.shouldRun()) {
     console.log("Request accepted. Processing..." + flow.checkResponse());
   } else {
@@ -31,6 +34,7 @@ async function sendRequest(apertureClient: ApertureClient) {
   }
 
   flow.end();
+  // END: CLFlowShouldRun
 }
 
 async function handleConcurrencyLimit(apertureClient: ApertureClient) {
