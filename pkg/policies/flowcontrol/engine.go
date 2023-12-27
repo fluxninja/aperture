@@ -141,7 +141,7 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 			limiterDecisions, decisionType, waitTime := runLimiters(ctx, limiterType.limiters, flowLabels)
 			for _, limiterDecision := range limiterDecisions {
 				response.LimiterDecisions = append(response.LimiterDecisions, limiterDecision)
-				if limiterDecision.Dropped && limiterDecision.DeniedResponseStatusCode != 0 {
+				if limiterDecision.Dropped {
 					if limiterDecision.DeniedResponseStatusCode != 0 {
 						response.DeniedResponseStatusCode = limiterDecision.DeniedResponseStatusCode
 					} else {
