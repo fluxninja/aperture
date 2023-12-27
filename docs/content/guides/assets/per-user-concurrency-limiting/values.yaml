@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=../../../../../blueprints/concurrency-limiting/base/gen/definitions.json
+blueprint: concurrency-limiting/base
+uri: ../../../../../blueprints
+policy:
+  components: []
+  policy_name: concurrency-limit-test
+  resources:
+    flow_control:
+      classifiers: []
+  concurrency_limiter:
+    alerter:
+      alert_name: "Too many inflight requests"
+    max_concurrency: 10
+    parameters:
+      limit_by_label_key: "user_id"
+      max_inflight_duration: 60s
+    request_parameters: {}
+    selectors:
+      - control_point: concurrency-limiting-feature

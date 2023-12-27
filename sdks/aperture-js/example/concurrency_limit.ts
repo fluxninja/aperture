@@ -1,29 +1,41 @@
 import { ApertureClient } from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
+import inquirer from 'inquirer';
 
 async function initializeApertureClient() {
-  const address = process.env.APERTURE_AGENT_ADDRESS || "localhost:8080";
-  const apiKey = process.env.APERTURE_API_KEY || "";
+    const answers = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'address',
+            message: 'Enter your organization\'s address:',
+        },
+        {
+            type: 'input',
+            name: 'apiKey',
+            message: 'Enter the API key:',
+        },
+    ]);
 
-  const apertureClient = new ApertureClient({
-    address: address,
-    apiKey: apiKey,
-    channelCredentials: grpc.credentials.createInsecure(),
-  });
+    const apertureClient = new ApertureClient({
+        address: answers.address,
+        apiKey: answers.apiKey,
+    });
 
-  return apertureClient;
+    return apertureClient;
 }
 
 async function sendRequest(apertureClient: ApertureClient) {
+  // START: CLStartFlow
   const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
     labels: {
       user_id: "some_user_id",
     },
     grpcCallOptions: {
-      deadline: Date.now() + 300,
+      deadline: Date.now() + 1000,
     },
   });
+  // END: CLStartFlow
 
+  // START: CLFlowShouldRun
   if (flow.shouldRun()) {
     console.log("Request accepted. Processing..." + flow.checkResponse());
   } else {
@@ -31,12 +43,12 @@ async function sendRequest(apertureClient: ApertureClient) {
   }
 
   flow.end();
+  // END: CLFlowShouldRun
 }
 
 async function handleConcurrencyLimit(apertureClient: ApertureClient) {
-  const requestsPerSecond = 10;
-  const durationInSeconds = 200;
-
+  const requestsPerSecond = 5;
+  const durationInSeconds = 1000;
   for (let i = 0; i < durationInSeconds; i++) {
     const requests = Array.from({ length: requestsPerSecond }, () =>
       sendRequest(apertureClient),
