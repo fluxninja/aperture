@@ -1,4 +1,4 @@
-package ratelimiter
+package ratelimiter_test
 
 import (
 	"context"
@@ -30,7 +30,7 @@ func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testCon
 	limiter.SetFillAmount(config.fillAmount)
 	limiter.SetPassThrough(false)
 
-	t.Logf("Successfully created new Limiter")
+	t.Logf("Successfully created new RateLimiter")
 	return limiter, nil
 }
 

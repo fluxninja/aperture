@@ -37,7 +37,8 @@ type GlobalTokenBucket struct {
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
-func NewGlobalTokenBucket(dc *distcache.DistCache,
+func NewGlobalTokenBucket(
+	dc *distcache.DistCache,
 	name string,
 	interval time.Duration,
 	maxIdleDuration time.Duration,
