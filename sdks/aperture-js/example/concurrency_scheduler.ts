@@ -38,6 +38,7 @@ async function sendRequestForTier(
   priority: number,
 ) {
   console.log(`[${tier} Tier] Sending request with priority ${priority}...`);
+  // START: CSStartFlow
   const flow = await apertureClient.startFlow(
     "concurrency-scheduling-feature",
     {
@@ -60,7 +61,8 @@ async function sendRequestForTier(
     console.log(`[${tier} Tier] Request rejected. Priority was ${priority}.`);
   }
 
-  await flow.end();
+  flow.end();
+  // END: CSStartFlow
 }
 
 // Launch each batch in parallel

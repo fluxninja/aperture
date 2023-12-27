@@ -31,11 +31,11 @@ blueprint.
 
 Concurrency Scheduling is a sophisticated technique that allows effective
 management of concurrent requests. With this technique services can limit the
-number of concurrent API calls, therefore alleviating the load on the system.
+number of concurrent API calls to alleviate the load on the system.
 
-When service limits are reached, incoming requests can be queued and served
-based on their priority which is based on business-critical labels that are set
-in the policy within Aperture Cloud and passed via the SDK.
+When service limits are reached, Aperture Cloud can queue incoming requests and
+serve them according to their priority, which is determined by business-critical
+labels set in the policy and passed via the SDK.
 
 <Zoom>
 
@@ -105,9 +105,7 @@ The next step is making a `startFlow` call to Aperture. For this call, it is
 important to specify the control point (`concurrency-scheduling-feature` in our
 example) and the labels that will align with the concurrency scheduling policy.
 The `priority` label is necessary for request prioritization, while the
-`workload` label differentiates each request. In this example, we're only
-tracking and logging requests sent to Aperture. However, after making the
-`startFlow` call, you can execute relevant business operations.
+`workload` label differentiates each request.
 
 According to the policy logic designed to prevent service limit breaches,
 Aperture will, on each `startFlow` call, either give precedence to a critical
@@ -118,12 +116,17 @@ indicates that the request can be queued for a maximum of 2 minutes. After this
 interval, the request will either be processed or discarded, depending on its
 position in the queue.
 
+In this example, we're only tracking and logging requests sent to Aperture.
+However, once the `startFlow` call is made, business logic can be executed
+directly, as excess requests are queued, eliminating the need to check if a flow
+`shouldRun`.
+
 ```mdx-code-block
 <Tabs>
   <TabItem value="TypeScript">
 ```
 
-<CodeSnippet lang="ts" snippetName="QSStartFlow" />
+<CodeSnippet lang="ts" snippetName="CSStartFlow" />
 
 ```mdx-code-block
   </TabItem>
@@ -137,7 +140,7 @@ flow.
 ## Create a Concurrency Scheduling Policy
 
 ```mdx-code-block
-  </Tabs>
+<Tabs>
   <TabItem value="aperturectl">
 ```
 
@@ -175,7 +178,7 @@ scheduling policy:
 Here is how the complete values file would look:
 
 ```yaml
-{@include: ./assets/managing-concurrencys/values.yaml}
+{@include: ./assets/concurrency-scheduling/values.yaml}
 ```
 
 The last step is to apply the policy using the following command:
@@ -220,12 +223,18 @@ in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the
 
 Once you've clicked on the policy, you will see the following dashboard:
 
+![Workload](./assets/managing-quotas/workloads.png)
+
 The two panels above provide insights into how the policy is performing by
 monitoring the number of accepted and rejected requests along with the
 acceptance percentage.
 
+![Request](./assets/managing-quotas/request-metrics.png)
+
 The panels above offer insights into the request details, including their
 latency.
+
+![Queue](./assets/managing-quotas/queue.png)
 
 These panels display insights into queue duration for `workload` requests and
 highlight the average of prioritized requests that moved ahead in the queue.
