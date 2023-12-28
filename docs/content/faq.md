@@ -109,8 +109,8 @@ The following results were observed:
 | Istio Proxy    | 1.81 mean, 2.11 max  | 12.5 mean, 20.8 max |
 
 [rate-limiter]: /concepts/rate-limiter.md
-[load-scheduler]: /concepts/scheduler/load-scheduler.md
-[scheduler]: /concepts/scheduler/scheduler.md
+[load-scheduler]: /concepts/request-prioritization/load-scheduler.md
+[scheduler]: /concepts/scheduler.md
 [flux-meter]: /concepts/advanced/flux-meter.md
 [classifier]: /concepts/advanced/classifier.md
 [flow-label]: /concepts/flow-label.md

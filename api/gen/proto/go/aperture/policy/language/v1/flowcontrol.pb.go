@@ -670,7 +670,7 @@ func (x *RateLimiter) GetOutPorts() *RateLimiter_Outs {
 //
 // :::info
 //
-// See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
+// See also [_Load Scheduler_ overview](/concepts/request-prioritization/load-scheduler.md).
 //
 // :::
 //
@@ -794,7 +794,7 @@ type Scheduler struct {
 	// :::info
 	//
 	// See also [workload definition in the concepts
-	// section](/concepts/scheduler/scheduler.md#workload).
+	// section](/concepts/scheduler.md#workload).
 	//
 	// :::
 	Workloads []*Scheduler_Workload `protobuf:"bytes,1,rep,name=workloads,proto3" json:"workloads,omitempty" validate:"dive"` // @gotags: validate:"dive"

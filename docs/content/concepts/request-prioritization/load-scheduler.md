@@ -4,7 +4,7 @@ keywords:
   - scheduler
   - service protection
   - queuing
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 :::info See Also
@@ -17,15 +17,10 @@ The _Load Scheduler_ is used to throttle request rates dynamically during high
 load, therefore protecting services from overloads and cascading failures. It
 uses a local token bucket for estimating the allowed token rate. The fill rate
 of the token bucket gets adjusted by the controller based on the specified
-policy. Since this component builds upon the [_Scheduler_](./scheduler.md), it
+policy. Since this component builds upon the [_Scheduler_](../scheduler.md), it
 allows defining workloads along with their priority and tokens. The scheduler
 employs weighted fair queuing of requests to achieve graceful degradation of
 applications.
-
-This diagram illustrates the working of a load scheduler.
-
-![Scheduler](./assets/img/load-scheduler-light.svg#gh-light-mode-only)
-![Scheduler](./assets/img/load-scheduler-dark.svg#gh-dark-mode-only)
 
 The _Load Scheduler_'s throttling behavior is controlled by the signal at its
 `load_multiplier` input port. As the policy circuit adjusts the signal at the
@@ -45,9 +40,8 @@ algorithm. Any request that fails to be scheduled within its designated timeout
 is rejected.
 
 Additionally, by defining workloads with varying priorities and weights
-(tokens), the load scheduler (and others mentioned below) can prioritize certain
-requests over others, facilitating graceful service degradation during
-high-traffic periods.
+(tokens), the load scheduler can prioritize certain requests over others,
+facilitating graceful service degradation during high-traffic periods.
 
 ## Load Schedulers {#load-schedulers}
 
