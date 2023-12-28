@@ -1,0 +1,34 @@
+flowchart LR
+subgraph root.0[<center>ConcurrencyLimiter<br/>1 selectors</center>]
+subgraph root.0_inports[ ]
+style root.0_inports fill:none,stroke:none
+root.0max_concurrency[max_concurrency]
+end
+subgraph root.0_outports[ ]
+style root.0_outports fill:none,stroke:none
+root.0accept_percentage[accept_percentage]
+end
+end
+root.0_max_concurrency_FakeConstantout((10.00))
+subgraph root.1[<center>Decider<br/>gte for 0s</center>]
+subgraph root.1_inports[ ]
+style root.1_inports fill:none,stroke:none
+root.1lhs[lhs]
+root.1rhs[rhs]
+end
+subgraph root.1_outports[ ]
+style root.1_outports fill:none,stroke:none
+root.1output[output]
+end
+end
+root.1_rhs_FakeConstantout((90.00))
+subgraph root.2[<center>Alerter<br/>Too many inflight requests/...</center>]
+subgraph root.2_inports[ ]
+style root.2_inports fill:none,stroke:none
+root.2signal[signal]
+end
+end
+root.0accept_percentage --> |ACCEPT_PERCENTAGE| root.1lhs
+root.0_max_concurrency_FakeConstantout --> root.0max_concurrency
+root.1output --> |ACCEPT_PERCENTAGE_ALERT| root.2signal
+root.1_rhs_FakeConstantout --> root.1rhs

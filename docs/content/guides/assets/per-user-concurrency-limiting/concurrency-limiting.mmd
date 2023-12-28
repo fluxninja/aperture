@@ -1,0 +1,15 @@
+flowchart RL
+classDef TokenCounter fill:#F8773D,stroke:#000000,stroke-width:2px;
+classDef Service fill:#56AE89,stroke:#000000,stroke-width:2px;
+
+subgraph Aperture_Cloud ["Aperture Cloud"]
+TB[\Token Counter/]
+class TB TokenCounter
+end
+class Aperture_Cloud Service
+
+TB <-- "counting tokens" --> SDK
+
+  subgraph "SDK"
+  end
+  class SDK Service

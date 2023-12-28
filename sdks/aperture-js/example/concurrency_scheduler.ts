@@ -1,17 +1,27 @@
 import {ApertureClient} from "@fluxninja/aperture-js";
-import grpc from "@grpc/grpc-js";
+
+import inquirer from 'inquirer';
 
 async function initializeApertureClient() {
-  const address = process.env.APERTURE_AGENT_ADDRESS || "localhost:8080";
-  const apiKey = process.env.APERTURE_API_KEY || "";
+    const answers = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'address',
+            message: 'Enter your organization\'s address:',
+        },
+        {
+            type: 'input',
+            name: 'apiKey',
+            message: 'Enter the API key:',
+        },
+    ]);
 
-  const apertureClient = new ApertureClient({
-    address: address,
-    apiKey: apiKey,
-    channelCredentials: grpc.credentials.createInsecure(),
-  });
+    const apertureClient = new ApertureClient({
+        address: answers.address,
+        apiKey: answers.apiKey,
+    });
 
-  return apertureClient;
+    return apertureClient;
 }
 
 // Define user tiers and associated priorities
@@ -35,7 +45,7 @@ async function sendRequestForTier(
       labels: {
         user_id: "some_user_id",
         priority: priority.toString(),
-        tier: tier,
+        workload: tier,
       },
       grpcCallOptions: {
         deadline: Date.now() + 120000, // ms
@@ -51,7 +61,7 @@ async function sendRequestForTier(
     console.log(`[${tier} Tier] Request rejected. Priority was ${priority}.`);
   }
 
-  await flow.end();
+  flow.end();
   // END: CSStartFlow
 }
 
