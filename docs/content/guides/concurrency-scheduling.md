@@ -113,8 +113,7 @@ request or queue a less urgent one when approaching API limits. The duration a
 request remains in the queue is determined by the gRPC deadline, set within the
 `startFlow` call. Setting this deadline to `120000` milliseconds, for example,
 indicates that the request can be queued for a maximum of 2 minutes. After this
-interval, the request will either be processed or discarded, depending on its
-position in the queue.
+interval, the request will be rejected.
 
 In this example, we're only tracking and logging requests sent to Aperture.
 However, once the `startFlow` call is made, business logic can be executed
@@ -133,9 +132,9 @@ directly, as excess requests are queued, eliminating the need to check if a flow
 </Tabs>
 ```
 
-It is important to make the `end` call made after processing each request, in
-order to send telemetry data that would provide granular visibility for each
-flow.
+It is important to make the `end` call after processing each request, to remove
+in-flight requests and send telemetry data that would provide granular
+visibility for each flow.
 
 ## Create a Concurrency Scheduling Policy
 
@@ -223,18 +222,20 @@ in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the
 
 Once you've clicked on the policy, you will see the following dashboard:
 
-![Workload](./assets/managing-quotas/workloads.png)
+![Workload](./assets/concurrency-scheduling/workloads.png)
 
 The two panels above provide insights into how the policy is performing by
 monitoring the number of accepted and rejected requests along with the
 acceptance percentage.
 
-![Request](./assets/managing-quotas/request-metrics.png)
+![Request](./assets/concurrency-scheduling/request-metrics.png)
 
 The panels above offer insights into the request details, including their
 latency.
 
-![Queue](./assets/managing-quotas/queue.png)
+![Queue](./assets/concurrency-scheduling/queue.png)
 
 These panels display insights into queue duration for `workload` requests and
 highlight the average of prioritized requests that moved ahead in the queue.
+Preemption for each token is measured as the average number of tokens a request
+belonging to a specific workload gets preempted in the queue.
