@@ -130,7 +130,7 @@ async function UIWorkload(apertureClient: ApertureClient, tier: string, priority
 
 async function UIConcurrencyTokens(apertureClient: ApertureClient, tier: string, priority: number) {
     // START: UIConcurrencyTokens
-    const flow = await apertureClient.startFlow("rate-limiting-feature", {
+    const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
         labels: {
           user_id: "user1",
           tier: "premium",
