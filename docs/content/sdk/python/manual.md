@@ -12,6 +12,11 @@ keywords:
   - manual
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 [Aperture Python SDK][pythonsdk] can be used to define feature control points
 within a Python service.
 
