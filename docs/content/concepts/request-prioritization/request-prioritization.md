@@ -1,6 +1,6 @@
 ---
-title: Advanced
-sidebar_position: 10
+title: Request Prioritization
+sidebar_position: 8
 ---
 
 ```mdx-code-block

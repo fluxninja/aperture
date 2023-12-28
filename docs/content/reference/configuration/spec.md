@@ -5653,7 +5653,8 @@ active service protection
 
 :::info
 
-See also [_Load Scheduler_ overview](/concepts/scheduler/load-scheduler.md).
+See also
+[_Load Scheduler_ overview](/concepts/request-prioritization/load-scheduler.md).
 
 :::
 
@@ -8878,7 +8879,7 @@ workloads, the first matching one will be used. If none of workloads match,
 :::info
 
 See also
-[workload definition in the concepts section](/concepts/scheduler/scheduler.md#workload).
+[workload definition in the concepts section](/concepts/scheduler.md#workload).
 
 :::
 

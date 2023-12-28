@@ -297,7 +297,7 @@ label_matcher:
 
 [label]: ./flow-label.md
 [flux-meter]: ./advanced/flux-meter.md
-[load-scheduler]: ./scheduler/load-scheduler.md
+[load-scheduler]: ./request-prioritization/load-scheduler.md
 [classifier]: ./advanced/classifier.md
 [label-matcher]: /reference/configuration/spec.md#label-matcher
 [gateway]: /aperture-for-infra/integrations/gateway/gateway.md
