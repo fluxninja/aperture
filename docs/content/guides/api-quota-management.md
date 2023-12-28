@@ -1,6 +1,6 @@
 ---
 title: API Quota Management
-sidebar_position: 2
+sidebar_position: 4
 keywords:
   - api quota management
   - guides

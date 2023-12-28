@@ -110,7 +110,7 @@ async function sendRequest(apertureClient: ApertureClient) {
     console.log("Request rejected due to concurrency limit. Try again later.");
   }
 
-  flow.end();
+  await flow.end();
 }
 
 async function handleConcurrencyLimit(apertureClient: ApertureClient) {

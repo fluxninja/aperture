@@ -127,3 +127,19 @@ async function UIWorkload(apertureClient: ApertureClient, tier: string, priority
     });
     // END: UIQSWorkload
 }
+
+async function UIConcurrencyTokens(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: UIConcurrencyTokens
+    const flow = await apertureClient.startFlow("rate-limiting-feature", {
+        labels: {
+          user_id: "user1",
+          tier: "premium",
+          tokens: "50",
+
+        },
+        grpcCallOptions: {
+          deadline: Date.now() + 300, // 300ms deadline
+        },
+      });
+    // END: UIConcurrencyTokens
+}
