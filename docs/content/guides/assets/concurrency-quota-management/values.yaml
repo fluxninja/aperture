@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../../../../blueprints/concurrency-scheduling/base/gen/definitions.json
+blueprint: concurrency-scheduling/base
+uri: ../../../../../blueprints
+policy:
+  policy_name: "concurrency-scheduling-test"
+  components: []
+  concurrency_scheduler:
+    alerter:
+      alert_name: "Too many inflight requests"
+    concurrency_limiter:
+      limit_by_label_key: "user_id"
+      max_inflight_duration: "60s"
+    max_concurrency: 20
+    scheduler:
+      priority_label_key: "priority"
+      tokens_label_key: "tokens"
+      workload_label_key: "workload"
+    selectors:
+      - control_point: "concurrency-scheduling-feature"
+  resources:
+    flow_control:
+      classifiers: []
