@@ -1,8 +1,9 @@
 ---
-title: Concurrency Scheduling
+title: Concurrency Quota Management
 sidebar_position: 5
 keywords:
   - concurrency scheduling
+  - concurrency quota management
   - guides
   - external API
   - prioritization
@@ -29,9 +30,10 @@ blueprint.
 
 ## Overview
 
-Concurrency Scheduling is a sophisticated technique that allows effective
-management of concurrent requests. With this technique services can limit the
-number of concurrent API calls to alleviate the load on the system.
+Concurrency quota management, also called concurrency scheduling, is a
+sophisticated technique that allows effective management of concurrent requests.
+With this technique services can limit the number of concurrent API calls to
+alleviate the load on the system.
 
 When service limits are reached, Aperture Cloud can queue incoming requests and
 serve them according to their priority, which is determined by business-critical
