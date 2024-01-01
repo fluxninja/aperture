@@ -27,7 +27,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
@@ -77,10 +77,10 @@ var _ = Describe("Tests for containerSecurityContext", func() {
 			}
 
 			expected := &corev1.SecurityContext{
-				RunAsUser:              pointer.Int64(0),
-				RunAsGroup:             pointer.Int64(0),
-				RunAsNonRoot:           pointer.Bool(false),
-				ReadOnlyRootFilesystem: pointer.Bool(false),
+				RunAsUser:              ptr.To[int64](0),
+				RunAsGroup:             ptr.To[int64](0),
+				RunAsNonRoot:           ptr.To(false),
+				ReadOnlyRootFilesystem: ptr.To(false),
 			}
 
 			result := ContainerSecurityContext(instance.Spec.ContainerSecurityContext)
@@ -129,7 +129,7 @@ var _ = Describe("Tests for podSecurityContext", func() {
 			}
 
 			expected := &corev1.PodSecurityContext{
-				FSGroup: pointer.Int64(1001),
+				FSGroup: ptr.To[int64](1001),
 			}
 
 			result := PodSecurityContext(instance.Spec.PodSecurityContext)
@@ -641,7 +641,7 @@ var _ = Describe("Tests for agentEnv", func() {
 								Name: Test,
 							},
 							Key:      Test,
-							Optional: pointer.Bool(false),
+							Optional: ptr.To(false),
 						},
 					},
 				},
@@ -781,7 +781,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 					Name: "aperture-agent-config",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: AgentServiceName,
 							},
@@ -827,7 +827,7 @@ var _ = Describe("Tests for agentVolumes", func() {
 					Name: "aperture-agent-config",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: AgentServiceName,
 							},
@@ -887,7 +887,7 @@ var _ = Describe("Tests for controllerEnv", func() {
 								Name: Test,
 							},
 							Key:      Test,
-							Optional: pointer.Bool(false),
+							Optional: ptr.To(false),
 						},
 					},
 				},
@@ -1028,7 +1028,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					Name: "aperture-controller-config",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: ControllerServiceName,
 							},
@@ -1039,7 +1039,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 						},
 					},
@@ -1083,7 +1083,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					Name: "aperture-controller-config",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: ControllerServiceName,
 							},
@@ -1094,7 +1094,7 @@ var _ = Describe("Tests for controllerVolumes", func() {
 					Name: "server-cert",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							DefaultMode: pointer.Int32(420),
+							DefaultMode: ptr.To[int32](420),
 							SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 						},
 					},

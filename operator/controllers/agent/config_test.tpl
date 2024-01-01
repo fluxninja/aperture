@@ -281,3 +281,9 @@ object_storage:
   bucket: list
   key_prefix: asdf
   operations_channel_size: 1000
+  retry_policy:
+    timeout: 10s
+    backoff:
+      initial: 0.500s
+      multiplier: 1.5
+      maximum: 2s

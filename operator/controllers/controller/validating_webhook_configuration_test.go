@@ -24,7 +24,7 @@ import (
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/fluxninja/aperture/v2/operator/api/common"
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
@@ -77,8 +77,8 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.String(PolicyValidatingWebhookURI),
-								Port:      pointer.Int32(8080),
+								Path:      ptr.To(PolicyValidatingWebhookURI),
+								Port:      ptr.To[int32](8080),
 							},
 							CABundle: []byte(Test),
 						},
@@ -101,7 +101,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}
@@ -163,8 +163,8 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      ControllerServiceName,
 								Namespace: instance.GetNamespace(),
-								Path:      pointer.String(PolicyValidatingWebhookURI),
-								Port:      pointer.Int32(80),
+								Path:      ptr.To(PolicyValidatingWebhookURI),
+								Port:      ptr.To[int32](80),
 							},
 							CABundle: []byte(Test),
 						},
@@ -187,7 +187,7 @@ var _ = Describe("ValidatingWebhookConfiguration for Controller", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}
@@ -221,7 +221,7 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32(10),
+					TimeoutSeconds: ptr.To[int32](10),
 				},
 			},
 		}

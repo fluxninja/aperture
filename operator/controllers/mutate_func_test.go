@@ -25,7 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("Test ClusterRole Mutate", func() {
@@ -104,7 +104,7 @@ var _ = Describe("Test MutatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32(10),
+					TimeoutSeconds: ptr.To[int32](10),
 				},
 			},
 		}
@@ -144,7 +144,7 @@ var _ = Describe("Test ServiceAccount Mutate", func() {
 	It("Mutate should update required fields only", func() {
 		expected := &corev1.ServiceAccount{
 			ObjectMeta:                   metav1.ObjectMeta{},
-			AutomountServiceAccountToken: pointer.Bool(true),
+			AutomountServiceAccountToken: ptr.To(true),
 		}
 
 		sa := &corev1.ServiceAccount{}
@@ -201,7 +201,7 @@ var _ = Describe("Test ValidatingWebhookConfiguration Mutate", func() {
 					},
 					FailurePolicy:  &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Ignore}[0],
 					SideEffects:    &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassSome}[0],
-					TimeoutSeconds: pointer.Int32(10),
+					TimeoutSeconds: ptr.To[int32](10),
 				},
 			},
 		}
