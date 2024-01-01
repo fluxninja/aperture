@@ -153,7 +153,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.90.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver v0.90.0
 	github.com/prometheus/alertmanager v0.26.0
-	github.com/prometheus/client_golang v1.17.0
+	github.com/prometheus/client_golang v1.18.0
 	github.com/prometheus/common v0.45.0
 	github.com/prometheus/prometheus v0.48.0
 	github.com/reugn/go-quartz v0.7.0
