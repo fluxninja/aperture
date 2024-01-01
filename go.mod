@@ -584,7 +584,7 @@ require (
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/linode/linodego v1.23.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20220913051719-115f729f3c8c // indirect
-	github.com/lukejoshuapark/infchan v1.0.0
+	github.com/lukejoshuapark/infchan v1.2.0
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
