@@ -31,7 +31,7 @@ require (
 	github.com/gofrs/flock v0.8.1
 	github.com/golang/mock v1.6.0
 	github.com/google/go-jsonnet v0.20.0
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
@@ -54,7 +54,7 @@ require (
 	github.com/natefinch/atomic v1.0.1
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
-	github.com/open-policy-agent/opa v0.58.0
+	github.com/open-policy-agent/opa v0.60.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.90.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v0.90.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.90.0
@@ -196,7 +196,7 @@ require (
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e
 	golang.org/x/net v0.19.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231127180814-3a041ad873d4
-	google.golang.org/grpc v1.59.0
+	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
@@ -643,7 +643,7 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0
-	golang.org/x/time v0.4.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/api v0.151.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
