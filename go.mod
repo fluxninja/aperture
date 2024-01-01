@@ -25,8 +25,8 @@ require (
 	github.com/getsentry/sentry-go v0.24.1
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-logr/zerologr v1.2.3
-	github.com/go-openapi/runtime v0.26.0
-	github.com/go-openapi/strfmt v0.21.7
+	github.com/go-openapi/runtime v0.26.2
+	github.com/go-openapi/strfmt v0.21.8
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gofrs/flock v0.8.1
 	github.com/golang/mock v1.6.0
@@ -299,9 +299,9 @@ require (
 	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/errors v0.20.4 // indirect
 	github.com/go-openapi/loads v0.21.2 // indirect
-	github.com/go-openapi/spec v0.20.9 // indirect
+	github.com/go-openapi/spec v0.20.11 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
-	github.com/go-openapi/validate v0.22.1 // indirect
+	github.com/go-openapi/validate v0.22.3 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -458,7 +458,7 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.mongodb.org/atlas v0.35.0 // indirect
-	go.mongodb.org/mongo-driver v1.13.0 // indirect
+	go.mongodb.org/mongo-driver v1.13.1 // indirect
 	go.opentelemetry.io/collector v0.90.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.90.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v0.90.0 // indirect
