@@ -26,7 +26,7 @@ require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-openapi/runtime v0.26.2
-	github.com/go-openapi/strfmt v0.21.8
+	github.com/go-openapi/strfmt v0.22.0
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gofrs/flock v0.8.1
 	github.com/golang/mock v1.6.0
@@ -297,7 +297,7 @@ require (
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/zapr v1.2.4 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
-	github.com/go-openapi/errors v0.20.4 // indirect
+	github.com/go-openapi/errors v0.21.0 // indirect
 	github.com/go-openapi/loads v0.21.2 // indirect
 	github.com/go-openapi/spec v0.20.11 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
