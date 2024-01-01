@@ -24,7 +24,7 @@ import (
 
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 // agentMutatingWebhookConfiguration prepares the MutatingWebhookConfiguration object for the Operator to mutate Agents, based on the provided parameter.
@@ -53,8 +53,8 @@ func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebho
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.String(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI)),
-						Port:      pointer.Int32(443),
+						Path:      ptr.To(fmt.Sprintf("/%s", controllers.AgentMutatingWebhookURI)),
+						Port:      ptr.To[int32](443),
 					},
 				},
 				NamespaceSelector: &v1.LabelSelector{},
@@ -72,7 +72,7 @@ func agentMutatingWebhookConfiguration() (*admissionregistrationv1.MutatingWebho
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32(10),
+				TimeoutSeconds:          ptr.To[int32](10),
 			},
 		},
 	}
@@ -106,8 +106,8 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.String(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI)),
-						Port:      pointer.Int32(443),
+						Path:      ptr.To(fmt.Sprintf("/%s", controllers.ControllerMutatingWebhookURI)),
+						Port:      ptr.To[int32](443),
 					},
 				},
 				NamespaceSelector: &v1.LabelSelector{},
@@ -125,7 +125,7 @@ func controllerMutatingWebhookConfiguration() (*admissionregistrationv1.Mutating
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32(10),
+				TimeoutSeconds:          ptr.To[int32](10),
 			},
 		},
 	}

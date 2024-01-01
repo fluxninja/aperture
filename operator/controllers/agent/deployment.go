@@ -28,7 +28,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -76,7 +76,7 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 			Annotations: spec.Annotations,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: pointer.Int32(spec.DeploymentConfigSpec.Replicas),
+			Replicas: ptr.To[int32](spec.DeploymentConfigSpec.Replicas),
 			Selector: &v1.LabelSelector{
 				MatchLabels: controllers.SelectorLabels(instance.GetName(), controllers.AgentServiceName),
 			},
@@ -95,7 +95,7 @@ func deploymentForAgent(instance *agentv1alpha1.Agent, log logr.Logger, scheme *
 					Affinity:                      spec.Affinity,
 					Tolerations:                   spec.Tolerations,
 					SecurityContext:               controllers.PodSecurityContext(spec.PodSecurityContext),
-					TerminationGracePeriodSeconds: pointer.Int64(spec.TerminationGracePeriodSeconds),
+					TerminationGracePeriodSeconds: ptr.To[int64](spec.TerminationGracePeriodSeconds),
 					InitContainers:                spec.InitContainers,
 					Containers: []corev1.Container{
 						{

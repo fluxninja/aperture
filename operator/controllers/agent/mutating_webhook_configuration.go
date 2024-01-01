@@ -24,7 +24,7 @@ import (
 
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 )
@@ -51,8 +51,8 @@ func podMutatingWebhookConfiguration(instance *agentv1alpha1.Agent) (*admissionr
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      os.Getenv("APERTURE_OPERATOR_SERVICE_NAME"),
 						Namespace: os.Getenv("APERTURE_OPERATOR_NAMESPACE"),
-						Path:      pointer.String(controllers.MutatingWebhookURI),
-						Port:      pointer.Int32(443),
+						Path:      ptr.To(controllers.MutatingWebhookURI),
+						Port:      ptr.To[int32](443),
 					},
 				},
 				NamespaceSelector: &v1.LabelSelector{
@@ -78,7 +78,7 @@ func podMutatingWebhookConfiguration(instance *agentv1alpha1.Agent) (*admissionr
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32(10),
+				TimeoutSeconds:          ptr.To[int32](10),
 			},
 		},
 	}

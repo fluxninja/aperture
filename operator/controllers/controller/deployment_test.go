@@ -28,7 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	controller "github.com/fluxninja/aperture/v2/cmd/aperture-controller/config"
 	. "github.com/fluxninja/aperture/v2/operator/controllers"
@@ -151,8 +151,8 @@ var _ = Describe("Controller Deployment", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
+							Controller:         ptr.To(true),
+							BlockOwnerDeletion: ptr.To(true),
 						},
 					},
 					Annotations: nil,
@@ -260,7 +260,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "aperture-controller-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: ControllerServiceName,
 											},
@@ -271,7 +271,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "server-cert",
 									VolumeSource: corev1.VolumeSource{
 										Secret: &corev1.SecretVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 										},
 									},
@@ -413,8 +413,8 @@ var _ = Describe("Controller Deployment", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Controller",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
+							Controller:         ptr.To(true),
+							BlockOwnerDeletion: ptr.To(true),
 						},
 					},
 					Annotations: TestMap,
@@ -452,9 +452,9 @@ var _ = Describe("Controller Deployment", func() {
 							Affinity:     affinity,
 							Tolerations:  tolerations,
 							SecurityContext: &corev1.PodSecurityContext{
-								FSGroup: pointer.Int64(1001),
+								FSGroup: ptr.To[int64](1001),
 							},
-							TerminationGracePeriodSeconds: pointer.Int64(10),
+							TerminationGracePeriodSeconds: ptr.To[int64](10),
 							InitContainers: []corev1.Container{
 								{
 									Name: Test,
@@ -466,10 +466,10 @@ var _ = Describe("Controller Deployment", func() {
 									Image:           "docker.io/fluxninja/aperture-controller:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64(0),
-										RunAsGroup:             pointer.Int64(0),
-										RunAsNonRoot:           pointer.Bool(false),
-										ReadOnlyRootFilesystem: pointer.Bool(false),
+										RunAsUser:              ptr.To[int64](0),
+										RunAsGroup:             ptr.To[int64](0),
+										RunAsNonRoot:           ptr.To(false),
+										ReadOnlyRootFilesystem: ptr.To(false),
 									},
 									Command: TestArray,
 									Args:    TestArray,
@@ -598,7 +598,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "aperture-controller-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: ControllerServiceName,
 											},
@@ -609,7 +609,7 @@ var _ = Describe("Controller Deployment", func() {
 									Name: "server-cert",
 									VolumeSource: corev1.VolumeSource{
 										Secret: &corev1.SecretVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 										},
 									},
@@ -650,7 +650,7 @@ var _ = Describe("Test Deployment Mutate", func() {
 						Tolerations:               []corev1.Toleration{},
 						TopologySpreadConstraints: []corev1.TopologySpreadConstraint{},
 						SecurityContext: &corev1.PodSecurityContext{
-							FSGroup: pointer.Int64(1001),
+							FSGroup: ptr.To[int64](1001),
 						},
 						InitContainers: []corev1.Container{},
 						Containers: []corev1.Container{
