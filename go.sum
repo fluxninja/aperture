@@ -1310,8 +1310,8 @@ github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i
 github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0/go.mod h1:zJYVVT2jmtg6P3p1VtQj7WsuWi/y4VnjVBn7F8KPB3I=
 github.com/lufia/plan9stats v0.0.0-20220913051719-115f729f3c8c h1:VtwQ41oftZwlMnOEbMWQtSEUgU64U4s+GHk7hZK+jtY=
 github.com/lufia/plan9stats v0.0.0-20220913051719-115f729f3c8c/go.mod h1:JKx41uQRwqlTZabZc+kILPrO/3jlKnQ2Z8b7YiVw5cE=
-github.com/lukejoshuapark/infchan v1.0.0 h1:LJddhQY0oKxFsVIs1zHI4aFyCxUMBw1BF9HOnZTKVWI=
-github.com/lukejoshuapark/infchan v1.0.0/go.mod h1:QPONMXuCA/kxcwvaCr7sf3SPtzkbohr+sSjdzsXLcpU=
+github.com/lukejoshuapark/infchan v1.2.0 h1:/uXN7El0HKG9I9PBTNAbg5NP8qpGcWz9OgGKzW2Gjjk=
+github.com/lukejoshuapark/infchan v1.2.0/go.mod h1:QPONMXuCA/kxcwvaCr7sf3SPtzkbohr+sSjdzsXLcpU=
 github.com/lukejoshuapark/test v1.0.4 h1:WacF0qpxET/ueRWar9hvjh7m1xyKz+ZAbPSDWiif5+k=
 github.com/lukejoshuapark/test v1.0.4/go.mod h1:aL/NFkmy+G4US2C+KgWjpToW8cz3WfeDHL120BxJmAM=
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
