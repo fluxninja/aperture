@@ -39,6 +39,7 @@ async function sendRequestForTier(
 ) {
   console.log(`[${tier} Tier] Sending request with priority ${priority}...`);
   // START: CSStartFlow
+  // START: UICS
   const flow = await apertureClient.startFlow(
     "concurrency-scheduling-feature",
     {
@@ -52,6 +53,7 @@ async function sendRequestForTier(
       },
     },
   );
+  // END: UICS
 
   if (flow.shouldRun()) {
     console.log(`[${tier} Tier] Request accepted with priority ${priority}.`);

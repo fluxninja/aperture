@@ -143,3 +143,87 @@ async function UIConcurrencyTokens(apertureClient: ApertureClient, tier: string,
       });
     // END: UIConcurrencyTokens
 }
+
+async function UIConcurrencySchedulingTokens(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: UICSTokens
+    const flow = await apertureClient.startFlow("concurrency-scheduling-feature", {
+        labels: {
+          user_id: "user1",
+          tier: "premium",
+          tokens: "50",
+
+        },
+        grpcCallOptions: {
+          deadline: Date.now() + 300, // 300ms deadline
+        },
+      });
+    // END: UICSTokens
+}
+
+async function UICSWorkload(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: UICSWorkload
+    let userWorkload = "subscriber";
+    const flow = await apertureClient.startFlow("concurrency-scheduling-feature", {
+        labels: {
+            user_id: "some_user_id",
+            product_tier: "trial",
+            priority: priority.toString(),
+            workload: userWorkload,
+        },
+        grpcCallOptions: {
+            deadline: Date.now() + 2000, // ms
+        },
+    });
+    // END: UICSWorkload
+}
+
+async function CSPriority(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: CSPriority
+    const userPriority = userTiers[tier] || 1;
+
+    const flow = await apertureClient.startFlow("concurrency-scheduling-feature", {
+        labels: {
+            user_id: "some_user_id",
+            priority: userPriority.toString(),
+            workload: `${tier} user`,
+        },
+        grpcCallOptions: {
+            deadline: Date.now() + 120000, // ms
+        },
+    });
+    console.log(`Request sent for ${tier} tier with priority ${userPriority}.`);
+    flow.end();
+    // END: CSPriority
+}
+
+async function UICLLabelMatcher(apertureClient: ApertureClient){
+    // START: UICLLabelMatcher
+    const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
+        labels: {
+            user_id: "user1",
+            customer_tier: "gold",
+            product_tier: "trial",
+          },
+        grpcCallOptions: {
+            deadline: Date.now() + 300, // ms
+        },
+    });
+    // END: UICLLabelMatcher
+
+}
+
+async function UICSLabelMatcher(apertureClient: ApertureClient){
+    // START: UICSLabelMatcher
+    const flow = await apertureClient.startFlow("concurrency-scheduling-feature", {
+        labels: {
+            user_id: "user1",
+            customer_tier: "gold",
+            product_tier: "trial",
+          },
+        grpcCallOptions: {
+            deadline: Date.now() + 300, // ms
+        },
+    });
+    // END: UICSLabelMatcher
+
+}
