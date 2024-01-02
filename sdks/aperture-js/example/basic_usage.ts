@@ -130,7 +130,6 @@ async function handleConcurrencyLimit(apertureClient: ApertureClient) {
 }
 // END: handleConcurrencyLimit
 
-// START: handleConcurrencyScheduler
 // Define user tiers and associated priorities
 const userTiers = {
   platinum: 8,
@@ -139,6 +138,7 @@ const userTiers = {
   free: 1,
 };
 
+// START: handleConcurrencyScheduler
 async function sendRequestForTier(
   apertureClient: ApertureClient,
   tier: string,
@@ -188,5 +188,4 @@ async function handleConcurrencyScheduler(apertureClient: ApertureClient) {
     await new Promise((resolve) => setTimeout(resolve, batchInterval));
   }
 }
-
 // END: handleConcurrencyScheduler
