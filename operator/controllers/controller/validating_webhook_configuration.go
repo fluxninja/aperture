@@ -20,7 +20,7 @@ import (
 	"github.com/fluxninja/aperture/v2/operator/controllers"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	controllerv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/controller/v1alpha1"
 )
@@ -42,8 +42,8 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 					Service: &admissionregistrationv1.ServiceReference{
 						Name:      controllers.ControllerResourcesName(instance),
 						Namespace: instance.GetNamespace(),
-						Path:      pointer.String(controllers.PolicyValidatingWebhookURI),
-						Port:      pointer.Int32(serverPort),
+						Path:      ptr.To(controllers.PolicyValidatingWebhookURI),
+						Port:      ptr.To[int32](serverPort),
 					},
 					CABundle: cert,
 				},
@@ -66,7 +66,7 @@ func validatingWebhookConfiguration(instance *controllerv1alpha1.Controller, cer
 				AdmissionReviewVersions: []string{controllers.V1Version},
 				FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 				SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-				TimeoutSeconds:          pointer.Int32(10),
+				TimeoutSeconds:          ptr.To[int32](10),
 			},
 		},
 	}

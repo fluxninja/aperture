@@ -23,7 +23,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -53,8 +53,8 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      "agent-defaulter.fluxninja.com",
 								Namespace: Test,
-								Path:      pointer.String("/agent-defaulter"),
-								Port:      pointer.Int32(443),
+								Path:      ptr.To("/agent-defaulter"),
+								Port:      ptr.To[int32](443),
 							},
 						},
 						NamespaceSelector: &v1.LabelSelector{},
@@ -73,7 +73,7 @@ var _ = Describe("MutatingWebhookConfiguration controller", Ordered, func() {
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						MatchPolicy:             &[]admissionregistrationv1.MatchPolicyType{admissionregistrationv1.Equivalent}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}

@@ -42,7 +42,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/rest"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -57,10 +57,10 @@ func ContainerSecurityContext(containerSecurityContext common.ContainerSecurityC
 	var securityContext *corev1.SecurityContext
 	if containerSecurityContext.Enabled {
 		securityContext = &corev1.SecurityContext{
-			RunAsUser:              pointer.Int64(containerSecurityContext.RunAsUser),
-			RunAsNonRoot:           pointer.Bool(containerSecurityContext.RunAsNonRootUser),
-			ReadOnlyRootFilesystem: pointer.Bool(containerSecurityContext.ReadOnlyRootFilesystem),
-			RunAsGroup:             pointer.Int64(containerSecurityContext.RunAsGroup),
+			RunAsUser:              ptr.To[int64](containerSecurityContext.RunAsUser),
+			RunAsNonRoot:           ptr.To(containerSecurityContext.RunAsNonRootUser),
+			ReadOnlyRootFilesystem: ptr.To(containerSecurityContext.ReadOnlyRootFilesystem),
+			RunAsGroup:             ptr.To[int64](containerSecurityContext.RunAsGroup),
 		}
 	} else {
 		securityContext = &corev1.SecurityContext{}
@@ -74,7 +74,7 @@ func PodSecurityContext(podSecurityContext common.PodSecurityContext) *corev1.Po
 	var securityContext *corev1.PodSecurityContext
 	if podSecurityContext.Enabled {
 		securityContext = &corev1.PodSecurityContext{
-			FSGroup: pointer.Int64(podSecurityContext.FsGroup),
+			FSGroup: ptr.To[int64](podSecurityContext.FsGroup),
 		}
 	} else {
 		securityContext = &corev1.PodSecurityContext{}
@@ -254,7 +254,7 @@ func AgentEnv(instance *agentv1alpha1.Agent, agentGroup string) []corev1.EnvVar 
 						Name: SecretName(instance.GetName(), "agent", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
 					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
-					Optional: pointer.Bool(false),
+					Optional: ptr.To(false),
 				},
 			},
 		})
@@ -291,7 +291,7 @@ func AgentVolumes(instance *agentv1alpha1.Agent) []corev1.Volume {
 			Name: "aperture-agent-config",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
+					DefaultMode: ptr.To[int32](420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: AgentResourceName(instance),
 					},
@@ -305,7 +305,7 @@ func AgentVolumes(instance *agentv1alpha1.Agent) []corev1.Volume {
 			Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
+					DefaultMode: ptr.To[int32](420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: agentSpec.ControllerClientCertConfig.ConfigMapName,
 					},
@@ -346,7 +346,7 @@ func ControllerEnv(instance *controllerv1alpha1.Controller) []corev1.EnvVar {
 						Name: SecretName(instance.GetName(), "controller", &instance.Spec.Secrets.FluxNinjaExtension),
 					},
 					Key:      SecretDataKey(&instance.Spec.Secrets.FluxNinjaExtension.SecretKeyRef),
-					Optional: pointer.Bool(false),
+					Optional: ptr.To(false),
 				},
 			},
 		})
@@ -379,7 +379,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "aperture-controller-config",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
-					DefaultMode: pointer.Int32(420),
+					DefaultMode: ptr.To[int32](420),
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: ControllerResourcesName(instance),
 					},
@@ -390,7 +390,7 @@ func ControllerVolumes(instance *controllerv1alpha1.Controller) []corev1.Volume 
 			Name: "server-cert",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					DefaultMode: pointer.Int32(420),
+					DefaultMode: ptr.To[int32](420),
 					SecretName:  fmt.Sprintf("%s-controller-cert", instance.GetName()),
 				},
 			},

@@ -27,7 +27,7 @@ import (
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
@@ -63,8 +63,8 @@ var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.String("/agent-defaulter"),
-								Port:      pointer.Int32(443),
+								Path:      ptr.To("/agent-defaulter"),
+								Port:      ptr.To[int32](443),
 							},
 							CABundle: serverCertPEM.Bytes(),
 						},
@@ -83,7 +83,7 @@ var _ = Describe("MutatingWebhookConfiguration for Agent CR", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}
@@ -131,8 +131,8 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.String("/controller-defaulter"),
-								Port:      pointer.Int32(443),
+								Path:      ptr.To("/controller-defaulter"),
+								Port:      ptr.To[int32](443),
 							},
 							CABundle: serverCertPEM.Bytes(),
 						},
@@ -151,7 +151,7 @@ var _ = Describe("MutatingWebhookConfiguration for Controller CR", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}

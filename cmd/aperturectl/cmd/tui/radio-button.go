@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 type radioButtonModel struct {
@@ -20,7 +20,7 @@ type optionMsg int
 func InitialRadioButtonModel(options []string, msg string) *radioButtonModel {
 	return &radioButtonModel{
 		options:  options,
-		Selected: pointer.Int(0),
+		Selected: ptr.To(0),
 		msg:      msg,
 	}
 }

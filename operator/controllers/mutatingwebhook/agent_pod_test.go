@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
@@ -247,8 +247,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "auto",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:  pointer.Int64(1000),
-					RunAsGroup: pointer.Int64(1000),
+					RunAsUser:  ptr.To[int64](1000),
+					RunAsGroup: ptr.To[int64](1000),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -277,8 +277,8 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:  pointer.Int64(1000),
-					RunAsGroup: pointer.Int64(1000),
+					RunAsUser:  ptr.To[int64](1000),
+					RunAsGroup: ptr.To[int64](1000),
 				},
 				Command: TestArray,
 				Args:    TestArray,
@@ -478,10 +478,10 @@ var _ = Describe("Sidecar container for Agent", func() {
 				Image:           "docker.io/fluxninja/aperture-agent:latest",
 				ImagePullPolicy: corev1.PullIfNotPresent,
 				SecurityContext: &corev1.SecurityContext{
-					RunAsUser:              pointer.Int64(0),
-					RunAsGroup:             pointer.Int64(0),
-					RunAsNonRoot:           pointer.Bool(false),
-					ReadOnlyRootFilesystem: pointer.Bool(false),
+					RunAsUser:              ptr.To[int64](0),
+					RunAsGroup:             ptr.To[int64](0),
+					RunAsNonRoot:           ptr.To(false),
+					ReadOnlyRootFilesystem: ptr.To(false),
 				},
 				Command:   TestArray,
 				Args:      TestArray,
@@ -772,7 +772,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32(420),
+									DefaultMode: ptr.To[int32](420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},
@@ -993,7 +993,7 @@ var _ = Describe("Pod modification for Agent", func() {
 							Name: "aperture-agent-config",
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
-									DefaultMode: pointer.Int32(420),
+									DefaultMode: ptr.To[int32](420),
 									LocalObjectReference: corev1.LocalObjectReference{
 										Name: AgentServiceName,
 									},

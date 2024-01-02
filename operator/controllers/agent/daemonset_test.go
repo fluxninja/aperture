@@ -26,7 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	agent "github.com/fluxninja/aperture/v2/cmd/aperture-agent/config"
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
@@ -148,8 +148,8 @@ var _ = Describe("Agent DaemonSet", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
+							Controller:         ptr.To(true),
+							BlockOwnerDeletion: ptr.To(true),
 						},
 					},
 					Annotations: nil,
@@ -174,7 +174,7 @@ var _ = Describe("Agent DaemonSet", func() {
 							NodeSelector:                  nil,
 							Tolerations:                   nil,
 							SecurityContext:               &corev1.PodSecurityContext{},
-							TerminationGracePeriodSeconds: pointer.Int64(0),
+							TerminationGracePeriodSeconds: ptr.To[int64](0),
 							InitContainers:                nil,
 							Containers: []corev1.Container{
 								{
@@ -265,7 +265,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -412,8 +412,8 @@ var _ = Describe("Agent DaemonSet", func() {
 							APIVersion:         "fluxninja.com/v1alpha1",
 							Name:               instance.GetName(),
 							Kind:               "Agent",
-							Controller:         pointer.Bool(true),
-							BlockOwnerDeletion: pointer.Bool(true),
+							Controller:         ptr.To(true),
+							BlockOwnerDeletion: ptr.To(true),
 						},
 					},
 					Annotations: TestMap,
@@ -446,9 +446,9 @@ var _ = Describe("Agent DaemonSet", func() {
 							Affinity:     affinity,
 							Tolerations:  tolerations,
 							SecurityContext: &corev1.PodSecurityContext{
-								FSGroup: pointer.Int64(1001),
+								FSGroup: ptr.To[int64](1001),
 							},
-							TerminationGracePeriodSeconds: pointer.Int64(10),
+							TerminationGracePeriodSeconds: ptr.To[int64](10),
 							InitContainers: []corev1.Container{
 								{
 									Name: Test,
@@ -460,10 +460,10 @@ var _ = Describe("Agent DaemonSet", func() {
 									Image:           "docker.io/fluxninja/aperture-agent:latest",
 									ImagePullPolicy: corev1.PullIfNotPresent,
 									SecurityContext: &corev1.SecurityContext{
-										RunAsUser:              pointer.Int64(0),
-										RunAsGroup:             pointer.Int64(0),
-										RunAsNonRoot:           pointer.Bool(false),
-										ReadOnlyRootFilesystem: pointer.Bool(false),
+										RunAsUser:              ptr.To[int64](0),
+										RunAsGroup:             ptr.To[int64](0),
+										RunAsNonRoot:           ptr.To(false),
+										ReadOnlyRootFilesystem: ptr.To(false),
 									},
 									Command: TestArray,
 									Args:    TestArray,
@@ -606,7 +606,7 @@ var _ = Describe("Agent DaemonSet", func() {
 									Name: "aperture-agent-config",
 									VolumeSource: corev1.VolumeSource{
 										ConfigMap: &corev1.ConfigMapVolumeSource{
-											DefaultMode: pointer.Int32(420),
+											DefaultMode: ptr.To[int32](420),
 											LocalObjectReference: corev1.LocalObjectReference{
 												Name: AgentServiceName,
 											},
@@ -646,7 +646,7 @@ var _ = Describe("Test DaemonSet Mutate", func() {
 						NodeSelector:       map[string]string{},
 						Tolerations:        []corev1.Toleration{},
 						SecurityContext: &corev1.PodSecurityContext{
-							FSGroup: pointer.Int64(1001),
+							FSGroup: ptr.To[int64](1001),
 						},
 						InitContainers: []corev1.Container{},
 						Containers: []corev1.Container{
