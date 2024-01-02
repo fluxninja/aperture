@@ -69,7 +69,7 @@ async function handleRequest(req: Request, res: Response) {
 async function handleRequestRateLimit(req: Request, res: Response) {
   const flow = await apertureClient.startFlow("awesomeFeature", {
     labels: {
-      user_id: "some_user_id",
+      limit_key: "some_user_id",
     },
     grpcCallOptions: {
       deadline: Date.now() + 300, // ms
@@ -93,11 +93,38 @@ async function handleRequestRateLimit(req: Request, res: Response) {
 }
 // END: handleRequestRateLimit
 
+// START: handleQuotaScheduler
+async function handleQuotaScheduler(apertureClient: ApertureClient, tier: string, priority: number) {
+    // START: QSStartFlow
+    const flow = await apertureClient.startFlow("quota-scheduling-feature", {
+        labels: {
+            limit_key: "some_user_id",
+            priority: priority.toString(),
+            workload: `${tier} user`,
+        },
+        grpcCallOptions: {
+            deadline: Date.now() + 120000, // ms
+        },
+    });
+    console.log(`Request sent for ${tier} tier with priority ${priority}.`);
+    flow.end();
+    // END: QSStartFlow
+}
+
+function scheduleRequests(apertureClient: ApertureClient) {
+    Object.entries(userTiers).forEach(([tier, priority]) => {
+        setInterval(() => {
+            handleQuotaScheduler(apertureClient, tier, priority);
+        }, 1000);
+    });
+}
+// END: handleQuotaScheduler
+
 // START: handleConcurrencyLimit
 async function sendRequest(apertureClient: ApertureClient) {
   const flow = await apertureClient.startFlow("concurrency-limiting-feature", {
     labels: {
-      user_id: "some_user_id",
+      limit_key: "some_user_id",
     },
     grpcCallOptions: {
       deadline: Date.now() + 300,
@@ -149,7 +176,7 @@ async function sendRequestForTier(
     "concurrency-scheduling-feature",
     {
       labels: {
-        user_id: "some_user_id",
+        limit_key: "some_user_id",
         priority: priority.toString(),
         tier: tier,
       },
