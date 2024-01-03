@@ -27,7 +27,7 @@ import (
 	. "github.com/onsi/gomega"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	agentv1alpha1 "github.com/fluxninja/aperture/v2/operator/api/agent/v1alpha1"
 	"github.com/fluxninja/aperture/v2/operator/api/common"
@@ -90,8 +90,8 @@ var _ = Describe("MutatingWebhookConfiguration for Pods", func() {
 							Service: &admissionregistrationv1.ServiceReference{
 								Name:      AppName,
 								Namespace: AppName,
-								Path:      pointer.String(MutatingWebhookURI),
-								Port:      pointer.Int32(443),
+								Path:      ptr.To(MutatingWebhookURI),
+								Port:      ptr.To[int32](443),
 							},
 							CABundle: serverCertPEM.Bytes(),
 						},
@@ -118,7 +118,7 @@ var _ = Describe("MutatingWebhookConfiguration for Pods", func() {
 						AdmissionReviewVersions: []string{V1Version},
 						FailurePolicy:           &[]admissionregistrationv1.FailurePolicyType{admissionregistrationv1.Fail}[0],
 						SideEffects:             &[]admissionregistrationv1.SideEffectClass{admissionregistrationv1.SideEffectClassNone}[0],
-						TimeoutSeconds:          pointer.Int32(10),
+						TimeoutSeconds:          ptr.To[int32](10),
 					},
 				},
 			}

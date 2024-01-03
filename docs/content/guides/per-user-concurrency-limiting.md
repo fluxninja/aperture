@@ -1,6 +1,6 @@
 ---
 title: Per-user Concurrency Limiting
-sidebar_position: 1
+sidebar_position: 2
 keywords:
   - guides
   - concurrency limiting

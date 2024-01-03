@@ -1,8 +1,9 @@
 ---
-title: Concurrency Scheduling
-sidebar_position: 2
+title: Concurrency Quota Management
+sidebar_position: 5
 keywords:
   - concurrency scheduling
+  - concurrency quota management
   - guides
   - external API
   - prioritization
@@ -29,9 +30,10 @@ blueprint.
 
 ## Overview
 
-Concurrency Scheduling is a sophisticated technique that allows effective
-management of concurrent requests. With this technique services can limit the
-number of concurrent API calls to alleviate the load on the system.
+Concurrency quota management, also called concurrency scheduling, is a
+sophisticated technique that allows effective management of concurrent requests.
+With this technique services can limit the number of concurrent API calls to
+alleviate the load on the system.
 
 When service limits are reached, Aperture Cloud can queue incoming requests and
 serve them according to their priority, which is determined by business-critical
@@ -40,7 +42,7 @@ labels set in the policy and passed via the SDK.
 <Zoom>
 
 ```mermaid
-{@include: ./assets/concurrency-scheduling/concurrency-scheduling.mmd}
+{@include: ./assets/concurrency-quota-management/concurrency-scheduling.mmd}
 ```
 
 </Zoom>
@@ -177,7 +179,7 @@ scheduling policy:
 Here is how the complete values file would look:
 
 ```yaml
-{@include: ./assets/concurrency-scheduling/values.yaml}
+{@include: ./assets/concurrency-quota-management/values.yaml}
 ```
 
 The last step is to apply the policy using the following command:
@@ -222,18 +224,18 @@ in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the
 
 Once you've clicked on the policy, you will see the following dashboard:
 
-![Workload](./assets/concurrency-scheduling/workloads.png)
+![Workload](./assets/concurrency-quota-management/workloads.png)
 
 The two panels above provide insights into how the policy is performing by
 monitoring the number of accepted and rejected requests along with the
 acceptance percentage.
 
-![Request](./assets/concurrency-scheduling/request-metrics.png)
+![Request](./assets/concurrency-quota-management/request-metrics.png)
 
 The panels above offer insights into the request details, including their
 latency.
 
-![Queue](./assets/concurrency-scheduling/queue.png)
+![Queue](./assets/concurrency-quota-management/queue.png)
 
 These panels display insights into queue duration for `workload` requests and
 highlight the average of prioritized requests that moved ahead in the queue.
