@@ -32,6 +32,12 @@ of in-flight requests across the Agents. If the ledger exceeds the configured
 requests drops below the limit or
 [until timeout](../scheduler.md#queue-timeout).
 
+:::note
+
+Only accepted requests are counted towards the in-flight concurrency.
+
+:::
+
 In a scenario where the maximum concurrency is known upfront, the _Concurrency
 Scheduler_ becomes particularly beneficial to enforce concurrency limits on a
 per-service basis.

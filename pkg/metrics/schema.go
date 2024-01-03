@@ -88,11 +88,11 @@ const (
 	// Cache metrics.
 
 	// CacheLookupHitsTotalMetricName - metric for cumulative number of cache lookup hits.
-	CacheLookupHitsTotalMetricName = "aperture_cache_lookup_hits_total"
+	CacheLookupHitsTotalMetricName = "cache_lookup_hits_total"
 	// CacheLookupMissesTotalMetricName - metric for cumulative number of cache lookup misses.
-	CacheLookupMissesTotalMetricName = "aperture_cache_lookup_misses_total"
+	CacheLookupMissesTotalMetricName = "cache_lookup_misses_total"
 	// CacheOperationResultsTotalMetricName - metric for cumulative number of cache operation results.
-	CacheOperationResultsTotalMetricName = "aperture_cache_operation_results_total"
+	CacheOperationResultsTotalMetricName = "cache_operation_results_total"
 
 	// Workload metrics.
 
@@ -218,17 +218,15 @@ const (
 	AgentGroupLabel = "agent_group"
 	// CacheTypeLabel - label for cache type.
 	CacheTypeLabel = "type"
-	// CacheTypeGlobal - cache type global.
-	CacheTypeGlobal = "global"
-	// CacheTypeResult - cache type result.
-	CacheTypeResult = "result"
 	// CacheOperationTypeLabel - label for type of cache operation.
 	CacheOperationTypeLabel = "operation_type"
 	// CacheOperationTypeLookup - cache lookup operation.
 	CacheOperationTypeLookup = "lookup"
 	// CacheOperationTypeDelete - cache delete operation.
 	CacheOperationTypeDelete = "delete"
-	// CacheOperationStatusLabel - label for cacho operation status.
+	// CacheOperationTypeUpsert - cache upsert operation.
+	CacheOperationTypeUpsert = "upsert"
+	// CacheOperationStatusLabel - label for cache operation status.
 	CacheOperationStatusLabel = "status"
 	// CacheOperationStatusSuccess - cache operation success.
 	CacheOperationStatusSuccess = "success"

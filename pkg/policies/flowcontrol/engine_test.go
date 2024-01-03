@@ -170,7 +170,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).To(BeEmpty())
-			Expect(mmr.schedulers).To(BeEmpty())
+			Expect(mmr.quotaAndLoadSchedulers).To(BeEmpty())
 		})
 
 		It("Return matched Load Schedulers and Flux Meters", func() {
@@ -183,7 +183,7 @@ var _ = Describe("Dataplane Engine", func() {
 
 			mmr := engine.(*Engine).getMatches(controlPoint, svcs, labels)
 			Expect(mmr.fluxMeters).NotTo(BeEmpty())
-			Expect(mmr.schedulers).NotTo(BeEmpty())
+			Expect(mmr.quotaAndLoadSchedulers).NotTo(BeEmpty())
 		})
 	})
 })
