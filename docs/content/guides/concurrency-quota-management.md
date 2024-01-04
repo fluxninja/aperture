@@ -142,6 +142,40 @@ visibility for each flow.
 
 ```mdx-code-block
 <Tabs>
+  <TabItem value="Aperture Cloud UI">
+```
+
+Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
+in the upper right corner. Next, choose the Request Prioritization blueprint,
+and from the drop-down options select Concurrency based. Now, complete the form
+with these specific values:
+
+1. `Policy Name`: Unique for each policy, this field can be used to define
+   policies tailored for different use cases. Set the policy name to
+   `concurrency-scheduling-test`.
+2. `Limit by label key`: Determines the specific label key used for concurrency
+   limits. We'll use `user_id` as an example.
+3. `Max inflight duration`: Configures the time duration after which flow is
+   assumed to have ended in case the end call gets missed. We'll set it to `60s`
+   as an example.
+4. `Max concurrency`: Configures the maximum number of concurrent requests that
+   a service can take. We'll set it to `20` as an example.
+5. `Priority label key`: This field specifies the label that is used to
+   determine the priority. We will leave the label as it is.
+6. `Tokens label key`: This field specifies the label that is used to determine
+   tokens. We will leave the label as it is.
+7. `Workload label key`: This field specifies the label that is used to
+   determine the workload. We will leave the label as it is.
+8. `Control point`: It can be a particular feature or execution block within a
+   service. We'll use `concurrency-scheduling-feature` as an example.
+
+![Concurrency Scheduling Policy](./assets/concurrency-quota-management/concurrency-scheduling-test.png)
+
+Once you've completed these fields, click `Continue` and then `Apply Policy` to
+finalize the policy setup.
+
+```mdx-code-block
+   </TabItem>
   <TabItem value="aperturectl">
 ```
 
