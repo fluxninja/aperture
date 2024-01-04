@@ -3,14 +3,9 @@ import { check, sleep } from "k6";
 import { vu } from "k6/execution";
 import http from "k6/http";
 
-export let vuStages1 = [
+export let vuStages = [
   { duration: "25s", target: 500 },
-  { duration: "20m", target: 10000 },
-];
-
-export let vuStages2 = [
-  { duration: "25s", target: 5000 },
-  { duration: "200m", target: 10000 },
+  { duration: "20m", target: 1000 },
 ];
 
 export let options = {
@@ -18,7 +13,7 @@ export let options = {
   scenarios: {
     guests_api_key1: {
       executor: "ramping-vus",
-      stages: vuStages1,
+      stages: vuStages,
       env: {
         USER_TYPE: "guest",
         API_KEY: "key1",
@@ -26,7 +21,7 @@ export let options = {
     },
     subscribers_api_key1: {
       executor: "ramping-vus",
-      stages: vuStages1,
+      stages: vuStages,
       env: {
         USER_TYPE: "subscriber",
         API_KEY: "key1",
@@ -34,7 +29,7 @@ export let options = {
     },
     guests_api_key2: {
       executor: "ramping-vus",
-      stages: vuStages2,
+      stages: vuStages,
       env: {
         USER_TYPE: "guest",
         API_KEY: "key2",
@@ -42,7 +37,7 @@ export let options = {
     },
     subscribers_api_key2: {
       executor: "ramping-vus",
-      stages: vuStages2,
+      stages: vuStages,
       env: {
         USER_TYPE: "subscriber",
         API_KEY: "key2",
@@ -53,8 +48,8 @@ export let options = {
 
 export default function () {
   let userType = __ENV.USER_TYPE;
-  let apiKey = __ENV.API_KEY;
   let userId = vu.idInTest;
+  let apiKey = __ENV.API_KEY;
   const url = "http://service1-demo-app.demoapp.svc.cluster.local/request";
   const headers = {
     "Content-Type": "application/json",
