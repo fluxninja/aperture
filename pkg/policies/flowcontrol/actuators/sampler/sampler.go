@@ -256,7 +256,7 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 			// remove from data engine
 			err = fr.factory.engineAPI.UnregisterSampler(fr)
 			if err != nil {
-				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
+				logger.Error().Err(err).Msg("Failed to unregister sampler")
 				merr = multierr.Append(merr, err)
 			}
 			// remove decisions notifier
