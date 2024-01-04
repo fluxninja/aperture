@@ -1,6 +1,6 @@
 ---
 title: Cache
-sidebar_position: 7
+sidebar_position: 9
 ---
 
 Aperture's _Cache_ can be used to reduce the load on a service by caching the

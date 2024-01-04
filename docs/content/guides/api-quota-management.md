@@ -1,6 +1,6 @@
 ---
 title: API Quota Management
-sidebar_position: 2
+sidebar_position: 4
 keywords:
   - api quota management
   - guides
@@ -277,3 +277,5 @@ latency.
 
 These panels display insights into queue duration for `workload` requests and
 highlight the average of prioritized requests that moved ahead in the queue.
+Preemption for each token is measured as the average number of tokens a request
+belonging to a specific workload gets preempted in the queue.

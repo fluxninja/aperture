@@ -24,8 +24,23 @@ or configured when integrating with API Gateways or Service Meshes.
 
 To empower Aperture to act at any of the control points, integrations need to be
 installed to be able to interact with the Aperture Agent. Here are the two
-primary types of control points: HTTP/gRPC control points and Feature Control
-Points.
+primary types of control points: Feature control points and HTTP/gRPC control
+points.
+
+### Feature Control Points
+
+Feature control points are facilitated by the [Aperture SDKs](/sdk/sdk.md),
+which are available for various popular programming languages. These SDKs allow
+any function call or code snippet within the service code to be wrapped as a
+feature control point. In Aperture's context, every execution of the feature is
+seen as a flow.
+
+The SDK offers an API to initiate a flow, which corresponds to a
+[`flowcontrol.v1.Check`][flowcontrol-proto] call into the Agent. The response
+from this call comprises a decision on whether to accept or reject the flow. The
+execution of a feature might be gated based on this decision. There is also an
+API to end a flow, which creates an OpenTelemetry span representing the flow and
+dispatches it to the Agent.
 
 ### HTTP/gRPC Control Points
 
@@ -44,21 +59,6 @@ default filter configuration designates `ingress` and `egress` control points as
 identified by
 [PatchContext](https://istio.io/latest/docs/reference/config/networking/envoy-filter/#EnvoyFilter-PatchContext)
 of Istio's EnvoyFilter CRD.
-
-### Feature Control Points
-
-Feature control points are facilitated by the [Aperture SDKs](/sdk/sdk.md),
-which are available for a variety of popular programming languages. These SDKs
-allow any function call or code snippet within the service code to be wrapped as
-a feature control point. In Aperture's context, every execution of the feature
-is seen as a flow.
-
-The SDK offers an API to initiate a flow, which corresponds to a
-[`flowcontrol.v1.Check`][flowcontrol-proto] call into the Agent. The response
-from this call comprises a decision on whether to accept or reject the flow. The
-execution of a feature might be gated based on this decision. There is also an
-API to end a flow, which creates an OpenTelemetry span representing the flow and
-dispatches it to the Agent.
 
 ## Understanding Control Points
 

@@ -9,9 +9,10 @@ sidebar_position: 5
 
 :::
 
-The _Rate Limiter_ component can be used to prevent recurring overloads by
-proactively regulating heavy-hitters. It achieves this by accepting or rejecting
-incoming flows based on per-label limits, which are configured using the
+The _Rate Limiter_ component can be used to ensure fair access and manage costs
+by regulating the number of requests made by an entity over time. It achieves
+this by accepting or rejecting incoming requests based on per-label limits,
+which are configured using the
 [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
 
 The _Rate Limiter_ is a component of Aperture's [policy][policies] system, and
@@ -84,13 +85,13 @@ inaccuracy within a (small) time window (sync interval).
 The _Rate Limiter_ component accepts or rejects incoming flows based on
 per-label limits, configured as the maximum number of requests per a given
 period of time. The rate-limiting label is chosen from the
-[flow-label][flow-label] with a specific key, enabling distinct limits per user
+[flow-label][flow-label] with a specific key, enabling distinct limits per-user
 as identified by unique values of the label.
 
-:::tip
+:::info
 
-The limit value is provided as a signal within the circuit. It can be set
-dynamically based on the circuit's logic.
+Refer to the [Per-user Rate Limiting guide][guide] for more information on how
+to use the _Rate Limiter_ using [aperture-js][aperture-js] SDK.
 
 :::
 
@@ -98,3 +99,5 @@ dynamically based on the circuit's logic.
 [agent-group]: /concepts/selector.md#agent-group
 [policies]: /concepts/advanced/policy.md
 [flow-label]: /concepts/flow-label.md
+[guide]: /guides/per-user-rate-limiting.md
+[aperture-js]: https://github.com/fluxninja/aperture-js

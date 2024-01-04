@@ -52,8 +52,7 @@ type PrometheusMetrics struct {
 	registry *prometheus.Registry
 
 	// Flow control service metrics
-	// TODO: 3 gauges for 3 types of flowcontrol decisions
-	checkReceivedTotal prometheus.Counter
+	checkReceivedTotal prometheus.CounterVec
 	checkDecision      prometheus.CounterVec
 	rejectReason       prometheus.CounterVec
 	flowEndTotal       prometheus.CounterVec
@@ -75,11 +74,11 @@ func (pm *PrometheusMetrics) allMetrics() []prometheus.Collector {
 func NewPrometheusMetrics(registry *prometheus.Registry) (*PrometheusMetrics, error) {
 	pm := &PrometheusMetrics{
 		registry: registry,
-		checkReceivedTotal: prometheus.NewCounter(
+		checkReceivedTotal: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: metrics.FlowControlRequestsMetricName,
 				Help: "Total number of aperture check requests handled",
-			},
+			}, []string{metrics.ControlPointLabel, metrics.AgentGroupLabel},
 		),
 		checkDecision: *prometheus.NewCounterVec(
 			prometheus.CounterOpts{
@@ -119,7 +118,10 @@ func (pm *PrometheusMetrics) CheckResponse(
 	controlPoint string,
 	agentInfo *agentinfo.AgentInfo,
 ) {
-	pm.checkReceivedTotal.Inc()
+	pm.checkReceivedTotal.With(prometheus.Labels{
+		metrics.ControlPointLabel: controlPoint,
+		metrics.AgentGroupLabel:   agentInfo.GetAgentGroup(),
+	}).Inc()
 	pm.checkDecision.With(prometheus.Labels{
 		metrics.ControlPointLabel:                 controlPoint,
 		metrics.FlowControlCheckDecisionTypeLabel: decision.Enum().String(),

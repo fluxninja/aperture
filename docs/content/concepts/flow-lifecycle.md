@@ -13,8 +13,6 @@ keywords:
 import Zoom from 'react-medium-image-zoom';
 ```
 
-## Flow Lifecycle
-
 The lifecycle of a flow begins when a service initiates it, requesting a
 decision from the Aperture Agent. As the flow enters the Aperture Agent, it
 embarks on a journey through multiple stages before a final decision is made.
@@ -62,19 +60,19 @@ components for that stage.
   regulating excessive requests in accordance with per-label limits.
 - **Caches** reduce the cost of operations and alleviate the load on constrained
   services by preventing duplicate requests to pay-per-use services.
-- [**Schedulers**](./scheduler/scheduler.md) offer on-demand queuing based on a
-  token bucket algorithm, and prioritize requests using weighted fair queuing.
+- [**Schedulers**](./scheduler.md) offer on-demand queuing based on a token
+  bucket algorithm, and prioritize requests using weighted fair queuing.
   Multiple matching schedulers can evaluate concurrently, with each having the
   power to drop a flow. There are two variants:
-  - The [**Load Scheduler**](./scheduler/load-scheduler.md) oversees the current
-    token rate in relation to the past token rate, adjusting as required based
-    on health signals from a service. This scheduler type facilitates active
-    service protection.
-  - The [**Quota Scheduler**](./scheduler/quota-scheduler.md) uses a global
-    token bucket as a ledger, managing the token distribution across all Agents.
-    It proves especially effective in environments with strict global rate
-    limits, as it allows for strategic prioritization of requests when reaching
-    quota limits.
+  - The [**Load Scheduler**](./request-prioritization/load-scheduler.md)
+    oversees the current token rate in relation to the past token rate,
+    adjusting as required based on health signals from a service. This scheduler
+    type facilitates active service protection.
+  - The [**Quota Scheduler**](./request-prioritization/quota-scheduler.md) uses
+    a global token bucket as a ledger, managing the token distribution across
+    all Agents. It proves especially effective in environments with strict
+    global rate limits, as it allows for strategic prioritization of requests
+    when reaching quota limits.
 
 After traversing these stages, the flow's decision is sent back to the
 initiating service.

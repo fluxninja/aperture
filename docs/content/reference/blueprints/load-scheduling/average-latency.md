@@ -27,12 +27,12 @@ At a high level, this policy works as follows:
   prevents accepting all the traffic at once after an overload, which can again
   lead to an overload.
 - Load Scheduler: The accepted token rate at the service is throttled by a
-  [weighted-fair queuing scheduler](/concepts/scheduler/scheduler.md). The
-  output of the adjustments to accepted token rate made by gradient controller
-  and optimizer logic are translated to a load multiplier that is synchronized
-  with Aperture Agents through etcd. The load multiplier adjusts (increases or
-  decreases) the token bucket fill rates based on the incoming token rate
-  observed at each agent.
+  [weighted-fair queuing scheduler](/concepts/scheduler.md). The output of the
+  adjustments to accepted token rate made by gradient controller and optimizer
+  logic are translated to a load multiplier that is synchronized with Aperture
+  Agents through etcd. The load multiplier adjusts (increases or decreases) the
+  token bucket fill rates based on the incoming token rate observed at each
+  agent.
 
 The following PromQL query (with appropriate filters) is used as `SIGNAL` for
 the load scheduler:
