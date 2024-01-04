@@ -2,6 +2,7 @@ local k = import 'k.libsonnet';
 
 local container = k.core.v1.container;
 local containerPort = k.core.v1.containerPort;
+local namespace = k.core.v1.namespace;
 local deployment = k.apps.v1.deployment;
 local service = k.core.v1.service;
 local servicePort = k.core.v1.servicePort;
@@ -26,7 +27,7 @@ local defaults = {
       'app.kubernetes.io/name': $.environment.name,
       'app.kubernetes.io/instance': $.environment.name,
     },
-    app_port: 8080,
+    app_port: 8099,
     agent: {
       address: 'aperture-agent.aperture-agent.svc.cluster.local:8080',
     },
@@ -37,6 +38,9 @@ function(values={}, environment={}) {
   local _merged = defaults { environment+: environment, values+: values },
   local _environment = _merged.environment,
   local _values = _merged.values,
+  namespace:
+    namespace.new(_environment.namespace)
+    + namespace.metadata.withLabels(_values.labels),
   deployment:
     deployment.new(name=_environment.name, containers=[
       container.new(_environment.name, image='%(repository)s:%(tag)s' % _values.image)

@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	defaultAppPort = "8080"
+	defaultAppPort = "8099"
 )
 
 // app struct contains the server and the Aperture client.
