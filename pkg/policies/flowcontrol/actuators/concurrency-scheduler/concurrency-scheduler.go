@@ -286,7 +286,7 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 			var merr, err error
 
 			// remove from data engine
-			err = cs.csFactory.engineAPI.UnregisterScheduler(cs)
+			err = cs.csFactory.engineAPI.UnregisterConcurrencyScheduler(cs)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister rate limiter")
 				merr = multierr.Append(merr, err)

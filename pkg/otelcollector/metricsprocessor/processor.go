@@ -245,7 +245,7 @@ func (p *metricsProcessor) updateMetricsForWorkload(limiterID iface.LimiterID, l
 			Str(metrics.PolicyNameLabel, limiterID.PolicyName).
 			Str(metrics.PolicyHashLabel, limiterID.PolicyHash).
 			Str(metrics.ComponentIDLabel, limiterID.ComponentID).
-			Msg("LoadScheduler not found")
+			Msg("Scheduler not found")
 		return
 	}
 	// Observe latency only if the request was allowed by Aperture and response was received from the server (I.E. latency is found)

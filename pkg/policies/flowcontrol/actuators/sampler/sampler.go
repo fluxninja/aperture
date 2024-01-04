@@ -253,10 +253,6 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := counterVec.DeletePartialMatch(metricLabels)
-			if deleted == 0 {
-				logger.Warn().Msg("Could not delete sampler counter from its metric vector. No traffic to generate metrics?")
-			}
 			// remove from data engine
 			err = fr.factory.engineAPI.UnregisterSampler(fr)
 			if err != nil {
@@ -268,6 +264,10 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to remove decision notifier")
 				merr = multierr.Append(merr, err)
+			}
+			deleted := counterVec.DeletePartialMatch(metricLabels)
+			if deleted == 0 {
+				logger.Warn().Msg("Could not delete sampler counter from its metric vector. No traffic to generate metrics?")
 			}
 			fr.registry.SetStatus(status.NewStatus(nil, merr))
 
