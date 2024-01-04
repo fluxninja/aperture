@@ -5,6 +5,7 @@ local containerPort = k.core.v1.containerPort;
 local deployment = k.apps.v1.deployment;
 local service = k.core.v1.service;
 local servicePort = k.core.v1.servicePort;
+local serviceAccount = k.core.v1.serviceAccount;
 
 local defaults = {
   environment:: {
@@ -23,6 +24,7 @@ local defaults = {
     },
     labels: {
       'app.kubernetes.io/name': $.environment.name,
+      'app.kubernetes.io/instance': $.environment.name,
     },
     app_port: 8080,
     agent: {
@@ -40,7 +42,7 @@ function(values={}, environment={}) {
       container.new(_environment.name, image='%(repository)s:%(tag)s' % _values.image)
       + container.withImagePullPolicy(_values.image.pullPolicy)
       + container.withPorts([
-        containerPort.newNamed(_values.app_port, 'http'),
+        containerPort.newNamed(_values.app_port, 'srvhttp'),
       ])
       + container.withEnvMap({
         APERTURE_APP_PORT: std.toString(_values.app_port),
@@ -48,14 +50,20 @@ function(values={}, environment={}) {
         APERTURE_AGENT_INSECURE: 'true',
       }),
     ])
+    + deployment.metadata.withLabels(_values.labels)
     + deployment.metadata.withNamespace(_environment.namespace)
     + deployment.spec.selector.withMatchLabels(_values.labels)
-    + deployment.spec.template.metadata.withLabels(_values.labels),
+    + deployment.spec.template.metadata.withLabels(_values.labels)
+    + deployment.spec.template.spec.withServiceAccountName(_environment.name),
   service:
     service.new($.deployment.metadata.name, selector=_values.labels, ports=[
-      local portName = 'http';
-      servicePort.newNamed(name=portName, port=_values.service.port, targetPort=portName),
+      servicePort.newNamed(name='http', port=_values.service.port, targetPort='srvhttp'),
     ])
+    + service.spec.withSelector(_values.labels)
     + service.metadata.withNamespace(_environment.namespace)
     + service.metadata.withLabels(_values.labels),
+  serviceAccount:
+    serviceAccount.new($.deployment.metadata.name)
+    + serviceAccount.metadata.withNamespace(_environment.namespace)
+    + serviceAccount.metadata.withLabels(_values.labels),
 }
