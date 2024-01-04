@@ -23,6 +23,12 @@ requests are maintained by the Agents based on the flow start and end calls made
 from the SDKs. Alternatively, for proxy integrations, the flow end is inferred
 as the access log stream is received from the underlying middleware or proxy.
 
+:::note
+
+Only accepted requests are counted towards the in-flight concurrency.
+
+:::
+
 ## Distributed Request Ledgers {#distributed-request-ledgers}
 
 For each configured [_Concurrency Limiter Component_][reference], every matching

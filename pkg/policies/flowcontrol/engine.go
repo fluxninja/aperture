@@ -24,23 +24,25 @@ import (
 
 // multiMatchResult is used as return value of PolicyConfigAPI.GetMatches.
 type multiMatchResult struct {
-	schedulers    map[iface.Limiter]struct{}
-	fluxMeters    map[iface.FluxMeter]struct{}
-	rateLimiters  map[iface.Limiter]struct{}
-	samplers      map[iface.Limiter]struct{}
-	rampSamplers  map[iface.Limiter]struct{}
-	labelPreviews map[iface.LabelPreview]struct{}
+	quotaAndLoadSchedulers map[iface.Limiter]struct{}
+	concurrencySchedulers  map[iface.Limiter]struct{}
+	fluxMeters             map[iface.FluxMeter]struct{}
+	rateLimiters           map[iface.Limiter]struct{}
+	samplers               map[iface.Limiter]struct{}
+	rampSamplers           map[iface.Limiter]struct{}
+	labelPreviews          map[iface.LabelPreview]struct{}
 }
 
 // newMultiMatchResult returns a new multiMatchResult.
 func newMultiMatchResult() *multiMatchResult {
 	return &multiMatchResult{
-		schedulers:    make(map[iface.Limiter]struct{}),
-		fluxMeters:    make(map[iface.FluxMeter]struct{}),
-		rateLimiters:  make(map[iface.Limiter]struct{}),
-		samplers:      make(map[iface.Limiter]struct{}),
-		rampSamplers:  make(map[iface.Limiter]struct{}),
-		labelPreviews: make(map[iface.LabelPreview]struct{}),
+		quotaAndLoadSchedulers: make(map[iface.Limiter]struct{}),
+		concurrencySchedulers:  make(map[iface.Limiter]struct{}),
+		fluxMeters:             make(map[iface.FluxMeter]struct{}),
+		rateLimiters:           make(map[iface.Limiter]struct{}),
+		samplers:               make(map[iface.Limiter]struct{}),
+		rampSamplers:           make(map[iface.Limiter]struct{}),
+		labelPreviews:          make(map[iface.LabelPreview]struct{}),
 	}
 }
 
@@ -178,18 +180,28 @@ func (e *Engine) ProcessRequest(ctx context.Context, requestContext iface.Reques
 		return
 	}
 
+	limiterTypes = []LimiterType{
+		{mmr.concurrencySchedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false, flowcontrolv1.StatusCode_ServiceUnavailable},
+	}
+	rejected = runLimiters(limiterTypes)
+	if rejected {
+		return
+	}
+
 	resultCacheHit, wgGlobal := e.cacheLookup(ctx, requestContext, controlPoint, response)
+	defer func() {
+		if wgGlobal != nil {
+			wgGlobal.Wait()
+		}
+	}()
 	if resultCacheHit {
 		return
 	}
 
 	limiterTypes = []LimiterType{
-		{mmr.schedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false, flowcontrolv1.StatusCode_ServiceUnavailable},
+		{mmr.quotaAndLoadSchedulers, flowcontrolv1.CheckResponse_REJECT_REASON_NO_TOKENS, false, flowcontrolv1.StatusCode_ServiceUnavailable},
 	}
 	runLimiters(limiterTypes)
-	if wgGlobal != nil {
-		wgGlobal.Wait()
-	}
 
 	return
 }
@@ -203,7 +215,7 @@ func (e *Engine) cacheLookup(ctx context.Context, requestContext iface.RequestCo
 	// Set the Check Control Point on the Cache Lookup Request, cannot rely on SDKs to set it at both places
 	requestContext.CacheLookupRequest.ControlPoint = controlPoint
 	// Lookup cache
-	lookupResponse, wgResult, wgGlobal := e.cache.LookupWait(ctx, requestContext.CacheLookupRequest)
+	lookupResponse, wgResult, wgGlobal := e.cache.LookupNoWait(ctx, requestContext.CacheLookupRequest)
 	response.CacheLookupResponse = lookupResponse
 	// wait for result cache lookup to finish
 	wgResult.Wait()
@@ -312,11 +324,18 @@ func (e *Engine) registerSchedulerUnsafe(cl iface.Scheduler) error {
 	} else {
 		return fmt.Errorf("scheduler already registered")
 	}
-
 	schedulerMatchedCB := func(mmr *multiMatchResult) *multiMatchResult {
-		mmr.schedulers[cl] = struct{}{}
+		mmr.quotaAndLoadSchedulers[cl] = struct{}{}
 		return mmr
 	}
+	// Check whether iface.Scheduler is a concurrency scheduler or not
+	if _, ok := cl.(iface.ConcurrencyScheduler); ok {
+		schedulerMatchedCB = func(mmr *multiMatchResult) *multiMatchResult {
+			mmr.concurrencySchedulers[cl] = struct{}{}
+			return mmr
+		}
+	}
+
 	return e.register(cl.GetLimiterID().String(), cl.GetSelectors(), schedulerMatchedCB)
 }
 

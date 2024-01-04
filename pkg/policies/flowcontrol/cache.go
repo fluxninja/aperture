@@ -160,66 +160,43 @@ func (c *Cache) ready() error {
 
 // Lookup looks up the cache for the given CacheLookupRequest.
 func (c *Cache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
-	response, wgResult, wgGlobal := c.LookupWait(ctx, request)
+	cacheLookupResponse, wgResult, wgGlobal := c.LookupNoWait(ctx, request)
 	wgResult.Wait()
 	wgGlobal.Wait()
-	c.reportLookupMetrics(request, response)
+	return cacheLookupResponse
+}
+
+// LookupNoWait looks up the cache for the given CacheLookupRequest.
+func (c *Cache) LookupNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, *sync.WaitGroup, *sync.WaitGroup) {
+	resultCacheResponse, wgResult := c.LookupResultNoWait(ctx, request)
+	globalCacheResponses, wgGlobal := c.LookupGlobalNoWait(ctx, request)
+	return &flowcontrolv1.CacheLookupResponse{
+		ResultCacheResponse:  resultCacheResponse,
+		GlobalCacheResponses: globalCacheResponses,
+	}, wgResult, wgGlobal
+}
+
+// LookupGlobal looks up the global caches for the given CacheLookupRequest.
+func (c *Cache) LookupGlobal(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) map[string]*flowcontrolv1.KeyLookupResponse {
+	response, wgGlobal := c.LookupGlobalNoWait(ctx, request)
+	wgGlobal.Wait()
 	return response
 }
 
-// LookupWait looks up the cache for the given CacheLookupRequest. It does not wait for the response.
-func (c *Cache) LookupWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, *sync.WaitGroup, *sync.WaitGroup) {
+// LookupGlobalNoWait looks up the global caches for the given CacheLookupRequest without waiting for the result.
+func (c *Cache) LookupGlobalNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (map[string]*flowcontrolv1.KeyLookupResponse, *sync.WaitGroup) {
 	// define wait groups
-	var wgResult, wgGlobal sync.WaitGroup
-	response := &flowcontrolv1.CacheLookupResponse{
-		GlobalCacheResponses: make(map[string]*flowcontrolv1.KeyLookupResponse),
-	}
+	var wgGlobal sync.WaitGroup
+	globalCacheResponses := make(map[string]*flowcontrolv1.KeyLookupResponse)
 	if request == nil {
-		return response, &wgResult, &wgGlobal
+		return globalCacheResponses, &wgGlobal
 	}
 
-	type Lookup struct {
-		lookupResponse *flowcontrolv1.KeyLookupResponse
-		key            string
-		cacheType      iface.CacheType
-		wg             *sync.WaitGroup
-	}
-
-	execLookup := func(lookup *Lookup) func() {
-		return func() {
-			defer lookup.wg.Done()
-			lookupResponse := lookup.lookupResponse
-			cachedBytes, err := c.get(ctx, request.ControlPoint, lookup.cacheType, lookup.key)
-			if err == nil {
-				lookupResponse.Value = cachedBytes
-				lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
-				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
-				return
-			}
-			lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
-			if err.Error() == ErrCacheKeyNotFound.Error() {
-				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
-			} else {
-				lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
-				lookupResponse.Error = err.Error()
-			}
-		}
-	}
-	var lookups []*Lookup
-	// define a lookup struct to hold the cache key and the cached value
-	if request.ResultCacheKey != "" {
-		response.ResultCacheResponse = &flowcontrolv1.KeyLookupResponse{}
-		lookups = append(lookups, &Lookup{
-			key:            request.ResultCacheKey,
-			lookupResponse: response.ResultCacheResponse,
-			cacheType:      iface.Result,
-			wg:             &wgResult,
-		})
-	}
+	var lookups []*lookup
 	for _, globalCacheKey := range request.GlobalCacheKeys {
 		lookupResponse := &flowcontrolv1.KeyLookupResponse{}
-		response.GlobalCacheResponses[globalCacheKey] = lookupResponse
-		lookups = append(lookups, &Lookup{
+		globalCacheResponses[globalCacheKey] = lookupResponse
+		lookups = append(lookups, &lookup{
 			key:            globalCacheKey,
 			lookupResponse: lookupResponse,
 			cacheType:      iface.Global,
@@ -227,15 +204,91 @@ func (c *Cache) LookupWait(ctx context.Context, request *flowcontrolv1.CacheLook
 		})
 	}
 
+	c.execLookups(ctx, request, lookups)
+
+	return globalCacheResponses, &wgGlobal
+}
+
+// LookupResult looks up the result cache for the given CacheLookupRequest.
+func (c *Cache) LookupResult(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.KeyLookupResponse {
+	response, wgResult := c.LookupResultNoWait(ctx, request)
+	wgResult.Wait()
+	return response
+}
+
+// LookupResultNoWait looks up the result cache for the given CacheLookupRequest without waiting for the result.
+func (c *Cache) LookupResultNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.KeyLookupResponse, *sync.WaitGroup) {
+	// define wait groups
+	var wgResult sync.WaitGroup
+	resultCacheResponse := &flowcontrolv1.KeyLookupResponse{}
+
+	if request == nil {
+		return resultCacheResponse, &wgResult
+	}
+
+	var lookups []*lookup
+	// define a lookup struct to hold the cache key and the cached value
+	if request.ResultCacheKey != "" {
+		lookups = append(lookups, &lookup{
+			key:            request.ResultCacheKey,
+			lookupResponse: resultCacheResponse,
+			cacheType:      iface.Result,
+			wg:             &wgResult,
+		})
+	}
+	c.execLookups(ctx, request, lookups)
+
+	return resultCacheResponse, &wgResult
+}
+
+type lookup struct {
+	lookupResponse *flowcontrolv1.KeyLookupResponse
+	wg             *sync.WaitGroup
+	key            string
+	cacheType      iface.CacheType
+}
+
+func (c *Cache) execLookups(ctx context.Context, request *flowcontrolv1.CacheLookupRequest, lookups []*lookup) {
 	for i, lookup := range lookups {
 		lookup.wg.Add(1)
 		if i == len(lookups)-1 {
-			execLookup(lookup)()
+			c.execLookup(ctx, request, lookup)()
 			continue
 		}
-		panichandler.Go(execLookup(lookup))
+		panichandler.Go(c.execLookup(ctx, request, lookup))
 	}
-	return response, &wgResult, &wgGlobal
+}
+
+func (c *Cache) execLookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest, lookup *lookup) func() {
+	return func() {
+		defer lookup.wg.Done()
+		defer c.reportLookupMetricsForResponse(
+			lookup.cacheType,
+			request.ControlPoint,
+			lookup.lookupResponse,
+		)
+		defer c.reportOperationMetricsForResponse(
+			metrics.CacheOperationTypeLookup,
+			lookup.cacheType,
+			request.ControlPoint,
+			lookup.lookupResponse.OperationStatus,
+		)
+		lookupResponse := lookup.lookupResponse
+		cachedBytes, err := c.get(ctx, request.ControlPoint, lookup.cacheType, lookup.key)
+		if err == nil {
+			lookupResponse.Value = cachedBytes
+			lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_HIT
+			lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+			return
+		}
+		lookupResponse.LookupStatus = flowcontrolv1.CacheLookupStatus_MISS
+		if err.Error() == ErrCacheKeyNotFound.Error() {
+			lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_SUCCESS
+		} else {
+			lookupResponse.OperationStatus = flowcontrolv1.CacheOperationStatus_ERROR
+			lookupResponse.Error = err.Error()
+		}
+	}
 }
 
 // Upsert upserts the cache for the given CacheUpsertRequest.
@@ -259,6 +312,12 @@ func (c *Cache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertReques
 	execCacheUpsert := func(upsertRequest *UpsertRequest) func() {
 		return func() {
 			defer wg.Done()
+			defer c.reportOperationMetricsForResponse(
+				metrics.CacheOperationTypeUpsert,
+				upsertRequest.cacheType,
+				req.ControlPoint,
+				upsertRequest.upsertResponse.OperationStatus,
+			)
 			cacheType := upsertRequest.cacheType
 			key := upsertRequest.key
 			value := upsertRequest.entry.Value
@@ -340,6 +399,12 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 	execCacheDelete := func(deleteRequest *DeleteRequest) func() {
 		return func() {
 			defer wg.Done()
+			defer c.reportOperationMetricsForResponse(
+				metrics.CacheOperationTypeDelete,
+				deleteRequest.cacheType,
+				req.ControlPoint,
+				deleteRequest.deleteResponse.OperationStatus,
+			)
 			cacheType := deleteRequest.cacheType
 			key := deleteRequest.key
 			err := c.delete(ctx, req.ControlPoint, cacheType, key)
@@ -387,67 +452,12 @@ func (c *Cache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteReques
 	}
 	wg.Wait()
 
-	c.reportDeleteMetrics(req, response)
 	return response
 }
 
-func (c *Cache) reportLookupMetrics(
-	request *flowcontrolv1.CacheLookupRequest,
-	response *flowcontrolv1.CacheLookupResponse,
-) {
-	if response.ResultCacheResponse != nil {
-		c.reportLookupMetricsForResponse(
-			metrics.CacheTypeResult,
-			request.ControlPoint,
-			response.ResultCacheResponse,
-		)
-		c.reportOperationMetricsForResponse(
-			metrics.CacheOperationTypeLookup,
-			metrics.CacheTypeResult,
-			request.ControlPoint,
-			response.ResultCacheResponse.OperationStatus,
-		)
-	}
-	for _, resp := range response.GlobalCacheResponses {
-		c.reportLookupMetricsForResponse(
-			metrics.CacheTypeGlobal,
-			request.ControlPoint,
-			resp,
-		)
-		c.reportOperationMetricsForResponse(
-			metrics.CacheOperationTypeLookup,
-			metrics.CacheTypeGlobal,
-			request.ControlPoint,
-			resp.OperationStatus,
-		)
-	}
-}
-
-func (c *Cache) reportDeleteMetrics(
-	request *flowcontrolv1.CacheDeleteRequest,
-	response *flowcontrolv1.CacheDeleteResponse,
-) {
-	if response.ResultCacheResponse != nil {
-		c.reportOperationMetricsForResponse(
-			metrics.CacheOperationTypeDelete,
-			metrics.CacheTypeResult,
-			request.ControlPoint,
-			response.ResultCacheResponse.OperationStatus,
-		)
-	}
-	for _, resp := range response.GlobalCacheResponses {
-		c.reportOperationMetricsForResponse(
-			metrics.CacheOperationTypeDelete,
-			metrics.CacheTypeGlobal,
-			request.ControlPoint,
-			resp.OperationStatus,
-		)
-	}
-}
-
-func (c *Cache) reportLookupMetricsForResponse(cacheType, controlPoint string, response *flowcontrolv1.KeyLookupResponse) {
+func (c *Cache) reportLookupMetricsForResponse(cacheType iface.CacheType, controlPoint string, response *flowcontrolv1.KeyLookupResponse) {
 	labels := prometheus.Labels(map[string]string{
-		metrics.CacheTypeLabel:    cacheType,
+		metrics.CacheTypeLabel:    cacheType.String(),
 		metrics.ControlPointLabel: controlPoint,
 	})
 	switch response.LookupStatus {
@@ -468,9 +478,9 @@ func (c *Cache) reportLookupMetricsForResponse(cacheType, controlPoint string, r
 	}
 }
 
-func (c *Cache) reportOperationMetricsForResponse(operationType, cacheType, controlPoint string, operationStatus flowcontrolv1.CacheOperationStatus) {
+func (c *Cache) reportOperationMetricsForResponse(operationType string, cacheType iface.CacheType, controlPoint string, operationStatus flowcontrolv1.CacheOperationStatus) {
 	labels := prometheus.Labels(map[string]string{
-		metrics.CacheTypeLabel:          cacheType,
+		metrics.CacheTypeLabel:          cacheType.String(),
 		metrics.ControlPointLabel:       controlPoint,
 		metrics.CacheOperationTypeLabel: operationType,
 	})
