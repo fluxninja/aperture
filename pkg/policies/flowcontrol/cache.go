@@ -220,7 +220,8 @@ func (c *Cache) LookupResult(ctx context.Context, request *flowcontrolv1.CacheLo
 func (c *Cache) LookupResultNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.KeyLookupResponse, *sync.WaitGroup) {
 	// define wait groups
 	var wgResult sync.WaitGroup
-	resultCacheResponse := &flowcontrolv1.KeyLookupResponse{}
+
+	var resultCacheResponse *flowcontrolv1.KeyLookupResponse
 
 	if request == nil {
 		return resultCacheResponse, &wgResult
@@ -229,6 +230,7 @@ func (c *Cache) LookupResultNoWait(ctx context.Context, request *flowcontrolv1.C
 	var lookups []*lookup
 	// define a lookup struct to hold the cache key and the cached value
 	if request.ResultCacheKey != "" {
+		resultCacheResponse = &flowcontrolv1.KeyLookupResponse{}
 		lookups = append(lookups, &lookup{
 			key:            request.ResultCacheKey,
 			lookupResponse: resultCacheResponse,
