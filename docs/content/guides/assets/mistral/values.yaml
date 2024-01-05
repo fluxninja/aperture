@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../../../../../blueprints/concurrency-scheduling/base/gen/definitions.json
+blueprint: concurrency-scheduling/base
+uri: ../../../../../blueprints
+policy:
+  policy_name: "mistral-concurrency-scheduling"
+  components: []
+  concurrency_scheduler:
+    alerter:
+      alert_name: "Too many inflight requests"
+    concurrency_limiter:
+      max_inflight_duration: "60s"
+    max_concurrency: 2
+    scheduler:
+      priority_label_key: "priority"
+      tokens_label_key: "tokens"
+      workload_label_key: "workload"
+    selectors:
+      - control_point: "mistral-prompt"
+  resources:
+    flow_control:
+      classifiers: []
