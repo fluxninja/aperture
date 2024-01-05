@@ -604,7 +604,7 @@ func (e *Engine) registerFlowEnderUnsafe(cl iface.ConcurrencyLimiter) error {
 	if _, ok := e.flowEnders[cl.GetLimiterID()]; !ok {
 		e.flowEnders[cl.GetLimiterID()] = cl
 	} else {
-		return fmt.Errorf("concurrency limiter already registered")
+		return fmt.Errorf("flow ender already registered")
 	}
 	return nil
 }
