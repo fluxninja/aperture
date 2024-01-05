@@ -1,15 +1,15 @@
 flowchart LR
-subgraph root.0[<center>ConcurrencyLimiter<br/>1 selectors</center>]
+subgraph root.0[<center>ConcurrencyScheduler<br/>1 selectors</center>]
 subgraph root.0_inports[ ]
 style root.0_inports fill:none,stroke:none
-root.0max_concurrency[max_concurrency]
+root.0max_capacity[max_capacity]
 end
 subgraph root.0_outports[ ]
 style root.0_outports fill:none,stroke:none
 root.0accept_percentage[accept_percentage]
 end
 end
-root.0_max_concurrency_FakeConstantout((20.00))
+root.0_max_capacity_FakeConstantout((2.00))
 subgraph root.1[<center>Decider<br/>gte for 0s</center>]
 subgraph root.1_inports[ ]
 style root.1_inports fill:none,stroke:none
@@ -29,6 +29,6 @@ root.2signal[signal]
 end
 end
 root.0accept_percentage --> |ACCEPT_PERCENTAGE| root.1lhs
-root.0_max_concurrency_FakeConstantout --> root.0max_concurrency
+root.0_max_capacity_FakeConstantout --> root.0max_capacity
 root.1output --> |ACCEPT_PERCENTAGE_ALERT| root.2signal
 root.1_rhs_FakeConstantout --> root.1rhs

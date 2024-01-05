@@ -14,7 +14,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@fluxninja/aperture-js": "^2.4.4",
+    "@fluxninja/aperture-js": "^2.8.2",
     "express": "^4.18.2",
     "http-terminator": "^3.2.0",
     "inquirer": "^9.2.12"

@@ -3,25 +3,28 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: concurrency-limit-test
+  name: mistral-concurrency-scheduling
 spec:
   circuit:
     components:
     - flow_control:
-        concurrency_limiter:
+        concurrency_scheduler:
+          concurrency_limiter:
+            limit_by_label_key: limit_by_label_key
+            max_inflight_duration: 60s
           in_ports:
             max_concurrency:
               constant_signal:
-                value: 20
+                value: 2
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
-          parameters:
-            limit_by_label_key: user_id
-            max_inflight_duration: 60s
-          request_parameters: {}
+          scheduler:
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: workload
           selectors:
-          - control_point: concurrency-limiting-feature
+          - control_point: mistral-prompt
     - decider:
         in_ports:
           lhs:
