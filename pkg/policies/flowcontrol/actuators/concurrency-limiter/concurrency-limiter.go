@@ -256,12 +256,8 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 		},
 		OnStop: func(context.Context) error {
 			var merr, err error
-			deleted := cl.clFactory.counterVector.DeletePartialMatch(metricLabels)
-			if deleted == 0 {
-				logger.Warn().Msg("Could not delete concurrency limiter counter from its metric vector. No traffic to generate metrics?")
-			}
 			// remove from data engine
-			err = cl.clFactory.engineAPI.UnregisterRateLimiter(cl)
+			err = cl.clFactory.engineAPI.UnregisterConcurrencyLimiter(cl)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to unregister concurrency limiter")
 				merr = multierr.Append(merr, err)
@@ -273,6 +269,10 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 			cl.limiter.Close()
+			deleted := cl.clFactory.counterVector.DeletePartialMatch(metricLabels)
+			if deleted == 0 {
+				logger.Warn().Msg("Could not delete concurrency limiter counter from its metric vector. No traffic to generate metrics?")
+			}
 			cl.registry.SetStatus(status.NewStatus(nil, merr))
 
 			return merr
