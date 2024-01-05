@@ -13,14 +13,9 @@ commonConfig {
       max_concurrency: '__REQUIRED_FIELD__',
       selectors: commonConfig.selectors_defaults,
       concurrency_limiter: {
-        limit_by_label_key: 'limit_by_label_key',
         max_inflight_duration: '__REQUIRED_FIELD__',
       },
-      scheduler: {
-        tokens_label_key: 'tokens',
-        priority_label_key: 'priority',
-        workload_label_key: 'workload',
-      },
+      scheduler: {},
       alerter: {
         alert_name: 'Too many inflight requests',
       },

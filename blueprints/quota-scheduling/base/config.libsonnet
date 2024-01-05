@@ -15,14 +15,9 @@ commonConfig {
       fill_amount: '__REQUIRED_FIELD__',
       selectors: commonConfig.selectors_defaults,
       rate_limiter: {
-        limit_by_label_key: 'limit_key',
         interval: '__REQUIRED_FIELD__',
       },
-      scheduler: {
-        tokens_label_key: 'tokens',
-        priority_label_key: 'priority',
-        workload_label_key: 'workload',
-      },
+      scheduler: {},
       alerter: {
         alert_name: 'More than 90% of requests are being rate limited',
       },

@@ -34,13 +34,9 @@ policy:
     # Required: True
     rate_limiter:
       interval: __REQUIRED_FIELD__
-      limit_by_label_key: "limit_key"
     # Scheduler configuration.
     # Type: aperture.spec.v1.Scheduler
-    scheduler:
-      priority_label_key: "priority"
-      tokens_label_key: "tokens"
-      workload_label_key: "workload"
+    scheduler: {}
     # Flow selectors to match requests against.
     # Type: []aperture.spec.v1.Selector
     # Required: True

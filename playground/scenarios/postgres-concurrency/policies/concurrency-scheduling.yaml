@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=../../../../blueprints/concurrency-scheduling/base/gen/definitions.json
+# Generated values file for concurrency-scheduling/base blueprint
+# Documentation/Reference for objects and parameters can be found at:
+# https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base
+
+blueprint: concurrency-scheduling/base
+uri: ../../../../blueprints
+policy:
+  components: []
+  policy_name: concurrency-scheduling
+  resources:
+    flow_control:
+      classifiers: []
+  concurrency_scheduler:
+    alerter:
+      alert_name: "Too many inflight requests"
+    concurrency_limiter:
+      max_inflight_duration: 60s
+      max_idle_time: "7200s"
+    max_concurrency: 2
+    scheduler:
+      workload_label_key: "userType"
+      priority_label_key: "priority"
+      denied_response_status_code: BadRequest
+    selectors:
+      - agent_group: default
+        control_point: postgres

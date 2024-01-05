@@ -1,0 +1,31 @@
+{
+  "renderer": "tanka",
+  "tkenv": "playground/tanka/apps/aperture-go-example",
+  "needs": ["postgresql"],
+  "aperture_policies": [
+    {
+      "policy_name": "concurrency-scheduling",
+      "values_file": "policies/concurrency-scheduling.yaml"
+    }
+  ],
+  "images": [
+    {
+      "ref": "aperture-go-example",
+      "context": "sdks/aperture-go",
+      "dockerfile": "Dockerfile.manual",
+      "ssh": "default"
+    }
+  ],
+  "child_resources": [
+    {
+      "workload": "aperture-go-example",
+      "resource_deps": [
+        "agent",
+        "controller",
+        "cluster-bootstrap",
+        "postgresql"
+      ],
+      "extra_objects": ["aperture-go-example:serviceaccount"]
+    }
+  ]
+}

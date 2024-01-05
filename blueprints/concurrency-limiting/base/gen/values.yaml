@@ -29,7 +29,6 @@ policy:
     # Type: aperture.spec.v1.ConcurrencyLimiterParameters
     # Required: True
     parameters:
-      limit_by_label_key: "limit_by_label_key"
       max_inflight_duration: __REQUIRED_FIELD__
     # Request Parameters.
     # Type: aperture.spec.v1.ConcurrencyLimiterRequestParameters

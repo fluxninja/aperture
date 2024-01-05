@@ -61,7 +61,6 @@
             "concurrency_limiter": {
               "description": "Concurrency Limiter Parameters.",
               "default": {
-                "limit_by_label_key": "limit_by_label_key",
                 "max_inflight_duration": "__REQUIRED_FIELD__"
               },
               "type": "object",
@@ -75,11 +74,7 @@
             },
             "scheduler": {
               "description": "Scheduler configuration.",
-              "default": {
-                "priority_label_key": "priority",
-                "tokens_label_key": "tokens",
-                "workload_label_key": "workload"
-              },
+              "default": {},
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/Scheduler"
             },

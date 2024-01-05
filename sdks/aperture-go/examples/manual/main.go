@@ -4,16 +4,21 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/connectivity"
@@ -24,13 +29,14 @@ import (
 )
 
 const (
-	defaultAppPort = "8080"
+	defaultAppPort = "8099"
 )
 
 // app struct contains the server and the Aperture client.
 type app struct {
 	server         *http.Server
 	apertureClient aperture.Client
+	db             *sql.DB
 }
 
 // START: grpcOptions
@@ -60,9 +66,34 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 
 // END: grpcOptions
 
+func runInitScript(db *sql.DB, scriptPath string) error {
+	// Read the init script
+	script, err := os.ReadFile(scriptPath)
+	if err != nil {
+		return fmt.Errorf("failed to read init script: %w", err)
+	}
+
+	// Split the script into separate queries
+	queries := strings.Split(string(script), ";")
+
+	// Execute each query
+	for _, query := range queries {
+		query = strings.TrimSpace(query) // Remove leading/trailing whitespace
+		if query != "" {
+			_, err := db.Exec(query)
+			if err != nil {
+				return fmt.Errorf("failed to execute query: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	ctx := context.Background()
 
+	apertureAgentAddress := getEnvOrDefault("APERTURE_AGENT_ADDRESS", "localhost:8089")
 	apertureAgentInsecure := getEnvOrDefault("APERTURE_AGENT_INSECURE", "false")
 	apertureAgentInsecureBool, _ := strconv.ParseBool(apertureAgentInsecure)
 	apertureAgentSkipVerify := getEnvOrDefault("APERTURE_AGENT_SKIP_VERIFY", "false")
@@ -71,9 +102,8 @@ func main() {
 	// START: clientConstructor
 
 	opts := aperture.Options{
-		Address:     "ORGANIZATION.app.fluxninja.com:443",
+		Address:     apertureAgentAddress,
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
-		APIKey:      getEnvOrDefault("APERTURE_API_KEY", ""),
 	}
 
 	// initialize Aperture Client with the provided options.
@@ -84,21 +114,43 @@ func main() {
 
 	// END: clientConstructor
 
+	pgsqlDB := &sql.DB{}
+	enablePostgres := getEnvOrDefault("APERTURE_ENABLE_POSTGRES", "false")
+	if enablePostgres == "true" {
+		pgsqlURL := getEnvOrDefault("POSTGRES_CONNECTION_STRING", "")
+		if pgsqlURL == "" {
+			log.Fatalf("failed to get postgres connection string")
+		}
+
+		pgsqlDB, err = sql.Open("postgres", pgsqlURL)
+		if err != nil {
+			log.Fatalf("failed to open postgres connection: %v", err)
+		}
+		err = pgsqlDB.Ping()
+		if err != nil {
+			log.Fatalf("failed to ping postgres: %v", err)
+		}
+
+		err = runInitScript(pgsqlDB, "/init.sql")
+		if err != nil {
+			log.Fatalf("failed to run init script: %v", err)
+		}
+	}
+
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
 	// Create a server with passing it the Aperture client.
 	mux := mux.NewRouter()
 	a := &app{
 		server: &http.Server{
-			Addr:    net.JoinHostPort("localhost", appPort),
+			Addr:    net.JoinHostPort("0.0.0.0", appPort),
 			Handler: mux,
 		},
 		apertureClient: apertureClient,
+		db:             pgsqlDB,
 	}
 
-	// Adding the http middleware to be executed before the actual business logic execution.
-	superRouter := mux.PathPrefix("/super").Subrouter()
-	superRouter.HandleFunc("", a.SuperHandler)
-
+	mux.HandleFunc("/super", a.SuperHandler)
+	mux.HandleFunc("/postgres", a.PostgresHandler)
 	mux.HandleFunc("/connected", a.ConnectedHandler)
 	mux.HandleFunc("/health", a.HealthHandler)
 
@@ -120,11 +172,13 @@ func main() {
 	if err := a.server.Shutdown(ctx); err != nil {
 		log.Fatalf("Failed to shutdown server: %+v", err)
 	}
+	if err := pgsqlDB.Close(); err != nil {
+		log.Fatalf("Failed to close postgres connection: %+v", err)
+	}
 }
 
 // SuperHandler handles HTTP requests on /super endpoint.
 func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
-
 	// START: manualFlowNoCaching
 
 	// START: defineLabels
@@ -157,17 +211,14 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("Flow Accepted Processing work")
 		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte("Super!"))
-
 	} else {
-
 		// handle flow rejection by Aperture Agent
 		log.Println("Flow Rejected")
 		flow.SetStatus(aperture.Error)
 		w.WriteHeader(http.StatusForbidden)
 	}
 
-	endResponse:= flow.End()
+	endResponse := flow.End()
 	if endResponse.Error != nil {
 		log.Printf("Failed to end flow: %+v", endResponse.Error)
 	}
@@ -175,6 +226,74 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Flow ended with response: %+v", endResponse.FlowEndResponse)
 
 	// END: manualFlowNoCaching
+}
+
+// PostgresHandler handles HTTP requests on /postgres endpoint.
+func (a *app) PostgresHandler(w http.ResponseWriter, r *http.Request) {
+	if a.db == nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	priority := "1"
+
+	userID := r.Header.Get("User-Id")
+	if userID == "" {
+		userID = "kenobi"
+	}
+
+	userType := r.Header.Get("User-Type")
+	if userType == "" {
+		userType = "jedi"
+	} else if userType == "guest" {
+		priority = "50"
+	} else if userType == "subscriber" {
+		priority = "200"
+	}
+
+	labels := map[string]string{
+		"userId":   userID,
+		"userType": userType,
+		"priority": priority,
+	}
+
+	flowParams := aperture.FlowParams{
+		Labels:   labels,
+		RampMode: false,
+	}
+
+	ctxTimeout, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
+	log.Printf("Starting flow with params: %+v", flowParams)
+	flow := a.apertureClient.StartFlow(ctxTimeout, "postgres", flowParams)
+	if flow.ShouldRun() {
+		time.Sleep(2 * time.Second)
+
+		log.Println("Flow Accepted Processing work")
+
+		_, err := a.db.Exec("INSERT into users (id, type) VALUES ($1, $2)", userID, userType)
+		if err != nil {
+			log.Printf("Failed to insert into postgres: %+v", err)
+			flow.SetStatus(aperture.Error)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		w.WriteHeader(http.StatusAccepted)
+	} else {
+		log.Println("Flow Rejected")
+		flow.SetStatus(aperture.Error)
+		w.WriteHeader(http.StatusForbidden)
+	}
+
+	checkResponse := flow.CheckResponse()
+	checkResponseBytes, _ := json.Marshal(checkResponse)
+	log.Printf("Flow check response: %+v", string(checkResponseBytes))
+
+	endResponse := flow.End()
+	if endResponse.Error != nil {
+		log.Printf("Failed to end flow: %+v", endResponse.Error)
+	}
 }
 
 // ConnectedHandler handles HTTP requests on /connected endpoint.

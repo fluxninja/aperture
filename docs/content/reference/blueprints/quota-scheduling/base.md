@@ -135,7 +135,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Rate Limiter Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../configuration/spec#rate-limiter-parameters'
-    value='{"interval": "__REQUIRED_FIELD__", "limit_by_label_key": "limit_key"}'
+    value='{"interval": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -149,7 +149,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/quota-sched
     description='Scheduler configuration.'
     type='Object (aperture.spec.v1.Scheduler)'
     reference='../../configuration/spec#scheduler'
-    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
+    value='{}'
 />
 
 <!-- vale on -->

@@ -3,33 +3,29 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: gpt-4-rpm
+  name: concurrency-scheduling
 spec:
   circuit:
     components:
     - flow_control:
-        quota_scheduler:
+        concurrency_scheduler:
+          concurrency_limiter:
+            max_idle_time: 7200s
+            max_inflight_duration: 60s
           in_ports:
-            bucket_capacity:
+            max_concurrency:
               constant_signal:
-                value: 200
-            fill_amount:
-              constant_signal:
-                value: 200
+                value: 2
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
-          rate_limiter:
-            interval: 60s
-            limit_by_label_key: api_key
           scheduler:
+            denied_response_status_code: BadRequest
             priority_label_key: priority
+            workload_label_key: userType
           selectors:
-          - control_point: openai
-            label_matcher:
-              match_labels:
-                product_reason: paid_user
-                prompt_type: chat
+          - agent_group: default
+            control_point: postgres
     - decider:
         in_ports:
           lhs:
@@ -46,7 +42,7 @@ spec:
           signal:
             signal_name: ACCEPT_PERCENTAGE_ALERT
         parameters:
-          alert_name: More than 90% of requests are being rate limited
+          alert_name: Too many inflight requests
     evaluation_interval: 1s
   resources:
     flow_control:
