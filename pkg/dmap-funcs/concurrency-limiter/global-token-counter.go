@@ -410,9 +410,6 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 	} else {
 		waitTime = MinimumWaitTime
 	}
-	if waitTime < MinimumWaitTime {
-		waitTime = MinimumWaitTime
-	}
 	if requestQueued != nil {
 		if requestQueued.NumRetries >= 5 {
 			// override wait time if the request has been retried more than 5 times
@@ -423,6 +420,12 @@ func (gtc *GlobalTokenCounter) takeN(key string, stateBytes, argBytes []byte) ([
 			// Increase wait time exponentially after every 5 re-tries
 			waitTime = requestQueued.WaitFor.AsDuration() * 2
 		}
+	}
+	if waitTime < MinimumWaitTime {
+		waitTime = MinimumWaitTime
+	}
+	if waitTime > MaximumWaitTime {
+		waitTime = MaximumWaitTime
 	}
 
 	var requestsInflight []*tokencounterv1.Request
