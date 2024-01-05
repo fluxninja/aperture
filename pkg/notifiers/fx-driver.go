@@ -110,7 +110,9 @@ func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 		if err = fr.app.Start(ctx); err != nil {
 			logger.Error().Err(err).Msg("Could not start application")
 			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
-			_ = fr.deinitApp()
+			if deinitErr := fr.deinitApp(); deinitErr != nil {
+			    logger.Error().Err(deinitErr).Msg("Failed to deinitialize application after start failure")
+			}
 			return err
 		}
 		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil))
