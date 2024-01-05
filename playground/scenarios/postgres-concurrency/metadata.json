@@ -4,8 +4,8 @@
   "needs": ["postgresql"],
   "aperture_policies": [
     {
-      "policy_name": "concurrency-limiting",
-      "values_file": "policies/concurrency-limiting.yaml"
+      "policy_name": "concurrency-scheduling",
+      "values_file": "policies/concurrency-scheduling.yaml"
     }
   ],
   "images": [

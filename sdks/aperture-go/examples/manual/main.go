@@ -79,22 +79,29 @@ func main() {
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
 	}
 
+	ctxTimeout, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
 	// initialize Aperture Client with the provided options.
-	apertureClient, err := aperture.NewClient(ctx, opts)
+	apertureClient, err := aperture.NewClient(ctxTimeout, opts)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
 	// END: clientConstructor
 
-	pgsqlURL := "postgres://postgres:secretpassword@postgresql.postgresql.svc.cluster.local:5432/postgres?sslmode=disable"
-	pgsqlDB, err := sql.Open("postgres", pgsqlURL)
-	if err != nil {
-		log.Fatalf("failed to open postgres connection: %v", err)
-	}
-	err = pgsqlDB.Ping()
-	if err != nil {
-		log.Fatalf("failed to ping postgres: %v", err)
+	pgsqlDB := &sql.DB{}
+	enablePostgres := getEnvOrDefault("APERTURE_ENABLE_POSTGRES", "false")
+	if enablePostgres == "true" {
+		pgsqlURL := "postgres://postgres:secretpassword@postgresql.postgresql.svc.cluster.local:5432/postgres?sslmode=disable"
+		pgsqlDB, err = sql.Open("postgres", pgsqlURL)
+		if err != nil {
+			log.Fatalf("failed to open postgres connection: %v", err)
+		}
+		err = pgsqlDB.Ping()
+		if err != nil {
+			log.Fatalf("failed to ping postgres: %v", err)
+		}
 	}
 
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
@@ -190,18 +197,31 @@ func (a *app) SuperHandler(w http.ResponseWriter, r *http.Request) {
 
 // PostgresHandler handles HTTP requests on /postgres endpoint.
 func (a *app) PostgresHandler(w http.ResponseWriter, r *http.Request) {
+	if a.db == nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	priority := "1"
+
 	userID := r.Header.Get("User-Id")
 	if userID == "" {
 		userID = "kenobi"
 	}
+
 	userType := r.Header.Get("User-Type")
 	if userType == "" {
 		userType = "jedi"
+	} else if userType == "guest" {
+		priority = "50"
+	} else if userType == "subscriber" {
+		priority = "200"
 	}
 
 	labels := map[string]string{
 		"userId":   userID,
 		"userType": userType,
+		"priority": priority,
 	}
 
 	flowParams := aperture.FlowParams{
@@ -212,15 +232,17 @@ func (a *app) PostgresHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Starting flow with params: %+v", flowParams)
 	flow := a.apertureClient.StartFlow(r.Context(), "postgres", flowParams)
 	if flow.ShouldRun() {
+		time.Sleep(2 * time.Second)
+
+		log.Println("Flow Accepted Processing work")
+
 		_, err := a.db.Exec("INSERT into users (id, type) VALUES ($1, $2)", userID, userType)
 		if err != nil {
 			log.Printf("Failed to insert into postgres: %+v", err)
 			flow.SetStatus(aperture.Error)
 			w.WriteHeader(http.StatusInternalServerError)
-			return
 		}
 
-		log.Println("Flow Accepted Processing work")
 		w.WriteHeader(http.StatusAccepted)
 	} else {
 		log.Println("Flow Rejected")

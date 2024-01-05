@@ -24,7 +24,7 @@ local defaults = {
       port: 80,
     },
     labels: {
-      'app.kubernetes.io/name': $.environment.name,
+      'app.kubernetes.io/name': 'example',
       'app.kubernetes.io/instance': $.environment.name,
     },
     app_port: 8099,
@@ -52,6 +52,7 @@ function(values={}, environment={}) {
         APERTURE_APP_PORT: std.toString(_values.app_port),
         APERTURE_AGENT_ADDRESS: _values.agent.address,
         APERTURE_AGENT_INSECURE: 'true',
+        APERTURE_ENABLE_POSTGRES: 'true',
       }),
     ])
     + deployment.metadata.withLabels(_values.labels)
@@ -64,8 +65,7 @@ function(values={}, environment={}) {
       servicePort.newNamed(name='http', port=_values.service.port, targetPort='srvhttp'),
     ])
     + service.spec.withSelector(_values.labels)
-    + service.metadata.withNamespace(_environment.namespace)
-    + service.metadata.withLabels(_values.labels),
+    + service.metadata.withNamespace(_environment.namespace),
   serviceAccount:
     serviceAccount.new($.deployment.metadata.name)
     + serviceAccount.metadata.withNamespace(_environment.namespace)

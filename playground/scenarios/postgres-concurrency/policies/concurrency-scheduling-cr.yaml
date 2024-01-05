@@ -3,12 +3,16 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: concurrency-limiting
+  name: concurrency-scheduling
 spec:
   circuit:
     components:
     - flow_control:
-        concurrency_limiter:
+        concurrency_scheduler:
+          concurrency_limiter:
+            limit_by_label_key: limit_by_label_key
+            max_idle_time: 7200s
+            max_inflight_duration: 60s
           in_ports:
             max_concurrency:
               constant_signal:
@@ -16,14 +20,14 @@ spec:
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
-          parameters:
-            limit_by_label_key: userId
-            max_inflight_duration: 1s
-          request_parameters: {}
+          scheduler:
+            denied_response_status_code: BadRequest
+            priority_label_key: priority
+            tokens_label_key: tokens
+            workload_label_key: userType
           selectors:
           - agent_group: default
-            control_point: ingress
-            service: aperture-go-example.aperture-go-example.svc.cluster.local
+            control_point: postgres
     - decider:
         in_ports:
           lhs:
@@ -40,7 +44,7 @@ spec:
           signal:
             signal_name: ACCEPT_PERCENTAGE_ALERT
         parameters:
-          alert_name: Too many inflight requests'
+          alert_name: Too many inflight requests
     evaluation_interval: 1s
   resources:
     flow_control:
