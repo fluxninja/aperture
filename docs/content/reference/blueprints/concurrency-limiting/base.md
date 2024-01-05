@@ -121,7 +121,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/concurrency
     description='Parameters.'
     type='Object (aperture.spec.v1.ConcurrencyLimiterParameters)'
     reference='../../configuration/spec#concurrency-limiter-parameters'
-    value='{"limit_by_label_key": "limit_by_label_key", "max_inflight_duration": "__REQUIRED_FIELD__"}'
+    value='{"max_inflight_duration": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

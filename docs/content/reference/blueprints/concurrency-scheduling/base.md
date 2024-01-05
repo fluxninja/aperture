@@ -107,7 +107,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/concurrency
     description='Concurrency Limiter Parameters.'
     type='Object (aperture.spec.v1.ConcurrencyLimiterParameters)'
     reference='../../configuration/spec#concurrency-limiter-parameters'
-    value='{"limit_by_label_key": "limit_by_label_key", "max_inflight_duration": "__REQUIRED_FIELD__"}'
+    value='{"max_inflight_duration": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->
@@ -135,7 +135,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/concurrency
     description='Scheduler configuration.'
     type='Object (aperture.spec.v1.Scheduler)'
     reference='../../configuration/spec#scheduler'
-    value='{"priority_label_key": "priority", "tokens_label_key": "tokens", "workload_label_key": "workload"}'
+    value='{}'
 />
 
 <!-- vale on -->
