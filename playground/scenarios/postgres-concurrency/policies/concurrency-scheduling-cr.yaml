@@ -3,13 +3,14 @@ kind: Policy
 metadata:
   labels:
     fluxninja.com/validate: "true"
-  name: mistral-concurrency-scheduling
+  name: concurrency-scheduling
 spec:
   circuit:
     components:
     - flow_control:
         concurrency_scheduler:
           concurrency_limiter:
+            max_idle_time: 7200s
             max_inflight_duration: 60s
           in_ports:
             max_concurrency:
@@ -19,11 +20,12 @@ spec:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
           scheduler:
+            denied_response_status_code: BadRequest
             priority_label_key: priority
-            tokens_label_key: tokens
-            workload_label_key: workload
+            workload_label_key: userType
           selectors:
-          - control_point: mistral-prompt
+          - agent_group: default
+            control_point: postgres
     - decider:
         in_ports:
           lhs:

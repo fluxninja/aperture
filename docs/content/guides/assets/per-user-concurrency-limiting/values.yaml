@@ -10,7 +10,7 @@ policy:
   concurrency_limiter:
     alerter:
       alert_name: "Too many inflight requests"
-    max_concurrency: 10
+    max_concurrency: 20
     parameters:
       limit_by_label_key: "user_id"
       max_inflight_duration: 60s

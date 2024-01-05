@@ -67,7 +67,6 @@
             "parameters": {
               "description": "Parameters.",
               "default": {
-                "limit_by_label_key": "limit_by_label_key",
                 "max_inflight_duration": "__REQUIRED_FIELD__"
               },
               "type": "object",

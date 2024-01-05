@@ -310,7 +310,7 @@ func (f *flow) End() EndResponse {
 	)
 	f.span.End()
 
-	inflightRequests := make([]*checkv1.InflightRequestRef, len(f.checkResponse.GetLimiterDecisions()))
+	inflightRequests := []*checkv1.InflightRequestRef{}
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {

@@ -26,9 +26,6 @@ spec:
               num_sync: 4
             limit_by_label_key: http.request.header.api_key
           scheduler:
-            priority_label_key: priority
-            tokens_label_key: tokens
-            workload_label_key: workload
             workloads:
             - label_matcher:
                 match_labels:

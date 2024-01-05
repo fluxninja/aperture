@@ -24,7 +24,6 @@ spec:
             limit_by_label_key: user_id
           scheduler:
             priority_label_key: priority
-            tokens_label_key: tokens
             workload_label_key: workload
           selectors:
           - control_point: quota-scheduling-feature

@@ -34,7 +34,6 @@ policy:
     # Required: True
     parameters:
       interval: __REQUIRED_FIELD__
-      limit_by_label_key: "limit_key"
     # Request Parameters.
     # Type: aperture.spec.v1.RateLimiterRequestParameters
     request_parameters: {}

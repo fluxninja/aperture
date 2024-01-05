@@ -99,7 +99,9 @@ func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 			visualize, _ := fx.VisualizeError(err)
 			logger.Error().Err(err).Str("visualize", visualize).Msg("fx.New failed")
 			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
-			_ = fr.deinitApp()
+			if deinitErr := fr.deinitApp(); deinitErr != nil {
+				logger.Error().Err(deinitErr).Msg("Failed to deinitialize application after start failure")
+			}
 			return err
 		}
 
@@ -110,6 +112,9 @@ func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 		if err = fr.app.Start(ctx); err != nil {
 			logger.Error().Err(err).Msg("Could not start application")
 			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
+			if deinitErr := fr.deinitApp(); deinitErr != nil {
+				logger.Error().Err(deinitErr).Msg("Failed to deinitialize application after start failure")
+			}
 			return err
 		}
 		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil))
@@ -124,8 +129,10 @@ func (fr *fxRunner) deinitApp() error {
 	logger := fr.fxRunnerStatusRegistry.GetLogger()
 	if fr.app != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StopTimeout())
-		defer func() { fr.app = nil }()
-		defer cancel()
+		defer func() {
+			cancel()
+			fr.app = nil
+		}()
 		if err := fr.app.Stop(ctx); err != nil {
 			logger.Error().Err(err).Msg("Could not stop application")
 			return err

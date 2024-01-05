@@ -122,6 +122,33 @@ provide granular visibility for each flow.
 
 ```mdx-code-block
 <Tabs>
+  <TabItem value="Aperture Cloud UI">
+```
+
+Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
+in the upper right corner. Next, choose the Rate Limiting blueprint, select
+Concurrency and complete the form with these specific values:
+
+1. `Policy name`: Unique for each policy, this field can be used to define
+   policies tailored for different use cases. Set the policy name to
+   `concurrency-limit-test`.
+2. `Max concurrency`: Configures the maximum number of concurrent requests
+   allowed. Set `Max concurrency` to `20`.
+3. `Limit by label key`: Determines the specific label key used for enforcing
+   concurrency limits. We'll use `user_id` as an example.
+4. `Max inflight duration`: Configures the time duration after which a flow is
+   assumed to have ended in case end call is missed. Set `Max inflight duration`
+   to `60s`.
+5. `Control point`: It can be a particular feature or execution block within a
+   service. We'll use `concurrency-limiting-feature` as an example.
+
+![Concurrency Limit Test](./assets/per-user-concurrency-limiting/concurrency-limit-test.png)
+
+Once you've entered these six fields, click `Continue` and then `Apply Policy`
+to finalize the policy setup.
+
+```mdx-code-block
+  </TabItem>
   <TabItem value="aperturectl">
 ```
 
@@ -141,7 +168,7 @@ limiting policy:
    policies tailored for different use cases. Set the policy name to
    `concurrency-limit-test`.
 2. `max_concurrency`: Configures the maximum number of concurrent requests
-   allowed. Set `max_concurrency` to `10`.
+   allowed. Set `max_concurrency` to `20`.
 3. `limit_by_label_key`: Determines the specific label key used for enforcing
    concurrency limits. We'll use `user_id` as an example.
 4. `max_inflight_duration`: Configures the time duration after which a flow is
@@ -161,14 +188,14 @@ The last step is to apply the policy using the following command:
 <CodeBlock language="bash"> aperturectl cloud blueprints apply
 --values-file=concurrency-limit-test.yaml </CodeBlock>
 
-For this policy, users are permitted to make up to 10 concurrent requests in
-before hitting the concurrency limit. Additional requests made after the maximum
-number of concurrent requests is reached are rejected.
-
 ```mdx-code-block
   </TabItem>
 </Tabs>
 ```
+
+For this policy, users are permitted to make up to 10 concurrent requests in
+before hitting the concurrency limit. Additional requests made after the maximum
+number of concurrent requests is reached are rejected.
 
 Next, we'll proceed to run an example to observe the newly implemented policy in
 action.

@@ -528,11 +528,32 @@ func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queu
 // Update metrics for preemption and delay
 // WARNING: Unsafe and should be called with scheduler lock.
 func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queuedRequest, allowed bool) {
+	initMetrics := func(labels prometheus.Labels) error {
+		var err error
+		_, err = pMetrics.workloadPreemptedTokensSummary.GetMetricWith(labels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_preempted_tokens summary", err)
+		}
+		_, err = pMetrics.workloadDelayedTokensSummary.GetMetricWith(labels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_delayed_tokens summary", err)
+		}
+		_, err = pMetrics.workloadOnTimeCounter.GetMetricWith(labels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get workload_on_time_total counter", err)
+		}
+		return nil
+	}
+
 	publishSummary := func(summary *prometheus.SummaryVec, value float64) {
 		if summary == nil {
 			return
 		}
 		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		err := initMetrics(metricsLabels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to initialize metrics")
+		}
 		observer, err := summary.GetMetricWith(metricsLabels)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to get workload preempted tokens summary")
@@ -546,6 +567,10 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 			return
 		}
 		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		err := initMetrics(metricsLabels)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to initialize metrics")
+		}
 		counter, err := counterVec.GetMetricWith(metricsLabels)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to get workload on time counter")

@@ -12,7 +12,7 @@ spec:
           in_ports:
             max_concurrency:
               constant_signal:
-                value: 10
+                value: 20
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
