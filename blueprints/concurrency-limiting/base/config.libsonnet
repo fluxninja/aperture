@@ -13,7 +13,6 @@ commonConfig {
       max_concurrency: '__REQUIRED_FIELD__',
       selectors: commonConfig.selectors_defaults,
       parameters: {
-        limit_by_label_key: 'limit_by_label_key',
         max_inflight_duration: '__REQUIRED_FIELD__',
       },
       request_parameters: {},

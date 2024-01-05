@@ -10,20 +10,18 @@ spec:
     - flow_control:
         concurrency_scheduler:
           concurrency_limiter:
-            limit_by_label_key: limit_by_label_key
             max_idle_time: 7200s
             max_inflight_duration: 60s
           in_ports:
             max_concurrency:
               constant_signal:
-                value: 10
+                value: 2
           out_ports:
             accept_percentage:
               signal_name: ACCEPT_PERCENTAGE
           scheduler:
             denied_response_status_code: BadRequest
             priority_label_key: priority
-            tokens_label_key: tokens
             workload_label_key: userType
           selectors:
           - agent_group: default

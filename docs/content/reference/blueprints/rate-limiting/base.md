@@ -135,7 +135,7 @@ href={`https://github.com/fluxninja/aperture/tree/${aver}/blueprints/rate-limiti
     description='Parameters.'
     type='Object (aperture.spec.v1.RateLimiterParameters)'
     reference='../../configuration/spec#rate-limiter-parameters'
-    value='{"interval": "__REQUIRED_FIELD__", "limit_by_label_key": "limit_key"}'
+    value='{"interval": "__REQUIRED_FIELD__"}'
 />
 
 <!-- vale on -->

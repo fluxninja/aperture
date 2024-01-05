@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net"
 	"net/http"
@@ -79,11 +80,8 @@ func main() {
 		DialOptions: grpcOptions(apertureAgentInsecureBool, apertureAgentSkipVerifyBool),
 	}
 
-	ctxTimeout, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
 	// initialize Aperture Client with the provided options.
-	apertureClient, err := aperture.NewClient(ctxTimeout, opts)
+	apertureClient, err := aperture.NewClient(ctx, opts)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
@@ -229,8 +227,11 @@ func (a *app) PostgresHandler(w http.ResponseWriter, r *http.Request) {
 		RampMode: false,
 	}
 
+	ctxTimeout, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+
 	log.Printf("Starting flow with params: %+v", flowParams)
-	flow := a.apertureClient.StartFlow(r.Context(), "postgres", flowParams)
+	flow := a.apertureClient.StartFlow(ctxTimeout, "postgres", flowParams)
 	if flow.ShouldRun() {
 		time.Sleep(2 * time.Second)
 
@@ -249,6 +250,10 @@ func (a *app) PostgresHandler(w http.ResponseWriter, r *http.Request) {
 		flow.SetStatus(aperture.Error)
 		w.WriteHeader(http.StatusForbidden)
 	}
+
+	checkResponse := flow.CheckResponse()
+	checkResponseBytes, _ := json.Marshal(checkResponse)
+	log.Printf("Flow check response: %+v", string(checkResponseBytes))
 
 	endResponse := flow.End()
 	if endResponse.Error != nil {

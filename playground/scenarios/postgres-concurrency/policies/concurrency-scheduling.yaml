@@ -17,7 +17,7 @@ policy:
     concurrency_limiter:
       max_inflight_duration: 60s
       max_idle_time: "7200s"
-    max_concurrency: 10
+    max_concurrency: 2
     scheduler:
       workload_label_key: "userType"
       priority_label_key: "priority"

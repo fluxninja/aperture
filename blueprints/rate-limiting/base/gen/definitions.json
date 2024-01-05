@@ -78,8 +78,7 @@
             "parameters": {
               "description": "Parameters.",
               "default": {
-                "interval": "__REQUIRED_FIELD__",
-                "limit_by_label_key": "limit_key"
+                "interval": "__REQUIRED_FIELD__"
               },
               "type": "object",
               "$ref": "../../../gen/jsonschema/_definitions.json#/definitions/RateLimiterParameters"
