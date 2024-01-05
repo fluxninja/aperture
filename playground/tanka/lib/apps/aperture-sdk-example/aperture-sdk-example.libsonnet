@@ -27,10 +27,11 @@ local defaults = {
       'app.kubernetes.io/name': 'example',
       'app.kubernetes.io/instance': $.environment.name,
     },
-    app_port: 8099,
+    app_port: 8080,
     agent: {
       address: 'aperture-agent.aperture-agent.svc.cluster.local:8080',
     },
+    extraEnv: {},
   },
 };
 
@@ -38,9 +39,6 @@ function(values={}, environment={}) {
   local _merged = defaults { environment+: environment, values+: values },
   local _environment = _merged.environment,
   local _values = _merged.values,
-  namespace:
-    namespace.new(_environment.namespace)
-    + namespace.metadata.withLabels(_values.labels),
   deployment:
     deployment.new(name=_environment.name, containers=[
       container.new(_environment.name, image='%(repository)s:%(tag)s' % _values.image)
@@ -52,8 +50,7 @@ function(values={}, environment={}) {
         APERTURE_APP_PORT: std.toString(_values.app_port),
         APERTURE_AGENT_ADDRESS: _values.agent.address,
         APERTURE_AGENT_INSECURE: 'true',
-        APERTURE_ENABLE_POSTGRES: 'true',
-      }),
+      } + _values.extraEnv),
     ])
     + deployment.metadata.withLabels(_values.labels)
     + deployment.metadata.withNamespace(_environment.namespace)

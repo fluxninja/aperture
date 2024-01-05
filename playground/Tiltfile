@@ -379,6 +379,9 @@ DEP_TREE = {
                 {
                     "workload": "aperture-go-example",
                     "resource_deps": ["agent", "controller", "cluster-bootstrap"],
+                    "extra_objects": [
+                        ("^aperture-go-example", "serviceaccount", APERTURE_GO_EXAMPLE_NS)
+                    ],
                 }
             ]
         },
@@ -1133,6 +1136,10 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, cloud_extensi
             namespace = app_config.get("namespace", None)
             if tkenv:
                 base_dir = app_config.get("base_dir")
+                if not namespace and "playground/tanka/apps/aperture-go-example" in tkenv and APERTURE_GO_EXAMPLE_NS + ":namespace" not in managed_namespaces:
+                    namespace_create(APERTURE_GO_EXAMPLE_NS, labels=ns_labels)
+                    namespace = APERTURE_GO_EXAMPLE_NS
+                    managed_namespaces += [namespace + ":namespace"]
                 render_tanka(tkenv, env_vars, base_dir, namespace, cloud_extension, values)
             elif renderer == "yaml":
                 render_yaml(manifests_path, env_vars)

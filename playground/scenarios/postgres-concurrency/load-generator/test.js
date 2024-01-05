@@ -28,7 +28,7 @@ export let options = {
 export default function () {
   let userType = __ENV.USER_TYPE;
   let userId = vu.idInTest;
-  const url = "http://localhost:8099/postgres";
+  const url = "http://aperture-go-example.aperture-go-example.svc.cluster.local:80/postgres";
   const headers = {
     "Content-Type": "application/json",
     Cookie:

@@ -19,7 +19,12 @@
   "child_resources": [
     {
       "workload": "aperture-go-example",
-      "resource_deps": ["cluster-bootstrap", "postgresql"],
+      "resource_deps": [
+        "agent",
+        "controller",
+        "cluster-bootstrap",
+        "postgresql"
+      ],
       "extra_objects": ["aperture-go-example:serviceaccount"]
     }
   ]

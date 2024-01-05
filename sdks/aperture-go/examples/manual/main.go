@@ -6,12 +6,14 @@ import (
 	"crypto/x509"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -64,6 +66,30 @@ func grpcOptions(insecureMode, skipVerify bool) []grpc.DialOption {
 
 // END: grpcOptions
 
+func runInitScript(db *sql.DB, scriptPath string) error {
+	// Read the init script
+	script, err := os.ReadFile(scriptPath)
+	if err != nil {
+		return fmt.Errorf("failed to read init script: %w", err)
+	}
+
+	// Split the script into separate queries
+	queries := strings.Split(string(script), ";")
+
+	// Execute each query
+	for _, query := range queries {
+		query = strings.TrimSpace(query) // Remove leading/trailing whitespace
+		if query != "" {
+			_, err := db.Exec(query)
+			if err != nil {
+				return fmt.Errorf("failed to execute query: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -91,7 +117,11 @@ func main() {
 	pgsqlDB := &sql.DB{}
 	enablePostgres := getEnvOrDefault("APERTURE_ENABLE_POSTGRES", "false")
 	if enablePostgres == "true" {
-		pgsqlURL := "postgres://postgres:secretpassword@postgresql.postgresql.svc.cluster.local:5432/postgres?sslmode=disable"
+		pgsqlURL := getEnvOrDefault("POSTGRES_CONNECTION_STRING", "")
+		if pgsqlURL == "" {
+			log.Fatalf("failed to get postgres connection string")
+		}
+
 		pgsqlDB, err = sql.Open("postgres", pgsqlURL)
 		if err != nil {
 			log.Fatalf("failed to open postgres connection: %v", err)
@@ -100,6 +130,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to ping postgres: %v", err)
 		}
+
+		err = runInitScript(pgsqlDB, "/init.sql")
+		if err != nil {
+			log.Fatalf("failed to run init script: %v", err)
+		}
 	}
 
 	appPort := getEnvOrDefault("APERTURE_APP_PORT", defaultAppPort)
@@ -107,7 +142,7 @@ func main() {
 	mux := mux.NewRouter()
 	a := &app{
 		server: &http.Server{
-			Addr:    net.JoinHostPort("localhost", appPort),
+			Addr:    net.JoinHostPort("0.0.0.0", appPort),
 			Handler: mux,
 		},
 		apertureClient: apertureClient,
