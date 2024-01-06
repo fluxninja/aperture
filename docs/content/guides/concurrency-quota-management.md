@@ -249,7 +249,7 @@ and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
 menu. Copy and enter both your Organization address and API Key to establish a
 connection between the SDK and Aperture Cloud.
 
-## Monitoring concurrency Scheduling Policy
+## Monitoring Concurrency Scheduling Policy
 
 After running the example for a few minutes, you can review the telemetry data
 in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the

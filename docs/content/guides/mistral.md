@@ -34,22 +34,22 @@ Such constraints, combined with an increase in demand, often result in slower
 response times to prompts, which leads to degradation of user experience during
 peak loads.
 
-Aperture handles peak loads and preserves the user experience with Concurrency
-Scheduling feature by efficiently scheduling in-flight requests directed to
-Mistral. This guide will provide detailed instructions on how to use the
-Aperture SDK when interfacing with Mistral, and define a concurrency scheduling
-policy using Aperture Cloud
+Aperture handles peak loads and preserves the user experience with the
+Concurrency Scheduling feature by efficiently scheduling in-flight requests
+directed to Mistral. This guide will provide detailed instructions on how to use
+the Aperture SDK when interfacing with Mistral, and define a concurrency
+scheduling policy using Aperture Cloud.
 
 ## Schedule Requests in Mistral with Aperture
 
-Aperture can help scheudle in-flight requests and improve user experience by
+Aperture can help schedule in-flight requests and improve user experience by
 queuing and prioritizing requests before sending them to Mistral. Aperture
 offers a blueprint for
 [concurrency scheduling](https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base),
 consisting of two main components:
 
-- Concurrency Limiter: It allows to set the max number of concurrenct requests
-  that can be processed. This paratemeter can be set according to the an
+- Concurrency Limiter: It allows setting the max number of concurrenct requests
+  that can be processed. This paratemeter can be set according to an
   application's ability to set to handle the maximum number of concurrent
   requests at a given time.
 - Scheduler: Aperture has a
@@ -73,7 +73,7 @@ Requests coming into the system are categorized into different workloads, each
 of which is defined by its priority and weight. This classification is crucial
 for the request scheduling process.
 
-The scheduler priorities request admission based the priority and weight
+The scheduler priorities request admission based on the priority and weight
 assigned to the corresponding workload. This mechanism ensures that
 high-priority requests are handled appropriately even under high load.
 
@@ -136,7 +136,7 @@ milliseconds, for example, indicates that the request can be queued for a
 maximum of 2 minutes. After this interval, the request will be rejected.
 
 Once the `startFlow` call is made, we send the prompt to Mistral and await for
-it's response. Excess requests are automatically queued by Aperture, eliminating
+its response. Excess requests are automatically queued by Aperture, eliminating
 the need to check if a flow `shouldRun` or not.
 
 ```mdx-code-block
@@ -194,8 +194,8 @@ visibility for each flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Rate Limiting blueprint and complete
-the form with these specific values:
+in the upper right corner. Next, choose the Rate Limiting blueprint, select
+Concurrency and complete the form with these specific values:
 
 1. `Policy name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
@@ -203,8 +203,8 @@ the form with these specific values:
 2. `Limit by label key`: Determines the specific label key used for concurrency
    limits. This paratemeter becomes essential for more granular concurrency
    limiting use cases such as per user limiting where a parameter like the
-   `user_id` can be passed. For now, since we want to do a global concurrency
-   limiting, we will leave the label as it is.
+   `user_id` can be passed. For now, we will test global concurrency limiting,
+   we will leave the label as it is.
 3. `Max inflight duration`: Configures the time duration after which flow is
    assumed to have ended in case the end call gets missed. We'll set it to `60s`
    as an example.
@@ -218,6 +218,11 @@ the form with these specific values:
    determine the workload. We will leave the label as it is.
 8. `Control point`: It can be a particular feature or execution block within a
    service. We'll use `mistral-prompt` as an example.
+
+![Concurrency Scheduling Policy](./assets/mistral/mistral-policy.png)
+
+Once you've completed these fields, click `Continue` and then `Apply Policy` to
+finalize the policy setup.
 
 ```mdx-code-block
   </TabItem>
@@ -289,22 +294,26 @@ and `endFlow` functions. To mimic real-world usage, we generated lists of
 prompts for paid and open source users, which were sent concurrently to Mistral.
 With around 50 users simultaneously requesting responses from Mistral, we
 observed significant latency differences. Without Aperture, the response time
-for generative AI workloads spiked up to 10 minutes. In contrast, with
-Aperture's concurrency scheduling policy in place, not only was the latency
-reduced to as low as 20 seconds, but our paying users also experienced much
-faster responses compared to those using the open-source version due to paid
-users having a high priority.
+for generative AI workloads spiked up to 5 minutes. In contrast, with Aperture's
+concurrency scheduling policy in place, not only was the latency reduced to as
+low as 50 seconds, but our paying users also experienced much faster responses
+compared to those using the open-source version due to paid users having a high
+priority.
 
 Here is a comparison of the latencies before and after Aperture.
 
 Before Aperture:
 
-[Before Aperture](./assets/mistral/before-aperture.png)
+![Before Aperture](./assets/mistral/before-aperture.png)
 
 After Aperture:
 
-Here is the queueing of requests when the max concurrency is met, and how it
-bumps up paid requests up in the queue.
+![After Aperture](./assets/mistral/after-aperture.png)
+
+Here is the queueing and prioritization of requests when the max concurrency is
+met, and how it bumps up paid requests up in the queue.
+
+![Dashboard](./assets/mistral/mistral-queue.png)
 
 In summary, whether you're operating Mistral as a service or employing its API
 for app development, managing the demands of generative AI workloads remains a
