@@ -11,8 +11,8 @@ import Zoom from 'react-medium-image-zoom';
 ```
 
 Aperture Cloud uses Personal Access Tokens to authenticate requests coming from
-[aperturectl][configure aperturectl]. You can create Personal Access Tokens for
-your user in the Aperture Cloud UI.
+[aperturectl][aperturectl]. You can create Personal Access Tokens for your user
+in the Aperture Cloud UI.
 
 ## Pre-requisites
 
@@ -36,5 +36,9 @@ You have [signed up][sign-up] on Aperture Cloud and created an organization.
 
    ![New Personal Access Token](./assets/personal-access-keys/new-personal-access-token.png)
 
-[configure aperturectl]: /reference/aperture-cli/aperture-cli.md
+5. Refer to the [aperturectl configuration][configure aperturectl] to learn how
+   to use the Access Token.
+
+[aperturectl]: /reference/aperture-cli/aperture-cli.md
+[configure aperturectl]: /reference/aperture-cli/configure-cli.md
 [sign-up]: /reference/cloud-ui/sign-up.md
