@@ -46,44 +46,43 @@ cloud application:
 ## ⚙️ Load management capabilities
 
 - ⏱️
-  [**Global Rate-Limiting**](https://docs.fluxninja.com/concepts/rate-limiter):
+  [**Global Rate and Concurrency Limiting**](https://docs.fluxninja.com/concepts/rate-limiter):
   Safeguard APIs and features against excessive usage with Aperture's
   high-performance, distributed rate limiter. Identify individual users or
   entities by fine-grained labels. Create precise rate limiters controlling
-  burst-capacity and fill-rate tailored to business-specific labels. Refer to
-  the [Rate Limiting](https://docs.fluxninja.com/guides/per-user-rate-limiting)
-  guide for more details.
+  burst-capacity and fill-rate tailored to business-specific labels. Limit per
+  user or global concurrency of in-flight requests. Refer to the
+  [Rate Limiting](https://docs.fluxninja.com/guides/per-user-rate-limiting) and
+  [Concurrency Limiting](https://docs.fluxninja.com/guides/per-user-concurrency-limiting)
+  guides for more details.
 - 📊
-  [**API Quota Management**](https://docs.fluxninja.com/concepts/scheduler/quota-scheduler):
+  [**API Quota Management**](https://docs.fluxninja.com/concepts/request-prioritization/quota-scheduler):
   Maintain compliance with external API quotas with a global token bucket and
   smart request queuing. This feature regulates requests aimed at external
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs. Refer to the
   [API Quota Management](https://docs.fluxninja.com/guides/api-quota-management/)
   guide for more details.
-- 🛡️
-  [**Adaptive Queuing**](https://docs.fluxninja.com/concepts/scheduler/load-scheduler):
-  Enhance resource utilization and safeguard against abrupt service overloads
-  with an intelligent queue at the entry point of services. This queue
-  dynamically adjusts the rate of requests based on live service health, thereby
-  mitigating potential service disruptions and ensuring optimal performance
-  under all load conditions. Refer to the
-  [Service Load Management](https://docs.fluxninja.com/guides/service-load-management/)
-  and
-  [Database Load Management](https://docs.fluxninja.com/guides/database-load-management/)
-  guides for more details.
+- 🚦
+  [**Concurrency Control and Prioritization**](https://docs.fluxninja.com/concepts/request-prioritization/concurrency-scheduler):
+  Safeguard against abrupt service overloads by limiting the number of
+  concurrent in-flight requests. Any requests beyond this limit are queued and
+  let in based on their priority as capacity becomes available. Refer to the
+  [Concurrency Control and Prioritization](https://docs.fluxninja.com/development/guides/concurrency-control-and-prioritization/)
+  guide for more details.
 - 🎯
   [**Workload Prioritization**](https://docs.fluxninja.com/concepts/scheduler/):
   Safeguard crucial user experience pathways and ensure prioritized access to
   external APIs by strategically prioritizing workloads. With
   [weighted fair queuing](https://en.wikipedia.org/wiki/Weighted_fair_queueing),
   Aperture aligns resource distribution with business value and urgency of
-  requests. Workload prioritization applies to API Quota Management and Adaptive
-  Queuing use cases.
+  requests. Workload prioritization applies to API Quota Management and
+  Concurrency Control and Prioritization use cases.
 - 💾 [**Caching**](https://docs.fluxninja.com/concepts/cache): Boost application
   performance and reduce costs by caching costly operations, preventing
   duplicate requests to pay-per-use services, and easing the load on constrained
-  services.
+  services. Refer to the [Caching](https://docs.fluxninja.com/guides/caching)
+  guide for more details.
 
 ## 🏗️ Architecture
 

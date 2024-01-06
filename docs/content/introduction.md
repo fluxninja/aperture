@@ -57,16 +57,13 @@ To sign-up to Aperture Cloud, [click here][sign-up].
   services, ensuring that the usage remains within prescribed rate limits and
   avoids penalties or additional costs. Refer to the
   [API Quota Management](guides/api-quota-management.md) guide for more details.
-- 🛡️ [**Adaptive Queuing**](concepts/request-prioritization/load-scheduler.md):
-  Enhance resource utilization and safeguard against abrupt service overloads
-  with an intelligent queue at the entry point of services. This queue
-  dynamically adjusts the rate of requests based on live service health, thereby
-  mitigating potential service disruptions and ensuring optimal performance
-  under all load conditions. Refer to the
-  [Service Load Management](aperture-for-infra/guides/service-load-management/service-load-management.md)
-  and
-  [Database Load Management](aperture-for-infra/guides/database-load-management/database-load-management.md)
-  guides for more details.
+- 🚦
+  [**Concurrency Control and Prioritization**](concepts/request-prioritization/concurrency-scheduler.md):
+  Safeguard against abrupt service overloads by limiting the number of
+  concurrent in-flight requests. Any requests beyond this limit are queued and
+  let in based on their priority as capacity becomes available. Refer to the
+  [Concurrency Control and Prioritization](guides/concurrency-control-and-prioritization.md)
+  guide for more details.
 - 🎯 [**Workload Prioritization**](concepts/scheduler.md): Safeguard crucial
   user experience pathways and ensure prioritized access to external APIs by
   strategically prioritizing workloads. With
@@ -74,9 +71,10 @@ To sign-up to Aperture Cloud, [click here][sign-up].
   Aperture aligns resource distribution with business value and urgency of
   requests. Workload prioritization applies to API Quota Management and Adaptive
   Queuing use cases.
-- 💾 **Caching**: Boost application performance and reduce costs by caching
-  costly operations, preventing duplicate requests to pay-per-use services, and
-  easing the load on constrained services.
+- 💾 [**Caching**](concepts/cache.md): Boost application performance and reduce
+  costs by caching costly operations, preventing duplicate requests to
+  pay-per-use services, and easing the load on constrained services. Refer to
+  the [Caching](guides/caching.md) guide for more details.
 
 ## ✨ Get started {#get-started}
 
