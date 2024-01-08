@@ -42,11 +42,11 @@ Requests coming into the system are categorized into different workloads, each
 of which is defined by its priority and weight. This classification is crucial
 for the scheduling process within each agent.
 
-Inside every agent, there is a scheduler that priorities request admission based
-on two factors: the priority and weight assigned to the corresponding workload,
-and the availability of tokens from the global token bucket. This mechanism
-ensures that high-priority requests are handled appropriately even under high
-load or when the request rate is close to the rate limit.
+Inside every agent, there is a scheduler that prioritizes request admission
+based on two factors: the priority and weight assigned to the corresponding
+workload, and the availability of tokens from the global token bucket. This
+mechanism ensures that high-priority requests are handled appropriately even
+under high load or when the request rate is close to the rate limit.
 
 ## Example Scenario
 

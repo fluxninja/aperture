@@ -55,7 +55,7 @@ Requests coming into the system are categorized into different workloads, each
 of which is defined by its priority and weight. This classification is crucial
 for the request scheduling process.
 
-The scheduler priorities request admission based on two factors: the priority
+The scheduler prioritizes request admission based on two factors: the priority
 and weight assigned to the corresponding workload, and the availability of
 tokens from the token bucket. This mechanism ensures that high-priority requests
 are handled appropriately even under high load or when the request rate is close
@@ -148,7 +148,7 @@ flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Request Prioritization blueprint,
+in the upper-right corner. Next, choose the Request Prioritization blueprint,
 and from the drop-down options select Quota based. Now, complete the form with
 these specific values:
 

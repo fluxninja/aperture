@@ -10,7 +10,6 @@ spec:
     - flow_control:
         concurrency_scheduler:
           concurrency_limiter:
-            limit_by_label_key: limit_by_label_key
             max_inflight_duration: 60s
           in_ports:
             max_concurrency:

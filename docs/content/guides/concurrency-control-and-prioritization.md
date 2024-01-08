@@ -144,7 +144,7 @@ visibility for each flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Request Prioritization blueprint,
+in the upper-right corner. Next, choose the Request Prioritization blueprint,
 and from the drop-down options select Concurrency based. Now, complete the form
 with these specific values:
 
@@ -247,7 +247,7 @@ and API Key. In the Aperture Cloud UI, select the Aperture tab from the sidebar
 menu. Copy and enter both your Organization address and API Key to establish a
 connection between the SDK and Aperture Cloud.
 
-## Monitoring concurrency Scheduling Policy
+## Monitoring Concurrency Scheduling Policy
 
 After running the example for a few minutes, you can review the telemetry data
 in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the
