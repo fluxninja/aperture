@@ -23,8 +23,8 @@
   </a>
 </p>
 
-> [!TIP]  
-> New blueprint `Concurrency Limiting` released. Try it to [limit concurrent requests](https://docs.fluxninja.com/guides/per-user-concurrency-limiting).
+> [!TIP] New blueprint `Concurrency Limiting` released. Try it to
+> [limit concurrent requests](https://docs.fluxninja.com/guides/per-user-concurrency-limiting).
 
 <!-- markdownlint-enable -->
 <!-- vale on -->
