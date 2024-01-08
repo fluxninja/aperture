@@ -5,7 +5,7 @@ import http from "k6/http";
 
 export let vuStages = [
   { duration: "10s", target: 10 },
-  { duration: "2m", target: 50 },
+  { duration: "5m", target: 50 },
   { duration: "10s", target: 10 },
 ];
 
@@ -41,7 +41,7 @@ export default function () {
     headers: headers,
   });
   const ret = check(res, {
-    "http status was 200": res.status === 200,
+    "http status was 200 or 202": res.status === 200 || res.status === 202,
   });
   if (!ret) {
     // sleep for 10ms to 25ms
