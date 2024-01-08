@@ -134,14 +134,14 @@ The load generator is configured to generate the following traffic pattern for
 - Hold at `5` concurrent users for `2m`.
 
 Once the traffic is running, you can visualize the decisions made by Aperture in
-Grafana. Navigate to [localhost:3000](http://localhost:3000) on your browser to
+Grafana. Navigate to [localhost:3333](http://localhost:3333) on your browser to
 reach Grafana. You can open the `FluxNinja` dashboard under `aperture-system`
 folder to a bunch of useful panels.
 
 ![Grafana Dashboard](./assets/dashboard.png)
 
 > 📍 Grafana's dashboard browser address is
-> [localhost:3000/dashboards](http://localhost:3000/dashboards)
+> [localhost:3333/dashboards](http://localhost:3333/dashboards)
 
 To stop the traffic at any point of time, press the `Stop Wavepool Generator`
 button in the `DemoApplications` resource.
