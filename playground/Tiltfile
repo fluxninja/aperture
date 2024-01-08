@@ -1207,7 +1207,7 @@ def declare_resources(resources, dep_tree, inv_dep_tree, race_arg, cloud_extensi
             labels=["ApertureController"],
             resource_deps=["grafana"],
             service="aperture-grafana",
-            local_port=3000,
+            local_port=3333,
             remote_port=3000,
             extra_env={
                 "PERIOD": "1",

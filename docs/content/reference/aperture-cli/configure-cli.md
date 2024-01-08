@@ -19,7 +19,7 @@ Replace `ORGANIZATION_NAME` with the Aperture Cloud organization name and
 `PERSONAL_ACCESS_TOKEN` with the Personal Access Token linked to the user. If a
 Personal Access Token has not been created, generate a new one through the
 Aperture Cloud UI. Refer to [Personal Access Tokens][access-tokens] for
-additional information.
+step-by-step instructions.
 
 :::info
 

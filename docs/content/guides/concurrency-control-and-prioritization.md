@@ -1,12 +1,11 @@
 ---
-title: Concurrency Quota Management
+title: Concurrency Control and Prioritization
 sidebar_position: 5
 keywords:
-  - concurrency scheduling
-  - concurrency quota management
-  - guides
-  - external API
+  - concurrency limiting
   - prioritization
+  - guides
+  - expensive API
 ---
 
 ```mdx-code-block
@@ -30,10 +29,9 @@ blueprint.
 
 ## Overview
 
-Concurrency quota management, also called concurrency scheduling, is a
-sophisticated technique that allows effective management of concurrent requests.
-With this technique services can limit the number of concurrent API calls to
-alleviate the load on the system.
+Concurrency control and prioritization, is a sophisticated technique that allows
+effective management of concurrent requests. With this technique, services can
+limit the number of concurrent API calls to alleviate the load on the system.
 
 When service limits are reached, Aperture Cloud can queue incoming requests and
 serve them according to their priority, which is determined by business-critical
@@ -42,7 +40,7 @@ labels set in the policy and passed via the SDK.
 <Zoom>
 
 ```mermaid
-{@include: ./assets/concurrency-quota-management/concurrency-scheduling.mmd}
+{@include: ./assets/concurrency-control-and-prioritization/concurrency-scheduling.mmd}
 ```
 
 </Zoom>
@@ -169,7 +167,7 @@ with these specific values:
 8. `Control point`: It can be a particular feature or execution block within a
    service. We'll use `concurrency-scheduling-feature` as an example.
 
-![Concurrency Scheduling Policy](./assets/concurrency-quota-management/concurrency-scheduling-test.png)
+![Concurrency Scheduling Policy](./assets/concurrency-control-and-prioritization/concurrency-scheduling-test.png)
 
 Once you've completed these fields, click `Continue` and then `Apply Policy` to
 finalize the policy setup.
@@ -213,7 +211,7 @@ scheduling policy:
 Here is how the complete values file would look:
 
 ```yaml
-{@include: ./assets/concurrency-quota-management/values.yaml}
+{@include: ./assets/concurrency-control-and-prioritization/values.yaml}
 ```
 
 The last step is to apply the policy using the following command:
@@ -258,18 +256,18 @@ in the Aperture Cloud UI. Navigate to the Aperture Cloud UI, and click the
 
 Once you've clicked on the policy, you will see the following dashboard:
 
-![Workload](./assets/concurrency-quota-management/workloads.png)
+![Workload](./assets/concurrency-control-and-prioritization/workloads.png)
 
 The two panels above provide insights into how the policy is performing by
 monitoring the number of accepted and rejected requests along with the
 acceptance percentage.
 
-![Request](./assets/concurrency-quota-management/request-metrics.png)
+![Request](./assets/concurrency-control-and-prioritization/request-metrics.png)
 
 The panels above offer insights into the request details, including their
 latency.
 
-![Queue](./assets/concurrency-quota-management/queue.png)
+![Queue](./assets/concurrency-control-and-prioritization/queue.png)
 
 These panels display insights into queue duration for `workload` requests and
 highlight the average of prioritized requests that moved ahead in the queue.

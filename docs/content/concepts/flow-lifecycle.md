@@ -41,6 +41,8 @@ components for that stage.
 
 :::
 
+### Selection, Classification, and Telemetry
+
 - [**Selectors**](./selector.md) are the criteria used to determine the
   components that will be applied to a flow in the subsequent stages.
 - [**Classifiers**](./advanced/classifier.md/) perform the task of assigning
@@ -52,27 +54,45 @@ components for that stage.
   telemetry based on access logs. They transform request flux that matches
   certain criteria into Prometheus histograms, enabling enhanced observability
   and control.
+
+### Rate limiting (fast rejection)
+
 - [**Samplers**](./advanced/load-ramp.md#sampler) manage load by permitting a
   portion of flows to be accepted, while immediately dropping the remainder with
   a forbidden status code. They are particularly useful in scenarios such as
   feature rollouts.
 - [**Rate-Limiters**](./rate-limiter.md) proactively guard against abuse by
   regulating excessive requests in accordance with per-label limits.
-- **Caches** reduce the cost of operations and alleviate the load on constrained
-  services by preventing duplicate requests to pay-per-use services.
-- [**Schedulers**](./scheduler.md) offer on-demand queuing based on a token
-  bucket algorithm, and prioritize requests using weighted fair queuing.
-  Multiple matching schedulers can evaluate concurrently, with each having the
-  power to drop a flow. There are two variants:
-  - The [**Load Scheduler**](./request-prioritization/load-scheduler.md)
-    oversees the current token rate in relation to the past token rate,
-    adjusting as required based on health signals from a service. This scheduler
-    type facilitates active service protection.
-  - The [**Quota Scheduler**](./request-prioritization/quota-scheduler.md) uses
-    a global token bucket as a ledger, managing the token distribution across
-    all Agents. It proves especially effective in environments with strict
-    global rate limits, as it allows for strategic prioritization of requests
-    when reaching quota limits.
+- [**Concurrency-Limiters**](./concurrency-limiter.md) enforce in-flight request
+  quotas to prevent overloads. They can also be used to enforce limits per
+  entity such as a user to ensure fair access across users.
+
+### Request Prioritization and Cache Lookup
+
+[**Schedulers**](./scheduler.md) offer on-demand queuing based on a limit
+enforced through a token bucket or a concurrency counter, and prioritize
+requests using weighted fair queuing. Multiple matching schedulers can evaluate
+concurrently, with each having the power to drop a flow. There are three
+variants running at various stages of the flow lifecycle:
+
+- The
+  [**Concurrency Scheduler**](./request-prioritization/concurrency-scheduler.md)
+  uses a global concurrency counter as a ledger, managing the concurrency across
+  all Agents. It proves especially effective in environments with strict global
+  concurrency limits, as it allows for strategic prioritization of requests when
+  reaching concurrency limits.
+- [**Caches**](./cache.md) Look of response and global caches occur at this
+  stage. If a response cache hit occurs, the flow is not sent to the Concurrency
+  and Load Scheduling stages, resulting in an early acceptance.
+- The [**Quota Scheduler**](./request-prioritization/quota-scheduler.md) uses a
+  global token bucket as a ledger, managing the token distribution across all
+  Agents. It proves especially effective in environments with strict global rate
+  limits, as it allows for strategic prioritization of requests when reaching
+  quota limits.
+- The [**Load Scheduler**](./request-prioritization/load-scheduler.md) oversees
+  the current token rate in relation to the past token rate, adjusting as
+  required based on health signals from a service. This scheduler type
+  facilitates active service protection.
 
 After traversing these stages, the flow's decision is sent back to the
 initiating service.
