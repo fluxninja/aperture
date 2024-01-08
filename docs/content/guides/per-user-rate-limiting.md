@@ -131,7 +131,7 @@ flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Rate Limiting blueprint and complete
+in the upper-right corner. Next, choose the Rate Limiting blueprint and complete
 the form with these specific values:
 
 1. `Policy name`: Unique for each policy, this field can be used to define

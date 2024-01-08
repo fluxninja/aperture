@@ -48,10 +48,10 @@ offers a blueprint for
 [concurrency scheduling](https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base),
 consisting of two main components:
 
-- Concurrency Limiter: It allows setting the max number of concurrenct requests
-  that can be processed. This paratemeter can be set according to an
-  application's ability to set to handle the maximum number of concurrent
-  requests at a given time.
+- Concurrency Limiter: It allows setting the max number of concurrent requests
+  that can be processed. This parameter can be set according to an application's
+  ability to set to handle the maximum number of concurrent requests at a given
+  time.
 - Scheduler: Aperture has a
   [weighted fair queuing](https://docs.fluxninja.com/concepts/scheduler/)
   scheduler that prioritizes the requests based on multiple factors such as the
@@ -135,7 +135,7 @@ deadline, set within the `startFlow` call. Setting this deadline to `120000`
 milliseconds, for example, indicates that the request can be queued for a
 maximum of 2 minutes. After this interval, the request will be rejected.
 
-Once the `startFlow` call is made, we send the prompt to Mistral and await for
+Once the `startFlow` call is made, we send the prompt to Mistral and wait for
 its response. Excess requests are automatically queued by Aperture, eliminating
 the need to check if a flow `shouldRun` or not.
 
@@ -194,15 +194,15 @@ visibility for each flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Rate Limiting blueprint, select
+in the upper-right corner. Next, choose the Rate Limiting blueprint, select
 Concurrency and complete the form with these specific values:
 
 1. `Policy name`: Unique for each policy, this field can be used to define
    policies tailored for different use cases. Set the policy name to
    `concurrency-scheduling-test`.
 2. `Limit by label key`: Determines the specific label key used for concurrency
-   limits. This paratemeter becomes essential for more granular concurrency
-   limiting use cases such as per user limiting where a parameter like the
+   limits. This parameter becomes essential for more granular concurrency
+   limiting use cases such as, per-user limiting where a parameter like the
    `user_id` can be passed. For now, we will test global concurrency limiting,
    we will leave the label as it is.
 3. `Max inflight duration`: Configures the time duration after which flow is
@@ -245,8 +245,8 @@ scheduling policy:
    policies tailored for different use cases. Set the policy name to
    `concurrency-scheduling-test`.
 2. `limit_by_label_key`: Determines the specific label key used for concurrency
-   limits. This paratemeter becomes essential for more granular concurrency
-   limiting use cases such as per user limiting where a parameter like the
+   limits. This parameter becomes essential for more granular concurrency
+   limiting use cases such as, per-user limiting where a parameter like the
    `user_id` can be passed. For now, since we want to do a global concurrency
    limiting, we will leave the label as it is.
 3. `max_inflight_duration`: Configures the time duration after which flow is

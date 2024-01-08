@@ -144,7 +144,7 @@ visibility for each flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper right corner. Next, choose the Request Prioritization blueprint,
+in the upper-right corner. Next, choose the Request Prioritization blueprint,
 and from the drop-down options select Concurrency based. Now, complete the form
 with these specific values:
 
