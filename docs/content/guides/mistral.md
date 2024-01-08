@@ -48,10 +48,9 @@ blueprint for
 [concurrency scheduling](https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base),
 consisting of two main components:
 
-- Concurrency Limiter: It allows setting the max number of concurrenct requests
-  that can be processed. This paratemeter can be set according to an
-  application's ability to handle the maximum number of concurrent requests at a
-  given time.
+- Concurrency Limiter: It allows setting the max number of concurrent requests
+  that can be processed. This parameter can be set according to an application's
+  ability to handle the maximum number of concurrent requests at a given time.
 - Scheduler: Aperture has a
   [weighted fair queuing](https://docs.fluxninja.com/concepts/scheduler/)
   scheduler that prioritizes the requests based on multiple factors such as the
@@ -201,8 +200,8 @@ Concurrency and complete the form with these specific values:
    policies tailored for different use cases. Set the policy name to
    `concurrency-scheduling-test`.
 2. `Limit by label key`: Determines the specific label key used for concurrency
-   limits. This paratemeter becomes essential for more granular concurrency
-   limiting use cases such as per user limiting where a parameter like the
+   limits. This parameter becomes essential for more granular concurrency
+   limiting use cases such as per-user limiting where a parameter like the
    `user_id` can be passed. For now, we will test global concurrency limiting,
    we will leave the label as it is.
 3. `Max inflight duration`: Configures the time duration after which flow is
@@ -245,8 +244,8 @@ scheduling policy:
    policies tailored for different use cases. Set the policy name to
    `concurrency-scheduling-test`.
 2. `limit_by_label_key`: Determines the specific label key used for concurrency
-   limits. This paratemeter becomes essential for more granular concurrency
-   limiting use cases such as per user limiting where a parameter like the
+   limits. This parameter becomes essential for more granular concurrency
+   limiting use cases such as per-user limiting where a parameter like the
    `user_id` can be passed. For now, since we want to do a global concurrency
    limiting, we will leave the label as it is.
 3. `max_inflight_duration`: Configures the time duration after which flow is
