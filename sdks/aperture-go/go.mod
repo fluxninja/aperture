@@ -3,7 +3,7 @@ module github.com/fluxninja/aperture-go/v2
 go 1.21.4
 
 require (
-	github.com/fluxninja/aperture/api/v2 v2.0.0-20240105045107-1a352382e8d8
+	github.com/fluxninja/aperture/api/v2 v2.0.0-20240109200640-489e0e9885eb
 	github.com/gorilla/mux v1.8.1
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.21.0
