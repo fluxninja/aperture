@@ -35,7 +35,7 @@ type queuedRequest struct {
 // Memory pool for heapRequest(s).
 var (
 	qRequestPool      sync.Pool
-	NumFairnessQueues = 2 ^ 8 // 256
+	NumFairnessQueues = 1 << 8
 )
 
 func newHeapRequest() interface{} {
