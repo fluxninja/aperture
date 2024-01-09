@@ -96,10 +96,10 @@ func (h *requestHeap) Pop() interface{} {
 
 type flowInfo struct {
 	queue         *list.List
+	workloadID    string
 	vt            float64
 	refCnt        int
 	requestOnHeap bool
-	workloadID    string
 }
 
 var fInfoPool sync.Pool
@@ -140,15 +140,15 @@ type WFQScheduler struct {
 	// metrics labels
 	metricsLabels prometheus.Labels
 	// flows
-	flows        map[string]*flowInfo
-	requests     requestHeap
-	vt           float64 // virtual time
-	fairnessSeed uint32
-	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
-	generation                uint64
-	lock                      sync.Mutex
-	queueOpen                 bool           // This tracks overload state
+	flows                     map[string]*flowInfo
 	fairnessQueuesPerWorkload map[string]int // map from workloadID to number of flows for each workload
+	requests                  requestHeap
+	vt                        float64 // virtual time
+	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
+	generation   uint64
+	fairnessSeed uint32
+	lock         sync.Mutex
+	queueOpen    bool // This tracks overload state
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
@@ -649,8 +649,6 @@ func appendWorkloadLabel(baseMetricsLabels prometheus.Labels, workloadLabel stri
 
 // WFQMetrics holds metrics related to internal workings of WFQScheduler.
 type WFQMetrics struct {
-	FlowsGauge                     prometheus.Gauge
-	HeapRequestsGauge              prometheus.Gauge
 	IncomingTokensCounter          prometheus.Counter
 	AcceptedTokensCounter          prometheus.Counter
 	RejectedTokensCounter          prometheus.Counter

@@ -12,6 +12,8 @@ type Scheduler interface {
 	Schedule(ctx context.Context, request *Request) (accept bool, remaining float64, current float64, reqID string)
 	// Info returns the last access time and number of requests that are currently in the queue.
 	Info() (time.Time, int)
+	// Identifiers returns flowID and workloadID for the given request
+	Identifiers(workloadLabel, fairnessLabel string, priority float64, generation uint64) (string, string)
 }
 
 // TokenManager : Interface for token managers.
