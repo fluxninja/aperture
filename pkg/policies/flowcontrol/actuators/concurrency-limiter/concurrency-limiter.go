@@ -189,7 +189,6 @@ type concurrencyLimiter struct {
 	registry  status.Registry
 	clFactory *concurrencyLimiterFactory
 	limiter   concurrencylimiter.ConcurrencyLimiter
-	inner     *concurrencylimiter.GlobalTokenCounter
 	clProto   *policylangv1.ConcurrencyLimiter
 	name      string
 }
@@ -225,8 +224,8 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			var err error
-			cl.inner, err = concurrencylimiter.NewGlobalTokenCounter(
+			// var err error
+			inner, err := concurrencylimiter.NewGlobalTokenCounter(
 				cl.clFactory.distCache,
 				cl.name,
 				cl.clProto.Parameters.GetMaxIdleTime().AsDuration(),
@@ -236,7 +235,7 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 				logger.Error().Err(err).Msg("Failed to create limiter")
 				return err
 			}
-			cl.limiter = cl.inner
+			cl.limiter = inner
 
 			// add decisions notifier
 			err = cl.clFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
@@ -399,8 +398,8 @@ func (cl *concurrencyLimiter) decisionUpdateCallback(event notifiers.Event, unma
 		return
 	}
 	limitDecision := wrapperMessage.ConcurrencyLimiterDecision
-	cl.inner.SetCapacity(limitDecision.MaxConcurrency)
-	cl.inner.SetPassThrough(limitDecision.PassThrough)
+	cl.limiter.SetCapacity(limitDecision.MaxConcurrency)
+	cl.limiter.SetPassThrough(limitDecision.PassThrough)
 }
 
 // GetLimiterID returns the limiter ID.
