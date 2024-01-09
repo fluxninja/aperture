@@ -4729,7 +4729,7 @@ definitions:
 
                 x-go-tag-default: ServiceUnavailable
             fairness_label_key:
-                description: Key for a flow label that is used to enforce fairness amongst requests in a workload. If not specified, requests within a workload of the same priority are admitted in a FIFO manner.
+                description: Key for a flow label that is used to enforce fairness among requests in a workload. If not specified, requests within a workload of the same priority are admitted in a FIFO manner.
                 type: string
             priority_label_key:
                 description: |-

@@ -827,7 +827,7 @@ type Scheduler struct {
 	// Key for a flow label that can be used to provide workloads for this request.
 	// If this parameter is not provided, the workloads for the flow will be determined by the matched workload's name in the policy.
 	WorkloadLabelKey string `protobuf:"bytes,10,opt,name=workload_label_key,json=workloadLabelKey,proto3" json:"workload_label_key,omitempty"`
-	// Key for a flow label that is used to enforce fairness amongst requests in a workload. If not specified, requests within a workload of the same priority are admitted in a FIFO manner.
+	// Key for a flow label that is used to enforce fairness among requests in a workload. If not specified, requests within a workload of the same priority are admitted in a FIFO manner.
 	FairnessLabelKey string `protobuf:"bytes,11,opt,name=fairness_label_key,json=fairnessLabelKey,proto3" json:"fairness_label_key,omitempty"`
 }
 
