@@ -120,10 +120,6 @@ const (
 	// RejectedTokensMetricName - total work measured in tokens of all rejected requests.
 	RejectedTokensMetricName = "rejected_tokens_total"
 
-	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
-	WFQFlowsMetricName = "wfq_flows_total"
-	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
-	WFQRequestsMetricName = "wfq_requests_total"
 	// TokenBucketLMMetricName - a gauge that tracks the load multiplier.
 	TokenBucketLMMetricName = "token_bucket_lm_ratio"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.

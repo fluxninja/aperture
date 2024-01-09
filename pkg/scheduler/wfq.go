@@ -5,10 +5,11 @@ import (
 	"container/list"
 	"context"
 	"fmt"
-	"strconv"
+	"math/rand"
 	"sync"
 	"time"
 
+	"github.com/cespare/xxhash"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
@@ -32,7 +33,10 @@ type queuedRequest struct {
 ////////
 
 // Memory pool for heapRequest(s).
-var qRequestPool sync.Pool
+var (
+	qRequestPool      sync.Pool
+	NumFairnessQueues = 2 ^ 8 // 256
+)
 
 func newHeapRequest() interface{} {
 	qRequest := new(queuedRequest)
@@ -95,6 +99,7 @@ type flowInfo struct {
 	vt            float64
 	refCnt        int
 	requestOnHeap bool
+	workloadID    string
 }
 
 var fInfoPool sync.Pool
@@ -124,9 +129,10 @@ func init() {
 
 // WFQScheduler : Weighted Fair Queue Scheduler.
 type WFQScheduler struct {
-	clk            clockwork.Clock
-	lastAccessTime time.Time
-	manager        TokenManager
+	clk                    clockwork.Clock
+	lastAccessTime         time.Time
+	fairnessSeedUpdateTime time.Time
+	manager                TokenManager
 	// metrics
 	metrics *WFQMetrics
 	// preemption metrics
@@ -134,13 +140,15 @@ type WFQScheduler struct {
 	// metrics labels
 	metricsLabels prometheus.Labels
 	// flows
-	flows    map[string]*flowInfo
-	requests requestHeap
-	vt       float64 // virtual time
+	flows        map[string]*flowInfo
+	requests     requestHeap
+	vt           float64 // virtual time
+	fairnessSeed uint32
 	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
-	generation uint64
-	lock       sync.Mutex
-	queueOpen  bool // This tracks overload state
+	generation                uint64
+	lock                      sync.Mutex
+	queueOpen                 bool           // This tracks overload state
+	fairnessQueuesPerWorkload map[string]int // map from workloadID to number of flows for each workload
 }
 
 // NewWFQScheduler creates a new weighted fair queue scheduler.
@@ -149,9 +157,13 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.queueOpen = false
 	sched.generation = 0
 	sched.clk = clk
-	sched.lastAccessTime = sched.clk.Now()
+	now := sched.clk.Now()
+	sched.lastAccessTime = now
+	sched.fairnessSeedUpdateTime = now
+	sched.fairnessSeed = 0
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
+	sched.fairnessQueuesPerWorkload = make(map[string]int)
 	sched.manager = tokenManger
 	sched.metricsLabels = metricsLabels
 	preemptionMetrics := &preemptionMetrics{metricsLabels: metricsLabels}
@@ -168,7 +180,7 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 }
 
 func (sched *WFQScheduler) updateRequestInQueueMetrics(accepted bool, request *Request, startTime time.Time) {
-	metricsLabels := appendWorkloadLabel(sched.metricsLabels, request.FairnessLabel)
+	metricsLabels := appendWorkloadLabel(sched.metricsLabels, request.WorkloadLabel)
 	requestInQueueMetricsObserver, err := sched.metrics.RequestInQueueDurationSummary.GetMetricWith(metricsLabels)
 	if err == nil {
 		requestInQueueMetricsObserver.Observe(float64(time.Since(startTime).Nanoseconds() / 1e6))
@@ -244,9 +256,32 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 	}
 }
 
-// Construct FlowID by appending RequestLabel and Priority.
-func (sched *WFQScheduler) flowID(fairnessLabel string, priority float64, generation uint64) string {
-	return fmt.Sprintf("%s_%s_%d", fairnessLabel, strconv.FormatFloat(priority, 'f', -1, 64), generation)
+// Identifiers computes fairnessQueueID by hashing fairnessLabel and doing a bit-wise AND with number of fairness queues. Constructs workloadID by appending workloadLabel, Priority and Generation. Constructs flowID by appending workloadID and fairnessQueueID.
+func (sched *WFQScheduler) Identifiers(workloadLabel, fairnessLabel string, priority float64, generation uint64) (string, string) {
+	// workloadID is the workloadLabel + priority + generation
+	workloadID := fmt.Sprintf("%s-%f-%d", workloadLabel, priority, generation)
+
+	var flowID string
+	if fairnessLabel != "" {
+		if sched.lastAccessTime.Sub(sched.fairnessSeedUpdateTime) > 300*time.Second {
+			// randomize fairnessSeed every 5 minutes
+			//nolint:gosec // G404: Use of math/rand is acceptable here due to non-security context
+			sched.fairnessSeed = rand.Uint32()
+			sched.fairnessSeedUpdateTime = sched.lastAccessTime
+		}
+		// Compute the hash using xxHash
+		hash := xxhash.Sum64String(fairnessLabel + fmt.Sprintf("%d", sched.fairnessSeed))
+
+		// Assuming NumFairnessQueues is a power of 2, use bitwise AND for modulo
+		fairnessQueueID := hash & uint64(NumFairnessQueues-1)
+		// flowID is the workloadID + fairnessQueueID
+		flowID = fmt.Sprintf("%s-%d", workloadID, fairnessQueueID)
+	} else {
+		// flowID is the workloadID
+		flowID = workloadID
+	}
+
+	return flowID, workloadID
 }
 
 // Attempt to queue this request.
@@ -275,25 +310,37 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 
 	sched.preemptionMetrics.onQueueEntry(request, qRequest)
 
-	flowID := sched.flowID(request.FairnessLabel, request.InvPriority, sched.generation)
+	flowID, workloadID := sched.Identifiers(request.WorkloadLabel, request.FairnessLabel, request.InvPriority, sched.generation)
 
 	qRequest.flowID = flowID
-
-	cost := float64(request.Tokens) * request.InvPriority
 
 	// Get FlowInfo
 	fInfo, ok := sched.flows[flowID]
 	if !ok {
 		fInfo = getFlowInfo()
-		sched.setFlowsGauge(float64(len(sched.flows)))
+		fInfo.workloadID = workloadID
 		fInfo.vt = sched.vt
 		sched.flows[flowID] = fInfo
+		_, counterFound := sched.fairnessQueuesPerWorkload[workloadID]
+		if !counterFound {
+			sched.fairnessQueuesPerWorkload[workloadID] = 0
+		}
+		sched.fairnessQueuesPerWorkload[workloadID]++
 	}
 	// Increment reference counter
 	fInfo.refCnt++
 
 	// Store flowInfo pointer in the request
 	qRequest.fInfo = fInfo
+
+	fairnessAdjustment := 1
+
+	numFairnessQueues, ok := sched.fairnessQueuesPerWorkload[workloadID]
+	if ok {
+		fairnessAdjustment = numFairnessQueues
+	}
+
+	cost := float64(request.Tokens) * request.InvPriority * float64(fairnessAdjustment)
 
 	// Store the cost of the request
 	qRequest.cost = cost
@@ -303,7 +350,6 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 			qRequest.vft = fInfo.vt + cost
 			qRequest.onHeap = true
 			heap.Push(&sched.requests, qRequest)
-			sched.setRequestsGauge(float64(sched.requests.Len()))
 			fInfo.requestOnHeap = true
 		} else {
 			// push to flow queue
@@ -387,7 +433,6 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 			heap.Push(&sched.requests, nextReq)
 			nextReq.onHeap = true
 			fInfo.requestOnHeap = true
-			sched.setRequestsGauge(float64(sched.requests.Len()))
 		}
 	}
 
@@ -400,7 +445,6 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 	}
 	// Pop from queue and wake next request
 	qRequest := heap.Pop(&sched.requests).(*queuedRequest)
-	sched.setRequestsGauge(float64(sched.requests.Len()))
 	qRequest.onHeap = false
 	qRequest.fInfo.requestOnHeap = false
 	// wake up this request
@@ -474,21 +518,15 @@ func (sched *WFQScheduler) cleanup(qRequest *queuedRequest) {
 		delete(sched.flows, qRequest.flowID)
 		// send flowInfo back to the Pool
 		putFlowInfo(qRequest.fInfo)
-		sched.setFlowsGauge(float64(len(sched.flows)))
+		_, ok := sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID]
+		if ok {
+			sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID]--
+			if sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID] == 0 {
+				delete(sched.fairnessQueuesPerWorkload, qRequest.fInfo.workloadID)
+			}
+		}
 	}
 	putHeapRequest(qRequest)
-}
-
-func (sched *WFQScheduler) setFlowsGauge(v float64) {
-	if sched.metrics != nil && sched.metrics.FlowsGauge != nil {
-		sched.metrics.FlowsGauge.Set(v)
-	}
-}
-
-func (sched *WFQScheduler) setRequestsGauge(v float64) {
-	if sched.metrics != nil && sched.metrics.HeapRequestsGauge != nil {
-		sched.metrics.HeapRequestsGauge.Set(v)
-	}
 }
 
 // Info returns the last access time and number of requests that are currently in the queue.
@@ -549,7 +587,7 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 		if summary == nil {
 			return
 		}
-		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.WorkloadLabel)
 		err := initMetrics(metricsLabels)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to initialize metrics")
@@ -566,7 +604,7 @@ func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queue
 		if counterVec == nil {
 			return
 		}
-		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.FairnessLabel)
+		metricsLabels := appendWorkloadLabel(pMetrics.metricsLabels, request.WorkloadLabel)
 		err := initMetrics(metricsLabels)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to initialize metrics")

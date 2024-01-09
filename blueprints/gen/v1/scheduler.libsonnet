@@ -19,6 +19,12 @@
   withDeniedResponseStatusCodeMixin(denied_response_status_code):: {
     denied_response_status_code+: denied_response_status_code,
   },
+  withFairnessLabelKey(fairness_label_key):: {
+    fairness_label_key: fairness_label_key,
+  },
+  withFairnessLabelKeyMixin(fairness_label_key):: {
+    fairness_label_key+: fairness_label_key,
+  },
   withPriorityLabelKey(priority_label_key):: {
     priority_label_key: priority_label_key,
   },

@@ -40,9 +40,6 @@ type Factory struct {
 	registry status.Registry
 
 	// WFQ Metrics.
-	wfqFlowsGaugeVec    *prometheus.GaugeVec
-	wfqRequestsGaugeVec *prometheus.GaugeVec
-
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
 	rejectedTokensCounterVec *prometheus.CounterVec
@@ -69,20 +66,6 @@ func newFactory(
 		registry: reg,
 	}
 
-	wsFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: metrics.WFQFlowsMetricName,
-			Help: "A gauge that tracks the number of flows in the WFQScheduler",
-		},
-		MetricLabelKeys,
-	)
-	wsFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: metrics.WFQRequestsMetricName,
-			Help: "A gauge that tracks the number of queued requests in the WFQScheduler",
-		},
-		MetricLabelKeys,
-	)
 	wsFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.IncomingTokensMetricName,
@@ -170,15 +153,7 @@ func newFactory(
 		OnStart: func(_ context.Context) error {
 			var merr error
 
-			err := prometheusRegistry.Register(wsFactory.wfqFlowsGaugeVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = prometheusRegistry.Register(wsFactory.wfqRequestsGaugeVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = prometheusRegistry.Register(wsFactory.incomingTokensCounterVec)
+			err := prometheusRegistry.Register(wsFactory.incomingTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -220,14 +195,6 @@ func newFactory(
 		OnStop: func(_ context.Context) error {
 			var merr error
 
-			if !prometheusRegistry.Unregister(wsFactory.wfqFlowsGaugeVec) {
-				err := fmt.Errorf("failed to unregister wfq_flows metric")
-				merr = multierr.Append(merr, err)
-			}
-			if !prometheusRegistry.Unregister(wsFactory.wfqRequestsGaugeVec) {
-				err := fmt.Errorf("failed to unregister wfq_requests metric")
-				merr = multierr.Append(merr, err)
-			}
 			if !prometheusRegistry.Unregister(wsFactory.incomingTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister incoming_tokens_total metric")
 				merr = multierr.Append(merr, err)
@@ -303,16 +270,6 @@ type SchedulerMetrics struct {
 
 // NewSchedulerMetrics creates a new SchedulerMetrics instance.
 func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*SchedulerMetrics, error) {
-	wfqFlowsGauge, err := wsFactory.wfqFlowsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq flows gauge", err)
-	}
-
-	wfqRequestsGauge, err := wsFactory.wfqRequestsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq requests gauge", err)
-	}
-
 	incomingTokensCounter, err := wsFactory.incomingTokensCounterVec.GetMetricWith(metricLabels)
 	if err != nil {
 		return nil, err
@@ -329,8 +286,6 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:                     wfqFlowsGauge,
-		HeapRequestsGauge:              wfqRequestsGauge,
 		IncomingTokensCounter:          incomingTokensCounter,
 		AcceptedTokensCounter:          acceptedTokensCounter,
 		RejectedTokensCounter:          rejectedTokensCounter,
@@ -351,16 +306,7 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 func (sm *SchedulerMetrics) Delete() error {
 	var merr error
 
-	// Remove metrics from metric vectors
-	deleted := sm.wsFactory.wfqFlowsGaugeVec.Delete(sm.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
-	}
-	deleted = sm.wsFactory.wfqRequestsGaugeVec.Delete(sm.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
-	}
-	deleted = sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
+	deleted := sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
 	}
@@ -615,7 +561,14 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcont
 		reqCtx = timeoutCtx
 	}
 
-	req := scheduler.NewRequest(matchedWorkloadLabel, tokens, invPriority)
+	var fairnessLabel string
+	if s.proto.FairnessLabelKey != "" {
+		if val, ok := labels.Get(s.proto.FairnessLabelKey); ok {
+			fairnessLabel = val
+		}
+	}
+
+	req := scheduler.NewRequest(matchedWorkloadLabel, fairnessLabel, tokens, invPriority)
 
 	accepted, remaining, current, reqID := s.scheduler.Schedule(reqCtx, req)
 
