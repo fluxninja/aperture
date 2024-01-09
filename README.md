@@ -22,6 +22,10 @@
     <img alt="Godoc Reference" src="https://img.shields.io/badge/godoc-reference-brightgreen?style=for-the-badge&logo=go&logoColor=white">
   </a>
 </p>
+
+> [!TIP] New blueprint `Concurrency Limiting` released. Try it to
+> [limit concurrent requests](https://docs.fluxninja.com/guides/per-user-concurrency-limiting).
+
 <!-- markdownlint-enable -->
 <!-- vale on -->
 

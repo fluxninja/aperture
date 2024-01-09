@@ -24,11 +24,11 @@ import CodeSnippet from '../codeSnippet.js'
 ## Mistral AI
 
 [Mistral](https://github.com/mistralai/mistral-src) is an open-source Large
-Language Model (LLM) increasingly used by numerous companies to develop
-AI-driven applications. Its open-source framework enables diverse implementation
+Language Model (LLM) used by numerous companies to develop AI-driven
+applications. Its open-source framework enables diverse implementation
 strategies, ranging from productizing Mistral as a service to running it locally
 for computation and feature development. However, one common challenge faced in
-all use cases is the limitation posed by GPUs, limiting LLMs full potential.
+all use cases is the limitation posed by GPUs, limiting its full potential.
 
 Such constraints, combined with an increase in demand, often result in slower
 response times to prompts, which leads to degradation of user experience during
@@ -43,15 +43,14 @@ scheduling policy using Aperture Cloud.
 ## Schedule Requests in Mistral with Aperture
 
 Aperture can help schedule in-flight requests and improve user experience by
-queuing and prioritizing requests before sending them to Mistral. Aperture
-offers a blueprint for
+queuing and prioritizing requests that are sent to Mistral. Aperture offers a
+blueprint for
 [concurrency scheduling](https://docs.fluxninja.com/reference/blueprints/concurrency-scheduling/base),
 consisting of two main components:
 
 - Concurrency Limiter: It allows setting the max number of concurrent requests
   that can be processed. This parameter can be set according to an application's
-  ability to set to handle the maximum number of concurrent requests at a given
-  time.
+  ability to handle the maximum number of concurrent requests at a given time.
 - Scheduler: Aperture has a
   [weighted fair queuing](https://docs.fluxninja.com/concepts/scheduler/)
   scheduler that prioritizes the requests based on multiple factors such as the
@@ -135,7 +134,7 @@ deadline, set within the `startFlow` call. Setting this deadline to `120000`
 milliseconds, for example, indicates that the request can be queued for a
 maximum of 2 minutes. After this interval, the request will be rejected.
 
-Once the `startFlow` call is made, we send the prompt to Mistral and wait for
+Once the `startFlow` call is made, we send the prompt to Mistral and await for
 its response. Excess requests are automatically queued by Aperture, eliminating
 the need to check if a flow `shouldRun` or not.
 
@@ -194,7 +193,7 @@ visibility for each flow.
 ```
 
 Navigate to the `Policies` tab on the sidebar menu, and select `Create Policy`
-in the upper-right corner. Next, choose the Rate Limiting blueprint, select
+in the upper right corner. Next, choose the Rate Limiting blueprint, select
 Concurrency and complete the form with these specific values:
 
 1. `Policy name`: Unique for each policy, this field can be used to define
@@ -202,7 +201,7 @@ Concurrency and complete the form with these specific values:
    `concurrency-scheduling-test`.
 2. `Limit by label key`: Determines the specific label key used for concurrency
    limits. This parameter becomes essential for more granular concurrency
-   limiting use cases such as, per-user limiting where a parameter like the
+   limiting use cases like per-user limiting where a parameter such as the
    `user_id` can be passed. For now, we will test global concurrency limiting,
    we will leave the label as it is.
 3. `Max inflight duration`: Configures the time duration after which flow is
@@ -246,7 +245,7 @@ scheduling policy:
    `concurrency-scheduling-test`.
 2. `limit_by_label_key`: Determines the specific label key used for concurrency
    limits. This parameter becomes essential for more granular concurrency
-   limiting use cases such as, per-user limiting where a parameter like the
+   limiting use cases like per-user limiting where a parameter such as the
    `user_id` can be passed. For now, since we want to do a global concurrency
    limiting, we will leave the label as it is.
 3. `max_inflight_duration`: Configures the time duration after which flow is
@@ -282,23 +281,22 @@ The last step is to apply the policy using the following command:
 Next, we'll proceed to run an example to observe the newly implemented policy in
 action.
 
-## Concurrency Scheduling and Mistral
+## Test Run
 
-We opted to set up a local instance of Mistral using
+We ran a local instance of Mistral using
 [Ollama](https://ollama.ai/library/mistral) due to their straightforward
 installation process and accessible API for prompt submission.
 
 Following installation, we developed a simple TypeScript application to send
 prompts to Mistral. These prompts were integrated with Aperture's `startFlow`
-and `endFlow` functions. To mimic real-world usage, we generated lists of
-prompts for paid and open source users, which were sent concurrently to Mistral.
-With around 50 users simultaneously requesting responses from Mistral, we
-observed significant latency differences. Without Aperture, the response time
-for generative AI workloads spiked up to 5 minutes. In contrast, with Aperture's
-concurrency scheduling policy in place, not only was the latency reduced to as
-low as 50 seconds, but our paying users also experienced much faster responses
-compared to those using the open-source version due to paid users having a high
-priority.
+and `endFlow` functions. To mimic real-world usage, we wrote two lists of
+prompts to be used by paid and open source users. With around 10 users, each
+simultaneously sending 25 prompts to Mistral, we observed significant latency
+differences. Without Aperture, the response time for generative AI workloads
+spiked up to 5 minutes and more. In contrast, with Aperture's concurrency
+scheduling policy in place, not only was the latency reduced to as low as 50
+seconds, but paying users also experienced much faster responses compared to
+those using the open-source version due to paid users having a high priority.
 
 Here is a comparison of the latencies before and after Aperture.
 
@@ -315,8 +313,8 @@ met, and how it bumps up paid requests up in the queue.
 
 ![Dashboard](./assets/mistral/mistral-queue.png)
 
-In summary, whether you're operating Mistral as a service or employing its API
-for app development, managing the demands of generative AI workloads remains a
-challenge, primarily due to GPU limitations impacting computation speed.
-Implementing Aperture's concurrency scheduling policy is essential as it ensures
-an optimal user experience while allowing to scale operations.
+In summary, whether you're operating Mistral as a service or using Mistral's API
+for app development, managing the load on LLMs remains a challenge, primarily
+due to GPU limitations impacting computation speed. Implementing Aperture's
+concurrency scheduling policy is essential as it ensures an optimal user
+experience while allowing to scale operations.
