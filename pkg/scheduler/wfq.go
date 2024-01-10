@@ -20,16 +20,21 @@ import (
 
 // Internal structure for tracking the request in the scheduler queue.
 type queuedRequest struct {
-	fInfo         *flowInfo
-	request       *Request
-	workloadState *WorkloadState
-	ready         chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
-	flowID        string        // Flow ID
-	vft           float64       // Virtual finish time
-	cost          float64       // Cost of the request (invPriority * tokens)
-	onHeap        bool          // Whether the request is on the heap or not
-	tokensInQueue float64       // tokens in queue when request was added to queue
-	tokensAllowed float64       // tokens allowed counter when request was added to queue
+	fInfo                      *flowInfo
+	request                    *Request
+	workloadState              *WorkloadState
+	ready                      chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
+	flowID                     string        // Flow ID
+	vft                        float64       // Virtual finish time
+	cost                       float64       // Cost of the request (invPriority * tokens)
+	onHeap                     bool          // Whether the request is on the heap or not
+	workloadPreemptionCounters preemptionCounters
+	fairnessPreemptionCounters preemptionCounters
+}
+
+type preemptionCounters struct {
+	tokensInQueue float64 // tokens in queue when request was added to queue
+	tokensAllowed float64 // tokens allowed counter when request was added to queue
 }
 
 ////////
@@ -344,7 +349,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 	// Increment reference counter
 	fInfo.refCnt++
 
-	sched.preemptionMetrics.onQueueEntry(qRequest)
+	sched.preemptionMetrics.onQueueEntry(&qRequest.workloadPreemptionCounters, request)
 
 	fairnessAdjustment := workloadState.numFairnessQueues
 
@@ -362,7 +367,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 		} else {
 			// push to flow queue
 			fInfo.queue.PushBack(qRequest)
-			workloadState.preemptionMetrics.onQueueEntry(qRequest)
+			workloadState.preemptionMetrics.onQueueEntry(&qRequest.fairnessPreemptionCounters, request)
 		}
 	} else {
 		// This is the only request in queue at this time, wake it up
@@ -414,7 +419,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 	defer sched.lock.Unlock()
 
 	// Update metrics for preemption and delay
-	sched.preemptionMetrics.onQueueExit(qRequest, allowed)
+	sched.preemptionMetrics.onQueueExit(&qRequest.workloadPreemptionCounters, request, allowed)
 
 	if allowed {
 		// move the flow's VT forward
@@ -438,7 +443,7 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 		if elm != nil {
 			fInfo.queue.Remove(elm)
 			nextReq := elm.Value.(*queuedRequest)
-			nextReq.workloadState.preemptionMetrics.onQueueExit(nextReq, true)
+			nextReq.workloadState.preemptionMetrics.onQueueExit(&nextReq.fairnessPreemptionCounters, nextReq.request, true)
 			nextReq.vft = fInfo.vt + nextReq.cost
 			heap.Push(&sched.requests, nextReq)
 			nextReq.onHeap = true
@@ -465,7 +470,7 @@ func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
-	sched.preemptionMetrics.onQueueExit(qRequest, false)
+	sched.preemptionMetrics.onQueueExit(&qRequest.workloadPreemptionCounters, qRequest.request, false)
 
 	select {
 	case <-qRequest.ready:
@@ -482,7 +487,7 @@ func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
 					if elm != nil {
 						qRequest.fInfo.queue.Remove(elm)
 						nextReq := elm.Value.(*queuedRequest)
-						nextReq.workloadState.preemptionMetrics.onQueueExit(nextReq, true)
+						nextReq.workloadState.preemptionMetrics.onQueueExit(&nextReq.fairnessPreemptionCounters, nextReq.request, true)
 						nextReq.vft = qRequest.fInfo.vt + nextReq.cost
 						sched.requests[i] = nextReq
 						nextReq.onHeap = true
@@ -509,7 +514,7 @@ func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
 				next = elm.Next()
 				if request == qRequest {
 					qRequest.fInfo.queue.Remove(elm)
-					qRequest.workloadState.preemptionMetrics.onQueueExit(qRequest, false)
+					qRequest.workloadState.preemptionMetrics.onQueueExit(&qRequest.fairnessPreemptionCounters, qRequest.request, false)
 					break
 				}
 			}
@@ -585,17 +590,15 @@ func NewPreemptionMetrics(
 
 // Maintain token counters used for calculating preemption and delay metrics.
 // WARNING: Unsafe and should be called with scheduler lock.
-func (pMetrics *PreemptionMetrics) onQueueEntry(qRequest *queuedRequest) {
-	request := qRequest.request
-	qRequest.tokensInQueue = pMetrics.tokensInQueue
-	qRequest.tokensAllowed = pMetrics.tokensAllowed
+func (pMetrics *PreemptionMetrics) onQueueEntry(pCounter *preemptionCounters, request *Request) {
+	pCounter.tokensInQueue = pMetrics.tokensInQueue
+	pCounter.tokensAllowed = pMetrics.tokensAllowed
 	pMetrics.tokensInQueue += request.Tokens
 }
 
 // Update metrics for preemption and delay
 // WARNING: Unsafe and should be called with scheduler lock.
-func (pMetrics *PreemptionMetrics) onQueueExit(qRequest *queuedRequest, allowed bool) {
-	request := qRequest.request
+func (pMetrics *PreemptionMetrics) onQueueExit(pCounter *preemptionCounters, request *Request, allowed bool) {
 	initMetrics := func(labels prometheus.Labels) error {
 		var err error
 		_, err = pMetrics.workloadPreemptedTokensSummary.GetMetricWith(labels)
@@ -648,8 +651,8 @@ func (pMetrics *PreemptionMetrics) onQueueExit(qRequest *queuedRequest, allowed 
 
 	if allowed {
 		// Update metrics
-		realIncrement := pMetrics.tokensAllowed - qRequest.tokensAllowed
-		expectedIncrement := qRequest.tokensInQueue
+		realIncrement := pMetrics.tokensAllowed - pCounter.tokensAllowed
+		expectedIncrement := pCounter.tokensInQueue
 		bump := expectedIncrement - realIncrement
 		if bump == 0 && pMetrics.workloadOnTimeCounter != nil {
 			publishCounter(pMetrics.workloadOnTimeCounter, 1)
