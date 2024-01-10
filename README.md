@@ -85,22 +85,6 @@ cloud application:
   services. Refer to the [Caching](https://docs.fluxninja.com/guides/caching)
   guide for more details.
 
-## 🏗️ Architecture
-
-![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
-
-- 🚦 Aperture Agents are typically deployed next to the services and provide
-  high-performance load management capabilities. They are responsible for
-  scheduling and rate-limiting incoming requests based on the policies defined
-  in the Aperture Controller. In addition, they also collect service health and
-  flow metrics.
-
-- 🤖 Aperture Controller executes observability-driven control policies and
-  configures Aperture Agents. The control policies are expressed as circuit
-  graphs consisting of interconnected signal processing blocks. The Aperture
-  policies provide a programmable way to tailor sophisticated control policies
-  to match any application's needs.
-
 ## 🏁 Getting Started
 
 ### ☁️ Aperture Cloud
