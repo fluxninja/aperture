@@ -11,6 +11,7 @@ require (
 	github.com/buger/jsonparser v1.1.1
 	github.com/buraksezer/olric v0.0.0-00010101000000-000000000000
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/cespare/xxhash v1.1.0
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/clarketm/json v1.17.1
 	github.com/containerd/cgroups v1.1.0

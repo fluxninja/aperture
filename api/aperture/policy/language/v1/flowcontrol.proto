@@ -455,6 +455,9 @@ message Scheduler {
   // Key for a flow label that can be used to provide workloads for this request.
   // If this parameter is not provided, the workloads for the flow will be determined by the matched workload's name in the policy.
   string workload_label_key = 10;
+
+  // Key for a flow label that is used to enforce fairness among requests in a workload. If not specified, requests within a workload of the same priority are admitted in a FIFO manner.
+  string fairness_label_key = 11;
 }
 
 // _AIMD Load Scheduler_ uses a Gradient Controller to throttle the token rate based on the deviation of the signal from the setpoint.

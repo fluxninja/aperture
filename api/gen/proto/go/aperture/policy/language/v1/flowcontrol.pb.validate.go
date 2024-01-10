@@ -2133,6 +2133,8 @@ func (m *Scheduler) validate(all bool) error {
 
 	// no validation rules for WorkloadLabelKey
 
+	// no validation rules for FairnessLabelKey
+
 	if len(errors) > 0 {
 		return SchedulerMultiError(errors)
 	}

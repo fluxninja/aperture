@@ -106,12 +106,18 @@ const (
 	WorkloadCounterMetricName = "workload_requests_total"
 	// RequestInQueueDurationMetricName - metric used for grouping durations for requests in queue of Scheduler.
 	RequestInQueueDurationMetricName = "request_in_queue_duration_ms"
-	// WorkloadPreemptedTokensMetricName - metric used for counting tokens preempted per request.
+	// WorkloadPreemptedTokensMetricName - metric used for counting tokens preempted per request measured end-to-end in the scheduler across all workloads.
 	WorkloadPreemptedTokensMetricName = "workload_preempted_tokens"
-	// WorkloadDelayedTokensMetricName - metric used for counting tokens delayed per request.
+	// WorkloadDelayedTokensMetricName - metric used for counting tokens delayed per request measured end-to-end in the scheduler across all workloads.
 	WorkloadDelayedTokensMetricName = "workload_delayed_tokens"
-	// WorkloadOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed.
+	// WorkloadOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed measured end-to-end in the scheduler across all workloads.
 	WorkloadOnTimeMetricName = "workload_on_time_total"
+	// FairnessPreemptedTokensMetricName - metric used for counting tokens preempted per request measured at fairness queues within the same workload.
+	FairnessPreemptedTokensMetricName = "fairness_preempted_tokens"
+	// FairnessDelayedTokensMetricName - metric used for counting tokens delayed per request measured at fairness queues within the same workload.
+	FairnessDelayedTokensMetricName = "fairness_delayed_tokens"
+	// FairnessOnTimeMetricName - metric used for counting requests that are on time, neither preempted nor delayed measured at fairness queues within the same workload.
+	FairnessOnTimeMetricName = "fairness_on_time_total"
 
 	// IncomingTokensMetricName - total work measured in tokens of all incoming requests.
 	IncomingTokensMetricName = "incoming_tokens_total"
@@ -120,10 +126,6 @@ const (
 	// RejectedTokensMetricName - total work measured in tokens of all rejected requests.
 	RejectedTokensMetricName = "rejected_tokens_total"
 
-	// WFQFlowsMetricName - weighted fair queuing number of flows gauge.
-	WFQFlowsMetricName = "wfq_flows_total"
-	// WFQRequestsMetricName - weighted fair queuing number of requests gauge.
-	WFQRequestsMetricName = "wfq_requests_total"
 	// TokenBucketLMMetricName - a gauge that tracks the load multiplier.
 	TokenBucketLMMetricName = "token_bucket_lm_ratio"
 	// TokenBucketFillRateMetricName - a gauge that tracks the fill rate of token bucket.

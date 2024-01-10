@@ -193,26 +193,4 @@ function(datasourceName, policyName, componentID, extraFilters={})
     ),
   ];
 
-  local legendFormat = '{{ instance }} - {{ policy_name }}';
-  local row10 = [
-    barGaugePanel(
-      'WFQ Scheduler Flows',
-      datasourceName,
-      'avg(wfq_flows_total{%(filters)s})' % { filters: stringFilters },
-      x=0,
-      h=6,
-      w=12,
-      legendFormat=legendFormat
-    ),
-    barGaugePanel(
-      'WFQ Scheduler Heap Requests',
-      datasourceName,
-      'avg(wfq_requests_total{%(filters)s})' % { filters: stringFilters },
-      x=12,
-      h=6,
-      w=12,
-      legendFormat=legendFormat
-    ),
-  ];
-
-  [row1, row2, row3, row4, row5, row6, row7, row8, row9, row10]
+  [row1, row2, row3, row4, row5, row6, row7, row8, row9]

@@ -40,9 +40,6 @@ type Factory struct {
 	registry status.Registry
 
 	// WFQ Metrics.
-	wfqFlowsGaugeVec    *prometheus.GaugeVec
-	wfqRequestsGaugeVec *prometheus.GaugeVec
-
 	incomingTokensCounterVec *prometheus.CounterVec
 	acceptedTokensCounterVec *prometheus.CounterVec
 	rejectedTokensCounterVec *prometheus.CounterVec
@@ -55,6 +52,10 @@ type Factory struct {
 	workloadPreemptedTokensSummaryVec *prometheus.SummaryVec
 	workloadDelayedTokensSummaryVec   *prometheus.SummaryVec
 	workloadOnTimeCounterVec          *prometheus.CounterVec
+
+	fairnessPreemptedTokensSummaryVec *prometheus.SummaryVec
+	fairnessDelayedTokensSummaryVec   *prometheus.SummaryVec
+	fairnessOnTimeCounterVec          *prometheus.CounterVec
 }
 
 // newFactory sets up the load scheduler module in the main fx app.
@@ -69,20 +70,6 @@ func newFactory(
 		registry: reg,
 	}
 
-	wsFactory.wfqFlowsGaugeVec = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: metrics.WFQFlowsMetricName,
-			Help: "A gauge that tracks the number of flows in the WFQScheduler",
-		},
-		MetricLabelKeys,
-	)
-	wsFactory.wfqRequestsGaugeVec = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: metrics.WFQRequestsMetricName,
-			Help: "A gauge that tracks the number of queued requests in the WFQScheduler",
-		},
-		MetricLabelKeys,
-	)
 	wsFactory.incomingTokensCounterVec = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: metrics.IncomingTokensMetricName,
@@ -138,7 +125,7 @@ func newFactory(
 
 	wsFactory.workloadPreemptedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadPreemptedTokensMetricName,
-		Help: "Number of tokens a request was preempted by",
+		Help: "Number of tokens a request was preempted, measured end-to-end in the scheduler across all workloads.",
 	}, []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -148,7 +135,7 @@ func newFactory(
 
 	wsFactory.workloadDelayedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.WorkloadDelayedTokensMetricName,
-		Help: "Number of tokens a request was delayed by",
+		Help: "Number of tokens a request was delayed by, measured end-to-end in the scheduler across all workloads.",
 	}, []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -158,7 +145,37 @@ func newFactory(
 
 	wsFactory.workloadOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.WorkloadOnTimeMetricName,
-		Help: "Counter of workload requests that were on time",
+		Help: "Counter of workload requests that were on time, measured end-to-end in the scheduler across all workloads.",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.fairnessPreemptedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.FairnessPreemptedTokensMetricName,
+		Help: "Number of tokens a request was preempted, measured at fairness queues within the same workload.",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.fairnessDelayedTokensSummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: metrics.FairnessDelayedTokensMetricName,
+		Help: "Number of tokens a request was delayed by, measured at fairness queues within the same workload.",
+	}, []string{
+		metrics.PolicyNameLabel,
+		metrics.PolicyHashLabel,
+		metrics.ComponentIDLabel,
+		metrics.WorkloadIndexLabel,
+	})
+
+	wsFactory.fairnessOnTimeCounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.FairnessOnTimeMetricName,
+		Help: "Counter of workload requests that were on time, measured at fairness queues within the same workload.",
 	}, []string{
 		metrics.PolicyNameLabel,
 		metrics.PolicyHashLabel,
@@ -170,15 +187,7 @@ func newFactory(
 		OnStart: func(_ context.Context) error {
 			var merr error
 
-			err := prometheusRegistry.Register(wsFactory.wfqFlowsGaugeVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = prometheusRegistry.Register(wsFactory.wfqRequestsGaugeVec)
-			if err != nil {
-				merr = multierr.Append(merr, err)
-			}
-			err = prometheusRegistry.Register(wsFactory.incomingTokensCounterVec)
+			err := prometheusRegistry.Register(wsFactory.incomingTokensCounterVec)
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -214,20 +223,24 @@ func newFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
+			err = prometheusRegistry.Register(wsFactory.fairnessPreemptedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.fairnessDelayedTokensSummaryVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = prometheusRegistry.Register(wsFactory.fairnessOnTimeCounterVec)
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
 
 			return merr
 		},
 		OnStop: func(_ context.Context) error {
 			var merr error
 
-			if !prometheusRegistry.Unregister(wsFactory.wfqFlowsGaugeVec) {
-				err := fmt.Errorf("failed to unregister wfq_flows metric")
-				merr = multierr.Append(merr, err)
-			}
-			if !prometheusRegistry.Unregister(wsFactory.wfqRequestsGaugeVec) {
-				err := fmt.Errorf("failed to unregister wfq_requests metric")
-				merr = multierr.Append(merr, err)
-			}
 			if !prometheusRegistry.Unregister(wsFactory.incomingTokensCounterVec) {
 				err := fmt.Errorf("failed to unregister incoming_tokens_total metric")
 				merr = multierr.Append(merr, err)
@@ -262,6 +275,18 @@ func newFactory(
 			}
 			if !prometheusRegistry.Unregister(wsFactory.workloadOnTimeCounterVec) {
 				err := fmt.Errorf("failed to unregister workload_on_time_total metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.fairnessPreemptedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister fairness_preempted_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.fairnessDelayedTokensSummaryVec) {
+				err := fmt.Errorf("failed to unregister fairness_delayed_tokens metric")
+				merr = multierr.Append(merr, err)
+			}
+			if !prometheusRegistry.Unregister(wsFactory.fairnessOnTimeCounterVec) {
+				err := fmt.Errorf("failed to unregister fairness_on_time_total metric")
 				merr = multierr.Append(merr, err)
 			}
 
@@ -303,16 +328,6 @@ type SchedulerMetrics struct {
 
 // NewSchedulerMetrics creates a new SchedulerMetrics instance.
 func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*SchedulerMetrics, error) {
-	wfqFlowsGauge, err := wsFactory.wfqFlowsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq flows gauge", err)
-	}
-
-	wfqRequestsGauge, err := wsFactory.wfqRequestsGaugeVec.GetMetricWith(metricLabels)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get wfq requests gauge", err)
-	}
-
 	incomingTokensCounter, err := wsFactory.incomingTokensCounterVec.GetMetricWith(metricLabels)
 	if err != nil {
 		return nil, err
@@ -329,8 +344,6 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 	}
 
 	wfqMetrics := &scheduler.WFQMetrics{
-		FlowsGauge:                     wfqFlowsGauge,
-		HeapRequestsGauge:              wfqRequestsGauge,
 		IncomingTokensCounter:          incomingTokensCounter,
 		AcceptedTokensCounter:          acceptedTokensCounter,
 		RejectedTokensCounter:          rejectedTokensCounter,
@@ -338,6 +351,9 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 		WorkloadPreemptedTokensSummary: wsFactory.workloadPreemptedTokensSummaryVec,
 		WorkloadDelayedTokensSummary:   wsFactory.workloadDelayedTokensSummaryVec,
 		WorkloadOnTimeCounter:          wsFactory.workloadOnTimeCounterVec,
+		FairnessPreemptedTokensSummary: wsFactory.fairnessPreemptedTokensSummaryVec,
+		FairnessDelayedTokensSummary:   wsFactory.fairnessDelayedTokensSummaryVec,
+		FairnessOnTimeCounter:          wsFactory.fairnessOnTimeCounterVec,
 	}
 
 	return &SchedulerMetrics{
@@ -351,16 +367,7 @@ func (wsFactory *Factory) NewSchedulerMetrics(metricLabels prometheus.Labels) (*
 func (sm *SchedulerMetrics) Delete() error {
 	var merr error
 
-	// Remove metrics from metric vectors
-	deleted := sm.wsFactory.wfqFlowsGaugeVec.Delete(sm.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_flows gauge from its metric vector"))
-	}
-	deleted = sm.wsFactory.wfqRequestsGaugeVec.Delete(sm.metricLabels)
-	if !deleted {
-		merr = multierr.Append(merr, errors.New("failed to delete wfq_requests gauge from its metric vector"))
-	}
-	deleted = sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
+	deleted := sm.wsFactory.incomingTokensCounterVec.Delete(sm.metricLabels)
 	if !deleted {
 		merr = multierr.Append(merr, errors.New("failed to delete incoming_tokens_total counter from its metric vector"))
 	}
@@ -395,6 +402,18 @@ func (sm *SchedulerMetrics) Delete() error {
 	deletedCount = sm.wsFactory.workloadOnTimeCounterVec.DeletePartialMatch(sm.metricLabels)
 	if deletedCount == 0 {
 		log.Warn().Msg("Could not delete workload_on_time_total counter from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.fairnessPreemptedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete fairness_preempted_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.fairnessDelayedTokensSummaryVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete fairness_delayed_tokens summary from its metric vector.")
+	}
+	deletedCount = sm.wsFactory.fairnessOnTimeCounterVec.DeletePartialMatch(sm.metricLabels)
+	if deletedCount == 0 {
+		log.Warn().Msg("Could not delete fairness_on_time_total counter from its metric vector.")
 	}
 	return merr
 }
@@ -449,6 +468,18 @@ func (wsFactory *Factory) NewScheduler(
 		_, err = schedulerMetrics.wsFactory.workloadOnTimeCounterVec.GetMetricWith(workloadLabels)
 		if err != nil {
 			return fmt.Errorf("%w: failed to get workload_on_time_total counter", err)
+		}
+		_, err = schedulerMetrics.wsFactory.fairnessPreemptedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get fairness_preempted_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.fairnessDelayedTokensSummaryVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get fairness_delayed_tokens summary", err)
+		}
+		_, err = schedulerMetrics.wsFactory.fairnessOnTimeCounterVec.GetMetricWith(workloadLabels)
+		if err != nil {
+			return fmt.Errorf("%w: failed to get fairness_on_time_total counter", err)
 		}
 		return nil
 	}
@@ -615,7 +646,14 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcont
 		reqCtx = timeoutCtx
 	}
 
-	req := scheduler.NewRequest(matchedWorkloadLabel, tokens, invPriority)
+	var fairnessLabel string
+	if s.proto.FairnessLabelKey != "" {
+		if val, ok := labels.Get(s.proto.FairnessLabelKey); ok {
+			fairnessLabel = val
+		}
+	}
+
+	req := scheduler.NewRequest(matchedWorkloadLabel, fairnessLabel, tokens, invPriority)
 
 	accepted, remaining, current, reqID := s.scheduler.Schedule(reqCtx, req)
 
