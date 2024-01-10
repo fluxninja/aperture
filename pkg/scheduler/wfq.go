@@ -21,6 +21,8 @@ import (
 // Internal structure for tracking the request in the scheduler queue.
 type queuedRequest struct {
 	fInfo         *flowInfo
+	request       *Request
+	workloadState *WorkloadState
 	ready         chan struct{} // Ready signal -- true = schedule, false = cancel/timeout
 	flowID        string        // Flow ID
 	vft           float64       // Virtual finish time
@@ -44,8 +46,11 @@ func newHeapRequest() interface{} {
 	return qRequest
 }
 
-func getHeapRequest() *queuedRequest {
-	return qRequestPool.Get().(*queuedRequest)
+func getHeapRequest(request *Request, workloadState *WorkloadState) *queuedRequest {
+	qRequest := qRequestPool.Get().(*queuedRequest)
+	qRequest.request = request
+	qRequest.workloadState = workloadState
+	return qRequest
 }
 
 func putHeapRequest(qRequest *queuedRequest) {
@@ -127,6 +132,12 @@ func init() {
 
 ////////
 
+// WorkloadState holds the state of a workload.
+type WorkloadState struct {
+	preemptionMetrics *PreemptionMetrics
+	numFairnessQueues int
+}
+
 // WFQScheduler : Weighted Fair Queue Scheduler.
 type WFQScheduler struct {
 	clk                    clockwork.Clock
@@ -136,14 +147,14 @@ type WFQScheduler struct {
 	// metrics
 	metrics *WFQMetrics
 	// preemption metrics
-	preemptionMetrics *preemptionMetrics
+	preemptionMetrics *PreemptionMetrics
 	// metrics labels
 	metricsLabels prometheus.Labels
 	// flows
-	flows                     map[string]*flowInfo
-	fairnessQueuesPerWorkload map[string]int // map from workloadID to number of flows for each workload
-	requests                  requestHeap
-	vt                        float64 // virtual time
+	flows     map[string]*flowInfo
+	workloads map[string]*WorkloadState // map from workloadID to WorkloadState
+	requests  requestHeap
+	vt        float64 // virtual time
 	// generation helps close the queue in face of concurrent requests leaving the queue while new requests also arrive.
 	generation   uint64
 	fairnessSeed uint32
@@ -163,17 +174,15 @@ func NewWFQScheduler(clk clockwork.Clock, tokenManger TokenManager, metrics *WFQ
 	sched.fairnessSeed = 0
 	sched.vt = 0
 	sched.flows = make(map[string]*flowInfo)
-	sched.fairnessQueuesPerWorkload = make(map[string]int)
+	sched.workloads = make(map[string]*WorkloadState)
 	sched.manager = tokenManger
 	sched.metricsLabels = metricsLabels
-	preemptionMetrics := &preemptionMetrics{metricsLabels: metricsLabels}
-	sched.preemptionMetrics = preemptionMetrics
 
 	if metrics != nil {
 		sched.metrics = metrics
-		preemptionMetrics.workloadPreemptedTokensSummary = metrics.WorkloadPreemptedTokensSummary
-		preemptionMetrics.workloadDelayedTokensSummary = metrics.WorkloadDelayedTokensSummary
-		preemptionMetrics.workloadOnTimeCounter = metrics.WorkloadOnTimeCounter
+		sched.preemptionMetrics = NewPreemptionMetrics(metricsLabels, metrics.WorkloadPreemptedTokensSummary, metrics.WorkloadDelayedTokensSummary, metrics.WorkloadOnTimeCounter)
+	} else {
+		sched.preemptionMetrics = NewPreemptionMetrics(metricsLabels, nil, nil, nil)
 	}
 
 	return sched
@@ -250,7 +259,7 @@ func (sched *WFQScheduler) Schedule(ctx context.Context, request *Request) (bool
 		// Update count for tokens in the queue here
 		return sched.updateMetricsAndReturn(accepted, remaining, current, request, startTime, reqID)
 	case <-ctx.Done():
-		sched.cancelRequest(request, qRequest)
+		sched.cancelRequest(qRequest)
 		// Update count for tokens in the queue here
 		return sched.updateMetricsAndReturn(false, 0, 0, request, startTime, "")
 	}
@@ -306,13 +315,16 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 
 	// Proceed to queueing
 
-	qRequest = getHeapRequest()
-
-	sched.preemptionMetrics.onQueueEntry(request, qRequest)
-
 	flowID, workloadID := sched.Identifiers(request.WorkloadLabel, request.FairnessLabel, request.InvPriority, sched.generation)
 
-	qRequest.flowID = flowID
+	workloadState, workloadStateFound := sched.workloads[workloadID]
+	if !workloadStateFound {
+		workloadState = &WorkloadState{
+			preemptionMetrics: NewPreemptionMetrics(sched.metricsLabels, sched.metrics.FairnessPreemptedTokensSummary, sched.metrics.FairnessDelayedTokensSummary, sched.metrics.FairnessOnTimeCounter),
+			numFairnessQueues: 0,
+		}
+		sched.workloads[workloadID] = workloadState
+	}
 
 	// Get FlowInfo
 	fInfo, ok := sched.flows[flowID]
@@ -321,24 +333,20 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 		fInfo.workloadID = workloadID
 		fInfo.vt = sched.vt
 		sched.flows[flowID] = fInfo
-		_, counterFound := sched.fairnessQueuesPerWorkload[workloadID]
-		if !counterFound {
-			sched.fairnessQueuesPerWorkload[workloadID] = 0
-		}
-		sched.fairnessQueuesPerWorkload[workloadID]++
+		workloadState.numFairnessQueues++
 	}
+
+	qRequest = getHeapRequest(request, workloadState)
+
+	qRequest.flowID = flowID
+	// Store flowInfo pointer in the request
+	qRequest.fInfo = fInfo
 	// Increment reference counter
 	fInfo.refCnt++
 
-	// Store flowInfo pointer in the request
-	qRequest.fInfo = fInfo
+	sched.preemptionMetrics.onQueueEntry(qRequest)
 
-	fairnessAdjustment := 1
-
-	numFairnessQueues, ok := sched.fairnessQueuesPerWorkload[workloadID]
-	if ok {
-		fairnessAdjustment = numFairnessQueues
-	}
+	fairnessAdjustment := workloadState.numFairnessQueues
 
 	cost := float64(request.Tokens) * request.InvPriority * float64(fairnessAdjustment)
 
@@ -354,6 +362,7 @@ func (sched *WFQScheduler) queueRequest(ctx context.Context, request *Request) (
 		} else {
 			// push to flow queue
 			fInfo.queue.PushBack(qRequest)
+			workloadState.preemptionMetrics.onQueueEntry(qRequest)
 		}
 	} else {
 		// This is the only request in queue at this time, wake it up
@@ -405,7 +414,7 @@ func (sched *WFQScheduler) scheduleRequest(ctx context.Context, request *Request
 	defer sched.lock.Unlock()
 
 	// Update metrics for preemption and delay
-	sched.preemptionMetrics.onQueueExit(request, qRequest, allowed)
+	sched.preemptionMetrics.onQueueExit(qRequest, allowed)
 
 	if allowed {
 		// move the flow's VT forward
@@ -429,6 +438,7 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 		if elm != nil {
 			fInfo.queue.Remove(elm)
 			nextReq := elm.Value.(*queuedRequest)
+			nextReq.workloadState.preemptionMetrics.onQueueExit(nextReq, true)
 			nextReq.vft = fInfo.vt + nextReq.cost
 			heap.Push(&sched.requests, nextReq)
 			nextReq.onHeap = true
@@ -451,11 +461,11 @@ func (sched *WFQScheduler) wakeNextRequest(fInfo *flowInfo) {
 	qRequest.ready <- struct{}{}
 }
 
-func (sched *WFQScheduler) cancelRequest(request *Request, qRequest *queuedRequest) {
+func (sched *WFQScheduler) cancelRequest(qRequest *queuedRequest) {
 	sched.lock.Lock()
 	defer sched.lock.Unlock()
 
-	sched.preemptionMetrics.onQueueExit(request, qRequest, false)
+	sched.preemptionMetrics.onQueueExit(qRequest, false)
 
 	select {
 	case <-qRequest.ready:
@@ -472,6 +482,7 @@ func (sched *WFQScheduler) cancelRequest(request *Request, qRequest *queuedReque
 					if elm != nil {
 						qRequest.fInfo.queue.Remove(elm)
 						nextReq := elm.Value.(*queuedRequest)
+						nextReq.workloadState.preemptionMetrics.onQueueExit(nextReq, true)
 						nextReq.vft = qRequest.fInfo.vt + nextReq.cost
 						sched.requests[i] = nextReq
 						nextReq.onHeap = true
@@ -498,6 +509,7 @@ func (sched *WFQScheduler) cancelRequest(request *Request, qRequest *queuedReque
 				next = elm.Next()
 				if request == qRequest {
 					qRequest.fInfo.queue.Remove(elm)
+					qRequest.workloadState.preemptionMetrics.onQueueExit(qRequest, false)
 					break
 				}
 			}
@@ -518,11 +530,11 @@ func (sched *WFQScheduler) cleanup(qRequest *queuedRequest) {
 		delete(sched.flows, qRequest.flowID)
 		// send flowInfo back to the Pool
 		putFlowInfo(qRequest.fInfo)
-		_, ok := sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID]
+		workloadState, ok := sched.workloads[qRequest.fInfo.workloadID]
 		if ok {
-			sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID]--
-			if sched.fairnessQueuesPerWorkload[qRequest.fInfo.workloadID] == 0 {
-				delete(sched.fairnessQueuesPerWorkload, qRequest.fInfo.workloadID)
+			workloadState.numFairnessQueues--
+			if workloadState.numFairnessQueues == 0 {
+				delete(sched.workloads, qRequest.fInfo.workloadID)
 			}
 		}
 	}
@@ -546,7 +558,8 @@ func (sched *WFQScheduler) GetPendingRequests() int {
 	return len(sched.requests)
 }
 
-type preemptionMetrics struct {
+// PreemptionMetrics holds metrics related to preemption and delay for a queuing system.
+type PreemptionMetrics struct {
 	workloadPreemptedTokensSummary *prometheus.SummaryVec
 	workloadDelayedTokensSummary   *prometheus.SummaryVec
 	workloadOnTimeCounter          *prometheus.CounterVec
@@ -555,9 +568,25 @@ type preemptionMetrics struct {
 	tokensAllowed                  float64
 }
 
+// NewPreemptionMetrics creates a new PreemptionMetrics object.
+func NewPreemptionMetrics(
+	metricsLabels prometheus.Labels,
+	workloadPreemptedTokensSummary *prometheus.SummaryVec,
+	workloadDelayedTokensSummary *prometheus.SummaryVec,
+	workloadOnTimeCounter *prometheus.CounterVec,
+) *PreemptionMetrics {
+	return &PreemptionMetrics{
+		metricsLabels:                  metricsLabels,
+		workloadPreemptedTokensSummary: workloadPreemptedTokensSummary,
+		workloadDelayedTokensSummary:   workloadDelayedTokensSummary,
+		workloadOnTimeCounter:          workloadOnTimeCounter,
+	}
+}
+
 // Maintain token counters used for calculating preemption and delay metrics.
 // WARNING: Unsafe and should be called with scheduler lock.
-func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queuedRequest) {
+func (pMetrics *PreemptionMetrics) onQueueEntry(qRequest *queuedRequest) {
+	request := qRequest.request
 	qRequest.tokensInQueue = pMetrics.tokensInQueue
 	qRequest.tokensAllowed = pMetrics.tokensAllowed
 	pMetrics.tokensInQueue += request.Tokens
@@ -565,7 +594,8 @@ func (pMetrics *preemptionMetrics) onQueueEntry(request *Request, qRequest *queu
 
 // Update metrics for preemption and delay
 // WARNING: Unsafe and should be called with scheduler lock.
-func (pMetrics *preemptionMetrics) onQueueExit(request *Request, qRequest *queuedRequest, allowed bool) {
+func (pMetrics *PreemptionMetrics) onQueueExit(qRequest *queuedRequest, allowed bool) {
+	request := qRequest.request
 	initMetrics := func(labels prometheus.Labels) error {
 		var err error
 		_, err = pMetrics.workloadPreemptedTokensSummary.GetMetricWith(labels)
@@ -656,4 +686,7 @@ type WFQMetrics struct {
 	WorkloadPreemptedTokensSummary *prometheus.SummaryVec
 	WorkloadDelayedTokensSummary   *prometheus.SummaryVec
 	WorkloadOnTimeCounter          *prometheus.CounterVec
+	FairnessPreemptedTokensSummary *prometheus.SummaryVec
+	FairnessDelayedTokensSummary   *prometheus.SummaryVec
+	FairnessOnTimeCounter          *prometheus.CounterVec
 }
