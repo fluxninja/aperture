@@ -543,7 +543,9 @@ func (e *Engine) getMatches(controlPoint string, serviceIDs []string, labels lab
 }
 
 // Lock must be held by caller.
-func (e *Engine) register(key string, selectorsProto []*policylangv1.Selector,
+func (e *Engine) register(
+	key string,
+	selectorsProto []*policylangv1.Selector,
 	matchedCB multimatcher.MatchCallback[*multiMatchResult],
 ) error {
 	s, err := selectors.FromSelectors(selectorsProto, e.agentInfo.GetAgentGroup())

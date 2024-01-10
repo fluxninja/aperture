@@ -1,10 +1,15 @@
 package flowcontrol
 
 import (
+	"context"
+	"fmt"
+	"sync"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	goprom "github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
@@ -14,6 +19,90 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/mocks"
 )
+
+var (
+	lock          sync.Mutex
+	limitersArray = []string{}
+)
+
+type MockTestLimiter struct {
+	name         string
+	shouldReject bool
+}
+
+// Decide implements iface.Limiter.
+func (l *MockTestLimiter) Decide(ctx context.Context, flowLabels labels.Labels) *flowcontrolv1.LimiterDecision {
+	lock.Lock()
+	defer lock.Unlock()
+
+	limitersArray = append(limitersArray, l.name)
+
+	var deniedResponseStatusCode flowcontrolv1.StatusCode
+	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
+	if l.shouldReject {
+		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
+		deniedResponseStatusCode = flowcontrolv1.StatusCode_BadRequest
+	}
+
+	return &flowcontrolv1.LimiterDecision{
+		PolicyName:               l.name,
+		PolicyHash:               "policy_hash",
+		ComponentId:              "component_id",
+		Dropped:                  l.shouldReject,
+		DeniedResponseStatusCode: deniedResponseStatusCode,
+		Reason:                   reason,
+		WaitTime:                 &durationpb.Duration{Seconds: 1},
+	}
+}
+
+// Revert implements iface.Limiter.
+func (l *MockTestLimiter) Revert(context.Context, labels.Labels, *flowcontrolv1.LimiterDecision) {
+	panic("unimplemented")
+}
+
+// GetLimiterID implements iface.Limiter.
+func (l *MockTestLimiter) GetLimiterID() iface.LimiterID {
+	return iface.LimiterID{
+		PolicyName:  l.name,
+		PolicyHash:  "policy_hash",
+		ComponentID: "component_id",
+	}
+}
+
+// GetRampMode implements iface.Limiter.
+func (l *MockTestLimiter) GetRampMode() bool {
+	panic("unimplemented")
+}
+
+// GetRequestCounter implements iface.Limiter.
+func (l *MockTestLimiter) GetRequestCounter(labels map[string]string) goprom.Counter {
+	panic("unimplemented")
+}
+
+// GetSelectors implements iface.Limiter.
+func (l *MockTestLimiter) GetSelectors() []*policylangv1.Selector {
+	return []*policylangv1.Selector{
+		{
+			ControlPoint: "ingress",
+			Service:      "testService.testNamespace.svc.cluster.local",
+			AgentGroup:   metrics.DefaultAgentGroup,
+		},
+	}
+}
+
+func (l *MockTestLimiter) GetPolicyName() string {
+	return l.name
+}
+
+func (l *MockTestLimiter) Return(ctx context.Context, label string, tokens float64, requestID string) (bool, error) {
+	panic("unimplemented")
+}
+
+func (l *MockTestLimiter) GetLatencyObserver(labels map[string]string) goprom.Observer {
+	panic("unimplemented")
+}
+
+var _ iface.Limiter = &MockTestLimiter{}
 
 var _ = Describe("Dataplane Engine", func() {
 	var (
@@ -35,6 +124,8 @@ var _ = Describe("Dataplane Engine", func() {
 		mockCtrl = gomock.NewController(t)
 		mockConLimiter = mocks.NewMockScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
+
+		limitersArray = make([]string, 0)
 
 		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
 		selectors = []*policylangv1.Selector{
@@ -62,6 +153,47 @@ var _ = Describe("Dataplane Engine", func() {
 			ComponentID: "0",
 			PolicyHash:  "test",
 		}
+	})
+
+	Context("ProcessRequest", func() {
+		It("Should have 3 registered limiters", func() {
+			cl1 := &MockTestLimiter{
+				name:         "concurrency-limiter1",
+				shouldReject: false,
+			}
+			err := engine.RegisterConcurrencyLimiter(cl1)
+			Expect(err).NotTo(HaveOccurred())
+
+			cs1 := &MockTestLimiter{
+				name:         "concurrency-scheduler1",
+				shouldReject: false,
+			}
+			err = engine.RegisterConcurrencyScheduler(cs1)
+			Expect(err).NotTo(HaveOccurred())
+
+			cl2 := &MockTestLimiter{
+				name:         "concurrency-limiter2",
+				shouldReject: false,
+			}
+			err = engine.RegisterConcurrencyLimiter(cl2)
+			Expect(err).NotTo(HaveOccurred())
+
+			resp := engine.ProcessRequest(context.Background(), iface.RequestContext{
+				FlowLabels:   make(labels.PlainMap),
+				ControlPoint: "ingress",
+				Services:     []string{"testService.testNamespace.svc.cluster.local"},
+				RampMode:     false,
+				ExpectEnd:    true,
+			})
+
+			fmt.Printf("\nprocess request response: %+v\n", resp)
+			fmt.Printf("\n limiters array: %+v\n", limitersArray)
+
+			Expect(len(limitersArray)).To(Equal(3))
+			Expect(limitersArray[0]).To(Equal("concurrency-limiter1"))
+			Expect(limitersArray[1]).To(Equal("concurrency-limiter2"))
+			Expect(limitersArray[2]).To(Equal("concurrency-scheduler1"))
+		})
 	})
 
 	Context("Load Scheduler", func() {
