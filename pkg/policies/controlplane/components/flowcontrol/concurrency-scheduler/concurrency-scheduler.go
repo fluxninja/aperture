@@ -83,6 +83,7 @@ func ParseConcurrencyScheduler(
 			},
 			Selectors:         concurrencyScheduler.GetSelectors(),
 			ParentComponentId: componentID.String(),
+			Scheduler:         concurrencyScheduler.Scheduler,
 		},
 	)
 	if err != nil {

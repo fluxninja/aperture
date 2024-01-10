@@ -77,6 +77,7 @@ func ParseLoadScheduler(
 			LoadSchedulerComponentId:   componentID.String(),
 			WorkloadLatencyBasedTokens: loadScheduler.Parameters.GetWorkloadLatencyBasedTokens(),
 			Selectors:                  loadScheduler.Parameters.GetSelectors(),
+			Scheduler:                  loadScheduler.Parameters.GetScheduler(),
 		})
 	if err != nil {
 		return nil, nil, err

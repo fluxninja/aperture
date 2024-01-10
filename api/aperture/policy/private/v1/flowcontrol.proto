@@ -14,6 +14,7 @@ message LoadActuator {
   string load_scheduler_component_id = 2;
   repeated aperture.policy.language.v1.Selector selectors = 3;
   bool workload_latency_based_tokens = 4;
+  aperture.policy.language.v1.Scheduler scheduler = 5;
 }
 
 message RateLimiter {
@@ -26,6 +27,7 @@ message QuotaScheduler {
   aperture.policy.language.v1.RateLimiter.Ins in_ports = 1; // @gotags: validate:"required"
   repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
   string parent_component_id = 3;
+  aperture.policy.language.v1.Scheduler scheduler = 4;
 }
 
 message ConcurrencyLimiter {
@@ -38,4 +40,5 @@ message ConcurrencyScheduler {
   aperture.policy.language.v1.ConcurrencyLimiter.Ins in_ports = 1; // @gotags: validate:"required"
   repeated aperture.policy.language.v1.Selector selectors = 2; // @gotags: validate:"required,gt=0,dive"
   string parent_component_id = 3;
+  aperture.policy.language.v1.Scheduler scheduler = 4;
 }
