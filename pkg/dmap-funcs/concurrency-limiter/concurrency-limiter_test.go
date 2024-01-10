@@ -154,7 +154,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
 	for _, f := range fr.flows {
-		acceptedRequestsExpected := (config.capacity) * float64(duration/latency)
+		acceptedRequestsExpected := math.Min((config.capacity)*float64(duration/latency), float64(f.totalRequests))
 		t.Logf("flow (%s) %d secs: \n totalRequests=%d, capacity=%f, acceptedRequests=%d, acceptedRequestsExpected=%v",
 			f.requestlabel,
 			duration,
