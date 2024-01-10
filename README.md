@@ -23,9 +23,6 @@
   </a>
 </p>
 
-> [!TIP] New blueprint `Concurrency Limiting` released. Try it to
-> [limit concurrent requests](https://docs.fluxninja.com/guides/per-user-concurrency-limiting).
-
 <!-- markdownlint-enable -->
 <!-- vale on -->
 
@@ -106,17 +103,27 @@ cloud application:
 
 ## 🏁 Getting Started
 
-### 🎮 Playground
+### ☁️ Aperture Cloud
+
+The easiest way to try Aperture is to sign up for a free Aperture Cloud account
+at [https://app.fluxninja.com/sign-up](https://cloud.fluxninja.com). Aperture
+Cloud is a fully managed service by FluxNinja. With Aperture Cloud, there's no
+need to manage any infrastructure, and you can integrate your application with
+Aperture using SDKs.
+
+[Get started with Aperture Cloud](https://docs.fluxninja.com/get-started/)
+
+![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-light.png#gh-light-mode-only)
+![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-dark.png#gh-dark-mode-only)
+_Prioritization Metrics for gpt-4_
+![Flow Analytics](./docs/content/guides/assets/openai/flow-analytics-light.png#gh-light-mode-only)
+![Flow Analytics](./docs/content/guides/assets/openai/flow-analytics-dark.png#gh-dark-mode-only)
+_Performance Metrics for OpenAI Models_
+
+### 🎮 Local Kubernetes Playground
 
 To try Aperture in a local Kubernetes environment, refer to
 [Playground docs](./playground/README.md).
-
-![Service Protection Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
-
-### 🏎️ Installation
-
-To install the Aperture system, follow the
-[Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Learn More
 
