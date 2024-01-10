@@ -8806,6 +8806,20 @@ This field allows you to override the default HTTP status code
 (`503 Service Unavailable`) that is returned when a request is denied.
 
 </dd>
+<dt>fairness_label_key</dt>
+<dd>
+
+<!-- vale off -->
+
+(string)
+
+<!-- vale on -->
+
+Key for a flow label that is used to enforce fairness among requests in a
+workload. If not specified, requests within a workload of the same priority are
+admitted in a FIFO manner.
+
+</dd>
 <dt>priority_label_key</dt>
 <dd>
 
