@@ -2,8 +2,9 @@ package flowcontrol
 
 import (
 	"context"
-	"fmt"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
@@ -21,26 +22,49 @@ import (
 )
 
 var (
-	lock          sync.Mutex
-	limitersArray = []string{}
+	lock       sync.Mutex
+	decideList = []string{}
+	revertList = []string{}
 )
 
-type MockTestLimiter struct {
+type mockTestLimiter struct {
 	name         string
+	limiterType  string
 	shouldReject bool
 }
 
-// Decide implements iface.Limiter.
-func (l *MockTestLimiter) Decide(ctx context.Context, flowLabels labels.Labels) *flowcontrolv1.LimiterDecision {
+func noLimitersAfterScheduler() bool {
 	lock.Lock()
 	defer lock.Unlock()
 
-	limitersArray = append(limitersArray, l.name)
+	schedulerFound := false
+
+	if len(decideList) > 0 {
+		for i := 0; i < len(decideList)-1; i++ {
+			limiterType := strings.Split(decideList[i], ".")[1]
+			if limiterType == "scheduler" {
+				schedulerFound = true
+				continue
+			}
+			if schedulerFound && limiterType == "limiter" {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+// Decide implements iface.Limiter.
+func (l *mockTestLimiter) Decide(ctx context.Context, flowLabels labels.Labels) *flowcontrolv1.LimiterDecision {
+	lock.Lock()
+	defer lock.Unlock()
+
+	decideList = append(decideList, l.name+"."+l.limiterType)
 
 	var deniedResponseStatusCode flowcontrolv1.StatusCode
 	reason := flowcontrolv1.LimiterDecision_LIMITER_REASON_UNSPECIFIED
 	if l.shouldReject {
-		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 		deniedResponseStatusCode = flowcontrolv1.StatusCode_BadRequest
 	}
 
@@ -56,12 +80,15 @@ func (l *MockTestLimiter) Decide(ctx context.Context, flowLabels labels.Labels) 
 }
 
 // Revert implements iface.Limiter.
-func (l *MockTestLimiter) Revert(context.Context, labels.Labels, *flowcontrolv1.LimiterDecision) {
-	panic("unimplemented")
+func (l *mockTestLimiter) Revert(ctx context.Context, flowLabels labels.Labels, decision *flowcontrolv1.LimiterDecision) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	revertList = append(revertList, l.name)
 }
 
 // GetLimiterID implements iface.Limiter.
-func (l *MockTestLimiter) GetLimiterID() iface.LimiterID {
+func (l *mockTestLimiter) GetLimiterID() iface.LimiterID {
 	return iface.LimiterID{
 		PolicyName:  l.name,
 		PolicyHash:  "policy_hash",
@@ -70,17 +97,17 @@ func (l *MockTestLimiter) GetLimiterID() iface.LimiterID {
 }
 
 // GetRampMode implements iface.Limiter.
-func (l *MockTestLimiter) GetRampMode() bool {
+func (l *mockTestLimiter) GetRampMode() bool {
 	panic("unimplemented")
 }
 
 // GetRequestCounter implements iface.Limiter.
-func (l *MockTestLimiter) GetRequestCounter(labels map[string]string) goprom.Counter {
+func (l *mockTestLimiter) GetRequestCounter(labels map[string]string) goprom.Counter {
 	panic("unimplemented")
 }
 
 // GetSelectors implements iface.Limiter.
-func (l *MockTestLimiter) GetSelectors() []*policylangv1.Selector {
+func (l *mockTestLimiter) GetSelectors() []*policylangv1.Selector {
 	return []*policylangv1.Selector{
 		{
 			ControlPoint: "ingress",
@@ -90,19 +117,19 @@ func (l *MockTestLimiter) GetSelectors() []*policylangv1.Selector {
 	}
 }
 
-func (l *MockTestLimiter) GetPolicyName() string {
+func (l *mockTestLimiter) GetPolicyName() string {
 	return l.name
 }
 
-func (l *MockTestLimiter) Return(ctx context.Context, label string, tokens float64, requestID string) (bool, error) {
+func (l *mockTestLimiter) Return(ctx context.Context, label string, tokens float64, requestID string) (bool, error) {
 	panic("unimplemented")
 }
 
-func (l *MockTestLimiter) GetLatencyObserver(labels map[string]string) goprom.Observer {
+func (l *mockTestLimiter) GetLatencyObserver(labels map[string]string) goprom.Observer {
 	panic("unimplemented")
 }
 
-var _ iface.Limiter = &MockTestLimiter{}
+var _ iface.Limiter = &mockTestLimiter{}
 
 var _ = Describe("Dataplane Engine", func() {
 	var (
@@ -124,9 +151,6 @@ var _ = Describe("Dataplane Engine", func() {
 		mockCtrl = gomock.NewController(t)
 		mockConLimiter = mocks.NewMockScheduler(mockCtrl)
 		mockFluxmeter = mocks.NewMockFluxMeter(mockCtrl)
-
-		limitersArray = make([]string, 0)
-
 		engine = NewEngine(agentinfo.NewAgentInfo(metrics.DefaultAgentGroup))
 		selectors = []*policylangv1.Selector{
 			{
@@ -135,7 +159,6 @@ var _ = Describe("Dataplane Engine", func() {
 				AgentGroup:   metrics.DefaultAgentGroup,
 			},
 		}
-
 		histogram = goprom.NewHistogram(goprom.HistogramOpts{
 			Name: metrics.FluxMeterMetricName,
 			ConstLabels: goprom.Labels{
@@ -156,29 +179,45 @@ var _ = Describe("Dataplane Engine", func() {
 	})
 
 	Context("ProcessRequest", func() {
-		It("Should have 3 registered limiters", func() {
-			cl1 := &MockTestLimiter{
+		BeforeEach(func() {
+			decideList = make([]string, 0)
+			revertList = make([]string, 0)
+
+			cl1 := &mockTestLimiter{
 				name:         "concurrency-limiter1",
+				limiterType:  "limiter",
 				shouldReject: false,
 			}
 			err := engine.RegisterConcurrencyLimiter(cl1)
 			Expect(err).NotTo(HaveOccurred())
 
-			cs1 := &MockTestLimiter{
+			cs1 := &mockTestLimiter{
 				name:         "concurrency-scheduler1",
+				limiterType:  "scheduler",
 				shouldReject: false,
 			}
 			err = engine.RegisterConcurrencyScheduler(cs1)
 			Expect(err).NotTo(HaveOccurred())
 
-			cl2 := &MockTestLimiter{
+			cl2 := &mockTestLimiter{
 				name:         "concurrency-limiter2",
+				limiterType:  "limiter",
 				shouldReject: false,
 			}
 			err = engine.RegisterConcurrencyLimiter(cl2)
 			Expect(err).NotTo(HaveOccurred())
+		})
 
-			resp := engine.ProcessRequest(context.Background(), iface.RequestContext{
+		It("Should have 3 registered limiters and maintain order", func() {
+			rl1 := &mockTestLimiter{
+				name:         "rate-limiter1",
+				limiterType:  "limiter",
+				shouldReject: false,
+			}
+			err := engine.RegisterRateLimiter(rl1)
+			Expect(err).NotTo(HaveOccurred())
+
+			_ = engine.ProcessRequest(context.Background(), iface.RequestContext{
 				FlowLabels:   make(labels.PlainMap),
 				ControlPoint: "ingress",
 				Services:     []string{"testService.testNamespace.svc.cluster.local"},
@@ -186,13 +225,37 @@ var _ = Describe("Dataplane Engine", func() {
 				ExpectEnd:    true,
 			})
 
-			fmt.Printf("\nprocess request response: %+v\n", resp)
-			fmt.Printf("\n limiters array: %+v\n", limitersArray)
+			Expect(len(decideList)).To(Equal(4))
+			Expect(noLimitersAfterScheduler()).To(BeTrue())
 
-			Expect(len(limitersArray)).To(Equal(3))
-			Expect(limitersArray[0]).To(Equal("concurrency-limiter1"))
-			Expect(limitersArray[1]).To(Equal("concurrency-limiter2"))
-			Expect(limitersArray[2]).To(Equal("concurrency-scheduler1"))
+			err = engine.UnregisterRateLimiter(rl1)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("Should revert other limiters if rate limiter rejects the request", func() {
+			rl1 := &mockTestLimiter{
+				name:         "rate-limiter1",
+				limiterType:  "limiter",
+				shouldReject: true,
+			}
+			err := engine.RegisterRateLimiter(rl1)
+			Expect(err).NotTo(HaveOccurred())
+
+			_ = engine.ProcessRequest(context.Background(), iface.RequestContext{
+				FlowLabels:   make(labels.PlainMap),
+				ControlPoint: "ingress",
+				Services:     []string{"testService.testNamespace.svc.cluster.local"},
+				RampMode:     false,
+				ExpectEnd:    true,
+			})
+			time.Sleep(2 * time.Second)
+
+			Expect(len(decideList)).To(Equal(3))
+			Expect(decideList).NotTo(ContainElement("concurrency-scheduler1"))
+			Expect(len(revertList)).To(Equal(2))
+
+			err = engine.UnregisterRateLimiter(rl1)
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 
