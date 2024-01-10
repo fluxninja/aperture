@@ -250,10 +250,15 @@ var _ = Describe("Dataplane Engine", func() {
 			})
 			time.Sleep(2 * time.Second)
 
+			lock.Lock()
 			Expect(len(decideList)).To(Equal(3))
 			Expect(decideList).NotTo(ContainElement("concurrency-scheduler1"))
+			lock.Unlock()
+
+			lock.Lock()
 			Expect(len(revertList)).To(Equal(2))
 			Expect(revertList).NotTo(ContainElement("rate-limiter1"))
+			lock.Unlock()
 
 			err = engine.UnregisterRateLimiter(rl1)
 			Expect(err).NotTo(HaveOccurred())
