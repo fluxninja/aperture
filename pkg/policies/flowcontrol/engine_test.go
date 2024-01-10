@@ -225,7 +225,9 @@ var _ = Describe("Dataplane Engine", func() {
 				ExpectEnd:    true,
 			})
 
+			lock.Lock()
 			Expect(len(decideList)).To(Equal(4))
+			lock.Unlock()
 			Expect(noLimitersAfterScheduler()).To(BeTrue())
 
 			err = engine.UnregisterRateLimiter(rl1)
