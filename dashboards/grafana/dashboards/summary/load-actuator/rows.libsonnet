@@ -6,6 +6,7 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libson
 
 function(datasourceName, policyName, component, extraFilters={})
   local componentID = component.component.load_scheduler_component_id;
+  local scheduler = if 'scheduler' in component.component then component.component.scheduler else {};
   local stringFilters = promUtils.dictToPrometheusFilter(extraFilters { policy_name: policyName, component_id: componentID });
 
   local row1 = [
@@ -43,4 +44,4 @@ function(datasourceName, policyName, component, extraFilters={})
     ),
   ];
 
-  schedulerRowsFn(datasourceName, policyName, componentID, extraFilters) + [row1]
+  schedulerRowsFn(datasourceName, policyName, componentID, scheduler, extraFilters) + [row1]

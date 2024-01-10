@@ -5,7 +5,7 @@ local timeSeriesPanel = import '../../../panels/time-series.libsonnet';
 local promUtils = import '../../../utils/prometheus.libsonnet';
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v10.1.0/main.libsonnet';
 
-function(datasourceName, policyName, componentID, extraFilters={})
+function(datasourceName, policyName, componentID, scheduler, extraFilters={})
   local stringFilters = promUtils.dictToPrometheusFilter(extraFilters { policy_name: policyName, component_id: componentID });
 
   local row1 = [
@@ -193,4 +193,16 @@ function(datasourceName, policyName, componentID, extraFilters={})
     ),
   ];
 
-  [row1, row2, row3, row4, row5, row6, row7, row8, row9]
+  if 'fairness_label_key' in scheduler && scheduler.fairness_label_key != ''
+  then
+    local row10 = [
+      timeSeriesPanel(
+        'Tokens adjusted per second to maintain fairness within a workload',
+        datasourceName,
+        query='sum by (workload_index) (rate(fairness_delayed_tokens_sum{%(filters)s}[$__rate_interval]))' % { filters: stringFilters },
+        axisLabel='Token Rate',
+      ),
+    ];
+    [row1, row2, row3, row4, row5, row6, row7, row8, row9, row10]
+  else
+    [row1, row2, row3, row4, row5, row6, row7, row8, row9]
