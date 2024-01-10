@@ -17,6 +17,9 @@ while true; do
     go get -u github.com/fluxninja/aperture/api/v2@"${COMMIT_SHA}"
     go mod tidy
     git add go.mod go.sum
+    cd examples/manual
+    go mod tidy
+    git add go.mod go.sum
     git commit -m "Update API Version in Go SDK"
 
     set +e
