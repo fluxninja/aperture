@@ -93,6 +93,7 @@ func ParseQuotaScheduler(
 			},
 			Selectors:         quotaScheduler.GetSelectors(),
 			ParentComponentId: componentID.String(),
+			Scheduler:         quotaScheduler.Scheduler,
 		})
 	if err != nil {
 		return nil, nil, err

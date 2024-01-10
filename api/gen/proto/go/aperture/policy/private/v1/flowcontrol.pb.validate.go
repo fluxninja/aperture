@@ -124,6 +124,35 @@ func (m *LoadActuator) validate(all bool) error {
 
 	// no validation rules for WorkloadLatencyBasedTokens
 
+	if all {
+		switch v := interface{}(m.GetScheduler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, LoadActuatorValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, LoadActuatorValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScheduler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadActuatorValidationError{
+				field:  "Scheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return LoadActuatorMultiError(errors)
 	}
@@ -451,6 +480,35 @@ func (m *QuotaScheduler) validate(all bool) error {
 	}
 
 	// no validation rules for ParentComponentId
+
+	if all {
+		switch v := interface{}(m.GetScheduler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuotaSchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScheduler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuotaSchedulerValidationError{
+				field:  "Scheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return QuotaSchedulerMultiError(errors)
@@ -783,6 +841,35 @@ func (m *ConcurrencyScheduler) validate(all bool) error {
 	}
 
 	// no validation rules for ParentComponentId
+
+	if all {
+		switch v := interface{}(m.GetScheduler()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConcurrencySchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConcurrencySchedulerValidationError{
+					field:  "Scheduler",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetScheduler()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConcurrencySchedulerValidationError{
+				field:  "Scheduler",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ConcurrencySchedulerMultiError(errors)
