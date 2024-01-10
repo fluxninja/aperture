@@ -91,6 +91,8 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 		// Some error from in-memory cache.
 		return nil, err
 	}
+
+	log.Debug().Str("key", key).Msg("Key not found in in-memory cache")
 	// Key not found in in-memory cache. Need to check backing storage.
 	metric, ready := o.getMissesTotalMetric(metrics.PersistentCacheTypeInMemory)
 	if ready {
@@ -122,6 +124,7 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 		return nil, innerErr
 	}
 
+	log.Debug().Str("key", key).Msg("Entry from storage saved in in-memory cache and response returned")
 	return olric.NewResponse(entry), nil
 }
 

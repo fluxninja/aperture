@@ -96,9 +96,10 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 	reader, err := obj.NewReader(timeoutCtx)
 	if err != nil {
 		if errors.Is(err, storage.ErrObjectNotExist) {
+			log.Debug().Err(err).Str("key", key).Msg("Requested object not found in the object storage")
 			return nil, ErrKeyNotFound
 		}
-		log.Error().Err(err).Msg("Failed to create object storage reader")
+		log.Error().Err(err).Str("key", key).Msg("Failed to create object storage reader")
 		return nil, err
 	}
 
@@ -114,6 +115,8 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		log.Error().Err(err).Msg("Failed to read object storage object")
 		return nil, err
 	}
+
+	log.Debug().Str("key", key).Msg("Retrieved data from object storage")
 
 	entry := &PersistentEntry{key: key, value: data}
 	attrs, err := obj.Attrs(timeoutCtx)
