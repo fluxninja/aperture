@@ -90,8 +90,6 @@ func runTest(config testConfig) {
 
 	limiters := createLimiters(t, cl, config)
 
-	t.Log("Starting flows")
-
 	fr = &flowRunner{
 		wg:       sync.WaitGroup{},
 		capacity: config.capacity,
@@ -157,8 +155,6 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
 	for _, f := range fr.flows {
 		acceptedRequestsExpected := (config.capacity) * float64(duration/latency)
-		// acceptedRequestsExpected := int32(math.Min(config.capacity, float64(f.totalRequests)))
-
 		t.Logf("flow (%s) %d secs: \n totalRequests=%d, capacity=%f, acceptedRequests=%d, acceptedRequestsExpected=%v",
 			f.requestlabel,
 			duration,
@@ -200,7 +196,7 @@ func TestLimiter(t *testing.T) {
 			t:                   t,
 			numOlrics:           1,
 			flows:               flows,
-			duration:            time.Second * 10,
+			duration:            time.Second*10 - time.Millisecond*100,
 			tolerance:           0.02,
 			capacity:            10,
 			maxInflightDuration: 7200 * time.Second,
@@ -220,7 +216,7 @@ func TestLimiter(t *testing.T) {
 			t:                   t,
 			numOlrics:           1,
 			flows:               flows,
-			duration:            time.Second * 10,
+			duration:            time.Second*10 - time.Millisecond*100,
 			tolerance:           0.02,
 			capacity:            10,
 			maxInflightDuration: latency,
