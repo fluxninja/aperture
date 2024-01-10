@@ -253,6 +253,7 @@ var _ = Describe("Dataplane Engine", func() {
 			Expect(len(decideList)).To(Equal(3))
 			Expect(decideList).NotTo(ContainElement("concurrency-scheduler1"))
 			Expect(len(revertList)).To(Equal(2))
+			Expect(revertList).NotTo(ContainElement("rate-limiter1"))
 
 			err = engine.UnregisterRateLimiter(rl1)
 			Expect(err).NotTo(HaveOccurred())
