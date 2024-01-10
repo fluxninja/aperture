@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 	"time"
@@ -108,8 +109,7 @@ func (o *ObjectStorage) Get(ctx context.Context, key string) (olricstorage.Entry
 		}
 	}()
 
-	data := make([]byte, reader.Attrs.Size)
-	_, err = reader.Read(data)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to read object storage object")
 		return nil, err
