@@ -88,13 +88,12 @@ inside applications.
 
 ### ☁️ Aperture Cloud
 
-The easiest way to try Aperture is to sign up for a free Aperture Cloud account
-at [https://app.fluxninja.com/sign-up](https://cloud.fluxninja.com). Aperture
-Cloud is a fully managed service by FluxNinja. With Aperture Cloud, there's no
-need to manage any infrastructure, and you can integrate your application with
-Aperture using SDKs.
-
-[Get started with Aperture Cloud](https://docs.fluxninja.com/get-started/)
+The easiest way to try Aperture is to
+[sign up](https://app.fluxninja.com/sign-up) for a free Aperture Cloud account.
+Aperture Cloud is a fully managed service by FluxNinja. With Aperture Cloud,
+there's no need to manage any infrastructure, and you can integrate your
+application with Aperture using SDKs. For more information, refer to the
+[get started](https://docs.fluxninja.com/get-started/) guide.
 
 ![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-light.png#gh-light-mode-only)
 ![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-dark.png#gh-dark-mode-only)
