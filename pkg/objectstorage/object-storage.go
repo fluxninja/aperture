@@ -377,7 +377,10 @@ func (o *ObjectStorage) Start(ctx context.Context) error {
 		return err
 	}
 	bucket := client.Bucket(o.bucketName)
+
+	o.client = client
 	o.bucket = bucket
+
 	go func() {
 		p := pool.New().WithMaxGoroutines(10)
 
