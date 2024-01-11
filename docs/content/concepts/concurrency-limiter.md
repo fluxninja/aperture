@@ -43,7 +43,7 @@ single _Concurrency Limiter_, providing seamless coordination and control across
 Agents. The Agents within an [agent group][agent-group] constantly share state
 and detect failures using a gossip protocol.
 
-### Max In-flight Duration {#max-in-flight-duration}
+## Max In-flight Duration {#max-in-flight-duration}
 
 In case of failures at the SDK or middleware/proxy, the flow end call might not
 be made. To prevent stale entries in the ledger, the _Concurrency Limiter_
