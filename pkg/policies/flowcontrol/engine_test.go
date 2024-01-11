@@ -25,6 +25,7 @@ var (
 	lock       sync.Mutex
 	decideList = []string{}
 	revertList = []string{}
+	cacheMap   = map[string]string{}
 )
 
 type mockTestLimiter struct {
@@ -33,7 +34,7 @@ type mockTestLimiter struct {
 	shouldReject bool
 }
 
-func noLimitersAfterScheduler() bool {
+func noXAfterY(x string, y string) bool {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -42,11 +43,11 @@ func noLimitersAfterScheduler() bool {
 	if len(decideList) > 0 {
 		for i := 0; i < len(decideList)-1; i++ {
 			limiterType := strings.Split(decideList[i], ".")[1]
-			if limiterType == "scheduler" {
+			if limiterType == y {
 				schedulerFound = true
 				continue
 			}
-			if schedulerFound && limiterType == "limiter" {
+			if schedulerFound && limiterType == "x" {
 				return false
 			}
 		}
@@ -131,6 +132,69 @@ func (l *mockTestLimiter) GetLatencyObserver(labels map[string]string) goprom.Ob
 
 var _ iface.Limiter = &mockTestLimiter{}
 
+type mockTestCache struct{}
+
+// Delete implements iface.Cache.
+func (*mockTestCache) Delete(ctx context.Context, req *flowcontrolv1.CacheDeleteRequest) *flowcontrolv1.CacheDeleteResponse {
+	panic("unimplemented")
+}
+
+// Lookup implements iface.Cache.
+func (*mockTestCache) Lookup(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.CacheLookupResponse {
+	panic("unimplemented")
+}
+
+// LookupGlobal implements iface.Cache.
+func (*mockTestCache) LookupGlobal(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) map[string]*flowcontrolv1.KeyLookupResponse {
+	panic("unimplemented")
+}
+
+// LookupGlobalNoWait implements iface.Cache.
+func (*mockTestCache) LookupGlobalNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (map[string]*flowcontrolv1.KeyLookupResponse, *sync.WaitGroup) {
+	panic("unimplemented")
+}
+
+// LookupNoWait implements iface.Cache.
+func (*mockTestCache) LookupNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.CacheLookupResponse, *sync.WaitGroup, *sync.WaitGroup) {
+	wg1 := sync.WaitGroup{}
+	wg2 := sync.WaitGroup{}
+
+	lock.Lock()
+	defer lock.Unlock()
+
+	key := request.ResultCacheKey
+	value, ok := cacheMap[key]
+
+	lookupStatus := flowcontrolv1.CacheLookupStatus_MISS
+	if ok {
+		lookupStatus = flowcontrolv1.CacheLookupStatus_HIT
+	}
+
+	return &flowcontrolv1.CacheLookupResponse{
+		ResultCacheResponse: &flowcontrolv1.KeyLookupResponse{
+			LookupStatus: lookupStatus,
+			Value:        []byte(value),
+		},
+	}, &wg1, &wg2
+}
+
+// LookupResult implements iface.Cache.
+func (*mockTestCache) LookupResult(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) *flowcontrolv1.KeyLookupResponse {
+	panic("unimplemented")
+}
+
+// LookupResultNoWait implements iface.Cache.
+func (*mockTestCache) LookupResultNoWait(ctx context.Context, request *flowcontrolv1.CacheLookupRequest) (*flowcontrolv1.KeyLookupResponse, *sync.WaitGroup) {
+	panic("unimplemented")
+}
+
+// Upsert implements iface.Cache.
+func (*mockTestCache) Upsert(ctx context.Context, req *flowcontrolv1.CacheUpsertRequest) *flowcontrolv1.CacheUpsertResponse {
+	panic("unimplemented")
+}
+
+var _ iface.Cache = &mockTestCache{}
+
 var _ = Describe("Dataplane Engine", func() {
 	var (
 		engine iface.Engine
@@ -182,6 +246,9 @@ var _ = Describe("Dataplane Engine", func() {
 		BeforeEach(func() {
 			decideList = make([]string, 0)
 			revertList = make([]string, 0)
+			cacheMap = make(map[string]string)
+
+			cacheMap["key"] = "value"
 
 			cl1 := &mockTestLimiter{
 				name:         "concurrency-limiter1",
@@ -228,7 +295,7 @@ var _ = Describe("Dataplane Engine", func() {
 			lock.Lock()
 			Expect(len(decideList)).To(Equal(4))
 			lock.Unlock()
-			Expect(noLimitersAfterScheduler()).To(BeTrue())
+			Expect(noXAfterY("limiter", "scheduler")).To(BeTrue())
 
 			err = engine.UnregisterRateLimiter(rl1)
 			Expect(err).NotTo(HaveOccurred())
@@ -264,6 +331,27 @@ var _ = Describe("Dataplane Engine", func() {
 
 			err = engine.UnregisterRateLimiter(rl1)
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("Should retrieve cached data correctly", func() {
+			cache := &mockTestCache{}
+			engine.RegisterCache(cache)
+
+			resp := engine.ProcessRequest(context.Background(), iface.RequestContext{
+				FlowLabels:   make(labels.PlainMap),
+				ControlPoint: "ingress",
+				Services:     []string{"testService.testNamespace.svc.cluster.local"},
+				RampMode:     false,
+				ExpectEnd:    true,
+				CacheLookupRequest: &flowcontrolv1.CacheLookupRequest{
+					ControlPoint:   "ingress",
+					ResultCacheKey: "key",
+				},
+			})
+			Expect(resp).NotTo(BeNil())
+			Expect(resp.CacheLookupResponse).NotTo(BeNil())
+			Expect(resp.CacheLookupResponse.ResultCacheResponse.LookupStatus).To(Equal(flowcontrolv1.CacheLookupStatus_HIT))
+			Expect(string(resp.CacheLookupResponse.ResultCacheResponse.Value)).To(Equal(cacheMap["key"]))
 		})
 	})
 
