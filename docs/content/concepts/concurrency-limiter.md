@@ -11,14 +11,11 @@ sidebar_position: 6
 
 The _Concurrency Limiter_ component is used to enforce in-flight request
 concurrency to prevent overloads. It can also be used to enforce limits per
-entity such as a user to ensure fair access across users.
-
-_Concurrency Limiter_ can be applied to a control point or certain labels that
-match within the control point. Requests are allowed or denied based on whether
-the in-flight requests are within the configured limit. Instead of measuring the
-number of requests, the _Concurrency Limiter_ can also be configured to measure
-the number of tokens associated with a request. Tokens can be sent as flow
-labels using Aperture SDKs.
+entity such as a user to ensure fair access across users. Requests are allowed
+or denied based on whether the in-flight requests are within the configured
+limit. Instead of measuring the number of requests, the _Concurrency Limiter_
+can also be configured to measure the number of tokens associated with a
+request. Tokens can be sent as flow labels using Aperture SDKs.
 
 :::note
 
