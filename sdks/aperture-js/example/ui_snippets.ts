@@ -227,3 +227,35 @@ async function UICSLabelMatcher(apertureClient: ApertureClient){
     // END: UICSLabelMatcher
 
 }
+
+async function UIQSFairness(apertureClient: ApertureClient){
+    // START: UIQSFairness
+    const flow = await apertureClient.startFlow("quota-scheduling-feature", {
+        labels: {
+            user_id: "some_user_id",
+            workload: "gold user",
+            fairness: "100",
+          },
+        grpcCallOptions: {
+            deadline: Date.now() + 300, // ms
+        },
+    });
+    // END: UIQSFairness
+
+}
+
+async function UICSFairness(apertureClient: ApertureClient){
+    // START: UICSFairness
+    const flow = await apertureClient.startFlow("concurrency-scheduling-feature", {
+        labels: {
+            user_id: "some_user_id",
+            workload: "gold user",
+            fairness: "100",
+          },
+        grpcCallOptions: {
+            deadline: Date.now() + 300, // ms
+        },
+    });
+    // END: UICSFairness
+
+}
