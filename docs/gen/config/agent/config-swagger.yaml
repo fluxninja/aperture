@@ -387,6 +387,38 @@ definitions:
                 x-go-tag-json: bind_addr
                 x-go-tag-validate: hostname_port
                 x-pattern-rules: hostname_port
+            eviction_policy:
+                $ref: '#/definitions/EvictionPolicy'
+                description: Eviction Policy determines whether LRU policy should be used or not.
+                x-go-tag-default: NONE
+                x-go-tag-json: eviction_policy
+                x-go-tag-validate: oneof=NONE LRU
+            lru_samples:
+                default: 5
+                description: Number of keys to randomly select for the approximated lru implementation
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: LRUSamples
+                x-go-tag-default: "5"
+                x-go-tag-json: lru_samples
+                x-go-tag-validate: gte=1
+            max_in_use:
+                default: 0
+                description: Maximum in-memory usage for the given cache node
+                format: int64
+                type: integer
+                x-go-name: MaxInUse
+                x-go-tag-default: "0"
+                x-go-tag-json: max_in_use
+            maximum_keys:
+                default: 0
+                description: Maximum Key count for the given cache node
+                format: int64
+                type: integer
+                x-go-name: MaxKeys
+                x-go-tag-default: "0"
+                x-go-tag-json: maximum_keys
             memberlist_advertise_addr:
                 description: Address of [`memberlist`](https://github.com/hashicorp/memberlist) to advertise to other cluster members. Used for NAT traversal if provided.
                 pattern: (^$)|(^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]):[0-9]+$)
@@ -405,6 +437,16 @@ definitions:
                 x-go-tag-json: memberlist_bind_addr
                 x-go-tag-validate: hostname_port
                 x-pattern-rules: hostname_port
+            num_eviction_workers:
+                default: 1
+                description: Number of evicitions workers to run in parallel.
+                format: int64
+                minimum: 0
+                type: integer
+                x-go-name: NumEvictionWorkers
+                x-go-tag-default: "1"
+                x-go-tag-json: num_eviction_workers
+                x-go-tag-validate: gte=0
             replica_count:
                 default: 1
                 description: ReplicaCount is 1 by default.
@@ -496,6 +538,10 @@ definitions:
         title: EtcdConfig holds configuration for etcd client.
         type: object
         x-go-package: github.com/fluxninja/aperture/v2/pkg/etcd
+    EvictionPolicy:
+        title: 'EvictionPolicy denotes eviction policy. Currently: LRU or NONE.'
+        type: string
+        x-go-package: github.com/buraksezer/olric/config
     FlowPreviewConfig:
         properties:
             enabled:
