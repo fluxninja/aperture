@@ -13,7 +13,10 @@ The _Rate Limiter_ component can be used to ensure fair access and manage costs
 by regulating the number of requests made by an entity over time. It achieves
 this by accepting or rejecting incoming requests based on per-label limits,
 which are configured using the
-[token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
+[token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket). Instead of
+measuring the number of requests, the _Rate Limiter_ can also be configured to
+measure the number of tokens associated with a request. Tokens can be sent as
+flow labels using Aperture SDKs.
 
 The _Rate Limiter_ is a component of Aperture's [policy][policies] system, and
 it can be configured to work with different labels and limits depending on the
