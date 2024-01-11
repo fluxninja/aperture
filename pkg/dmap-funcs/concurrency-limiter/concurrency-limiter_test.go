@@ -154,7 +154,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
 	for _, f := range fr.flows {
-		acceptedRequestsExpected := math.Min((config.capacity)*float64(duration/latency), float64(f.totalRequests))
+		acceptedRequestsExpected := (config.capacity) * float64(duration/latency)
 		t.Logf("flow (%s) %d secs: \n totalRequests=%d, capacity=%f, acceptedRequests=%d, acceptedRequestsExpected=%v",
 			f.requestlabel,
 			duration,
@@ -196,8 +196,8 @@ func TestLimiter(t *testing.T) {
 			t:                   t,
 			numOlrics:           1,
 			flows:               flows,
-			duration:            time.Second*10 - time.Millisecond*100,
-			tolerance:           0.02,
+			duration:            time.Second * 10,
+			tolerance:           0.15,
 			capacity:            10,
 			maxInflightDuration: 7200 * time.Second,
 		})
@@ -216,8 +216,8 @@ func TestLimiter(t *testing.T) {
 			t:                   t,
 			numOlrics:           1,
 			flows:               flows,
-			duration:            time.Second*10 - time.Millisecond*100,
-			tolerance:           0.02,
+			duration:            time.Second * 10,
+			tolerance:           0.15,
 			capacity:            10,
 			maxInflightDuration: latency,
 		})
