@@ -112,10 +112,11 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 			if ready {
 				metric.Inc()
 			}
-		}
-		metric, ready = o.getOperationErrorsMetric(metrics.PersistentCacheOperationGet, metrics.PersistentCacheTypeObjectStorage)
-		if ready {
-			metric.Inc()
+		} else {
+			metric, ready = o.getOperationErrorsMetric(metrics.PersistentCacheOperationGet, metrics.PersistentCacheTypeObjectStorage)
+			if ready {
+				metric.Inc()
+			}
 		}
 		return nil, innerErr
 	}
