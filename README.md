@@ -23,9 +23,6 @@
   </a>
 </p>
 
-> [!TIP] New blueprint `Concurrency Limiting` released. Try it to
-> [limit concurrent requests](https://docs.fluxninja.com/guides/per-user-concurrency-limiting).
-
 <!-- markdownlint-enable -->
 <!-- vale on -->
 
@@ -41,8 +38,7 @@ optimizing resource utilization.
 Aperture seamlessly integrates with existing control points such as gateways,
 service meshes, and application middlewares. Moreover, it offers SDKs for
 developers to establish control points around specific features or code sections
-inside applications. The following diagram depicts the role of Aperture in a
-cloud application:
+inside applications.
 
 ![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg#gh-light-mode-only)
 ![Unified Load Management](./docs/content/assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
@@ -88,35 +84,28 @@ cloud application:
   services. Refer to the [Caching](https://docs.fluxninja.com/guides/caching)
   guide for more details.
 
-## 🏗️ Architecture
-
-![Aperture Architecture Overview](./docs/content/assets/diagrams/architecture/architecture_simple.mmd.svg)
-
-- 🚦 Aperture Agents are typically deployed next to the services and provide
-  high-performance load management capabilities. They are responsible for
-  scheduling and rate-limiting incoming requests based on the policies defined
-  in the Aperture Controller. In addition, they also collect service health and
-  flow metrics.
-
-- 🤖 Aperture Controller executes observability-driven control policies and
-  configures Aperture Agents. The control policies are expressed as circuit
-  graphs consisting of interconnected signal processing blocks. The Aperture
-  policies provide a programmable way to tailor sophisticated control policies
-  to match any application's needs.
-
 ## 🏁 Getting Started
 
-### 🎮 Playground
+### ☁️ Aperture Cloud
+
+The easiest way to try Aperture is to
+[sign up](https://app.fluxninja.com/sign-up) for a free Aperture Cloud account.
+Aperture Cloud is a fully managed service by FluxNinja. With Aperture Cloud,
+there's no need to manage any infrastructure, and you can integrate your
+application with Aperture using SDKs. For more information, refer to the
+[get started](https://docs.fluxninja.com/get-started/) guide.
+
+![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-light.png#gh-light-mode-only)
+![Quota Management Dashboard](./docs/content/guides/assets/openai/priorities-dark.png#gh-dark-mode-only)
+_Prioritization Metrics for gpt-4_
+![Flow Analytics](./docs/content/guides/assets/openai/flow-analytics-light.png#gh-light-mode-only)
+![Flow Analytics](./docs/content/guides/assets/openai/flow-analytics-dark.png#gh-dark-mode-only)
+_Performance Metrics for OpenAI Models_
+
+### 🎮 Local Kubernetes Playground
 
 To try Aperture in a local Kubernetes environment, refer to
 [Playground docs](./playground/README.md).
-
-![Service Protection Policy Dashboard](./docs/content/assets/img/grafana_dashboard.png)
-
-### 🏎️ Installation
-
-To install the Aperture system, follow the
-[Installation](https://docs.fluxninja.com/get-started/installation) guide.
 
 ### 📖 Learn More
 
