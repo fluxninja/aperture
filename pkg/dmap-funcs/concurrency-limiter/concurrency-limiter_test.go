@@ -13,12 +13,11 @@ import (
 	concurrencylimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/concurrency-limiter"
 )
 
+const latency = 100 * time.Millisecond
+
 type flow struct {
 	requestlabel string
-	requestRate  int32
-
-	// config info
-	capacity float64
+	shouldReturn bool
 
 	// counters
 	totalRequests    int32 // total requests made
@@ -91,8 +90,6 @@ func runTest(config testConfig) {
 
 	limiters := createLimiters(t, cl, config)
 
-	t.Log("Starting flows")
-
 	fr = &flowRunner{
 		wg:       sync.WaitGroup{},
 		capacity: config.capacity,
@@ -115,51 +112,54 @@ func runTest(config testConfig) {
 // runFlows runs the flows for the given duration.
 func (fr *flowRunner) runFlows(t *testing.T) {
 	for _, f := range fr.flows {
-		f.capacity = fr.capacity
+		wg := sync.WaitGroup{}
 
-		fr.wg.Add(1)
-		go func(f *flow) {
-			defer fr.wg.Done()
+		stopTime := time.Now().Add(fr.duration)
 
-			stopTime := time.Now().Add(fr.duration)
-			// delay between requests (in nanoseconds) = 1,000,000,000 / requestRate
-			requestDelay := time.Duration(1e9 / f.requestRate)
+		limit := 3 * fr.capacity
 
-			for {
-				randomLimiterIndex := rand.Intn(len(fr.limiters))
-				limiter := fr.limiters[randomLimiterIndex]
-				atomic.AddInt32(&f.totalRequests, 1)
-				accepted, waitTime, remaining, current, reqID := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
-				if accepted {
-					atomic.AddInt32(&f.acceptedRequests, 1)
+		for i := 0; i < int(limit); i++ {
+			wg.Add(1)
+			go func() {
+				for {
+					randomLimiterIndex := rand.Intn(len(fr.limiters))
+					limiter := fr.limiters[randomLimiterIndex]
+					atomic.AddInt32(&f.totalRequests, 1)
+					accepted, _, _, _, reqID := limiter.TakeIfAvailable(context.TODO(), f.requestlabel, 1)
+					if accepted {
+						atomic.AddInt32(&f.acceptedRequests, 1)
+						time.Sleep(latency)
+						if f.shouldReturn {
+							_, err := limiter.Return(context.TODO(), f.requestlabel, 1, reqID)
+							if err != nil {
+								t.Logf("Error returning tokens: %v", err)
+							}
+						}
+					} else {
+						time.Sleep(time.Millisecond * 10)
+					}
+
+					if time.Now().After(stopTime) {
+						break
+					}
 				}
-				t.Logf("accepted=%v, waitTime=%v, remaining=%v, current=%v, reqID=%v", accepted, waitTime, remaining, current, reqID)
+				wg.Done()
+			}()
+		}
 
-				nextReqTime := time.Now().Add(requestDelay)
-				if nextReqTime.Before(stopTime) {
-					time.Sleep(requestDelay)
-				} else {
-					break
-				}
-			}
-		}(f)
+		wg.Wait()
 	}
-	fr.wg.Wait()
 }
 
 // checkResults checks if a certain number of requests were accepted under a given tolerance.
 func checkResults(t *testing.T, fr *flowRunner, duration time.Duration, config testConfig) {
-	// availableAmount := config.capacity
-
 	for _, f := range fr.flows {
-		acceptedRequestsExpected := int32(math.Min(config.capacity, float64(f.totalRequests)))
-
-		t.Logf("flow (%s) @ %d requests/sec for %v secs: \n totalRequests=%d, capacity=%f, acceptedRequests=%d, acceptedRequestsExpected=%d",
+		acceptedRequestsExpected := (config.capacity) * float64(duration/latency)
+		t.Logf("flow (%s) %d secs: \n totalRequests=%d, capacity=%f, acceptedRequests=%d, acceptedRequestsExpected=%v",
 			f.requestlabel,
-			f.requestRate,
 			duration,
 			f.totalRequests,
-			f.capacity,
+			fr.capacity,
 			f.acceptedRequests,
 			acceptedRequestsExpected,
 		)
@@ -181,25 +181,45 @@ func closeLimiters(t *testing.T, limiters []concurrencylimiter.ConcurrencyLimite
 	}
 }
 
-// TestLimiterWithBasicLimit tests the limiter with a basic limit.
-func TestLimiterWithBasicLimit(t *testing.T) {
-	t.Run("Basic", func(t *testing.T) {
+// TestLimiter tests the limiter.
+func TestLimiter(t *testing.T) {
+	t.Run("BasicWithReturn", func(t *testing.T) {
 		// run subtests in parallel
 		t.Parallel()
 		flows := []*flow{
 			{
 				requestlabel: "user-0",
-				requestRate:  2,
+				shouldReturn: true,
 			},
 		}
 		runTest(testConfig{
 			t:                   t,
 			numOlrics:           1,
 			flows:               flows,
-			duration:            (time.Second * 10) - (time.Millisecond * 100),
-			tolerance:           0.02,
+			duration:            time.Second * 10,
+			tolerance:           0.15,
 			capacity:            10,
 			maxInflightDuration: 7200 * time.Second,
+		})
+	})
+
+	t.Run("MaxInflightDurationWithoutReturn", func(t *testing.T) {
+		// run subtests in parallel
+		t.Parallel()
+		flows := []*flow{
+			{
+				requestlabel: "user-0",
+				shouldReturn: false,
+			},
+		}
+		runTest(testConfig{
+			t:                   t,
+			numOlrics:           1,
+			flows:               flows,
+			duration:            time.Second * 10,
+			tolerance:           0.15,
+			capacity:            10,
+			maxInflightDuration: latency,
 		})
 	})
 }
