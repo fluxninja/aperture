@@ -9,25 +9,26 @@ sidebar_position: 6
 
 :::
 
-The _Concurrency Limiter_ component is used to enforce in-flight request quotas
-to prevent overloads. It can also be used to enforce limits per entity such as a
-user to ensure fair access across users. Essentially, providing an added layer
-of protection in additional to per-user rate limits.
-
-_Concurrency Limiter_ can limit the number of concurrent requests to a control
-point or certain labels that match within the control point. It achieves this by
-maintaining a ledger of in-flight requests. If the number of in-flight requests
-exceeds the configured limit, the _Concurrency Limiter_ rejects new requests
-until the number of in-flight requests drops below the limit. The in-flight
-requests are maintained by the Agents based on the flow start and end calls made
-from the SDKs. Alternatively, for proxy integrations, the flow end is inferred
-as the access log stream is received from the underlying middleware or proxy.
+The _Concurrency Limiter_ component is used to enforce in-flight request
+concurrency to prevent overloads. It can also be used to enforce limits per
+entity such as a user to ensure fair access across users. Requests are allowed
+or denied based on whether the in-flight requests are within the configured
+limit. Instead of measuring the number of requests, the _Concurrency Limiter_
+can also be configured to measure the number of tokens associated with a
+request. Tokens can be sent as flow labels using Aperture SDKs.
 
 :::note
 
 Only accepted requests are counted towards the in-flight concurrency.
 
 :::
+
+## Lifecycle of a Request {#lifecycle-of-a-request}
+
+The _Concurrency Limiter_ maintains a ledger of in-flight requests. The ledger
+is updated by the Agents based on the flow start and end calls made from the
+SDKs. Alternatively, for proxy integrations, the flow end is inferred as the
+access log stream is received from the underlying middleware or proxy.
 
 ## Distributed Request Ledgers {#distributed-request-ledgers}
 
@@ -39,14 +40,7 @@ single _Concurrency Limiter_, providing seamless coordination and control across
 Agents. The Agents within an [agent group][agent-group] constantly share state
 and detect failures using a gossip protocol.
 
-## Lifecycle of a Request {#lifecycle-of-a-request}
-
-The _Concurrency Limiter_ maintains a ledger of in-flight requests. The ledger
-is updated by the Agents based on the flow start and end calls made from the
-SDKs. Alternatively, for proxy integrations, the flow end is inferred as the
-access log stream is received from the underlying middleware or proxy.
-
-### Max In-flight Duration {#max-in-flight-duration}
+## Max In-flight Duration {#max-in-flight-duration}
 
 In case of failures at the SDK or middleware/proxy, the flow end call might not
 be made. To prevent stale entries in the ledger, the _Concurrency Limiter_

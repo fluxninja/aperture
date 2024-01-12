@@ -201,10 +201,9 @@ type concurrencyScheduler struct {
 	schedulers sync.Map
 	iface.Component
 	registry         status.Registry
-	limiter          concurrencylimiter.ConcurrencyLimiter
 	clock            clockwork.Clock
 	csFactory        *concurrencySchedulerFactory
-	inner            *concurrencylimiter.GlobalTokenCounter
+	limiter          concurrencylimiter.ConcurrencyLimiter
 	proto            *policylangv1.ConcurrencyScheduler
 	schedulerMetrics *workloadscheduler.SchedulerMetrics
 	name             string
@@ -254,7 +253,7 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				return err
 			}
 
-			cs.inner, err = concurrencylimiter.NewGlobalTokenCounter(
+			inner, err := concurrencylimiter.NewGlobalTokenCounter(
 				cs.csFactory.distCache,
 				cs.name,
 				cs.proto.ConcurrencyLimiter.GetMaxIdleTime().AsDuration(),
@@ -264,7 +263,7 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				logger.Error().Err(err).Msg("Failed to create limiter")
 				return err
 			}
-			cs.limiter = cs.inner
+			cs.limiter = inner
 
 			// add decisions notifier
 			err = cs.csFactory.decisionsWatcher.AddKeyNotifier(decisionNotifier)
@@ -474,8 +473,8 @@ func (cs *concurrencyScheduler) decisionUpdateCallback(event notifiers.Event, un
 		return
 	}
 	limitDecision := wrapperMessage.ConcurrencyLimiterDecision
-	cs.inner.SetCapacity(limitDecision.MaxConcurrency)
-	cs.inner.SetPassThrough(limitDecision.PassThrough)
+	cs.limiter.SetCapacity(limitDecision.MaxConcurrency)
+	cs.limiter.SetPassThrough(limitDecision.PassThrough)
 }
 
 // GetLimiterID returns the limiter ID.
