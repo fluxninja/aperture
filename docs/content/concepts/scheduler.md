@@ -75,6 +75,18 @@ $$
 virtual\_finish\_time = virtual\_time + \left(tokens \cdot inverted\_priority\right)
 $$
 
+The capacity of a service is divided among the workloads based on their
+priorities. The higher the priority, the larger the share of its capacity. Note
+that priorities are relative to each other and not absolute. For example, if
+there are two workloads with priorities 1 and 2, the second workload gets twice
+the capacity of the first workload. If there are three workloads with priorities
+1, 2 and 3, the third workload gets three times the capacity of the first
+workload.
+
+If a certain workload does not have enough requests, the capacity is shared
+among the other workloads. There is no upfront allocation of capacity to
+workloads.
+
 ### Tokens {#tokens}
 
 Tokens represent the cost for admitting a specific request. They can be defined
@@ -91,6 +103,9 @@ Tokens are determined in the following order of precedence:
   setting).
 - Specified in the `Workload.tokens` setting.
 
+Tokens determine the relative allocation of capacity among requests. For
+example, a request with 4 tokens is the same as 4 requests with 1 token each.
+
 ### Queue Timeout {#queue-timeout}
 
 The queue timeout is determined by the gRPC timeout provided on the
@@ -101,13 +116,30 @@ timeout duration, it is admitted. Otherwise, the timeout expires before the
 tokens are available, the request is rejected. Thus, the timeout prevents
 requests from waiting excessively long.
 
-Developers can set the gRPC timeout on each `startFlow` call. In case of
+Developers can set the gRPC timeout on each `startFlow` call. In the case of
 middlewares, gRPC timeout is configured statically specific to each middleware
 integration, e.g. through Envoy filter.
 
 The timeout can also be configured using the `queue_timeout` parameter in the
 [workload parameters](/reference/configuration/spec#scheduler-workload-parameters).
 The smaller of the two timeouts is used.
+
+### Fairness {#fairness}
+
+The requests in a workload at the same priority level are served in a
+first-in-first-out manner. But that may not be desirable in multi-tenant
+environments, where a few users or tenants may take up most of the capacity.
+
+Aperture's scheduler can ensure fair usage among users within a workload using a
+stochastic fair queuing strategy. Developers can send the fairness key
+identifying users or tenants in their app as a flow label. The label for
+fairness key is defined in the
+[Scheduler specification](/reference/configuration/spec#scheduler) as
+`fairness_label_key`.
+
+Note that priorities determine relative allocation of capacity among workloads.
+Fairness determines relative allocation of capacity among users within a
+workload.
 
 [label-matcher]: ./selector.md#label-matcher
 [flowcontrol-proto]:
