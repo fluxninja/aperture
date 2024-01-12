@@ -7,6 +7,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/fx"
+	"go.uber.org/multierr"
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	flowcontrolv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	policysyncv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/sync/v1"
@@ -26,10 +31,6 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/paths"
 	"github.com/fluxninja/aperture/v2/pkg/status"
-	"github.com/prometheus/client_golang/prometheus"
-	"go.uber.org/fx"
-	"go.uber.org/multierr"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 const rateLimiterStatusRoot = "rate_limiters"
