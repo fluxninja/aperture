@@ -32,7 +32,8 @@ type LazySyncRateLimiter struct {
 }
 
 // NewLazySyncRateLimiter creates a new LazySyncLimiter.
-func NewLazySyncRateLimiter(limiter ratelimiter.RateLimiter,
+func NewLazySyncRateLimiter(
+	limiter ratelimiter.RateLimiter,
 	interval time.Duration,
 	numSync uint32,
 	jobGroup *jobs.JobGroup,
