@@ -72,8 +72,8 @@ definitions:
             disable_kubelet_scraper:
                 default: false
                 description: |-
-                    DisableKubeletScraper disables the default metrics collection for kubelet.
-                    Deprecated: kubelet scraper is removed entirely, so this flag makes no difference.
+                    DisableKubeletScraper disables the default metrics collection for Kubelet.
+                    Deprecated: Kubelet scraper is removed entirely, so this flag makes no difference.
                 type: boolean
                 x-go-name: DisableKubeletScraper
                 x-go-tag-default: "false"
