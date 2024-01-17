@@ -138,8 +138,7 @@ fairness key is defined in the
 `fairness_label_key`.
 
 Note that priorities determine relative allocation of capacity among workloads.
-Fairness determines relative allocation of capacity among users within a
-workload.
+Fairness ensures equitable allocation of capacity among users within a workload.
 
 [label-matcher]: ./selector.md#label-matcher
 [flowcontrol-proto]:
