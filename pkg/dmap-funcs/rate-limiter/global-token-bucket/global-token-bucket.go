@@ -22,6 +22,17 @@ const (
 	TakeNFunction = "TakeN"
 )
 
+// counter is used to track the state of a label.
+type counter struct {
+	lock        sync.Mutex
+	availableAt time.Time
+	tokens      float64
+}
+
+// TODO:
+// Add map to label -> struct { time when available, number of tokens }
+// Do not call takeifavailable if requested tokens are gte to number of tokens
+
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
 	dMap             olric.DMap
@@ -34,6 +45,7 @@ type GlobalTokenBucket struct {
 	continuousFill   bool
 	delayInitialFill bool
 	passThrough      bool
+	counters         sync.Map
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -113,6 +125,22 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return true, 0, 0, 0
 	}
 
+	c := &counter{}
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	existing, loaded := gtb.counters.LoadOrStore(label, c)
+	if loaded {
+		c = existing.(*counter)
+	}
+
+	if !c.availableAt.IsZero() && time.Now().Before(c.availableAt) {
+		if n >= c.tokens {
+			return false, 0, 0, 0
+		} else {
+			c.tokens -= n
+		}
+	}
+
 	if deadlinemargin.IsMarginExceeded(ctx) {
 		return false, 0, 0, 0
 	}
@@ -140,6 +168,9 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		log.Autosample().Errorf("error decoding response: %v", err)
 		return true, 0, 0, 0
 	}
+
+	c.tokens = resp.Remaining
+	c.availableAt = resp.AvailableAt.AsTime()
 
 	var waitTime time.Duration
 	availableAt := resp.GetAvailableAt().AsTime()
