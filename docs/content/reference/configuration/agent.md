@@ -811,8 +811,8 @@ AgentOTelConfig is the configuration for Agent's OTel collector.
 
 <!-- vale on -->
 
-DisableKubeletScraper disables the default metrics collection for kubelet.
-Deprecated: kubelet scraper is removed entirely, so this flag makes no
+DisableKubeletScraper disables the default metrics collection for Kubelet.
+Deprecated: Kubelet scraper is removed entirely, so this flag makes no
 difference.
 
 </dd>

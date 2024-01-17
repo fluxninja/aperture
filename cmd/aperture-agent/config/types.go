@@ -26,8 +26,8 @@ type AgentOTelConfig struct {
 	otelconfig.CommonOTelConfig `json:",inline"`
 	// DisableKubernetesScraper disables the default metrics collection for Kubernetes resources.
 	DisableKubernetesScraper bool `json:"disable_kubernetes_scraper" default:"false"`
-	// DisableKubeletScraper disables the default metrics collection for kubelet.
-	// Deprecated: kubelet scraper is removed entirely, so this flag makes no difference.
+	// DisableKubeletScraper disables the default metrics collection for Kubelet.
+	// Deprecated: Kubelet scraper is removed entirely, so this flag makes no difference.
 	DisableKubeletScraper bool `json:"disable_kubelet_scraper" default:"false"`
 	// EnableHighCardinalityPlatformMetrics filters out high cardinality Aperture platform metrics from being
 	// published to Prometheus. Filtered out metrics are:

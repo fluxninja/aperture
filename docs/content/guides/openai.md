@@ -60,9 +60,7 @@ consisting of two main components:
 
 <Zoom>
 
-```mermaid
-{@include: ./assets/openai/graph.mmd}
-```
+![request prioritization](./assets/openai/request-prioritization.png)
 
 </Zoom>
 
