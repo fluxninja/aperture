@@ -20,8 +20,8 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testConfig) (ratelimiter.RateLimiter, error) {
-	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", config.interval, time.Hour, config.continuousFill, config.delayInitialFill)
+func newTestLimiter(t *testing.T, distCache *distcache.DistCache, config testConfig, jobGroup *jobs.JobGroup) (ratelimiter.RateLimiter, error) {
+	limiter, err := globaltokenbucket.NewGlobalTokenBucket(distCache, "Limiter", config.interval, time.Hour, config.continuousFill, config.delayInitialFill, jobGroup)
 	if err != nil {
 		t.Logf("Failed to create DistCacheLimiter: %v", err)
 		return nil, err
@@ -87,7 +87,7 @@ func (fr *flowRunner) runFlows(t *testing.T) {
 }
 
 // createJobGroup creates a job group for the given limiter..
-func createJobGroup(_ ratelimiter.RateLimiter) *jobs.JobGroup {
+func createJobGroup() *jobs.JobGroup {
 	var gws jobs.GroupWatchers
 
 	alerter := alerts.NewSimpleAlerter(100)
@@ -107,7 +107,8 @@ func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, confi
 	defer cl.Lock.Unlock()
 	var limiters []ratelimiter.RateLimiter
 	for _, distCache := range cl.Members {
-		limiter, err := newTestLimiter(t, distCache, config)
+		jobGroup := createJobGroup()
+		limiter, err := newTestLimiter(t, distCache, config, jobGroup)
 		if err != nil {
 			t.Logf("Error creating limiter: %v", err)
 			t.FailNow()
@@ -121,7 +122,7 @@ func createOlricLimiters(t *testing.T, cl *distcache.TestDistCacheCluster, confi
 func createLazySyncLimiters(t *testing.T, limiters []ratelimiter.RateLimiter, config testConfig) []ratelimiter.RateLimiter {
 	var lazySyncLimiters []ratelimiter.RateLimiter
 	for _, limiter := range limiters {
-		jobGroup := createJobGroup(limiter)
+		jobGroup := createJobGroup()
 		lazySyncLimiter, err := lazysync.NewLazySyncRateLimiter(limiter, config.interval, config.numSyncs, jobGroup)
 		if err != nil {
 			t.Logf("Error creating lazy sync limiter: %v", err)
@@ -269,7 +270,7 @@ func TestOlricLimiterWithBasicLimit(t *testing.T) {
 		t.Run(fmt.Sprintf("continuousFill=%v,delayInitialFill=%v", c.continuousFill, c.delayInitialFill), func(t *testing.T) {
 			t.Parallel() // run subtests in parallel
 			flows := []*flow{
-				{requestlabel: "user-0", requestRate: 50},
+				{requestlabel: "user-0", requestRate: 500},
 			}
 			baseOfLimiterTest(testConfig{
 				t:                t,

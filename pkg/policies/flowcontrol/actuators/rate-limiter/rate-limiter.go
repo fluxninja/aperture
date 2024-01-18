@@ -74,13 +74,14 @@ func provideRateLimiterWatchers(
 }
 
 type rateLimiterFactory struct {
-	engineAPI        iface.Engine
-	registry         status.Registry
-	distCache        *distcache.DistCache
-	lazySyncJobGroup *jobs.JobGroup
-	decisionsWatcher notifiers.Watcher
-	counterVector    *prometheus.CounterVec
-	agentGroupName   string
+	engineAPI           iface.Engine
+	registry            status.Registry
+	distCache           *distcache.DistCache
+	lazySyncJobGroup    *jobs.JobGroup
+	rateLimiterJobGroup *jobs.JobGroup
+	decisionsWatcher    notifiers.Watcher
+	counterVector       *prometheus.CounterVec
+	agentGroupName      string
 }
 
 // main fx app.
@@ -111,19 +112,26 @@ func setupRateLimiterFactory(
 		return err
 	}
 
+	rateLimiterJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "rate_limiter_jobs"), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create rate limiter job group")
+		return err
+	}
+
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.RateLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
 	}, metricLabelKeys)
 
 	rateLimiterFactory := &rateLimiterFactory{
-		engineAPI:        e,
-		distCache:        distCache,
-		lazySyncJobGroup: lazySyncJobGroup,
-		decisionsWatcher: decisionsWatcher,
-		agentGroupName:   agentGroupName,
-		registry:         reg,
-		counterVector:    counterVector,
+		engineAPI:           e,
+		distCache:           distCache,
+		lazySyncJobGroup:    lazySyncJobGroup,
+		rateLimiterJobGroup: rateLimiterJobGroup,
+		decisionsWatcher:    decisionsWatcher,
+		agentGroupName:      agentGroupName,
+		registry:            reg,
+		counterVector:       counterVector,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(
@@ -146,6 +154,10 @@ func setupRateLimiterFactory(
 			if err != nil {
 				return err
 			}
+			err = rateLimiterJobGroup.Start()
+			if err != nil {
+				return err
+			}
 			err = decisionsWatcher.Start()
 			if err != nil {
 				return err
@@ -159,6 +171,10 @@ func setupRateLimiterFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = lazySyncJobGroup.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = rateLimiterJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -253,6 +269,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 				rl.rlProto.Parameters.GetMaxIdleTime().AsDuration(),
 				rl.rlProto.Parameters.GetContinuousFill(),
 				rl.rlProto.Parameters.GetDelayInitialFill(),
+				rl.rlFactory.rateLimiterJobGroup,
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
@@ -262,10 +279,12 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			// check whether lazy limiter is enabled
 			if lazySyncConfig := rl.rlProto.Parameters.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					rl.limiter, err = lazysync.NewLazySyncRateLimiter(rl.limiter,
+					rl.limiter, err = lazysync.NewLazySyncRateLimiter(
+						rl.limiter,
 						rl.rlProto.Parameters.GetInterval().AsDuration(),
 						lazySyncConfig.GetNumSync(),
-						rl.rlFactory.lazySyncJobGroup)
+						rl.rlFactory.lazySyncJobGroup,
+					)
 					if err != nil {
 						logger.Error().Err(err).Msg("Failed to create lazy limiter")
 						return err
