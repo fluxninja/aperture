@@ -57,8 +57,7 @@ policy:
             interval: "1s"
             limit_by_label_key: http.request.header.user_id
             lazy_sync:
-              enabled: true
-              num_sync: 4
+              enabled: false
   # Additional resources.
   # Type: aperture.spec.v1.Resources
   resources:

@@ -73,13 +73,14 @@ func provideQuotaSchedulerWatchers(
 }
 
 type quotaSchedulerFactory struct {
-	engineAPI        iface.Engine
-	registry         status.Registry
-	decisionsWatcher notifiers.Watcher
-	distCache        *distcache.DistCache
-	auditJobGroup    *jobs.JobGroup
-	wsFactory        *workloadscheduler.Factory
-	agentGroupName   string
+	engineAPI           iface.Engine
+	registry            status.Registry
+	decisionsWatcher    notifiers.Watcher
+	distCache           *distcache.DistCache
+	auditJobGroup       *jobs.JobGroup
+	rateLimiterJobGroup *jobs.JobGroup
+	wsFactory           *workloadscheduler.Factory
+	agentGroupName      string
 }
 
 // main fx app.
@@ -111,14 +112,21 @@ func setupQuotaSchedulerFactory(
 		return err
 	}
 
+	rateLimiterJobGroup, err := jobs.NewJobGroup(reg.Child("sync", "rate_limiter_audit_jobs"), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create rate limiter audit job group")
+		return err
+	}
+
 	quotaSchedulerFactory := &quotaSchedulerFactory{
-		engineAPI:        e,
-		distCache:        distCache,
-		auditJobGroup:    auditJobGroup,
-		decisionsWatcher: decisionsWatcher,
-		agentGroupName:   agentGroupName,
-		registry:         reg,
-		wsFactory:        wsFactory,
+		engineAPI:           e,
+		distCache:           distCache,
+		auditJobGroup:       auditJobGroup,
+		rateLimiterJobGroup: rateLimiterJobGroup,
+		decisionsWatcher:    decisionsWatcher,
+		agentGroupName:      agentGroupName,
+		registry:            reg,
+		wsFactory:           wsFactory,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -131,6 +139,10 @@ func setupQuotaSchedulerFactory(
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			err = auditJobGroup.Start()
+			if err != nil {
+				return err
+			}
+			err = rateLimiterJobGroup.Start()
 			if err != nil {
 				return err
 			}
@@ -147,6 +159,10 @@ func setupQuotaSchedulerFactory(
 				merr = multierr.Append(merr, err)
 			}
 			err = auditJobGroup.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = rateLimiterJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -263,6 +279,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 				qs.proto.RateLimiter.GetMaxIdleTime().AsDuration(),
 				qs.proto.RateLimiter.GetContinuousFill(),
 				qs.proto.RateLimiter.GetDelayInitialFill(),
+				qs.qsFactory.rateLimiterJobGroup,
 			)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to create limiter")
@@ -273,10 +290,12 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 			// check whether lazy limiter is enabled
 			if lazySyncConfig := qs.proto.RateLimiter.GetLazySync(); lazySyncConfig != nil {
 				if lazySyncConfig.GetEnabled() {
-					qs.limiter, err = lazysync.NewLazySyncRateLimiter(qs.limiter,
+					qs.limiter, err = lazysync.NewLazySyncRateLimiter(
+						qs.limiter,
 						qs.proto.RateLimiter.GetInterval().AsDuration(),
 						lazySyncConfig.GetNumSync(),
-						qs.qsFactory.auditJobGroup)
+						qs.qsFactory.auditJobGroup,
+					)
 					if err != nil {
 						logger.Error().Err(err).Msg("Failed to create lazy limiter")
 						return err

@@ -7,13 +7,16 @@ import (
 	"time"
 
 	"github.com/buraksezer/olric"
-	"github.com/buraksezer/olric/config"
+	olricconfig "github.com/buraksezer/olric/config"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	tokenbucketv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/tokenbucket/v1"
+	"github.com/fluxninja/aperture/v2/pkg/config"
 	distcache "github.com/fluxninja/aperture/v2/pkg/dist-cache"
 	deadlinemargin "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/deadline-margin"
 	ratelimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/rate-limiter"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 )
 
@@ -22,10 +25,20 @@ const (
 	TakeNFunction = "TakeN"
 )
 
+// counter is used to track the state of a label.
+type counter struct {
+	availableAt         time.Time
+	remaining           float64
+	current             float64
+	lastRequestedTokens float64
+}
+
 // GlobalTokenBucket implements Limiter.
 type GlobalTokenBucket struct {
 	dMap             olric.DMap
 	dc               *distcache.DistCache
+	jobGroup         *jobs.JobGroup
+	counters         sync.Map
 	name             string
 	bucketCapacity   float64
 	fillAmount       float64
@@ -44,6 +57,7 @@ func NewGlobalTokenBucket(
 	maxIdleDuration time.Duration,
 	continuousFill bool,
 	delayInitialFill bool,
+	jobGroup *jobs.JobGroup,
 ) (*GlobalTokenBucket, error) {
 	gtb := &GlobalTokenBucket{
 		name:             name,
@@ -52,11 +66,21 @@ func NewGlobalTokenBucket(
 		continuousFill:   continuousFill,
 		delayInitialFill: delayInitialFill,
 		dc:               dc,
+		jobGroup:         jobGroup,
 	}
 
-	dmapConfig := config.DMap{
+	job := jobs.NewBasicJob(gtb.name, gtb.audit)
+	// register job with job group
+	err := gtb.jobGroup.RegisterJob(job, jobs.JobConfig{
+		ExecutionPeriod: config.MakeDuration(interval),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dmapConfig := olricconfig.DMap{
 		MaxIdleDuration: maxIdleDuration,
-		Functions: map[string]config.Function{
+		Functions: map[string]olricconfig.Function{
 			TakeNFunction: gtb.takeN,
 		},
 	}
@@ -69,6 +93,22 @@ func NewGlobalTokenBucket(
 	gtb.dMap = dMap
 
 	return gtb, nil
+}
+
+func (gtb *GlobalTokenBucket) audit(ctx context.Context) (proto.Message, error) {
+	now := time.Now()
+	// range through the map and sync the counters
+	gtb.counters.Range(func(label, value interface{}) bool {
+		c := value.(*counter)
+
+		// if the availableAt time is in the past, remove the counter
+		if now.After(c.availableAt) {
+			gtb.counters.Delete(label)
+			return true
+		}
+		return true
+	})
+	return nil, nil
 }
 
 // SetBucketCapacity sets the rate limit for the rate limiter.
@@ -105,12 +145,40 @@ func (gtb *GlobalTokenBucket) Close() error {
 	if err != nil {
 		return err
 	}
+	err = gtb.jobGroup.DeregisterJob(gtb.name)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label string, n float64, canWait bool, deadline time.Time) (bool, time.Duration, float64, float64) {
+	getWaitTime := func(availableAt time.Time) time.Duration {
+		var waitTime time.Duration
+		if !availableAt.IsZero() {
+			waitTime = time.Until(availableAt)
+			if waitTime < 0 {
+				waitTime = 0
+			}
+		}
+		return waitTime
+	}
+
 	if gtb.GetPassThrough() {
 		return true, 0, 0, 0
+	}
+
+	c := &counter{}
+
+	if !canWait {
+		existing, ok := gtb.counters.Load(label)
+		if ok {
+			c = existing.(*counter)
+			waitTime := getWaitTime(c.availableAt)
+			if c.lastRequestedTokens >= n && waitTime > 0 {
+				return false, waitTime, c.remaining, c.current
+			}
+		}
 	}
 
 	if deadlinemargin.IsMarginExceeded(ctx) {
@@ -141,14 +209,22 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return true, 0, 0, 0
 	}
 
-	var waitTime time.Duration
-	availableAt := resp.GetAvailableAt().AsTime()
-	if !availableAt.IsZero() {
-		waitTime = time.Until(availableAt)
-		if waitTime < 0 {
-			waitTime = 0
+	if !canWait {
+		if n < 0 {
+			gtb.counters.Delete(label)
+		} else if !resp.GetOk() {
+			c = &counter{
+				availableAt:         resp.GetAvailableAt().AsTime(),
+				remaining:           resp.GetRemaining(),
+				current:             resp.GetCurrent(),
+				lastRequestedTokens: n,
+			}
+			gtb.counters.Store(label, c)
 		}
 	}
+
+	availableAt := resp.GetAvailableAt().AsTime()
+	waitTime := getWaitTime(availableAt)
 
 	return resp.Ok, waitTime, resp.Remaining, resp.Current
 }
@@ -270,7 +346,7 @@ func (gtb *GlobalTokenBucket) fastForwardState(now time.Time, stateBytes []byte,
 			return nil, err
 		}
 	} else {
-		log.Info().Msgf("Creating new token bucket state for key %s in dmap %s", key, gtb.dMap.Name())
+		log.Trace().Str("key", key).Str("dMap", gtb.dMap.Name()).Msg("Creating new token bucket state")
 		state.LastFillAt = timestamppb.New(now)
 		state.Available = gtb.bucketCapacity
 	}
