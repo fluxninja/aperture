@@ -27,7 +27,6 @@ const (
 
 // counter is used to track the state of a label.
 type counter struct {
-	lock                sync.Mutex
 	availableAt         time.Time
 	remaining           float64
 	current             float64
@@ -38,6 +37,8 @@ type counter struct {
 type GlobalTokenBucket struct {
 	dMap             olric.DMap
 	dc               *distcache.DistCache
+	jobGroup         *jobs.JobGroup
+	counters         sync.Map
 	name             string
 	bucketCapacity   float64
 	fillAmount       float64
@@ -46,8 +47,6 @@ type GlobalTokenBucket struct {
 	continuousFill   bool
 	delayInitialFill bool
 	passThrough      bool
-	counters         sync.Map
-	jobGroup         *jobs.JobGroup
 }
 
 // NewGlobalTokenBucket creates a new instance of DistCacheRateTracker.
@@ -101,8 +100,6 @@ func (gtb *GlobalTokenBucket) audit(ctx context.Context) (proto.Message, error) 
 	// range through the map and sync the counters
 	gtb.counters.Range(func(label, value interface{}) bool {
 		c := value.(*counter)
-		c.lock.Lock()
-		defer c.lock.Unlock()
 
 		// if the availableAt time is in the past, remove the counter
 		if now.After(c.availableAt) {
@@ -174,17 +171,13 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 	c := &counter{}
 
 	if !canWait {
-		existing, loaded := gtb.counters.LoadOrStore(label, c)
-		if loaded {
+		existing, ok := gtb.counters.Load(label)
+		if ok {
 			c = existing.(*counter)
-		}
-
-		c.lock.Lock()
-		defer c.lock.Unlock()
-
-		waitTime := getWaitTime(c.availableAt)
-		if c.lastRequestedTokens >= n && waitTime > 0 {
-			return false, waitTime, c.remaining, c.current
+			waitTime := getWaitTime(c.availableAt)
+			if c.lastRequestedTokens >= n && waitTime > 0 {
+				return false, waitTime, c.remaining, c.current
+			}
 		}
 	}
 
@@ -220,10 +213,13 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		if n < 0 {
 			gtb.counters.Delete(label)
 		} else if !resp.GetOk() {
-			c.availableAt = resp.GetAvailableAt().AsTime()
-			c.remaining = resp.GetRemaining()
-			c.current = resp.GetCurrent()
-			c.lastRequestedTokens = n
+			c = &counter{
+				availableAt:         resp.GetAvailableAt().AsTime(),
+				remaining:           resp.GetRemaining(),
+				current:             resp.GetCurrent(),
+				lastRequestedTokens: n,
+			}
+			gtb.counters.Store(label, c)
 		}
 	}
 
