@@ -184,12 +184,7 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 
 		waitTime := getWaitTime(c.availableAt)
 		if c.lastRequestedTokens >= n && waitTime > 0 {
-			remaining := c.remaining
-			current := c.current
-			if n < 0 {
-				gtb.counters.Delete(label)
-			}
-			return false, waitTime, remaining, current
+			return false, waitTime, c.remaining, c.current
 		}
 	}
 
@@ -221,11 +216,15 @@ func (gtb *GlobalTokenBucket) executeTakeRequest(ctx context.Context, label stri
 		return true, 0, 0, 0
 	}
 
-	if !canWait && !resp.GetOk() {
-		c.availableAt = resp.GetAvailableAt().AsTime()
-		c.remaining = resp.GetRemaining()
-		c.current = resp.GetCurrent()
-		c.lastRequestedTokens = n
+	if !canWait {
+		if n < 0 {
+			gtb.counters.Delete(label)
+		} else if !resp.GetOk() {
+			c.availableAt = resp.GetAvailableAt().AsTime()
+			c.remaining = resp.GetRemaining()
+			c.current = resp.GetCurrent()
+			c.lastRequestedTokens = n
+		}
 	}
 
 	availableAt := resp.GetAvailableAt().AsTime()
