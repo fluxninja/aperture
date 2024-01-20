@@ -44,6 +44,7 @@ process:
 
 <!-- vale off -->
 <!-- markdownlint-disable -->
+
   <details>
   <summary>Example</summary>
 
@@ -80,6 +81,7 @@ const labels = {
 
 <!-- vale off -->
 <!-- markdownlint-disable -->
+
   <details>
   <summary>Example</summary>
 
@@ -106,6 +108,7 @@ if (flow.shouldRun()) {
 ```
 
   </details>
+
 <!-- markdownlint-enable -->
 <!-- vale on -->
 
