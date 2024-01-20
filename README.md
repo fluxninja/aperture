@@ -112,42 +112,42 @@ if (flow.shouldRun()) {
 - **Configure & monitor policies**: Configure policies to control the rate,
   concurrency, and priority of requests.
 
-  <!-- vale off -->
-  <!-- markdownlint-disable -->
+<!-- vale off -->
+<!-- markdownlint-disable -->
 
   <details>
   <summary>Policy YAML</summary>
 
-  ```yaml
-  blueprint: rate-limiting/base
-  uri: github.com/fluxninja/aperture/blueprints@latest
-  policy:
-    policy_name: rate_limit
-    rate_limiter:
-      bucket_capacity: 60
-      fill_amount: 60
-      parameters:
-        interval: 3600s
-        limit_by_label_key: user
-      selectors:
-        - control_point: your_workload
-          label_matcher:
-            match_list:
-              - key: tier
-                operator: In
-                values:
-                  - premium
-  ```
+```yaml
+blueprint: rate-limiting/base
+uri: github.com/fluxninja/aperture/blueprints@latest
+policy:
+  policy_name: rate_limit
+  rate_limiter:
+    bucket_capacity: 60
+    fill_amount: 60
+    parameters:
+      interval: 3600s
+      limit_by_label_key: user
+    selectors:
+      - control_point: your_workload
+        label_matcher:
+          match_list:
+            - key: tier
+              operator: In
+              values:
+                - premium
+```
 
   </details>
 
-  <!-- markdownlint-enable -->
-  <!-- vale on -->
+<!-- markdownlint-enable -->
+<!-- vale on -->
 
-  ![Rate Limiter Blueprint](./docs/content/get-started/assets/rate-limiter-blueprint-dark.png#gh-dark-mode-only)
-  ![Rate Limiter Blueprint](./docs/content/get-started/assets/rate-limiter-blueprint-light.png#gh-light-mode-only)
-  ![Rate Limiter Dashboard](./docs/content/get-started/assets/rate-limiter-dashboard-dark.png#gh-dark-mode-only)
-  ![Rate Limiter Dashboard](./docs/content/get-started/assets/rate-limiter-dashboard-light.png#gh-light-mode-only)
+![Rate Limiter Blueprint](./docs/content/get-started/assets/rate-limiter-blueprint-dark.png#gh-dark-mode-only)
+![Rate Limiter Blueprint](./docs/content/get-started/assets/rate-limiter-blueprint-light.png#gh-light-mode-only)
+![Rate Limiter Dashboard](./docs/content/get-started/assets/rate-limiter-dashboard-dark.png#gh-dark-mode-only)
+![Rate Limiter Dashboard](./docs/content/get-started/assets/rate-limiter-dashboard-light.png#gh-light-mode-only)
 
 In addition to language SDKs, Aperture also integrates with existing control
 points such as API gateways, service meshes, and application middlewares.
