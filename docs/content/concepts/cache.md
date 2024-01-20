@@ -13,9 +13,9 @@ The _Cache_ functionality can be used via [Aperture SDKs][skds] as part of the
 function names, the general idea is as follows:
 
 1. Create an instance of Aperture `Client`.
-2. Instantiate a `Flow` by calling the `StartFlow` method with `resultCacheKey`
-   parameter set to your desired value. The first call will let Aperture
-   initialize a cache entry for the flow, uniquely identified by the
+2. Instantiate a `Flow` by calling the `StartFlow` method with the
+   `resultCacheKey` parameter set to your desired value. The first call will let
+   Aperture initialize a cache entry for the flow, uniquely identified by the
    `ControlPoint` and `ResultCacheKey` values. Subsequent calls will return the
    cached value as part of the response object.
 3. The value stored in the cache can be retrieved by calling the `ResultCache`
@@ -38,7 +38,7 @@ function names, the general idea is as follows:
 :::info
 
 Refer to the [Caching Guide][guide] for more information on how to use the
-_Cache_ via [aperture-js][aperture-js] SDK.
+_Cache_ via [`aperture-js`][aperture-js] SDK.
 
 :::
 

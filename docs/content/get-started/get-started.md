@@ -25,7 +25,7 @@ self-hosted within your infrastructure.
 
 For signing up, head over to
 [Aperture Cloud](https://app.fluxninja.com/sign-up). For detailed instructions,
-please refer to our [step-by-step][sign-up] guide.
+refer to our [step-by-step][sign-up] guide.
 
 ## 2. Pick your Integration
 
@@ -44,8 +44,7 @@ The Serverless mode is the quickest way to start using Aperture.
 
 In Aperture Cloud, authentication for SDK integrations is handled using API
 keys. These keys can be found in the Aperture Cloud UI. For detailed
-instructions on locating API Keys, please refer to the [API Keys][api-keys]
-section.
+instructions on locating API Keys, refer to the [API Keys][api-keys] section.
 
 ## 4. Install SDK and Define Control Points
 
@@ -164,7 +163,7 @@ internal services and use it for subsequent requests. There are two types of
 cache key that can be passed to Aperture:
 
 - `result_cache_key` - This key is useful to store the response of the request
-  in Aperture. For example, the result of a heavy tasks like database query, a
+  in Aperture. For example, the result of heavy tasks such as database query, a
   third-party API call which later can be used for subsequent requests if
   requested within the TTL. This removes the need to perform the same task
   again.
@@ -200,7 +199,7 @@ example is available
 ## 5. Create Your Policy
 
 Within the Aperture UI, navigate to the policy in tab in the sidebar menu, and
-click on the `Create Policy` button in the top-right corner. There you can pick
+click the `Create Policy` button in the upper-right corner. There you can pick
 the blueprint that best aligns with your needs. After a few clicks, you'll be
 directed to a screen where you can input the necessary parameters to generate
 the policy.
@@ -229,7 +228,7 @@ Infrastructure][aperture-for-infra].
 
 :::info
 
-For more details on fully self-hosted installation, please refer to the
+For more details on fully self-hosted installation, refer to the
 [Self-hosted][aperture-for-infra] section.
 
 :::
@@ -251,8 +250,7 @@ Aperture Cloud authenticates requests from integrations using API keys, which
 are created for your project and can be found within the Aperture Cloud UI. Copy
 the API key and save it in a secure location. This key will be used during the
 configuration of [Self-hosted][aperture-for-infra] Agents. For detailed
-instructions on locating API Keys, please refer to the [API Keys][api-keys]
-section.
+instructions on locating API Keys, refer to the [API Keys][api-keys] section.
 
 :::info
 

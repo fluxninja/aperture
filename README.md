@@ -35,6 +35,9 @@ it provides a comprehensive suite of load management capabilities. These
 capabilities enhance the reliability and performance of cloud applications,
 while also optimizing cost and resource utilization.
 
+![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg#gh-light-mode-only)
+![Unified Load Management](./docs/content/assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
+
 Integrating Aperture in your application through SDKs is a simple 3-step
 process:
 
@@ -154,9 +157,6 @@ policy:
 
 In addition to language SDKs, Aperture also integrates with existing control
 points such as API gateways, service meshes, and application middlewares.
-
-![Unified Load Management](./docs/content/assets/img/unified-load-management-light.svg#gh-light-mode-only)
-![Unified Load Management](./docs/content/assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
 
 ## ⚙️ Load management capabilities
 
