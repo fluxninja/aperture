@@ -16,29 +16,143 @@ keywords:
 import Zoom from 'react-medium-image-zoom';
 ```
 
-[Aperture](https://github.com/fluxninja/aperture) is an open source load
-management platform designed for classifying, rate limiting, queuing and
-prioritizing API traffic in cloud applications. Built upon a foundation of
-observability and a global control plane, it offers a comprehensive suite of
-load management capabilities. These capabilities enhance the reliability and
-performance of cloud applications while also optimizing resource utilization.
+Aperture is a distributed load management platform designed for rate limiting,
+caching, and prioritizing requests in cloud applications. Built upon a
+foundation of distributed counters, observability, and a global control plane,
+it provides a comprehensive suite of load management capabilities. These
+capabilities enhance the reliability and performance of cloud applications,
+while also optimizing cost and resource utilization.
 
-Aperture can seamlessly integrate with existing control points such as gateways,
-service meshes, and application middlewares. Moreover, it offers SDKs for
-developers who need to establish control points around specific features or code
-sections inside applications. The following diagram depicts the role of Aperture
-in a cloud application:
+![Unified Load Management](./assets/img/unified-load-management-light.svg#gh-light-mode-only)
+![Unified Load Management](./assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
 
-![Unified Load Management (dark)](./assets/img/unified-load-management-dark.svg#gh-dark-mode-only)
-![Unified Load Management (light)](./assets/img/unified-load-management-light.svg#gh-light-mode-only)
+Integrating Aperture in your application through SDKs is a simple 3-step
+process:
+
+- **Define labels**: Define labels to identify users, entities, or features
+  within your application. For example, you can define labels to identify
+  individual users, features, or API endpoints.
+
+<!-- vale off -->
+<!-- markdownlint-disable -->
+
+  <details>
+  <summary>Example</summary>
+
+```typescript
+// Tailor policies to get deeper insights into your workload with labels that
+// capture business context.
+const labels = {
+  // You can rate limit each user individually.
+  user: "jack",
+  // And have different rate limits for different tiers of users.
+  tier: "premium",
+  // You can also provide the tokens for each request.
+  // Tokens are flexible: LLM AI tokens in a prompt, complexity of a request,
+  // number of sub-actions, etc.
+  tokens: "200",
+  // When peak load exceeds external quotas or infrastructure capacity,
+  // requests can be throttled and prioritized.
+  priority: HIGH,
+  // Get deep insights into your workload. You can slice and dice performance
+  // metrics by any label.
+  workload: "/chat",
+};
+```
+
+<!-- markdownlint-enable -->
+<!-- vale on -->
+
+  </details>
+
+- **Wrap your workload**: Wrap your workload with `startFlow` and `endFlow`
+  calls to establish control points around specific features or code sections
+  inside your application. For example, you can wrap your API endpoints with
+  Aperture SDKs to limit the number of requests per user or feature.
+
+<!-- vale off -->
+<!-- markdownlint-disable -->
+
+  <details>
+  <summary>Example</summary>
+
+```typescript
+// Wrap your workload with startFlow and endFlow calls, passing in the
+// labels you defined earlier.
+const flow = await apertureClient.startFlow("your_workload", {
+  labels: labels,
+  // Lookup result cache key to retrieve a cached result.
+  resultCacheKey: queryParams,
+});
+
+// If rate or quota limit is not exceeded, the workload is executed.
+if (flow.shouldRun()) {
+  // Return a cached result or execute the workload.
+  const cachedResult = flow.resultCache();
+  const result = await yourWorkload(cachedResult);
+  flow.setResultCache({
+    value: result,
+    ttl: { seconds: 86400, nanos: 0 },
+  });
+}
+//
+```
+
+  </details>
+
+<!-- markdownlint-enable -->
+<!-- vale on -->
+
+- **Configure & monitor policies**: Configure policies to control the rate,
+  concurrency, and priority of requests.
+
+<!-- vale off -->
+<!-- markdownlint-disable -->
+
+  <details>
+  <summary>Policy YAML</summary>
+
+```yaml
+blueprint: rate-limiting/base
+uri: github.com/fluxninja/aperture/blueprints@latest
+policy:
+  policy_name: rate_limit
+  rate_limiter:
+    bucket_capacity: 60
+    fill_amount: 60
+    parameters:
+      interval: 3600s
+      limit_by_label_key: user
+    selectors:
+      - control_point: your_workload
+        label_matcher:
+          match_list:
+            - key: tier
+              operator: In
+              values:
+                - premium
+```
+
+  </details>
+
+<!-- markdownlint-enable -->
+<!-- vale on -->
+
+![Rate Limiter Blueprint](./get-started/assets/rate-limiter-blueprint-dark.png#gh-dark-mode-only)
+![Rate Limiter Blueprint](./get-started/assets/rate-limiter-blueprint-light.png#gh-light-mode-only)
+![Rate Limiter Dashboard](./get-started/assets/rate-limiter-dashboard-dark.png#gh-dark-mode-only)
+![Rate Limiter Dashboard](./get-started/assets/rate-limiter-dashboard-light.png#gh-light-mode-only)
+
+In addition to language SDKs, Aperture also integrates with existing control
+points such as API gateways, service meshes, and application middlewares.
 
 Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
 [self-hosted][self-hosted] within your infrastructure. Visit the
 [Architecture][architecture] page for more details.
 
-:::info Sign-up
+:::info Sign up
 
-To sign-up to Aperture Cloud, [click here][sign-up].
+To sign up to Aperture Cloud, [click here][sign-up].
 
 :::
 

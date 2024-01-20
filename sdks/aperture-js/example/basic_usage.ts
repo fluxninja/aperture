@@ -14,7 +14,7 @@ import { FlowStatus, LookupStatus } from "@fluxninja/aperture-js";
 import { Request, Response } from "express";
 
 async function handleRequest(req: Request, res: Response) {
-  const flow = await apertureClient.startFlow("archimedes-service", {
+  const flow = await apertureClient.startFlow("your_workload", {
     labels: {
       user: "user1",
       tier: "premium",
@@ -81,7 +81,6 @@ async function handleRequestRateLimit(req: Request, res: Response) {
     console.log("Request accepted. Processing...");
     const resString = "foo";
     res.send({ message: resString });
-
   } else {
     console.log("Request rate-limited. Try again later.");
     // Handle flow rejection
@@ -94,29 +93,33 @@ async function handleRequestRateLimit(req: Request, res: Response) {
 // END: handleRequestRateLimit
 
 // START: handleQuotaScheduler
-async function handleQuotaScheduler(apertureClient: ApertureClient, tier: string, priority: number) {
-    // START: QSStartFlow
-    const flow = await apertureClient.startFlow("quota-scheduling-feature", {
-        labels: {
-            limit_key: "some_user_id",
-            priority: priority.toString(),
-            workload: `${tier} user`,
-        },
-        grpcCallOptions: {
-            deadline: Date.now() + 120000, // ms
-        },
-    });
-    console.log(`Request sent for ${tier} tier with priority ${priority}.`);
-    flow.end();
-    // END: QSStartFlow
+async function handleQuotaScheduler(
+  apertureClient: ApertureClient,
+  tier: string,
+  priority: number,
+) {
+  // START: QSStartFlow
+  const flow = await apertureClient.startFlow("quota-scheduling-feature", {
+    labels: {
+      limit_key: "some_user_id",
+      priority: priority.toString(),
+      workload: `${tier} user`,
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 120000, // ms
+    },
+  });
+  console.log(`Request sent for ${tier} tier with priority ${priority}.`);
+  flow.end();
+  // END: QSStartFlow
 }
 
 function scheduleRequests(apertureClient: ApertureClient) {
-    Object.entries(userTiers).forEach(([tier, priority]) => {
-        setInterval(() => {
-            handleQuotaScheduler(apertureClient, tier, priority);
-        }, 1000);
-    });
+  Object.entries(userTiers).forEach(([tier, priority]) => {
+    setInterval(() => {
+      handleQuotaScheduler(apertureClient, tier, priority);
+    }, 1000);
+  });
 }
 // END: handleQuotaScheduler
 
