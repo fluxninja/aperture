@@ -258,7 +258,7 @@ repos:
           - "--ignore-words=./.github/styles/config/vocabularies/FluxNinja/accept.txt"
         exclude: ^(.*\.svg|yarn.lock|go.sum|.*/go.sum|.circleci/.*|docs/content/reference/api/.*|api/gen/.*|sdks/aperture-java/lib/core/src/main/java/com/fluxninja/generated/.*|sdks/aperture-py/aperture_sdk/_gen/.*|blueprints/gen/.*|sdks/aperture-js/docs/.*|sdks/aperture-js/README.md|sdks/aperture-py/docs/.*|playground/resources/nginx/.*|\.github/.*|.*\.libsonnet|playground/resources/demo-ui/package-lock\.json|sdks/aperture-js/example/package-lock.json)$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.7.1
+    rev: v0.12.1
     hooks:
       - id: markdownlint-cli2
         files: '^docs/content/.*\.md$'

@@ -200,12 +200,15 @@ example is available
 ## 5. Create Your Policy
 
 Within the Aperture UI, navigate to the policy in tab in the sidebar menu, and
-click on the `Create Policy` button in the top right corner. There you can pick
+click on the `Create Policy` button in the top-right corner. There you can pick
 the blueprint that best aligns with your needs. After a few clicks, you'll be
 directed to a screen where you can input the necessary parameters to generate
 the policy.
 
-![Rate Limiter Blueprint](./assets/rate_limiter_blueprint.png)
+![Rate Limiter Blueprint](./assets/rate-limiter-blueprint-dark.png#gh-dark-mode-only)
+![Rate Limiter Blueprint](./assets/rate-limiter-blueprint-light.png#gh-light-mode-only)
+![Rate Limiter Dashboard](./assets/rate-limiter-dashboard-dark.png#gh-dark-mode-only)
+![Rate Limiter Dashboard](./assets/rate-limiter-dashboard-light.png#gh-light-mode-only)
 
 For more details on how to create a policy, follow our [step-by-step
 guide][policies].
@@ -221,8 +224,8 @@ within your infrastructure, making it perfect for air-gapped environments.
 ## 3. Set Up the Environment
 
 The Aperture Agent can be installed in various modes. For installation steps,
-see [Agent][agent-docs] docs under [Aperture For Infra
-section][aperture-for-infra].
+see [Agent][agent-docs] docs under [Aperture For
+Infrastructure][aperture-for-infra].
 
 :::info
 
