@@ -12,7 +12,7 @@ require (
 require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.0.2 // indirect
-	github.com/fluxninja/aperture/api/v2 v2.0.0-20240118190006-19243f5a9c81 // indirect
+	github.com/fluxninja/aperture/api/v2 v2.0.0-20240120192438-5aa1a7ac43f8 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
