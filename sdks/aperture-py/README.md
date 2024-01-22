@@ -17,14 +17,3 @@ service code.
 
 Refer to [documentation](https://docs.fluxninja.com/sdk/python/) for more
 details.
-
-# ISSUES
-
-Due to issues with the installer used by poetry 1.4.0, one should disable the
-modern installation method:
-
-```
-poetry config installer.modern-installation false
-```
-
-Source: https://github.com/python-poetry/poetry/issues/7572

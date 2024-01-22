@@ -92,9 +92,11 @@ class Flow(AbstractContextManager):
     def http_response_code(self) -> Optional[int]:
         if self.check_response is None:
             return 0
-        if self.check_response.denied_response_status_code is StatusCode.Empty:
+        denied_status_code = self.check_response.denied_response_status_code
+        if denied_status_code is None or StatusCode.Empty:
             return 200
-        return int(self._check_response.denied_response_status_code)
+        else:
+            return int(denied_status_code)
 
     def retry_after(self) -> Optional[datetime.timedelta]:
         if self.check_response is None:
@@ -191,7 +193,7 @@ class Flow(AbstractContextManager):
         if inflight_request_ref:
             flow_end_request = FlowEndRequest(
                 control_point=self._control_point,
-                inflight_request_refs=inflight_request_ref,
+                inflight_requests=inflight_request_ref,
             )
 
             try:
