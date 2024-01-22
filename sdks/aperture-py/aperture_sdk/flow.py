@@ -91,12 +91,12 @@ class Flow(AbstractContextManager):
 
     def http_response_code(self) -> Optional[int]:
         if self.check_response is None:
-            return 0
-        denied_status_code = self.check_response.denied_response_status_code
-        if denied_status_code is None or StatusCode.Empty:
-            return 200
-        else:
-            return int(denied_status_code)
+            return 200  # Default to 200 if check_response is None
+
+        if self.check_response.denied_response_status_code == StatusCode.Empty:
+            return 200  # Default to 200 if denied_response_status_code is None or Empty
+
+        return self.check_response.denied_response_status_code
 
     def retry_after(self) -> Optional[datetime.timedelta]:
         if self.check_response is None:
