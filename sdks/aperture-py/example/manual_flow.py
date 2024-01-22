@@ -11,7 +11,7 @@ from aperture_sdk.client import ApertureClient, FlowParams
 from aperture_sdk.flow import FlowStatus
 from quart import Quart
 
-default_agent_address = "localhost:8089"
+default_agent_address = "localhost:8080"
 app = Quart(__name__)
 
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
@@ -28,7 +28,7 @@ logger = logging.getLogger("aperture-manual-flow-example")
 
 @app.get("/")
 async def index():
-    return "Welcome to Aperture!, try /super, /super2 and /super3 "
+    return "Welcome to Aperture!, try /super, /super2 and /super3"
 
 
 @app.get("/super")
@@ -36,8 +36,8 @@ async def super_handler():
     # START: manualFlow
     # business logic produces labels
     labels = {
-        "userId": "some_user_id",
-        "userTier": "gold",
+        "user_id": "some_user_id",
+        "user_tier": "gold",
         "priority": "100",
     }
     flow_params = FlowParams(
@@ -62,6 +62,7 @@ async def super_handler():
     else:
         # handle flow rejection by Aperture Agent
         flow.set_status(FlowStatus.Error)
+
     res = flow.end()
     if res.get_error():
         logger.error("Error: {}".format(res.get_error()))
@@ -98,6 +99,8 @@ async def super2_handler():
             # depending on whether an error was raised or not
             pass
     # END: contextManagerFlow
+
+    return "", 200
 
 
 @app.get("/super3")
@@ -197,4 +200,4 @@ async def health_handler():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8089)
