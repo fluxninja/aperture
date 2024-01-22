@@ -7,15 +7,15 @@ readme = "README.md"
 packages = [{ include = "aperture_sdk" }]
 
 [tool.pydoctor]
-docformat="google"
-project-name="aperture-py"
-project-version="2.23.0"
-project-url="https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
+docformat = "google"
+project-name = "aperture-py"
+project-version = "2.23.0"
+project-url = "https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
 add-package = ["aperture_sdk"]
-html-output="docs"
+html-output = "docs"
 sidebar-expand-depth = 2
 # build-time is hard-coded as a pre-commit workaround
-buildtime="2023-12-05 04:20:29"
+buildtime = "2023-12-05 04:20:29"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -26,13 +26,11 @@ opentelemetry-exporter-otlp = "^1.20.0"
 protobuf = "^4.24.4"
 pydoctor = "^23.9.1"
 
-
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.59.2"
 black = "^23.1.0"
 mypy = "^1.1.1"
 grpc-stubs = "^1.24.12.1"
-
 
 [tool.poetry.group.example.dependencies]
 quart = "^0.19.3"
@@ -45,4 +43,4 @@ build-backend = "poetry.core.masonry.api"
 namespace_packages = true
 check_untyped_defs = true
 exclude = ["aperture_sdk/_gen/"]
-python_version = 3.7
+python_version = "3.7"
