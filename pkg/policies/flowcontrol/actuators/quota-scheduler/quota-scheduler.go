@@ -158,11 +158,11 @@ func setupQuotaSchedulerFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = auditJobGroup.Stop()
+			err = rateLimiterJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = rateLimiterJobGroup.Stop()
+			err = auditJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
