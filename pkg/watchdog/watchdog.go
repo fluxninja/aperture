@@ -175,7 +175,7 @@ func (w *watchdog) start() error {
 					if e != nil {
 						log.Autosample().Warn().Err(e).Msg("Heap check failed")
 					}
-					w.heapStatusRegistry.SetStatus(status.NewStatus(details, nil))
+					w.heapStatusRegistry.SetStatus(status.NewStatus(details, nil), nil)
 				}
 			case <-w.sentinel.ctx.Done():
 				return

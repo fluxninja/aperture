@@ -2,7 +2,6 @@ package concurrencylimiter
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 	"strconv"
@@ -22,7 +21,9 @@ import (
 	concurrencylimiter "github.com/fluxninja/aperture/v2/pkg/dmap-funcs/concurrency-limiter"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -72,12 +73,14 @@ func provideConcurrencyLimiterWatchers(
 }
 
 type concurrencyLimiterFactory struct {
-	engineAPI        iface.Engine
-	registry         status.Registry
-	distCache        *distcache.DistCache
-	decisionsWatcher notifiers.Watcher
-	counterVector    *prometheus.CounterVec
-	agentGroupName   string
+	engineAPI           iface.Engine
+	registry            status.Registry
+	distCache           *distcache.DistCache
+	decisionsWatcher    notifiers.Watcher
+	counterVector       *prometheus.CounterVec
+	agentGroupName      string
+	labelStatusJobGroup *jobs.JobGroup
+	labelStatusFactory  *labelstatus.LabelStatusFactory
 }
 
 // main fx app.
@@ -90,6 +93,7 @@ func setupConcurrencyLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	labelStatusFactory *labelstatus.LabelStatusFactory,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.ConcurrencyLimiterDecisionsPath)
@@ -99,19 +103,28 @@ func setupConcurrencyLimiterFactory(
 	}
 
 	reg := statusRegistry.Child("component", concurrencyLimiterStatusRoot)
+	logger := reg.GetLogger()
 
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.ConcurrencyLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Concurrency Limiter was triggered",
 	}, metricLabelKeys)
 
+	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", concurrencyLimiterStatusRoot), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create labels status job group")
+		return err
+	}
+
 	concurrencyLimiterFactory := &concurrencyLimiterFactory{
-		engineAPI:        e,
-		distCache:        distCache,
-		decisionsWatcher: decisionsWatcher,
-		agentGroupName:   agentGroupName,
-		registry:         reg,
-		counterVector:    counterVector,
+		engineAPI:           e,
+		distCache:           distCache,
+		decisionsWatcher:    decisionsWatcher,
+		agentGroupName:      agentGroupName,
+		registry:            reg,
+		counterVector:       counterVector,
+		labelStatusJobGroup: labelStatusJobGroup,
+		labelStatusFactory:  labelStatusFactory,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(
@@ -130,6 +143,10 @@ func setupConcurrencyLimiterFactory(
 			if err != nil {
 				return err
 			}
+			err = labelStatusJobGroup.Start()
+			if err != nil {
+				return err
+			}
 			err = decisionsWatcher.Start()
 			if err != nil {
 				return err
@@ -139,6 +156,10 @@ func setupConcurrencyLimiterFactory(
 		OnStop: func(context.Context) error {
 			var err, merr error
 			err = decisionsWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = labelStatusJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -159,22 +180,26 @@ func setupConcurrencyLimiterFactory(
 // per component fx app.
 func (clFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(key notifiers.Key, unmarshaller config.Unmarshaller, reg status.Registry) (fx.Option, error) {
 	logger := clFactory.registry.GetLogger()
+
 	wrapperMessage := &policysyncv1.ConcurrencyLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.ConcurrencyLimiter == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency limiter config")
 		return fx.Options(), err
 	}
 
 	clProto := wrapperMessage.ConcurrencyLimiter
 	cl := &concurrencyLimiter{
-		Component: wrapperMessage.GetCommonAttributes(),
-		clProto:   clProto,
-		clFactory: clFactory,
-		registry:  reg,
+		Component:           wrapperMessage.GetCommonAttributes(),
+		clProto:             clProto,
+		clFactory:           clFactory,
+		registry:            reg,
+		labelStatusJobGroup: clFactory.labelStatusJobGroup,
 	}
 	cl.name = iface.ComponentKey(cl)
+	cl.tokensLabelKeyStatus = clFactory.labelStatusFactory.New("tokens_label_key", cl.GetPolicyName(), cl.GetComponentId())
+	cl.limitByLabelKeyStatus = clFactory.labelStatusFactory.New("limit_by_label_key", cl.GetPolicyName(), cl.GetComponentId())
 
 	return fx.Options(
 		fx.Invoke(
@@ -186,11 +211,14 @@ func (clFactory *concurrencyLimiterFactory) newConcurrencyLimiterOptions(key not
 // concurrencyLimiter implements concurrency limiter on the data plane side.
 type concurrencyLimiter struct {
 	iface.Component
-	registry  status.Registry
-	clFactory *concurrencyLimiterFactory
-	limiter   concurrencylimiter.ConcurrencyLimiter
-	clProto   *policylangv1.ConcurrencyLimiter
-	name      string
+	registry              status.Registry
+	clFactory             *concurrencyLimiterFactory
+	limiter               concurrencylimiter.ConcurrencyLimiter
+	clProto               *policylangv1.ConcurrencyLimiter
+	name                  string
+	labelStatusJobGroup   *jobs.JobGroup
+	tokensLabelKeyStatus  *labelstatus.LabelStatus
+	limitByLabelKeyStatus *labelstatus.LabelStatus
 }
 
 // Make sure concurrencyLimiter implements iface.Limiter.
@@ -222,9 +250,14 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyHashLabel] = cl.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = cl.GetComponentId()
 
+	// setup labels status
+	cl.tokensLabelKeyStatus.Setup(cl.clFactory.labelStatusJobGroup, lifecycle)
+	cl.limitByLabelKeyStatus.Setup(cl.clFactory.labelStatusJobGroup, lifecycle)
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			// var err error
+			var err error
+
 			inner, err := concurrencylimiter.NewGlobalTokenCounter(
 				cl.clFactory.distCache,
 				cl.name,
@@ -272,7 +305,7 @@ func (cl *concurrencyLimiter) setup(lifecycle fx.Lifecycle) error {
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete concurrency limiter counter from its metric vector. No traffic to generate metrics?")
 			}
-			cl.registry.SetStatus(status.NewStatus(nil, merr))
+			cl.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},
@@ -297,10 +330,13 @@ func (cl *concurrencyLimiter) Decide(ctx context.Context, labels labels.Labels) 
 		deniedResponseStatusCode = rParams.GetDeniedResponseStatusCode()
 		tokensLabelKey := rParams.GetTokensLabelKey()
 		if tokensLabelKey != "" {
-			if val, ok := labels.Get(tokensLabelKey); ok {
+			val, ok := labels.Get(tokensLabelKey)
+			if ok {
 				if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 					tokens = parsedTokens
 				}
+			} else {
+				cl.tokensLabelKeyStatus.SetMissing()
 			}
 		}
 	}
@@ -367,8 +403,8 @@ func (cl *concurrencyLimiter) takeIfAvailable(
 		return label, true, 0, 0, 0, ""
 	}
 
-	label, err := cl.getLimitLabelFromLabels(labels)
-	if err != nil {
+	label, found := cl.getLimitLabelFromLabels(labels)
+	if !found {
 		return label, true, 0, 0, 0, ""
 	}
 
@@ -426,17 +462,20 @@ func (cl *concurrencyLimiter) GetRampMode() bool {
 	return false
 }
 
-// getLabelFromLabels returns the label value from labels.
-func (cl *concurrencyLimiter) getLimitLabelFromLabels(labels labels.Labels) (label string, err error) {
+// getLabelFromLabels returns the label value from labels and bool indicating if the label was found.
+func (cl *concurrencyLimiter) getLimitLabelFromLabels(labels labels.Labels) (label string, ok bool) {
 	labelKey := cl.clProto.Parameters.GetLimitByLabelKey()
 	if labelKey == "" {
 		label = "default"
-	} else {
-		labelValue, found := labels.Get(labelKey)
-		if !found {
-			return "", errors.New("limit label not found")
-		}
-		label = labelKey + ":" + labelValue
+		return label, true
 	}
-	return label, nil
+
+	labelValue, found := labels.Get(labelKey)
+	if !found {
+		cl.limitByLabelKeyStatus.SetMissing()
+		return "", false
+	}
+
+	label = labelKey + ":" + labelValue
+	return label, true
 }

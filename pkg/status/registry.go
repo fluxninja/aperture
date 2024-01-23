@@ -15,7 +15,7 @@ import (
 // Registry .
 type Registry interface {
 	GetStatus() *statusv1.Status
-	SetStatus(*statusv1.Status)
+	SetStatus(*statusv1.Status, map[string]string)
 	SetGroupStatus(*statusv1.GroupStatus)
 	GetGroupStatus() *statusv1.GroupStatus
 	Child(key, value string) Registry
@@ -177,27 +177,43 @@ func (r *registry) GetStatus() *statusv1.Status {
 }
 
 // SetStatus sets the status of the Registry.
-func (r *registry) SetStatus(status *statusv1.Status) {
+func (r *registry) SetStatus(status *statusv1.Status, labels map[string]string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.status = status
 
 	if r.status != nil && r.status.Error != nil {
-		r.alerter.AddAlert(r.createAlert(r.status.Error))
+		r.alerter.AddAlert(r.createAlert(r.status.Error, labels))
 	}
 }
 
-func (r *registry) createAlert(err *statusv1.Status_Error) *alerts.Alert {
+func (r *registry) createAlert(err *statusv1.Status_Error, labels map[string]string) *alerts.Alert {
 	resolve := time.Duration(time.Second * alertResolveTimeout)
-	newAlert := alerts.NewAlert(
+
+	severity := alerts.SeverityInfo.String()
+	if labels != nil {
+		s, ok := labels["severity"]
+		if ok {
+			severity = s
+			delete(labels, "severity")
+		}
+	}
+
+	alertOpts := []alerts.AlertOption{
 		alerts.WithName(err.String()),
-		alerts.WithSeverity(alerts.ParseSeverity("info")),
+		alerts.WithSeverity(alerts.ParseSeverity(severity)),
 		alerts.WithAlertChannels([]string{alertChannel}),
 		alerts.WithResolveTimeout(resolve),
 		alerts.WithGeneratorURL(
 			fmt.Sprintf("http://%s%s", info.GetHostInfo().Hostname, r.uri),
 		),
-	)
+	}
+
+	for k, v := range labels {
+		alertOpts = append(alertOpts, alerts.WithLabel(k, v))
+	}
+
+	newAlert := alerts.NewAlert(alertOpts...)
 
 	return newAlert
 }

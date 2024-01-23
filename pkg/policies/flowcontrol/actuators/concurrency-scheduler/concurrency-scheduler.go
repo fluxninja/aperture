@@ -168,7 +168,7 @@ func (csFactory *concurrencySchedulerFactory) newConcurrencySchedulerOptions(
 	wrapperMessage := &policysyncv1.ConcurrencySchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.ConcurrencyScheduler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency scheduler config")
 		return fx.Options(), err
 	}
@@ -312,7 +312,7 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 
-			cs.registry.SetStatus(status.NewStatus(nil, merr))
+			cs.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},

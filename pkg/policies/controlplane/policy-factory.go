@@ -146,7 +146,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 	var wrapperMessage policysyncv1.PolicyWrapper
 	err := unmarshaller.Unmarshal(&wrapperMessage)
 	if err != nil || wrapperMessage.Policy == nil {
-		registry.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err), nil)
 		registry.GetLogger().Error().Err(err).Msg("Failed to unmarshal policy config wrapper")
 		return fx.Options(), err
 	}
@@ -156,7 +156,7 @@ func (factory *PolicyFactory) provideControllerPolicyFxOptions(
 		registry,
 	)
 	if err != nil {
-		registry.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err), nil)
 		registry.GetLogger().Warn().Err(err).Msg("Failed to create policy options")
 		return fx.Options(), err
 	}

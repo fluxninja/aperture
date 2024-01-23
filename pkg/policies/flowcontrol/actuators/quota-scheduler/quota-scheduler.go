@@ -186,7 +186,7 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	wrapperMessage := &policysyncv1.QuotaSchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.QuotaScheduler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal quota scheduler config")
 		return fx.Options(), err
 	}
@@ -350,7 +350,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 
-			qs.registry.SetStatus(status.NewStatus(nil, merr))
+			qs.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},

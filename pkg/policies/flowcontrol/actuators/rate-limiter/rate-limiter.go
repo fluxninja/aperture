@@ -198,7 +198,7 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, un
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
@@ -327,7 +327,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
-			rl.registry.SetStatus(status.NewStatus(nil, merr))
+			rl.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},

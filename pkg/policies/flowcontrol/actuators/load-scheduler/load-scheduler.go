@@ -220,7 +220,7 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	loadSchedulerProto := wrapperMessage.LoadScheduler
 	if err != nil || loadSchedulerProto == nil {
-		registry.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
@@ -295,7 +295,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				ls.registry.SetStatus(status.NewStatus(nil, err))
+				ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 				return err
 			}
 
@@ -397,7 +397,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketAvailableMetricName+" gauge from its metric vector"))
 			}
 
-			ls.registry.SetStatus(status.NewStatus(nil, errMulti))
+			ls.registry.SetStatus(status.NewStatus(nil, errMulti), nil)
 			return errMulti
 		},
 	})
@@ -433,7 +433,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		logger.Warn().Err(err).Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, err))
+		ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 		return
 	}
 
@@ -441,7 +441,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if loadDecision == nil {
 		statusMsg := "load decision is nil"
 		logger.Error().Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get load decision from LoadDecisionWrapper: %s", statusMsg)))
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get load decision from LoadDecisionWrapper: %s", statusMsg)), nil)
 		return
 	}
 
@@ -449,7 +449,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if commonAttributes == nil {
 		statusMsg := "common attributes is nil"
 		logger.Error().Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get common attributes from LoadDecisionWrapper: %s", statusMsg)))
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get common attributes from LoadDecisionWrapper: %s", statusMsg)), nil)
 		return
 	}
 
@@ -458,7 +458,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", ls.GetPolicyHash(), commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, err))
+		ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 		return
 	}
 

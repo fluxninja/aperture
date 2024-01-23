@@ -282,7 +282,7 @@ func (circuit *Circuit) Execute(tickInfo TickInfo) error {
 
 		}
 		signalStatus := status.NewStatus(signalInfo, nil)
-		reg.SetStatus(signalStatus)
+		reg.SetStatus(signalStatus, nil)
 	}()
 
 	// Populate with last run's looped signal

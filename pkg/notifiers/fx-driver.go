@@ -60,7 +60,7 @@ func (fr *fxRunner) processEvent(event Event, unmarshaller config.Unmarshaller) 
 }
 
 func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
-	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner initializing"), nil))
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner initializing"), nil), nil)
 	logger := fr.fxRunnerStatusRegistry.GetLogger()
 
 	if fr.app == nil && unmarshaller != nil {
@@ -98,34 +98,34 @@ func (fr *fxRunner) initApp(key Key, unmarshaller config.Unmarshaller) error {
 		if err = fr.app.Err(); err != nil {
 			visualize, _ := fx.VisualizeError(err)
 			logger.Error().Err(err).Str("visualize", visualize).Msg("fx.New failed")
-			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
+			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err), nil)
 			if deinitErr := fr.deinitApp(); deinitErr != nil {
 				logger.Error().Err(deinitErr).Msg("Failed to deinitialize application after start failure")
 			}
 			return err
 		}
 
-		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner starting"), nil))
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner starting"), nil), nil)
 
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StartTimeout())
 		defer cancel()
 		if err = fr.app.Start(ctx); err != nil {
 			logger.Error().Err(err).Msg("Could not start application")
-			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err))
+			fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, err), nil)
 			if deinitErr := fr.deinitApp(); deinitErr != nil {
 				logger.Error().Err(deinitErr).Msg("Failed to deinitialize application after start failure")
 			}
 			return err
 		}
-		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil))
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner started"), nil), nil)
 	} else {
-		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("fxRunner is not initialized")))
+		fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(nil, errors.New("fxRunner is not initialized")), nil)
 	}
 	return nil
 }
 
 func (fr *fxRunner) deinitApp() error {
-	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopping"), nil))
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopping"), nil), nil)
 	logger := fr.fxRunnerStatusRegistry.GetLogger()
 	if fr.app != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), fr.app.StopTimeout())
@@ -138,7 +138,7 @@ func (fr *fxRunner) deinitApp() error {
 			return err
 		}
 	}
-	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopped"), nil))
+	fr.fxRunnerStatusRegistry.SetStatus(status.NewStatus(wrapperspb.String("policy runner stopped"), nil), nil)
 	return nil
 }
 

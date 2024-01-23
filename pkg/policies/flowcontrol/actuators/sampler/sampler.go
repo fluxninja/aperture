@@ -169,7 +169,7 @@ func (frf *samplerFactory) newSamplerOptions(
 	wrapperMessage := &policysyncv1.SamplerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.Sampler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal sampler config")
 		return fx.Options(), err
 	}
@@ -269,7 +269,7 @@ func (fr *sampler) setup(lifecycle fx.Lifecycle) error {
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete sampler counter from its metric vector. No traffic to generate metrics?")
 			}
-			fr.registry.SetStatus(status.NewStatus(nil, merr))
+			fr.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},
