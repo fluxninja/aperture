@@ -141,6 +141,9 @@ func (b configBuilder) withMetrics(pipelineName string) configBuilder {
 		"batch/metrics-slow",
 		"attributes/fluxninja",
 	}
+	if pipelineName == "metrics/slow" {
+		processors = append(processors, "attributes/agent_group")
+	}
 	b.cfg.Service.AddPipeline(pipelineName, otelconfig.Pipeline{
 		Receivers:  []string{"prometheus/fluxninja"},
 		Processors: processors,
