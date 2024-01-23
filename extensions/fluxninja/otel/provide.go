@@ -170,6 +170,7 @@ func addMetricsSlowPipeline(config *otelconfig.Config) {
 		Processors: []string{
 			processorBatchMetricsSlow,
 			processorAttributes,
+			otelconsts.ProcessorAgentGroup,
 		},
 		Exporters: []string{exporterFluxNinja},
 	})
