@@ -170,11 +170,11 @@ func setupRateLimiterFactory(
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = lazySyncJobGroup.Stop()
+			err = rateLimiterJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
-			err = rateLimiterJobGroup.Stop()
+			err = lazySyncJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
