@@ -46,7 +46,7 @@ async def super_handler():
     )
     # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
     # It returns a Flow or raises an error if any.
-    flow = aperture_client.start_flow(
+    flow = await aperture_client.start_flow(
         control_point="AwesomeFeature",
         params=flow_params,
     )
@@ -63,7 +63,7 @@ async def super_handler():
         # handle flow rejection by Aperture Agent
         flow.set_status(FlowStatus.Error)
 
-    res = flow.end()
+    res = await flow.end()
     if res.get_error():
         logger.error("Error: {}".format(res.get_error()))
     elif res.get_flow_end_response():
@@ -88,7 +88,7 @@ async def super2_handler():
         check_timeout=timedelta(seconds=200),
     )
 
-    with aperture_client.start_flow(
+    with await aperture_client.start_flow(
         control_point="AwesomeFeature",
         params=flow_params,
     ) as flow:
@@ -119,7 +119,7 @@ async def super3_handler():
     )
     # start_flow performs a flowcontrol.v1.Check call to Aperture Agent.
     # It returns a Flow or raises an error if any.
-    flow = aperture_client.start_flow(
+    flow = await aperture_client.start_flow(
         control_point="super3",
         params=flow_params,
     )
@@ -167,7 +167,7 @@ async def super3_handler():
         flow.set_status(FlowStatus.Error)
 
     if flow:
-        flow.end()
+        await flow.end()
     # END: cacheFlow
 
     response_string = f"Result Cache Value: {result_string}, Global Cache key: cache-key Value: {cache_value}"

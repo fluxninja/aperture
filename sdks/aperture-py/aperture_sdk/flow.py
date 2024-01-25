@@ -127,7 +127,7 @@ class Flow(AbstractContextManager):
     def set_status(self, status_code: FlowStatus) -> None:
         self._status_code = status_code
 
-    def end(self) -> EndResponse:
+    async def end(self) -> EndResponse:
         if self._ended:
             self.logger.warning("attempting to end an already ended flow")
             return EndResponse(
@@ -160,7 +160,7 @@ class Flow(AbstractContextManager):
 
         if self.check_response:
             for decision in self.check_response.limiter_decisions:
-                if decision.concurrency_limiter_info:
+                if decision.WhichOneof("details") == "concurrency_limiter_info":
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
@@ -168,14 +168,12 @@ class Flow(AbstractContextManager):
                         label=decision.concurrency_limiter_info.label,
                         request_id=decision.concurrency_limiter_info.request_id,
                     )
-
                     if decision.concurrency_limiter_info.tokens_info:
                         ref.tokens = (
                             decision.concurrency_limiter_info.tokens_info.consumed
                         )
                     inflight_request_ref.append(ref)
-
-                if decision.concurrency_scheduler_info:
+                elif decision.WhichOneof("details") == "concurrency_scheduler_info":
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
@@ -183,7 +181,6 @@ class Flow(AbstractContextManager):
                         label=decision.concurrency_scheduler_info.label,
                         request_id=decision.concurrency_scheduler_info.request_id,
                     )
-
                     if decision.concurrency_scheduler_info.tokens_info:
                         ref.tokens = (
                             decision.concurrency_scheduler_info.tokens_info.consumed
@@ -396,12 +393,12 @@ class Flow(AbstractContextManager):
     def __enter__(self: TFlow) -> TFlow:
         return self
 
-    def __exit__(self, exc_type, _exc_value, _traceback) -> None:
+    async def __exit__(self, exc_type, _exc_value, _traceback) -> None:
         if self._ended:
             return
         if exc_type is not None:
             self.set_status(FlowStatus.Error)
-        res = self.end()
+        res = await self.end()
 
         if res.get_error():
             self.logger.warning(f"Failed to end flow: {res.get_error()}")

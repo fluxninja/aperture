@@ -69,7 +69,7 @@ class ApertureClient:
         channel: grpc.Channel,
         otlp_exporter: OTLPSpanExporter,
     ):
-        self.logger = logging.getLogger("aperture-py-sdk")
+        self.logger = logging.getLogger("aperture-py")
 
         resource = Resource.create(
             {
@@ -102,7 +102,6 @@ class ApertureClient:
             credentials = grpc.ssl_channel_credentials()
         if api_key:
             metadata_plugin_instance = ApertureCloudAuthMetadataPlugin(api_key)
-
             credentials = grpc.composite_channel_credentials(
                 credentials,
                 grpc.metadata_call_credentials(
@@ -110,6 +109,7 @@ class ApertureClient:
                     name="x-api-key",
                 ),
             )
+
         otlp_exporter = OTLPSpanExporter(
             endpoint=address,
             insecure=insecure,
@@ -139,7 +139,7 @@ class ApertureClient:
             otlp_exporter=otlp_exporter,
         )
 
-    def start_flow(
+    async def start_flow(
         self,
         control_point: str,
         params: FlowParams,
@@ -199,12 +199,12 @@ class ApertureClient:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                with self.start_flow(control_point, params) as flow:
-                    if flow.should_run():
-                        return await run_fn(fn, *args, **kwargs)
-                    else:
-                        if on_reject:
-                            return on_reject()
+                flow = await self.start_flow(control_point, params)
+                if flow.should_run():
+                    return await run_fn(fn, *args, **kwargs)
+                else:
+                    if on_reject:
+                        return on_reject()
 
             return wrapper
 
