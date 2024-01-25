@@ -101,7 +101,7 @@ class Flow(AbstractContextManager):
     def set_status(self, status_code: FlowStatus) -> None:
         self._status_code = status_code
 
-    async def end(self) -> EndResponse:
+    def end(self) -> EndResponse:
         if self._ended:
             self.logger.warning("attempting to end an already ended flow")
             return EndResponse(
@@ -168,7 +168,7 @@ class Flow(AbstractContextManager):
             )
 
             try:
-                res = await self._fcs_stub.FlowEnd(flow_end_request)
+                res = self._fcs_stub.FlowEnd(flow_end_request)
             except grpc.RpcError as e:
                 self.logger.error(f"Aperture gRPC call failed: {e.details()}")
                 return EndResponse(
@@ -367,12 +367,12 @@ class Flow(AbstractContextManager):
     def __enter__(self: TFlow) -> TFlow:
         return self
 
-    async def __exit__(self, exc_type, _exc_value, _traceback) -> None:
+    def __exit__(self, exc_type, _exc_value, _traceback) -> None:
         if self._ended:
             return
         if exc_type is not None:
             self.set_status(FlowStatus.Error)
-        res = await self.end()
+        res = self.end()
 
         if res.get_error():
             self.logger.warning(f"Failed to end flow: {res.get_error()}")

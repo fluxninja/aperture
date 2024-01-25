@@ -117,7 +117,7 @@ class ApertureClient:
             otlp_exporter=otlp_exporter,
         )
 
-    async def start_flow(
+    def start_flow(
         self,
         control_point: str,
         params: FlowParams,
@@ -149,7 +149,7 @@ class ApertureClient:
             timeout = typing.cast(int, params.check_timeout.total_seconds())
             if timeout == 0:
                 timeout = None
-            response = await stub.Check(request, timeout=timeout)
+            response = stub.Check(request, timeout=timeout)
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
@@ -175,7 +175,7 @@ class ApertureClient:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                flow = await self.start_flow(control_point, params)
+                flow = self.start_flow(control_point, params)
                 if flow.should_run():
                     return await run_fn(fn, *args, **kwargs)
                 else:
