@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   docker: circleci/docker@2.4.0
   gcp-gcr: circleci/gcp-gcr@0.15.3
-  codecov: codecov/codecov@3.3.0
 
 executors:
   base-cimg-executor:
@@ -305,7 +304,6 @@ jobs:
               $PKGS
             mkdir -p /tmp/test-results
             mv unit-tests.xml /tmp/test-results
-      - codecov/upload
       - store_test_results:
           path: /tmp/test-results
       - run:
