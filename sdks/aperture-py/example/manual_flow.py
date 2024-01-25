@@ -5,10 +5,10 @@ import os
 from datetime import timedelta
 from typing import Optional
 
-import grpc
 from aperture_sdk.cache import LookupStatus
-from aperture_sdk.client import ApertureClient, FlowParams
-from aperture_sdk.flow import FlowStatus
+from aperture_sdk.client_async import ApertureClientAsync, FlowParams
+from aperture_sdk.flow_async import FlowStatus
+from grpc import ChannelConnectivity
 from quart import Quart
 
 default_agent_address = "localhost:8080"
@@ -18,7 +18,7 @@ agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
 api_key = os.getenv("APERTURE_API_KEY", "")
 insecure = os.getenv("APERTURE_AGENT_INSECURE", "true").lower() == "true"
 
-aperture_client = ApertureClient.new_client(
+aperture_client = ApertureClientAsync.new_client(
     address=agent_address, insecure=insecure, api_key=api_key
 )
 
@@ -142,7 +142,7 @@ async def super3_handler():
             # After completing the work, you can return store the response in cache and return it, for example:
             result_string = "foo"
             # save to result cache for 10 seconds
-            flow.set_result_cache(result_string, timedelta(seconds=10))
+            await flow.set_result_cache(result_string, timedelta(seconds=10))
         else:
             result_string = flow.result_cache().get_value()
             logging.info("Result Cache Hit: {}".format(result_string))
@@ -153,7 +153,9 @@ async def super3_handler():
                 "Cache Miss, setting global cache for key: '{}'".format("cache-key")
             )
             # save to global cache for key for 10 seconds
-            flow.set_global_cache("cache-key", "awesome-value", timedelta(seconds=10))
+            await flow.set_global_cache(
+                "cache-key", "awesome-value", timedelta(seconds=10)
+            )
             cache_value = "awesome-value"
         else:
             logging.info("Cache Hit")
@@ -177,20 +179,18 @@ async def super3_handler():
 
 @app.get("/connected")
 async def connected_handler():
-    state: Optional[grpc.ChannelConnectivity] = None
+    state: Optional[ChannelConnectivity] = None
 
-    def subscribe_callback(connectivity: grpc.ChannelConnectivity):
+    def subscribe_callback(connectivity: ChannelConnectivity):
         nonlocal state
         state = connectivity
 
     # gRPC does not expose a way to get the current state of the channel
     # so we subscribe to the channel and unsubscribe immediately,
     # as callback is triggered immediately when subscribing
-    grpc_channel = aperture_client.grpc_channel
-    grpc_channel.subscribe(subscribe_callback, try_to_connect=True)
-    grpc_channel.unsubscribe(subscribe_callback)
+    state = aperture_client.grpc_channel.get_state()
     print(f"State: {state}")
-    http_code = 200 if state == grpc.ChannelConnectivity.READY else 503
+    http_code = 200 if state == ChannelConnectivity.READY else 503
     return str(state), http_code
 
 

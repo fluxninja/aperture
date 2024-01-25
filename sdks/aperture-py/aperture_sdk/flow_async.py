@@ -1,4 +1,4 @@
-"""Flow started using the ApertureClient."""
+"""FlowAsync started using the ApertureClientAsync."""
 
 import datetime
 import logging
@@ -6,7 +6,7 @@ import time
 from contextlib import AbstractContextManager
 from typing import List, Optional, TypeVar
 
-import grpc
+import grpc.aio
 from aperture_sdk._gen.aperture.flowcontrol.check.v1 import check_pb2
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
     CacheDeleteRequest,
@@ -31,10 +31,10 @@ from google.protobuf import json_format
 from google.protobuf.duration_pb2 import Duration
 from opentelemetry import trace
 
-TFlow = TypeVar("TFlow", bound="Flow")
+TFlowAsync = TypeVar("TFlowAsync", bound="FlowAsync")
 
 
-class Flow(AbstractContextManager):
+class FlowAsync(AbstractContextManager):
     def __init__(
         self,
         fcs_stub: FlowControlServiceStub,
@@ -44,7 +44,7 @@ class Flow(AbstractContextManager):
         ramp_mode: bool,
         cache_key: Optional[str],
         error: Optional[Exception],
-        grpc_channel: grpc.Channel,
+        grpc_channel: grpc.aio.Channel,
     ):
         self._fcs_stub = fcs_stub
         self._control_point = control_point
@@ -135,6 +135,9 @@ class Flow(AbstractContextManager):
         if self.check_response:
             for decision in self.check_response.limiter_decisions:
                 if decision.WhichOneof("details") == "concurrency_limiter_info":
+                    if decision.concurrency_limiter_info.request_id == "":
+                        continue
+
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
@@ -148,6 +151,9 @@ class Flow(AbstractContextManager):
                         )
                     inflight_request_ref.append(ref)
                 elif decision.WhichOneof("details") == "concurrency_scheduler_info":
+                    if decision.concurrency_scheduler_info.request_id == "":
+                        continue
+
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
@@ -176,6 +182,8 @@ class Flow(AbstractContextManager):
                     flow_end_response=None,
                 )
 
+            # print("Check response ", self.check_response)
+
             return EndResponse(
                 error=None,
                 flow_end_response=res,
@@ -189,7 +197,7 @@ class Flow(AbstractContextManager):
     def error(self) -> Optional[Exception]:
         return self._error
 
-    def set_result_cache(
+    async def set_result_cache(
         self, value: str, ttl: datetime.timedelta, **grpc_opts
     ) -> KeyUpsertResponse:
         if not self._cache_key:
@@ -207,7 +215,7 @@ class Flow(AbstractContextManager):
         )
 
         try:
-            res = self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
+            res = await self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             return KeyUpsertResponse(e)
@@ -219,7 +227,7 @@ class Flow(AbstractContextManager):
             convert_cache_error(res.result_cache_response.error),
         )
 
-    def delete_result_cache(self, **grpc_opts) -> KeyDeleteResponse:
+    async def delete_result_cache(self, **grpc_opts) -> KeyDeleteResponse:
         if not self._cache_key:
             return KeyDeleteResponse(ValueError("No cache key"))
 
@@ -229,7 +237,7 @@ class Flow(AbstractContextManager):
         )
 
         try:
-            res: CacheDeleteResponse = self._fcs_stub.CacheDelete(
+            res: CacheDeleteResponse = await self._fcs_stub.CacheDelete(
                 cache_delete_request, **grpc_opts
             )
         except grpc.RpcError as e:
@@ -271,7 +279,7 @@ class Flow(AbstractContextManager):
             convert_cache_error(lookup_response.error),
         )
 
-    def set_global_cache(
+    async def set_global_cache(
         self, key: str, value: str, ttl: datetime.timedelta, **grpc_opts
     ) -> KeyUpsertResponse:
         ttl_duration = Duration()
@@ -286,7 +294,7 @@ class Flow(AbstractContextManager):
         )
 
         try:
-            res = self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
+            res = await self._fcs_stub.CacheUpsert(cache_upsert_request, **grpc_opts)
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             return KeyUpsertResponse(e)
@@ -303,13 +311,13 @@ class Flow(AbstractContextManager):
             convert_cache_error(responses[key].error),
         )
 
-    def delete_global_cache(self, key: str, **grpc_opts) -> KeyDeleteResponse:
+    async def delete_global_cache(self, key: str, **grpc_opts) -> KeyDeleteResponse:
         cache_delete_request = CacheDeleteRequest(
             global_cache_keys=[key],
         )
 
         try:
-            res: CacheDeleteResponse = self._fcs_stub.CacheDelete(
+            res: CacheDeleteResponse = await self._fcs_stub.CacheDelete(
                 cache_delete_request, **grpc_opts
             )
         except grpc.RpcError as e:
@@ -364,7 +372,7 @@ class Flow(AbstractContextManager):
             convert_cache_error(lookup_response.error),
         )
 
-    def __enter__(self: TFlow) -> TFlow:
+    def __enter__(self: TFlowAsync) -> TFlowAsync:
         return self
 
     async def __exit__(self, exc_type, _exc_value, _traceback) -> None:
