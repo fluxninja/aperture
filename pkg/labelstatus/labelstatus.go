@@ -99,12 +99,11 @@ func (ls *LabelStatus) setLookupStatus(ctx context.Context) (proto.Message, erro
 	}
 
 	if time.Since(ls.timestamp) >= 5*time.Minute {
-		labels["severity"] = alerts.SeverityInfo.String()
 		ls.registry.SetStatus(nil, labels)
 		return nil, nil
 	} else {
 		labels["severity"] = alerts.SeverityCrit.String()
-		s := status.NewStatus(nil, errors.New("label "+ls.labelKey+"missing"))
+		s := status.NewStatus(nil, errors.New("label "+ls.labelKey+" missing"))
 		ls.registry.SetStatus(s, labels)
 	}
 
