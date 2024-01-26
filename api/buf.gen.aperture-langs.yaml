@@ -16,7 +16,7 @@ plugins:
     out: gen/proto/java
   - plugin: buf.build/grpc/python
     out: gen/proto/python
-  - plugin: buf.build/protocolbuffers/python:v24.4
+  - plugin: buf.build/protocolbuffers/python:v25.2
     out: gen/proto/python
   - plugin: buf.build/protocolbuffers/pyi
     out: gen/proto/python
