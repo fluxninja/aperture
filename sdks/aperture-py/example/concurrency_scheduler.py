@@ -1,56 +1,63 @@
 import asyncio
+from datetime import timedelta
 
-from aperture_sdk.client import ApertureClient, FlowParams
+from aperture_sdk.client_async import ApertureClientAsync, FlowParams
+from aperture_sdk.flow_common import FlowStatus
 
 user_tiers = {
-    "platinum": 8,
-    "gold": 4,
-    "silver": 2,
     "free": 1,
+    "silver": 2,
+    "gold": 4,
+    "platinum": 8,
 }
-requests_per_batch = 10
+requests_per_batch = 50
 batch_interval = 1
 
-agent_address = "agents.us-central1.gcp.latest.dev.fluxninja.com:443"
-api_key = "6428f436ddf647e9ab6c94c391750f39"
+agent_address = "agents.us-central1.gcp.app.fluxninja.com:443"
+api_key = "e9f01f421f5b498db3e0647b475a331c"
 
 
-async def initialize_aperture_client():
-    aperture_client = ApertureClient.new_client(address=agent_address, api_key=api_key)
+def initialize_aperture_client():
+    aperture_client = ApertureClientAsync.new_client(
+        address=agent_address, api_key=api_key
+    )
     return aperture_client
 
 
-async def send_request_for_tier(aperture_client, tier, priority):
+async def send_request_for_tier(i, aperture_client, tier, priority):
     print(f"[{tier} Tier] Sending request with priority {priority}...")
     flow_params = FlowParams(
         explicit_labels={
-            "user_id": "some_user_id",
             "priority": str(priority),
             "workload": tier,
         },
+        check_timeout=timedelta(seconds=10),
     )
-    flow = aperture_client.start_flow(
+
+    flow = await aperture_client.start_flow(
         control_point="concurrency-scheduling-feature",
         params=flow_params,
     )
 
     if flow.should_run():
-        print(f"[{tier} Tier] Request accepted with priority {priority}.")
-        await asyncio.sleep(5)
+        await asyncio.sleep(0.1)
+        print(f"[{tier} Tier] Request accepted. Priority was {priority}.")
     else:
+        flow.set_status(FlowStatus.Error)
         print(f"[{tier} Tier] Request rejected. Priority was {priority}.")
 
-    flow.end()
+    await flow.end()
 
 
 async def schedule_requests(aperture_client):
     while True:
         print("Sending new batch of requests...")
+
         tasks = []
         for tier, priority in user_tiers.items():
-            for _ in range(requests_per_batch):
+            for i in range(requests_per_batch):
                 task = asyncio.create_task(
-                    send_request_for_tier(aperture_client, tier, priority)
+                    send_request_for_tier(i, aperture_client, tier, priority)
                 )
                 tasks.append(task)
 
@@ -59,7 +66,7 @@ async def schedule_requests(aperture_client):
 
 
 async def main():
-    aperture_client = await initialize_aperture_client()
+    aperture_client = initialize_aperture_client()
     await schedule_requests(aperture_client)
 
 
