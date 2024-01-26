@@ -10,7 +10,7 @@ packages = [{ include = "aperture_sdk" }]
 docformat = "google"
 project-name = "aperture-py"
 project-version = "2.23.0"
-project-url = "https://github.com/fluxninja/aperture/tree/main/sdks/aperture-py"
+project-url = "https://github.com/fluxninja/aperture-py"
 add-package = ["aperture_sdk"]
 html-output = "docs"
 sidebar-expand-depth = 2
@@ -19,7 +19,7 @@ buildtime = "2023-12-05 04:20:29"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-grpcio = "^1.59.2"
+grpcio = "^1.60.0"
 opentelemetry-api = "^1.20.0"
 opentelemetry-sdk = "^1.20.0"
 opentelemetry-exporter-otlp = "^1.20.0"

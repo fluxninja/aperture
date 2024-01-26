@@ -1,4 +1,4 @@
-"""ApertureClient for starting Flows."""
+"""ApertureClientAsync for starting Flows."""
 
 import datetime
 import functools
@@ -7,7 +7,7 @@ import time
 import typing
 from typing import Callable, Optional, Type, TypeVar
 
-import grpc
+import grpc.aio
 from aperture_sdk._gen.aperture.flowcontrol.check.v1.check_pb2 import (
     CacheLookupRequest,
     CheckRequest,
@@ -24,7 +24,7 @@ from aperture_sdk.const import (
     source_label,
     workload_start_timestamp_label,
 )
-from aperture_sdk.flow import Flow
+from aperture_sdk.flow_async import FlowAsync
 from aperture_sdk.utils import TWrappedReturn, run_fn
 from opentelemetry import baggage, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -33,18 +33,18 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.util import types as otel_types
 
-TApertureClient = TypeVar("TApertureClient", bound="ApertureClient")
+TApertureClientAsync = TypeVar("TApertureClientAsync", bound="ApertureClientAsync")
 TWrappedFunction = Callable[..., TWrappedReturn]
 
 
-class ApertureClient:
+class ApertureClientAsync:
     """
-    ApertureClient can be used to start Flows.
+    ApertureClientAsync can be used to start Flows.
     """
 
     def __init__(
         self,
-        channel: grpc.Channel,
+        channel: grpc.aio.Channel,
         otlp_exporter: OTLPSpanExporter,
     ):
         self.logger = logging.getLogger("aperture-py")
@@ -66,14 +66,14 @@ class ApertureClient:
 
     @classmethod
     def new_client(
-        cls: Type[TApertureClient],
+        cls: Type[TApertureClientAsync],
         address: str,
         api_key: Optional[str] = None,
         insecure: bool = False,
         grpc_timeout: datetime.timedelta = default_grpc_reconnection_time,
         credentials: Optional[grpc.ChannelCredentials] = None,
         compression: grpc.Compression = grpc.Compression.NoCompression,
-    ) -> TApertureClient:
+    ) -> TApertureClientAsync:
         if not address:
             raise ValueError("Address must be provided")
         if not credentials:
@@ -101,11 +101,11 @@ class ApertureClient:
         }
         grpc_channel_options = [(k, v) for k, v in grpc_channel_options_dict.items()]
         grpc_channel = (
-            grpc.insecure_channel(
+            grpc.aio.insecure_channel(
                 address, compression=compression, options=grpc_channel_options
             )
             if insecure
-            else grpc.secure_channel(
+            else grpc.aio.secure_channel(
                 address,
                 credentials,
                 compression=compression,
@@ -117,11 +117,11 @@ class ApertureClient:
             otlp_exporter=otlp_exporter,
         )
 
-    def start_flow(
+    async def start_flow(
         self,
         control_point: str,
         params: FlowParams,
-    ) -> Flow:
+    ) -> FlowAsync:
         labels: Labels = {}
         labels.update({key: str(value) for key, value in baggage.get_all().items()})
         # Explicit labels override baggage
@@ -149,13 +149,13 @@ class ApertureClient:
             timeout = typing.cast(int, params.check_timeout.total_seconds())
             if timeout == 0:
                 timeout = None
-            response = stub.Check(request, timeout=timeout)
+            response = await stub.Check(request, timeout=timeout)
         except grpc.RpcError as e:
             self.logger.debug(f"Aperture gRPC call failed: {e.details()}")
             response = None
             error = e
         span.set_attribute(workload_start_timestamp_label, time.monotonic_ns())
-        return Flow(
+        return FlowAsync(
             fcs_stub=stub,
             control_point=control_point,
             span=span,
@@ -175,7 +175,7 @@ class ApertureClient:
         def decorator(fn: TWrappedFunction) -> TWrappedFunction:
             @functools.wraps(fn)
             async def wrapper(*args, **kwargs):
-                flow = self.start_flow(control_point, params)
+                flow = await self.start_flow(control_point, params)
                 if flow.should_run():
                     return await run_fn(fn, *args, **kwargs)
                 else:
