@@ -31,7 +31,7 @@ async function handleRequestRateLimit(apertureClient: ApertureClient) {
                 user_id: "some_user_id",
             },
             grpcCallOptions: {
-                deadline: Date.now() + 300, // ms
+                deadline: Date.now() + 1000, // ms
             },
         });
         // END: RLStartFlow
