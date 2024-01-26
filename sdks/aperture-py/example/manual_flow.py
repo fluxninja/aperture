@@ -6,13 +6,12 @@ from datetime import timedelta
 from typing import Optional
 
 from aperture_sdk.cache import LookupStatus
+
+# START: asyncClientConstructor
 from aperture_sdk.client_async import ApertureClientAsync, FlowParams
 from aperture_sdk.flow_async import FlowStatus
 from grpc import ChannelConnectivity
 from quart import Quart
-
-default_agent_address = "localhost:8080"
-app = Quart(__name__)
 
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
 api_key = os.getenv("APERTURE_API_KEY", "")
@@ -21,6 +20,11 @@ insecure = os.getenv("APERTURE_AGENT_INSECURE", "true").lower() == "true"
 aperture_client = ApertureClientAsync.new_client(
     address=agent_address, insecure=insecure, api_key=api_key
 )
+# END: asyncClientConstructor
+
+default_agent_address = "localhost:8080"
+app = Quart(__name__)
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("aperture-manual-flow-example")
