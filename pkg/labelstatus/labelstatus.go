@@ -86,8 +86,8 @@ func (ls *LabelStatus) SetMissing() {
 }
 
 func (ls *LabelStatus) setLookupStatus(ctx context.Context) (proto.Message, error) {
-	ls.lock.Lock()
-	defer ls.lock.Unlock()
+	ls.lock.RLock()
+	defer ls.lock.RUnlock()
 
 	if ls.timestamp.IsZero() {
 		return nil, nil
