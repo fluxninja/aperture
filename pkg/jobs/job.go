@@ -10,10 +10,11 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"github.com/reugn/go-quartz/quartz"
+
 	jobsconfig "github.com/fluxninja/aperture/v2/pkg/jobs/config"
 	panichandler "github.com/fluxninja/aperture/v2/pkg/panic-handler"
 	"github.com/fluxninja/aperture/v2/pkg/status"
-	"github.com/reugn/go-quartz/quartz"
 )
 
 // JobCallback is the callback function that is called after a job is executed.
@@ -133,11 +134,11 @@ func (executor *jobExecutor) doJob(ctx context.Context) (proto.Message, error) {
 		select {
 		case <-timerCh:
 			s := status.NewStatus(wrapperspb.String("Timeout"), errors.New("job execution timeout"))
-			executor.livenessRegistry.SetStatus(s)
+			executor.livenessRegistry.SetStatus(s, nil)
 			timer.Reset(time.Second * 1)
 		case <-jobCh:
 			s := status.NewStatus(wrapperspb.String("OK"), nil)
-			executor.livenessRegistry.SetStatus(s)
+			executor.livenessRegistry.SetStatus(s, nil)
 			timer.Stop()
 			return msg, err
 		}

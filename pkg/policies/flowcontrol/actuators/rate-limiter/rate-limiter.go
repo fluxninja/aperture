@@ -25,6 +25,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -82,6 +83,8 @@ type rateLimiterFactory struct {
 	decisionsWatcher    notifiers.Watcher
 	counterVector       *prometheus.CounterVec
 	agentGroupName      string
+	labelStatusJobGroup *jobs.JobGroup
+	labelStatusFactory  *labelstatus.LabelStatusFactory
 }
 
 // main fx app.
@@ -94,6 +97,7 @@ func setupRateLimiterFactory(
 	prometheusRegistry *prometheus.Registry,
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
+	labelStatusFactory *labelstatus.LabelStatusFactory,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.RateLimiterDecisionsPath)
@@ -118,6 +122,12 @@ func setupRateLimiterFactory(
 		return err
 	}
 
+	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", rateLimiterStatusRoot), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create labels status job group")
+		return err
+	}
+
 	counterVector := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: metrics.RateLimiterCounterTotalMetricName,
 		Help: "A counter measuring the number of times Rate Limiter was triggered",
@@ -132,6 +142,8 @@ func setupRateLimiterFactory(
 		agentGroupName:      agentGroupName,
 		registry:            reg,
 		counterVector:       counterVector,
+		labelStatusJobGroup: labelStatusJobGroup,
+		labelStatusFactory:  labelStatusFactory,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(
@@ -158,6 +170,10 @@ func setupRateLimiterFactory(
 			if err != nil {
 				return err
 			}
+			err = labelStatusJobGroup.Start()
+			if err != nil {
+				return err
+			}
 			err = decisionsWatcher.Start()
 			if err != nil {
 				return err
@@ -167,6 +183,10 @@ func setupRateLimiterFactory(
 		OnStop: func(context.Context) error {
 			var err, merr error
 			err = decisionsWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = labelStatusJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -198,19 +218,22 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, un
 	wrapperMessage := &policysyncv1.RateLimiterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.RateLimiter == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal rate limiter config")
 		return fx.Options(), err
 	}
 
 	rlProto := wrapperMessage.RateLimiter
 	rl := &rateLimiter{
-		Component: wrapperMessage.GetCommonAttributes(),
-		rlProto:   rlProto,
-		rlFactory: rlFactory,
-		registry:  reg,
+		Component:           wrapperMessage.GetCommonAttributes(),
+		rlProto:             rlProto,
+		rlFactory:           rlFactory,
+		registry:            reg,
+		labelStatusJobGroup: rlFactory.labelStatusJobGroup,
 	}
 	rl.name = iface.ComponentKey(rl)
+	rl.tokensLabelKeyStatus = rlFactory.labelStatusFactory.New("tokens_label_key", rl.GetPolicyName(), rl.GetComponentId())
+	rl.limitByLabelKeyStatus = rlFactory.labelStatusFactory.New("limit_by_label_key", rl.GetPolicyName(), rl.GetComponentId())
 
 	return fx.Options(
 		fx.Invoke(
@@ -222,12 +245,15 @@ func (rlFactory *rateLimiterFactory) newRateLimiterOptions(key notifiers.Key, un
 // rateLimiter implements rate limiter on the data plane side.
 type rateLimiter struct {
 	iface.Component
-	registry  status.Registry
-	rlFactory *rateLimiterFactory
-	limiter   ratelimiter.RateLimiter
-	inner     *globaltokenbucket.GlobalTokenBucket
-	rlProto   *policylangv1.RateLimiter
-	name      string
+	registry              status.Registry
+	rlFactory             *rateLimiterFactory
+	limiter               ratelimiter.RateLimiter
+	inner                 *globaltokenbucket.GlobalTokenBucket
+	rlProto               *policylangv1.RateLimiter
+	name                  string
+	labelStatusJobGroup   *jobs.JobGroup
+	tokensLabelKeyStatus  *labelstatus.LabelStatus
+	limitByLabelKeyStatus *labelstatus.LabelStatus
 }
 
 // Make sure rateLimiter implements iface.Limiter.
@@ -258,6 +284,10 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyNameLabel] = rl.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = rl.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = rl.GetComponentId()
+
+	// setup labels status
+	rl.tokensLabelKeyStatus.Setup(rl.rlFactory.labelStatusJobGroup, lifecycle)
+	rl.limitByLabelKeyStatus.Setup(rl.rlFactory.labelStatusJobGroup, lifecycle)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -327,7 +357,7 @@ func (rl *rateLimiter) setup(lifecycle fx.Lifecycle) error {
 			if deleted == 0 {
 				logger.Warn().Msg("Could not delete rate limiter counter from its metric vector. No traffic to generate metrics?")
 			}
-			rl.registry.SetStatus(status.NewStatus(nil, merr))
+			rl.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},
@@ -352,10 +382,13 @@ func (rl *rateLimiter) Decide(ctx context.Context, labels labels.Labels) *flowco
 		deniedResponseStatusCode = rParams.GetDeniedResponseStatusCode()
 		tokensLabelKey := rParams.GetTokensLabelKey()
 		if tokensLabelKey != "" {
-			if val, ok := labels.Get(tokensLabelKey); ok {
+			val, ok := labels.Get(tokensLabelKey)
+			if ok {
 				if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 					tokens = parsedTokens
 				}
+			} else {
+				rl.tokensLabelKeyStatus.SetMissing()
 			}
 		}
 	}
@@ -426,6 +459,7 @@ func (rl *rateLimiter) takeIfAvailable(
 	} else {
 		labelValue, found := labels.Get(labelKey)
 		if !found {
+			rl.limitByLabelKeyStatus.SetMissing()
 			return "", true, 0, 0, 0
 		}
 		label = labelKey + ":" + labelValue

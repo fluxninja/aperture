@@ -162,7 +162,7 @@ func (psFactory *podScalerFactory) newPodScalerOptions(
 	wrapperMessage := &policysyncv1.PodScalerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.PodScaler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal pod scaler")
 		return fx.Options(), err
 	}
@@ -296,14 +296,14 @@ func (ps *podScaler) setup(
 				logger.Error().Err(err).Msg("Failed to remove control point notifier")
 				merr = multierror.Append(merr, err)
 			}
-			ps.registry.SetStatus(status.NewStatus(nil, merr))
+			ps.registry.SetStatus(status.NewStatus(nil, merr), nil)
 			ps.cancel()
 			ps.etcdClient.Delete(ps.statusEtcdPath)
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to delete scale status")
 				merr = multierr.Append(merr, err)
 			}
-			ps.registry.SetStatus(status.NewStatus(nil, merr))
+			ps.registry.SetStatus(status.NewStatus(nil, merr), nil)
 			return merr
 		},
 	})

@@ -30,13 +30,13 @@ func platformReadinessStatus(in platformReadinessStatusIn) error {
 		OnStart: func(context.Context) error {
 			platform.statusRegistry.Child("system", readinessStatusPath).
 				Child("component", platformStatusPath).
-				SetStatus(status.NewStatus(nil, errors.New("platform starting")))
+				SetStatus(status.NewStatus(nil, errors.New("platform starting")), nil)
 			return nil
 		},
 		OnStop: func(context.Context) error {
 			platform.statusRegistry.Child("system", readinessStatusPath).
 				Child("component", platformStatusPath).
-				SetStatus(status.NewStatus(nil, errors.New("platform stopped")))
+				SetStatus(status.NewStatus(nil, errors.New("platform stopped")), nil)
 			return nil
 		},
 	})

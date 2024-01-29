@@ -23,6 +23,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -71,13 +72,15 @@ func provideConcurrencySchedulerWatchers(
 }
 
 type concurrencySchedulerFactory struct {
-	engineAPI        iface.Engine
-	registry         status.Registry
-	decisionsWatcher notifiers.Watcher
-	distCache        *distcache.DistCache
-	auditJobGroup    *jobs.JobGroup
-	wsFactory        *workloadscheduler.Factory
-	agentGroupName   string
+	engineAPI           iface.Engine
+	registry            status.Registry
+	decisionsWatcher    notifiers.Watcher
+	distCache           *distcache.DistCache
+	auditJobGroup       *jobs.JobGroup
+	wsFactory           *workloadscheduler.Factory
+	agentGroupName      string
+	labelStatusJobGroup *jobs.JobGroup
+	labelStatusFactory  *labelstatus.LabelStatusFactory
 }
 
 // main fx app.
@@ -91,6 +94,7 @@ func setupConcurrencySchedulerFactory(
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 	wsFactory *workloadscheduler.Factory,
+	labelStatusFactory *labelstatus.LabelStatusFactory,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.ConcurrencySchedulerDecisionsPath)
@@ -109,14 +113,22 @@ func setupConcurrencySchedulerFactory(
 		return err
 	}
 
+	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", concurrencySchedulerStatusRoot), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create label_status job group")
+		return err
+	}
+
 	concurrencySchedulerFactory := &concurrencySchedulerFactory{
-		engineAPI:        e,
-		distCache:        distCache,
-		auditJobGroup:    auditJobGroup,
-		decisionsWatcher: decisionsWatcher,
-		agentGroupName:   agentGroupName,
-		registry:         reg,
-		wsFactory:        wsFactory,
+		engineAPI:           e,
+		distCache:           distCache,
+		auditJobGroup:       auditJobGroup,
+		decisionsWatcher:    decisionsWatcher,
+		agentGroupName:      agentGroupName,
+		registry:            reg,
+		wsFactory:           wsFactory,
+		labelStatusJobGroup: labelStatusJobGroup,
+		labelStatusFactory:  labelStatusFactory,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -132,6 +144,10 @@ func setupConcurrencySchedulerFactory(
 			if err != nil {
 				return err
 			}
+			err = labelStatusJobGroup.Start()
+			if err != nil {
+				return err
+			}
 			err = decisionsWatcher.Start()
 			if err != nil {
 				return err
@@ -141,6 +157,10 @@ func setupConcurrencySchedulerFactory(
 		OnStop: func(context.Context) error {
 			var err, merr error
 			err = decisionsWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = labelStatusJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -168,7 +188,7 @@ func (csFactory *concurrencySchedulerFactory) newConcurrencySchedulerOptions(
 	wrapperMessage := &policysyncv1.ConcurrencySchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.ConcurrencyScheduler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal concurrency scheduler config")
 		return fx.Options(), err
 	}
@@ -181,13 +201,19 @@ func (csFactory *concurrencySchedulerFactory) newConcurrencySchedulerOptions(
 	}
 
 	cs := &concurrencyScheduler{
-		Component: wrapperMessage.GetCommonAttributes(),
-		proto:     csProto,
-		csFactory: csFactory,
-		registry:  reg,
-		clock:     clockwork.NewRealClock(),
+		Component:           wrapperMessage.GetCommonAttributes(),
+		proto:               csProto,
+		csFactory:           csFactory,
+		registry:            reg,
+		clock:               clockwork.NewRealClock(),
+		labelStatusJobGroup: csFactory.labelStatusJobGroup,
 	}
 	cs.name = iface.ComponentKey(cs)
+	cs.limitByLabelKeyStatus = csFactory.labelStatusFactory.New("limit_by_label_key", cs.GetPolicyName(), cs.GetComponentId())
+	cs.tokensLabelKeyStatus = csFactory.labelStatusFactory.New("tokens_label_key", cs.GetPolicyName(), cs.GetComponentId())
+	cs.priorityLabelKeyStatus = csFactory.labelStatusFactory.New("priority_label_key", cs.GetPolicyName(), cs.GetComponentId())
+	cs.workloadLabelKeyStatus = csFactory.labelStatusFactory.New("workload_label_key", cs.GetPolicyName(), cs.GetComponentId())
+	cs.fairnessLabelKeyStatus = csFactory.labelStatusFactory.New("fairness_label_key", cs.GetPolicyName(), cs.GetComponentId())
 
 	return fx.Options(
 		fx.Invoke(
@@ -200,21 +226,29 @@ func (csFactory *concurrencySchedulerFactory) newConcurrencySchedulerOptions(
 type concurrencyScheduler struct {
 	schedulers sync.Map
 	iface.Component
-	registry         status.Registry
-	clock            clockwork.Clock
-	csFactory        *concurrencySchedulerFactory
-	limiter          concurrencylimiter.ConcurrencyLimiter
-	proto            *policylangv1.ConcurrencyScheduler
-	schedulerMetrics *workloadscheduler.SchedulerMetrics
-	name             string
+	registry               status.Registry
+	clock                  clockwork.Clock
+	csFactory              *concurrencySchedulerFactory
+	limiter                concurrencylimiter.ConcurrencyLimiter
+	proto                  *policylangv1.ConcurrencyScheduler
+	schedulerMetrics       *workloadscheduler.SchedulerMetrics
+	name                   string
+	labelStatusJobGroup    *jobs.JobGroup
+	limitByLabelKeyStatus  *labelstatus.LabelStatus
+	tokensLabelKeyStatus   *labelstatus.LabelStatus
+	priorityLabelKeyStatus *labelstatus.LabelStatus
+	workloadLabelKeyStatus *labelstatus.LabelStatus
+	fairnessLabelKeyStatus *labelstatus.LabelStatus
 }
 
 func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 	logger := cs.registry.GetLogger()
-	etcdKey := paths.AgentComponentKey(cs.csFactory.agentGroupName,
+
+	etcdKey := paths.AgentComponentKey(
+		cs.csFactory.agentGroupName,
 		cs.GetPolicyName(),
-		cs.GetComponentId())
-	// decision notifier
+		cs.GetComponentId(),
+	)
 	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err
@@ -232,6 +266,12 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 	metricLabels[metrics.PolicyNameLabel] = cs.GetPolicyName()
 	metricLabels[metrics.PolicyHashLabel] = cs.GetPolicyHash()
 	metricLabels[metrics.ComponentIDLabel] = cs.GetComponentId()
+
+	cs.limitByLabelKeyStatus.Setup(cs.csFactory.labelStatusJobGroup, lifecycle)
+	cs.tokensLabelKeyStatus.Setup(cs.csFactory.labelStatusJobGroup, lifecycle)
+	cs.priorityLabelKeyStatus.Setup(cs.csFactory.labelStatusJobGroup, lifecycle)
+	cs.workloadLabelKeyStatus.Setup(cs.csFactory.labelStatusJobGroup, lifecycle)
+	cs.fairnessLabelKeyStatus.Setup(cs.csFactory.labelStatusJobGroup, lifecycle)
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -312,7 +352,7 @@ func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 
-			cs.registry.SetStatus(status.NewStatus(nil, merr))
+			cs.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},
@@ -333,6 +373,7 @@ func (cs *concurrencyScheduler) getLabelKey(labels labels.Labels) (string, bool)
 	} else {
 		labelValue, found := labels.Get(labelKey)
 		if !found {
+			cs.limitByLabelKeyStatus.SetMissing()
 			return "", false
 		}
 		label = labelKey + ":" + labelValue
@@ -376,7 +417,6 @@ func (cs *concurrencyScheduler) Decide(ctx context.Context, labels labels.Labels
 
 	var found bool
 	label, found = cs.getLabelKey(labels)
-
 	if !found {
 		reason = flowcontrolv1.LimiterDecision_LIMITER_REASON_KEY_NOT_FOUND
 		return returnDecision()
@@ -393,6 +433,10 @@ func (cs *concurrencyScheduler) Decide(ctx context.Context, labels labels.Labels
 			cs,
 			tokenCounter,
 			cs.schedulerMetrics,
+			cs.tokensLabelKeyStatus,
+			cs.priorityLabelKeyStatus,
+			cs.workloadLabelKeyStatus,
+			cs.fairnessLabelKeyStatus,
 		)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create scheduler")

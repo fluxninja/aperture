@@ -25,6 +25,7 @@ import (
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
 	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
@@ -81,6 +82,8 @@ type quotaSchedulerFactory struct {
 	rateLimiterJobGroup *jobs.JobGroup
 	wsFactory           *workloadscheduler.Factory
 	agentGroupName      string
+	labelStatusJobGroup *jobs.JobGroup
+	labelStatusFactory  *labelstatus.LabelStatusFactory
 }
 
 // main fx app.
@@ -94,6 +97,7 @@ func setupQuotaSchedulerFactory(
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 	wsFactory *workloadscheduler.Factory,
+	labelStatusFactory *labelstatus.LabelStatusFactory,
 ) error {
 	agentGroupName := ai.GetAgentGroup()
 	etcdPath := path.Join(paths.QuotaSchedulerDecisionsPath)
@@ -118,6 +122,12 @@ func setupQuotaSchedulerFactory(
 		return err
 	}
 
+	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", "load_scheduler"), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create labels status job group")
+		return err
+	}
+
 	quotaSchedulerFactory := &quotaSchedulerFactory{
 		engineAPI:           e,
 		distCache:           distCache,
@@ -127,6 +137,8 @@ func setupQuotaSchedulerFactory(
 		agentGroupName:      agentGroupName,
 		registry:            reg,
 		wsFactory:           wsFactory,
+		labelStatusJobGroup: labelStatusJobGroup,
+		labelStatusFactory:  labelStatusFactory,
 	}
 
 	fxDriver, err := notifiers.NewFxDriver(reg, prometheusRegistry,
@@ -146,6 +158,11 @@ func setupQuotaSchedulerFactory(
 			if err != nil {
 				return err
 			}
+
+			err = labelStatusJobGroup.Start()
+			if err != nil {
+				return err
+			}
 			err = decisionsWatcher.Start()
 			if err != nil {
 				return err
@@ -155,6 +172,10 @@ func setupQuotaSchedulerFactory(
 		OnStop: func(context.Context) error {
 			var err, merr error
 			err = decisionsWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+			err = labelStatusJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -186,7 +207,7 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	wrapperMessage := &policysyncv1.QuotaSchedulerWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.QuotaScheduler == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal quota scheduler config")
 		return fx.Options(), err
 	}
@@ -199,13 +220,18 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 	}
 
 	qs := &quotaScheduler{
-		Component: wrapperMessage.GetCommonAttributes(),
-		proto:     qsProto,
-		qsFactory: qsFactory,
-		registry:  reg,
-		clock:     clockwork.NewRealClock(),
+		Component:           wrapperMessage.GetCommonAttributes(),
+		proto:               qsProto,
+		qsFactory:           qsFactory,
+		registry:            reg,
+		clock:               clockwork.NewRealClock(),
+		labelStatusJobGroup: qsFactory.labelStatusJobGroup,
 	}
 	qs.name = iface.ComponentKey(qs)
+	qs.tokensLabelKeyStatus = qsFactory.labelStatusFactory.New("tokens_label_key", qs.GetPolicyName(), qs.GetComponentId())
+	qs.priorityLabelKeyStatus = qsFactory.labelStatusFactory.New("priority_label_key", qs.GetPolicyName(), qs.GetComponentId())
+	qs.workloadLabelKeyStatus = qsFactory.labelStatusFactory.New("workload_label_key", qs.GetPolicyName(), qs.GetComponentId())
+	qs.fairnessLabelKeyStatus = qsFactory.labelStatusFactory.New("fairness_label_key", qs.GetPolicyName(), qs.GetComponentId())
 
 	return fx.Options(
 		fx.Invoke(
@@ -218,14 +244,19 @@ func (qsFactory *quotaSchedulerFactory) newQuotaSchedulerOptions(
 type quotaScheduler struct {
 	schedulers sync.Map
 	iface.Component
-	registry         status.Registry
-	limiter          ratelimiter.RateLimiter
-	clock            clockwork.Clock
-	qsFactory        *quotaSchedulerFactory
-	inner            *globaltokenbucket.GlobalTokenBucket
-	proto            *policylangv1.QuotaScheduler
-	schedulerMetrics *workloadscheduler.SchedulerMetrics
-	name             string
+	registry               status.Registry
+	limiter                ratelimiter.RateLimiter
+	clock                  clockwork.Clock
+	qsFactory              *quotaSchedulerFactory
+	inner                  *globaltokenbucket.GlobalTokenBucket
+	proto                  *policylangv1.QuotaScheduler
+	schedulerMetrics       *workloadscheduler.SchedulerMetrics
+	name                   string
+	labelStatusJobGroup    *jobs.JobGroup
+	tokensLabelKeyStatus   *labelstatus.LabelStatus
+	priorityLabelKeyStatus *labelstatus.LabelStatus
+	workloadLabelKeyStatus *labelstatus.LabelStatus
+	fairnessLabelKeyStatus *labelstatus.LabelStatus
 }
 
 func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
@@ -350,7 +381,7 @@ func (qs *quotaScheduler) setup(lifecycle fx.Lifecycle) error {
 				merr = multierr.Append(merr, err)
 			}
 
-			qs.registry.SetStatus(status.NewStatus(nil, merr))
+			qs.registry.SetStatus(status.NewStatus(nil, merr), nil)
 
 			return merr
 		},
@@ -433,6 +464,10 @@ func (qs *quotaScheduler) Decide(ctx context.Context, labels labels.Labels) *flo
 			qs,
 			tokenBucket,
 			qs.schedulerMetrics,
+			qs.tokensLabelKeyStatus,
+			qs.priorityLabelKeyStatus,
+			qs.workloadLabelKeyStatus,
+			qs.fairnessLabelKeyStatus,
 		)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create scheduler")

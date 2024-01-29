@@ -35,10 +35,10 @@ var _ = Describe("Status Registry", func() {
 		})
 		It("returns updated status information", func() {
 			test_status := NewStatus(nil, errors.New("test status"))
-			rootRegistry.SetStatus(test_status)
+			rootRegistry.SetStatus(test_status, nil)
 			Expect(rootRegistry.GetStatus()).To(Equal(test_status))
 			Expect(rootRegistry.HasError()).To(BeTrue())
-			rootRegistry.SetStatus(nil)
+			rootRegistry.SetStatus(nil, nil)
 			Expect(rootRegistry.GetStatus()).To(Equal(&statusv1.Status{}))
 			Expect(rootRegistry.HasError()).To(BeFalse())
 
@@ -98,7 +98,7 @@ var _ = Describe("Status Registry", func() {
 		})
 		It("returns updated status information", func() {
 			test_status1 := NewStatus(nil, errors.New(""))
-			rootRegistry.SetStatus(test_status1)
+			rootRegistry.SetStatus(test_status1, nil)
 			Expect(rootRegistry.GetStatus()).To(Equal(test_status1))
 			Expect(rootRegistry.HasError()).To(BeTrue())
 
@@ -107,7 +107,7 @@ var _ = Describe("Status Registry", func() {
 				Status: test_status2,
 				Groups: make(map[string]*statusv1.GroupStatus),
 			}
-			child1.SetStatus(test_status1)
+			child1.SetStatus(test_status1, nil)
 			child1.SetGroupStatus(test_groupstatus1)
 			Expect(child1.HasError()).To(BeFalse())
 			Expect(child1.GetStatus()).To(Equal(test_status2))
@@ -128,7 +128,7 @@ var _ = Describe("Status Registry", func() {
 			rootRegistry.SetGroupStatus(test_groupstatus2)
 			rootGroupStatus := rootRegistry.GetGroupStatus().Status
 			Expect(rootGroupStatus).To(Equal(test_status3))
-			rootRegistry.SetStatus(nil)
+			rootRegistry.SetStatus(nil, nil)
 			Expect(rootRegistry.HasError()).To(BeTrue())
 		})
 		It("creates multiple child registries then detaches them", func() {

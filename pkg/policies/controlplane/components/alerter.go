@@ -82,8 +82,7 @@ func (a *Alerter) Execute(inPortReadings runtime.PortToReading, circuitAPI runti
 }
 
 // DynamicConfigUpdate is a no-op for Alerter.
-func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {
-}
+func (a *Alerter) DynamicConfigUpdate(event notifiers.Event, unmarshaller config.Unmarshaller) {}
 
 func (a *Alerter) createAlert() *alerts.Alert {
 	newAlert := alerts.NewAlert(
