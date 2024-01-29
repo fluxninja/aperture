@@ -135,6 +135,8 @@ class Flow(AbstractContextManager):
         if self.check_response:
             for decision in self.check_response.limiter_decisions:
                 if decision.WhichOneof("details") == "concurrency_limiter_info":
+                    if decision.concurrency_limiter_info.request_id == "":
+                        continue
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
@@ -148,6 +150,8 @@ class Flow(AbstractContextManager):
                         )
                     inflight_request_ref.append(ref)
                 elif decision.WhichOneof("details") == "concurrency_scheduler_info":
+                    if decision.concurrency_scheduler_info.request_id == "":
+                        continue
                     ref: InflightRequestRef = InflightRequestRef(
                         policy_name=decision.policy_name,
                         policy_hash=decision.policy_hash,
