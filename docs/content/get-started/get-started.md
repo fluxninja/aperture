@@ -131,21 +131,14 @@ Let's create a feature control point in the following code snippet.
 
 The code snippet below shows how to wrap your
 [Control Point](/concepts/control-point.md) within the `StartFlow` call while
-also passing [labels](/concepts/flow-label.md) and `cacheKey` to Aperture
-Agents.
+also passing [labels](/concepts/flow-label.md) to Aperture Agents.
 
 - The function `Flow.ShouldRun()` checks if the flow allows the request.
 - The `Flow.End()` function is responsible for sending telemetry.
-- The `flow.CachedValue().GetLookupStatus()` function returns the status of the
-  cache lookup. The status can be `Hit` or `Miss`.
-- If the status is `Hit`, the `flow.CachedValue().GetValue()` function returns
-  the cached response.
-- The `flow.SetCachedValue()` function is responsible for setting the response
-  in Aperture cache with the specified TTL (time to live).
 
 <CodeSnippet
     lang="ts"
-    snippetName="handleRequestWithCache"
+    snippetName="handleRequestRateLimit"
  />
 
 ```mdx-code-block
@@ -155,26 +148,11 @@ Agents.
 
 The code snippet below shows how to wrap your
 [Control Point](/concepts/control-point.md) within the `start_flow` call while
-passing [labels](/concepts/flow-label.md) and cache keys to Aperture.
-
-Caching mechanism allows you to store the response of a request in the Aperture.
-This feature is useful when you want to cache the response from external or
-internal services and use it for subsequent requests. There are two types of
-cache key that can be passed to Aperture:
-
-- `result_cache_key` - This key is useful to store the response of the request
-  in Aperture. For example, the result of heavy tasks such as database query, a
-  third-party API call which later can be used for subsequent requests if
-  requested within the TTL. This removes the need to perform the same task
-  again.
-- `global_cache_keys` - Using these keys, a global cache value can be set up,
-  which can be accessed throughput anywhere in the application.
-
-Each of these keys is associated with a TTL, a cache expiration time.
+passing [labels](/concepts/flow-label.md) to Aperture.
 
 <CodeSnippet
     lang="py"
-    snippetName="cacheFlow"
+    snippetName="syncFlow"
  />
 
 ```mdx-code-block
