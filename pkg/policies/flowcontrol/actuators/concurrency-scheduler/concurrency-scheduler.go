@@ -115,7 +115,7 @@ func setupConcurrencySchedulerFactory(
 
 	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", concurrencySchedulerStatusRoot), jobs.JobGroupConfig{}, nil)
 	if err != nil {
-		logger.Error().Err(err).Msg("Failed to create labels status job group")
+		logger.Error().Err(err).Msg("Failed to create label_status job group")
 		return err
 	}
 
@@ -243,10 +243,12 @@ type concurrencyScheduler struct {
 
 func (cs *concurrencyScheduler) setup(lifecycle fx.Lifecycle) error {
 	logger := cs.registry.GetLogger()
-	etcdKey := paths.AgentComponentKey(cs.csFactory.agentGroupName,
+
+	etcdKey := paths.AgentComponentKey(
+		cs.csFactory.agentGroupName,
 		cs.GetPolicyName(),
-		cs.GetComponentId())
-	// decision notifier
+		cs.GetComponentId(),
+	)
 	decisionUnmarshaller, err := config.NewProtobufUnmarshaller(nil)
 	if err != nil {
 		return err

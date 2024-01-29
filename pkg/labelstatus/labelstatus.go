@@ -15,16 +15,16 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/status"
 )
 
-// LabelStatusFactory is a factory for creating LabelStatus.
-type LabelStatusFactory struct {
-	registry status.Registry
-}
-
-// LabelStatusModule is an fx module for providing LabelStatusFactory.
-func LabelStatusModule() fx.Option {
+// Module is an fx module for providing LabelStatusFactory.
+func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(NewLabelStatusFactory),
 	)
+}
+
+// LabelStatusFactory is a factory for creating LabelStatus.
+type LabelStatusFactory struct {
+	registry status.Registry
 }
 
 // NewLabelStatusFactory creates a new LabelStatusFactory.
@@ -59,7 +59,7 @@ type LabelStatus struct {
 func (ls *LabelStatus) Setup(jobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			job := jobs.NewBasicJob("", ls.setLookupStatus)
+			job := jobs.NewBasicJob("label-status", ls.setLookupStatus)
 			err := jobGroup.RegisterJob(job, jobs.JobConfig{
 				ExecutionPeriod: config.MakeDuration(10 * time.Second),
 			})
@@ -69,7 +69,7 @@ func (ls *LabelStatus) Setup(jobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) {
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			err := jobGroup.DeregisterJob("")
+			err := jobGroup.DeregisterJob("label-status")
 			if err != nil {
 				return err
 			}
