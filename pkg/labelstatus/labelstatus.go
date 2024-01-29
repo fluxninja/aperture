@@ -3,6 +3,7 @@ package labelstatus
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -57,9 +58,10 @@ type LabelStatus struct {
 
 // Setup sets up the LabelsStatus's lifecycle hooks.
 func (ls *LabelStatus) Setup(jobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) {
+	jobName := fmt.Sprintf("label-status-%s-%s-%s", ls.policyName, ls.componentID, ls.labelKey)
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			job := jobs.NewBasicJob("label-status", ls.setLookupStatus)
+			job := jobs.NewBasicJob(jobName, ls.setLookupStatus)
 			err := jobGroup.RegisterJob(job, jobs.JobConfig{
 				ExecutionPeriod: config.MakeDuration(10 * time.Second),
 			})
@@ -69,7 +71,7 @@ func (ls *LabelStatus) Setup(jobGroup *jobs.JobGroup, lifecycle fx.Lifecycle) {
 			return nil
 		},
 		OnStop: func(context.Context) error {
-			err := jobGroup.DeregisterJob("label-status")
+			err := jobGroup.DeregisterJob(jobName)
 			if err != nil {
 				return err
 			}
