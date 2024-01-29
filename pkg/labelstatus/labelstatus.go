@@ -43,6 +43,7 @@ func (lsf *LabelStatusFactory) New(labelKey string, policyName string, component
 		labelKey:    labelKey,
 		policyName:  policyName,
 		componentID: componentID,
+		timestamp:   time.Time{},
 	}
 }
 
@@ -96,8 +97,8 @@ func (ls *LabelStatus) setLookupStatus(ctx context.Context) (proto.Message, erro
 	}
 
 	labels := map[string]string{
-		"policy":    ls.policyName,
-		"component": ls.componentID,
+		"policy_name":  ls.policyName,
+		"component_id": ls.componentID,
 	}
 
 	if time.Since(ls.timestamp) >= 5*time.Minute {

@@ -530,10 +530,14 @@ func (wsFactory *Factory) NewScheduler(
 				Name:       metrics.DefaultWorkloadIndex,
 			},
 		},
-		registry:             registry,
-		workloadMultiMatcher: mm,
-		component:            component,
-		metrics:              schedulerMetrics,
+		registry:               registry,
+		workloadMultiMatcher:   mm,
+		component:              component,
+		metrics:                schedulerMetrics,
+		tokensLabelKeyStatus:   tokensLabelKeyStatus,
+		priorityLabelKeyStatus: priorityLabelKeyStatus,
+		workloadLabelKeyStatus: workloadLabelKeyStatus,
+		fairnessLabelKeyStatus: fairnessLabelKeyStatus,
 	}
 
 	var wfqMetrics *scheduler.WFQMetrics
