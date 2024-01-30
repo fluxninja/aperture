@@ -22,30 +22,6 @@ code.
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
 
-# API Reference
-
-# @fluxninja/aperture-js
-
-## Table of contents
-
-### Enumerations
-
-- [FlowStatus](docs/enums/FlowStatus.md)
-- [LookupStatus](docs/enums/LookupStatus.md)
-
-### Classes
-
-- [ApertureClient](docs/classes/ApertureClient.md)
-
-### Interfaces
-
-- [CacheEntry](docs/interfaces/CacheEntry.md)
-- [Flow](docs/interfaces/Flow.md)
-- [FlowParams](docs/interfaces/FlowParams.md)
-- [KeyDeleteResponse](docs/interfaces/KeyDeleteResponse.md)
-- [KeyLookupResponse](docs/interfaces/KeyLookupResponse.md)
-- [KeyUpsertResponse](docs/interfaces/KeyUpsertResponse.md)
-
 ## Usage
 
 ### Install SDK
@@ -119,3 +95,29 @@ that would provide granular visibility for each flow.
 
 For more context on using the Aperture JavaScript SDK to set feature control
 points, refer to the [example app][example] available in the repository.
+
+[example]: https://github.com/fluxninja/aperture-js/tree/main/example
+
+# API Reference
+
+# @fluxninja/aperture-js
+
+## Table of contents
+
+### Enumerations
+
+- [FlowStatus](docs/enums/FlowStatus.md)
+- [LookupStatus](docs/enums/LookupStatus.md)
+
+### Classes
+
+- [ApertureClient](docs/classes/ApertureClient.md)
+
+### Interfaces
+
+- [CacheEntry](docs/interfaces/CacheEntry.md)
+- [Flow](docs/interfaces/Flow.md)
+- [FlowParams](docs/interfaces/FlowParams.md)
+- [KeyDeleteResponse](docs/interfaces/KeyDeleteResponse.md)
+- [KeyLookupResponse](docs/interfaces/KeyLookupResponse.md)
+- [KeyUpsertResponse](docs/interfaces/KeyUpsertResponse.md)
