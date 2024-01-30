@@ -14,8 +14,12 @@
 
 # C# SDK for FluxNinja Aperture
 
-The C# SDK provides an easy way to integrate your .NET applications with
-[FluxNinja Aperture](https://github.com/fluxninja/aperture).
+The `aperture-csharp` SDK provides an easy way to integrate your .NET
+applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+It allows flow control functionality on fine-grained features inside service
+code.
+
+Refer [documentation](https://docs.fluxninja.com/sdk/dotnet/) for more details.
 
 ## Usage
 

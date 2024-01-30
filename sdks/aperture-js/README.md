@@ -12,9 +12,9 @@
   </a>
 </p>
 
-# Aperture JavaScript SDK
+# JavaScript SDK for FluxNinja Aperture
 
-The `aperture-js` SDK provides an easy way to integrate your javascript
+The `aperture-js` SDK provides an easy way to integrate your JavaScript
 applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
 It allows flow control functionality on fine-grained features inside service
 code.

@@ -9,9 +9,9 @@
   </a>
 </p>
 
-# Aperture Python SDK
+# Python SDK for FluxNinja Aperture
 
-The `aperture-py` is SDK is an easy way to integrate your python applications
+The `aperture-py` SDK provides an easy way to integrate your Python applications
 with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
 control functionality on fine-grained features inside service code.
 
