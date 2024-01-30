@@ -317,7 +317,7 @@ func (f *flow) End() EndResponse {
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {
-			if decision.GetConcurrencyLimiterInfo().RequestId == "" {
+			if decision.GetConcurrencyLimiterInfo().GetRequestId() == "" {
 				continue
 			}
 			inflightRequest := &checkv1.InflightRequestRef{
@@ -334,7 +334,7 @@ func (f *flow) End() EndResponse {
 		}
 
 		if decision.GetConcurrencySchedulerInfo() != nil {
-			if decision.GetConcurrencySchedulerInfo().RequestId == "" {
+			if decision.GetConcurrencySchedulerInfo().GetRequestId() == "" {
 				continue
 			}
 			ref := &checkv1.InflightRequestRef{
