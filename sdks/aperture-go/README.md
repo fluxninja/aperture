@@ -1,15 +1,25 @@
-# Aperture-Go SDK
+# Go SDK for FluxNinja Aperture
 
-`aperture-go` is an SDK to interact with Aperture Agent. It allows flow control
-functionality on fine-grained features inside service code.
+The `aperture-go` SDK provides an easy way to integrate your go applications
+with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
+control functionality on fine-grained features inside service code.
+
+Refer [documentation](https://docs.fluxninja.com/sdk/go/) for more details.
 
 ## Usage
+
+Run the command below to install the SDK:
 
 ```bash
 go get github.com/fluxninja/aperture-go/v2
 ```
 
 ### ApertureClient Interface
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
 
 `ApertureClient` maintains a gRPC connection with Aperture Agent.
 

@@ -17,5 +17,106 @@
 
 # Java SDK for FluxNinja Aperture
 
-Java SDK provides an easy way to integrate your Java applications with
-[FluxNinja Aperture](https://github.com/fluxninja/aperture).
+The `aperture-java` SDK provides an easy way to integrate your Java applications
+with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
+control functionality on fine-grained features inside service code.
+
+Refer [documentation](https://docs.fluxninja.com/sdk/java/) for more details.
+
+## Usage
+
+Follow this
+[link](https://central.sonatype.com/artifact/com.fluxninja.aperture/aperture-java-core?smo=true)
+to install the Aperture Java SDK.
+
+### Create Aperture Client
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
+
+```java
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.EndResponse;
+import com.fluxninja.aperture.sdk.FeatureFlowParameters;
+import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.FlowStatus;
+
+  String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
+  String apiKey = "API_KEY";
+
+  ApertureSDK apertureSDK;
+      try {
+          apertureSDK =
+                  ApertureSDK.builder()
+                          .setAddress(agentAddress)
+                          .setAPIKey(apiKey)
+                          .useInsecureGrpc(insecureGrpc)
+                          .setRootCertificateFile(rootCertFile)
+                          .build();
+      } catch (IOException e) {
+          e.printStackTrace();
+          return;
+      }
+```
+
+### Flow Functionality
+
+The created instance can then be used to start a flow:
+
+```java
+Map<String, String> labels = new HashMap<>();
+
+// business logic produces labels
+labels.put("userId", "some_user_id");
+labels.put("userTier", "gold");
+labels.put("priority", "100");
+
+Boolean rampMode = false;
+
+FeatureFlowParameters params =
+        FeatureFlowParameters.newBuilder("featureName")
+                .setExplicitLabels(labels)
+                .setRampMode(rampMode)
+                .setFlowTimeout(Duration.ofMillis(1000))
+                .build();
+// StartFlow performs a flowcontrolv1.Check call to Aperture. It returns a Flow.
+Flow flow = this.apertureSDK.startFlow(params);
+
+// See whether flow was accepted by Aperture.
+try {
+    if (flow.shouldRun()) {
+        // do actual work
+        res.status(202);
+    } else {
+        // handle flow rejection by Aperture
+        res.status(flow.getRejectionHttpStatusCode());
+    }
+} catch (Exception e) {
+    // Flow Status captures whether the feature captured by the Flow was
+    // successful or resulted in an error. When not explicitly set,
+    // the default value is FlowStatus.OK .
+    flow.setStatus(FlowStatus.Error);
+    logger.error("Error in flow execution", e);
+} finally {
+    EndResponse endResponse = flow.end();
+    if (endResponse.getError() != null) {
+        logger.error("Error ending flow", endResponse.getError());
+    }
+
+    logger.info("Flow End response: {}", endResponse.getFlowEndResponse());
+}
+```
+
+The above code snippet is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`featureName` in the example) and
+business labels that will be aligned with the policy created in Aperture Cloud.
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see response returns, but in a production environment,
+actual business logic can be executed when a request is allowed. It is important
+to make the `end` call made after processing each request, to send telemetry
+data that would provide granular visibility for each flow.

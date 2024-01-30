@@ -12,11 +12,12 @@
   </a>
 </p>
 
-# Aperture JavaScript SDK
+# JavaScript SDK for FluxNinja Aperture
 
-`aperture-js` is an SDK to interact with [Aperture](https://docs.fluxninja.com)
-Agent. It allows flow control functionality on fine-grained features inside
-service code.
+The `aperture-js` SDK provides an easy way to integrate your JavaScript
+applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+It allows flow control functionality on fine-grained features inside service
+code.
 
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
@@ -44,3 +45,77 @@ details.
 - [KeyDeleteResponse](docs/interfaces/KeyDeleteResponse.md)
 - [KeyLookupResponse](docs/interfaces/KeyLookupResponse.md)
 - [KeyUpsertResponse](docs/interfaces/KeyUpsertResponse.md)
+
+## Usage
+
+### Install SDK
+
+Run the command below to install the SDK:
+
+```bash
+npm install @fluxninja/aperture-js
+```
+
+### Create Aperture Client
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
+
+```typescript
+import { ApertureClient } from "@fluxninja/aperture-js";
+
+// Create aperture client
+export const apertureClient = new ApertureClient({
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  apiKey: "API_KEY",
+});
+```
+
+### Flow Functionality
+
+The created instance can then be used to start a flow:
+
+```typescript
+async function handleRequestRateLimit(req: Request, res: Response) {
+  // Start a flow by passing control point and business labels
+  const flow = await apertureClient.startFlow("awesomeFeature", {
+    labels: {
+      limit_key: "some_user_id",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 300, // ms
+    },
+  });
+
+  if (flow.shouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+    const resString = "foo";
+    res.send({ message: resString });
+  } else {
+    console.log("Request rate-limited. Try again later.");
+    // Handle flow rejection
+    flow.setStatus(FlowStatus.Error);
+    res.status(429).send({ message: "Too many requests" });
+  }
+
+  flow.end();
+}
+```
+
+The above code snippet is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`awesomeFeature` in the example)
+and business labels that will be aligned with the policy created in Aperture
+Cloud. For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see log returns, but in a production environment, actual
+business logic can be executed when a request is allowed. It is important to
+make the `end` call made after processing each request, to send telemetry data
+that would provide granular visibility for each flow.
+
+For more context on using the Aperture JavaScript SDK to set feature control
+points, refer to the [example app][example] available in the repository.
