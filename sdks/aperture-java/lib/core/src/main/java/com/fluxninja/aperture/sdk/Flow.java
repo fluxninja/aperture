@@ -419,6 +419,10 @@ public final class Flow {
 
         for (LimiterDecision decision : this.checkResponse.getLimiterDecisionsList()) {
             if (decision.getConcurrencyLimiterInfo() != null) {
+                if (decision.getConcurrencyLimiterInfo().getRequestId().isEmpty()) {
+                    continue;
+                }
+
                 InflightRequestRef.Builder refBuilder =
                         InflightRequestRef.newBuilder()
                                 .setPolicyName(decision.getPolicyName())
@@ -435,6 +439,10 @@ public final class Flow {
             }
 
             if (decision.getConcurrencySchedulerInfo() != null) {
+                if (decision.getConcurrencySchedulerInfo().getRequestId().isEmpty()) {
+                    continue;
+                }
+
                 InflightRequestRef.Builder refBuilder =
                         InflightRequestRef.newBuilder()
                                 .setPolicyName(decision.getPolicyName())

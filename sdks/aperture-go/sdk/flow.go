@@ -314,6 +314,9 @@ func (f *flow) End() EndResponse {
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {
+			if decision.GetConcurrencyLimiterInfo().GetRequestId() == "" {
+				continue
+			}
 			inflightRequest := &checkv1.InflightRequestRef{
 				PolicyName:  decision.PolicyName,
 				PolicyHash:  decision.PolicyHash,
@@ -324,11 +327,13 @@ func (f *flow) End() EndResponse {
 			if decision.GetConcurrencyLimiterInfo().GetTokensInfo() != nil {
 				inflightRequest.Tokens = decision.GetConcurrencyLimiterInfo().GetTokensInfo().GetConsumed()
 			}
-
 			inflightRequests = append(inflightRequests, inflightRequest)
 		}
 
 		if decision.GetConcurrencySchedulerInfo() != nil {
+			if decision.GetConcurrencySchedulerInfo().GetRequestId() == "" {
+				continue
+			}
 			ref := &checkv1.InflightRequestRef{
 				PolicyName:  decision.PolicyName,
 				PolicyHash:  decision.PolicyHash,
@@ -339,7 +344,6 @@ func (f *flow) End() EndResponse {
 			if decision.GetConcurrencySchedulerInfo().GetTokensInfo() != nil {
 				ref.Tokens = decision.GetConcurrencySchedulerInfo().GetTokensInfo().GetConsumed()
 			}
-
 			inflightRequests = append(inflightRequests, ref)
 		}
 	}

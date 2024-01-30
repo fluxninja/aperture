@@ -97,7 +97,7 @@ export class _Flow implements Flow {
     if (
       (!this.rampMode && this._checkResponse === null) ||
       this._checkResponse?.decisionType ===
-        _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
+      _aperture_flowcontrol_check_v1_CheckResponse_DecisionType.DECISION_TYPE_ACCEPTED
     ) {
       return true;
     } else {
@@ -493,6 +493,9 @@ export class _Flow implements Flow {
 
           this._checkResponse.limiterDecisions.forEach((decision) => {
             if (decision.concurrencyLimiterInfo) {
+              if (decision.concurrencyLimiterInfo.requestId == "") {
+                return;
+              }
               inflightRequestRefs.push({
                 policyName: decision.policyName,
                 policyHash: decision.policyHash,
@@ -503,6 +506,9 @@ export class _Flow implements Flow {
               });
             }
             if (decision.concurrencySchedulerInfo) {
+              if (decision.concurrencySchedulerInfo.requestId == "") {
+                return;
+              }
               inflightRequestRefs.push({
                 policyName: decision.policyName,
                 policyHash: decision.policyHash,
