@@ -259,6 +259,10 @@ public class FeatureFlow : IFlow
 
             if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo != null)
             {
+                if (_checkResponse.LimiterDecisions[i].ConcurrencyLimiterInfo.RequestId == "") {
+                    continue;
+                }
+
                 var inflightRequest = new InflightRequestRef
                 {
                     PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
@@ -277,6 +281,10 @@ public class FeatureFlow : IFlow
 
             if (_checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo != null)
             {
+                if (_checkResponse.LimiterDecisions[i].ConcurrencySchedulerInfo.RequestId == "") {
+                    continue;
+                }
+
                 var inflightRequest = new InflightRequestRef
                 {
                     PolicyHash = _checkResponse.LimiterDecisions[i].PolicyHash,
