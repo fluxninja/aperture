@@ -14,9 +14,10 @@
 
 # Aperture JavaScript SDK
 
-The `aperture-js` SDK provides an easy to way to integrate your js applications
-with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
-control functionality on fine-grained features inside service code.
+The `aperture-js` SDK provides an easy way to integrate your javascript
+applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+It allows flow control functionality on fine-grained features inside service
+code.
 
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
@@ -49,11 +50,18 @@ details.
 
 ### Install SDK
 
+Run the command below to install the SDK:
+
 ```bash
 npm install @fluxninja/aperture-js
 ```
 
 ### Create Aperture Client
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
 
 ```typescript
 import { ApertureClient } from "@fluxninja/aperture-js";
@@ -66,6 +74,8 @@ export const apertureClient = new ApertureClient({
 ```
 
 ### Flow Functionality
+
+The created instance can then be used to start a flow:
 
 ```typescript
 async function handleRequestRateLimit(req: Request, res: Response) {
@@ -94,3 +104,18 @@ async function handleRequestRateLimit(req: Request, res: Response) {
   flow.end();
 }
 ```
+
+The above code snippet is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`awesomeFeature` in the example)
+and business labels that will be aligned with the policy created in Aperture
+Cloud. For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see log returns, but in a production environment, actual
+business logic can be executed when a request is allowed. It is important to
+make the `end` call made after processing each request, to send telemetry data
+that would provide granular visibility for each flow.
+
+For more context on using the Aperture JavaScript SDK to set feature control
+points, refer to the [example app][example] available in the repository.

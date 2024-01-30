@@ -21,11 +21,18 @@ The C# SDK provides an easy way to integrate your .NET applications with
 
 ### Install
 
+Run the command below to install the SDK:
+
 ```bash
 dotnet add package ApertureSDK --version 2.23.1
 ```
 
 ### Create Aperture Client
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
 
 ```csharp
 var sdk = ApertureSdk
@@ -36,6 +43,8 @@ var sdk = ApertureSdk
 ```
 
 ### Flow Functionality
+
+The created instance can then be used to start a flow:
 
 ```csharp
 // do some business logic to collect labels
@@ -82,3 +91,15 @@ else if (endResponse.FlowEndResponse != null)
     log.Info("Ended flow with response: " + endResponse.FlowEndResponse.ToString());
 }
 ```
+
+The above code snippet is making `StartFlow` calls to Aperture. For this call,
+it is important to specify the control point (`featureName` in the example) and
+business labels that will be aligned with the policy created in Aperture Cloud.
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `ShouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see log returns, but in a production environment, actual
+business logic can be executed when a request is allowed. It is important to
+make the `End` call made after processing each request, to send telemetry data
+that would provide granular visibility for each flow.

@@ -28,6 +28,11 @@ to install the Aperture Java SDK.
 
 ### Create Aperture Client
 
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
+
 ```java
 import com.fluxninja.aperture.sdk.ApertureSDK;
 import com.fluxninja.aperture.sdk.EndResponse;
@@ -54,6 +59,8 @@ import com.fluxninja.aperture.sdk.FlowStatus;
 ```
 
 ### Flow Functionality
+
+The created instance can then be used to start a flow:
 
 ```java
 Map<String, String> labels = new HashMap<>();
@@ -98,3 +105,15 @@ try {
     logger.info("Flow End response: {}", endResponse.getFlowEndResponse());
 }
 ```
+
+The above code snippet is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`featureName` in the example) and
+business labels that will be aligned with the policy created in Aperture Cloud.
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see response returns, but in a production environment,
+actual business logic can be executed when a request is allowed. It is important
+to make the `end` call made after processing each request, to send telemetry
+data that would provide granular visibility for each flow.

@@ -22,15 +22,21 @@ details.
 
 ### Install SDK
 
+Run the command below to install the SDK:
+
 ```bash
 pip install aperture-py
 ```
 
 ### Create Aperture Client
 
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
+
 ```python
 from aperture_sdk.client import ApertureClient, FlowParams
-
 
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
 api_key = os.getenv("APERTURE_API_KEY", "")
@@ -42,6 +48,8 @@ aperture_client = ApertureClient.new_client(
 ```
 
 ### Flow Functionality
+
+The created instance can then be used to start a flow:
 
 ```python
 # business logic produces labels
@@ -83,3 +91,13 @@ aperture_client = ApertureClient.new_client(
     await asyncio.sleep(2)
     return "", 202
 ```
+
+The above code snippet is making `start_flow` calls to Aperture. For this call,
+it is important to specify the control point (`AwesomeFeature` in the example)
+and `FlowParams` that will be aligned with the policy created in Aperture Cloud.
+For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `should_run` decision is made,
+determining whether to allow the request into the system or to rate limit it. It
+is important to make the `end` call made after processing each request, to send
+telemetry data that would provide granular visibility for each flow.
