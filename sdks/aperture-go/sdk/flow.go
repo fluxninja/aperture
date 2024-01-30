@@ -297,12 +297,15 @@ func (f *flow) End() EndResponse {
 
 	f.ended = true
 
-	checkResponseJSONBytes, err := protojson.Marshal(f.checkResponse)
+	cr := f.checkResponse
+	cr.CacheLookupResponse = nil
+	checkResponseJSONBytes, err := protojson.Marshal(cr)
 	if err != nil {
 		return EndResponse{
 			Error: err,
 		}
 	}
+
 	f.span.SetAttributes(
 		attribute.String(flowStatusLabel, f.statusCode.String()),
 		attribute.String(checkResponseLabel, string(checkResponseJSONBytes)),
@@ -314,7 +317,7 @@ func (f *flow) End() EndResponse {
 
 	for _, decision := range f.checkResponse.GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {
-			if decision.GetConcurrencyLimiterInfo().GetRequestId() == "" {
+			if decision.GetConcurrencyLimiterInfo().RequestId == "" {
 				continue
 			}
 			inflightRequest := &checkv1.InflightRequestRef{
@@ -331,7 +334,7 @@ func (f *flow) End() EndResponse {
 		}
 
 		if decision.GetConcurrencySchedulerInfo() != nil {
-			if decision.GetConcurrencySchedulerInfo().GetRequestId() == "" {
+			if decision.GetConcurrencySchedulerInfo().RequestId == "" {
 				continue
 			}
 			ref := &checkv1.InflightRequestRef{
