@@ -14,5 +14,71 @@
 
 # C# SDK for FluxNinja Aperture
 
-C# SDK provides an easy way to integrate your .NET applications with
+The C# SDK provides an easy way to integrate your .NET applications with
 [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+
+## Usage
+
+### Install
+
+```bash
+dotnet add package ApertureSDK --version 2.23.1
+```
+
+### Create Aperture Client
+
+```csharp
+var sdk = ApertureSdk
+    .Builder()
+    .SetAddress("ORGANIZATION.app.fluxninja.com:443")
+    .SetAgentApiKey("API_KEY")
+    .Build();
+```
+
+### Flow Functionality
+
+```csharp
+// do some business logic to collect labels
+var labels = new Dictionary<string, string>();
+labels.Add("userId", "some_user_id");
+labels.Add("userTier", "gold");
+labels.Add("priority", "100");
+
+var rampMode = false;
+var flowTimeout = TimeSpan.FromSeconds(5);
+var pms = new FeatureFlowParams(
+    "featureName",
+    labels,
+    rampMode,
+    flowTimeout,
+    new Grpc.Core.CallOptions(),
+    "test",
+    new RepeatedField<string> { "test" });
+
+var flow = sdk.StartFlow(pms);
+
+if (flow.ShouldRun())
+{
+    // do actual work
+    Thread.Sleep(2000);
+    SimpleHandlePath((int)HttpStatusCode.OK, "Hello world!", response);
+}
+else
+{
+    // handle flow rejection by Aperture Agent
+    flow.SetStatus(FlowStatus.Error);
+    SimpleHandlePath(flow.GetRejectionHttpStatusCode(), "REJECTED!", response);
+}
+
+var endResponse = flow.End();
+if (endResponse.Error != null)
+{
+    // handle end failure
+    log.Error("Failed to end flow: {e}", endResponse.Error);
+}
+else if (endResponse.FlowEndResponse != null)
+{
+    // handle end success
+    log.Info("Ended flow with response: " + endResponse.FlowEndResponse.ToString());
+}
+```

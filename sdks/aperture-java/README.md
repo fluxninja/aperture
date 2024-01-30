@@ -17,5 +17,84 @@
 
 # Java SDK for FluxNinja Aperture
 
-Java SDK provides an easy way to integrate your Java applications with
+The Java SDK provides an easy way to integrate your Java applications with
 [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+
+## Usage
+
+Follow this
+[link](https://central.sonatype.com/artifact/com.fluxninja.aperture/aperture-java-core?smo=true)
+to install the Aperture Java SDK.
+
+### Create Aperture Client
+
+```java
+import com.fluxninja.aperture.sdk.ApertureSDK;
+import com.fluxninja.aperture.sdk.EndResponse;
+import com.fluxninja.aperture.sdk.FeatureFlowParameters;
+import com.fluxninja.aperture.sdk.Flow;
+import com.fluxninja.aperture.sdk.FlowStatus;
+
+  String agentAddress = "ORGANIZATION.app.fluxninja.com:443";
+  String apiKey = "API_KEY";
+
+  ApertureSDK apertureSDK;
+      try {
+          apertureSDK =
+                  ApertureSDK.builder()
+                          .setAddress(agentAddress)
+                          .setAPIKey(apiKey)
+                          .useInsecureGrpc(insecureGrpc)
+                          .setRootCertificateFile(rootCertFile)
+                          .build();
+      } catch (IOException e) {
+          e.printStackTrace();
+          return;
+      }
+```
+
+### Flow Functionality
+
+```java
+Map<String, String> labels = new HashMap<>();
+
+// business logic produces labels
+labels.put("userId", "some_user_id");
+labels.put("userTier", "gold");
+labels.put("priority", "100");
+
+Boolean rampMode = false;
+
+FeatureFlowParameters params =
+        FeatureFlowParameters.newBuilder("featureName")
+                .setExplicitLabels(labels)
+                .setRampMode(rampMode)
+                .setFlowTimeout(Duration.ofMillis(1000))
+                .build();
+// StartFlow performs a flowcontrolv1.Check call to Aperture. It returns a Flow.
+Flow flow = this.apertureSDK.startFlow(params);
+
+// See whether flow was accepted by Aperture.
+try {
+    if (flow.shouldRun()) {
+        // do actual work
+        res.status(202);
+    } else {
+        // handle flow rejection by Aperture
+        res.status(flow.getRejectionHttpStatusCode());
+    }
+} catch (Exception e) {
+    // Flow Status captures whether the feature captured by the Flow was
+    // successful or resulted in an error. When not explicitly set,
+    // the default value is FlowStatus.OK .
+    flow.setStatus(FlowStatus.Error);
+    logger.error("Error in flow execution", e);
+} finally {
+    EndResponse endResponse = flow.end();
+    if (endResponse.getError() != null) {
+        logger.error("Error ending flow", endResponse.getError());
+    }
+
+    logger.info("Flow End response: {}", endResponse.getFlowEndResponse());
+}
+```

@@ -14,9 +14,9 @@
 
 # Aperture JavaScript SDK
 
-`aperture-js` is an SDK to interact with [Aperture](https://docs.fluxninja.com)
-Agent. It allows flow control functionality on fine-grained features inside
-service code.
+The `aperture-js` SDK provides an easy to way to integrate your js applications
+with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
+control functionality on fine-grained features inside service code.
 
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
@@ -44,3 +44,53 @@ details.
 - [KeyDeleteResponse](docs/interfaces/KeyDeleteResponse.md)
 - [KeyLookupResponse](docs/interfaces/KeyLookupResponse.md)
 - [KeyUpsertResponse](docs/interfaces/KeyUpsertResponse.md)
+
+## Usage
+
+### Install SDK
+
+```bash
+npm install @fluxninja/aperture-js
+```
+
+### Create Aperture Client
+
+```typescript
+import { ApertureClient } from "@fluxninja/aperture-js";
+
+// Create aperture client
+export const apertureClient = new ApertureClient({
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  apiKey: "API_KEY",
+});
+```
+
+### Flow Functionality
+
+```typescript
+async function handleRequestRateLimit(req: Request, res: Response) {
+  // Start a flow by passing control point and business labels
+  const flow = await apertureClient.startFlow("awesomeFeature", {
+    labels: {
+      limit_key: "some_user_id",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 300, // ms
+    },
+  });
+
+  if (flow.shouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+    const resString = "foo";
+    res.send({ message: resString });
+  } else {
+    console.log("Request rate-limited. Try again later.");
+    // Handle flow rejection
+    flow.setStatus(FlowStatus.Error);
+    res.status(429).send({ message: "Too many requests" });
+  }
+
+  flow.end();
+}
+```
