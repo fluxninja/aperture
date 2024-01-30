@@ -1,4 +1,10 @@
 <p align="center">
+🚀 <b></b>Just launched v1 of <a href="https://blog.fluxninja.com/blog/aperture-v1-launch-2024/">managed rate limiting service</a></b>
+  <br/>Support us with your feedback and questions on <a href="https://www.producthunt.com/posts/fluxninja-aperture">Product Hunt</a> or <a href="https://discord.gg/U3N3fCZEPm">Discord</a>
+  <br/>
+</p>
+
+<p align="center">
   <img src="https://github.com/fluxninja/aperture/raw/main/docs/content/assets/img/aperture_logo.png" alt="FluxNinja Aperture" width="75%">
   <br/>
   <a href="https://docs.fluxninja.com">
@@ -15,7 +21,7 @@
   </a>
 </p>
 
-# Java SDK for FluxNinja Aperture
+# Rate Limiting for Java Applications
 
 The `aperture-java` SDK provides an easy way to integrate your Java applications
 with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
