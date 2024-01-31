@@ -33,5 +33,6 @@ webhooks:
     - UPDATE
     resources:
     - controllers
+    scope: Namespaced
   sideEffects: None
 {{- end }}
