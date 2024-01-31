@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	checkv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/flowcontrol/check/v1"
@@ -297,8 +298,11 @@ func (f *flow) End() EndResponse {
 
 	f.ended = true
 
-	cr := f.checkResponse
-	cr.CacheLookupResponse = nil
+	cr := proto.Clone(f.checkResponse).(*checkv1.CheckResponse)
+	cr.CacheLookupResponse.ResultCacheResponse.Value = nil
+	for _, v := range cr.CacheLookupResponse.GlobalCacheResponses {
+		v.Value = nil
+	}
 	checkResponseJSONBytes, err := protojson.Marshal(cr)
 	if err != nil {
 		return EndResponse{
