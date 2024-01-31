@@ -860,6 +860,12 @@ workflows:
           requires: *release_required
           repo: aperture-java
 
+      - release-sdk:
+          name: release-sdk-csharp
+          filters: *release_aperture_filters
+          requires: *release_required
+          repo: aperture-csharp
+
   helm-release:
     when:
       matches:

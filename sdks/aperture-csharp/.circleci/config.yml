@@ -49,19 +49,6 @@ workflows:
           mapping: |
             (Core/.*|Examples/.*|Generated/.*|ApertureSDK.*|README.*) updated-sdk true
 
-  filter-paths-pr:
-    when:
-      and:
-        - not:
-            equal: [main, << pipeline.git.branch >>]
-        - not:
-            matches: *is_not_empty_tag
-        - not: *scheduled
-    jobs:
-      - path-filtering/filter:
-          <<: *path_filtering_job
-          base-revision: main
-
   release-sdk:
     when:
       matches:
