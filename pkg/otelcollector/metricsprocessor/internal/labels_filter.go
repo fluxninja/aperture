@@ -27,6 +27,8 @@ var (
 		otelconsts.ApertureDroppingQuotaSchedulersLabel,
 		otelconsts.ApertureSamplersLabel,
 		otelconsts.ApertureDroppingSamplersLabel,
+		otelconsts.ApertureConcurrencySchedulersLabel,
+		otelconsts.ApertureDroppingConcurrencySchedulersLabel,
 		otelconsts.ApertureWorkloadsLabel,
 		otelconsts.ApertureDroppingWorkloadsLabel,
 		otelconsts.ApertureFluxMetersLabel,

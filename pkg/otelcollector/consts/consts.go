@@ -57,6 +57,10 @@ const (
 	ApertureRateLimitersLabel = "aperture.rate_limiters"
 	// ApertureDroppingRateLimitersLabel describes rate limiters dropping the traffic.
 	ApertureDroppingRateLimitersLabel = "aperture.dropping_rate_limiters"
+	// ApertureConcurrencySchedulersLabel describes rate limiters matched to the traffic.
+	ApertureConcurrencySchedulersLabel = "aperture.concurrency_schedulers"
+	// ApertureDroppingConcurrencySchedulersLabel describes rate limiters dropping the traffic.
+	ApertureDroppingConcurrencySchedulersLabel = "aperture.dropping_concurrency_schedulers"
 	// ApertureLoadSchedulersLabel describes load schedulers matched to the traffic.
 	ApertureLoadSchedulersLabel = "aperture.load_schedulers"
 	// ApertureQuotaSchedulersLabel describes quota schedulers matched to the traffic.

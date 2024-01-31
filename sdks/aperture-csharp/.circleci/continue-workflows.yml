@@ -1,27 +1,38 @@
 version: 2.1
 
+orbs:
+  windows: circleci/windows@5.0.0
+
 parameters:
   updated-sdk:
     type: boolean
     default: false
 
 jobs:
-  say-hello:
-    docker:
-      - image: cimg/base:stable
+  verify-release:
+    executor:
+      name: windows/default
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - dotnet-packages-v1-{{ checksum "ApertureSDK.csproj" }}
+      - save_cache:
+          paths:
+            - C:\Users\circleci\.nuget\packages
+          key: dotnet-packages-v1-{{ checksum "ApertureSDK.csproj" }}
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Package Application"
+          command: dotnet.exe pack
+      - run:
+          name: "Verify Publish Application"
+          command: dotnet.exe nuget push C:\Users\circleci\project\bin\Debug\ApertureSDK* --api-key $env:NUGET_API_TOKEN --source https://api.nuget.org/v3/index.json --skip-duplicate
 
 workflows:
   version: 2
 
-  say-hello:
-    when:
-      and:
-        - equal: [main, << pipeline.git.branch >>]
-        - << pipeline.parameters.updated-sdk >>
+  publish-release:
+    when: << pipeline.parameters.updated-sdk >>
     jobs:
-      - say-hello
+      - verify-release:
+          name: verify-publish-release

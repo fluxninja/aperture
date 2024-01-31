@@ -63,7 +63,7 @@ operator:
     ## pullSecrets:
     ##   - myRegistryKeySecretName
     ##
-    pullSecrets: []
+    # pullSecrets: []
 
   ## @param operator.replicaCount Number of replicas for Operator deployment
   ##
@@ -383,7 +383,7 @@ controller:
     ## pullSecrets:
     ##   - myRegistryKeySecretName
     ##
-    pullSecrets: []
+    # pullSecrets: []
   ## Controller service parameters
   ##
   service:

@@ -105,6 +105,28 @@ var _ = DescribeTable("Check Response labels", func(checkResponse *flowcontrolv1
 		},
 	),
 
+	Entry("Sets concurrency schedulers",
+		&flowcontrolv1.CheckResponse{
+			LimiterDecisions: []*flowcontrolv1.LimiterDecision{
+				{
+					PolicyName:  "foo",
+					PolicyHash:  "foo-hash",
+					ComponentId: "1",
+					Dropped:     true,
+					Details: &flowcontrolv1.LimiterDecision_ConcurrencySchedulerInfo_{
+						ConcurrencySchedulerInfo: &flowcontrolv1.LimiterDecision_ConcurrencySchedulerInfo{
+							WorkloadIndex: "0",
+						},
+					},
+				},
+			},
+		},
+		map[string]interface{}{
+			otelconsts.ApertureConcurrencySchedulersLabel:         []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+			otelconsts.ApertureDroppingConcurrencySchedulersLabel: []interface{}{"policy_name:foo,component_id:1,policy_hash:foo-hash"},
+		},
+	),
+
 	Entry("Sets flux meters",
 		&flowcontrolv1.CheckResponse{
 			FluxMeterInfos: []*flowcontrolv1.FluxMeterInfo{
