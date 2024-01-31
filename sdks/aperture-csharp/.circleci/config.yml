@@ -6,16 +6,27 @@ setup: true
 orbs:
   path-filtering: circleci/path-filtering@0.1.3
   continuation: circleci/continuation@0.3.1
+  windows: circleci/windows@5.0.0
 
 jobs:
-  say-hello:
-    docker:
-      - image: cimg/base:stable
+  release:
+    executor:
+      name: windows/default
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - dotnet-packages-v1-{{ checksum "ApertureSDK.csproj" }}
+      - save_cache:
+          paths:
+            - C:\Users\circleci\.nuget\packages
+          key: dotnet-packages-v1-{{ checksum "ApertureSDK.csproj" }}
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Package Application"
+          command: dotnet.exe pack
+      - run:
+          name: "Publish Application"
+          command: dotnet.exe nuget push C:\Users\circleci\project\bin\Debug\ApertureSDK* --api-key $env:NUGET_API_TOKEN --source https://api.nuget.org/v3/index.json
 
 workflows:
   version: 2
@@ -36,7 +47,7 @@ workflows:
           base-revision: << pipeline.git.base_revision >>
           config-path: .circleci/continue-workflows.yml
           mapping: |
-            (Core/.*|Example/.*|Generated/.*|ApertureSDK.*) updated-sdk true
+            (Core/.*|Examples/.*|Generated/.*|ApertureSDK.*|README.*) updated-sdk true
 
   filter-paths-pr:
     when:
@@ -51,12 +62,12 @@ workflows:
           <<: *path_filtering_job
           base-revision: main
 
-  say-hello-workflow:
+  release-sdk:
     when:
       matches:
         { value: << pipeline.git.tag >>, pattern: "^releases/.*$" }
     jobs:
-      - say-hello:
+      - release:
           filters:
             branches:
               ignore: /.+/
