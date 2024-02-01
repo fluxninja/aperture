@@ -26,7 +26,7 @@ require (
 	github.com/getsentry/sentry-go v0.24.1
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-logr/zerologr v1.2.3
-	github.com/go-openapi/runtime v0.26.2
+	github.com/go-openapi/runtime v0.27.1
 	github.com/go-openapi/strfmt v0.22.0
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gofrs/flock v0.8.1
@@ -297,12 +297,12 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/zapr v1.2.4 // indirect
-	github.com/go-openapi/analysis v0.21.4 // indirect
+	github.com/go-openapi/analysis v0.21.5 // indirect
 	github.com/go-openapi/errors v0.21.0 // indirect
-	github.com/go-openapi/loads v0.21.2 // indirect
-	github.com/go-openapi/spec v0.20.11 // indirect
-	github.com/go-openapi/swag v0.22.4 // indirect
-	github.com/go-openapi/validate v0.22.3 // indirect
+	github.com/go-openapi/loads v0.21.3 // indirect
+	github.com/go-openapi/spec v0.20.12 // indirect
+	github.com/go-openapi/swag v0.22.5 // indirect
+	github.com/go-openapi/validate v0.22.4 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
@@ -538,8 +538,8 @@ require (
 	github.com/go-logr/logr v1.4.1
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/go-openapi/jsonpointer v0.20.0 // indirect
-	github.com/go-openapi/jsonreference v0.20.2 // indirect
+	github.com/go-openapi/jsonpointer v0.20.1 // indirect
+	github.com/go-openapi/jsonreference v0.20.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
