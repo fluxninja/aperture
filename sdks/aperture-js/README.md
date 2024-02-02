@@ -18,7 +18,7 @@
   </a>
 </p>
 
-# Rate Limiting for JavaScript Applications
+# Rate Limiting for JavaScript or Node.js Applications
 
 The `aperture-js` SDK provides an easy way to integrate your JavaScript
 applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
@@ -27,6 +27,34 @@ code.
 
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
+
+## Use Cases and Features
+
+Aperture provides rate limiting, caching, and api quota management to
+effectively manage the load on your application. With its unique approach that
+separates application code from rate limiting code/infra, it can effectively
+handle various use cases of rate limiting such as:
+
+- Enforcing or complying with
+  - Rate-limits based on no. of requests per second
+  - Per-user rate-limits based on consumed tokens (e.g. quota mangement for GPT
+    APIs)
+  - Rate-limits based on user subscription plans
+  - Rate-limits based on token-bucket algorithm
+  - Fine-grained rate-limits
+    [configured via policies UI or yaml](https://docs.fluxninja.com/reference/cloud-ui/policies/policy-creation)
+- Prioritizing requests based on custom labels (e.g. free user vs paid user)
+- Enforcing adaptive rate-limits based on concurrency and available system
+  capacity
+- Managing load on your databases or self-hosted services such as Mistral,
+  CodeLlama, etc.
+- Caching API responses to avoid high API or Cloud cost and improve time to
+  response
+- Updating rate-limiting policies from UI without changing the code
+- Monitoring workload for your internal or external services
+
+Are we missing your use case for FluxNinja Aperture?
+[Share with us on Discord](https://discord.gg/U3N3fCZEPm)
 
 ## Usage
 
