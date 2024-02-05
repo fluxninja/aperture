@@ -1545,8 +1545,8 @@ github.com/redis/go-redis/v9 v9.3.0 h1:RiVDjmig62jIWp7Kk4XVLs0hzV6pI3PyTnnL0cnn0
 github.com/redis/go-redis/v9 v9.3.0/go.mod h1:hdY0cQFCN4fnSYT6TkisLufl/4W5UIXyv0b/CLO2V2M=
 github.com/relvacode/iso8601 v1.3.0 h1:HguUjsGpIMh/zsTczGN3DVJFxTU/GX+MMmzcKoMO7ko=
 github.com/relvacode/iso8601 v1.3.0/go.mod h1:FlNp+jz+TXpyRqgmM7tnzHHzBnz776kmAH2h3sZCn0I=
-github.com/reugn/go-quartz v0.7.0 h1:OBHpAPlqeBf+nYlOXp2CagXNTRTI65yrFyDX8rfpEC0=
-github.com/reugn/go-quartz v0.7.0/go.mod h1:no4ktgYbAAuY0E1SchR8cTx1LF4jYIzdgaQhzRPSkpk=
+github.com/reugn/go-quartz v0.10.0 h1:pOFJDOjOD/RpoCHyvx6IwPLU2A9vGquyPwQuTxdvjow=
+github.com/reugn/go-quartz v0.10.0/go.mod h1:no4ktgYbAAuY0E1SchR8cTx1LF4jYIzdgaQhzRPSkpk=
 github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
