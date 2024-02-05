@@ -43,7 +43,17 @@ detailed instructions on locating API Keys, please refer to the
 import CodeSnippet from '../../codeSnippet.js'
 
 <Tabs>
-<TabItem value="Python">
+<TabItem value="Python Async">
+```
+
+<CodeSnippet
+lang="py"
+snippetName="asyncClientConstructor"
+/>
+
+```mdx-code-block
+</TabItem>
+<TabItem value= "Python Sync">
 ```
 
 <CodeSnippet
@@ -60,12 +70,22 @@ The created instance can then be used to start a flow:
 
 ```mdx-code-block
 <Tabs>
-<TabItem value="Python">
+<TabItem value="Python Async">
 ```
 
 <CodeSnippet
 lang="py"
 snippetName="manualFlow"
+/>
+
+```mdx-code-block
+</TabItem>
+<TabItem value="Python Sync">
+```
+
+<CodeSnippet
+lang="py"
+snippetName="syncFlow"
 />
 
 ```mdx-code-block

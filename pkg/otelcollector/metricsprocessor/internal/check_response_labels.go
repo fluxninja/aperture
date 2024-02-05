@@ -33,6 +33,10 @@ import (
 // * otelconsts.ApertureResultCacheOperationStatusLabel
 // * otelconsts.ApertureGlobalCacheLookupStatusesLabel
 // * otelconsts.ApertureGlobalCacheOperationStatusesLabel
+// * otelconsts.ApertureSamplersLabel
+// * otelconsts.ApertureDroppingSamplersLabel
+// * otelconsts.ApertureConcurrencySchedulersLabel
+// * otelconsts.ApertureDroppingConcurrencySchedulersLabel
 // * dynamic flow labels.
 func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcontrolv1.CheckResponse, sourceStr string) {
 	// Aperture Processing Duration
@@ -83,11 +87,13 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 	// Note: Sorted alphabetically to help sorting attributes in rollupprocessor.key at least a bit.
 	droppingLoadSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingLoadSchedulersLabel)
 	droppingQuotaSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingQuotaSchedulersLabel)
+	droppingConcurrencySchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingConcurrencySchedulersLabel)
 	droppingRateLimitersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingRateLimitersLabel)
 	droppingSamplersSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingSamplersLabel)
 	droppingWorkloadsSlice := attributes.PutEmptySlice(otelconsts.ApertureDroppingWorkloadsLabel)
 	loadSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureLoadSchedulersLabel)
 	quotaSchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureQuotaSchedulersLabel)
+	concurrencySchedulersSlice := attributes.PutEmptySlice(otelconsts.ApertureConcurrencySchedulersLabel)
 	rateLimitersSlice := attributes.PutEmptySlice(otelconsts.ApertureRateLimitersLabel)
 	samplersSlice := attributes.PutEmptySlice(otelconsts.ApertureSamplersLabel)
 	workloadsSlice := attributes.PutEmptySlice(otelconsts.ApertureWorkloadsLabel)
@@ -105,7 +111,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				droppingRateLimitersSlice.AppendEmpty().SetStr(value)
 			}
 		}
-		if cl := decision.GetLoadSchedulerInfo(); cl != nil {
+		if ls := decision.GetLoadSchedulerInfo(); ls != nil {
 			value := fmt.Sprintf(
 				"%s:%v,%s:%v,%s:%v",
 				metrics.PolicyNameLabel, decision.GetPolicyName(),
@@ -121,7 +127,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				"%s:%v,%s:%v,%s:%v,%s:%v",
 				metrics.PolicyNameLabel, decision.GetPolicyName(),
 				metrics.ComponentIDLabel, decision.GetComponentId(),
-				metrics.WorkloadIndexLabel, cl.GetWorkloadIndex(),
+				metrics.WorkloadIndexLabel, ls.GetWorkloadIndex(),
 				metrics.PolicyHashLabel, decision.GetPolicyHash(),
 			)
 			workloadsSlice.AppendEmpty().SetStr(workloadsValue)
@@ -141,7 +147,7 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				droppingSamplersSlice.AppendEmpty().SetStr(value)
 			}
 		}
-		if cl := decision.GetQuotaSchedulerInfo(); cl != nil {
+		if qs := decision.GetQuotaSchedulerInfo(); qs != nil {
 			value := fmt.Sprintf(
 				"%s:%v,%s:%v,%s:%v",
 				metrics.PolicyNameLabel, decision.GetPolicyName(),
@@ -157,7 +163,31 @@ func AddCheckResponseBasedLabels(attributes pcommon.Map, checkResponse *flowcont
 				"%s:%v,%s:%v,%s:%v,%s:%v",
 				metrics.PolicyNameLabel, decision.GetPolicyName(),
 				metrics.ComponentIDLabel, decision.GetComponentId(),
-				metrics.WorkloadIndexLabel, cl.GetWorkloadIndex(),
+				metrics.WorkloadIndexLabel, qs.GetWorkloadIndex(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			workloadsSlice.AppendEmpty().SetStr(workloadsValue)
+			if decision.Dropped {
+				droppingWorkloadsSlice.AppendEmpty().SetStr(workloadsValue)
+			}
+		}
+		if cs := decision.GetConcurrencySchedulerInfo(); cs != nil {
+			value := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.PolicyHashLabel, decision.GetPolicyHash(),
+			)
+			concurrencySchedulersSlice.AppendEmpty().SetStr(value)
+			if decision.Dropped {
+				droppingConcurrencySchedulersSlice.AppendEmpty().SetStr(value)
+			}
+
+			workloadsValue := fmt.Sprintf(
+				"%s:%v,%s:%v,%s:%v,%s:%v",
+				metrics.PolicyNameLabel, decision.GetPolicyName(),
+				metrics.ComponentIDLabel, decision.GetComponentId(),
+				metrics.WorkloadIndexLabel, cs.GetWorkloadIndex(),
 				metrics.PolicyHashLabel, decision.GetPolicyHash(),
 			)
 			workloadsSlice.AppendEmpty().SetStr(workloadsValue)

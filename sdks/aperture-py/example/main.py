@@ -6,13 +6,14 @@ from datetime import timedelta
 from typing import Optional
 
 import grpc
-from aperture_sdk.client import ApertureClient, FlowParams
 from quart import Quart
 
 default_agent_address = "localhost:8089"
 app = Quart(__name__)
 
 # START: clientConstructor
+from aperture_sdk.client import ApertureClient, FlowParams
+
 agent_address = os.getenv("APERTURE_AGENT_ADDRESS", default_agent_address)
 api_key = os.getenv("APERTURE_API_KEY", "")
 insecure = os.getenv("APERTURE_AGENT_INSECURE", "true").lower() == "true"
@@ -23,6 +24,8 @@ aperture_client = ApertureClient.new_client(
 # END: clientConstructor
 
 logging.basicConfig(level=logging.DEBUG)
+default_agent_address = "localhost:8089"
+app = Quart(__name__)
 
 # START: apertureDecorator
 flow_params = FlowParams(
@@ -69,3 +72,31 @@ async def health_handler():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
+
+async def syncSnippet(aperture_client):
+    # START: syncFlow
+    labels = {
+        "userId": "some_user_id",
+        "userTier": "gold",
+        "priority": "100",
+    }
+    flow_params = FlowParams(
+        check_timeout=timedelta(seconds=400),
+        explicit_labels=labels,
+    )
+    flow = aperture_client.start_flow(
+        control_point="rate-limiting-feature",
+        params=flow_params,
+    )
+
+    if flow.should_run():
+        print("Request accepted. Processing...")
+    else:
+        print("Request rate-limited. Try again later.")
+        flow.set_status()
+
+    flow.end()
+    # Simulate work being done
+    await asyncio.sleep(1)
+    # END: syncFlow

@@ -1,4 +1,10 @@
 <p align="center">
+🚀 <b></b>Just launched v1 of <a href="https://blog.fluxninja.com/blog/aperture-v1-launch-2024/">managed rate limiting service</a></b>
+  <br/>Support us with your feedback and questions on <a href="https://www.producthunt.com/posts/fluxninja-aperture">Product Hunt</a> or <a href="https://discord.gg/U3N3fCZEPm">Discord</a>
+  <br/>
+</p>
+
+<p align="center">
   <img src="https://github.com/fluxninja/aperture/raw/main/docs/content/assets/img/aperture_logo.png" alt="FluxNinja Aperture" width="75%">
   <br/>
   <a href="https://docs.fluxninja.com">
@@ -12,14 +18,119 @@
   </a>
 </p>
 
-# Aperture JavaScript SDK
+# Rate Limiting for JavaScript or Node.js Applications
 
-`aperture-js` is an SDK to interact with [Aperture](https://docs.fluxninja.com)
-Agent. It allows flow control functionality on fine-grained features inside
-service code.
+The `aperture-js` SDK provides an easy way to integrate your JavaScript
+applications with [FluxNinja Aperture](https://github.com/fluxninja/aperture).
+It allows flow control functionality on fine-grained features inside service
+code.
 
 Refer [documentation](https://docs.fluxninja.com/sdk/javascript/) for more
 details.
+
+## Use Cases and Features
+
+Aperture provides rate limiting, caching, and api quota management to
+effectively manage the load on your application. With its unique approach that
+separates application code from rate limiting code/infra, it can effectively
+handle various use cases of rate limiting such as:
+
+- Enforcing or complying with
+  - Rate-limits based on no. of requests per second
+  - Per-user rate-limits based on consumed tokens (e.g. quota mangement for GPT
+    APIs)
+  - Rate-limits based on user subscription plans
+  - Rate-limits based on token-bucket algorithm
+  - Fine-grained rate-limits
+    [configured via policies UI or yaml](https://docs.fluxninja.com/reference/cloud-ui/policies/policy-creation)
+- Prioritizing requests based on custom labels (e.g. free user vs paid user)
+- Enforcing adaptive rate-limits based on concurrency and available system
+  capacity
+- Managing load on your databases or self-hosted services such as Mistral,
+  CodeLlama, etc.
+- Caching API responses to avoid high API or Cloud cost and improve time to
+  response
+- Updating rate-limiting policies from UI without changing the code
+- Monitoring workload for your internal or external services
+
+Are we missing your use case for FluxNinja Aperture?
+[Share with us on Discord](https://discord.gg/U3N3fCZEPm)
+
+## Usage
+
+### Install SDK
+
+Run the command below to install the SDK:
+
+```bash
+npm install @fluxninja/aperture-js
+```
+
+### Create Aperture Client
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
+
+```typescript
+import { ApertureClient } from "@fluxninja/aperture-js";
+
+// Create aperture client
+export const apertureClient = new ApertureClient({
+  address: "ORGANIZATION.app.fluxninja.com:443",
+  apiKey: "API_KEY",
+});
+```
+
+### Flow Functionality
+
+The created instance can then be used to start a flow:
+
+```typescript
+async function handleRequestRateLimit(req: Request, res: Response) {
+  // Start a flow by passing control point and business labels
+  const flow = await apertureClient.startFlow("awesomeFeature", {
+    labels: {
+      limit_key: "some_user_id",
+    },
+    grpcCallOptions: {
+      deadline: Date.now() + 300, // ms
+    },
+  });
+
+  if (flow.shouldRun()) {
+    // Add business logic to process incoming request
+    console.log("Request accepted. Processing...");
+    const resString = "foo";
+    res.send({ message: resString });
+  } else {
+    console.log("Request rate-limited. Try again later.");
+    // Handle flow rejection
+    flow.setStatus(FlowStatus.Error);
+    res.status(429).send({ message: "Too many requests" });
+  }
+
+  flow.end();
+}
+```
+
+The above code snippet is making `startFlow` calls to Aperture. For this call,
+it is important to specify the control point (`awesomeFeature` in the example)
+and business labels that will be aligned with the policy created in Aperture
+Cloud. For request prioritization use cases, it's important to set a higher gRPC
+deadline. This parameter specifies the maximum duration a request can remain in
+the queue. For each flow that is started, a `shouldRun` decision is made,
+determining whether to allow the request into the system or to rate limit it. In
+this example, we only see log returns, but in a production environment, actual
+business logic can be executed when a request is allowed. It is important to
+make the `end` call made after processing each request, to send telemetry data
+that would provide granular visibility for each flow.
+
+For more context on using the Aperture JavaScript SDK to set feature control
+points, refer to the [example app][example] available in the repository.
+
+[example]: https://github.com/fluxninja/aperture-js/tree/main/example
 
 # API Reference
 

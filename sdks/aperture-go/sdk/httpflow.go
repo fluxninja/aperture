@@ -125,6 +125,9 @@ func (f *httpflow) End() EndResponse {
 
 	for _, decision := range f.checkResponse.GetCheckResponse().GetLimiterDecisions() {
 		if decision.GetConcurrencyLimiterInfo() != nil {
+			if decision.GetConcurrencyLimiterInfo().GetRequestId() == "" {
+				continue
+			}
 			inflightRequest := &checkv1.InflightRequestRef{
 				PolicyName:  decision.PolicyName,
 				PolicyHash:  decision.PolicyHash,
@@ -140,6 +143,9 @@ func (f *httpflow) End() EndResponse {
 		}
 
 		if decision.GetConcurrencySchedulerInfo() != nil {
+			if decision.GetConcurrencySchedulerInfo().GetRequestId() == "" {
+				continue
+			}
 			ref := &checkv1.InflightRequestRef{
 				PolicyName:  decision.PolicyName,
 				PolicyHash:  decision.PolicyHash,

@@ -69,7 +69,7 @@ func (gt *groupTracker) updateStatus(job Job, s *statusv1.Status) error {
 		return errExistingJob
 	}
 
-	tracker.statusRegistry.SetStatus(s)
+	tracker.statusRegistry.SetStatus(s, nil)
 	return nil
 }
 

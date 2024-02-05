@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	agentinfo "github.com/fluxninja/aperture/v2/pkg/agent-info"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/iface"
 	"github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/resources/classifier"
@@ -22,6 +23,7 @@ func Module() fx.Option {
 		servicegetter.Module,
 		EngineModule(),
 		CacheModule(),
+		labelstatus.Module(),
 	)
 }
 

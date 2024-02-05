@@ -19,7 +19,9 @@ import (
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	etcdclient "github.com/fluxninja/aperture/v2/pkg/etcd/client"
 	etcdwatcher "github.com/fluxninja/aperture/v2/pkg/etcd/watcher"
+	"github.com/fluxninja/aperture/v2/pkg/jobs"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	"github.com/fluxninja/aperture/v2/pkg/notifiers"
 	workloadscheduler "github.com/fluxninja/aperture/v2/pkg/policies/flowcontrol/actuators/workload-scheduler"
@@ -78,6 +80,8 @@ type loadSchedulerFactory struct {
 	tokenBucketAvailableTokensGaugeVec *prometheus.GaugeVec
 	wsFactory                          *workloadscheduler.Factory
 	agentGroupName                     string
+	labelStatusJobGroup                *jobs.JobGroup
+	labelStatusFactory                 *labelstatus.LabelStatusFactory
 }
 
 // setupLoadSchedulerFactory sets up the load scheduler module in the main fx app.
@@ -90,8 +94,11 @@ func setupLoadSchedulerFactory(
 	etcdClient *etcdclient.Client,
 	ai *agentinfo.AgentInfo,
 	wsFactory *workloadscheduler.Factory,
+	labelStatusFactory *labelstatus.LabelStatusFactory,
 ) error {
 	reg := registry.Child("component", "load_scheduler")
+
+	logger := reg.GetLogger()
 
 	agentGroup := ai.GetAgentGroup()
 
@@ -102,12 +109,20 @@ func setupLoadSchedulerFactory(
 		return err
 	}
 
+	labelStatusJobGroup, err := jobs.NewJobGroup(reg.Child("label_status", "load_scheduler"), jobs.JobGroupConfig{}, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to create labels status job group")
+		return err
+	}
+
 	lsFactory := &loadSchedulerFactory{
 		engineAPI:           e,
 		registry:            reg,
 		wsFactory:           wsFactory,
 		loadDecisionWatcher: loadDecisionWatcher,
 		agentGroupName:      ai.GetAgentGroup(),
+		labelStatusJobGroup: labelStatusJobGroup,
+		labelStatusFactory:  labelStatusFactory,
 	}
 
 	// Initialize and register the WFQ and Token Bucket Metric Vectors
@@ -169,6 +184,11 @@ func setupLoadSchedulerFactory(
 				return err
 			}
 
+			err = labelStatusJobGroup.Start()
+			if err != nil {
+				return err
+			}
+
 			err = lsFactory.loadDecisionWatcher.Start()
 			if err != nil {
 				return err
@@ -180,6 +200,11 @@ func setupLoadSchedulerFactory(
 			var merr error
 
 			err := lsFactory.loadDecisionWatcher.Stop()
+			if err != nil {
+				merr = multierr.Append(merr, err)
+			}
+
+			err = labelStatusJobGroup.Stop()
 			if err != nil {
 				merr = multierr.Append(merr, err)
 			}
@@ -220,7 +245,7 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	loadSchedulerProto := wrapperMessage.LoadScheduler
 	if err != nil || loadSchedulerProto == nil {
-		registry.SetStatus(status.NewStatus(nil, err))
+		registry.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal load scheduler config wrapper")
 		return fx.Options(), err
 	}
@@ -236,7 +261,12 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 		registry:             registry,
 		loadSchedulerFactory: lsFactory,
 		clock:                clockwork.NewRealClock(),
+		labelStatusJobGroup:  lsFactory.labelStatusJobGroup,
 	}
+	ls.tokensLabelKeyStatus = lsFactory.labelStatusFactory.New("tokens_label_key", ls.GetPolicyName(), ls.GetComponentId())
+	ls.priorityLabelKeyStatus = lsFactory.labelStatusFactory.New("priority_label_key", ls.GetPolicyName(), ls.GetComponentId())
+	ls.workloadLabelKeyStatus = lsFactory.labelStatusFactory.New("workload_label_key", ls.GetPolicyName(), ls.GetComponentId())
+	ls.fairnessLabelKeyStatus = lsFactory.labelStatusFactory.New("fairness_label_key", ls.GetPolicyName(), ls.GetComponentId())
 
 	return fx.Options(
 		fx.Invoke(
@@ -249,13 +279,18 @@ func (lsFactory *loadSchedulerFactory) newLoadSchedulerOptions(
 type loadScheduler struct {
 	// TODO: comment to self: why do we depend on Scheduler to implement Decide and Revert in this case?
 	iface.Component
-	scheduler            *workloadscheduler.Scheduler
-	registry             status.Registry
-	proto                *policylangv1.LoadScheduler
-	loadSchedulerFactory *loadSchedulerFactory
-	clock                clockwork.Clock
-	tokenBucket          *scheduler.LoadMultiplierTokenBucket
-	schedulerMetrics     *workloadscheduler.SchedulerMetrics
+	scheduler              *workloadscheduler.Scheduler
+	registry               status.Registry
+	proto                  *policylangv1.LoadScheduler
+	loadSchedulerFactory   *loadSchedulerFactory
+	clock                  clockwork.Clock
+	tokenBucket            *scheduler.LoadMultiplierTokenBucket
+	schedulerMetrics       *workloadscheduler.SchedulerMetrics
+	labelStatusJobGroup    *jobs.JobGroup
+	tokensLabelKeyStatus   *labelstatus.LabelStatus
+	priorityLabelKeyStatus *labelstatus.LabelStatus
+	workloadLabelKeyStatus *labelstatus.LabelStatus
+	fairnessLabelKeyStatus *labelstatus.LabelStatus
 }
 
 // Make sure LoadScheduler implements the iface.LoadScheduler.
@@ -295,7 +330,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			retErr := func(err error) error {
-				ls.registry.SetStatus(status.NewStatus(nil, err))
+				ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 				return err
 			}
 
@@ -342,6 +377,10 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				ls,
 				ls.tokenBucket,
 				ls.schedulerMetrics,
+				ls.tokensLabelKeyStatus,
+				ls.priorityLabelKeyStatus,
+				ls.workloadLabelKeyStatus,
+				ls.fairnessLabelKeyStatus,
 			)
 			if err != nil {
 				return retErr(err)
@@ -397,7 +436,7 @@ func (ls *loadScheduler) setup(lifecycle fx.Lifecycle) error {
 				errMulti = multierr.Append(errMulti, errors.New("failed to delete "+metrics.TokenBucketAvailableMetricName+" gauge from its metric vector"))
 			}
 
-			ls.registry.SetStatus(status.NewStatus(nil, errMulti))
+			ls.registry.SetStatus(status.NewStatus(nil, errMulti), nil)
 			return errMulti
 		},
 	})
@@ -433,7 +472,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if err != nil {
 		statusMsg := "Failed to unmarshal config wrapper"
 		logger.Warn().Err(err).Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, err))
+		ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 		return
 	}
 
@@ -441,7 +480,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if loadDecision == nil {
 		statusMsg := "load decision is nil"
 		logger.Error().Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get load decision from LoadDecisionWrapper: %s", statusMsg)))
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get load decision from LoadDecisionWrapper: %s", statusMsg)), nil)
 		return
 	}
 
@@ -449,7 +488,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 	if commonAttributes == nil {
 		statusMsg := "common attributes is nil"
 		logger.Error().Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get common attributes from LoadDecisionWrapper: %s", statusMsg)))
+		ls.registry.SetStatus(status.NewStatus(nil, fmt.Errorf("failed to get common attributes from LoadDecisionWrapper: %s", statusMsg)), nil)
 		return
 	}
 
@@ -458,7 +497,7 @@ func (ls *loadScheduler) decisionUpdateCallback(event notifiers.Event, unmarshal
 		err = errors.New("policy id mismatch")
 		statusMsg := fmt.Sprintf("Expected policy hash: %s, Got: %s", ls.GetPolicyHash(), commonAttributes.PolicyHash)
 		logger.Warn().Err(err).Msg(statusMsg)
-		ls.registry.SetStatus(status.NewStatus(nil, err))
+		ls.registry.SetStatus(status.NewStatus(nil, err), nil)
 		return
 	}
 

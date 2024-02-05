@@ -1,15 +1,31 @@
-# Aperture-Go SDK
+<p align="center">
+🚀 <b></b>Just launched v1 of <a href="https://blog.fluxninja.com/blog/aperture-v1-launch-2024/">managed rate limiting service</a></b>
+  <br/>Support us with your feedback and questions on <a href="https://www.producthunt.com/posts/fluxninja-aperture">Product Hunt</a> or <a href="https://discord.gg/U3N3fCZEPm">Discord</a>
+  <br/>
+</p>
 
-`aperture-go` is an SDK to interact with Aperture Agent. It allows flow control
-functionality on fine-grained features inside service code.
+# Rate Limiting for Golang Applications
+
+The `aperture-go` SDK provides an easy way to integrate your Golang Applications
+with [FluxNinja Aperture](https://github.com/fluxninja/aperture). It allows flow
+control functionality on fine-grained features inside service code.
+
+Refer [documentation](https://docs.fluxninja.com/sdk/go/) for more details.
 
 ## Usage
+
+Run the command below to install the SDK:
 
 ```bash
 go get github.com/fluxninja/aperture-go/v2
 ```
 
 ### ApertureClient Interface
+
+The next step is to create an Aperture Client instance, for which, the address
+of the organization created in Aperture Cloud and API key are needed. You can
+locate both these details by clicking on the Aperture tab in the sidebar menu of
+Aperture Cloud.
 
 `ApertureClient` maintains a gRPC connection with Aperture Agent.
 

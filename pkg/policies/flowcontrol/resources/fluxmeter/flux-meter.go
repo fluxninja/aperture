@@ -120,7 +120,7 @@ func (fluxMeterFactory *fluxMeterFactory) newFluxMeterOptions(
 	wrapperMessage := &policysyncv1.FluxMeterWrapper{}
 	err := unmarshaller.Unmarshal(wrapperMessage)
 	if err != nil || wrapperMessage.FluxMeter == nil {
-		reg.SetStatus(status.NewStatus(nil, err))
+		reg.SetStatus(status.NewStatus(nil, err), nil)
 		logger.Warn().Err(err).Msg("Failed to unmarshal flux meter config wrapper")
 		return fx.Options(), err
 	}

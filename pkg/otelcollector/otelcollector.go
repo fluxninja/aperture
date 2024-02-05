@@ -163,5 +163,5 @@ func otelState(otelService *otelcol.Collector) (proto.Message, error) {
 func setReadinessStatus(statusRegistry status.Registry, msg proto.Message, err error) {
 	statusRegistry.Child("system", "readiness").
 		Child("component", "otel-collector").
-		SetStatus(status.NewStatus(msg, err))
+		SetStatus(status.NewStatus(msg, err), nil)
 }

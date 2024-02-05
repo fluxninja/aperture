@@ -164,12 +164,12 @@ func Run(app *fx.App) {
 
 	defer stop(app)
 
-	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
+	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil), nil)
 
 	// Wait for os.Signal
 	signal := <-app.Done()
 	log.Info().Str("signal", signal.String()).Msg("Received signal. Stopping application")
-	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
+	platform.statusRegistry.Child("system", readinessStatusPath).Child("component", platformStatusPath).SetStatus(status.NewStatus(nil, errors.New("platform stopping")), nil)
 }
 
 func stop(app *fx.App) {

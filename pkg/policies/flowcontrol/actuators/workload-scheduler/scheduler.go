@@ -18,6 +18,7 @@ import (
 	policylangv1 "github.com/fluxninja/aperture/api/v2/gen/proto/go/aperture/policy/language/v1"
 	"github.com/fluxninja/aperture/v2/pkg/config"
 	"github.com/fluxninja/aperture/v2/pkg/labels"
+	"github.com/fluxninja/aperture/v2/pkg/labelstatus"
 	"github.com/fluxninja/aperture/v2/pkg/log"
 	"github.com/fluxninja/aperture/v2/pkg/metrics"
 	multimatcher "github.com/fluxninja/aperture/v2/pkg/multi-matcher"
@@ -431,15 +432,19 @@ func (sm *SchedulerMetrics) appendWorkloadLabel(workloadLabel string) prometheus
 
 // Scheduler implements load scheduler on the flowcontrol side.
 type Scheduler struct {
-	component             iface.Component
-	scheduler             scheduler.Scheduler
-	registry              status.Registry
-	proto                 *policylangv1.Scheduler
-	defaultWorkload       *workload
-	workloadMultiMatcher  *multiMatcher
-	tokensByWorkloadIndex map[string]float64
-	metrics               *SchedulerMetrics
-	mutex                 sync.RWMutex
+	component              iface.Component
+	scheduler              scheduler.Scheduler
+	registry               status.Registry
+	proto                  *policylangv1.Scheduler
+	defaultWorkload        *workload
+	workloadMultiMatcher   *multiMatcher
+	tokensByWorkloadIndex  map[string]float64
+	metrics                *SchedulerMetrics
+	mutex                  sync.RWMutex
+	tokensLabelKeyStatus   *labelstatus.LabelStatus
+	priorityLabelKeyStatus *labelstatus.LabelStatus
+	workloadLabelKeyStatus *labelstatus.LabelStatus
+	fairnessLabelKeyStatus *labelstatus.LabelStatus
 }
 
 // NewScheduler returns fx options for the load scheduler fx app.
@@ -450,6 +455,10 @@ func (wsFactory *Factory) NewScheduler(
 	component iface.Component,
 	tokenManger scheduler.TokenManager,
 	schedulerMetrics *SchedulerMetrics,
+	tokensLabelKeyStatus *labelstatus.LabelStatus,
+	priorityLabelKeyStatus *labelstatus.LabelStatus,
+	workloadLabelKeyStatus *labelstatus.LabelStatus,
+	fairnessLabelKeyStatus *labelstatus.LabelStatus,
 ) (*Scheduler, error) {
 	initPreemptMetrics := func(workloadLabel string) error {
 		if schedulerMetrics == nil {
@@ -521,10 +530,14 @@ func (wsFactory *Factory) NewScheduler(
 				Name:       metrics.DefaultWorkloadIndex,
 			},
 		},
-		registry:             registry,
-		workloadMultiMatcher: mm,
-		component:            component,
-		metrics:              schedulerMetrics,
+		registry:               registry,
+		workloadMultiMatcher:   mm,
+		component:              component,
+		metrics:                schedulerMetrics,
+		tokensLabelKeyStatus:   tokensLabelKeyStatus,
+		priorityLabelKeyStatus: priorityLabelKeyStatus,
+		workloadLabelKeyStatus: workloadLabelKeyStatus,
+		fairnessLabelKeyStatus: fairnessLabelKeyStatus,
 	}
 
 	var wfqMetrics *scheduler.WFQMetrics
@@ -579,8 +592,11 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcont
 	}
 
 	if s.proto.WorkloadLabelKey != "" {
-		if val, ok := labels.Get(s.proto.WorkloadLabelKey); ok {
+		val, ok := labels.Get(s.proto.WorkloadLabelKey)
+		if ok {
 			matchedWorkloadLabel = val
+		} else {
+			s.workloadLabelKeyStatus.SetMissing()
 		}
 	}
 
@@ -589,21 +605,27 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcont
 	}
 
 	if s.proto.TokensLabelKey != "" {
-		if val, ok := labels.Get(s.proto.TokensLabelKey); ok {
+		val, ok := labels.Get(s.proto.TokensLabelKey)
+		if ok {
 			if parsedTokens, err := strconv.ParseFloat(val, 64); err == nil {
 				tokens = parsedTokens
+			} else {
+				s.tokensLabelKeyStatus.SetMissing()
 			}
 		}
 	}
 
 	if s.proto.PriorityLabelKey != "" {
-		if val, ok := labels.Get(s.proto.PriorityLabelKey); ok {
+		val, ok := labels.Get(s.proto.PriorityLabelKey)
+		if ok {
 			if parsedPriority, err := strconv.ParseFloat(val, 64); err == nil {
 				if parsedPriority > 0 {
 					priority = parsedPriority
 					invPriority = 1 / parsedPriority
 				}
 			}
+		} else {
+			s.priorityLabelKeyStatus.SetMissing()
 		}
 	}
 
@@ -648,8 +670,11 @@ func (s *Scheduler) Decide(ctx context.Context, labels labels.Labels) (*flowcont
 
 	var fairnessLabel string
 	if s.proto.FairnessLabelKey != "" {
-		if val, ok := labels.Get(s.proto.FairnessLabelKey); ok {
+		val, ok := labels.Get(s.proto.FairnessLabelKey)
+		if ok {
 			fairnessLabel = val
+		} else {
+			s.fairnessLabelKeyStatus.SetMissing()
 		}
 	}
 

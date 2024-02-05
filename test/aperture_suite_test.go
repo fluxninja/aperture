@@ -196,7 +196,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	etcdWatcher.Start()
 
-	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil))
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(wrapperspb.String("platform running"), nil), nil)
 
 	project = "staging"
 	Eventually(func() bool {
@@ -206,7 +206,7 @@ var _ = BeforeSuite(func() {
 })
 
 var _ = AfterSuite(func() {
-	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(nil, errors.New("platform stopping")))
+	registry.Child("system", "readiness").Child("component", "platform").SetStatus(status.NewStatus(nil, errors.New("platform stopping")), nil)
 
 	stopCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
