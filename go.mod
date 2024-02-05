@@ -197,7 +197,7 @@ require (
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
 	golang.org/x/net v0.20.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240116215550-a9fa1716bcac
-	google.golang.org/grpc v1.60.1
+	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
 	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/yaml.v3 v3.0.1
@@ -517,7 +517,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/buraksezer/consistent v0.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/cncf/xds/go v0.0.0-20230607035331-e9ce68804cb4 // indirect
+	github.com/cncf/xds/go v0.0.0-20231109132714-523115ebc101 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
