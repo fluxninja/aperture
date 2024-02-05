@@ -361,7 +361,7 @@ require (
 	github.com/moby/sys/mountinfo v0.6.2 // indirect
 	github.com/mongodb-forks/digest v1.0.5 // indirect
 	github.com/montanaflynn/stats v0.7.0 // indirect
-	github.com/mrunalp/fileutils v0.5.0 // indirect
+	github.com/mrunalp/fileutils v0.5.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
@@ -411,7 +411,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/skywalking v0.91.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.91.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/winperfcounters v0.91.0 // indirect
-	github.com/opencontainers/runc v1.1.9 // indirect
+	github.com/opencontainers/runc v1.1.12 // indirect
 	github.com/opencontainers/selinux v1.11.0 // indirect
 	github.com/openshift/api v3.9.0+incompatible // indirect
 	github.com/openshift/client-go v0.0.0-20230120202327-72f107311084 // indirect
