@@ -13,8 +13,8 @@ interval_time = 1
 
 
 async def initialize_aperture_client():
-    agent_address = "agents.us-central1.gcp.latest.dev.fluxninja.com:443"
-    api_key = "6428f436ddf647e9ab6c94c391750f39"
+    agent_address = ""
+    api_key = ""
     aperture_client = ApertureClient.new_client(address=agent_address, api_key=api_key)
     return aperture_client
 

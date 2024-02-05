@@ -3,8 +3,8 @@ from datetime import timedelta
 
 from aperture_sdk.client import ApertureClient, FlowParams, LookupStatus
 
-agent_address = "agents.us-central1.gcp.latest.dev.fluxninja.com:443"
-api_key = "6428f436ddf647e9ab6c94c391750f39"
+agent_address = ""
+api_key = ""
 
 
 async def initialize_aperture_client():

@@ -13,8 +13,8 @@ user_tiers = {
 requests_per_batch = 50
 batch_interval = 1
 
-agent_address = "agents.us-central1.gcp.app.fluxninja.com:443"
-api_key = "e9f01f421f5b498db3e0647b475a331c"
+agent_address = ""
+api_key = ""
 
 
 def initialize_aperture_client():
