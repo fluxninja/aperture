@@ -27,7 +27,7 @@ require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-logr/zerologr v1.2.3
 	github.com/go-openapi/runtime v0.27.1
-	github.com/go-openapi/strfmt v0.22.0
+	github.com/go-openapi/strfmt v0.22.1
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gofrs/flock v0.8.1
 	github.com/golang/mock v1.6.0
@@ -455,7 +455,7 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.mongodb.org/atlas v0.36.0 // indirect
-	go.mongodb.org/mongo-driver v1.13.1 // indirect
+	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opentelemetry.io/collector v0.93.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.93.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v0.93.0 // indirect
