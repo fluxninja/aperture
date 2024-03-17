@@ -1,11 +1,6 @@
 <!-- vale off -->
 <!-- markdownlint-disable -->
 <p align="center">
-🚀 <b></b>Just launched v1 of <a href="https://blog.fluxninja.com/blog/aperture-v1-launch-2024/">managed rate limiting service</a></b>
-  <br/>Support us with your feedback and questions on <a href="https://www.producthunt.com/posts/fluxninja-aperture">Product Hunt</a> or <a href="https://discord.gg/U3N3fCZEPm">Discord</a>
-  <br/>
-</p>
-<p align="center">
   <img src="docs/content/assets/img/aperture_logo.png" alt="FluxNinja Aperture" width="75%">
   <br/>
   <a href="https://docs.fluxninja.com">
@@ -204,6 +199,16 @@ points such as API gateways, service meshes, and application middlewares.
 ## 🏁 Getting Started
 
 ### ☁️ Aperture Cloud
+
+<!-- vale off -->
+
+> [!NOTE]
+>
+> FluxNinja has been acquired by [CodeRabbit](https://coderabbit.ai). New
+> sign-ups are temporarily disabled. Existing users can continue to use Aperture
+> Cloud by signing in to their accounts.
+
+<!-- vale on -->
 
 The easiest way to try Aperture is to
 [sign up](https://app.fluxninja.com/sign-up) for a free Aperture Cloud account.
