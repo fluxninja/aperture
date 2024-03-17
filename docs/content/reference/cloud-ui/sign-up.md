@@ -10,11 +10,11 @@ sidebar_position: 2
 import Zoom from 'react-medium-image-zoom';
 ```
 
-:::info
+:::info Sign up
 
-Aperture Cloud provides a 30-day free trial period. You can use all the features
-of Aperture Cloud during the trial period. After the trial period, you can
-choose to continue using Aperture Cloud by subscribing to one of the [plans][].
+FluxNinja has been acquired by [CodeRabbit](https://www.coderabbit.ai). New
+sign-ups are temporarily disabled. Existing users can continue to use the
+service as usual.
 
 :::
 
@@ -79,8 +79,8 @@ set up an organization and a project for you.
    ![Add Users](./assets/sign-up/invite-members.png)
 
 9. To start using Aperture Cloud. Click **Finish**. You will be redirected to
-    the Aperture Cloud UI.
+   the Aperture Cloud UI.
 
-    ![Final Step](./assets/sign-up/thats-all.png)
+   ![Final Step](./assets/sign-up/thats-all.png)
 
 [plans]: https://www.fluxninja.com/pricing
