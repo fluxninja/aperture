@@ -146,15 +146,17 @@ policy:
 In addition to language SDKs, Aperture also integrates with existing control
 points such as API gateways, service meshes, and application middlewares.
 
+:::info Sign up
+
+FluxNinja has been acquired by [CodeRabbit](https://www.coderabbit.ai). New
+sign-ups are temporarily disabled. Existing users can continue to use the
+service as usual.
+
+:::
+
 Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
 [self-hosted][self-hosted] within your infrastructure. Visit the
 [Architecture][architecture] page for more details.
-
-:::info Sign up
-
-To sign up to Aperture Cloud, [click here][sign-up].
-
-:::
 
 ## ⚙️ Load management capabilities {#load-management-capabilities}
 

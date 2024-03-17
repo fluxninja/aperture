@@ -16,6 +16,14 @@ import CodeSnippet from '../codeSnippet.js'
 
 ```
 
+:::info Sign up
+
+FluxNinja has been acquired by [CodeRabbit](https://www.coderabbit.ai). New
+sign-ups are temporarily disabled. Existing users can continue to use the
+service as usual.
+
+:::
+
 Aperture is available as a managed service, [Aperture Cloud][cloud], or can be
 self-hosted within your infrastructure.
 
