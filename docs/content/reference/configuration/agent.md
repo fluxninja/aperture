@@ -1258,6 +1258,42 @@ BindAddr denotes the address that DistCache will bind to for communication with
 other peer nodes.
 
 </dd>
+<dt>lru_samples</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, minimum: `1`, default: `5`)
+
+<!-- vale on -->
+
+Number of keys to randomly select for the approximated lru implementation
+
+</dd>
+<dt>max_in_use</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, default: `0`)
+
+<!-- vale on -->
+
+Maximum in-memory usage for the given cache node
+
+</dd>
+<dt>maximum_keys</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, default: `0`)
+
+<!-- vale on -->
+
+Maximum Key count for the given cache node
+
+</dd>
 <dt>memberlist_advertise_addr</dt>
 <dd>
 
@@ -1284,6 +1320,18 @@ Address to bind [`memberlist`](https://github.com/hashicorp/memberlist) server
 to.
 
 </dd>
+<dt>num_eviction_workers</dt>
+<dd>
+
+<!-- vale off -->
+
+(int64, minimum: `0`, default: `1`)
+
+<!-- vale on -->
+
+Number of evicitions workers to run in parallel.
+
+</dd>
 <dt>replica_count</dt>
 <dd>
 
@@ -1307,6 +1355,18 @@ ReplicaCount is 1 by default.
 
 SyncReplication enables synchronous replication. By default the replication is
 asynchronous.
+
+</dd>
+<dt>eviction_policy</dt>
+<dd>
+
+<!-- vale off -->
+
+([EvictionPolicy](#eviction-policy))
+
+<!-- vale on -->
+
+Eviction Policy determines whether LRU policy should be used or not.
 
 </dd>
 </dl>
@@ -1407,6 +1467,20 @@ Client TLS configuration
 
 </dd>
 </dl>
+
+---
+
+<!-- vale off -->
+
+### EvictionPolicy {#eviction-policy}
+
+<!-- vale on -->
+
+EvictionPolicy denotes eviction policy. Currently: LRU or NONE.
+
+| Property         | Type   | Default | Constraints | Description |
+| ---------------- | ------ | ------- | ----------- | ----------- |
+| `EvictionPolicy` | string |         |             |             |
 
 ---
 
