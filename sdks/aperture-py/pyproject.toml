@@ -28,7 +28,7 @@ pydoctor = "^23.9.1"
 
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.59.2"
-black = "^23.1.0"
+black = ">=23.1,<25.0"
 mypy = "^1.1.1"
 grpc-stubs = "^1.24.12.1"
 
