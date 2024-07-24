@@ -74,6 +74,8 @@ const (
 	PersistentCacheTypeInMemory = "in_memory"
 	// PersistentCacheTypeObjectStorage - object_storage layer of persistent cache.
 	PersistentCacheTypeObjectStorage = "object_storage"
+	// PersistentCacheOperationErrorMetricName - metric for cumulative number of dmap and object storage errors.
+	PersistentCacheOperationErrorMetricName = "persistent_cache_operation_errors_total"
 	// PersistentCacheOperationDurationMetricName - metric for duration of persistent cache operations.
 	PersistentCacheOperationDurationMetricName = "persistent_cache_operation_duration_ms"
 	// PersistentCacheOperationLabel - label to define type of operation performed on persistent cache.
