@@ -22,6 +22,7 @@ type ObjectStorageBackedDMap struct {
 	getDistCacheLabels func() (prometheus.Labels, bool)
 	getMissesTotal     *prometheus.CounterVec
 	getHitsTotal       *prometheus.CounterVec
+	operationErrors    *prometheus.CounterVec
 	operationDuration  *prometheus.SummaryVec
 }
 
@@ -89,6 +90,10 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 	}
 	if !errors.Is(err, olric.ErrKeyNotFound) {
 		// Some error from in-memory cache.
+		metric, ready := o.getOperationErrorsMetric(metrics.PersistentCacheOperationGet, metrics.PersistentCacheTypeInMemory)
+		if ready {
+			metric.Inc()
+		}
 		return nil, err
 	}
 
@@ -107,6 +112,11 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 			if ready {
 				metric.Inc()
 			}
+		} else {
+			metric, ready = o.getOperationErrorsMetric(metrics.PersistentCacheOperationGet, metrics.PersistentCacheTypeObjectStorage)
+			if ready {
+				metric.Inc()
+			}
 		}
 		return nil, innerErr
 	}
@@ -121,6 +131,10 @@ func (o *ObjectStorageBackedDMap) Get(ctx context.Context, key string) (*olric.G
 	log.Trace().Str("expireAt", expireAt.String()).Msg("Entry from storage expiration time/TTL")
 	_, innerErr = o.dmap.Put(ctx, key, entry.Value(), olric.EXAT(expireAt), olric.TS(entry.Timestamp()))
 	if innerErr != nil {
+		metric, ready := o.getOperationErrorsMetric(metrics.PersistentCacheOperationGet, metrics.PersistentCacheTypeObjectStorage)
+		if ready {
+			metric.Inc()
+		}
 		return nil, innerErr
 	}
 
@@ -167,6 +181,10 @@ func (o *ObjectStorageBackedDMap) Put(
 
 	entryCfg, err := o.dmap.Put(ctx, key, value, options...)
 	if err != nil {
+		metric, ready := o.getOperationErrorsMetric(metrics.PersistentCacheOperationPut, metrics.PersistentCacheTypeInMemory)
+		if ready {
+			metric.Inc()
+		}
 		return nil, err
 	}
 
@@ -176,6 +194,10 @@ func (o *ObjectStorageBackedDMap) Put(
 	objectKey := o.generateObjectKey(key)
 	err = o.backingStorage.Put(ctx, objectKey, bytes, timestamp, ttl)
 	if err != nil {
+		metric, ready := o.getOperationErrorsMetric(metrics.PersistentCacheOperationPut, metrics.PersistentCacheTypeObjectStorage)
+		if ready {
+			metric.Inc()
+		}
 		return nil, err
 	}
 
@@ -220,6 +242,16 @@ func (o *ObjectStorageBackedDMap) getHitsTotalMetric(cacheType string) (promethe
 	return o.getHitsTotal.With(labels), true
 }
 
+func (o *ObjectStorageBackedDMap) getOperationErrorsMetric(operation string, cacheType string) (prometheus.Counter, bool) {
+	labels, ready := o.getDistCacheLabels()
+	if !ready {
+		return nil, false
+	}
+	labels[metrics.PersistentCacheTypeLabel] = cacheType
+	labels[metrics.PersistentCacheOperationLabel] = operation
+	return o.operationErrors.With(labels), true
+}
+
 func (o *ObjectStorageBackedDMap) getOperationDurationMetric(operation string) (prometheus.Observer, bool) {
 	labels, ready := o.getDistCacheLabels()
 	if !ready {
@@ -255,6 +287,16 @@ func NewPersistentDMap(
 		metrics.DistCacheMemberNameLabel,
 		metrics.PersistentCacheOperationLabel,
 	}
+	operationErrorsLabels := []string{
+		metrics.DistCacheMemberIDLabel,
+		metrics.DistCacheMemberNameLabel,
+		metrics.PersistentCacheOperationLabel,
+		metrics.PersistentCacheTypeLabel,
+	}
+	operationErrors := prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: metrics.PersistentCacheOperationErrorMetricName,
+		Help: "Cumulative number of dmap and object storage errors",
+	}, operationErrorsLabels)
 	operationDuration := prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Name: metrics.PersistentCacheOperationDurationMetricName,
 		Help: "Duration of persistent cache operations.",
@@ -272,6 +314,7 @@ func NewPersistentDMap(
 		backingStorage:     backingStorage,
 		getMissesTotal:     getMissesTotal,
 		getHitsTotal:       getHitsTotal,
+		operationErrors:    operationErrors,
 		operationDuration:  operationDuration,
 		getDistCacheLabels: getDistCacheLabels,
 	}, nil
