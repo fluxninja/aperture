@@ -7,6 +7,6 @@ requests==2.31.0
 typer==0.9.0
 openapi2jsonschema==0.9.1
 ordered-set==4.1.0
-python-slugify==8.0.3
+python-slugify==8.0.4
 text-unidecode==1.3
 pydoctor==23.9.1
