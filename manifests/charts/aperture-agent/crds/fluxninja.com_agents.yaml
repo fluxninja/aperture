@@ -1095,6 +1095,20 @@ spec:
                         description: BindAddr denotes the address that DistCache will
                           bind to for communication with other peer nodes.
                         type: string
+                      eviction_policy:
+                        description: Eviction Policy determines whether LRU policy
+                          should be used or not.
+                        type: string
+                      lru_samples:
+                        description: Number of keys to randomly select for the approximated
+                          lru implementation
+                        type: integer
+                      max_in_use:
+                        description: Maximum in-memory usage for the given cache node
+                        type: integer
+                      maximum_keys:
+                        description: Maximum Key count for the given cache node
+                        type: integer
                       memberlist_advertise_addr:
                         description: Address of [`memberlist`](https://github.com/hashicorp/memberlist)
                           to advertise to other cluster members. Used for NAT traversal
@@ -1104,6 +1118,9 @@ spec:
                         description: Address to bind [`memberlist`](https://github.com/hashicorp/memberlist)
                           server to.
                         type: string
+                      num_eviction_workers:
+                        description: Number of evicitions workers to run in parallel.
+                        type: integer
                       replica_count:
                         description: ReplicaCount is 1 by default.
                         type: integer

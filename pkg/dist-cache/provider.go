@@ -87,7 +87,12 @@ func (constructor DistCacheConstructor) ProvideDistCache(in DistCacheConstructor
 		oc.ReplicationMode = olricconfig.AsyncReplicationMode
 	}
 
+	oc.DMaps.MaxKeys = defaultConfig.MaxKeys
+	oc.DMaps.MaxInuse = defaultConfig.MaxInUse
+	oc.DMaps.EvictionPolicy = defaultConfig.EvictionPolicy
+	oc.DMaps.LRUSamples = defaultConfig.LRUSamples
 	oc.DMaps.Custom = make(map[string]olricconfig.DMap)
+
 	oc.Logger = stdlog.New(&OlricLogWriter{Logger: in.Logger}, "", 0)
 
 	bindAddr, port, err := net.SplitHostPort(defaultConfig.BindAddr)
