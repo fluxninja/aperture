@@ -32,7 +32,7 @@ jobs:
           notion-token: ${{ secrets.NOTION_TOKEN }}
           notion-db: ${{ secrets.NOTION_DATABASE }}
       - name: Send slack notification
-        uses: rtCamp/action-slack-notify@v2.2.1
+        uses: rtCamp/action-slack-notify@v2.3.0
         if: ${{ failure() }}
         env:
           SLACK_MESSAGE: |
